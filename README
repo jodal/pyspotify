@@ -1,0 +1,5 @@
+installation on jaunty for python2.6
+
+python setup.py install --install-layout=deb --prefix=/usr/local
+
+

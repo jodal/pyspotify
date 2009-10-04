@@ -3,6 +3,7 @@
 #include "spotify/api.h"
 
 static PyObject *LinkError;
+static PyTypeObject LinkType;
 
 typedef struct {
     PyObject_HEAD
@@ -22,8 +23,18 @@ static PyObject *Link_new(PyTypeObject *type, PyObject *args, PyObject *kwds) {
 }
 
 static PyObject *Link_fromString(Link *self, PyObject *args) {
-    PyErr_SetString(PyExc_NotImplementedError, "");
-    return NULL;
+    char *s;
+    if(!PyArg_ParseTuple(args, "s", &s))
+	return NULL;
+    sp_link *link = sp_link_create_from_string(s);
+    if(!link) {
+	PyErr_SetString(LinkError, "Failed to get link from a Spotify URI");
+	return NULL;
+    }
+    Link *plink = PyObject_CallObject((PyObject *)&LinkType, NULL);
+    Py_INCREF(plink);
+    plink->_link = link;
+    return plink;
 }
 
 static PyObject *Link_fromTrack(Link *self, PyObject *args) {
@@ -69,6 +80,15 @@ static PyObject *Link_asAlbum(Link *self) {
 static PyObject *Link_asArtist(Link *self) {
     PyErr_SetString(PyExc_NotImplementedError, "");
     return NULL;
+}
+
+static PyObject *Link_str(Link *self) {
+    char uri[1024];
+    if(0 > sp_link_as_string(self->_link, uri, sizeof(uri))) {
+	PyErr_SetString(LinkError, "failed to render Spotify URI from link");
+	return NULL;
+    }
+    return Py_BuildValue("s", uri);
 }
 
 static PyMethodDef Link_methods[] = {
@@ -121,7 +141,7 @@ static PyTypeObject LinkType = {
     "pyspotify.link.Link",     /*tp_name*/
     sizeof(Link),              /*tp_basicsize*/
     0,                         /*tp_itemsize*/
-    0,                         /*tp_dealloc*/
+    0,                         /*tp_dealloc*/  // TODO: IMPLEMENT THIS WITH sp_link_release
     0,                         /*tp_print*/
     0,                         /*tp_getattr*/
     0,                         /*tp_setattr*/
@@ -132,7 +152,7 @@ static PyTypeObject LinkType = {
     0,                         /*tp_as_mapping*/
     0,                         /*tp_hash */
     0,                         /*tp_call*/
-    0,                         /*tp_str*/
+    Link_str,                  /*tp_str*/
     0,                         /*tp_getattro*/
     0,                         /*tp_setattro*/
     0,                         /*tp_as_buffer*/

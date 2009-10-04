@@ -82,11 +82,20 @@ static PyObject *Session_logout(Session *self) {
     return Py_BuildValue("");
 };
 
+static PyObject *Session_process_events(Session *self) {
+    fprintf(stderr, "process events called on %p\n", self);
+    int timeout;
+    sp_session_process_events(self->_session, &timeout);
+    fprintf(stderr, "process events leaving\n");
+    return Py_BuildValue("i", timeout);
+}
+
 static PyMethodDef Session_methods[] = {
     {"username", (PyCFunction)Session_username, METH_NOARGS, "Return the canonical username for the logged in user"},
     {"display_name", (PyCFunction)Session_display_name, METH_NOARGS, "Return the full name for the logged in user"},
     {"user_is_loaded", (PyCFunction)Session_user_is_loaded, METH_NOARGS, "Return whether the user is loaded or not"},
     {"logout", (PyCFunction)Session_logout, METH_NOARGS, "Logout from the session and terminate the main loop"},
+    {"process_events", (PyCFunction)Session_process_events, METH_NOARGS, "Process any outstanding events"},
     {NULL}
 };
 
@@ -163,9 +172,28 @@ static void message_to_user(sp_session *session, const char *message) {
 }
 
 static void notify_main_thread(sp_session *session) {
-    fprintf(stderr, "notify_main_thread called\n");
-    pthread_kill(g_main_thread, SIGIO);
+    fprintf(stderr, "notify_main_thread called with %p\n", session);
+    PyGILState_STATE gstate;
+    gstate = PyGILState_Ensure();
+    Session *psession = PyObject_CallObject((PyObject *)&SessionType, NULL);
+    Py_INCREF(psession);
+    fprintf(stderr, "Session constructed\n");
+    psession->_session = session;
+    PyObject *client = (PyObject *)sp_session_userdata(session);
+    fprintf(stderr, "client is %p\n", client);
+    if(client != NULL) {
+	Py_INCREF(client);
+	fprintf(stderr, "waking client\n");
+        PyObject_CallMethod(client, "wake", "O", psession);
+	fprintf(stderr, "client awoken\n");
+	Py_DECREF(client);
+    }
+    Py_DECREF(psession);
+    fprintf(stderr, "Releasing GIL\n");
+    PyGILState_Release(gstate);
+    fprintf(stderr, "Leaving notify_main_thread\n");
 }
+
 
 static void music_delivery(sp_session *session, const sp_audioformat *format, const void *frames, int num_frames) {
     fprintf(stderr, "music_delivery called\n");
@@ -196,22 +224,7 @@ static sp_session_callbacks g_callbacks = {
     &end_of_track
 };
 
-static void loop(sp_session *session) {
-    sigset_t sigset;
-    sigemptyset(&sigset);
-    sigaddset(&sigset, SIGIO);
-    while (g_exit_code < 0) {
-	fprintf(stderr, "running event loop\n");
-	int timeout = -1;
-	pthread_sigmask(SIG_BLOCK, &sigset, NULL);
-	sp_session_process_events(session, &timeout);
-	pthread_sigmask(SIG_UNBLOCK, &sigset, NULL);
-	fprintf(stderr, "sleeping for %d seconds\n", timeout/1000);
-	usleep(timeout * 1000);
-    }
-}
-
-static PyObject *spotify_run(PyObject *self, PyObject *args) {
+static PyObject *session_connect(PyObject *self, PyObject *args) {
 
     PyObject *client;
     if(!PyArg_ParseTuple(args, "O", &client))
@@ -224,6 +237,7 @@ static PyObject *spotify_run(PyObject *self, PyObject *args) {
     config.api_version = SPOTIFY_API_VERSION;
     config.userdata = (void *)client;
 
+    fprintf(stderr, "Setting up configuration...\n");
     PyObject *cache_location = PyObject_GetAttr(client, PyString_FromString("cache_location"));
     if(cache_location == NULL) {
 	PyErr_SetString(SpotifyError, "Client did not provide a cache_location");
@@ -231,6 +245,7 @@ static PyObject *spotify_run(PyObject *self, PyObject *args) {
     }
     config.cache_location = PyString_AsString(cache_location);
 
+    fprintf(stderr, "connecting...X\n");
     PyObject *settings_location = PyObject_GetAttr(client, PyString_FromString("settings_location"));
     if(settings_location == NULL) {
 	PyErr_SetString(SpotifyError, "Client did not provide a settings_location");
@@ -238,6 +253,7 @@ static PyObject *spotify_run(PyObject *self, PyObject *args) {
     }
     config.settings_location = PyString_AsString(settings_location);
 
+    fprintf(stderr, "connecting...XX\n");
     PyObject *application_key = PyObject_GetAttr(client, PyString_FromString("application_key"));
     if(application_key == NULL) {
 	PyErr_SetString(SpotifyError, "Client did not provide an application_key");
@@ -246,6 +262,7 @@ static PyObject *spotify_run(PyObject *self, PyObject *args) {
     config.application_key = PyString_AsString(application_key);
     config.application_key_size = PyString_Size(application_key);
 
+    fprintf(stderr, "connecting...XXX\n");
     PyObject *user_agent = PyObject_GetAttr(client, PyString_FromString("user_agent"));
     if(user_agent == NULL) {
 	PyErr_SetString(SpotifyError, "Client did not provide a user_agent");
@@ -260,6 +277,7 @@ static PyObject *spotify_run(PyObject *self, PyObject *args) {
     PyObject *uobj, *pobj;
     char *username, *password;
 
+    fprintf(stderr, "connecting...XXXX\n");
     uobj = PyObject_GetAttr(client, PyString_FromString("username"));
     if(uobj == NULL) {
 	PyErr_SetString(SpotifyError, "Client did not provide a username");
@@ -267,6 +285,7 @@ static PyObject *spotify_run(PyObject *self, PyObject *args) {
     }
     username = PyString_AsString(uobj);
 
+    fprintf(stderr, "connecting...YYYYY\n");
     pobj = PyObject_GetAttr(client, PyString_FromString("password"));
     if(pobj == NULL) {
 	PyErr_SetString(SpotifyError, "Client did not provide a password");
@@ -274,24 +293,30 @@ static PyObject *spotify_run(PyObject *self, PyObject *args) {
     }
     password = PyString_AsString(pobj);
 
+    fprintf(stderr, "connecting...ZZZZZ\n");
     error = sp_session_init(&config, &session);
     if(error != SP_ERROR_OK) {
 	PyErr_SetString(SpotifyError, sp_error_message(error));
         return NULL;
     }
+    fprintf(stderr, "connecting...M\n");
     error = sp_session_login(session, username, password);
     if(error != SP_ERROR_OK) {
 	PyErr_SetString(SpotifyError, sp_error_message(error));
         return NULL;
     }
-
-    fprintf(stderr, "Entering main loop\n");
-    loop(session);
-    return Py_BuildValue("");
+    fprintf(stderr, "connecting...MZ\n");
+    Session *psession = PyObject_CallObject((PyObject *)&SessionType, NULL);
+    fprintf(stderr, "connecting...MZx\n");
+    psession->_session = session;
+    fprintf(stderr, "connecting...MZy\n");
+    Py_INCREF(psession);
+    fprintf(stderr, "connecting...MZz\n");
+    return psession;
 }
 
 static PyMethodDef module_methods[] = {
-    {"run", spotify_run, METH_VARARGS, "Run the spotify subsystem.  this will return on error, or after spotify is logged out."},
+    {"connect", session_connect, METH_VARARGS, "Run the spotify subsystem.  this will return on error, or after spotify is logged out."},
     {NULL, NULL, 0, NULL}
 };
 
@@ -308,6 +333,7 @@ PyMODINIT_FUNC initsession(void) {
     if(m == NULL)
         return;
 
+    PyEval_InitThreads();
     SpotifyError = PyErr_NewException("spotify.session.error", NULL, NULL);
     Py_INCREF(SpotifyError);
     PyModule_AddObject(m, "error", SpotifyError);
@@ -315,9 +341,6 @@ PyMODINIT_FUNC initsession(void) {
     SpotifyApiVersion = Py_BuildValue("i", SPOTIFY_API_VERSION);
     Py_INCREF(SpotifyApiVersion);
     PyModule_AddObject(m, "api_version", SpotifyApiVersion);
-
-    g_main_thread = pthread_self();
-    signal(SIGIO, &sigIgn);
 
     PyModule_AddObject(m, "Session", (PyObject *)&SessionType);
 }
@@ -339,9 +362,6 @@ PyMODINIT_FUNC initmocksession(void) {
     SpotifyApiVersion = Py_BuildValue("i", SPOTIFY_API_VERSION);
     Py_INCREF(SpotifyApiVersion);
     PyModule_AddObject(m, "api_version", SpotifyApiVersion);
-
-    g_main_thread = pthread_self();
-    signal(SIGIO, &sigIgn);
 
     PyModule_AddObject(m, "Session", (PyObject *)&SessionType);
 }

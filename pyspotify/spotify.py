@@ -1,4 +1,5 @@
 import session
+import threading
 
 class Client(object):
     api_version = session.api_version
@@ -6,42 +7,58 @@ class Client(object):
     settings_location = 'tmp'
     application_key = None
     appkey_file = 'spotify_appkey.key'
-    user_agent='pyspotify-example'
+    user_agent = 'pyspotify-example'
+    exit_code = -1
 
     def __init__(self, username, password):
         self.username = username
         self.password = password
         self.application_key = open(self.appkey_file).read()
+        self.awoken = threading.Event() # used to block until awoken
         
-    def run(self):
-        session.run(self)
+    def connect(self):
+        sess = session.connect(self)
+        print "Connect, session is", sess
+        self.loop(sess) # returns on disconnect
+        
+    def loop(self, sess):
+        print "Looping session", session
+        while self.exit_code < 0:
+            self.awoken.clear()
+            print "Processing events"
+            timeout = sess.process_events()
+            self.awoken.wait()
+            
+    def wake(self, sess):
+        print "CLIENT AWAKES"
+        self.awoken.set()
 
     def logged_in(self, session, error):
         pass
 
-    def logged_out(self, session):
+    def logged_out(self, sess):
         pass
 
-    def metadata_updated(self, session):
+    def metadata_updated(self, sess):
         pass
 
-    def connection_error(self, session, error):
+    def connection_error(self, sess, error):
         pass
 
-    def message_to_user(self, session, message):
+    def message_to_user(self, sess, message):
         pass
 
-    def notify_main_thread(self, session):
+    def notify_main_thread(self, sess):
         pass
 
-    def music_delivery(self, session, mformat, frames):
+    def music_delivery(self, sess, mformat, frames):
         pass
 
-    def play_token_lost(self, session):
+    def play_token_lost(self, sess):
         pass
 
-    def log_message(self, session, data):
+    def log_message(self, sess, data):
         pass
 
-    def end_of_track(self, session):
+    def end_of_track(self, sess):
         pass

@@ -1,7 +1,7 @@
-from pyspotify import spotify
+from spotify import client
 import sys
 
-class Client(spotify.Client):
+class Client(client.Client):
     def logged_in(self, session, error):
         print "LOGGED IN CALLED"
         username = session.username()

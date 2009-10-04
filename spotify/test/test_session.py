@@ -2,14 +2,14 @@
 import unittest
 import threading
 
-from pyspotify import spotify
-from pyspotify import session
-from pyspotify import mocksession
+from spotify import client
+from spotify import session
+from spotify import mocksession
 
 # shim the mocking interface
-spotify.session = mocksession
+client.session = mocksession
 
-class MockClient(spotify.Client):
+class MockClient(client.Client):
 
     cache_location = "/foo"
     settings_location = "/foo"
@@ -31,9 +31,9 @@ class MockClient(spotify.Client):
 class TestSession(unittest.TestCase):
 
     def test_initialisation(self):
-        client = MockClient()
-        client.connect()
-        self.assertEqual(client.username, client.found_username)
+        c = MockClient()
+        c.connect()
+        self.assertEqual(c.username, c.found_username)
 
 
 

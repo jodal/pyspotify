@@ -138,7 +138,7 @@ static PyMethodDef Link_methods[] = {
 static PyTypeObject LinkType = {
     PyObject_HEAD_INIT(NULL)
     0,                         /*ob_size*/
-    "pyspotify.link.Link",     /*tp_name*/
+    "spotify.link.Link",       /*tp_name*/
     sizeof(Link),              /*tp_basicsize*/
     0,                         /*tp_itemsize*/
     0,                         /*tp_dealloc*/  // TODO: IMPLEMENT THIS WITH sp_link_release

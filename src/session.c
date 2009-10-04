@@ -92,7 +92,7 @@ static PyMethodDef Session_methods[] = {
 static PyTypeObject SessionType = {
     PyObject_HEAD_INIT(NULL)
     0,                         /*ob_size*/
-    "pyspotify.session.Session",             /*tp_name*/
+    "spotify.session.Session",             /*tp_name*/
     sizeof(Session),             /*tp_basicsize*/
     0,                         /*tp_itemsize*/
     0,			       /*tp_dealloc*/

@@ -1,5 +1,5 @@
 import unittest
-from pyspotify.link import Link
+from spotify.link import Link
 
 class TestLink(unittest.TestCase):
 

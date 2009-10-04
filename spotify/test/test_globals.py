@@ -1,8 +1,8 @@
 
 import unittest
-from pyspotify import spotify
+from spotify import client
 
 class TestGlobals(unittest.TestCase):
 
     def test_api_version(self):
-        self.assertEqual(spotify.Client.api_version, 2)
+        self.assertEqual(client.Client.api_version, 2)

@@ -4,7 +4,7 @@ from ez_setup import use_setuptools
 use_setuptools()
 from setuptools import setup, find_packages, Extension
 
-setup(name='pyspotify',
+setup(name='spotify',
       version='1.0',
       description='Python wrapper for libspotify',
       author='Doug Winter',
@@ -12,23 +12,22 @@ setup(name='pyspotify',
       url='foo',
       packages=find_packages(exclude='tests'),
       ext_modules=[
-        Extension('pyspotify.session', 
-                  ['src/session.c'], 
+        Extension('spotify.session',
+                  ['src/session.c'],
                   libraries=['spotify'],
                   library_dirs=["lib"],
                  ),
-        Extension('pyspotify.link', 
-                  ['src/link.c'], 
+        Extension('spotify.link',
+                  ['src/link.c'],
                   libraries=['spotify'],
                   library_dirs=["lib"],
                  ),
-        Extension('pyspotify.mocksession', 
-                  ['src/session.c', 
+        Extension('spotify.mocksession',
+                  ['src/session.c',
                   'src/mocksession.c'],
                   library_dirs=["lib"],
                  )
       ],
-      test_suite="pyspotify.tests.test_all",
       )
 
 

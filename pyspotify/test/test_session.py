@@ -1,5 +1,7 @@
 
 import unittest
+import threading
+
 from pyspotify import spotify
 from pyspotify import session
 from pyspotify import mocksession
@@ -15,21 +17,22 @@ class MockClient(spotify.Client):
     user_agent = "user_agent_foo"
     username = "username_good"
     password = "password_good"
-    
+
     def __init__(self):
-        pass
+        self.awoken = threading.Event() # used to block until awoken
 
     def logged_in(self, session, error):
         print "MockClient: logged_in"
         username = session.username()
         self.found_username = username
         session.logout()
+        self.disconnect()
 
 class TestSession(unittest.TestCase):
 
     def test_initialisation(self):
         client = MockClient()
-        client.run()
+        client.connect()
         self.assertEqual(client.username, client.found_username)
 
 

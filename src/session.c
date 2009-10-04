@@ -7,22 +7,14 @@
 #include <stdint.h>
 #include "spotify/api.h"
 
-int g_exit_code = -1;
-static pthread_t g_main_thread = -1;
-
-static PyObject *SpotifyError;
+static PyObject *SessionError;
 
 static PyObject *SpotifyApiVersion;
 
 typedef struct {
     PyObject_HEAD
-    void *_session;
+    sp_session *_session;
 } Session;
-
-static void Session_dealloc(Session *self) {
-    Py_XDECREF(self->_session);
-    self->ob_type->tp_free((PyObject *)self);
-}
 
 static PyObject *Session_new(PyTypeObject *type, PyObject *args, PyObject *kwds) {
     Session *self;
@@ -41,7 +33,7 @@ static PyObject *Session_username(Session *self) {
     sp_user *user;
     user = sp_session_user(self->_session);
     if(user == NULL) {
-	PyErr_SetString(SpotifyError, "no user returned from session");
+	PyErr_SetString(SessionError, "no user returned from session");
 	return NULL;
     }
     const char *username = sp_user_canonical_name(user);
@@ -73,11 +65,9 @@ static PyObject *Session_logout(Session *self) {
     fprintf(stderr, "Session_logout called\n");
     sp_error error = sp_session_logout(self->_session);
     if(error != SP_ERROR_OK) {
-	PyErr_SetString(SpotifyError, "Failed to log out");
-	g_exit_code = 5;
+	PyErr_SetString(SessionError, "Failed to log out");
         return NULL;
     }
-    g_exit_code = 0;
     fprintf(stderr, "Session_logout completing\n");
     return Py_BuildValue("");
 };
@@ -102,10 +92,10 @@ static PyMethodDef Session_methods[] = {
 static PyTypeObject SessionType = {
     PyObject_HEAD_INIT(NULL)
     0,                         /*ob_size*/
-    "_spotify.Session",             /*tp_name*/
+    "pyspotify.session.Session",             /*tp_name*/
     sizeof(Session),             /*tp_basicsize*/
     0,                         /*tp_itemsize*/
-    (destructor)Session_dealloc, /*tp_dealloc*/
+    0,			       /*tp_dealloc*/
     0,                         /*tp_print*/
     0,                         /*tp_getattr*/
     0,                         /*tp_setattr*/
@@ -240,7 +230,7 @@ static PyObject *session_connect(PyObject *self, PyObject *args) {
     fprintf(stderr, "Setting up configuration...\n");
     PyObject *cache_location = PyObject_GetAttr(client, PyString_FromString("cache_location"));
     if(cache_location == NULL) {
-	PyErr_SetString(SpotifyError, "Client did not provide a cache_location");
+	PyErr_SetString(SessionError, "Client did not provide a cache_location");
         return NULL;
     }
     config.cache_location = PyString_AsString(cache_location);
@@ -248,7 +238,7 @@ static PyObject *session_connect(PyObject *self, PyObject *args) {
     fprintf(stderr, "connecting...X\n");
     PyObject *settings_location = PyObject_GetAttr(client, PyString_FromString("settings_location"));
     if(settings_location == NULL) {
-	PyErr_SetString(SpotifyError, "Client did not provide a settings_location");
+	PyErr_SetString(SessionError, "Client did not provide a settings_location");
         return NULL;
     }
     config.settings_location = PyString_AsString(settings_location);
@@ -256,7 +246,7 @@ static PyObject *session_connect(PyObject *self, PyObject *args) {
     fprintf(stderr, "connecting...XX\n");
     PyObject *application_key = PyObject_GetAttr(client, PyString_FromString("application_key"));
     if(application_key == NULL) {
-	PyErr_SetString(SpotifyError, "Client did not provide an application_key");
+	PyErr_SetString(SessionError, "Client did not provide an application_key");
         return NULL;
     }
     config.application_key = PyString_AsString(application_key);
@@ -265,7 +255,7 @@ static PyObject *session_connect(PyObject *self, PyObject *args) {
     fprintf(stderr, "connecting...XXX\n");
     PyObject *user_agent = PyObject_GetAttr(client, PyString_FromString("user_agent"));
     if(user_agent == NULL) {
-	PyErr_SetString(SpotifyError, "Client did not provide a user_agent");
+	PyErr_SetString(SessionError, "Client did not provide a user_agent");
         return NULL;
     }
     config.user_agent = PyString_AsString(user_agent);
@@ -280,7 +270,7 @@ static PyObject *session_connect(PyObject *self, PyObject *args) {
     fprintf(stderr, "connecting...XXXX\n");
     uobj = PyObject_GetAttr(client, PyString_FromString("username"));
     if(uobj == NULL) {
-	PyErr_SetString(SpotifyError, "Client did not provide a username");
+	PyErr_SetString(SessionError, "Client did not provide a username");
 	return NULL;
     }
     username = PyString_AsString(uobj);
@@ -288,7 +278,7 @@ static PyObject *session_connect(PyObject *self, PyObject *args) {
     fprintf(stderr, "connecting...YYYYY\n");
     pobj = PyObject_GetAttr(client, PyString_FromString("password"));
     if(pobj == NULL) {
-	PyErr_SetString(SpotifyError, "Client did not provide a password");
+	PyErr_SetString(SessionError, "Client did not provide a password");
 	return NULL;
     }
     password = PyString_AsString(pobj);
@@ -296,13 +286,13 @@ static PyObject *session_connect(PyObject *self, PyObject *args) {
     fprintf(stderr, "connecting...ZZZZZ\n");
     error = sp_session_init(&config, &session);
     if(error != SP_ERROR_OK) {
-	PyErr_SetString(SpotifyError, sp_error_message(error));
+	PyErr_SetString(SessionError, sp_error_message(error));
         return NULL;
     }
     fprintf(stderr, "connecting...M\n");
     error = sp_session_login(session, username, password);
     if(error != SP_ERROR_OK) {
-	PyErr_SetString(SpotifyError, sp_error_message(error));
+	PyErr_SetString(SessionError, sp_error_message(error));
         return NULL;
     }
     fprintf(stderr, "connecting...MZ\n");
@@ -334,9 +324,9 @@ PyMODINIT_FUNC initsession(void) {
         return;
 
     PyEval_InitThreads();
-    SpotifyError = PyErr_NewException("spotify.session.error", NULL, NULL);
-    Py_INCREF(SpotifyError);
-    PyModule_AddObject(m, "error", SpotifyError);
+    SessionError = PyErr_NewException("spotify.session.error", NULL, NULL);
+    Py_INCREF(SessionError);
+    PyModule_AddObject(m, "error", SessionError);
 
     SpotifyApiVersion = Py_BuildValue("i", SPOTIFY_API_VERSION);
     Py_INCREF(SpotifyApiVersion);
@@ -355,9 +345,9 @@ PyMODINIT_FUNC initmocksession(void) {
     if(m == NULL)
         return;
 
-    SpotifyError = PyErr_NewException("spotify.session.error", NULL, NULL);
-    Py_INCREF(SpotifyError);
-    PyModule_AddObject(m, "error", SpotifyError);
+    SessionError = PyErr_NewException("spotify.session.error", NULL, NULL);
+    Py_INCREF(SessionError);
+    PyModule_AddObject(m, "error", SessionError);
 
     SpotifyApiVersion = Py_BuildValue("i", SPOTIFY_API_VERSION);
     Py_INCREF(SpotifyApiVersion);

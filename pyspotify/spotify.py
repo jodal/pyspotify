@@ -15,20 +15,26 @@ class Client(object):
         self.password = password
         self.application_key = open(self.appkey_file).read()
         self.awoken = threading.Event() # used to block until awoken
-        
+
     def connect(self):
         sess = session.connect(self)
         print "Connect, session is", sess
         self.loop(sess) # returns on disconnect
-        
+
+    def disconnect(self):
+        print "DISCONNECTING"
+        self.exit_code = 0
+        self.awoken.set()
+
     def loop(self, sess):
         print "Looping session", session
         while self.exit_code < 0:
-            self.awoken.clear()
             print "Processing events"
+            self.awoken.clear()
             timeout = sess.process_events()
+            print "Blocking for event"
             self.awoken.wait()
-            
+
     def wake(self, sess):
         print "CLIENT AWAKES"
         self.awoken.set()

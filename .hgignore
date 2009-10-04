@@ -1,0 +1,6 @@
+spotify_appkey.key
+build
+tmp
+pyspotify/session.so
+pyspotify/mocksession.so
+pyspotify.egg-info

@@ -1,0 +1,10 @@
+prefix=/usr/local
+exec_prefix=${prefix}
+libdir=${exec_prefix}/lib
+includedir=${prefix}/include
+
+Name: libspotify
+Description: Spotify client library
+Version: 0.0.2
+Libs: -L${libdir} -lspotify
+Cflags: -I${includedir}

@@ -7,9 +7,10 @@ class Client(spotify.Client):
         print "username", username
         print "display name", session.display_name()
         print "loaded", session.user_is_loaded()
+        session.logout()
 
 client = Client("winjer", "route66")
-spotify.run(client)
+client.run()
 
 
 

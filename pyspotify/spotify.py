@@ -1,7 +1,7 @@
 import session
 
 class Client(object):
-    api_version = _spotify.api_version
+    api_version = session.api_version
     cache_location = 'tmp'
     settings_location = 'tmp'
     application_key = None

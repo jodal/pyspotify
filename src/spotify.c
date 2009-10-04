@@ -37,12 +37,15 @@ static PyMemberDef Session_members[] = {
 };
 
 static PyObject *Session_username(Session *self) {
+    fprintf(stderr, "Session_username called\n");
     sp_user *user;
-
     user = sp_session_user(self->_session);
-    if(user == NULL)
+    if(user == NULL) {
+	PyErr_SetString(SpotifyError, "no user returned from session");
 	return NULL;
+    }
     const char *username = sp_user_canonical_name(user);
+    fprintf(stderr, "Session_username completing: %s\n", username);
     return PyString_FromString(username);
 };
 
@@ -66,11 +69,24 @@ static PyObject *Session_user_is_loaded(Session *self) {
     return Py_BuildValue("i", loaded);
 };
 
+static PyObject *Session_logout(Session *self) {
+    fprintf(stderr, "Session_logout called\n");
+    sp_error error = sp_session_logout(self->_session);
+    if(error != SP_ERROR_OK) {
+	PyErr_SetString(SpotifyError, "Failed to log out");
+	g_exit_code = 5;
+        return NULL;
+    }
+    g_exit_code = 0;
+    fprintf(stderr, "Session_logout completing\n");
+    return Py_BuildValue("");
+};
 
 static PyMethodDef Session_methods[] = {
     {"username", (PyCFunction)Session_username, METH_NOARGS, "Return the canonical username for the logged in user"},
     {"display_name", (PyCFunction)Session_display_name, METH_NOARGS, "Return the full name for the logged in user"},
     {"user_is_loaded", (PyCFunction)Session_user_is_loaded, METH_NOARGS, "Return whether the user is loaded or not"},
+    {"logout", (PyCFunction)Session_logout, METH_NOARGS, "Logout from the session and terminate the main loop"},
     {NULL}
 };
 
@@ -123,15 +139,11 @@ static void logged_in(sp_session *session, sp_error error) {
     fprintf(stderr, "logged_in called\n");
     PyGILState_STATE gstate;
     gstate = PyGILState_Ensure();
-    fprintf(stderr, "XXX1\n");
     Session *psession = PyObject_CallObject((PyObject *)&SessionType, NULL);
-    fprintf(stderr, "XXX2\n");
     psession->_session = session;
-    fprintf(stderr, "XXX3\n");
     PyObject *client = (PyObject *)sp_session_userdata(session);
-    fprintf(stderr, "XXX4\n");
+    fprintf(stderr, "client is %p\n", client);
     PyObject_CallMethod(client, "logged_in", "Oi", psession, error);
-    fprintf(stderr, "XXX5\n");
     PyGILState_Release(gstate);
 }
 
@@ -197,7 +209,6 @@ static void loop(sp_session *session) {
 	fprintf(stderr, "sleeping for %d seconds\n", timeout/1000);
 	usleep(timeout * 1000);
     }
-    fprintf(stderr, "Exit code is %d\n", g_exit_code);
 }
 
 static PyObject *spotify_run(PyObject *self, PyObject *args) {
@@ -207,6 +218,7 @@ static PyObject *spotify_run(PyObject *self, PyObject *args) {
 	return NULL;
     Py_INCREF(client);
 
+    fprintf(stderr, "client is %p\n", client);
     sp_session_config config;
 
     config.api_version = SPOTIFY_API_VERSION;
@@ -275,12 +287,11 @@ static PyObject *spotify_run(PyObject *self, PyObject *args) {
 
     fprintf(stderr, "Entering main loop\n");
     loop(session);
-    PyErr_SetString(SpotifyError, "Spotify exited");
-    return NULL;
+    return Py_BuildValue("");
 }
 
 static PyMethodDef module_methods[] = {
-    {"run", spotify_run, METH_VARARGS, "Run the spotify subsystem.  this will never return."},
+    {"run", spotify_run, METH_VARARGS, "Run the spotify subsystem.  this will return on error, or after spotify is logged out."},
     {NULL, NULL, 0, NULL}
 };
 
@@ -294,6 +305,30 @@ PyMODINIT_FUNC init_spotify(void) {
 	return;
 
     m = Py_InitModule("_spotify", module_methods);
+    if(m == NULL)
+        return;
+
+    SpotifyError = PyErr_NewException("_spotify.error", NULL, NULL);
+    Py_INCREF(SpotifyError);
+    PyModule_AddObject(m, "error", SpotifyError);
+
+    SpotifyApiVersion = Py_BuildValue("i", SPOTIFY_API_VERSION);
+    Py_INCREF(SpotifyApiVersion);
+    PyModule_AddObject(m, "api_version", SpotifyApiVersion);
+
+    g_main_thread = pthread_self();
+    signal(SIGIO, &sigIgn);
+
+    PyModule_AddObject(m, "Session", (PyObject *)&SessionType);
+}
+
+PyMODINIT_FUNC init_mockspotify(void) {
+    PyObject *m;
+
+    if(PyType_Ready(&SessionType) < 0)
+	return;
+
+    m = Py_InitModule("_mockspotify", module_methods);
     if(m == NULL)
         return;
 

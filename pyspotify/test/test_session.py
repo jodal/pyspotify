@@ -1,9 +1,10 @@
 
 import unittest
 from pyspotify import spotify
-import _mockspotify
+from pyspotify import mocksession
 
-spotify._spotify = _mockspotify
+# shim the mocking interface
+spotify.session = mocksession
 
 class MockClient:
 

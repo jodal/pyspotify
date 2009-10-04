@@ -1,7 +1,4 @@
-import _spotify
-
-def run(client):
-    _spotify.run(client)
+import session
 
 class Client(object):
     api_version = _spotify.api_version
@@ -15,6 +12,9 @@ class Client(object):
         self.username = username
         self.password = password
         self.application_key = open(self.appkey_file).read()
+        
+    def run(self):
+        session.run(self)
 
     def logged_in(self, session, error):
         pass

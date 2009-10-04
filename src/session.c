@@ -5,7 +5,7 @@
 #include <signal.h>
 #include <unistd.h>
 #include <stdint.h>
-#include <spotify/api.h>
+#include "spotify/api.h"
 
 int g_exit_code = -1;
 static pthread_t g_main_thread = -1;
@@ -298,17 +298,17 @@ static PyMethodDef module_methods[] = {
 static void sigIgn(int signo) {
 }
 
-PyMODINIT_FUNC init_spotify(void) {
+PyMODINIT_FUNC initsession(void) {
     PyObject *m;
 
     if(PyType_Ready(&SessionType) < 0)
 	return;
 
-    m = Py_InitModule("_spotify", module_methods);
+    m = Py_InitModule("session", module_methods);
     if(m == NULL)
         return;
 
-    SpotifyError = PyErr_NewException("_spotify.error", NULL, NULL);
+    SpotifyError = PyErr_NewException("spotify.session.error", NULL, NULL);
     Py_INCREF(SpotifyError);
     PyModule_AddObject(m, "error", SpotifyError);
 
@@ -322,17 +322,17 @@ PyMODINIT_FUNC init_spotify(void) {
     PyModule_AddObject(m, "Session", (PyObject *)&SessionType);
 }
 
-PyMODINIT_FUNC init_mockspotify(void) {
+PyMODINIT_FUNC initmocksession(void) {
     PyObject *m;
 
     if(PyType_Ready(&SessionType) < 0)
 	return;
 
-    m = Py_InitModule("_mockspotify", module_methods);
+    m = Py_InitModule("mocksession", module_methods);
     if(m == NULL)
         return;
 
-    SpotifyError = PyErr_NewException("_spotify.error", NULL, NULL);
+    SpotifyError = PyErr_NewException("spotify.session.error", NULL, NULL);
     Py_INCREF(SpotifyError);
     PyModule_AddObject(m, "error", SpotifyError);
 

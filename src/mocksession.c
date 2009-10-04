@@ -1,6 +1,6 @@
 
 #include <stdio.h>
-#include <spotify/api.h>
+#include "spotify/api.h"
 
 typedef struct {
     void *userdata;

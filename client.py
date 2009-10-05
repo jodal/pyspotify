@@ -11,6 +11,6 @@ class Client(client.Client):
         session.logout()
         sys.exit()
 
-client = Client("winjer", "route66")
+client = Client(sys.argv[1], sys.argv[2])
 client.connect()
 

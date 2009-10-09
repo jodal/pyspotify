@@ -1,4 +1,4 @@
-import session
+from pyspotify import session
 import threading
 
 class Client(object):

@@ -57,8 +57,14 @@ static PyObject *Playlist_set_collaborative(Playlist *self, PyObject *args) {
 
 /////////////// SEQUENCE PROTOCOL
 
-int PySequence_Check(
+static int Playlist_sq_length(Playlist *self) {
+}
 
+static PyObject *Playlist_sq_item(Playlist *self) {
+}
+
+PyObject *Playlist_sq_ass_item(Playlist *self, PyObject *args) {
+}
 
 /////////////// ADDITIONAL METHODS
 
@@ -138,6 +144,62 @@ static PyObject *PlaylistContainer_new(PyTypeObject *type, PyObject *args, PyObj
     return (PyObject *)self;
 }
 
+static PyMethodDef PlaylistContainer_methods[] = {
+    {NULL}
+};
+
+static PySequenceMethods PlaylistContainer_as_sequence = {
+    PlaylistContainer_sq_length,		// sq_length
+    0,						// sq_concat
+    0,						// sq_repeat
+    PlaylistContainer_sq_item,			// sq_item
+    PlaylistContainer_sq_ass_item,		// sq_ass_item
+    0,						// sq_contains
+    0,						// sq_inplace_concat
+    0,						// sq_inplace_repeat
+};
+
+static PyTypeObject PlaylistContainerType = {
+    PyObject_HEAD_INIT(NULL)
+    0,                         /*ob_size*/
+    "spotify.playlist.PlaylistContainer",     /*tp_name*/
+    sizeof(PlaylistContainer),             /*tp_basicsize*/
+    0,                         /*tp_itemsize*/
+    0,                         /*tp_dealloc*/  // TODO: IMPLEMENT THIS WITH sp_playlist_release
+    0,                         /*tp_print*/
+    0,                         /*tp_getattr*/
+    0,                         /*tp_setattr*/
+    0,                         /*tp_compare*/
+    0,                         /*tp_repr*/
+    0,                         /*tp_as_number*/
+    PlaylistContainer_as_sequence,      /*tp_as_sequence*/
+    0,                         /*tp_as_mapping*/
+    0,                         /*tp_hash */
+    0,                         /*tp_call*/
+    PlaylistContainer_str,                 /*tp_str*/
+    0,                         /*tp_getattro*/
+    0,                         /*tp_setattro*/
+    0,                         /*tp_as_buffer*/
+    Py_TPFLAGS_DEFAULT | Py_TPFLAGS_BASETYPE, /*tp_flags*/
+    "PlaylistContainer objects",           /* tp_doc */
+    0,		               /* tp_traverse */
+    0,		               /* tp_clear */
+    0,		               /* tp_richcompare */
+    0,		               /* tp_weaklistoffset */
+    0,		               /* tp_iter */
+    0,		               /* tp_iternext */
+    PlaylistContainer_methods,             /* tp_methods */
+    PlaylistContainer_members,             /* tp_members */
+    0,                         /* tp_getset */
+    0,                         /* tp_base */
+    0,                         /* tp_dict */
+    0,                         /* tp_descr_get */
+    0,                         /* tp_descr_set */
+    0,                         /* tp_dictoffset */
+    0,			       /* tp_init */
+    0,                         /* tp_alloc */
+    PlaylistContainer_new,                 /* tp_new */
+};
 
 static PyMethodDef module_methods[] = {
     {NULL, NULL, 0, NULL}

@@ -104,6 +104,10 @@ bool sp_user_is_loaded(sp_user *user) {
     return 0;
 }
 
+sp_error sp_session_player_load(sp_session *session, sp_track *track) {
+    return 0;
+}
+
 sp_track* sp_link_as_track(sp_link *link) {
     if(strncmp(link->data, "link:track:", strlen("link:track:")))
 	return NULL;
@@ -180,8 +184,34 @@ sp_track *_mock_track(char *name, int num_artists, sp_artist **artists,
     return t;
 }
 
+PyObject *mock_track(PyObject *self, PyObject *args) {
+    char *name;
+    int num_artists;
+    sp_artist **artists;
+    sp_album *album;
+    int duration;
+    int popularity;
+    int disc;
+    int index;
+    sp_error error;
+    int loaded;
+    if(!PyArg_ParseTuple(args, "siO!iiiiii", &name, &num_artists, &AlbumType, &album,
+	&duration, &popularity, &disc, &index, &error, &loaded))
+	return NULL;
+    sp_track *t = _mock_track(name, num_artists, NULL, album, duration, popularity, disc, index, error, loaded);
+    Track *track = (Track *)PyObject_CallObject((PyObject *)&TrackType, NULL);
+    track->_track = t;
+    Py_INCREF(track);
+    return track;
+}
+
 sp_album *_mock_album() {
     return NULL;
+}
+
+PyObject *mock_album() {
+    Album *album = (Album *)PyObject_CallObject((PyObject *)&AlbumType, NULL);
+    return album;
 }
 
 /// Generate a mock spotify.Artist python object
@@ -256,7 +286,8 @@ sp_user * sp_session_user(sp_session *session) {
 
 static PyMethodDef module_methods[] = {
     {"connect", session_connect, METH_VARARGS, "Run the spotify subsystem.  this will return on error, or after spotify is logged out."},
-    //{"mock_track", mock_track, METH_VARARGS, "Create a mock track"},
+    {"mock_track", mock_track, METH_VARARGS, "Create a mock track"},
+    {"mock_album", mock_album, METH_VARARGS, "Create a mock album"},
     {"mock_artist", mock_artist, METH_VARARGS, "Create a mock artist"},
     {NULL, NULL, 0, NULL}
 };

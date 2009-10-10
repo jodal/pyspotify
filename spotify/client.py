@@ -1,8 +1,8 @@
-from pyspotify import session
+import spotify
 import threading
 
 class Client(object):
-    api_version = session.api_version
+    api_version = spotify.api_version
     cache_location = 'tmp'
     settings_location = 'tmp'
     application_key = None
@@ -17,7 +17,7 @@ class Client(object):
         self.awoken = threading.Event() # used to block until awoken
 
     def connect(self):
-        sess = session.connect(self)
+        sess = spotify.connect(self)
         print "Connect, session is", sess
         self.loop(sess) # returns on disconnect
 
@@ -27,7 +27,7 @@ class Client(object):
         self.awoken.set()
 
     def loop(self, sess):
-        print "Looping session", session
+        print "Looping session", sess
         while self.exit_code < 0:
             print "Processing events"
             self.awoken.clear()

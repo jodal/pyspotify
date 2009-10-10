@@ -8,6 +8,7 @@
 #include "spotify/api.h"
 #include "pyspotify.h"
 #include "session.h"
+#include "track.h"
 
 static PyObject *Session_new(PyTypeObject *type, PyObject *args, PyObject *kwds) {
     Session *self;
@@ -65,6 +66,23 @@ static PyObject *Session_logout(Session *self) {
     return Py_BuildValue("");
 };
 
+static PyObject *Session_load(Session *self, PyObject *args) {
+    Track *track;
+    if(!PyArg_ParseTuple(args, "O!", &TrackType, &track)) {
+	return NULL;
+    }
+    sp_error err = sp_session_player_load(self->_session, track->_track);
+    switch(err) {
+	case SP_ERROR_OK:
+	    return Py_BuildValue("");
+	    break;
+	default:
+	    PyErr_SetString(SpotifyError, "Error!!!");
+	    return NULL;
+	    break;
+    }
+}
+
 static PyObject *Session_process_events(Session *self) {
     fprintf(stderr, "process events called on %p\n", self);
     int timeout;
@@ -79,6 +97,7 @@ static PyMethodDef Session_methods[] = {
     {"user_is_loaded", (PyCFunction)Session_user_is_loaded, METH_NOARGS, "Return whether the user is loaded or not"},
     {"logout", (PyCFunction)Session_logout, METH_NOARGS, "Logout from the session and terminate the main loop"},
     {"process_events", (PyCFunction)Session_process_events, METH_NOARGS, "Process any outstanding events"},
+    {"load", (PyCFunction)Session_load, METH_VARARGS, "Load the specified track on the player"},
     {NULL}
 };
 

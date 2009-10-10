@@ -3,11 +3,9 @@ import unittest
 import threading
 
 from spotify import client
-from spotify import session
-from spotify import mocksession
+from spotify import _mockspotify
 
-# shim the mocking interface
-client.session = mocksession
+client.spotify = _mockspotify
 
 class MockClient(client.Client):
 

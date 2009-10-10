@@ -4,6 +4,7 @@
 #include "pyspotify.h"
 #include "link.h"
 #include "track.h"
+#include "artist.h"
 
 static PyMemberDef Link_members[] = {
     {NULL}
@@ -56,8 +57,18 @@ static PyObject *Link_from_album(Link *self, PyObject *args) {
 }
 
 static PyObject *Link_from_artist(Link *self, PyObject *args) {
-    PyErr_SetString(PyExc_NotImplementedError, "");
-    return NULL;
+    Artist *artist;
+    if(!PyArg_ParseTuple(args, "O!", &ArtistType, &artist)) {
+	return NULL;
+    }
+    sp_link *l = sp_link_create_from_artist(artist->_artist);
+    if(!l) {
+	PyErr_SetString(SpotifyError, "Failed to get track from a Link");
+	return NULL;
+    }
+    Link *link = (Link *)PyObject_CallObject((PyObject *)&LinkType, NULL);
+    link->_link = l;
+    return (PyObject *)link;
 }
 
 static PyObject *Link_from_search(Link *self, PyObject *args) {

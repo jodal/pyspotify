@@ -115,6 +115,13 @@ sp_link* sp_link_create_from_track(sp_track *track,int offset) {
     return l;
 }
 
+sp_link *sp_link_create_from_artist(sp_artist *artist) {
+    sp_link *l = malloc(sizeof(sp_link));
+    memset(l, 0, sizeof(l));
+    sprintf(l->data, "link_from_artist:%s", artist->name);
+    return l;
+}
+
 sp_link* sp_link_create_from_string(const char * link) {
     sp_link *l = malloc(sizeof(sp_link));
     memset(l,0,sizeof(l));

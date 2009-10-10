@@ -1,5 +1,5 @@
 import unittest
-from spotify._mockspotify import Link
+from spotify._mockspotify import Link, mock_artist
 
 class TestLink(unittest.TestCase):
 
@@ -19,7 +19,9 @@ class TestLink(unittest.TestCase):
         pass
 
     def test_from_artist(self):
-        pass
+        a = mock_artist("test_from_artist", 1)
+        l = Link.from_artist(a)
+        self.assertEqual(str(l), "link_from_artist:test_from_artist");
 
     def test_from_search(self):
         pass

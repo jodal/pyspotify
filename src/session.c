@@ -67,6 +67,7 @@ static PyObject *Session_logout(Session *self) {
 };
 
 PyObject *handle_error(err) {
+    fprintf(stderr, "Handling error value %d\n", err);
     switch(err) {
 	case SP_ERROR_OK:
 	    return Py_BuildValue("");
@@ -79,17 +80,26 @@ PyObject *handle_error(err) {
 }
 
 static PyObject *Session_load(Session *self, PyObject *args) {
+    fprintf(stderr, "entering Session_load\n");
     Track *track;
+    sp_track *t;
+    sp_session *s;
     if(!PyArg_ParseTuple(args, "O!", &TrackType, &track)) {
 	return NULL;
     }
-    return handle_error(sp_session_player_load(self->_session, track->_track));
+    t = track->_track;
+    s = self->_session;
+    fprintf(stderr, "+++++LOADING\n");
+    sp_error err = sp_session_player_load(s, t);
+    fprintf(stderr, "+++++LOADED\n");
+    return handle_error(err);
 }
 
 static PyObject *Session_play(Session *self, PyObject *args) {
     int play;
     if(!PyArg_ParseTuple(args, "i", &play))
 	return NULL;
+    fprintf(stderr, "+++++PLAYING\n");
     return handle_error(sp_session_player_play(self->_session, play));
 }
 
@@ -187,26 +197,26 @@ static void message_to_user(sp_session *session, const char *message) {
 }
 
 static void notify_main_thread(sp_session *session) {
-    fprintf(stderr, "notify_main_thread called with %p\n", session);
+    //fprintf(stderr, "notify_main_thread called with %p\n", session);
     PyGILState_STATE gstate;
     gstate = PyGILState_Ensure();
     Session *psession = (Session *)PyObject_CallObject((PyObject *)&SessionType, NULL);
     Py_INCREF(psession);
-    fprintf(stderr, "Session constructed\n");
+    //fprintf(stderr, "Session constructed\n");
     psession->_session = session;
     PyObject *client = (PyObject *)sp_session_userdata(session);
-    fprintf(stderr, "client is %p\n", client);
+    //fprintf(stderr, "client is %p\n", client);
     if(client != NULL) {
 	Py_INCREF(client);
-	fprintf(stderr, "waking client\n");
+	//fprintf(stderr, "waking client\n");
         PyObject_CallMethod(client, "wake", "O", psession);
-	fprintf(stderr, "client awoken\n");
+	//fprintf(stderr, "client awoken\n");
 	Py_DECREF(client);
     }
     Py_DECREF(psession);
-    fprintf(stderr, "Releasing GIL\n");
+    //fprintf(stderr, "Releasing GIL\n");
     PyGILState_Release(gstate);
-    fprintf(stderr, "Leaving notify_main_thread\n");
+    //fprintf(stderr, "Leaving notify_main_thread\n");
 }
 
 

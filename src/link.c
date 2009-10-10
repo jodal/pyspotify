@@ -20,16 +20,26 @@ static PyObject *Link_new(PyTypeObject *type, PyObject *args, PyObject *kwds) {
 
 static PyObject *Link_from_string(Link *self, PyObject *args) {
     fprintf(stderr, "Link_from_string called\n");
-    char *s;
+    char *s, *s2;
+    //const char SPOTIFY_URI[] = "spotify:track:6JEK0CvvjDjjMUBFoXShNZ";
+    fprintf(stderr, "X\n");
     if(!PyArg_ParseTuple(args, "s", &s))
 	return NULL;
-    sp_link *link = sp_link_create_from_string(s);
+    s2 = malloc(strlen(s) +1);
+    strcpy(s2, s);
+    fprintf(stderr, "X%sX\n", s2);
+    //sp_link *link = sp_link_create_from_string(SPOTIFY_URI);
+    sp_link *link = sp_link_create_from_string(s2);
+    fprintf(stderr, "X\n");
     if(!link) {
 	PyErr_SetString(SpotifyError, "Failed to get link from a Spotify URI");
 	return NULL;
     }
+    fprintf(stderr, "X");
     Link *plink = (Link *)PyObject_CallObject((PyObject *)&LinkType, NULL);
+    fprintf(stderr, "X");
     Py_INCREF(plink);
+    fprintf(stderr, "X");
     plink->_link = link;
     fprintf(stderr, "Link_from_string completed\n");
     return (PyObject *)plink;
@@ -87,14 +97,20 @@ static PyObject *Link_type(Link *self) {
 }
 
 static PyObject *Link_as_track(Link *self) {
+    fprintf(stderr, "11111111111111111111111");
     sp_track *track = sp_link_as_track(self->_link);
+    fprintf(stderr, "22222222222222222222222");
     if(!track) {
 	PyErr_SetString(SpotifyError, "Not a track link");
 	return NULL;
     }
+    fprintf(stderr, "333333333333333333333333");
     Track *ptrack = (Track *)PyObject_CallObject((PyObject *)&TrackType, NULL);
+    fprintf(stderr, "444444444444444444444444");
     ptrack->_track = track;
+    fprintf(stderr, "555555555555555555555555");
     Py_INCREF(ptrack);
+    fprintf(stderr, "666666666666666666666666");
     return (PyObject *)ptrack;
 }
 
@@ -176,7 +192,7 @@ static PyMethodDef Link_methods[] = {
 PyTypeObject LinkType = {
     PyObject_HEAD_INIT(NULL)
     0,                         /*ob_size*/
-    "spotify.link.Link",       /*tp_name*/
+    "_spotify.Link",           /*tp_name*/
     sizeof(Link),              /*tp_basicsize*/
     0,                         /*tp_itemsize*/
     0,                         /*tp_dealloc*/  // TODO: IMPLEMENT THIS WITH sp_link_release

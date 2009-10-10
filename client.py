@@ -1,18 +1,22 @@
 from spotify import client, Link
 import sys
+import traceback
+import time
 
 class Client(client.Client):
     def logged_in(self, session, error):
         print "LOGGED IN CALLED"
-        username = session.username()
-        print "username", username
-        print "display name", session.display_name()
-        print "loaded", session.user_is_loaded()
-        track = Link.as_track("spotify:track:35QLYzQCz629mzQeQiQCwb")
-        session.load(track)
-        session.play()
-        session.logout()
-        sys.exit()
+        print "Loading track..."
+        time.sleep(20)
+        l = Link.from_string("spotify:track:35QLYzQCz629mzQeQiQCwb")
+        track = l.as_track()
+        print "Session is", session
+        try:
+            session.load(track)
+        except Exception:
+            traceback.print_exc()
+        print sys.stderr, "Playing track..."
+        session.play(1)
 
 client = Client(sys.argv[1], sys.argv[2])
 client.connect()

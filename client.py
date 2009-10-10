@@ -1,4 +1,4 @@
-from spotify import client
+from spotify import client, Link
 import sys
 
 class Client(client.Client):
@@ -8,6 +8,9 @@ class Client(client.Client):
         print "username", username
         print "display name", session.display_name()
         print "loaded", session.user_is_loaded()
+        track = Link.as_track("spotify:track:35QLYzQCz629mzQeQiQCwb")
+        session.load(track)
+        session.play()
         session.logout()
         sys.exit()
 

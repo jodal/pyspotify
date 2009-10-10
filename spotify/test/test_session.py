@@ -45,6 +45,9 @@ class TestSession(unittest.TestCase):
                 session.logout()
                 self.disconnect()
 
+            def music_delivery(self, sess, mformat, frames):
+                print "MUSIC!"
+
         c = MockClient()
         c.connect()
 

@@ -91,7 +91,10 @@ sp_track* sp_link_as_track(sp_link *link) {
 }
 
 sp_link* sp_link_create_from_track(sp_track *track,int offset) {
-    return NULL;
+    sp_link *l = malloc(sizeof(sp_link));
+    memset(l,0,sizeof(l));
+    sprintf(l->mock, "link:%s/%d", track->mock, offset);
+    return l;
 }
 
 sp_link* sp_link_create_from_string(const char * link) {

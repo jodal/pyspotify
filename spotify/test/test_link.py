@@ -1,10 +1,12 @@
 import unittest
-from spotify.link import Link
+from spotify._mockspotify import Link
 
 class TestLink(unittest.TestCase):
 
-    def test_playlist_string(self):
-        s = "spotify:user:winjer:playlist:4gzM1HrVHQXvCnALez6xhr"
+    def test_from_string(self):
+        s = "from_string_test"
         l = Link.from_string(s)
-        self.assertEqual(str(l), s)
+        self.assertEqual(str(l), "link:" + s)
+
+
 

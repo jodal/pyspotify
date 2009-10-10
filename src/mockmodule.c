@@ -25,6 +25,14 @@ typedef struct {
 
 mocking_data g_data;
 
+struct sp_track {
+    char mock[1024];
+};
+
+struct sp_link {
+    char mock[1024];
+};
+
 typedef enum event_type {
     MOCK_LOGGED_IN                   = 0,
     MOCK_LOGGED_OUT                  = 1,
@@ -74,7 +82,10 @@ bool sp_user_is_loaded(sp_user *user) {
 }
 
 sp_track* sp_link_as_track(sp_link *link) {
-    return NULL;
+    sp_track *t;
+    memset(t,0,sizeof(t));
+    sprintf(t->mock, "track:%s", link->mock);
+    return t;
 }
 
 sp_link* sp_link_create_from_track(sp_track *track,int offset) {
@@ -82,11 +93,15 @@ sp_link* sp_link_create_from_track(sp_track *track,int offset) {
 }
 
 sp_link* sp_link_create_from_string(const char * link) {
-    return NULL;
+    sp_link *l = malloc(sizeof(sp_link));
+    memset(l,0,sizeof(l));
+    sprintf(l->mock, "link:%s", link);
+    return l;
 }
 
 int sp_link_as_string (sp_link *link, char *buffer, int buffer_size) {
-    return 0;
+    strncpy(buffer, link->mock, buffer_size);
+    return strlen(link->mock);
 }
 
 const char *sp_track_name (sp_track *track) {

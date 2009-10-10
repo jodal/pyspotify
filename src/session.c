@@ -66,12 +66,7 @@ static PyObject *Session_logout(Session *self) {
     return Py_BuildValue("");
 };
 
-static PyObject *Session_load(Session *self, PyObject *args) {
-    Track *track;
-    if(!PyArg_ParseTuple(args, "O!", &TrackType, &track)) {
-	return NULL;
-    }
-    sp_error err = sp_session_player_load(self->_session, track->_track);
+PyObject *handle_error(err) {
     switch(err) {
 	case SP_ERROR_OK:
 	    return Py_BuildValue("");
@@ -81,6 +76,21 @@ static PyObject *Session_load(Session *self, PyObject *args) {
 	    return NULL;
 	    break;
     }
+}
+
+static PyObject *Session_load(Session *self, PyObject *args) {
+    Track *track;
+    if(!PyArg_ParseTuple(args, "O!", &TrackType, &track)) {
+	return NULL;
+    }
+    return handle_error(sp_session_player_load(self->_session, track->_track));
+}
+
+static PyObject *Session_play(Session *self, PyObject *args) {
+    int play;
+    if(!PyArg_ParseTuple(args, "i", &play))
+	return NULL;
+    return handle_error(sp_session_player_play(self->_session, play));
 }
 
 static PyObject *Session_process_events(Session *self) {
@@ -98,6 +108,7 @@ static PyMethodDef Session_methods[] = {
     {"logout", (PyCFunction)Session_logout, METH_NOARGS, "Logout from the session and terminate the main loop"},
     {"process_events", (PyCFunction)Session_process_events, METH_NOARGS, "Process any outstanding events"},
     {"load", (PyCFunction)Session_load, METH_VARARGS, "Load the specified track on the player"},
+    {"play", (PyCFunction)Session_play, METH_VARARGS, "Play or pause the currently loaded track"},
     {NULL}
 };
 

@@ -108,6 +108,10 @@ sp_error sp_session_player_load(sp_session *session, sp_track *track) {
     return 0;
 }
 
+sp_error sp_session_player_play(sp_session *session, bool b) {
+    return 0;
+}
+
 sp_track* sp_link_as_track(sp_link *link) {
     if(strncmp(link->data, "link:track:", strlen("link:track:")))
 	return NULL;

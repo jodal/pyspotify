@@ -41,6 +41,7 @@ class TestSession(unittest.TestCase):
                 print "MockClient: logged_in"
                 track = mock_track("foo", 0, mock_album(), 0, 0, 0, 0, 0, 1)
                 session.load(track)
+                session.play(True)
                 session.logout()
                 self.disconnect()
 

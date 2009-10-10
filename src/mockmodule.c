@@ -73,6 +73,26 @@ bool sp_user_is_loaded(sp_user *user) {
     return 0;
 }
 
+sp_track* sp_link_as_track(sp_link *link) {
+    return NULL;
+}
+
+sp_link* sp_link_create_from_track(sp_track *track,int offset) {
+    return NULL;
+}
+
+sp_link* sp_link_create_from_string(const char * link) {
+    return NULL;
+}
+
+int sp_link_as_string (sp_link *link, char *buffer, int buffer_size) {
+    return 0;
+}
+
+const char *sp_track_name (sp_track *track) {
+    return "foo";
+}
+
 sp_error sp_session_init(const sp_session_config *config, sp_session **sess) {
     fprintf(stderr, "MOCK: sp_session_init called\n");
     if(strcmp(config->application_key, "appkey_good"))
@@ -139,22 +159,40 @@ PyMODINIT_FUNC init_mockspotify(void) {
 
     if(PyType_Ready(&SessionType) < 0)
 	return;
+    if(PyType_Ready(&AlbumType) < 0)
+	return;
+    if(PyType_Ready(&ArtistType) < 0)
+	return;
+    if(PyType_Ready(&LinkType) < 0)
+	return;
+    if(PyType_Ready(&PlaylistType) < 0)
+	return;
+    if(PyType_Ready(&PlaylistContainerType) < 0)
+	return;
+    if(PyType_Ready(&ResultsType) < 0)
+	return;
+    if(PyType_Ready(&TrackType) < 0)
+	return;
 
     m = Py_InitModule("_mockspotify", module_methods);
     if(m == NULL)
         return;
 
-    PyEval_InitThreads();
+    PyObject *spotify = PyImport_ImportModule("spotify");
+    PyObject *d = PyModule_GetDict(spotify);
+    PyObject *s = PyString_FromString("SpotifyError");
+    SpotifyError = PyDict_GetItem(d, s);
+    Py_DECREF(s);
+
     SpotifyApiVersion = Py_BuildValue("i", SPOTIFY_API_VERSION);
     Py_INCREF(SpotifyApiVersion);
     PyModule_AddObject(m, "api_version", SpotifyApiVersion);
-    PyModule_AddObject(m, "Album", (PyObject *)&AlbumType);
-    PyModule_AddObject(m, "Artist", (PyObject *)&ArtistType);
-    PyModule_AddObject(m, "Link", (PyObject *)&LinkType);
-    PyModule_AddObject(m, "Playlist", (PyObject *)&PlaylistType);
-    PyModule_AddObject(m, "PlaylistContainer", (PyObject *)&PlaylistContainerType);
-    PyModule_AddObject(m, "Results", (PyObject *)&ResultsType);
-    PyModule_AddObject(m, "Session", (PyObject *)&SessionType);
-    PyModule_AddObject(m, "Track", (PyObject *)&TrackType);
+    album_init(m);
+    artist_init(m);
+    link_init(m);
+    playlist_init(m);
+    session_init(m);
+    search_init(m);
+    track_init(m);
 }
 

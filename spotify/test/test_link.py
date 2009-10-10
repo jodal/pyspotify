@@ -5,6 +5,6 @@ class TestLink(unittest.TestCase):
 
     def test_playlist_string(self):
         s = "spotify:user:winjer:playlist:4gzM1HrVHQXvCnALez6xhr"
-        l = Link.fromString(s)
+        l = Link.from_string(s)
         self.assertEqual(str(l), s)
 

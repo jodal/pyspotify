@@ -23,6 +23,20 @@ PyMODINIT_FUNC init_spotify(void) {
 
     if(PyType_Ready(&SessionType) < 0)
 	return;
+    if(PyType_Ready(&AlbumType) < 0)
+	return;
+    if(PyType_Ready(&ArtistType) < 0)
+	return;
+    if(PyType_Ready(&LinkType) < 0)
+	return;
+    if(PyType_Ready(&PlaylistType) < 0)
+	return;
+    if(PyType_Ready(&PlaylistContainerType) < 0)
+	return;
+    if(PyType_Ready(&ResultsType) < 0)
+	return;
+    if(PyType_Ready(&TrackType) < 0)
+	return;
 
     m = Py_InitModule("_spotify", module_methods);
     if(m == NULL)

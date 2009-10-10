@@ -18,7 +18,7 @@ static PyObject *Link_new(PyTypeObject *type, PyObject *args, PyObject *kwds) {
 }
 
 static PyObject *Link_from_string(Link *self, PyObject *args) {
-    fprintf(stderr, "Link_fromString called\n");
+    fprintf(stderr, "Link_from_string called\n");
     char *s;
     if(!PyArg_ParseTuple(args, "s", &s))
 	return NULL;
@@ -30,7 +30,7 @@ static PyObject *Link_from_string(Link *self, PyObject *args) {
     Link *plink = (Link *)PyObject_CallObject((PyObject *)&LinkType, NULL);
     Py_INCREF(plink);
     plink->_link = link;
-    fprintf(stderr, "Link_fromString completed\n");
+    fprintf(stderr, "Link_from_string completed\n");
     return (PyObject *)plink;
 }
 

@@ -19,7 +19,7 @@ static PyObject *Link_new(PyTypeObject *type, PyObject *args, PyObject *kwds) {
     return (PyObject *)self;
 }
 
-static PyObject *Link_fromString(Link *self, PyObject *args) {
+static PyObject *Link_from_string(Link *self, PyObject *args) {
     fprintf(stderr, "Link_fromString called\n");
     char *s;
     if(!PyArg_ParseTuple(args, "s", &s))
@@ -36,7 +36,7 @@ static PyObject *Link_fromString(Link *self, PyObject *args) {
     return (PyObject *)plink;
 }
 
-static PyObject *Link_fromTrack(Link *self, PyObject *args) {
+static PyObject *Link_from_track(Link *self, PyObject *args) {
     Track *track;
     int offset;
     if(!PyArg_ParseTuple(args, "O!i", &TrackType, &track, &offset)) {
@@ -52,22 +52,22 @@ static PyObject *Link_fromTrack(Link *self, PyObject *args) {
     return (PyObject *)plink;
 }
 
-static PyObject *Link_fromAlbum(Link *self, PyObject *args) {
+static PyObject *Link_from_album(Link *self, PyObject *args) {
     PyErr_SetString(PyExc_NotImplementedError, "");
     return NULL;
 }
 
-static PyObject *Link_fromArtist(Link *self, PyObject *args) {
+static PyObject *Link_from_artist(Link *self, PyObject *args) {
     PyErr_SetString(PyExc_NotImplementedError, "");
     return NULL;
 }
 
-static PyObject *Link_fromSearch(Link *self, PyObject *args) {
+static PyObject *Link_from_search(Link *self, PyObject *args) {
     PyErr_SetString(PyExc_NotImplementedError, "");
     return NULL;
 }
 
-static PyObject *Link_fromPlaylist(Link *self, PyObject *args) {
+static PyObject *Link_from_playlist(Link *self, PyObject *args) {
     PyErr_SetString(PyExc_NotImplementedError, "");
     return NULL;
 }
@@ -77,7 +77,7 @@ static PyObject *Link_type(Link *self) {
     return NULL;
 }
 
-static PyObject *Link_asTrack(Link *self) {
+static PyObject *Link_as_track(Link *self) {
     sp_track *track = sp_link_as_track(self->_link);
     if(!track) {
 	PyErr_SetString(LinkError, "Not a track link");
@@ -87,12 +87,12 @@ static PyObject *Link_asTrack(Link *self) {
     return (PyObject *)ptrack;
 }
 
-static PyObject *Link_asAlbum(Link *self) {
+static PyObject *Link_as_album(Link *self) {
     PyErr_SetString(PyExc_NotImplementedError, "");
     return NULL;
 }
 
-static PyObject *Link_asArtist(Link *self) {
+static PyObject *Link_as_artist(Link *self) {
     PyErr_SetString(PyExc_NotImplementedError, "");
     return NULL;
 }
@@ -112,44 +112,44 @@ static PyObject *Link_str(PyObject *oself) {
 }
 
 static PyMethodDef Link_methods[] = {
-    {"fromString",
-     (PyCFunction)Link_fromString,
+    {"from_string",
+     (PyCFunction)Link_from_string,
      METH_VARARGS | METH_CLASS,
      "Create a new Link object from a string"},
-    {"fromTrack",
-     (PyCFunction)Link_fromTrack,
+    {"from_track",
+     (PyCFunction)Link_from_track,
      METH_VARARGS | METH_CLASS,
      "Create a new Link object from a Track object"},
-    {"fromAlbum",
-     (PyCFunction)Link_fromAlbum,
+    {"from_album",
+     (PyCFunction)Link_from_album,
      METH_VARARGS | METH_CLASS,
      "Create a new Link object from an Album object"},
-    {"fromArtist",
-     (PyCFunction)Link_fromArtist,
+    {"from_artist",
+     (PyCFunction)Link_from_artist,
      METH_VARARGS | METH_CLASS,
      "Create a new Link object from an Artist object"},
-    {"fromSearch",
-     (PyCFunction)Link_fromSearch,
+    {"from_search",
+     (PyCFunction)Link_from_search,
      METH_VARARGS | METH_CLASS,
      "Create a new Link object from a Search object"},
-    {"fromPlaylist",
-     (PyCFunction)Link_fromPlaylist,
+    {"from_playlist",
+     (PyCFunction)Link_from_playlist,
      METH_VARARGS | METH_CLASS,
      "Create a new Link object from a Playlist object"},
     {"type",
      (PyCFunction)Link_type,
      METH_NOARGS,
      "Return the type of the link"},
-    {"asTrack",
-     (PyCFunction)Link_asTrack,
+    {"as_track",
+     (PyCFunction)Link_as_track,
      METH_NOARGS,
      "Return this link as a Track object"},
-    {"asAlbum",
-     (PyCFunction)Link_asAlbum,
+    {"as_album",
+     (PyCFunction)Link_as_album,
      METH_NOARGS,
      "Return this link as a Album object"},
-    {"asArtist",
-     (PyCFunction)Link_asArtist,
+    {"as_artist",
+     (PyCFunction)Link_as_artist,
      METH_NOARGS,
      "Return this link as an Artist object"},
     {NULL}

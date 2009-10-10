@@ -82,9 +82,11 @@ bool sp_user_is_loaded(sp_user *user) {
 }
 
 sp_track* sp_link_as_track(sp_link *link) {
-    sp_track *t;
+    fprintf(stderr, "sp_link_as_track called\n");
+    sp_track *t = malloc(sizeof(sp_track));
     memset(t,0,sizeof(t));
     sprintf(t->mock, "track:%s", link->mock);
+    fprintf(stderr, "sp_link_as_track: track mock is %s\n", t->mock);
     return t;
 }
 
@@ -105,7 +107,8 @@ int sp_link_as_string (sp_link *link, char *buffer, int buffer_size) {
 }
 
 const char *sp_track_name (sp_track *track) {
-    return "foo";
+    fprintf(stderr, "track mock is %s\n", track->mock);
+    return track->mock;
 }
 
 sp_error sp_session_init(const sp_session_config *config, sp_session **sess) {

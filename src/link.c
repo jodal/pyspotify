@@ -82,6 +82,8 @@ static PyObject *Link_as_track(Link *self) {
 	return NULL;
     }
     Track *ptrack = (Track *)PyObject_CallObject((PyObject *)&TrackType, NULL);
+    ptrack->_track = track;
+    Py_INCREF(ptrack);
     return (PyObject *)ptrack;
 }
 

@@ -17,9 +17,10 @@ static PyObject *Track_new(PyTypeObject *type, PyObject *args, PyObject *kwds) {
 }
 
 static PyObject *Track_str(PyObject *oself) {
+    fprintf(stderr, "Track_str called\n");
     Track *self = (Track *)oself;
-    // TODO: make this prettier
     const char *s = sp_track_name(self->_track);
+    fprintf(stderr, "track name is %s\n", s);
     return Py_BuildValue("s", s);
 }
 

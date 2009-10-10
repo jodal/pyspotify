@@ -6,15 +6,11 @@
 #include <unistd.h>
 #include <stdint.h>
 #include "spotify/api.h"
+#include "pyspotify.h"
 
 static PyObject *SessionError;
 
 static PyObject *SpotifyApiVersion;
-
-typedef struct {
-    PyObject_HEAD
-    sp_session *_session;
-} Session;
 
 static PyObject *Session_new(PyTypeObject *type, PyObject *args, PyObject *kwds) {
     Session *self;
@@ -138,7 +134,7 @@ static void logged_in(sp_session *session, sp_error error) {
     fprintf(stderr, "logged_in called\n");
     PyGILState_STATE gstate;
     gstate = PyGILState_Ensure();
-    Session *psession = PyObject_CallObject((PyObject *)&SessionType, NULL);
+    Session *psession = (Session *)PyObject_CallObject((PyObject *)&SessionType, NULL);
     psession->_session = session;
     PyObject *client = (PyObject *)sp_session_userdata(session);
     fprintf(stderr, "client is %p\n", client);
@@ -165,7 +161,7 @@ static void notify_main_thread(sp_session *session) {
     fprintf(stderr, "notify_main_thread called with %p\n", session);
     PyGILState_STATE gstate;
     gstate = PyGILState_Ensure();
-    Session *psession = PyObject_CallObject((PyObject *)&SessionType, NULL);
+    Session *psession = (Session *)PyObject_CallObject((PyObject *)&SessionType, NULL);
     Py_INCREF(psession);
     fprintf(stderr, "Session constructed\n");
     psession->_session = session;
@@ -185,8 +181,9 @@ static void notify_main_thread(sp_session *session) {
 }
 
 
-static void music_delivery(sp_session *session, const sp_audioformat *format, const void *frames, int num_frames) {
+static int music_delivery(sp_session *session, const sp_audioformat *format, const void *frames, int num_frames) {
     fprintf(stderr, "music_delivery called\n");
+    return num_frames; // consume all of them
 }
 
 static void play_token_lost(sp_session *session) {
@@ -296,22 +293,19 @@ static PyObject *session_connect(PyObject *self, PyObject *args) {
         return NULL;
     }
     fprintf(stderr, "connecting...MZ\n");
-    Session *psession = PyObject_CallObject((PyObject *)&SessionType, NULL);
+    Session *psession = (Session *)PyObject_CallObject((PyObject *)&SessionType, NULL);
     fprintf(stderr, "connecting...MZx\n");
     psession->_session = session;
     fprintf(stderr, "connecting...MZy\n");
     Py_INCREF(psession);
     fprintf(stderr, "connecting...MZz\n");
-    return psession;
+    return (PyObject *)psession;
 }
 
 static PyMethodDef module_methods[] = {
     {"connect", session_connect, METH_VARARGS, "Run the spotify subsystem.  this will return on error, or after spotify is logged out."},
     {NULL, NULL, 0, NULL}
 };
-
-static void sigIgn(int signo) {
-}
 
 PyMODINIT_FUNC initsession(void) {
     PyObject *m;

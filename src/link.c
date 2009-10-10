@@ -6,11 +6,6 @@
 static PyObject *LinkError;
 static PyTypeObject LinkType;
 
-typedef struct {
-    PyObject_HEAD
-    sp_link *_link;
-} Link;
-
 static PyMemberDef Link_members[] = {
     {NULL}
 };
@@ -37,14 +32,14 @@ static PyObject *Link_fromString(Link *self, PyObject *args) {
 	return NULL;
     }
     fprintf(stderr, "XXX3\n");
-    Link *plink = PyObject_CallObject((PyObject *)&LinkType, NULL);
+    Link *plink = (Link *)PyObject_CallObject((PyObject *)&LinkType, NULL);
     fprintf(stderr, "XXX4\n");
     Py_INCREF(plink);
     fprintf(stderr, "XXX5\n");
     plink->_link = link;
     fprintf(stderr, "XXX6\n");
     fprintf(stderr, "Link_fromString completed\n");
-    return plink;
+    return (PyObject *)plink;
 }
 
 static PyObject *Link_fromTrack(Link *self, PyObject *args) {
@@ -83,8 +78,8 @@ static PyObject *Link_asTrack(Link *self) {
 	PyErr_SetString(LinkError, "Not a track link");
 	return NULL;
     }
-    Track *ptrack = PyObject_CallObject((PyObject *)&TrackType, NULL);
-    return ptrack;
+    Track *ptrack = (Track *)PyObject_CallObject((PyObject *)&TrackType, NULL);
+    return (PyObject *)ptrack;
 }
 
 static PyObject *Link_asAlbum(Link *self) {
@@ -97,7 +92,8 @@ static PyObject *Link_asArtist(Link *self) {
     return NULL;
 }
 
-static PyObject *Link_str(Link *self) {
+static PyObject *Link_str(PyObject *oself) {
+    Link *self = (Link *)oself;
     fprintf(stderr, "AAA %p\n", self->_link);
     char uri[1024];
     fprintf(stderr, "AAA1\n");

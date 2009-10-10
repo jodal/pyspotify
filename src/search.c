@@ -1,14 +1,10 @@
 #include <Python.h>
 #include <structmember.h>
 #include "spotify/api.h"
+#include "pyspotify.h"
 
 static PyObject *ResultsError;
 static PyTypeObject ResultsType;
-
-typedef struct {
-    PyObject_HEAD
-    sp_search *_search;
-} Results;
 
 static PyMemberDef Results_members[] = {
     {NULL}
@@ -23,32 +19,52 @@ static PyObject *Results_new(PyTypeObject *type, PyObject *args, PyObject *kwds)
 }
 
 static PyObject *Results_did_you_mean(Results *self) {
+    PyErr_SetString(PyExc_NotImplementedError, "");
+    return NULL;
 }
 
 static PyObject *Results_error(Results *self) {
+    PyErr_SetString(PyExc_NotImplementedError, "");
+    return NULL;
 }
 
 static PyObject *Results_artists(Results *self) {
+    PyErr_SetString(PyExc_NotImplementedError, "");
+    return NULL;
 }
 
 static PyObject *Results_albums(Results *self) {
+    PyErr_SetString(PyExc_NotImplementedError, "");
+    return NULL;
 }
 
 static PyObject *Results_tracks(Results *self) {
+    PyErr_SetString(PyExc_NotImplementedError, "");
+    return NULL;
 }
 
 static PyObject *Results_total_tracks(Results *self) {
+    PyErr_SetString(PyExc_NotImplementedError, "");
+    return NULL;
 }
 
 static PyObject *Results_query(Results *self) {
+    PyErr_SetString(PyExc_NotImplementedError, "");
+    return NULL;
 }
 
 static PyObject *Results_str(Results *self) {
+    PyErr_SetString(PyExc_NotImplementedError, "");
+    return NULL;
 }
 
 static PyMethodDef Results_methods[] = {
-    {"is_loaded",
-     (PyCFunction)Results_is_loaded,
+    {"did_you_mean",
+     (PyCFunction)Results_did_you_mean,
+     METH_NOARGS,
+     "True if this results has been loaded by the client"},
+    {"error",
+     (PyCFunction)Results_error,
      METH_NOARGS,
      "True if this results has been loaded by the client"},
     {"artists",

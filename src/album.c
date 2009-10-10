@@ -1,14 +1,10 @@
 #include <Python.h>
 #include <structmember.h>
 #include "spotify/api.h"
+#include "pyspotify.h"
 
 static PyObject *AlbumError;
 static PyTypeObject AlbumType;
-
-typedef struct {
-    PyObject_HEAD
-    sp_album *_album;
-} Album;
 
 static PyMemberDef Album_members[] = {
     {NULL}
@@ -23,27 +19,43 @@ static PyObject *Album_new(PyTypeObject *type, PyObject *args, PyObject *kwds) {
 }
 
 static PyObject *Album_is_loaded(Album *self) {
+    PyErr_SetString(PyExc_NotImplementedError, "");
+    return NULL;
 }
 
 static PyObject *Album_is_available(Album *self) {
+    PyErr_SetString(PyExc_NotImplementedError, "");
+    return NULL;
 }
 
 static PyObject *Album_artist(Album *self) {
+    PyErr_SetString(PyExc_NotImplementedError, "");
+    return NULL;
 }
 
 static PyObject *Album_cover(Album *self) {
+    PyErr_SetString(PyExc_NotImplementedError, "");
+    return NULL;
 }
 
 static PyObject *Album_name(Album *self) {
+    PyErr_SetString(PyExc_NotImplementedError, "");
+    return NULL;
 }
 
 static PyObject *Album_year(Album *self) {
+    PyErr_SetString(PyExc_NotImplementedError, "");
+    return NULL;
 }
 
 static PyObject *Album_type(Album *self) {
+    PyErr_SetString(PyExc_NotImplementedError, "");
+    return NULL;
 }
 
-static PyObject *Album_str(Album *self) {
+static PyObject *Album_str(PyObject *self) {
+    PyErr_SetString(PyExc_NotImplementedError, "");
+    return NULL;
 }
 
 static PyMethodDef Album_methods[] = {

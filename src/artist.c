@@ -1,14 +1,10 @@
 #include <Python.h>
 #include <structmember.h>
 #include "spotify/api.h"
+#include "pyspotify.h"
 
 static PyObject *ArtistError;
 static PyTypeObject ArtistType;
-
-typedef struct {
-    PyObject_HEAD
-    sp_artist *_artist;
-} Artist;
 
 static PyMemberDef Artist_members[] = {
     {NULL}
@@ -23,12 +19,18 @@ static PyObject *Artist_new(PyTypeObject *type, PyObject *args, PyObject *kwds) 
 }
 
 static PyObject *Artist_is_loaded(Artist *self) {
+    PyErr_SetString(PyExc_NotImplementedError, "");
+    return NULL;
 }
 
 static PyObject *Artist_name(Artist *self) {
+    PyErr_SetString(PyExc_NotImplementedError, "");
+    return NULL;
 }
 
 static PyObject *Artist_str(Artist *self) {
+    PyErr_SetString(PyExc_NotImplementedError, "");
+    return NULL;
 }
 
 static PyMethodDef Artist_methods[] = {

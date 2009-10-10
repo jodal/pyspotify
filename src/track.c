@@ -17,7 +17,8 @@ static PyObject *Track_new(PyTypeObject *type, PyObject *args, PyObject *kwds) {
     return (PyObject *)self;
 }
 
-static PyObject *Track_str(Track *self) {
+static PyObject *Track_str(PyObject *oself) {
+    Track *self = (Track *)oself;
     // TODO: make this prettier
     const char *s = sp_track_name(self->_track);
     return Py_BuildValue("s", s);

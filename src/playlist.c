@@ -1,19 +1,10 @@
 art#include <Python.h>
 #include <structmember.h>
 #include "spotify/api.h"
+#include "pyspotify.h"
 
 static PyObject *PlaylistError;
 static PyTypeObject PlaylistType;
-
-typedef struct {
-    PyObject_HEAD
-    sp_playlist *_playlist;
-} Playlist;
-
-typedef struct {
-    PyObject_HEAD
-    sp_playlistcontainer *_playlistcontainer;
-} PlaylistContainer;
 
 static PyMemberDef Playlist_members[] = {
     {NULL}

@@ -1,5 +1,6 @@
 
 #include <stdio.h>
+#include <string.h>
 #include "spotify/api.h"
 
 typedef struct {
@@ -74,15 +75,15 @@ sp_error sp_session_init(const sp_session_config *config, sp_session **sess) {
     fprintf(stderr, "MOCK: sp_session_init mark 2\n");
     g_data.config.api_version = config->api_version;
     fprintf(stderr, "MOCK: sp_session_init mark 3\n");
-    strcpy(g_data.config.cache_location, config->cache_location);
+    strcpy((char *)g_data.config.cache_location, config->cache_location);
     fprintf(stderr, "MOCK: sp_session_init mark 4\n");
-    strcpy(g_data.config.settings_location, config->settings_location);
+    strcpy((char *)g_data.config.settings_location, config->settings_location);
     fprintf(stderr, "MOCK: sp_session_init mark 5\n");
-    memcpy(g_data.config.application_key, config->application_key, config->application_key_size);
+    memcpy((char *)g_data.config.application_key, config->application_key, config->application_key_size);
     fprintf(stderr, "MOCK: sp_session_init mark 6\n");
-    strcpy(g_data.config.user_agent, config->user_agent);
+    strcpy((char *)g_data.config.user_agent, config->user_agent);
     fprintf(stderr, "MOCK: sp_session_init mark 7\n");
-    memcpy(g_data.config.callbacks, config->callbacks, sizeof(sp_session_callbacks));
+    memcpy((char *)g_data.config.callbacks, config->callbacks, sizeof(sp_session_callbacks));
     fprintf(stderr, "MOCK: sp_session_init mark 8\n");
     g_data.config.userdata = config->userdata;
     fprintf(stderr, "MOCK: sp_session_init completed\n");

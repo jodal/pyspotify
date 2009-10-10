@@ -3,6 +3,7 @@
 #include "spotify/api.h"
 #include "pyspotify.h"
 
+
 static PyObject *LinkError;
 static PyTypeObject LinkType;
 
@@ -21,30 +22,34 @@ static PyObject *Link_new(PyTypeObject *type, PyObject *args, PyObject *kwds) {
 static PyObject *Link_fromString(Link *self, PyObject *args) {
     fprintf(stderr, "Link_fromString called\n");
     char *s;
-    fprintf(stderr, "XXX\n");
     if(!PyArg_ParseTuple(args, "s", &s))
 	return NULL;
-    fprintf(stderr, "XXX1\n");
     sp_link *link = sp_link_create_from_string(s);
-    fprintf(stderr, "XXX2\n");
     if(!link) {
 	PyErr_SetString(LinkError, "Failed to get link from a Spotify URI");
 	return NULL;
     }
-    fprintf(stderr, "XXX3\n");
     Link *plink = (Link *)PyObject_CallObject((PyObject *)&LinkType, NULL);
-    fprintf(stderr, "XXX4\n");
     Py_INCREF(plink);
-    fprintf(stderr, "XXX5\n");
     plink->_link = link;
-    fprintf(stderr, "XXX6\n");
     fprintf(stderr, "Link_fromString completed\n");
     return (PyObject *)plink;
 }
 
 static PyObject *Link_fromTrack(Link *self, PyObject *args) {
-    PyErr_SetString(PyExc_NotImplementedError, "");
-    return NULL;
+    Track *track;
+    int offset;
+    if(!PyArg_ParseTuple(args, "O!i", &TrackType, &track, &offset)) {
+	return NULL;
+    }
+    sp_link *link = sp_link_create_from_track(track->_track, offset);
+    if(!link) {
+	PyErr_SetString(LinkError, "Failed to get track from a Link");
+	return NULL;
+    }
+    Link *plink = (Link *)PyObject_CallObject((PyObject *)&LinkType, NULL);
+    plink->_link = link;
+    return (PyObject *)plink;
 }
 
 static PyObject *Link_fromAlbum(Link *self, PyObject *args) {

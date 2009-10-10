@@ -2,8 +2,7 @@
 #include <structmember.h>
 #include "spotify/api.h"
 #include "pyspotify.h"
-
-static PyObject *TrackError;
+#include "track.h"
 
 static PyMemberDef Track_members[] = {
     {NULL}
@@ -118,7 +117,7 @@ static PyMethodDef Track_methods[] = {
     {NULL}
 };
 
-static PyTypeObject TrackType = {
+PyTypeObject TrackType = {
     PyObject_HEAD_INIT(NULL)
     0,                         /*ob_size*/
     "spotify.track.Track",       /*tp_name*/
@@ -160,23 +159,6 @@ static PyTypeObject TrackType = {
     Track_new,                  /* tp_new */
 };
 
-static PyMethodDef module_methods[] = {
-    {NULL, NULL, 0, NULL}
-};
-
-PyMODINIT_FUNC inittrack(void) {
-    PyObject *m;
-
-    if(PyType_Ready(&TrackType) < 0)
-	return;
-
-    m = Py_InitModule("track", module_methods);
-    if(m == NULL)
-        return;
-
-    PyEval_InitThreads();
-    TrackError = PyErr_NewException("spotify.track.TrackError", NULL, NULL);
-    Py_INCREF(TrackError);
-    PyModule_AddObject(m, "TrackError", TrackError);
+void track_init(PyObject *m) {
     PyModule_AddObject(m, "Track", (PyObject *)&TrackType);
 }

@@ -2,9 +2,7 @@
 #include <structmember.h>
 #include "spotify/api.h"
 #include "pyspotify.h"
-
-static PyObject *ArtistError;
-static PyTypeObject ArtistType;
+#include "artist.h"
 
 static PyMemberDef Artist_members[] = {
     {NULL}
@@ -45,7 +43,7 @@ static PyMethodDef Artist_methods[] = {
     {NULL}
 };
 
-static PyTypeObject ArtistType = {
+PyTypeObject ArtistType = {
     PyObject_HEAD_INIT(NULL)
     0,                         /*ob_size*/
     "spotify.artist.Artist",     /*tp_name*/
@@ -87,23 +85,6 @@ static PyTypeObject ArtistType = {
     Artist_new,                 /* tp_new */
 };
 
-static PyMethodDef module_methods[] = {
-    {NULL, NULL, 0, NULL}
-};
-
-PyMODINIT_FUNC initartist(void) {
-    PyObject *m;
-
-    if(PyType_Ready(&ArtistType) < 0)
-	return;
-
-    m = Py_InitModule("artist", module_methods);
-    if(m == NULL)
-        return;
-
-    PyEval_InitThreads();
-    ArtistError = PyErr_NewException("spotify.artist.ArtistError", NULL, NULL);
-    Py_INCREF(ArtistError);
-    PyModule_AddObject(m, "ArtistError", ArtistError);
+void artist_init(PyObject *m) {
     PyModule_AddObject(m, "Artist", (PyObject *)&ArtistType);
 }

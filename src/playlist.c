@@ -1,10 +1,8 @@
-art#include <Python.h>
+#include <Python.h>
 #include <structmember.h>
 #include "spotify/api.h"
 #include "pyspotify.h"
-
-static PyObject *PlaylistError;
-static PyTypeObject PlaylistType;
+#include "playlist.h"
 
 static PyMemberDef Playlist_members[] = {
     {NULL}
@@ -74,7 +72,7 @@ static PyMethodDef Playlist_methods[] = {
     {NULL}
 };
 
-static PySequenceMethods Playlist_as_sequence = {
+/*static PySequenceMethods Playlist_as_sequence = {
     Playlist_sq_length,		// sq_length
     0,				// sq_concat
     0,				// sq_repeat
@@ -83,9 +81,9 @@ static PySequenceMethods Playlist_as_sequence = {
     0,				// sq_contains
     0,				// sq_inplace_concat
     0,				// sq_inplace_repeat
-};
+};*/
 
-static PyTypeObject PlaylistType = {
+PyTypeObject PlaylistType = {
     PyObject_HEAD_INIT(NULL)
     0,                         /*ob_size*/
     "spotify.playlist.Playlist",     /*tp_name*/
@@ -98,7 +96,7 @@ static PyTypeObject PlaylistType = {
     0,                         /*tp_compare*/
     0,                         /*tp_repr*/
     0,                         /*tp_as_number*/
-    Playlist_as_sequence,      /*tp_as_sequence*/
+    0, //Playlist_as_sequence,      /*tp_as_sequence*/
     0,                         /*tp_as_mapping*/
     0,                         /*tp_hash */
     0,                         /*tp_call*/
@@ -139,7 +137,10 @@ static PyMethodDef PlaylistContainer_methods[] = {
     {NULL}
 };
 
-static PySequenceMethods PlaylistContainer_as_sequence = {
+static PyObject *PlaylistContainer_str(Playlist *self) {
+}
+
+/*static PySequenceMethods PlaylistContainer_as_sequence = {
     PlaylistContainer_sq_length,		// sq_length
     0,						// sq_concat
     0,						// sq_repeat
@@ -148,9 +149,9 @@ static PySequenceMethods PlaylistContainer_as_sequence = {
     0,						// sq_contains
     0,						// sq_inplace_concat
     0,						// sq_inplace_repeat
-};
+};*/
 
-static PyTypeObject PlaylistContainerType = {
+PyTypeObject PlaylistContainerType = {
     PyObject_HEAD_INIT(NULL)
     0,                         /*ob_size*/
     "spotify.playlist.PlaylistContainer",     /*tp_name*/
@@ -163,7 +164,7 @@ static PyTypeObject PlaylistContainerType = {
     0,                         /*tp_compare*/
     0,                         /*tp_repr*/
     0,                         /*tp_as_number*/
-    PlaylistContainer_as_sequence,      /*tp_as_sequence*/
+    0, //PlaylistContainer_as_sequence,      /*tp_as_sequence*/
     0,                         /*tp_as_mapping*/
     0,                         /*tp_hash */
     0,                         /*tp_call*/
@@ -192,23 +193,8 @@ static PyTypeObject PlaylistContainerType = {
     PlaylistContainer_new,                 /* tp_new */
 };
 
-static PyMethodDef module_methods[] = {
-    {NULL, NULL, 0, NULL}
-};
-
-PyMODINIT_FUNC initplaylist(void) {
-    PyObject *m;
-
-    if(PyType_Ready(&PlaylistType) < 0)
-	return;
-
-    m = Py_InitModule("playlist", module_methods);
-    if(m == NULL)
-        return;
-
-    PyEval_InitThreads();
-    PlaylistError = PyErr_NewException("spotify.playlist.PlaylistError", NULL, NULL);
-    Py_INCREF(PlaylistError);
-    PyModule_AddObject(m, "PlaylistError", PlaylistError);
+void playlist_init(PyObject *m) {
     PyModule_AddObject(m, "Playlist", (PyObject *)&PlaylistType);
+    PyModule_AddObject(m, "PlaylistContainer", (PyObject *)&PlaylistContainerType);
 }
+

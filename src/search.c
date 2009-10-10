@@ -2,9 +2,7 @@
 #include <structmember.h>
 #include "spotify/api.h"
 #include "pyspotify.h"
-
-static PyObject *ResultsError;
-static PyTypeObject ResultsType;
+#include "search.h"
 
 static PyMemberDef Results_members[] = {
     {NULL}
@@ -90,7 +88,7 @@ static PyMethodDef Results_methods[] = {
     {NULL}
 };
 
-static PyTypeObject ResultsType = {
+PyTypeObject ResultsType = {
     PyObject_HEAD_INIT(NULL)
     0,                         /*ob_size*/
     "spotify.search.Results",     /*tp_name*/
@@ -132,23 +130,6 @@ static PyTypeObject ResultsType = {
     Results_new,                 /* tp_new */
 };
 
-static PyMethodDef module_methods[] = {
-    {NULL, NULL, 0, NULL}
-};
-
-PyMODINIT_FUNC initresults(void) {
-    PyObject *m;
-
-    if(PyType_Ready(&ResultsType) < 0)
-	return;
-
-    m = Py_InitModule("results", module_methods);
-    if(m == NULL)
-        return;
-
-    PyEval_InitThreads();
-    ResultsError = PyErr_NewException("spotify.search.ResultsError", NULL, NULL);
-    Py_INCREF(ResultsError);
-    PyModule_AddObject(m, "ResultsError", ResultsError);
+void search_init(PyObject *m) {
     PyModule_AddObject(m, "Results", (PyObject *)&ResultsType);
 }

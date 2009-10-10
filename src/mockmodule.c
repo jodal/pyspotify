@@ -1,7 +1,20 @@
 
 #include <stdio.h>
 #include <string.h>
+#include <Python.h>
 #include "spotify/api.h"
+#include "pyspotify.h"
+#include "artist.h"
+#include "album.h"
+#include "link.h"
+#include "playlist.h"
+#include "search.h"
+#include "session.h"
+#include "track.h"
+
+
+PyObject *SpotifyError;
+PyObject *SpotifyApiVersion;
 
 typedef struct {
     void *userdata;
@@ -108,11 +121,40 @@ sp_error sp_session_logout(sp_session *session) {
 
 const char* sp_error_message(sp_error error) {
     const char buff[1024];
-    sprintf(buff, "Error number %d", error);
+    sprintf((char *)buff, "Error number %d", error);
     return buff;
 }
 
 sp_user * sp_session_user(sp_session *session) {
     return (sp_user *)-1;
+}
+
+static PyMethodDef module_methods[] = {
+    {"connect", session_connect, METH_VARARGS, "Run the spotify subsystem.  this will return on error, or after spotify is logged out."},
+    {NULL, NULL, 0, NULL}
+};
+
+PyMODINIT_FUNC init_mockspotify(void) {
+    PyObject *m;
+
+    if(PyType_Ready(&SessionType) < 0)
+	return;
+
+    m = Py_InitModule("_mockspotify", module_methods);
+    if(m == NULL)
+        return;
+
+    PyEval_InitThreads();
+    SpotifyApiVersion = Py_BuildValue("i", SPOTIFY_API_VERSION);
+    Py_INCREF(SpotifyApiVersion);
+    PyModule_AddObject(m, "api_version", SpotifyApiVersion);
+    PyModule_AddObject(m, "Album", (PyObject *)&AlbumType);
+    PyModule_AddObject(m, "Artist", (PyObject *)&ArtistType);
+    PyModule_AddObject(m, "Link", (PyObject *)&LinkType);
+    PyModule_AddObject(m, "Playlist", (PyObject *)&PlaylistType);
+    PyModule_AddObject(m, "PlaylistContainer", (PyObject *)&PlaylistContainerType);
+    PyModule_AddObject(m, "Results", (PyObject *)&ResultsType);
+    PyModule_AddObject(m, "Session", (PyObject *)&SessionType);
+    PyModule_AddObject(m, "Track", (PyObject *)&TrackType);
 }
 

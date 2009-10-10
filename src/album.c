@@ -2,9 +2,7 @@
 #include <structmember.h>
 #include "spotify/api.h"
 #include "pyspotify.h"
-
-static PyObject *AlbumError;
-static PyTypeObject AlbumType;
+#include "album.h"
 
 static PyMemberDef Album_members[] = {
     {NULL}
@@ -90,7 +88,7 @@ static PyMethodDef Album_methods[] = {
     {NULL}
 };
 
-static PyTypeObject AlbumType = {
+PyTypeObject AlbumType = {
     PyObject_HEAD_INIT(NULL)
     0,                         /*ob_size*/
     "spotify.album.Album",     /*tp_name*/
@@ -132,23 +130,6 @@ static PyTypeObject AlbumType = {
     Album_new,                 /* tp_new */
 };
 
-static PyMethodDef module_methods[] = {
-    {NULL, NULL, 0, NULL}
-};
-
-PyMODINIT_FUNC initalbum(void) {
-    PyObject *m;
-
-    if(PyType_Ready(&AlbumType) < 0)
-	return;
-
-    m = Py_InitModule("album", module_methods);
-    if(m == NULL)
-        return;
-
-    PyEval_InitThreads();
-    AlbumError = PyErr_NewException("spotify.album.AlbumError", NULL, NULL);
-    Py_INCREF(AlbumError);
-    PyModule_AddObject(m, "AlbumError", AlbumError);
+void album_init(PyObject *m) {
     PyModule_AddObject(m, "Album", (PyObject *)&AlbumType);
 }

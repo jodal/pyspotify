@@ -2,10 +2,8 @@
 #include <structmember.h>
 #include "spotify/api.h"
 #include "pyspotify.h"
-
-
-static PyObject *LinkError;
-static PyTypeObject LinkType;
+#include "link.h"
+#include "track.h"
 
 static PyMemberDef Link_members[] = {
     {NULL}
@@ -26,7 +24,7 @@ static PyObject *Link_from_string(Link *self, PyObject *args) {
 	return NULL;
     sp_link *link = sp_link_create_from_string(s);
     if(!link) {
-	PyErr_SetString(LinkError, "Failed to get link from a Spotify URI");
+	PyErr_SetString(SpotifyError, "Failed to get link from a Spotify URI");
 	return NULL;
     }
     Link *plink = (Link *)PyObject_CallObject((PyObject *)&LinkType, NULL);
@@ -44,7 +42,7 @@ static PyObject *Link_from_track(Link *self, PyObject *args) {
     }
     sp_link *link = sp_link_create_from_track(track->_track, offset);
     if(!link) {
-	PyErr_SetString(LinkError, "Failed to get track from a Link");
+	PyErr_SetString(SpotifyError, "Failed to get track from a Link");
 	return NULL;
     }
     Link *plink = (Link *)PyObject_CallObject((PyObject *)&LinkType, NULL);
@@ -80,7 +78,7 @@ static PyObject *Link_type(Link *self) {
 static PyObject *Link_as_track(Link *self) {
     sp_track *track = sp_link_as_track(self->_link);
     if(!track) {
-	PyErr_SetString(LinkError, "Not a track link");
+	PyErr_SetString(SpotifyError, "Not a track link");
 	return NULL;
     }
     Track *ptrack = (Track *)PyObject_CallObject((PyObject *)&TrackType, NULL);
@@ -104,7 +102,7 @@ static PyObject *Link_str(PyObject *oself) {
     fprintf(stderr, "AAA1\n");
     if(0 > sp_link_as_string(self->_link, uri, sizeof(uri))) {
         fprintf(stderr, "AAA2\n");
-	PyErr_SetString(LinkError, "failed to render Spotify URI from link");
+	PyErr_SetString(SpotifyError, "failed to render Spotify URI from link");
 	return NULL;
     }
     fprintf(stderr, "AAA3\n");
@@ -155,7 +153,7 @@ static PyMethodDef Link_methods[] = {
     {NULL}
 };
 
-static PyTypeObject LinkType = {
+PyTypeObject LinkType = {
     PyObject_HEAD_INIT(NULL)
     0,                         /*ob_size*/
     "spotify.link.Link",       /*tp_name*/
@@ -197,23 +195,6 @@ static PyTypeObject LinkType = {
     Link_new,                  /* tp_new */
 };
 
-static PyMethodDef module_methods[] = {
-    {NULL, NULL, 0, NULL}
-};
-
-PyMODINIT_FUNC initlink(void) {
-    PyObject *m;
-
-    if(PyType_Ready(&LinkType) < 0)
-	return;
-
-    m = Py_InitModule("link", module_methods);
-    if(m == NULL)
-        return;
-
-    PyEval_InitThreads();
-    LinkError = PyErr_NewException("spotify.link.error", NULL, NULL);
-    Py_INCREF(LinkError);
-    PyModule_AddObject(m, "error", LinkError);
+void link_init(PyObject *m) {
     PyModule_AddObject(m, "Link", (PyObject *)&LinkType);
 }

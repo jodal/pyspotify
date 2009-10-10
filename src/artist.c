@@ -17,18 +17,20 @@ static PyObject *Artist_new(PyTypeObject *type, PyObject *args, PyObject *kwds) 
 }
 
 static PyObject *Artist_is_loaded(Artist *self) {
-    PyErr_SetString(PyExc_NotImplementedError, "");
+    return Py_BuildValue("i", sp_artist_is_loaded(self->_artist));
     return NULL;
 }
 
 static PyObject *Artist_name(Artist *self) {
-    PyErr_SetString(PyExc_NotImplementedError, "");
-    return NULL;
+    char *s = sp_artist_name(self->_artist);
+    if(!s) return NULL;
+    return PyString_FromString(s);
 }
 
 static PyObject *Artist_str(Artist *self) {
-    PyErr_SetString(PyExc_NotImplementedError, "");
-    return NULL;
+    char *s = sp_artist_name(self->_artist);
+    if(!s) return NULL;
+    return PyString_FromString(s);
 }
 
 static PyMethodDef Artist_methods[] = {

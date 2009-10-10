@@ -44,7 +44,7 @@ class TestLink(unittest.TestCase):
         pass
 
     def test_str(self):
-        pass
-
-
+        s = "str_test"
+        l = Link.from_string(s)
+        self.assertEqual(str(l), "link:str_test")
 

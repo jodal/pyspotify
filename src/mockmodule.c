@@ -25,13 +25,31 @@ typedef struct {
 
 mocking_data g_data;
 
-struct sp_track {
-    char mock[1024];
+struct sp_link {
+    char data[1024];
 };
 
-struct sp_link {
-    char mock[1024];
+struct sp_artist {
+    char name[1024];
+    int loaded;
 };
+
+struct sp_album {
+    char name[1024];
+};
+
+struct sp_track {
+    char name[1024];
+    int num_artists;
+    sp_artist *artists[16];
+    sp_album *album;
+    int duration;
+    int popularity;
+    int disc;
+    int index;
+    sp_error error;
+};
+
 
 typedef enum event_type {
     MOCK_LOGGED_IN                   = 0,
@@ -85,33 +103,86 @@ sp_track* sp_link_as_track(sp_link *link) {
     fprintf(stderr, "sp_link_as_track called\n");
     sp_track *t = malloc(sizeof(sp_track));
     memset(t,0,sizeof(t));
-    sprintf(t->mock, "track:%s", link->mock);
-    fprintf(stderr, "sp_link_as_track: track mock is %s\n", t->mock);
+    sprintf(t->name, "track:%s", link->data);
+    fprintf(stderr, "sp_link_as_track: track mock is %s\n", t->name);
     return t;
 }
 
 sp_link* sp_link_create_from_track(sp_track *track,int offset) {
     sp_link *l = malloc(sizeof(sp_link));
     memset(l,0,sizeof(l));
-    sprintf(l->mock, "link:%s/%d", track->mock, offset);
+    sprintf(l->data, "link:%s/%d", track->name, offset);
     return l;
 }
 
 sp_link* sp_link_create_from_string(const char * link) {
     sp_link *l = malloc(sizeof(sp_link));
     memset(l,0,sizeof(l));
-    sprintf(l->mock, "link:%s", link);
+    sprintf(l->data, "link:%s", link);
     return l;
 }
 
+const char *sp_artist_name(sp_artist *a) {
+    return a->name;
+}
+
+bool sp_artist_is_loaded(sp_artist *a) {
+    return a->loaded;
+}
+
 int sp_link_as_string (sp_link *link, char *buffer, int buffer_size) {
-    strncpy(buffer, link->mock, buffer_size);
-    return strlen(link->mock);
+    strncpy(buffer, link->data, buffer_size);
+    return strlen(link->data);
 }
 
 const char *sp_track_name (sp_track *track) {
-    fprintf(stderr, "track mock is %s\n", track->mock);
-    return track->mock;
+    fprintf(stderr, "track mock is %s\n", track->name);
+    return track->name;
+}
+
+/// Generate a mock sp_artist structure
+sp_artist *_mock_artist(char *name, int loaded) {
+    sp_artist *a;
+    a = malloc(sizeof(sp_artist));
+    memset(a, 0, sizeof(sp_artist));
+    strcpy(a->name, name);
+    a->loaded = loaded;
+    return a;
+}
+
+sp_album *_mock_album() {
+    return NULL;
+}
+
+/// Generate a mock spotify.Artist python object
+PyObject *mock_artist(PyObject *self, PyObject *args) {
+    char *s;
+    int loaded;
+    if(!PyArg_ParseTuple(args, "si", &s, &loaded))
+	return NULL;
+    Artist *artist = (Artist *)PyObject_CallObject((PyObject *)&ArtistType, NULL);
+    if(!artist)
+	return NULL;
+    Py_INCREF(artist);
+    artist -> _artist = _mock_artist(s, loaded);
+    return artist;
+}
+
+sp_track *_mock_track() {
+    sp_track *t;
+    t = malloc(sizeof(sp_track));
+    memset(&t, 0, sizeof(sp_track));
+    strcpy(t->name, "Mock track");
+    t->num_artists = 2;
+    t->artists[0] = _mock_artist("Mock Artist 1", 1);
+    t->artists[1] = _mock_artist("Mock Artist 2", 1);
+    t->album = _mock_album();
+    t->duration = 360;
+    t->popularity = 5;
+    t->disc = 1;
+    t->index = 5;
+    t->error = 0;
+    return t;
 }
 
 sp_error sp_session_init(const sp_session_config *config, sp_session **sess) {
@@ -172,6 +243,8 @@ sp_user * sp_session_user(sp_session *session) {
 
 static PyMethodDef module_methods[] = {
     {"connect", session_connect, METH_VARARGS, "Run the spotify subsystem.  this will return on error, or after spotify is logged out."},
+    //{"mock_track", mock_track, METH_VARARGS, "Create a mock track"},
+    {"mock_artist", mock_artist, METH_VARARGS, "Create a mock artist"},
     {NULL, NULL, 0, NULL}
 };
 

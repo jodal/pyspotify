@@ -1,4 +1,7 @@
 
+class SpotifyError(Exception):
+    pass
+
 from _spotify import Session;
 from _spotify import Track;
 from _spotify import Artist;

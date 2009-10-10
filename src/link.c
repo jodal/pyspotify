@@ -104,8 +104,15 @@ static PyObject *Link_as_album(Link *self) {
 }
 
 static PyObject *Link_as_artist(Link *self) {
-    PyErr_SetString(PyExc_NotImplementedError, "");
-    return NULL;
+    sp_artist *a = sp_link_as_artist(self->_link);
+    if(!a) {
+	PyErr_SetString(SpotifyError, "Not an artist link");
+	return NULL;
+    }
+    Artist *artist = (Artist *)PyObject_CallObject((PyObject *)&ArtistType, NULL);
+    artist->_artist = a;
+    Py_INCREF(artist);
+    return (PyObject *)artist;
 }
 
 static PyObject *Link_str(PyObject *oself) {

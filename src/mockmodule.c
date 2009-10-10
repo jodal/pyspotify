@@ -12,6 +12,10 @@
 #include "session.h"
 #include "track.h"
 
+sp_artist *_mock_artist(char *name, int loaded);
+sp_track *_mock_track(char *name, int num_artists, sp_artist **artists,
+		      sp_album *album, int duration, int popularity,
+		      int disc, int index, sp_error error, int loaded);
 
 PyObject *SpotifyError;
 PyObject *SpotifyApiVersion;
@@ -48,6 +52,7 @@ struct sp_track {
     int disc;
     int index;
     sp_error error;
+    int loaded;
 };
 
 
@@ -100,12 +105,18 @@ bool sp_user_is_loaded(sp_user *user) {
 }
 
 sp_track* sp_link_as_track(sp_link *link) {
-    fprintf(stderr, "sp_link_as_track called\n");
+    if(strncmp(link->data, "link:track:", strlen("link:track:")))
+	return NULL;
     sp_track *t = malloc(sizeof(sp_track));
     memset(t,0,sizeof(t));
-    sprintf(t->name, "track:%s", link->data);
-    fprintf(stderr, "sp_link_as_track: track mock is %s\n", t->name);
+    return _mock_track(link->data + strlen("link:track:"), 0, NULL, NULL, 0, 0, 0, 0, 0, 1);
     return t;
+}
+
+sp_artist *sp_link_as_artist(sp_link *link) {
+    if(strncmp(link->data, "link:artist:", strlen("link:artist:")))
+	return NULL;
+    return _mock_artist(link->data + strlen("link:artist:"), 1);
 }
 
 sp_link* sp_link_create_from_track(sp_track *track,int offset) {
@@ -157,6 +168,18 @@ sp_artist *_mock_artist(char *name, int loaded) {
     return a;
 }
 
+/// Generate a mock sp_track structure
+sp_track *_mock_track(char *name, int num_artists, sp_artist **artists,
+		      sp_album *album, int duration, int popularity,
+		      int disc, int index, sp_error error, int loaded) {
+    sp_track *t;
+    t = malloc(sizeof(t));
+    memset(t, 0, sizeof(t));
+    strcpy(t->name, name);
+    t->loaded = loaded;
+    return t;
+}
+
 sp_album *_mock_album() {
     return NULL;
 }
@@ -173,23 +196,6 @@ PyObject *mock_artist(PyObject *self, PyObject *args) {
     Py_INCREF(artist);
     artist -> _artist = _mock_artist(s, loaded);
     return artist;
-}
-
-sp_track *_mock_track() {
-    sp_track *t;
-    t = malloc(sizeof(sp_track));
-    memset(&t, 0, sizeof(sp_track));
-    strcpy(t->name, "Mock track");
-    t->num_artists = 2;
-    t->artists[0] = _mock_artist("Mock Artist 1", 1);
-    t->artists[1] = _mock_artist("Mock Artist 2", 1);
-    t->album = _mock_album();
-    t->duration = 360;
-    t->popularity = 5;
-    t->disc = 1;
-    t->index = 5;
-    t->error = 0;
-    return t;
 }
 
 sp_error sp_session_init(const sp_session_config *config, sp_session **sess) {

@@ -42,6 +42,15 @@ struct sp_album {
     char name[1024];
 };
 
+struct sp_playlist {
+    char name[1024];
+};
+
+struct sp_playlistcontainer {
+    sp_playlist *playlist[32];
+    int num_playlists;
+};
+
 struct sp_track {
     char name[1024];
     int num_artists;
@@ -230,6 +239,21 @@ PyObject *mock_artist(PyObject *self, PyObject *args) {
     Py_INCREF(artist);
     artist -> _artist = _mock_artist(s, loaded);
     return artist;
+}
+
+sp_playlistcontainer *_mock_playlistcontainer() {
+    sp_playlistcontainer *pc;
+    memset(pc, 0, sizeof(pc));
+    return pc;
+}
+
+PyObject *mock_playlistcontainer(PyObject *self) {
+    PlaylistContainer *pc = (PlaylistContainer *)PyObject_CallObject((PyObject *)&PlaylistContainerType, NULL);
+    pc -> _playlistcontainer = _mock_playlistcontainer();
+}
+
+sp_playlistcontainer *sp_session_playlistcontainer(sp_session *session) {
+    return _mock_playlistcontainer;
 }
 
 sp_error sp_session_init(const sp_session_config *config, sp_session **sess) {

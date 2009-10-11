@@ -9,6 +9,7 @@
 #include "pyspotify.h"
 #include "session.h"
 #include "track.h"
+#include "playlist.h"
 
 static PyObject *Session_new(PyTypeObject *type, PyObject *args, PyObject *kwds) {
     Session *self;
@@ -79,6 +80,15 @@ PyObject *handle_error(err) {
     }
 }
 
+static PyObject *Session_playlist_container(Session *self) {
+    fprintf(stderr, "entering Session_playlist_container\n");
+    sp_playlistcontainer* pc = sp_session_playlistcontainer(self->_session);
+    PlaylistContainer *ppc = (PlaylistContainer *)PyObject_CallObject((PyObject *)&PlaylistContainerType, NULL);
+    ppc -> _playlistcontainer = pc;
+    Py_INCREF(ppc);
+    return (PyObject *)ppc;
+}
+
 static PyObject *Session_load(Session *self, PyObject *args) {
     fprintf(stderr, "entering Session_load\n");
     Track *track;
@@ -119,6 +129,7 @@ static PyMethodDef Session_methods[] = {
     {"process_events", (PyCFunction)Session_process_events, METH_NOARGS, "Process any outstanding events"},
     {"load", (PyCFunction)Session_load, METH_VARARGS, "Load the specified track on the player"},
     {"play", (PyCFunction)Session_play, METH_VARARGS, "Play or pause the currently loaded track"},
+    {"playlist_container", (PyCFunction)Session_playlist_container, METH_NOARGS, "Return the playlist container for the currently logged in user"},
     {NULL}
 };
 
@@ -182,18 +193,50 @@ static void logged_in(sp_session *session, sp_error error) {
 
 static void logged_out(sp_session *session) {
     fprintf(stderr, "----------> logged_out called\n");
+    PyGILState_STATE gstate;
+    gstate = PyGILState_Ensure();
+    Session *psession = (Session *)PyObject_CallObject((PyObject *)&SessionType, NULL);
+    psession->_session = session;
+    PyObject *client = (PyObject *)sp_session_userdata(session);
+    fprintf(stderr, "client is %p\n", client);
+    PyObject_CallMethod(client, "logged_out", "O", psession);
+    PyGILState_Release(gstate);
 }
 
 static void metadata_updated(sp_session *session) {
     fprintf(stderr, "----------> metadata_updated called\n");
+    PyGILState_STATE gstate;
+    gstate = PyGILState_Ensure();
+    Session *psession = (Session *)PyObject_CallObject((PyObject *)&SessionType, NULL);
+    psession->_session = session;
+    PyObject *client = (PyObject *)sp_session_userdata(session);
+    fprintf(stderr, "client is %p\n", client);
+    PyObject_CallMethod(client, "metadata_updated", "O", psession);
+    PyGILState_Release(gstate);
 }
 
 static void connection_error(sp_session *session, sp_error error) {
     fprintf(stderr, "----------> connection_error called\n");
+    PyGILState_STATE gstate;
+    gstate = PyGILState_Ensure();
+    Session *psession = (Session *)PyObject_CallObject((PyObject *)&SessionType, NULL);
+    psession->_session = session;
+    PyObject *client = (PyObject *)sp_session_userdata(session);
+    fprintf(stderr, "client is %p\n", client);
+    PyObject_CallMethod(client, "connection_error", "Oi", psession, error);
+    PyGILState_Release(gstate);
 }
 
 static void message_to_user(sp_session *session, const char *message) {
     fprintf(stderr, "----------> message to user: %s", message);
+    PyGILState_STATE gstate;
+    gstate = PyGILState_Ensure();
+    Session *psession = (Session *)PyObject_CallObject((PyObject *)&SessionType, NULL);
+    psession->_session = session;
+    PyObject *client = (PyObject *)sp_session_userdata(session);
+    fprintf(stderr, "client is %p\n", client);
+    PyObject_CallMethod(client, "message_to_user", "Os", psession, message);
+    PyGILState_Release(gstate);
 }
 
 static void notify_main_thread(sp_session *session) {

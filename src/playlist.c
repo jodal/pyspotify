@@ -140,7 +140,7 @@ static PyMethodDef PlaylistContainer_methods[] = {
 static PyObject *PlaylistContainer_str(Playlist *self) {
 }
 
-Py_ssize_t Playlist_container_sq_length(PlaylistContainer *pc) {
+Py_ssize_t PlaylistContainer_sq_length(PlaylistContainer *pc) {
     int len = sp_playlistcontainer_num_playlists(pc->_playlistcontainer);
     return Py_BuildValue("i", len);
 }
@@ -149,15 +149,16 @@ Py_ssize_t Playlist_container_sq_length(PlaylistContainer *pc) {
 PyObject *PlaylistContainer_sq_item(PlaylistContainer *pc, Py_ssize_t index) {
     sp_playlist *pl = sp_playlistcontainer_playlist(pc->_playlistcontainer, (int)index);
     Playlist *p = (Playlist *)PyObject_CallObject((PyObject *)&PlaylistType, NULL);
+    Py_INCREF(p);
     p->_playlist = pl;
-    return p;
+    return (PyObject *)p;
 }
 
-/// PlaylistContainer Set Item [] = 
-PyObject *PlaylistContainer_sq_ass_item(PyObject *, Py_ssize_t, Py_ssize_t) {
+/// PlaylistContainer Set Item [] =
+PyObject *PlaylistContainer_sq_ass_item(PyObject *o, Py_ssize_t index, Py_ssize_t meh) {
 }
 
-static PySequenceMethods PlaylistContainer_as_sequence = {
+static const PySequenceMethods PlaylistContainer_as_sequence = {
     PlaylistContainer_sq_length,		// sq_length
     0,						// sq_concat
     0,						// sq_repeat
@@ -181,7 +182,7 @@ PyTypeObject PlaylistContainerType = {
     0,                         /*tp_compare*/
     0,                         /*tp_repr*/
     0,                         /*tp_as_number*/
-    PlaylistContainer_as_sequence,      /*tp_as_sequence*/
+    &PlaylistContainer_as_sequence,      /*tp_as_sequence*/
     0,                         /*tp_as_mapping*/
     0,                         /*tp_hash */
     0,                         /*tp_call*/

@@ -125,7 +125,7 @@ sp_track* sp_link_as_track(sp_link *link) {
     if(strncmp(link->data, "link:track:", strlen("link:track:")))
 	return NULL;
     sp_track *t = malloc(sizeof(sp_track));
-    memset(t,0,sizeof(t));
+    memset(t,0,sizeof(sp_track));
     return _mock_track(link->data + strlen("link:track:"), 0, NULL, NULL, 0, 0, 0, 0, 0, 1);
     return t;
 }
@@ -138,21 +138,21 @@ sp_artist *sp_link_as_artist(sp_link *link) {
 
 sp_link* sp_link_create_from_track(sp_track *track,int offset) {
     sp_link *l = malloc(sizeof(sp_link));
-    memset(l,0,sizeof(l));
+    memset(l,0,sizeof(sp_link));
     sprintf(l->data, "link:%s/%d", track->name, offset);
     return l;
 }
 
 sp_link *sp_link_create_from_artist(sp_artist *artist) {
     sp_link *l = malloc(sizeof(sp_link));
-    memset(l, 0, sizeof(l));
+    memset(l, 0, sizeof(sp_link));
     sprintf(l->data, "link_from_artist:%s", artist->name);
     return l;
 }
 
 sp_link* sp_link_create_from_string(const char * link) {
     sp_link *l = malloc(sizeof(sp_link));
-    memset(l,0,sizeof(l));
+    memset(l,0,sizeof(sp_link));
     sprintf(l->data, "link:%s", link);
     return l;
 }
@@ -175,6 +175,18 @@ const char *sp_track_name (sp_track *track) {
     return track->name;
 }
 
+/**************** MOCK PLAYLIST METHODS *****************/
+
+sp_playlist *sp_playlistcontainer_playlist(sp_playlistcontainer *pc, int index) {
+    return pc->playlist[index];
+}
+
+int sp_playlistcontainer_num_playlists(sp_playlistcontainer *pc) {
+    return pc->num_playlists;
+}
+
+/**************** MOCKING NEW OBJECTS *******************/
+
 /// Generate a mock sp_artist structure
 sp_artist *_mock_artist(char *name, int loaded) {
     sp_artist *a;
@@ -190,8 +202,8 @@ sp_track *_mock_track(char *name, int num_artists, sp_artist **artists,
 		      sp_album *album, int duration, int popularity,
 		      int disc, int index, sp_error error, int loaded) {
     sp_track *t;
-    t = malloc(sizeof(t));
-    memset(t, 0, sizeof(t));
+    t = malloc(sizeof(sp_track));
+    memset(t, 0, sizeof(sp_track));
     strcpy(t->name, name);
     t->loaded = loaded;
     return t;
@@ -241,19 +253,64 @@ PyObject *mock_artist(PyObject *self, PyObject *args) {
     return artist;
 }
 
+sp_playlist *_mock_playlist(char *name) {
+    sp_playlist *p;
+    p = malloc(sizeof(sp_playlist));
+    memset(p, 0, sizeof(sp_playlist));
+    strcpy(p->name, name);
+    return p;
+}
+
+PyObject *mock_playlist(PyObject *self, PyObject *args) {
+    char *s;
+    if(!PyArg_ParseTuple(args, "s", &s))
+	return NULL;
+    Playlist *playlist = (Playlist *)PyObject_CallObject((PyObject *)&PlaylistType, NULL);
+    if(!playlist)
+	return NULL;
+    Py_INCREF(playlist);
+    playlist -> _playlist = _mock_playlist(s);
+    return playlist;
+}
+
 sp_playlistcontainer *_mock_playlistcontainer() {
     sp_playlistcontainer *pc;
-    memset(pc, 0, sizeof(pc));
+    pc = malloc(sizeof(sp_playlistcontainer));
+    memset(pc, 0, sizeof(sp_playlistcontainer));
     return pc;
 }
 
-PyObject *mock_playlistcontainer(PyObject *self) {
+PyObject *mock_playlistcontainer(PyObject *self, PyObject *args) {
+    fprintf(stderr, "YY1\n");
+    PyObject *seq;
+    fprintf(stderr, "YY2\n");
+    if(!PyArg_ParseTuple(args, "O", &seq))
+	return NULL;
+    fprintf(stderr, "YY4\n");
     PlaylistContainer *pc = (PlaylistContainer *)PyObject_CallObject((PyObject *)&PlaylistContainerType, NULL);
+    fprintf(stderr, "YY5\n");
     pc -> _playlistcontainer = _mock_playlistcontainer();
+    fprintf(stderr, "YY6\n");
+    int len = PySequence_Length(seq);
+    fprintf(stderr, "YY7\n");
+    int i;
+    fprintf(stderr, "YY8\n");
+    for(i=0; i<len; ++i) {
+	fprintf(stderr, "YY9\n");
+	Playlist *item = (Playlist *)PySequence_GetItem(seq, i);
+	fprintf(stderr, "YY91\n");
+	sp_playlist *pl = malloc(sizeof(sp_playlist));
+	fprintf(stderr, "YY92\n");
+	memcpy(pl, item->_playlist, sizeof(sp_playlist));
+	fprintf(stderr, "YY93 %d\n", pc->_playlistcontainer->num_playlists);
+	pc->_playlistcontainer->playlist[pc->_playlistcontainer->num_playlists++] = pl;
+    }
+    fprintf(stderr, "YY10\n");
+    return pc;
 }
 
 sp_playlistcontainer *sp_session_playlistcontainer(sp_session *session) {
-    return _mock_playlistcontainer;
+    return _mock_playlistcontainer();
 }
 
 sp_error sp_session_init(const sp_session_config *config, sp_session **sess) {
@@ -317,6 +374,8 @@ static PyMethodDef module_methods[] = {
     {"mock_track", mock_track, METH_VARARGS, "Create a mock track"},
     {"mock_album", mock_album, METH_VARARGS, "Create a mock album"},
     {"mock_artist", mock_artist, METH_VARARGS, "Create a mock artist"},
+    {"mock_playlist", mock_playlist, METH_VARARGS, "Create a mock playlist"},
+    {"mock_playlistcontainer", mock_playlistcontainer, METH_VARARGS, "Create a mock playlist container"},
     {NULL, NULL, 0, NULL}
 };
 

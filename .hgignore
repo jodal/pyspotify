@@ -4,3 +4,4 @@ tmp
 spotify/session.so
 spotify/mocksession.so
 spotify.egg-info
+pyspotify.wpu

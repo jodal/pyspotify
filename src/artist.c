@@ -22,13 +22,13 @@ static PyObject *Artist_is_loaded(Artist *self) {
 }
 
 static PyObject *Artist_name(Artist *self) {
-    char *s = sp_artist_name(self->_artist);
+    const char *s = sp_artist_name(self->_artist);
     if(!s) return NULL;
     return PyString_FromString(s);
 }
 
 static PyObject *Artist_str(Artist *self) {
-    char *s = sp_artist_name(self->_artist);
+    const char *s = sp_artist_name(self->_artist);
     if(!s) return NULL;
     return PyString_FromString(s);
 }

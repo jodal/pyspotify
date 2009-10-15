@@ -62,8 +62,7 @@ static PyObject *Playlist_set_collaborative(Playlist *self, PyObject *args) {
 /////////////// SEQUENCE PROTOCOL
 
 static int Playlist_sq_length(Playlist *self) {
-    PyErr_SetString(PyExc_NotImplementedError, "");
-    return NULL;
+    return 0;
 }
 
 static PyObject *Playlist_sq_item(Playlist *self) {

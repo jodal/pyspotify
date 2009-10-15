@@ -67,7 +67,7 @@ static PyObject *Session_logout(Session *self) {
     return Py_BuildValue("");
 };
 
-PyObject *handle_error(err) {
+PyObject *handle_error(int err) {
     fprintf(stderr, "Handling error value %d\n", err);
     switch(err) {
 	case SP_ERROR_OK:

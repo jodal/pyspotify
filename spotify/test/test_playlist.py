@@ -24,4 +24,10 @@ class TestPlaylistContainer(unittest.TestCase):
         def _():
             return pc[2]
         self.assertRaises(IndexError, _)
+ 
+class TestPlaylist(unittest.TestCase):
+    
+    def test_name(self):
+        p1 = _mockspotify.mock_playlist("foo")
+        self.assertEqual(p1.name(), "foo")
         

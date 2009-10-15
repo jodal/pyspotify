@@ -177,6 +177,10 @@ const char *sp_track_name (sp_track *track) {
 
 /**************** MOCK PLAYLIST METHODS *****************/
 
+const char *sp_playlist_name(sp_playlist *p) {
+    return p->name;
+}
+
 sp_playlist *sp_playlistcontainer_playlist(sp_playlistcontainer *pc, int index) {
     return pc->playlist[index];
 }
@@ -305,7 +309,7 @@ PyObject *mock_playlistcontainer(PyObject *self, PyObject *args) {
 	fprintf(stderr, "YY93 %d\n", pc->_playlistcontainer->num_playlists);
 	pc->_playlistcontainer->playlist[pc->_playlistcontainer->num_playlists++] = pl;
     }
-    fprintf(stderr, "YY10\n");
+    fprintf(stderr, "YY10:%d\n", pc->_playlistcontainer->num_playlists);
     return pc;
 }
 

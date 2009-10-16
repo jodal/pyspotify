@@ -297,6 +297,15 @@ void session_init(PyObject *m) {
     PyModule_AddObject(m, "Session", (PyObject *)&SessionType);
 }
 
+char *copystring(PyObject *ob) {
+    char *s1, *s2;
+    int len;
+    PyString_AsStringAndSize(ob, &s1, &len);
+    s2 = malloc(len+1);
+    memcpy(s2, s1, len+1);
+    return s2;
+}
+
 PyObject *session_connect(PyObject *self, PyObject *args) {
 
     PyObject *client;
@@ -316,7 +325,7 @@ PyObject *session_connect(PyObject *self, PyObject *args) {
 	PyErr_SetString(SpotifyError, "Client did not provide a cache_location");
         return NULL;
     }
-    config.cache_location = PyString_AsString(cache_location);
+    config.cache_location = copystring(cache_location);
 
     fprintf(stderr, "connecting...X\n");
     PyObject *settings_location = PyObject_GetAttr(client, PyString_FromString("settings_location"));
@@ -324,7 +333,7 @@ PyObject *session_connect(PyObject *self, PyObject *args) {
 	PyErr_SetString(SpotifyError, "Client did not provide a settings_location");
         return NULL;
     }
-    config.settings_location = PyString_AsString(settings_location);
+    config.settings_location = copystring(settings_location);
 
     fprintf(stderr, "connecting...XX\n");
     PyObject *application_key = PyObject_GetAttr(client, PyString_FromString("application_key"));
@@ -332,7 +341,7 @@ PyObject *session_connect(PyObject *self, PyObject *args) {
 	PyErr_SetString(SpotifyError, "Client did not provide an application_key");
         return NULL;
     }
-    config.application_key = PyString_AsString(application_key);
+    config.application_key = copystring(application_key);
     config.application_key_size = PyString_Size(application_key);
 
     fprintf(stderr, "connecting...XXX\n");
@@ -341,7 +350,7 @@ PyObject *session_connect(PyObject *self, PyObject *args) {
 	PyErr_SetString(SpotifyError, "Client did not provide a user_agent");
         return NULL;
     }
-    config.user_agent = PyString_AsString(user_agent);
+    config.user_agent = copystring(user_agent);
 
     config.callbacks = &g_callbacks;
 
@@ -356,7 +365,7 @@ PyObject *session_connect(PyObject *self, PyObject *args) {
 	PyErr_SetString(SpotifyError, "Client did not provide a username");
 	return NULL;
     }
-    username = PyString_AsString(uobj);
+    username = copystring(uobj);
 
     fprintf(stderr, "connecting...YYYYY\n");
     pobj = PyObject_GetAttr(client, PyString_FromString("password"));
@@ -364,10 +373,18 @@ PyObject *session_connect(PyObject *self, PyObject *args) {
 	PyErr_SetString(SpotifyError, "Client did not provide a password");
 	return NULL;
     }
-    password = PyString_AsString(pobj);
+    password = copystring(pobj);
 
-    fprintf(stderr, "connecting...ZZZZZ\n");
+    fprintf(stderr, "connecting...ZZZZZ %p %p\n", &config, session);
+    fprintf(stderr, "config -> api_version = %d\n", config.api_version);
+    fprintf(stderr, "config -> cache_location = %s\n", config.cache_location);
+    fprintf(stderr, "config -> settings_location = %s\n", config.settings_location);
+    fprintf(stderr, "config -> application_key_size = %d\n", config.application_key_size);
+    fprintf(stderr, "config -> user_agent = %s\n", config.user_agent);
+    fprintf(stderr, "config -> callbacks = %p\n", config.callbacks);
+    fprintf(stderr, "config -> userdata = %p\n", config.userdata);
     error = sp_session_init(&config, &session);
+    fprintf(stderr, "MOO\n");
     if(error != SP_ERROR_OK) {
 	PyErr_SetString(SpotifyError, sp_error_message(error));
         return NULL;

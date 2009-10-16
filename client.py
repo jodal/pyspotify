@@ -6,6 +6,9 @@ import time
 class Client(client.Client):
     def logged_in(self, session, error):
         print "LOGGED IN CALLED"
+        ctr = session.playlist_container()
+        print ctr[0].name()
+
         #print "Loading track..."
         #l = Link.from_string("spotify:track:35QLYzQCz629mzQeQiQCwb")
         #l = Link.from_string("spotify:track:3i1EXbQPWMjFWGzaJagAmr")

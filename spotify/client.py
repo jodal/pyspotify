@@ -32,16 +32,12 @@ class Client(object):
         self.awoken.set()
 
     def loop(self, sess):
-        print "Looping session", sess
         while self.exit_code < 0:
-            print "Processing events"
             self.awoken.clear()
             timeout = sess.process_events()
-            print "Blocking for event"
             self.awoken.wait()
 
     def wake(self, sess):
-        print "CLIENT AWAKES"
         self.awoken.set()
 
     def logged_in(self, session, error):

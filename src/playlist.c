@@ -63,11 +63,13 @@ static PyObject *Playlist_set_collaborative(Playlist *self, PyObject *args) {
 
 /////////////// SEQUENCE PROTOCOL
 
-Py_ssize_t Playlist_sq_length(Playlist *self) {
+Py_ssize_t Playlist_sq_length(PyObject *o) {
+    Playlist *self = (Playlist *)o;
     return sp_playlist_num_tracks(self->_playlist);
 }
 
-PyObject *Playlist_sq_item(Playlist *self, Py_ssize_t index) {
+PyObject *Playlist_sq_item(PyObject *o, Py_ssize_t index) {
+    Playlist *self = (Playlist *)o;
     if(index >= sp_playlist_num_tracks(self->_playlist)) {
         PyErr_SetString(PyExc_IndexError, "");
         return NULL;
@@ -79,14 +81,15 @@ PyObject *Playlist_sq_item(Playlist *self, Py_ssize_t index) {
     return (PyObject *)t;
 }
 
-PyObject *Playlist_sq_ass_item(Playlist *self, PyObject *args) {
-    PyErr_SetString(PyExc_NotImplementedError, "");
-    return NULL;
+int Playlist_sq_ass_item(PyObject *o, Py_ssize_t index, PyObject *args) {
+    Playlist *self = (Playlist *)o;
+    return 0;
 }
 
 /////////////// ADDITIONAL METHODS
 
-static PyObject *Playlist_str(Playlist *self) {
+static PyObject *Playlist_str(PyObject *o) {
+    Playlist *self = (Playlist *)o;
     PyErr_SetString(PyExc_NotImplementedError, "");
     return NULL;
 }
@@ -108,7 +111,7 @@ static PySequenceMethods Playlist_as_sequence = {
     0,				// sq_concat
     0,				// sq_repeat
     Playlist_sq_item,		// sq_item
-    Playlist_sq_ass_item,	// sq_ass_item
+    0, //Playlist_sq_ass_item,	// sq_ass_item
     0,				// sq_contains
     0,				// sq_inplace_concat
     0,				// sq_inplace_repeat
@@ -168,17 +171,20 @@ static PyMethodDef PlaylistContainer_methods[] = {
     {NULL}
 };
 
-static PyObject *PlaylistContainer_str(Playlist *self) {
+static PyObject *PlaylistContainer_str(PyObject *o) {
+    Playlist *self = (Playlist *)o;
     PyErr_SetString(PyExc_NotImplementedError, "");
     return NULL;
 }
 
-Py_ssize_t PlaylistContainer_sq_length(PlaylistContainer *pc) {
-    return sp_playlistcontainer_num_playlists(pc->_playlistcontainer);
+Py_ssize_t PlaylistContainer_sq_length(PyObject *o) {
+    PlaylistContainer *self = (PlaylistContainer *)o;
+    return sp_playlistcontainer_num_playlists(self->_playlistcontainer);
 }
 
 /// PlaylistContainer Get Item []
-PyObject *PlaylistContainer_sq_item(PlaylistContainer *pc, Py_ssize_t index) {
+PyObject *PlaylistContainer_sq_item(PyObject *o, Py_ssize_t index) {
+    PlaylistContainer *pc = (PlaylistContainer *)o;
     fprintf(stderr, "SIZ %d %d\n", index, sp_playlistcontainer_num_playlists(pc->_playlistcontainer));
     if(index >= sp_playlistcontainer_num_playlists(pc->_playlistcontainer)) {
         PyErr_SetString(PyExc_IndexError, "");
@@ -197,7 +203,7 @@ PyObject *PlaylistContainer_sq_ass_item(PyObject *o, Py_ssize_t index, Py_ssize_
     return NULL;
 }
 
-static const PySequenceMethods PlaylistContainer_as_sequence = {
+PySequenceMethods PlaylistContainer_as_sequence = {
     PlaylistContainer_sq_length,		// sq_length
     0,						// sq_concat
     0,						// sq_repeat

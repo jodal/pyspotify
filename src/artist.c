@@ -26,8 +26,9 @@ static PyObject *Artist_name(Artist *self) {
     return PyString_FromString(s);
 }
 
-static PyObject *Artist_str(Artist *self) {
-    const char *s = sp_artist_name(self->_artist);
+PyObject *Artist_str(PyObject *self) {
+    Artist *a = (Artist *)self;
+    const char *s = sp_artist_name(a->_artist);
     if(!s) return NULL;
     return PyString_FromString(s);
 }

@@ -69,14 +69,11 @@ static PyObject *Session_logout(Session *self) {
 
 PyObject *handle_error(int err) {
     fprintf(stderr, "Handling error value %d\n", err);
-    switch(err) {
-	case SP_ERROR_OK:
-	    return Py_BuildValue("");
-	    break;
-	default:
-	    PyErr_SetString(SpotifyError, "Error!!!");
-	    return NULL;
-	    break;
+    if(err != 0) {
+	PyErr_SetString(SpotifyError, sp_error_message(err));
+	return NULL;
+    } else {
+	return Py_BuildValue("");
     }
 }
 
@@ -114,10 +111,8 @@ static PyObject *Session_play(Session *self, PyObject *args) {
 }
 
 static PyObject *Session_process_events(Session *self) {
-    fprintf(stderr, "process events called on %p\n", self);
     int timeout;
     sp_session_process_events(self->_session, &timeout);
-    fprintf(stderr, "process events leaving\n");
     return Py_BuildValue("i", timeout);
 }
 
@@ -262,7 +257,7 @@ static void notify_main_thread(sp_session *session) {
     //fprintf(stderr, "Leaving notify_main_thread\n");
 }
 
-static int frame_size(sp_audioformat *format) {
+static int frame_size(const sp_audioformat *format) {
     switch(format->sample_type) {
 	case SP_SAMPLETYPE_INT16_NATIVE_ENDIAN:
 	    return format->channels * 2; // 16 bits = 2 bytes
@@ -276,10 +271,8 @@ static int music_delivery(sp_session *session, const sp_audioformat *format, con
     fprintf(stderr, "----------> music_delivery called\n");
     PyGILState_STATE gstate;
     gstate = PyGILState_Ensure();
-    fprintf(stderr, "frames[0] is %d\n", (int)frames);
     int siz = frame_size(format);
-    //PyObject *pyframes = PyBuffer_FromMemory(frames, num_frames * siz);
-    PyObject *pyframes = Py_BuildValue("s#", frames, num_frames * siz);
+    PyObject *pyframes = PyBuffer_FromMemory((void *)frames, num_frames * siz);
     Py_INCREF(pyframes);
     Session *psession = (Session *)PyObject_CallObject((PyObject *)&SessionType, NULL);
     Py_INCREF(psession);
@@ -287,15 +280,15 @@ static int music_delivery(sp_session *session, const sp_audioformat *format, con
     PyObject *client = (PyObject *)sp_session_userdata(session);
     Py_INCREF(client);
     PyObject *c= PyObject_CallMethod(client, "music_delivery", "OOiiiii", psession, pyframes, siz, num_frames, format->sample_type, format->sample_rate, format->channels);
-    int consumed = 0;
+    int consumed = num_frames; // assume all consumed
     if(PyObject_TypeCheck(c, &PyInt_Type)) {
-	consumed = PyArg_Parse("i", c);
+	consumed = PyArg_Parse(c, "i");
     }
     Py_DECREF(pyframes);
     Py_DECREF(psession);
     Py_DECREF(client);
     PyGILState_Release(gstate);
-    return consumed; // consume all of them
+    return consumed;
 }
 
 static void play_token_lost(sp_session *session) {
@@ -338,18 +331,17 @@ char *copystring(PyObject *ob) {
 
 PyObject *session_connect(PyObject *self, PyObject *args) {
 
+    PyEval_InitThreads();
     PyObject *client;
     if(!PyArg_ParseTuple(args, "O", &client))
 	return NULL;
     Py_INCREF(client);
 
-    fprintf(stderr, "client is %p\n", client);
     sp_session_config config;
 
     config.api_version = SPOTIFY_API_VERSION;
     config.userdata = (void *)client;
 
-    fprintf(stderr, "Setting up configuration...\n");
     PyObject *cache_location = PyObject_GetAttr(client, PyString_FromString("cache_location"));
     if(cache_location == NULL) {
 	PyErr_SetString(SpotifyError, "Client did not provide a cache_location");
@@ -357,7 +349,6 @@ PyObject *session_connect(PyObject *self, PyObject *args) {
     }
     config.cache_location = copystring(cache_location);
 
-    fprintf(stderr, "connecting...X\n");
     PyObject *settings_location = PyObject_GetAttr(client, PyString_FromString("settings_location"));
     if(settings_location == NULL) {
 	PyErr_SetString(SpotifyError, "Client did not provide a settings_location");
@@ -365,7 +356,6 @@ PyObject *session_connect(PyObject *self, PyObject *args) {
     }
     config.settings_location = copystring(settings_location);
 
-    fprintf(stderr, "connecting...XX\n");
     PyObject *application_key = PyObject_GetAttr(client, PyString_FromString("application_key"));
     if(application_key == NULL) {
 	PyErr_SetString(SpotifyError, "Client did not provide an application_key");
@@ -374,7 +364,6 @@ PyObject *session_connect(PyObject *self, PyObject *args) {
     config.application_key = copystring(application_key);
     config.application_key_size = PyString_Size(application_key);
 
-    fprintf(stderr, "connecting...XXX\n");
     PyObject *user_agent = PyObject_GetAttr(client, PyString_FromString("user_agent"));
     if(user_agent == NULL) {
 	PyErr_SetString(SpotifyError, "Client did not provide a user_agent");
@@ -389,7 +378,6 @@ PyObject *session_connect(PyObject *self, PyObject *args) {
     PyObject *uobj, *pobj;
     char *username, *password;
 
-    fprintf(stderr, "connecting...XXXX\n");
     uobj = PyObject_GetAttr(client, PyString_FromString("username"));
     if(uobj == NULL) {
 	PyErr_SetString(SpotifyError, "Client did not provide a username");
@@ -397,7 +385,6 @@ PyObject *session_connect(PyObject *self, PyObject *args) {
     }
     username = copystring(uobj);
 
-    fprintf(stderr, "connecting...YYYYY\n");
     pobj = PyObject_GetAttr(client, PyString_FromString("password"));
     if(pobj == NULL) {
 	PyErr_SetString(SpotifyError, "Client did not provide a password");
@@ -405,7 +392,6 @@ PyObject *session_connect(PyObject *self, PyObject *args) {
     }
     password = copystring(pobj);
 
-    fprintf(stderr, "connecting...ZZZZZ %p %p\n", &config, session);
     fprintf(stderr, "config -> api_version = %d\n", config.api_version);
     fprintf(stderr, "config -> cache_location = %s\n", config.cache_location);
     fprintf(stderr, "config -> settings_location = %s\n", config.settings_location);
@@ -413,14 +399,20 @@ PyObject *session_connect(PyObject *self, PyObject *args) {
     fprintf(stderr, "config -> user_agent = %s\n", config.user_agent);
     fprintf(stderr, "config -> callbacks = %p\n", config.callbacks);
     fprintf(stderr, "config -> userdata = %p\n", config.userdata);
+    Py_BEGIN_ALLOW_THREADS
+    fprintf(stderr, "MOOx\n");
     error = sp_session_init(&config, &session);
     fprintf(stderr, "MOO\n");
+    Py_END_ALLOW_THREADS
     if(error != SP_ERROR_OK) {
 	PyErr_SetString(SpotifyError, sp_error_message(error));
         return NULL;
     }
     fprintf(stderr, "connecting...M\n");
+    Py_BEGIN_ALLOW_THREADS
     error = sp_session_login(session, username, password);
+    fprintf(stderr, "MOO\n");
+    Py_END_ALLOW_THREADS
     if(error != SP_ERROR_OK) {
 	PyErr_SetString(SpotifyError, sp_error_message(error));
         return NULL;

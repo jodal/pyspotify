@@ -42,8 +42,6 @@ PyMODINIT_FUNC init_spotify(void) {
     if(m == NULL)
         return;
 
-    PyEval_InitThreads();
-
     PyObject *spotify = PyImport_ImportModule("spotify");
     PyObject *d = PyModule_GetDict(spotify);
     PyObject *s = PyString_FromString("SpotifyError");

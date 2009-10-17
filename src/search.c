@@ -51,7 +51,7 @@ static PyObject *Results_query(Results *self) {
     return NULL;
 }
 
-static PyObject *Results_str(Results *self) {
+PyObject *Results_str(PyObject *self) {
     PyErr_SetString(PyExc_NotImplementedError, "");
     return NULL;
 }

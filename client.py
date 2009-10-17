@@ -2,10 +2,17 @@ from spotify import client, Link
 import sys
 import traceback
 import time
+import alsaaudio
 
 class Client(client.Client):
     queued = False
-    output = open("/tmp/music", "w")
+
+    def __init__(self, *a, **kw):
+        global out
+        client.Client.__init__(self, *a, **kw)
+        self.out = alsaaudio.PCM(alsaaudio.PCM_PLAYBACK)
+        self.out.setformat(alsaaudio.PCM_FORMAT_S16_LE)
+        self.out.setperiodsize(160)
 
     def logged_in(self, session, error):
         try:
@@ -15,14 +22,14 @@ class Client(client.Client):
 
     def metadata_updated(self, session):
         try:
-            for p in self.ctr:
-                if p.is_loaded():
-                    print p.name()
             if not self.queued:
                 playlist = self.ctr[27]
                 if playlist.is_loaded():
-                    session.load(playlist[0])
-                    session.play(1)
+                    if playlist[0].is_loaded():
+                        session.load(playlist[0])
+                        session.play(1)
+                        self.queued = True
+                        print "Playing", playlist[0].name()
         except:
             traceback.print_exc()
 
@@ -37,22 +44,11 @@ class Client(client.Client):
             print sample_type, "type"
             print sample_rate, "rate"
             print channels, "channels"
-            self.output.write(frames)
+            self.out.setchannels(channels)
+            self.out.setrate(sample_rate)
+            self.out.write(frames)
         except:
             traceback.print_exc()
-
-
-        #print "Loading track..."
-        #l = Link.from_string("spotify:track:35QLYzQCz629mzQeQiQCwb")
-        #l = Link.from_string("spotify:track:3i1EXbQPWMjFWGzaJagAmr")
-        #track = l.as_track()
-        #print "Session is", session
-        #try:
-        #    session.load(track)
-        #except Exception:
-        #    traceback.print_exc()
-        #print sys.stderr, "Playing track..."
-        #session.play(1)
 
 client = Client(sys.argv[1], sys.argv[2])
 client.connect()

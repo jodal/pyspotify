@@ -25,8 +25,7 @@ static PyObject *Track_str(PyObject *oself) {
 }
 
 static PyObject *Track_is_loaded(Track *self) {
-    PyErr_SetString(PyExc_NotImplementedError, "");
-    return NULL;
+    return Py_BuildValue("i", sp_track_is_loaded(self->_track));
 }
 
 static PyObject *Track_is_available(Track *self) {

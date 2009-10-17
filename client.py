@@ -4,10 +4,25 @@ import traceback
 import time
 
 class Client(client.Client):
+    queued = False
     def logged_in(self, session, error):
-        print "LOGGED IN CALLED"
-        ctr = session.playlist_container()
-        print ctr[0].name()
+        try:
+            self.ctr = session.playlist_container()
+        except:
+            traceback.print_exc()
+
+    def metadata_updated(self, session):
+        try:
+            for p in self.ctr:
+                if p.is_loaded():
+                    print p.name()
+            if not self.queued:
+                playlist = self.ctr[27]
+                if playlist.is_loaded():
+                    session.load(playlist[0])
+                    session.play(1)
+        except:
+            traceback.print_exc()
 
         #print "Loading track..."
         #l = Link.from_string("spotify:track:35QLYzQCz629mzQeQiQCwb")

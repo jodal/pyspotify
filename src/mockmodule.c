@@ -44,6 +44,8 @@ struct sp_album {
 
 struct sp_playlist {
     char name[1024];
+    sp_track *track[32];
+    int num_tracks;
 };
 
 struct sp_playlistcontainer {
@@ -177,8 +179,20 @@ const char *sp_track_name (sp_track *track) {
 
 /**************** MOCK PLAYLIST METHODS *****************/
 
+bool sp_playlist_is_loaded(sp_playlist *p) {
+    return 1;
+}
+
 const char *sp_playlist_name(sp_playlist *p) {
     return p->name;
+}
+
+sp_track *sp_playlist_track(sp_playlist *p, int index) {
+    return p->track[index];
+}
+
+int sp_playlist_num_tracks(sp_playlist *p) {
+    return p->num_tracks;
 }
 
 sp_playlist *sp_playlistcontainer_playlist(sp_playlistcontainer *pc, int index) {

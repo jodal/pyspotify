@@ -18,7 +18,6 @@ static PyObject *Artist_new(PyTypeObject *type, PyObject *args, PyObject *kwds) 
 
 static PyObject *Artist_is_loaded(Artist *self) {
     return Py_BuildValue("i", sp_artist_is_loaded(self->_artist));
-    return NULL;
 }
 
 static PyObject *Artist_name(Artist *self) {

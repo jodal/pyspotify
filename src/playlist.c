@@ -3,6 +3,7 @@
 #include "spotify/api.h"
 #include "pyspotify.h"
 #include "playlist.h"
+#include "track.h"
 
 static PyMemberDef Playlist_members[] = {
     {NULL}
@@ -21,8 +22,7 @@ static PyObject *Playlist_new(PyTypeObject *type, PyObject *args, PyObject *kwds
 }
 
 static PyObject *Playlist_is_loaded(Playlist *self) {
-    PyErr_SetString(PyExc_NotImplementedError, "");
-    return NULL;
+    return Py_BuildValue("i", sp_playlist_is_loaded(self->_playlist));
 }
 
 static PyObject *Playlist_add_callbacks(Playlist *self, PyObject *args) {
@@ -36,7 +36,9 @@ static PyObject *Playlist_remove_callbacks(Playlist *self, PyObject *args) {
 }
 
 static PyObject *Playlist_name(Playlist *self) {
-    return Py_BuildValue("s", sp_playlist_name(self->_playlist));
+    const char *name = sp_playlist_name(self->_playlist);
+    fprintf(stderr, "Playlist name is %s\n", name);
+    return Py_BuildValue("s", name);
 }
 
 static PyObject *Playlist_rename(Playlist *self, PyObject *args) {
@@ -61,13 +63,20 @@ static PyObject *Playlist_set_collaborative(Playlist *self, PyObject *args) {
 
 /////////////// SEQUENCE PROTOCOL
 
-static int Playlist_sq_length(Playlist *self) {
-    return 0;
+Py_ssize_t Playlist_sq_length(Playlist *self) {
+    return sp_playlist_num_tracks(self->_playlist);
 }
 
-static PyObject *Playlist_sq_item(Playlist *self) {
-    PyErr_SetString(PyExc_NotImplementedError, "");
-    return NULL;
+PyObject *Playlist_sq_item(Playlist *self, Py_ssize_t index) {
+    if(index >= sp_playlist_num_tracks(self->_playlist)) {
+        PyErr_SetString(PyExc_IndexError, "");
+        return NULL;
+    }
+    sp_track *tr = sp_playlist_track(self->_playlist, (int)index);
+    Track *t = (Track *)PyObject_CallObject((PyObject *)&TrackType, NULL);
+    Py_INCREF(t);
+    t->_track = tr;
+    return (PyObject *)t;
 }
 
 PyObject *Playlist_sq_ass_item(Playlist *self, PyObject *args) {
@@ -94,7 +103,7 @@ static PyMethodDef Playlist_methods[] = {
     {NULL}
 };
 
-/*static PySequenceMethods Playlist_as_sequence = {
+static PySequenceMethods Playlist_as_sequence = {
     Playlist_sq_length,		// sq_length
     0,				// sq_concat
     0,				// sq_repeat
@@ -103,7 +112,7 @@ static PyMethodDef Playlist_methods[] = {
     0,				// sq_contains
     0,				// sq_inplace_concat
     0,				// sq_inplace_repeat
-};*/
+};
 
 PyTypeObject PlaylistType = {
     PyObject_HEAD_INIT(NULL)
@@ -118,7 +127,7 @@ PyTypeObject PlaylistType = {
     0,                         /*tp_compare*/
     0,                         /*tp_repr*/
     0,                         /*tp_as_number*/
-    0, //Playlist_as_sequence,      /*tp_as_sequence*/
+    &Playlist_as_sequence,      /*tp_as_sequence*/
     0,                         /*tp_as_mapping*/
     0,                         /*tp_hash */
     0,                         /*tp_call*/

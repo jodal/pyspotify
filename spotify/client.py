@@ -2,6 +2,11 @@ import spotify
 import threading
 
 class Client(object):
+
+    """ Client for spotify. Inherit from this class to have your callbacks
+    called on the appropriate events. Exceptions raised in your callback
+    handlers will be silently discarded unless you handle them! """
+
     api_version = spotify.api_version
     cache_location = 'tmp'
     settings_location = 'tmp'

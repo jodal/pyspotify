@@ -5,6 +5,8 @@ import time
 
 class Client(client.Client):
     queued = False
+    output = open("/tmp/music", "w")
+
     def logged_in(self, session, error):
         try:
             self.ctr = session.playlist_container()
@@ -23,6 +25,22 @@ class Client(client.Client):
                     session.play(1)
         except:
             traceback.print_exc()
+
+    def music_delivery(self, session, frames, frame_size, num_frames, sample_type, sample_rate, channels):
+        try:
+            print "Music delivery called"
+            print repr(frames)
+            #print str(frames)
+            print len(frames), "frame bytes"
+            print frame_size, "frame size"
+            print num_frames, "frames"
+            print sample_type, "type"
+            print sample_rate, "rate"
+            print channels, "channels"
+            self.output.write(frames)
+        except:
+            traceback.print_exc()
+
 
         #print "Loading track..."
         #l = Link.from_string("spotify:track:35QLYzQCz629mzQeQiQCwb")

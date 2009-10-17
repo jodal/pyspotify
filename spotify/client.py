@@ -62,7 +62,7 @@ class Client(object):
     def notify_main_thread(self, sess):
         pass
 
-    def music_delivery(self, sess, mformat, frames):
+    def music_delivery(self, sess, frames, frame_size, num_frames, sample_type, sample_rate, channels):
         pass
 
     def play_token_lost(self, sess):

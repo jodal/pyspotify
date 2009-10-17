@@ -262,10 +262,40 @@ static void notify_main_thread(sp_session *session) {
     //fprintf(stderr, "Leaving notify_main_thread\n");
 }
 
+static int frame_size(sp_audioformat *format) {
+    switch(format->sample_type) {
+	case SP_SAMPLETYPE_INT16_NATIVE_ENDIAN:
+	    return format->channels * 2; // 16 bits = 2 bytes
+	    break;
+	default:
+	    return -1;
+    }
+}
 
 static int music_delivery(sp_session *session, const sp_audioformat *format, const void *frames, int num_frames) {
     fprintf(stderr, "----------> music_delivery called\n");
-    return num_frames; // consume all of them
+    PyGILState_STATE gstate;
+    gstate = PyGILState_Ensure();
+    fprintf(stderr, "frames[0] is %d\n", (int)frames);
+    int siz = frame_size(format);
+    //PyObject *pyframes = PyBuffer_FromMemory(frames, num_frames * siz);
+    PyObject *pyframes = Py_BuildValue("s#", frames, num_frames * siz);
+    Py_INCREF(pyframes);
+    Session *psession = (Session *)PyObject_CallObject((PyObject *)&SessionType, NULL);
+    Py_INCREF(psession);
+    psession->_session = session;
+    PyObject *client = (PyObject *)sp_session_userdata(session);
+    Py_INCREF(client);
+    PyObject *c= PyObject_CallMethod(client, "music_delivery", "OOiiiii", psession, pyframes, siz, num_frames, format->sample_type, format->sample_rate, format->channels);
+    int consumed = 0;
+    if(PyObject_TypeCheck(c, &PyInt_Type)) {
+	consumed = PyArg_Parse("i", c);
+    }
+    Py_DECREF(pyframes);
+    Py_DECREF(psession);
+    Py_DECREF(client);
+    PyGILState_Release(gstate);
+    return consumed; // consume all of them
 }
 
 static void play_token_lost(sp_session *session) {

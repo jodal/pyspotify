@@ -156,5 +156,6 @@ PyTypeObject TrackType = {
 };
 
 void track_init(PyObject *m) {
+    Py_INCREF(&TrackType);
     PyModule_AddObject(m, "Track", (PyObject *)&TrackType);
 }

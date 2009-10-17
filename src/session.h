@@ -1,6 +1,7 @@
 typedef struct {
     PyObject_HEAD
     sp_session *_session;
+    PyObject *client;
 } Session;
 
 extern PyTypeObject SessionType;

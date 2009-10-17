@@ -131,5 +131,6 @@ PyTypeObject ResultsType = {
 };
 
 void search_init(PyObject *m) {
+    Py_INCREF(&ResultsType);
     PyModule_AddObject(m, "Results", (PyObject *)&ResultsType);
 }

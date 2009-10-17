@@ -185,7 +185,6 @@ Py_ssize_t PlaylistContainer_sq_length(PyObject *o) {
 /// PlaylistContainer Get Item []
 PyObject *PlaylistContainer_sq_item(PyObject *o, Py_ssize_t index) {
     PlaylistContainer *pc = (PlaylistContainer *)o;
-    fprintf(stderr, "SIZ %d %d\n", index, sp_playlistcontainer_num_playlists(pc->_playlistcontainer));
     if(index >= sp_playlistcontainer_num_playlists(pc->_playlistcontainer)) {
         PyErr_SetString(PyExc_IndexError, "");
         return NULL;
@@ -257,6 +256,8 @@ PyTypeObject PlaylistContainerType = {
 };
 
 void playlist_init(PyObject *m) {
+    Py_INCREF(&PlaylistType);
+    Py_INCREF(&PlaylistContainerType);
     PyModule_AddObject(m, "Playlist", (PyObject *)&PlaylistType);
     PyModule_AddObject(m, "PlaylistContainer", (PyObject *)&PlaylistContainerType);
 }

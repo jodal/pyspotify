@@ -8,7 +8,6 @@ class Client(client.Client):
     queued = False
 
     def __init__(self, *a, **kw):
-        global out
         client.Client.__init__(self, *a, **kw)
         self.out = alsaaudio.PCM(alsaaudio.PCM_PLAYBACK)
         self.out.setformat(alsaaudio.PCM_FORMAT_S16_LE)

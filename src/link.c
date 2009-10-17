@@ -19,29 +19,19 @@ static PyObject *Link_new(PyTypeObject *type, PyObject *args, PyObject *kwds) {
 }
 
 static PyObject *Link_from_string(Link *self, PyObject *args) {
-    fprintf(stderr, "Link_from_string called\n");
     char *s, *s2;
-    //const char SPOTIFY_URI[] = "spotify:track:6JEK0CvvjDjjMUBFoXShNZ";
-    fprintf(stderr, "X\n");
     if(!PyArg_ParseTuple(args, "s", &s))
 	return NULL;
     s2 = malloc(strlen(s) +1);
     strcpy(s2, s);
-    fprintf(stderr, "X%sX\n", s2);
-    //sp_link *link = sp_link_create_from_string(SPOTIFY_URI);
     sp_link *link = sp_link_create_from_string(s2);
-    fprintf(stderr, "X\n");
     if(!link) {
 	PyErr_SetString(SpotifyError, "Failed to get link from a Spotify URI");
 	return NULL;
     }
-    fprintf(stderr, "X");
     Link *plink = (Link *)PyObject_CallObject((PyObject *)&LinkType, NULL);
-    fprintf(stderr, "X");
     Py_INCREF(plink);
-    fprintf(stderr, "X");
     plink->_link = link;
-    fprintf(stderr, "Link_from_string completed\n");
     return (PyObject *)plink;
 }
 
@@ -232,5 +222,6 @@ PyTypeObject LinkType = {
 };
 
 void link_init(PyObject *m) {
+    Py_INCREF(&LinkType);
     PyModule_AddObject(m, "Link", (PyObject *)&LinkType);
 }

@@ -46,7 +46,7 @@ PyMODINIT_FUNC init_spotify(void) {
     PyObject *d = PyModule_GetDict(spotify);
     PyObject *s = PyString_FromString("SpotifyError");
     SpotifyError = PyDict_GetItem(d, s);
-    Py_DECREF(s);
+    Py_INCREF(SpotifyError);
 
     SpotifyApiVersion = Py_BuildValue("i", SPOTIFY_API_VERSION);
     Py_INCREF(SpotifyApiVersion);

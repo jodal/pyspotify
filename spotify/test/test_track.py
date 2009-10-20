@@ -1,29 +1,31 @@
 
 import unittest
-from spotify import _mockspotify
+from spotify._mockspotify import mock_track, mock_album, mock_artist
 
 class TestTrack(unittest.TestCase):
 
+    track = mock_track("foo", 3, mock_album("bar"), 10, 20, 30, 40, 0, 1)
+
     def test_artists(self):
-        pass
+        self.assertEqual([x.name() for x in self.track.artists()], ["a1", "a2", "a3"])
 
     def test_album(self):
-        pass
+        self.assertEqual(self.track.album().name(), "bar")
 
     def test_name(self):
-        pass
+        self.assertEqual(self.track.name(), "foo")
 
     def test_duration(self):
-        pass
+        self.assertEqual(self.track.duration(), 10)
 
     def test_popularity(self):
-        pass
+        self.assertEqual(self.track.popularity(), 20)
 
     def test_disc(self):
-        pass
+        self.assertEqual(self.track.disc(), 30)
 
     def test_index(self):
-        pass
+        self.assertEqual(self.track.index(), 40)
 
 
 

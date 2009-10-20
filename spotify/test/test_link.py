@@ -1,3 +1,4 @@
+
 import unittest
 from spotify._mockspotify import Link, mock_artist, mock_track, mock_album, mock_playlist
 from spotify import SpotifyError

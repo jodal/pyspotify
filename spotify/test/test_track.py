@@ -27,5 +27,10 @@ class TestTrack(unittest.TestCase):
     def test_index(self):
         self.assertEqual(self.track.index(), 40)
 
+    def test_error(self):
+        self.assertEqual(self.track.error(), 0)
+
+    def test_is_loaded(self):
+        self.assertEqual(self.track.is_loaded(), 1)
 
 

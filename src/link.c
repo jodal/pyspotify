@@ -87,20 +87,14 @@ static PyObject *Link_type(Link *self) {
 }
 
 static PyObject *Link_as_track(Link *self) {
-    fprintf(stderr, "11111111111111111111111");
     sp_track *track = sp_link_as_track(self->_link);
-    fprintf(stderr, "22222222222222222222222");
     if(!track) {
 	PyErr_SetString(SpotifyError, "Not a track link");
 	return NULL;
     }
-    fprintf(stderr, "333333333333333333333333");
     Track *ptrack = (Track *)PyObject_CallObject((PyObject *)&TrackType, NULL);
-    fprintf(stderr, "444444444444444444444444");
     ptrack->_track = track;
-    fprintf(stderr, "555555555555555555555555");
     Py_INCREF(ptrack);
-    fprintf(stderr, "666666666666666666666666");
     return (PyObject *)ptrack;
 }
 

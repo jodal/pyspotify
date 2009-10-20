@@ -35,7 +35,21 @@ class TestLink(unittest.TestCase):
         self.assertEqual(str(l), "link_from_playlist:foo")
 
     def test_type(self):
-        pass
+        t = mock_track("foo", 0, mock_album("bar"), 0, 0, 0, 0, 0, 1)
+        l2 = Link.from_track(t, 42)
+        self.assertEqual(l2.type(), Link.LINK_TRACK)
+        a = mock_album("foo")
+        l2 = Link.from_album(a)
+        self.assertEqual(l2.type(), Link.LINK_ALBUM)
+        a = mock_artist("artist", 1)
+        l = Link.from_artist(a)
+        self.assertEqual(l.type(), Link.LINK_ARTIST)
+        s = mock_search("query")
+        l2 = Link.from_search(s)
+        self.assertEqual(l.type(), Link.LINK_SEARCH)
+        p = mock_playlist("foo", [])
+        l = Link.from_playlist(p)
+        self.assertEqual(l.type(), Link.LINK_PLAYLIST)
 
     def test_as_track(self):
         l = Link.from_string("track:as_track_test")
@@ -68,4 +82,3 @@ class TestLink(unittest.TestCase):
         s = "str_test"
         l = Link.from_string(s)
         self.assertEqual(str(l), "link:str_test")
-

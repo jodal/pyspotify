@@ -334,7 +334,6 @@ PyObject *session_connect(PyObject *self, PyObject *args) {
     config.callbacks = &g_callbacks;
     config.user_agent = "unset";
 
-    fprintf(stderr, "userdata is %p\n", config.userdata);
     PyObject *cache_location = PyObject_GetAttr(client, PyString_FromString("cache_location"));
     if(cache_location == NULL) {
 	PyErr_SetString(SpotifyError, "Client did not provide a cache_location");

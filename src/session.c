@@ -75,7 +75,6 @@ PyObject *handle_error(int err) {
 }
 
 static PyObject *Session_playlist_container(Session *self) {
-    fprintf(stderr, "entering Session_playlist_container\n");
     sp_playlistcontainer* pc = sp_session_playlistcontainer(self->_session);
     PlaylistContainer *ppc = (PlaylistContainer *)PyObject_CallObject((PyObject *)&PlaylistContainerType, NULL);
     Py_INCREF(ppc);
@@ -260,7 +259,6 @@ static int frame_size(const sp_audioformat *format) {
 }
 
 static int music_delivery(sp_session *session, const sp_audioformat *format, const void *frames, int num_frames) {
-    fprintf(stderr, "----------> music_delivery called\n");
     PyGILState_STATE gstate;
     gstate = PyGILState_Ensure();
     int siz = frame_size(format);
@@ -270,15 +268,13 @@ static int music_delivery(sp_session *session, const sp_audioformat *format, con
     Py_INCREF(psession);
     psession->_session = session;
     PyObject *client = (PyObject *)sp_session_userdata(session);
-    Py_INCREF(client);
     PyObject *c= PyObject_CallMethod(client, "music_delivery", "OOiiiii", psession, pyframes, siz, num_frames, format->sample_type, format->sample_rate, format->channels);
     int consumed = num_frames; // assume all consumed
     if(PyObject_TypeCheck(c, &PyInt_Type)) {
-	consumed = PyArg_Parse(c, "i");
+	consumed = (int)PyInt_AsLong(c);
     }
     Py_DECREF(pyframes);
     Py_DECREF(psession);
-    Py_DECREF(client);
     PyGILState_Release(gstate);
     return consumed;
 }
@@ -339,6 +335,7 @@ PyObject *session_connect(PyObject *self, PyObject *args) {
     config.callbacks = &g_callbacks;
     config.user_agent = "unset";
 
+    fprintf(stderr, "userdata is %p\n", config.userdata);
     PyObject *cache_location = PyObject_GetAttr(client, PyString_FromString("cache_location"));
     if(cache_location == NULL) {
 	PyErr_SetString(SpotifyError, "Client did not provide a cache_location");
@@ -382,17 +379,8 @@ PyObject *session_connect(PyObject *self, PyObject *args) {
     }
     password = copystring(pobj);
 
-    fprintf(stderr, "config -> api_version = %d\n", config.api_version);
-    fprintf(stderr, "config -> cache_location = %s\n", config.cache_location);
-    fprintf(stderr, "config -> settings_location = %s\n", config.settings_location);
-    fprintf(stderr, "config -> application_key_size = %d\n", config.application_key_size);
-    fprintf(stderr, "config -> user_agent = %s\n", config.user_agent);
-    fprintf(stderr, "config -> callbacks = %p\n", config.callbacks);
-    fprintf(stderr, "config -> userdata = %p\n", config.userdata);
-    fprintf(stderr, "MOOx\n");
     error = sp_session_init(&config, &session);
     session_constructed = 1;
-    fprintf(stderr, "MOO\n");
     if(error != SP_ERROR_OK) {
 	PyErr_SetString(SpotifyError, sp_error_message(error));
         return NULL;

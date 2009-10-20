@@ -159,22 +159,31 @@ sp_link* sp_link_create_from_string(const char * link) {
     return l;
 }
 
+int sp_link_as_string (sp_link *link, char *buffer, int buffer_size) {
+    strncpy(buffer, link->data, buffer_size);
+    return strlen(link->data);
+}
+
+/*************** MOCK TRACK METHODS ************************/
+
+bool sp_track_is_loaded(sp_track *t) {
+    return t->loaded;
+}
+
+const char *sp_track_name (sp_track *track) {
+    fprintf(stderr, "track mock is %s\n", track->name);
+    return track->name;
+}
+
+
+/*************** MOCK ARTIST METHODS **********************/
+
 const char *sp_artist_name(sp_artist *a) {
     return a->name;
 }
 
 bool sp_artist_is_loaded(sp_artist *a) {
     return a->loaded;
-}
-
-int sp_link_as_string (sp_link *link, char *buffer, int buffer_size) {
-    strncpy(buffer, link->data, buffer_size);
-    return strlen(link->data);
-}
-
-const char *sp_track_name (sp_track *track) {
-    fprintf(stderr, "track mock is %s\n", track->name);
-    return track->name;
 }
 
 /**************** MOCK PLAYLIST METHODS *****************/
@@ -245,7 +254,7 @@ PyObject *mock_track(PyObject *self, PyObject *args) {
     Track *track = (Track *)PyObject_CallObject((PyObject *)&TrackType, NULL);
     track->_track = t;
     Py_INCREF(track);
-    return track;
+    return (PyObject *)track;
 }
 
 sp_album *_mock_album() {
@@ -281,13 +290,20 @@ sp_playlist *_mock_playlist(char *name) {
 
 PyObject *mock_playlist(PyObject *self, PyObject *args) {
     char *s;
-    if(!PyArg_ParseTuple(args, "s", &s))
+    int i;
+    PyObject *tracks;
+    if(!PyArg_ParseTuple(args, "sO", &s, &tracks))
 	return NULL;
     Playlist *playlist = (Playlist *)PyObject_CallObject((PyObject *)&PlaylistType, NULL);
     if(!playlist)
 	return NULL;
     Py_INCREF(playlist);
     playlist -> _playlist = _mock_playlist(s);
+    for(i=0; i< PySequence_Length(tracks); i++) {
+	Track *t = (Track *)PySequence_GetItem(tracks, i);
+	Py_INCREF(t);
+	playlist->_playlist->track[playlist->_playlist->num_tracks++] = t->_track;
+    }
     return playlist;
 }
 
@@ -299,31 +315,18 @@ sp_playlistcontainer *_mock_playlistcontainer() {
 }
 
 PyObject *mock_playlistcontainer(PyObject *self, PyObject *args) {
-    fprintf(stderr, "YY1\n");
     PyObject *seq;
-    fprintf(stderr, "YY2\n");
     if(!PyArg_ParseTuple(args, "O", &seq))
 	return NULL;
-    fprintf(stderr, "YY4\n");
     PlaylistContainer *pc = (PlaylistContainer *)PyObject_CallObject((PyObject *)&PlaylistContainerType, NULL);
-    fprintf(stderr, "YY5\n");
     pc -> _playlistcontainer = _mock_playlistcontainer();
-    fprintf(stderr, "YY6\n");
     int len = PySequence_Length(seq);
-    fprintf(stderr, "YY7\n");
     int i;
-    fprintf(stderr, "YY8\n");
     for(i=0; i<len; ++i) {
-	fprintf(stderr, "YY9\n");
 	Playlist *item = (Playlist *)PySequence_GetItem(seq, i);
-	fprintf(stderr, "YY91\n");
-	sp_playlist *pl = malloc(sizeof(sp_playlist));
-	fprintf(stderr, "YY92\n");
-	memcpy(pl, item->_playlist, sizeof(sp_playlist));
-	fprintf(stderr, "YY93 %d\n", pc->_playlistcontainer->num_playlists);
-	pc->_playlistcontainer->playlist[pc->_playlistcontainer->num_playlists++] = pl;
+	Py_INCREF(item);
+	pc->_playlistcontainer->playlist[pc->_playlistcontainer->num_playlists++] = item->_playlist;
     }
-    fprintf(stderr, "YY10:%d\n", pc->_playlistcontainer->num_playlists);
     return pc;
 }
 

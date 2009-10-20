@@ -23,11 +23,9 @@ class Client(object):
 
     def connect(self):
         sess = spotify.connect(self)
-        print "Connect, session is", sess
         self.loop(sess) # returns on disconnect
 
     def disconnect(self):
-        print "DISCONNECTING"
         self.exit_code = 0
         self.awoken.set()
 

@@ -83,7 +83,6 @@ static PyObject *Session_playlist_container(Session *self) {
 }
 
 static PyObject *Session_load(Session *self, PyObject *args) {
-    fprintf(stderr, "entering Session_load\n");
     Track *track;
     sp_track *t;
     sp_session *s;

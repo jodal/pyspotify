@@ -123,15 +123,11 @@ static PyObject *Link_as_artist(Link *self) {
 
 static PyObject *Link_str(PyObject *oself) {
     Link *self = (Link *)oself;
-    fprintf(stderr, "AAA %p\n", self->_link);
     char uri[1024];
-    fprintf(stderr, "AAA1\n");
     if(0 > sp_link_as_string(self->_link, uri, sizeof(uri))) {
-        fprintf(stderr, "AAA2\n");
 	PyErr_SetString(SpotifyError, "failed to render Spotify URI from link");
 	return NULL;
     }
-    fprintf(stderr, "AAA3\n");
     return Py_BuildValue("s", uri);
 }
 

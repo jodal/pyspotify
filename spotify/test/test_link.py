@@ -1,5 +1,5 @@
 import unittest
-from spotify._mockspotify import Link, mock_artist
+from spotify._mockspotify import Link, mock_artist, mock_track, mock_album, mock_playlist
 from spotify import SpotifyError
 
 class TestLink(unittest.TestCase):
@@ -10,25 +10,29 @@ class TestLink(unittest.TestCase):
         self.assertEqual(str(l), "link:from_string_test")
 
     def test_from_track(self):
-        s = "track:from_track_test"
-        l = Link.from_string(s)
-        t = l.as_track()
+        t = mock_track("foo", 0, mock_album("bar"), 0, 0, 0, 0, 0, 1)
         l2 = Link.from_track(t, 42)
-        self.assertEqual(str(l2), "link:from_track_test/42")
+        self.assertEqual(str(l2), "link_from_track:foo")
 
     def test_from_album(self):
-        pass
+        a = mock_album("foo")
+        l2 = Link.from_album(a)
+        self.assertEqual(str(l2), "link_from_album:foo")
 
     def test_from_artist(self):
-        a = mock_artist("test_from_artist", 1)
+        a = mock_artist("artist", 1)
         l = Link.from_artist(a)
-        self.assertEqual(str(l), "link_from_artist:test_from_artist");
+        self.assertEqual(str(l), "link_from_artist:artist")
 
     def test_from_search(self):
-        pass
+        s = mock_search("query")
+        l2 = Link.from_search(s)
+        self.assertEqual(str(l2), "link_from_search:query")
 
     def test_from_playlist(self):
-        pass
+        p = mock_playlist("foo", [])
+        l = Link.from_playlist(p)
+        self.assertEqual(str(l), "link_from_playlist:foo")
 
     def test_type(self):
         pass
@@ -43,7 +47,13 @@ class TestLink(unittest.TestCase):
         self.assertRaises(SpotifyError, l.as_track)
 
     def test_as_album(self):
-        pass
+        l = Link.from_string("album:as_album_test")
+        t = l.as_album()
+        self.assertEqual(str(t), "as_album_test")
+
+    def test_as_album_badlink(self):
+        l = Link.from_string("NOTalbum:as_album_test")
+        self.assertRaises(SpotifyError, l.as_album)
 
     def test_as_artist(self):
         l = Link.from_string("artist:test_as_artist")

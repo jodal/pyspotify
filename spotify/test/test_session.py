@@ -25,7 +25,6 @@ class TestSession(unittest.TestCase):
     def test_initialisation(self):
         class MockClient(BaseMockClient):
             def logged_in(self, session, error):
-                print "MockClient: logged_in"
                 username = session.username()
                 self.found_username = username
                 session.logout()
@@ -38,7 +37,6 @@ class TestSession(unittest.TestCase):
     def test_load(self):
         class MockClient(BaseMockClient):
             def logged_in(self, session, error):
-                print "MockClient: logged_in"
                 track = mock_track("foo", 0, mock_album(), 0, 0, 0, 0, 0, 1)
                 session.load(track)
                 session.play(True)
@@ -46,7 +44,7 @@ class TestSession(unittest.TestCase):
                 self.disconnect()
 
             def music_delivery(self, sess, mformat, frames):
-                print "MUSIC!"
+                pass
 
         c = MockClient()
         c.connect()

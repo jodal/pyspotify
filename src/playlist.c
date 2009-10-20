@@ -37,7 +37,6 @@ static PyObject *Playlist_remove_callbacks(Playlist *self, PyObject *args) {
 
 static PyObject *Playlist_name(Playlist *self) {
     const char *name = sp_playlist_name(self->_playlist);
-    fprintf(stderr, "Playlist name is %s\n", name);
     return Py_BuildValue("s", name);
 }
 

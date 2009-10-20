@@ -4,7 +4,7 @@ from spotify._mockspotify import mock_track, mock_album, mock_artist
 
 class TestTrack(unittest.TestCase):
 
-    track = mock_track("foo", 3, mock_album("bar"), 10, 20, 30, 40, 0, 1)
+    track = mock_track("foo", 3, mock_album("bar", mock_artist("baz", 1), 0, "", 0), 10, 20, 30, 40, 0, 1)
 
     def test_artists(self):
         self.assertEqual([x.name() for x in self.track.artists()], ["a1", "a2", "a3"])

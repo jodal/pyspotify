@@ -218,6 +218,21 @@ sp_artist *_mock_artist(char *name, int loaded) {
     return a;
 }
 
+/// Generate a mock spotify.Artist python object
+PyObject *mock_artist(PyObject *self, PyObject *args) {
+    char *s;
+    int loaded;
+    if(!PyArg_ParseTuple(args, "si", &s, &loaded))
+	return NULL;
+    Artist *artist = (Artist *)PyObject_CallObject((PyObject *)&ArtistType, NULL);
+    if(!artist)
+	return NULL;
+    Py_INCREF(artist);
+    artist -> _artist = _mock_artist(s, loaded);
+    return artist;
+}
+
+
 /// Generate a mock sp_track structure
 sp_track *_mock_track(char *name, int num_artists, sp_artist **artists,
 		      sp_album *album, int duration, int popularity,
@@ -255,23 +270,14 @@ sp_album *_mock_album() {
     return NULL;
 }
 
-PyObject *mock_album() {
+PyObject *mock_album(PyObject *self, PyObject *args) {
+    PyObject *artist, *cover;
+    char *name;
+    int year, type;
+    if(!PyArg_ParseTuple(args, "sO!isi", &name, &ArtistType, &artist, &year, &cover, &type))
+	return NULL;
     Album *album = (Album *)PyObject_CallObject((PyObject *)&AlbumType, NULL);
     return album;
-}
-
-/// Generate a mock spotify.Artist python object
-PyObject *mock_artist(PyObject *self, PyObject *args) {
-    char *s;
-    int loaded;
-    if(!PyArg_ParseTuple(args, "si", &s, &loaded))
-	return NULL;
-    Artist *artist = (Artist *)PyObject_CallObject((PyObject *)&ArtistType, NULL);
-    if(!artist)
-	return NULL;
-    Py_INCREF(artist);
-    artist -> _artist = _mock_artist(s, loaded);
-    return artist;
 }
 
 sp_playlist *_mock_playlist(char *name) {

@@ -133,4 +133,8 @@ PyTypeObject AlbumType = {
 void album_init(PyObject *m) {
     PyModule_AddObject(m, "Album", (PyObject *)&AlbumType);
     Py_INCREF(&AlbumType);
+    PyMapping_SetItemString(AlbumType.tp_dict, "ALBUM", Py_BuildValue("i", SP_ALBUMTYPE_ALBUM));
+    PyMapping_SetItemString(AlbumType.tp_dict, "SINGLE", Py_BuildValue("i", SP_ALBUMTYPE_SINGLE));
+    PyMapping_SetItemString(AlbumType.tp_dict, "COMPILATION", Py_BuildValue("i", SP_ALBUMTYPE_COMPILATION));
+    PyMapping_SetItemString(AlbumType.tp_dict, "UNKNOWN", Py_BuildValue("i", SP_ALBUMTYPE_UNKNOWN));
 }

@@ -28,6 +28,7 @@ sp_artist *_mock_artist(char *name, int loaded);
 sp_track *_mock_track(char *name, int num_artists, sp_artist **artists,
 		      sp_album *album, int duration, int popularity,
 		      int disc, int index, sp_error error, int loaded);
+sp_playlistcontainer *_mock_playlistcontainer();
 
 /****************************** GLOBALS ************************************/
 
@@ -107,6 +108,52 @@ event_type eventq[16];
 int events = 0;
 
 /***************************** MOCK SESSION FUNCTIONS **************************/
+
+sp_error sp_session_login(sp_session *session, const char *username, const char *password) {
+    strcpy(g_data.username, username);
+    strcpy(g_data.password, password);
+    eventq[events++] = MOCK_LOGGED_IN;
+    return SP_ERROR_OK;
+}
+
+sp_error sp_session_logout(sp_session *session) {
+    eventq[events++] = MOCK_LOGGED_OUT;
+    return SP_ERROR_OK;
+}
+
+const char* sp_error_message(sp_error error) {
+    const char buff[1024];
+    sprintf((char *)buff, "Error number %d", error);
+    return buff;
+}
+
+sp_user * sp_session_user(sp_session *session) {
+    return (sp_user *)-1;
+}
+
+sp_playlistcontainer *sp_session_playlistcontainer(sp_session *session) {
+    return _mock_playlistcontainer();
+}
+
+sp_error sp_session_init(const sp_session_config *config, sp_session **sess) {
+    if(strcmp(config->application_key, "appkey_good"))
+        return SP_ERROR_BAD_APPLICATION_KEY;
+    g_data.config.cache_location = malloc(strlen(config->cache_location) + 1);
+    g_data.config.settings_location = malloc(strlen(config->settings_location) + 1);
+    g_data.config.application_key = malloc(config->application_key_size);
+    g_data.config.user_agent = malloc(strlen(config->user_agent) + 1);
+    g_data.config.callbacks = (sp_session_callbacks *)malloc(sizeof(sp_session_callbacks));
+    g_data.config.userdata = config->userdata;
+
+    g_data.config.api_version = config->api_version;
+    strcpy((char *)g_data.config.cache_location, config->cache_location);
+    strcpy((char *)g_data.config.settings_location, config->settings_location);
+    memcpy((char *)g_data.config.application_key, config->application_key, config->application_key_size);
+    strcpy((char *)g_data.config.user_agent, config->user_agent);
+    memcpy((char *)g_data.config.callbacks, config->callbacks, sizeof(sp_session_callbacks));
+    g_data.config.userdata = config->userdata;
+    return SP_ERROR_OK;
+}
 
 void * sp_session_userdata(sp_session *session) {
     return g_data.config.userdata;
@@ -396,51 +443,12 @@ PyObject *mock_playlistcontainer(PyObject *self, PyObject *args) {
     return pc;
 }
 
-sp_playlistcontainer *sp_session_playlistcontainer(sp_session *session) {
-    return _mock_playlistcontainer();
+PyObject *mock_search(PyObject *self, PyObject *args) {
+    Results *results = (Results *)PyObject_CallObject((PyObject *)&ResultsType, NULL);
+    return results;
 }
 
-sp_error sp_session_init(const sp_session_config *config, sp_session **sess) {
-    if(strcmp(config->application_key, "appkey_good"))
-        return SP_ERROR_BAD_APPLICATION_KEY;
-    g_data.config.cache_location = malloc(strlen(config->cache_location) + 1);
-    g_data.config.settings_location = malloc(strlen(config->settings_location) + 1);
-    g_data.config.application_key = malloc(config->application_key_size);
-    g_data.config.user_agent = malloc(strlen(config->user_agent) + 1);
-    g_data.config.callbacks = (sp_session_callbacks *)malloc(sizeof(sp_session_callbacks));
-    g_data.config.userdata = config->userdata;
-
-    g_data.config.api_version = config->api_version;
-    strcpy((char *)g_data.config.cache_location, config->cache_location);
-    strcpy((char *)g_data.config.settings_location, config->settings_location);
-    memcpy((char *)g_data.config.application_key, config->application_key, config->application_key_size);
-    strcpy((char *)g_data.config.user_agent, config->user_agent);
-    memcpy((char *)g_data.config.callbacks, config->callbacks, sizeof(sp_session_callbacks));
-    g_data.config.userdata = config->userdata;
-    return SP_ERROR_OK;
-}
-
-sp_error sp_session_login(sp_session *session, const char *username, const char *password) {
-    strcpy(g_data.username, username);
-    strcpy(g_data.password, password);
-    eventq[events++] = MOCK_LOGGED_IN;
-    return SP_ERROR_OK;
-}
-
-sp_error sp_session_logout(sp_session *session) {
-    eventq[events++] = MOCK_LOGGED_OUT;
-    return SP_ERROR_OK;
-}
-
-const char* sp_error_message(sp_error error) {
-    const char buff[1024];
-    sprintf((char *)buff, "Error number %d", error);
-    return buff;
-}
-
-sp_user * sp_session_user(sp_session *session) {
-    return (sp_user *)-1;
-}
+/**************************** MODULE INITIALISATION ********************************/
 
 static PyMethodDef module_methods[] = {
     {"connect", session_connect, METH_VARARGS, "Run the spotify subsystem.  this will return on error, or after spotify is logged out."},
@@ -449,6 +457,7 @@ static PyMethodDef module_methods[] = {
     {"mock_artist", mock_artist, METH_VARARGS, "Create a mock artist"},
     {"mock_playlist", mock_playlist, METH_VARARGS, "Create a mock playlist"},
     {"mock_playlistcontainer", mock_playlistcontainer, METH_VARARGS, "Create a mock playlist container"},
+    {"mock_search", mock_search, METH_VARARGS, "Create mock search results"},
     {NULL, NULL, 0, NULL}
 };
 

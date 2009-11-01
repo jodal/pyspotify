@@ -1,6 +1,8 @@
 
 import unittest
 from spotify import _mockspotify
+from spotify._mockspotify import mock_album, mock_artist, mock_track
+from spotify import Album
 
 class TestPlaylistContainer(unittest.TestCase):
 
@@ -28,7 +30,7 @@ class TestPlaylistContainer(unittest.TestCase):
 class TestPlaylist(unittest.TestCase):
 
     def _mock_track(self, name):
-        return _mockspotify.mock_track(name, 0, _mockspotify.mock_album(), 0, 0, 0, 0, 0, 1)
+        return mock_track(name, 0, mock_album("foo", mock_artist("bar", 1), 2006, "01234567890123456789", Album.ALBUM, 1), 0, 0, 0, 0, 0, 1)
 
     def test_name(self):
         p1 = _mockspotify.mock_playlist("foo", [])

@@ -1,6 +1,6 @@
 
 import unittest
-from spotify._mockspotify import Link, mock_artist, mock_track, mock_album, mock_playlist
+from spotify._mockspotify import Link, mock_artist, mock_track, mock_album, mock_playlist, mock_search
 from spotify import SpotifyError
 
 class TestLink(unittest.TestCase):
@@ -11,12 +11,12 @@ class TestLink(unittest.TestCase):
         self.assertEqual(str(l), "link:from_string_test")
 
     def test_from_track(self):
-        t = mock_track("foo", 0, mock_album("bar", mock_artist("baz", 1), 0, "", 0), 0, 0, 0, 0, 0, 1)
+        t = mock_track("foo", 0, mock_album("bar", mock_artist("baz", 1), 0, "", 0, 1), 0, 0, 0, 0, 0, 1)
         l2 = Link.from_track(t, 42)
         self.assertEqual(str(l2), "link_from_track:foo")
 
     def test_from_album(self):
-        a = mock_album("bar", mock_artist("baz", 1), 0, "", 0)
+        a = mock_album("bar", mock_artist("baz", 1), 0, "", 0, 1)
         l2 = Link.from_album(a)
         self.assertEqual(str(l2), "link_from_album:foo")
 
@@ -36,7 +36,7 @@ class TestLink(unittest.TestCase):
         self.assertEqual(str(l), "link_from_playlist:foo")
 
     def test_type(self):
-        t = mock_track("foo", 0, mock_album("bar", mock_artist("baz", 1), 0, "", 0), 0, 0, 0, 0, 0, 1)
+        t = mock_track("foo", 0, mock_album("bar", mock_artist("baz", 1), 0, "", 0, 1), 0, 0, 0, 0, 0, 1)
         l2 = Link.from_track(t, 42)
         self.assertEqual(l2.type(), Link.LINK_TRACK)
         a = mock_album("bar", mock_artist("baz", 1), 0, "", 0)

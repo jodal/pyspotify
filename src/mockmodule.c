@@ -220,7 +220,7 @@ sp_album *sp_link_as_album(sp_link *link) {
 sp_link* sp_link_create_from_track(sp_track *track,int offset) {
     sp_link *l = malloc(sizeof(sp_link));
     memset(l,0,sizeof(sp_link));
-    sprintf(l->data, "link:%s/%d", track->name, offset);
+    sprintf(l->data, "link:track:%s/%d", track->name, offset);
     return l;
 }
 
@@ -241,7 +241,7 @@ sp_link *sp_link_create_from_playlist(sp_playlist *playlist) {
 sp_link *sp_link_create_from_artist(sp_artist *artist) {
     sp_link *l = malloc(sizeof(sp_link));
     memset(l, 0, sizeof(sp_link));
-    sprintf(l->data, "link_from_artist:%s", artist->name);
+    sprintf(l->data, "link:artist:%s", artist->name);
     return l;
 }
 

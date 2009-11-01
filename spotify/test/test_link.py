@@ -13,27 +13,27 @@ class TestLink(unittest.TestCase):
     def test_from_track(self):
         t = mock_track("foo", 0, mock_album("bar", mock_artist("baz", 1), 0, "", 0, 1), 0, 0, 0, 0, 0, 1)
         l2 = Link.from_track(t, 42)
-        self.assertEqual(str(l2), "link_from_track:foo")
+        self.assertEqual(str(l2), "link:track:foo/42")
 
     def test_from_album(self):
         a = mock_album("bar", mock_artist("baz", 1), 0, "", 0, 1)
         l2 = Link.from_album(a)
-        self.assertEqual(str(l2), "link_from_album:foo")
+        self.assertEqual(str(l2), "link:album:bar")
 
     def test_from_artist(self):
         a = mock_artist("artist", 1)
         l = Link.from_artist(a)
-        self.assertEqual(str(l), "link_from_artist:artist")
+        self.assertEqual(str(l), "link:artist:artist")
 
     def test_from_search(self):
         s = mock_search("query")
         l2 = Link.from_search(s)
-        self.assertEqual(str(l2), "link_from_search:query")
+        self.assertEqual(str(l2), "link:search:query")
 
     def test_from_playlist(self):
         p = mock_playlist("foo", [])
         l = Link.from_playlist(p)
-        self.assertEqual(str(l), "link_from_playlist:foo")
+        self.assertEqual(str(l), "link:playlist:foo")
 
     def test_type(self):
         t = mock_track("foo", 0, mock_album("bar", mock_artist("baz", 1), 0, "", 0, 1), 0, 0, 0, 0, 0, 1)

@@ -5,6 +5,8 @@
 #include "link.h"
 #include "track.h"
 #include "artist.h"
+#include "album.h"
+#include "playlist.h"
 
 static PyMemberDef Link_members[] = {
     {NULL}
@@ -52,8 +54,17 @@ static PyObject *Link_from_track(Link *self, PyObject *args) {
 }
 
 static PyObject *Link_from_album(Link *self, PyObject *args) {
-    PyErr_SetString(PyExc_NotImplementedError, "");
-    return NULL;
+    Album *album;
+    if(!PyArg_ParseTuple(args, "O!", &AlbumType, &album))
+	return NULL;
+    sp_link *link = sp_link_create_from_album(album->_album);
+    if(!link) {
+	PyErr_SetString(SpotifyError, "Failed to get link from an album");
+	return NULL;
+    }
+    Link *plink = (Link *)PyObject_CallObject((PyObject *)&LinkType, NULL);
+    plink->_link = link;
+    return (PyObject *)plink;
 }
 
 static PyObject *Link_from_artist(Link *self, PyObject *args) {
@@ -77,8 +88,17 @@ static PyObject *Link_from_search(Link *self, PyObject *args) {
 }
 
 static PyObject *Link_from_playlist(Link *self, PyObject *args) {
-    PyErr_SetString(PyExc_NotImplementedError, "");
-    return NULL;
+    Playlist *playlist;
+    if(!PyArg_ParseTuple(args, "O!", &PlaylistType, &playlist))
+	return NULL;
+    sp_link *link = sp_link_create_from_playlist(playlist->_playlist);
+    if(!link) {
+	PyErr_SetString(SpotifyError, "Failed to get link from an album");
+	return NULL;
+    }
+    Link *plink = (Link *)PyObject_CallObject((PyObject *)&LinkType, NULL);
+    plink->_link = link;
+    return (PyObject *)plink;
 }
 
 static PyObject *Link_type(Link *self) {
@@ -99,8 +119,15 @@ static PyObject *Link_as_track(Link *self) {
 }
 
 static PyObject *Link_as_album(Link *self) {
-    PyErr_SetString(PyExc_NotImplementedError, "");
-    return NULL;
+    sp_album *a = sp_link_as_album(self->_link);
+    if(!a) {
+	PyErr_SetString(SpotifyError, "Not an album link");
+	return NULL;
+    }
+    Album *album = (Album *)PyObject_CallObject((PyObject *)&AlbumType, NULL);
+    album->_album = a;
+    Py_INCREF(album);
+    return (PyObject *)album;
 }
 
 static PyObject *Link_as_artist(Link *self) {

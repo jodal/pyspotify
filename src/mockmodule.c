@@ -24,6 +24,7 @@
 
 /***************************** FORWARD DEFINES *****************************/
 
+sp_album *_mock_album(char *name, sp_artist *artist, int year, byte *cover, int type, int loaded);
 sp_artist *_mock_artist(char *name, int loaded);
 sp_track *_mock_track(char *name, int num_artists, sp_artist **artists,
 		      sp_album *album, int duration, int popularity,
@@ -210,10 +211,30 @@ sp_artist *sp_link_as_artist(sp_link *link) {
     return _mock_artist(link->data + strlen("link:artist:"), 1);
 }
 
+sp_album *sp_link_as_album(sp_link *link) {
+    if(strncmp(link->data, "link:album:", strlen("link:album:")))
+	return NULL;
+    return _mock_album(link->data + strlen("link:album:"), _mock_artist("mock", 1), 1901, (byte *)"", SP_ALBUMTYPE_ALBUM, 1);
+}
+
 sp_link* sp_link_create_from_track(sp_track *track,int offset) {
     sp_link *l = malloc(sizeof(sp_link));
     memset(l,0,sizeof(sp_link));
     sprintf(l->data, "link:%s/%d", track->name, offset);
+    return l;
+}
+
+sp_link *sp_link_create_from_album(sp_album *album) {
+    sp_link *l = malloc(sizeof(sp_link));
+    memset(l, 0, sizeof(sp_link));
+    sprintf(l->data, "link:album:%s", album->name);
+    return l;
+}
+
+sp_link *sp_link_create_from_playlist(sp_playlist *playlist) {
+    sp_link *l = malloc(sizeof(sp_link));
+    memset(l, 0, sizeof(sp_link));
+    sprintf(l->data, "link:playlist:%s", playlist->name);
     return l;
 }
 
@@ -332,9 +353,8 @@ PyObject *mock_artist(PyObject *self, PyObject *args) {
 	return NULL;
     Py_INCREF(artist);
     artist -> _artist = _mock_artist(s, loaded);
-    return artist;
+    return (PyObject *)artist;
 }
-
 
 /// Generate a mock sp_track structure
 sp_track *_mock_track(char *name, int num_artists, sp_artist **artists,
@@ -351,7 +371,7 @@ sp_track *_mock_track(char *name, int num_artists, sp_artist **artists,
 PyObject *mock_track(PyObject *self, PyObject *args) {
     char *name;
     int num_artists;
-    sp_artist **artists;
+    //sp_artist **artists;
     sp_album *album;
     int duration;
     int popularity;
@@ -383,14 +403,15 @@ sp_album *_mock_album(char *name, sp_artist *artist, int year, byte *cover, int 
 }
 
 PyObject *mock_album(PyObject *self, PyObject *args) {
-    PyObject *artist, *cover;
+    Artist *artist;
+    byte *cover;
     char *name;
     int year, type, loaded;
     if(!PyArg_ParseTuple(args, "sO!isii", &name, &ArtistType, &artist, &year, &cover, &type, &loaded))
 	return NULL;
     Album *album = (Album *)PyObject_CallObject((PyObject *)&AlbumType, NULL);
-    album->_album = _mock_album(name, artist, year, cover, type, loaded);
-    return album;
+    album->_album = _mock_album(name, artist->_artist, year, cover, type, loaded);
+    return (PyObject *)album;
 }
 
 sp_playlist *_mock_playlist(char *name) {
@@ -417,7 +438,7 @@ PyObject *mock_playlist(PyObject *self, PyObject *args) {
 	Py_INCREF(t);
 	playlist->_playlist->track[playlist->_playlist->num_tracks++] = t->_track;
     }
-    return playlist;
+    return (PyObject *)playlist;
 }
 
 sp_playlistcontainer *_mock_playlistcontainer() {
@@ -440,12 +461,12 @@ PyObject *mock_playlistcontainer(PyObject *self, PyObject *args) {
 	Py_INCREF(item);
 	pc->_playlistcontainer->playlist[pc->_playlistcontainer->num_playlists++] = item->_playlist;
     }
-    return pc;
+    return (PyObject *)pc;
 }
 
 PyObject *mock_search(PyObject *self, PyObject *args) {
     Results *results = (Results *)PyObject_CallObject((PyObject *)&ResultsType, NULL);
-    return results;
+    return (PyObject *)results;
 }
 
 /**************************** MODULE INITIALISATION ********************************/

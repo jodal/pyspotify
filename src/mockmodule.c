@@ -58,7 +58,7 @@ struct sp_album {
     char name[1024];
     sp_artist *artist;
     int year;
-    char *image;
+    byte cover[20];
     int type;
     int loaded;
 };
@@ -242,6 +242,26 @@ bool sp_album_is_loaded(sp_album *a) {
     return a->loaded;
 }
 
+sp_artist *sp_album_artist(sp_album *a) {
+    return a->artist;
+}
+
+const byte *sp_album_cover(sp_album *a) {
+    return a->cover;
+}
+
+const char *sp_album_name(sp_album *a) {
+    return a->name;
+}
+
+int sp_album_year(sp_album *a) {
+    return a->year;
+}
+
+sp_albumtype sp_album_type(sp_album *a) {
+    return a->type;
+}
+
 /**************** MOCKING NEW OBJECTS *******************/
 
 /// Generate a mock sp_artist structure
@@ -302,15 +322,14 @@ PyObject *mock_track(PyObject *self, PyObject *args) {
     return (PyObject *)track;
 }
 
-sp_album *_mock_album(char *name, sp_artist *artist, int year, char *image, int type, int loaded) {
+sp_album *_mock_album(char *name, sp_artist *artist, int year, byte *cover, int type, int loaded) {
     sp_album *a;
     a = malloc(sizeof(sp_album));
     memset(a, 0, sizeof(sp_album));
     strcpy(a->name, name);
     a->artist = artist;
     a->year = year;
-    a->image = malloc(strlen(image)+1);
-    strcpy(a->image, image);
+    memcpy(a->cover, cover, 20);
     a->type = type;
     a->loaded = loaded;
     return a;

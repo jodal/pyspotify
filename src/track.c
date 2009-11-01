@@ -71,6 +71,11 @@ static PyObject *Track_index(Track *self) {
     return NULL;
 }
 
+static PyObject *Track_error(Track *self) {
+    PyErr_SetString(PyExc_NotImplementedError, "");
+    return NULL;
+}
+
 static PyMethodDef Track_methods[] = {
     {"is_loaded",
      (PyCFunction)Track_is_loaded,
@@ -108,6 +113,10 @@ static PyMethodDef Track_methods[] = {
      (PyCFunction)Track_index,
      METH_NOARGS,
      "The position of this track on its disc"},
+    {"error",
+     (PyCFunction)Track_error,
+     METH_NOARGS,
+     "The error associated with this track"},
     {NULL}
 };
 

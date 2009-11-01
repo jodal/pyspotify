@@ -17,8 +17,7 @@ static PyObject *Album_new(PyTypeObject *type, PyObject *args, PyObject *kwds) {
 }
 
 static PyObject *Album_is_loaded(Album *self) {
-    PyErr_SetString(PyExc_NotImplementedError, "");
-    return NULL;
+    return Py_BuildValue("i", sp_album_is_loaded(self->_album));
 }
 
 static PyObject *Album_is_available(Album *self) {

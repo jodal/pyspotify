@@ -1,3 +1,13 @@
+/* $Id$
+ *
+ * mockmodule.c
+ *
+ * Provides mocking for the entire libspotify library.  All sp_ calls are mocked here to provide
+ * something approximate to what libspotify would provide.
+ *
+ * Functions for creating mock instances of all spotify objects are also provided.
+ *
+*/
 
 #include <stdio.h>
 #include <string.h>
@@ -12,13 +22,19 @@
 #include "session.h"
 #include "track.h"
 
+/***************************** FORWARD DEFINES *****************************/
+
 sp_artist *_mock_artist(char *name, int loaded);
 sp_track *_mock_track(char *name, int num_artists, sp_artist **artists,
 		      sp_album *album, int duration, int popularity,
 		      int disc, int index, sp_error error, int loaded);
 
+/****************************** GLOBALS ************************************/
+
 PyObject *SpotifyError;
 PyObject *SpotifyApiVersion;
+
+/************************** MOCK DATA STRUCTURES **************************/
 
 typedef struct {
     void *userdata;
@@ -40,6 +56,11 @@ struct sp_artist {
 
 struct sp_album {
     char name[1024];
+    sp_artist *artist;
+    int year;
+    char *image;
+    int type;
+    int loaded;
 };
 
 struct sp_playlist {
@@ -66,6 +87,8 @@ struct sp_track {
     int loaded;
 };
 
+/***************************** MOCK EVENT GENERATION ***************************/
+
 
 typedef enum event_type {
     MOCK_LOGGED_IN                   = 0,
@@ -83,6 +106,8 @@ typedef enum event_type {
 event_type eventq[16];
 int events = 0;
 
+/***************************** MOCK SESSION FUNCTIONS **************************/
+
 void * sp_session_userdata(sp_session *session) {
     return g_data.config.userdata;
 }
@@ -98,14 +123,6 @@ void sp_session_process_events(sp_session *session, int *next_timeout) {
     *next_timeout = 1;
 }
 
-const char * sp_user_canonical_name(sp_user *user) {
-    return g_data.username;
-}
-
-const char * sp_user_display_name(sp_user *user) {
-    return "Mock display name";
-}
-
 bool sp_user_is_loaded(sp_user *user) {
     return 0;
 }
@@ -117,6 +134,19 @@ sp_error sp_session_player_load(sp_session *session, sp_track *track) {
 sp_error sp_session_player_play(sp_session *session, bool b) {
     return 0;
 }
+
+/********************************* MOCK USER FUNCTIONS ***********************************/
+
+const char * sp_user_canonical_name(sp_user *user) {
+    return g_data.username;
+}
+
+const char * sp_user_display_name(sp_user *user) {
+    return "Mock display name";
+}
+
+/********************************* MOCK LINK FUNCTIONS ***********************************/
+
 
 sp_track* sp_link_as_track(sp_link *link) {
     if(strncmp(link->data, "link:track:", strlen("link:track:")))
@@ -206,6 +236,12 @@ int sp_playlistcontainer_num_playlists(sp_playlistcontainer *pc) {
     return pc->num_playlists;
 }
 
+/*********************** MOCK ALBUM METHODS ************************/
+
+bool sp_album_is_loaded(sp_album *a) {
+    return a->loaded;
+}
+
 /**************** MOCKING NEW OBJECTS *******************/
 
 /// Generate a mock sp_artist structure
@@ -266,17 +302,28 @@ PyObject *mock_track(PyObject *self, PyObject *args) {
     return (PyObject *)track;
 }
 
-sp_album *_mock_album() {
-    return NULL;
+sp_album *_mock_album(char *name, sp_artist *artist, int year, char *image, int type, int loaded) {
+    sp_album *a;
+    a = malloc(sizeof(sp_album));
+    memset(a, 0, sizeof(sp_album));
+    strcpy(a->name, name);
+    a->artist = artist;
+    a->year = year;
+    a->image = malloc(strlen(image)+1);
+    strcpy(a->image, image);
+    a->type = type;
+    a->loaded = loaded;
+    return a;
 }
 
 PyObject *mock_album(PyObject *self, PyObject *args) {
     PyObject *artist, *cover;
     char *name;
-    int year, type;
-    if(!PyArg_ParseTuple(args, "sO!isi", &name, &ArtistType, &artist, &year, &cover, &type))
+    int year, type, loaded;
+    if(!PyArg_ParseTuple(args, "sO!isii", &name, &ArtistType, &artist, &year, &cover, &type, &loaded))
 	return NULL;
     Album *album = (Album *)PyObject_CallObject((PyObject *)&AlbumType, NULL);
+    album->_album = _mock_album(name, artist, year, cover, type, loaded);
     return album;
 }
 

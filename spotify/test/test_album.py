@@ -3,7 +3,7 @@ from spotify._mockspotify import mock_album, mock_artist, Album
 
 class TestAlbum(unittest.TestCase):
 
-    album = mock_album("foo", mock_artist("bar", 1), 2006, "JPEG", Album.ALBUM)
+    album = mock_album("foo", mock_artist("bar", 1), 2006, "JPEG", Album.ALBUM, 1)
 
     def test_is_loaded(self):
         self.assertEqual(self.album.is_loaded(), 1)

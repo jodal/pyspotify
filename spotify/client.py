@@ -33,6 +33,7 @@ class Client(object):
         while self.exit_code < 0:
             self.awoken.clear()
             timeout = sess.process_events()
+            threading.Timer(timeout, self.awoken.set)
             self.awoken.wait()
 
     def wake(self, sess):

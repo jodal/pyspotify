@@ -3,6 +3,8 @@ import unittest
 from spotify._mockspotify import Link, mock_artist, mock_track, mock_album, mock_playlist, mock_search
 from spotify import SpotifyError
 
+# fake change
+
 class TestLink(unittest.TestCase):
 
     def test_from_string(self):

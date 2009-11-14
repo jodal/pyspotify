@@ -3,6 +3,7 @@
 #include <libgen.h>
 #include <unistd.h>
 #include <stdint.h>
+#include <pthread.h>
 #include "spotify/api.h"
 #include "pyspotify.h"
 #include "session.h"
@@ -258,8 +259,10 @@ static int frame_size(const sp_audioformat *format) {
 }
 
 static int music_delivery(sp_session *session, const sp_audioformat *format, const void *frames, int num_frames) {
+    fprintf(stderr, "----------> music_delivery [%ud]\n", pthread_self());
     PyGILState_STATE gstate;
     gstate = PyGILState_Ensure();
+    fprintf(stderr, "----------> music_delivery acquired GIL\n");
     int siz = frame_size(format);
     PyObject *pyframes = PyBuffer_FromMemory((void *)frames, num_frames * siz);
     Py_INCREF(pyframes);

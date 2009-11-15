@@ -56,7 +56,10 @@ static PyObject *Session_user_is_loaded(Session *self) {
 };
 
 static PyObject *Session_logout(Session *self) {
-    sp_error error = sp_session_logout(self->_session);
+    sp_error error;
+    Py_BEGIN_ALLOW_THREADS
+    error = sp_session_logout(self->_session);
+    Py_END_ALLOW_THREADS
     if(error != SP_ERROR_OK) {
 	PyErr_SetString(SpotifyError, "Failed to log out");
         return NULL;
@@ -76,7 +79,10 @@ PyObject *handle_error(int err) {
 }
 
 static PyObject *Session_playlist_container(Session *self) {
-    sp_playlistcontainer* pc = sp_session_playlistcontainer(self->_session);
+    sp_playlistcontainer* pc;
+    Py_BEGIN_ALLOW_THREADS
+    pc = sp_session_playlistcontainer(self->_session);
+    Py_END_ALLOW_THREADS
     PlaylistContainer *ppc = (PlaylistContainer *)PyObject_CallObject((PyObject *)&PlaylistContainerType, NULL);
     Py_INCREF(ppc);
     ppc -> _playlistcontainer = pc;
@@ -415,13 +421,17 @@ PyObject *session_connect(PyObject *self, PyObject *args) {
     }
     password = copystring(pobj);
 
+    Py_BEGIN_ALLOW_THREADS
     error = sp_session_init(&config, &session);
+    Py_END_ALLOW_THREADS
     session_constructed = 1;
     if(error != SP_ERROR_OK) {
 	PyErr_SetString(SpotifyError, sp_error_message(error));
         return NULL;
     }
+    Py_BEGIN_ALLOW_THREADS
     error = sp_session_login(session, username, password);
+    Py_END_ALLOW_THREADS
     if(error != SP_ERROR_OK) {
 	PyErr_SetString(SpotifyError, sp_error_message(error));
         return NULL;

@@ -65,8 +65,23 @@ class JukeboxUI(cmd.Cmd, threading.Thread):
         self.jukebox.load(playlist, track)
         self.jukebox.play()
 
+    def do_queue(self, line):
+        if not line:
+            for playlist, track in self.jukebox._queue:
+                print playlist, track
+            return
+        try:
+            playlist, track = map(int, line.split(' ', 1))
+        except ValueError:
+            print "Usage: play playlist track"
+            return
+        self.jukebox.queue(playlist, track)
+
     def do_stop(self, line):
         self.jukebox.stop()
+
+    def do_next(self, line):
+        self.jukebox.next()
 
     def emptyline(self):
         pass
@@ -85,6 +100,8 @@ class Jukebox(SpotifySessionManager):
         self.audio = AlsaController()
         self.ui = JukeboxUI(self)
         self.ctr = None
+        self.playing = False
+        self._queue = []
         print "Logging in, please wait..."
 
     def logged_in(self, session, error):
@@ -96,19 +113,43 @@ class Jukebox(SpotifySessionManager):
             traceback.print_exc()
 
     def load(self, playlist, track):
+        if self.playing:
+            self.stop()
         self.session.load(self.ctr[playlist][track])
         print "Loading %s from %s" % (self.ctr[playlist][track].name(), self.ctr[playlist].name())
+
+    def queue(self, playlist, track):
+        if self.playing:
+            self._queue.append((playlist, track))
+        else:
+            self.load(playlist, track)
+            self.play()
 
     def play(self):
         self.session.play(1)
         print "Playing"
+        self.playing = True
 
     def stop(self):
         self.session.play(0)
         print "Stopping"
+        self.playing = False
 
     def music_delivery(self, *a, **kw):
         return self.audio.music_delivery(*a, **kw)
+
+    def next(self):
+        self.stop()
+        if self._queue:
+            t = self._queue.pop()
+            self.load(*t)
+            self.play()
+        else:
+            self.stop()
+
+    def end_of_track(self, sess):
+        print "track ends."
+        self.next()
 
 if __name__ == '__main__':
     import optparse

@@ -40,10 +40,7 @@ class Example1(SpotifySessionManager):
             traceback.print_exc()
 
     def end_of_track(self, session):
-        session.logout()
-
-    def logged_out(self, sess):
-        sys.exit(0)
+        self.terminate()
 
     def music_delivery(self, *a, **kw):
         return self.audio.music_delivery(*a, **kw)

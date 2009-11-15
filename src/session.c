@@ -87,29 +87,34 @@ static PyObject *Session_load(Session *self, PyObject *args) {
     Track *track;
     sp_track *t;
     sp_session *s;
+    sp_error err;
     if(!PyArg_ParseTuple(args, "O!", &TrackType, &track)) {
 	return NULL;
     }
     Py_INCREF(track);
     t = track->_track;
     s = self->_session;
-    sp_error err = sp_session_player_load(s, t);
+    Py_BEGIN_ALLOW_THREADS
+    err = sp_session_player_load(s, t);
+    Py_END_ALLOW_THREADS
     return handle_error(err);
 }
 
 static PyObject *Session_play(Session *self, PyObject *args) {
     int play;
+    sp_error err;
     if(!PyArg_ParseTuple(args, "i", &play))
 	return NULL;
-    return handle_error(sp_session_player_play(self->_session, play));
+    Py_BEGIN_ALLOW_THREADS
+    err = sp_session_player_play(self->_session, play);
+    Py_END_ALLOW_THREADS
+    return handle_error(err);
 }
 
 static PyObject *Session_process_events(Session *self) {
     int timeout;
     Py_BEGIN_ALLOW_THREADS
-    fprintf(stderr, "process_events 1 for %p\n", self->_session);
     sp_session_process_events(self->_session, &timeout);
-    fprintf(stderr, "process_events 2, %d\n", timeout);
     Py_END_ALLOW_THREADS
     return Py_BuildValue("i", timeout);
 }

@@ -13,7 +13,6 @@ class SpotifySessionManager(object):
     application_key = None
     appkey_file = 'spotify_appkey.key'
     user_agent = 'pyspotify-example'
-    exit_code = -1
 
     def __init__(self, username, password):
         self.username = username
@@ -21,6 +20,7 @@ class SpotifySessionManager(object):
         self.application_key = open(self.appkey_file).read()
         self.awoken = threading.Event() # used to block until awoken
         self.timer = None
+        self.finished = False
 
     def connect(self):
         sess = spotify.connect(self)
@@ -35,14 +35,18 @@ class SpotifySessionManager(object):
         event. The event is either triggered by a timer expiring, or by a
         notification from within the spotify subsystem (it calls the wake
         method below). """
-        while self.exit_code < 0:
+        while not self.finished:
             self.awoken.clear()
             timeout = sess.process_events()
             self.timer = threading.Timer(timeout/1000.0, self.awoken.set)
             self.timer.start()
             self.awoken.wait()
 
-    def wake(self, sess):
+    def terminate(self):
+        self.finished = True
+        self.wake()
+
+    def wake(self, sess=None):
         """ This is called by the spotify subsystem to wake up the main loop. """
         if self.timer is not None:
             self.timer.cancel()

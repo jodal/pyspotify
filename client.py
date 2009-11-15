@@ -7,6 +7,8 @@ import alsaaudio
 import Queue
 import threading
 
+sys.setcheckinterval(10)
+
 class AudioData:
 
     def __init__(self, nsamples, rate, channels, samples):
@@ -15,37 +17,19 @@ class AudioData:
         self.channels = channels
         self.samples = samples
 
-class AlsaPlayer(threading.Thread):
+class AlsaController(object):
 
-    def __init__(self, *a, **kw):
-        threading.Thread.__init__(self, *a, **kw)
+    mode = alsaaudio.PCM_NORMAL
+
+    def __init__(self):
+        self.out = alsaaudio.PCM(alsaaudio.PCM_PLAYBACK, mode=self.mode)
+        self.out.setformat(alsaaudio.PCM_FORMAT_S16_LE) # actually native endian
         self.__rate = None
         self.__periodsize = None
         self.__channels = None
-        self.queue = Queue.Queue(800)
-        self.out = alsaaudio.PCM(alsaaudio.PCM_PLAYBACK, mode=alsaaudio.PCM_NONBLOCK)
-        self.out.setformat(alsaaudio.PCM_FORMAT_S16_LE) # actually native endian
         self.periodsize = 2048
         self.channels = 2
         self.rate = 44100
-
-    def run(self):
-        while True:
-            print "reading...",
-            try:
-                ad = self.queue.get(block=False)
-            except Queue.Empty:
-                print "empty"
-                time.sleep(5)
-                continue
-            print "read"
-            if ad.nsamples != self.periodsize:
-                print "Sample count mismatch %d != %d" % (ad.nsamples, self.periodsize)
-            self.rate = ad.rate
-            self.channels = ad.channels
-            print "writing to alsa...",
-            #self.out.write(ad.samples)
-            print "written"
 
     def getperiodsize(self):
         return self.__periodsize
@@ -77,12 +61,29 @@ class AlsaPlayer(threading.Thread):
 
     channels = property(getchannels, setchannels)
 
-class Client(client.Client):
-    queued = False
+class AlsaPlayer(AlsaController, threading.Thread):
 
     def __init__(self, *a, **kw):
-        client.Client.__init__(self, *a, **kw)
-        self.player = AlsaPlayer()
+        threading.Thread.__init__(self, *a, **kw)
+        AlsaController.__init__(self)
+        self.queue = Queue.Queue(800)
+
+    def run(self):
+        while True:
+            try:
+                ad = self.queue.get(block=False)
+            except Queue.Empty:
+                print "empty"
+                time.sleep(5)
+                continue
+            if ad.nsamples != self.periodsize:
+                print "Sample count mismatch %d != %d" % (ad.nsamples, self.periodsize)
+            self.rate = ad.rate
+            self.channels = ad.channels
+            self.out.write(ad.samples)
+
+class PlayFirstTrack(object):
+    queued = False
 
     def logged_in(self, session, error):
         print "logged_in"
@@ -101,28 +102,57 @@ class Client(client.Client):
                     if playlist[0].is_loaded():
                         session.load(playlist[0])
                         session.play(1)
-                        self.player.start()
+                        self.start()
                         self.queued = True
                         print "Playing", playlist[0].name()
         except:
             traceback.print_exc()
+
+    def start(self):
+        pass
+
+class ThreadedClient(PlayFirstTrack, client.Client):
+
+    def __init__(self, *a, **kw):
+        client.Client.__init__(self, *a, **kw)
+        self.player = AlsaPlayer()
+
+    def start(self):
+        self.player.start()
 
     def music_delivery(self, session, frames, frame_size, num_frames, sample_type, sample_rate, channels):
         print "delivery", frame_size, num_frames, sample_type, sample_rate, channels
         try:
             if frames == 0:
                 return 0 # audio discontinuity, do nothing
-            if self.player.queue.full():
-                print "Queue full"
-                return 0
-            print "writing...",
             assert len(frames) == num_frames * 2 * channels
             ad = AudioData(num_frames, sample_rate, channels, frames)
             self.player.queue.put(ad, block=True)
-            print "written size is now", self.player.queue.qsize()
             return num_frames
         except:
             traceback.print_exc()
+
+class SynchronousClient(AlsaController, PlayFirstTrack, client.Client):
+
+    mode = alsaaudio.PCM_NONBLOCK
+
+    def __init__(self, *a, **kw):
+        client.Client.__init__(self, *a, **kw)
+        AlsaController.__init__(self)
+
+    def music_delivery(self, session, frames, frame_size, num_frames, sample_type, sample_rate, channels):
+        try:
+            self.channels = 2
+            self.periodsize = num_frames
+            self.rate = sample_rate
+            print "writing...",
+            written = self.out.write(frames)
+            print written
+            return written
+        except:
+            traceback.print_exc()
+
+Client = SynchronousClient
 
 if __name__ == '__main__':
     import optparse

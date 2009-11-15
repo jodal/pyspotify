@@ -221,7 +221,7 @@ static void connection_error(sp_session *session, sp_error error) {
 }
 
 static void message_to_user(sp_session *session, const char *message) {
-    fprintf(stderr, "----------> message to user: %s", message);
+    fprintf(stderr, "----------> message to user: %s\n", message);
     PyGILState_STATE gstate;
     gstate = PyGILState_Ensure();
     Session *psession = (Session *)PyObject_CallObject((PyObject *)&SessionType, NULL);
@@ -259,10 +259,8 @@ static int frame_size(const sp_audioformat *format) {
 }
 
 static int music_delivery(sp_session *session, const sp_audioformat *format, const void *frames, int num_frames) {
-    fprintf(stderr, "----------> music_delivery [%ud]\n", pthread_self());
     PyGILState_STATE gstate;
     gstate = PyGILState_Ensure();
-    fprintf(stderr, "----------> music_delivery acquired GIL\n");
     int siz = frame_size(format);
     PyObject *pyframes = PyBuffer_FromMemory((void *)frames, num_frames * siz);
     Py_INCREF(pyframes);

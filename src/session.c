@@ -286,14 +286,41 @@ static int music_delivery(sp_session *session, const sp_audioformat *format, con
 
 static void play_token_lost(sp_session *session) {
     fprintf(stderr, "----------> play_token_lost called\n");
+    PyGILState_STATE gstate;
+    gstate = PyGILState_Ensure();
+    Session *psession = (Session *)PyObject_CallObject((PyObject *)&SessionType, NULL);
+    Py_INCREF(psession);
+    psession->_session = session;
+    PyObject *client = (PyObject *)sp_session_userdata(session);
+    PyObject_CallMethod(client, "play_token_lost", "O", psession);
+    Py_DECREF(psession);
+    PyGILState_Release(gstate);
 }
 
 static void log_message(sp_session *session, const char *data) {
     fprintf(stderr, "----------> log_message called: %s\n", data);
+    PyGILState_STATE gstate;
+    gstate = PyGILState_Ensure();
+    Session *psession = (Session *)PyObject_CallObject((PyObject *)&SessionType, NULL);
+    Py_INCREF(psession);
+    psession->_session = session;
+    PyObject *client = (PyObject *)sp_session_userdata(session);
+    PyObject_CallMethod(client, "log_message", "Os", psession, data);
+    Py_DECREF(psession);
+    PyGILState_Release(gstate);
 }
 
 static void end_of_track(sp_session *session) {
     fprintf(stderr, "----------> end_of_track called\n");
+    PyGILState_STATE gstate;
+    gstate = PyGILState_Ensure();
+    Session *psession = (Session *)PyObject_CallObject((PyObject *)&SessionType, NULL);
+    Py_INCREF(psession);
+    psession->_session = session;
+    PyObject *client = (PyObject *)sp_session_userdata(session);
+    PyObject_CallMethod(client, "end_of_track", "O", psession);
+    Py_DECREF(psession);
+    PyGILState_Release(gstate);
 }
 
 void session_init(PyObject *m) {

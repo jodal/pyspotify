@@ -31,27 +31,27 @@ class Client(object):
         self.awoken.set()
 
     def loop(self, sess):
+        """ The main loop. This processes events and then either waits for an
+        event. The event is either triggered by a timer expiring, or by a
+        notification from within the spotify subsystem (it calls the wake
+        method below). """
         while self.exit_code < 0:
-            print "number of active threads:", threading.active_count()
-            print "loop 1"
             self.awoken.clear()
-            print "loop 2"
             timeout = sess.process_events()
-            print "loop 3",timeout/1000.0
             self.timer = threading.Timer(timeout/1000.0, self.awoken.set)
-            print "loop 4"
             self.timer.start()
-            print "loop 5"
             self.awoken.wait()
-            print "loop 6"
 
     def wake(self, sess):
-        print "wake"
+        """ This is called by the spotify subsystem to wake up the main loop. """
         if self.timer is not None:
             self.timer.cancel()
         self.awoken.set()
 
     def logged_in(self, session, error):
+        """ Called when the user has successfully logged in. You almost
+        certainly want to do something with session.playlist_container() at
+        this point. """
         pass
 
     def logged_out(self, sess):

@@ -111,6 +111,12 @@ class PlayAutoTrack(object):
     def start(self):
         pass
 
+    def end_of_track(self, session):
+        session.logout()
+
+    def logged_out(self, sess):
+        sys.exit(0)
+
 class ThreadedClient(PlayAutoTrack, client.Client):
 
     def __init__(self, *a, **kw):

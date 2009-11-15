@@ -7,8 +7,6 @@ import alsaaudio
 import Queue
 import threading
 
-sys.setcheckinterval(10)
-
 class AudioData:
 
     def __init__(self, nsamples, rate, channels, samples):
@@ -82,8 +80,10 @@ class AlsaPlayer(AlsaController, threading.Thread):
             self.channels = ad.channels
             self.out.write(ad.samples)
 
-class PlayFirstTrack(object):
+class PlayAutoTrack(object):
     queued = False
+    playlist = 4
+    track = 2
 
     def logged_in(self, session, error):
         print "logged_in"
@@ -97,21 +97,21 @@ class PlayFirstTrack(object):
         print "metadata_updated called"
         try:
             if not self.queued:
-                playlist = self.ctr[27]
+                playlist = self.ctr[self.playlist]
                 if playlist.is_loaded():
-                    if playlist[0].is_loaded():
-                        session.load(playlist[0])
+                    if playlist[self.track].is_loaded():
+                        session.load(playlist[self.track])
                         session.play(1)
                         self.start()
                         self.queued = True
-                        print "Playing", playlist[0].name()
+                        print "Playing", playlist[self.track].name()
         except:
             traceback.print_exc()
 
     def start(self):
         pass
 
-class ThreadedClient(PlayFirstTrack, client.Client):
+class ThreadedClient(PlayAutoTrack, client.Client):
 
     def __init__(self, *a, **kw):
         client.Client.__init__(self, *a, **kw)
@@ -132,7 +132,7 @@ class ThreadedClient(PlayFirstTrack, client.Client):
         except:
             traceback.print_exc()
 
-class SynchronousClient(AlsaController, PlayFirstTrack, client.Client):
+class SynchronousClient(AlsaController, PlayAutoTrack, client.Client):
 
     mode = alsaaudio.PCM_NONBLOCK
 
@@ -145,9 +145,7 @@ class SynchronousClient(AlsaController, PlayFirstTrack, client.Client):
             self.channels = 2
             self.periodsize = num_frames
             self.rate = sample_rate
-            print "writing...",
             written = self.out.write(frames)
-            print written
             return written
         except:
             traceback.print_exc()

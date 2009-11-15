@@ -106,7 +106,11 @@ static PyObject *Session_play(Session *self, PyObject *args) {
 
 static PyObject *Session_process_events(Session *self) {
     int timeout;
+    Py_BEGIN_ALLOW_THREADS
+    fprintf(stderr, "process_events 1 for %p\n", self->_session);
     sp_session_process_events(self->_session, &timeout);
+    fprintf(stderr, "process_events 2, %d\n", timeout);
+    Py_END_ALLOW_THREADS
     return Py_BuildValue("i", timeout);
 }
 
@@ -234,6 +238,7 @@ static void message_to_user(sp_session *session, const char *message) {
 }
 
 static void notify_main_thread(sp_session *session) {
+    fprintf(stderr, "----------> notify_main_thread\n");
     if(!session_constructed) return;
     PyGILState_STATE gstate;
     gstate = PyGILState_Ensure();

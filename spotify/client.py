@@ -20,6 +20,7 @@ class Client(object):
         self.password = password
         self.application_key = open(self.appkey_file).read()
         self.awoken = threading.Event() # used to block until awoken
+        self.timer = None
 
     def connect(self):
         sess = spotify.connect(self)
@@ -31,12 +32,23 @@ class Client(object):
 
     def loop(self, sess):
         while self.exit_code < 0:
+            print "number of active threads:", threading.active_count()
+            print "loop 1"
             self.awoken.clear()
+            print "loop 2"
             timeout = sess.process_events()
-            threading.Timer(timeout, self.awoken.set)
+            print "loop 3",timeout/1000.0
+            self.timer = threading.Timer(timeout/1000.0, self.awoken.set)
+            print "loop 4"
+            self.timer.start()
+            print "loop 5"
             self.awoken.wait()
+            print "loop 6"
 
     def wake(self, sess):
+        print "wake"
+        if self.timer is not None:
+            self.timer.cancel()
         self.awoken.set()
 
     def logged_in(self, session, error):

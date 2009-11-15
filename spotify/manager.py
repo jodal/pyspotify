@@ -1,7 +1,7 @@
 import spotify
 import threading
 
-class Client(object):
+class SpotifySessionManager(object):
 
     """ Client for spotify. Inherit from this class to have your callbacks
     called on the appropriate events. Exceptions raised in your callback

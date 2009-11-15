@@ -45,15 +45,8 @@ class Example1(SpotifySessionManager):
     def logged_out(self, sess):
         sys.exit(0)
 
-    def music_delivery(self, session, frames, frame_size, num_frames, sample_type, sample_rate, channels):
-        try:
-            self.audio.channels = 2
-            self.audio.periodsize = num_frames
-            self.audio.rate = sample_rate
-            written = self.audio.playsamples(frames)
-            return written
-        except:
-            traceback.print_exc()
+    def music_delivery(self, *a, **kw):
+        return self.audio.music_delivery(*a, **kw)
 
 if __name__ == '__main__':
     import optparse

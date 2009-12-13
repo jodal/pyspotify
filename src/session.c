@@ -184,7 +184,7 @@ PyTypeObject SessionType = {
 /*************************************/
 
 static void logged_in(sp_session *session, sp_error error) {
-    fprintf(stderr, "----------> logged_in called\n");
+    // fprintf(stderr, "----------> logged_in called\n");
     PyGILState_STATE gstate;
     gstate = PyGILState_Ensure();
     Session *psession = (Session *)PyObject_CallObject((PyObject *)&SessionType, NULL);
@@ -197,7 +197,7 @@ static void logged_in(sp_session *session, sp_error error) {
 }
 
 static void logged_out(sp_session *session) {
-    fprintf(stderr, "----------> logged_out called\n");
+    // fprintf(stderr, "----------> logged_out called\n");
     PyGILState_STATE gstate;
     gstate = PyGILState_Ensure();
     Session *psession = (Session *)PyObject_CallObject((PyObject *)&SessionType, NULL);
@@ -210,7 +210,7 @@ static void logged_out(sp_session *session) {
 }
 
 static void metadata_updated(sp_session *session) {
-    fprintf(stderr, "----------> metadata_updated called\n");
+    // fprintf(stderr, "----------> metadata_updated called\n");
     PyGILState_STATE gstate;
     gstate = PyGILState_Ensure();
     Session *psession = (Session *)PyObject_CallObject((PyObject *)&SessionType, NULL);
@@ -223,7 +223,7 @@ static void metadata_updated(sp_session *session) {
 }
 
 static void connection_error(sp_session *session, sp_error error) {
-    fprintf(stderr, "----------> connection_error called\n");
+    // fprintf(stderr, "----------> connection_error called\n");
     PyGILState_STATE gstate;
     gstate = PyGILState_Ensure();
     Session *psession = (Session *)PyObject_CallObject((PyObject *)&SessionType, NULL);
@@ -236,7 +236,7 @@ static void connection_error(sp_session *session, sp_error error) {
 }
 
 static void message_to_user(sp_session *session, const char *message) {
-    fprintf(stderr, "----------> message to user: %s\n", message);
+    // fprintf(stderr, "----------> message to user: %s\n", message);
     PyGILState_STATE gstate;
     gstate = PyGILState_Ensure();
     Session *psession = (Session *)PyObject_CallObject((PyObject *)&SessionType, NULL);
@@ -249,7 +249,7 @@ static void message_to_user(sp_session *session, const char *message) {
 }
 
 static void notify_main_thread(sp_session *session) {
-    fprintf(stderr, "----------> notify_main_thread\n");
+    // fprintf(stderr, "----------> notify_main_thread\n");
     if(!session_constructed) return;
     PyGILState_STATE gstate;
     gstate = PyGILState_Ensure();
@@ -296,7 +296,7 @@ static int music_delivery(sp_session *session, const sp_audioformat *format, con
 }
 
 static void play_token_lost(sp_session *session) {
-    fprintf(stderr, "----------> play_token_lost called\n");
+    // fprintf(stderr, "----------> play_token_lost called\n");
     PyGILState_STATE gstate;
     gstate = PyGILState_Ensure();
     Session *psession = (Session *)PyObject_CallObject((PyObject *)&SessionType, NULL);
@@ -309,7 +309,7 @@ static void play_token_lost(sp_session *session) {
 }
 
 static void log_message(sp_session *session, const char *data) {
-    fprintf(stderr, "----------> log_message called: %s\n", data);
+    // fprintf(stderr, "----------> log_message called: %s\n", data);
     PyGILState_STATE gstate;
     gstate = PyGILState_Ensure();
     Session *psession = (Session *)PyObject_CallObject((PyObject *)&SessionType, NULL);
@@ -322,7 +322,7 @@ static void log_message(sp_session *session, const char *data) {
 }
 
 static void end_of_track(sp_session *session) {
-    fprintf(stderr, "----------> end_of_track called\n");
+    // fprintf(stderr, "----------> end_of_track called\n");
     PyGILState_STATE gstate;
     gstate = PyGILState_Ensure();
     Session *psession = (Session *)PyObject_CallObject((PyObject *)&SessionType, NULL);

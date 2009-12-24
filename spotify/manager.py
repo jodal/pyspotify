@@ -17,7 +17,8 @@ class SpotifySessionManager(object):
     def __init__(self, username, password):
         self.username = username
         self.password = password
-        self.application_key = open(self.appkey_file).read()
+        if self.application_key is None:
+            self.application_key = open(self.appkey_file).read()
         self.awoken = threading.Event() # used to block until awoken
         self.timer = None
         self.finished = False
@@ -25,10 +26,6 @@ class SpotifySessionManager(object):
     def connect(self):
         sess = spotify.connect(self)
         self.loop(sess) # returns on disconnect
-
-    def disconnect(self):
-        self.exit_code = 0
-        self.awoken.set()
 
     def loop(self, sess):
         """ The main loop. This processes events and then either waits for an
@@ -45,6 +42,8 @@ class SpotifySessionManager(object):
     def terminate(self):
         self.finished = True
         self.wake()
+        
+    disconnect = terminate
 
     def wake(self, sess=None):
         """ This is called by the spotify subsystem to wake up the main loop. """

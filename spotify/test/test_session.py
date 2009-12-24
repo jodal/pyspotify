@@ -2,22 +2,24 @@
 import unittest
 import threading
 
-from spotify import client
 from spotify import _mockspotify
+from spotify import manager
+# monkeypatch for testing
+manager.spotify = _mockspotify
+
+from spotify.manager import SpotifySessionManager
 from spotify._mockspotify import mock_track, mock_album
 
-client.spotify = _mockspotify
 
-class BaseMockClient(client.Client):
+class BaseMockClient(SpotifySessionManager):
 
     cache_location = "/foo"
     settings_location = "/foo"
     application_key = "appkey_good"
     user_agent = "user_agent_foo"
-    username = "username_good"
-    password = "password_good"
 
     def __init__(self):
+        SpotifySessionManager.__init__(self, "username_good", "password_good")
         self.awoken = threading.Event() # used to block until awoken
 
 class TestSession(unittest.TestCase):

@@ -132,8 +132,11 @@ typedef struct {
 } search_trampoline;
 
 void search_complete(sp_search *search, search_trampoline *st) {
+    fprintf(stderr, "Search complete called\n");
     PyObject *args = PyTuple_New(2);
+    fprintf(stderr, "XXX\n");
     Results *results = (Results *)PyObject_CallObject((PyObject *)&ResultsType, NULL);
+    fprintf(stderr, "Got results\n");
     Py_INCREF(results);
     results->_search = search;
     PyTuple_SetItem(args, 0, (PyObject *)results);

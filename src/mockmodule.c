@@ -89,6 +89,10 @@ struct sp_track {
     int loaded;
 };
 
+struct sp_search {
+    int tracks;
+};
+
 /***************************** MOCK EVENT GENERATION ***************************/
 
 
@@ -186,7 +190,10 @@ sp_error sp_session_player_play(sp_session *session, bool b) {
 /********************************* MOCK SEARCH FUNCTIONS *********************************/
 
 sp_search *sp_search_create (sp_session *session, const char *query, int track_offset, int track_count, int album_offset, int album_count, int artist_offset, int artist_count, search_complete_cb *callback, void *userdata) {
-    return NULL;
+    fprintf(stderr, "sp_search_create called\n");
+    static sp_search search;
+    callback(&search, userdata);
+    return &search;
 }
 
 

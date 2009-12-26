@@ -144,6 +144,7 @@ void search_complete(sp_search *search, search_trampoline *st) {
 
 static PyObject *Session_search(Session *self, PyObject *args, PyObject *kwds) {
     char *query;
+    sp_search *search;
     PyObject *callback, *userdata;
     int track_offset=0, track_count=0,
         album_offset=0, album_count=0, 
@@ -164,11 +165,13 @@ static PyObject *Session_search(Session *self, PyObject *args, PyObject *kwds) {
     st = malloc(sizeof(search_trampoline));
     st->userdata = userdata;
     st->callback = callback;
-    sp_search *search = sp_search_create(self->_session, query,
+    Py_BEGIN_ALLOW_THREADS
+    search = sp_search_create(self->_session, query,
 					 track_offset, track_count,
 					 album_offset, album_count,
 					 artist_offset, artist_count,
 					 search_complete, (void *)st);
+    Py_END_ALLOW_THREADS
     Results *results = (Results *)PyObject_CallObject((PyObject *)&ResultsType, NULL);
     Py_INCREF(results);
     results->_search = search;
@@ -184,7 +187,7 @@ static PyMethodDef Session_methods[] = {
     {"load", (PyCFunction)Session_load, METH_VARARGS, "Load the specified track on the player"},
     {"play", (PyCFunction)Session_play, METH_VARARGS, "Play or pause the currently loaded track"},
     {"playlist_container", (PyCFunction)Session_playlist_container, METH_NOARGS, "Return the playlist container for the currently logged in user"},
-    {"search", (PyCFunction)Session_search, METH_VARARGS, "Conduct a search, calling the callback when results are available"},
+    {"search", (PyCFunctionWithKeywords)Session_search, METH_KEYWORDS, "Conduct a search, calling the callback when results are available"},
     {NULL}
 };
 

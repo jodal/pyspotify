@@ -183,6 +183,13 @@ sp_error sp_session_player_play(sp_session *session, bool b) {
     return 0;
 }
 
+/********************************* MOCK SEARCH FUNCTIONS *********************************/
+
+sp_search *sp_search_create (sp_session *session, const char *query, int track_offset, int track_count, int album_offset, int album_count, int artist_offset, int artist_count, search_complete_cb *callback, void *userdata) {
+    return NULL;
+}
+
+
 /********************************* MOCK USER FUNCTIONS ***********************************/
 
 const char * sp_user_canonical_name(sp_user *user) {
@@ -466,7 +473,14 @@ PyObject *mock_playlistcontainer(PyObject *self, PyObject *args) {
 
 PyObject *mock_search(PyObject *self, PyObject *args) {
     Results *results = (Results *)PyObject_CallObject((PyObject *)&ResultsType, NULL);
+    Py_INCREF(results);
     return (PyObject *)results;
+}
+
+PyObject *mock_session(PyObject *self, PyObject *args) {
+    Session *session = (Session *)PyObject_CallObject((PyObject *)&SessionType, NULL);
+    Py_INCREF(session);
+    return (PyObject *)session;
 }
 
 /**************************** MODULE INITIALISATION ********************************/
@@ -479,6 +493,7 @@ static PyMethodDef module_methods[] = {
     {"mock_playlist", mock_playlist, METH_VARARGS, "Create a mock playlist"},
     {"mock_playlistcontainer", mock_playlistcontainer, METH_VARARGS, "Create a mock playlist container"},
     {"mock_search", mock_search, METH_VARARGS, "Create mock search results"},
+    {"mock_session", mock_session, METH_VARARGS, "Create a mock session"},
     {NULL, NULL, 0, NULL}
 };
 

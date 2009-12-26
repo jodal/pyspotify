@@ -9,6 +9,7 @@
 #include "session.h"
 #include "track.h"
 #include "playlist.h"
+#include "search.h"
 
 static int session_constructed = 0;
 
@@ -125,6 +126,55 @@ static PyObject *Session_process_events(Session *self) {
     return Py_BuildValue("i", timeout);
 }
 
+typedef struct {
+    PyObject *callback;
+    PyObject *userdata;
+} search_trampoline;
+
+void search_complete(sp_search *search, search_trampoline *st) {
+    PyObject *args = PyTuple_New(2);
+    Results *results = (Results *)PyObject_CallObject((PyObject *)&ResultsType, NULL);
+    Py_INCREF(results);
+    results->_search = search;
+    PyTuple_SetItem(args, 0, (PyObject *)results);
+    PyTuple_SetItem(args, 1, st->userdata);
+    PyObject_CallObject(st->callback, args);
+    Py_DECREF(results);
+}
+
+static PyObject *Session_search(Session *self, PyObject *args, PyObject *kwds) {
+    char *query;
+    PyObject *callback, *userdata;
+    int track_offset=0, track_count=0,
+        album_offset=0, album_count=0, 
+	artist_offset=0, artist_count=0;
+    search_trampoline *st;
+    static char *kwlist[] = {"query", "callback", 
+                             "track_offset", "track_count", 
+			     "album_offset", "album_count",
+			     "artist_offset", "artist_count",
+			     "userdata", NULL};
+    PyArg_ParseTupleAndKeywords(args, kwds, "sO|iiiiiiO", kwlist, &query, &callback, 
+	&track_offset, &track_count, 
+	&album_offset, &album_count, 
+	&artist_offset, &artist_count,
+	&userdata);
+    Py_INCREF(userdata);
+    Py_INCREF(callback);
+    st = malloc(sizeof(search_trampoline));
+    st->userdata = userdata;
+    st->callback = callback;
+    sp_search *search = sp_search_create(self->_session, query,
+					 track_offset, track_count,
+					 album_offset, album_count,
+					 artist_offset, artist_count,
+					 search_complete, (void *)st);
+    Results *results = (Results *)PyObject_CallObject((PyObject *)&ResultsType, NULL);
+    Py_INCREF(results);
+    results->_search = search;
+    return (PyObject *)results;
+}
+
 static PyMethodDef Session_methods[] = {
     {"username", (PyCFunction)Session_username, METH_NOARGS, "Return the canonical username for the logged in user"},
     {"display_name", (PyCFunction)Session_display_name, METH_NOARGS, "Return the full name for the logged in user"},
@@ -134,6 +184,7 @@ static PyMethodDef Session_methods[] = {
     {"load", (PyCFunction)Session_load, METH_VARARGS, "Load the specified track on the player"},
     {"play", (PyCFunction)Session_play, METH_VARARGS, "Play or pause the currently loaded track"},
     {"playlist_container", (PyCFunction)Session_playlist_container, METH_NOARGS, "Return the playlist container for the currently logged in user"},
+    {"search", (PyCFunction)Session_search, METH_VARARGS, "Conduct a search, calling the callback when results are available"},
     {NULL}
 };
 

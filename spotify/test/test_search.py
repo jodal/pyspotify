@@ -2,7 +2,12 @@
 import unittest
 
 class TestSearch(unittest.TestCase):
-    pass
+    
+    def test_search_is_loaded(self):
+        def _(results,  userdata):
+            self.assertEqual(results.is_loaded(), False)
+        session.search("!loaded", _)
+        
 
 """
 

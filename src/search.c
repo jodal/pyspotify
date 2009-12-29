@@ -3,6 +3,9 @@
 #include "spotify/api.h"
 #include "pyspotify.h"
 #include "search.h"
+#include "artist.h"
+#include "album.h"
+#include "track.h"
 
 static PyMemberDef Results_members[] = {
     {NULL}
@@ -20,43 +23,62 @@ static PyObject *Results_is_loaded(Results *self) {
 }
 
 static PyObject *Results_did_you_mean(Results *self) {
-    PyErr_SetString(PyExc_NotImplementedError, "");
-    return NULL;
+    return PyString_FromString(sp_search_did_you_mean(self->_search));
 }
 
 static PyObject *Results_error(Results *self) {
-    PyErr_SetString(PyExc_NotImplementedError, "");
-    return NULL;
+    return Py_BuildValue("i", sp_search_error(self->_search));
 }
 
 static PyObject *Results_artists(Results *self) {
-    PyErr_SetString(PyExc_NotImplementedError, "");
-    return NULL;
+    int count = sp_search_num_artists(self->_search);
+    PyObject *l = PyList_New(count);
+    int i;
+    for(i=0;i<count;++i) {
+        Artist *a = (Artist *)PyObject_CallObject((PyObject *)&ArtistType, NULL);
+        a->_artist = sp_search_artist(self->_search, i);
+        PyList_SetItem(l, i, (PyObject *)a);
+    }
+    Py_INCREF(l);
+    return l;
 }
 
 static PyObject *Results_albums(Results *self) {
-    PyErr_SetString(PyExc_NotImplementedError, "");
-    return NULL;
+    int count = sp_search_num_albums(self->_search);
+    PyObject *l = PyList_New(count);
+    int i;
+    for(i=0;i<count;++i) {
+        Album *a = (Album *)PyObject_CallObject((PyObject *)&AlbumType, NULL);
+        a->_album = sp_search_album(self->_search, i);
+        PyList_SetItem(l, i, (PyObject *)a);
+    }
+    Py_INCREF(l);
+    return l;
 }
 
 static PyObject *Results_tracks(Results *self) {
-    PyErr_SetString(PyExc_NotImplementedError, "");
-    return NULL;
+    int count = sp_search_num_tracks(self->_search);
+    PyObject *l = PyList_New(count);
+    int i;
+    for(i=0;i<count;++i) {
+        Track *a = (Track *)PyObject_CallObject((PyObject *)&TrackType, NULL);
+        a->_track = sp_search_track(self->_search, i);
+        PyList_SetItem(l, i, (PyObject *)a);
+    }
+    Py_INCREF(l);
+    return l;
 }
 
 static PyObject *Results_total_tracks(Results *self) {
-    PyErr_SetString(PyExc_NotImplementedError, "");
-    return NULL;
+    return Py_BuildValue("i", sp_search_total_tracks(self->_search));
 }
 
 static PyObject *Results_query(Results *self) {
-    PyErr_SetString(PyExc_NotImplementedError, "");
-    return NULL;
+    return PyString_FromString(sp_search_query(self->_search));
 }
 
 PyObject *Results_str(PyObject *self) {
-    PyErr_SetString(PyExc_NotImplementedError, "");
-    return NULL;
+    return PyString_FromString(sp_search_query(((Results *)self)->_search));
 }
 
 static PyMethodDef Results_methods[] = {

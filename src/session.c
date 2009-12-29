@@ -134,15 +134,9 @@ typedef struct {
 void search_complete(sp_search *search, search_trampoline *st) {
     PyGILState_STATE gstate;
     gstate = PyGILState_Ensure();
-    fprintf(stderr, "Search complete called\n");
     Results *results = (Results *)PyObject_CallObject((PyObject *)&ResultsType, NULL);
     Py_INCREF(results);
     results->_search = search;
-    fprintf(stderr, "Got results\n");
-    //PyObject *args = PyTuple_New(2);
-    //PyTuple_SetItem(args, 0, (PyObject *)results);
-    //PyTuple_SetItem(args, 1, st->userdata);
-    //PyObject_CallObject(st->callback, args);
     PyObject_CallFunctionObjArgs(st->callback, results, st->userdata, NULL);
     Py_DECREF(results);
     PyGILState_Release(gstate);

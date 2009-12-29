@@ -91,7 +91,16 @@ struct sp_track {
 
 struct sp_search {
     int loaded;
-    int tracks;
+    int total_tracks;
+    int num_tracks;
+    int num_artists;
+    int num_albums;
+    sp_track *track[20];
+    sp_album *album[20];
+    sp_artist *artist[20];
+    char *query;
+    char *did_you_mean;
+    int error;
 };
 
 /***************************** MOCK EVENT GENERATION ***************************/
@@ -128,7 +137,7 @@ sp_error sp_session_logout(sp_session *session) {
 }
 
 const char* sp_error_message(sp_error error) {
-    const char buff[1024];
+    static const char buff[1024];
     sprintf((char *)buff, "Error number %d", error);
     return buff;
 }
@@ -191,7 +200,6 @@ sp_error sp_session_player_play(sp_session *session, bool b) {
 /********************************* MOCK SEARCH FUNCTIONS *********************************/
 
 sp_search *sp_search_create(sp_session *session, const char *query, int track_offset, int track_count, int album_offset, int album_count, int artist_offset, int artist_count, search_complete_cb *callback, void *userdata) {
-    fprintf(stderr, "sp_search_create called\n");
     sp_search *search = malloc(sizeof(sp_search));
     if(!strncmp(query, "!loaded", 7))
 	search->loaded = 0;
@@ -203,6 +211,46 @@ sp_search *sp_search_create(sp_session *session, const char *query, int track_of
 
 bool sp_search_is_loaded(sp_search *s) {
     return s->loaded;
+}
+
+int sp_search_num_artists(sp_search *s) {
+    return s->num_artists;
+}
+
+int sp_search_num_albums(sp_search *s) {
+    return s->num_albums;
+}
+
+int sp_search_num_tracks(sp_search *s) {
+    return s->num_tracks;
+}
+
+int sp_search_total_tracks(sp_search *s) {
+    return s->total_tracks;
+}
+
+sp_artist *sp_search_artist(sp_search *s, int i) {
+    return s->artist[i];
+}
+
+sp_album *sp_search_album(sp_search *s, int i) {
+    return s->album[i];
+}
+
+sp_track *sp_search_track(sp_search *s, int i) {
+    return s->track[i];
+}
+
+const char *sp_search_query(sp_search *s) {
+    return s->query;
+}
+
+sp_error sp_search_error(sp_search *s) {
+    return s->error;
+}
+
+const char *sp_search_did_you_mean(sp_search *s) {
+    return s->did_you_mean;
 }
 
 

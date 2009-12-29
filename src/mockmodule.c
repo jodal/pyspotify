@@ -205,6 +205,23 @@ sp_search *sp_search_create(sp_session *session, const char *query, int track_of
 	search->loaded = 0;
     if(!strncmp(query, "loaded", 6))
 	search->loaded = 1;
+    search->num_tracks = 4;
+    search->num_albums = 3;
+    search->num_artists = 2;
+    search->total_tracks = 24;
+    search->query = malloc(strlen(query) +1);
+    strcpy(search->query, query);
+    search->error = 3;
+    search->did_you_mean = "did_you_mean";
+    search->artist[0] = _mock_artist("foo", 1);
+    search->artist[1] = _mock_artist("bar", 1);
+    search->album[0] = _mock_album("baz", search->artist[0], 2001, "01234567890123456789", 1, 1);
+    search->album[1] = _mock_album("qux", search->artist[1], 2002, "01234567890123456789", 1, 1);
+    search->album[2] = _mock_album("quux", search->artist[0], 2003, "01234567890123456789", 1, 1);
+    search->track[0] = _mock_track("corge", 1, search->artist, search->album[0], 99, 72, 1, 1, 0, 1);
+    search->track[1] = _mock_track("grault", 1, search->artist, search->album[1], 98, 72, 1, 1, 0, 1);
+    search->track[2] = _mock_track("garply", 1, search->artist, search->album[2], 97, 72, 1, 1, 0, 1);
+    search->track[3] = _mock_track("waldo", 1, search->artist, search->album[0], 96, 72, 1, 1, 0, 1);
     callback(search, userdata);
     return search;
 }

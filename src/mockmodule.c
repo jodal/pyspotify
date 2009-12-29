@@ -333,6 +333,13 @@ sp_link *sp_link_create_from_artist(sp_artist *artist) {
     return l;
 }
 
+sp_link *sp_link_create_from_search(sp_search *s) {
+    sp_link *l = malloc(sizeof(sp_link));
+    memset(l, 0, sizeof(sp_link));
+    sprintf(l->data, "link:search:%s", s->query);
+    return l;
+}
+
 sp_link* sp_link_create_from_string(const char * link) {
     sp_link *l = malloc(sizeof(sp_link));
     memset(l,0,sizeof(sp_link));
@@ -349,6 +356,7 @@ sp_linktype sp_link_type(sp_link *link) {
     return 1;
 }
 
+
 /*************** MOCK TRACK METHODS ************************/
 
 bool sp_track_is_loaded(sp_track *t) {
@@ -359,6 +367,45 @@ const char *sp_track_name (sp_track *track) {
     return track->name;
 }
 
+bool sp_track_is_available(sp_track *t) {
+    return 1;
+}
+
+int sp_track_num_artists(sp_track *t) {
+    return 3;
+}
+
+sp_artist *sp_track_artist(sp_track *t, int index) {
+    const static sp_artist *a[3];
+    a[0] = _mock_artist("a1", 1);
+    a[1] = _mock_artist("a2", 1);
+    a[2] = _mock_artist("a3", 1);
+    return a[index];
+}
+
+int sp_track_disc(sp_track *t) {
+    return t->disc;
+}
+
+int sp_track_index(sp_track *t) {
+    return t->index;
+}
+
+int sp_track_popularity(sp_track *t) {
+    return t->popularity;
+}
+
+int sp_track_duration(sp_track *t) {
+    return t->duration;
+}
+
+sp_error sp_track_error(sp_track *t) {
+    return t->error;
+}
+
+sp_album *sp_track_album(sp_track *t) {
+    return t->album;
+}
 
 /*************** MOCK ARTIST METHODS **********************/
 
@@ -457,6 +504,12 @@ sp_track *_mock_track(char *name, int num_artists, sp_artist **artists,
     memset(t, 0, sizeof(sp_track));
     strcpy(t->name, name);
     t->loaded = loaded;
+    t->disc = disc;
+    t->index = index;
+    t->error = error;
+    t->duration = duration;
+    t->popularity = popularity;
+    t->album = album;
     return t;
 }
 
@@ -464,7 +517,7 @@ PyObject *mock_track(PyObject *self, PyObject *args) {
     char *name;
     int num_artists;
     //sp_artist **artists;
-    sp_album *album;
+    Album *album;
     int duration;
     int popularity;
     int disc;
@@ -474,7 +527,7 @@ PyObject *mock_track(PyObject *self, PyObject *args) {
     if(!PyArg_ParseTuple(args, "siO!iiiiii", &name, &num_artists, &AlbumType, &album,
 	&duration, &popularity, &disc, &index, &error, &loaded))
 	return NULL;
-    sp_track *t = _mock_track(name, num_artists, NULL, album, duration, popularity, disc, index, error, loaded);
+    sp_track *t = _mock_track(name, num_artists, NULL, album->_album, duration, popularity, disc, index, error, loaded);
     Track *track = (Track *)PyObject_CallObject((PyObject *)&TrackType, NULL);
     track->_track = t;
     Py_INCREF(track);
@@ -557,7 +610,11 @@ PyObject *mock_playlistcontainer(PyObject *self, PyObject *args) {
 }
 
 PyObject *mock_search(PyObject *self, PyObject *args) {
+    sp_search *s;
+    s = malloc(sizeof(sp_search));
+    s->query = "query";
     Results *results = (Results *)PyObject_CallObject((PyObject *)&ResultsType, NULL);
+    results->_search = s;
     Py_INCREF(results);
     return (PyObject *)results;
 }

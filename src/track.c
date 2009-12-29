@@ -3,6 +3,8 @@
 #include "spotify/api.h"
 #include "pyspotify.h"
 #include "track.h"
+#include "artist.h"
+#include "album.h"
 
 static PyMemberDef Track_members[] = {
     {NULL}
@@ -27,23 +29,25 @@ static PyObject *Track_is_loaded(Track *self) {
 }
 
 static PyObject *Track_is_available(Track *self) {
-    PyErr_SetString(PyExc_NotImplementedError, "");
-    return NULL;
+    return Py_BuildValue("i", sp_track_is_available(self->_track));
 }
 
-static PyObject *Track_num_artists(Track *self) {
-    PyErr_SetString(PyExc_NotImplementedError, "");
-    return NULL;
-}
-
-static PyObject *Track_artist(Track *self, PyObject *args) {
-    PyErr_SetString(PyExc_NotImplementedError, "");
-    return NULL;
+static PyObject *Track_artists(Track *self, PyObject *args) {
+    int count = sp_track_num_artists(self->_track);
+    PyObject *l = PyList_New(count);
+    int i;
+    for(i=0;i < count; i++) {
+        Artist *a = (Artist *)PyObject_CallObject((PyObject *)&ArtistType, NULL);
+        a->_artist = sp_track_artist(self->_track, i);
+        PyList_SetItem(l, i, (PyObject *)a);
+    }
+    return l;
 }
 
 static PyObject *Track_album(Track *self) {
-    PyErr_SetString(PyExc_NotImplementedError, "");
-    return NULL;
+    Album *a = PyObject_CallObject((PyObject *)&AlbumType, NULL);
+    a->_album = sp_track_album(self->_track);
+    return (PyObject *)a;
 }
 
 static PyObject *Track_name(Track *self) {
@@ -52,28 +56,23 @@ static PyObject *Track_name(Track *self) {
 }
 
 static PyObject *Track_duration(Track *self) {
-    PyErr_SetString(PyExc_NotImplementedError, "");
-    return NULL;
+    return Py_BuildValue("i", sp_track_duration(self->_track));
 }
 
 static PyObject *Track_popularity(Track *self) {
-    PyErr_SetString(PyExc_NotImplementedError, "");
-    return NULL;
+    return Py_BuildValue("i", sp_track_popularity(self->_track));
 }
 
 static PyObject *Track_disc(Track *self) {
-    PyErr_SetString(PyExc_NotImplementedError, "");
-    return NULL;
+    return Py_BuildValue("i", sp_track_disc(self->_track));
 }
 
 static PyObject *Track_index(Track *self) {
-    PyErr_SetString(PyExc_NotImplementedError, "");
-    return NULL;
+    return Py_BuildValue("i", sp_track_index(self->_track));
 }
 
 static PyObject *Track_error(Track *self) {
-    PyErr_SetString(PyExc_NotImplementedError, "");
-    return NULL;
+    return Py_BuildValue("i", sp_track_error(self->_track));
 }
 
 static PyMethodDef Track_methods[] = {
@@ -86,9 +85,9 @@ static PyMethodDef Track_methods[] = {
      METH_NOARGS,
      "Return true if the track is available for playback."},
     {"artists",
-     (PyCFunction)Track_artist,
+     (PyCFunction)Track_artists,
      METH_VARARGS,
-     "The artist matching the specified index performing on this track."},
+     "The artists who performed this track."},
     {"album",
      (PyCFunction)Track_album,
      METH_NOARGS,

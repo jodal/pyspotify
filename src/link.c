@@ -7,6 +7,7 @@
 #include "artist.h"
 #include "album.h"
 #include "playlist.h"
+#include "search.h"
 
 static PyMemberDef Link_members[] = {
     {NULL}
@@ -83,8 +84,18 @@ static PyObject *Link_from_artist(Link *self, PyObject *args) {
 }
 
 static PyObject *Link_from_search(Link *self, PyObject *args) {
-    PyErr_SetString(PyExc_NotImplementedError, "");
-    return NULL;
+    Results *results;
+    if(!PyArg_ParseTuple(args, "O!", &ResultsType, &results)) {
+	return NULL;
+    }
+    sp_link *l = sp_link_create_from_search(results->_search);
+    if(!l) {
+	PyErr_SetString(SpotifyError, "Failed to get link from a search");
+	return NULL;
+    }
+    Link *link = (Link *)PyObject_CallObject((PyObject *)&LinkType, NULL);
+    link->_link = l;
+    return (PyObject *)link;
 }
 
 static PyObject *Link_from_playlist(Link *self, PyObject *args) {

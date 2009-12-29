@@ -146,9 +146,9 @@ static PyObject *Session_search(Session *self, PyObject *args, PyObject *kwds) {
     char *query;
     sp_search *search;
     PyObject *callback, *userdata;
-    int track_offset=0, track_count=0,
-        album_offset=0, album_count=0, 
-	artist_offset=0, artist_count=0;
+    int track_offset=0, track_count=32,
+        album_offset=0, album_count=32, 
+	artist_offset=0, artist_count=32;
     search_trampoline *st;
     static char *kwlist[] = {"query", "callback", 
                              "track_offset", "track_count", 

@@ -9,6 +9,7 @@ import threading
 
 from spotify.manager import SpotifySessionManager
 from spotify.alsahelper import AlsaController
+from spotify import Link
 
 class JukeboxUI(cmd.Cmd, threading.Thread):
 
@@ -20,6 +21,7 @@ class JukeboxUI(cmd.Cmd, threading.Thread):
         self.jukebox = jukebox
         self.playlist = None
         self.track = None
+        self.results = False
 
     def run(self):
         self.cmdloop()
@@ -64,6 +66,31 @@ class JukeboxUI(cmd.Cmd, threading.Thread):
             return
         self.jukebox.load(playlist, track)
         self.jukebox.play()
+
+    def do_search(self, line):
+        if not line:
+            if self.results is False:
+                print "No search is in progress"
+            elif self.results is None:
+                print "Searching is in progress"
+            else:
+                print "Artists:"
+                for a in self.results.artists():
+                    print "    ", Link.from_artist(a), a.name()
+                print "Albums:"
+                for a in self.results.albums():
+                    print "    ", Link.from_album(a), a.name()
+                print "Tracks:"
+                for a in self.results.tracks():
+                    print "    ", Link.from_track(a, 0), a.name()
+                print self.results.total_tracks() - len(self.results.tracks()), "Tracks not shown"
+                self.results = False
+        else:
+            self.results = None
+            def _(results, userdata):
+                print "\nSearch results received"
+                self.results = results
+            self.jukebox.search(line, _)
 
     def do_queue(self, line):
         if not line:
@@ -150,6 +177,9 @@ class Jukebox(SpotifySessionManager):
     def end_of_track(self, sess):
         print "track ends."
         self.next()
+
+    def search(self, query, callback):
+        self.session.search(query, callback)
 
 if __name__ == '__main__':
     import optparse

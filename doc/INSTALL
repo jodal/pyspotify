@@ -1,0 +1,18 @@
+Installing pyspotify 
+====================
+
+If you haven't already installed libspotify, you can use the included one by doing this:
+
+export LD_LIBRARY_PATH=$PWD/lib
+
+installation of pyspotify on jaunty for python2.6:
+    python setup.py install --install-layout=deb --prefix=/usr/local
+
+however best for now is something like:
+
+sudo python setup.py develop
+
+Try the example1 script with your spotify credentials:
+
+./example1.py -u USERNAME -p PASSWORD
+

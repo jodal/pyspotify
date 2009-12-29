@@ -1,16 +1,51 @@
+This is pyspotify version 1.0.0
+===============================
 
-If you haven't already installed libspotify, you can use the included one by doing this:
+Copyright 2009 Doug Winter
+All rights reserved
 
-export LD_LIBRARY_PATH=$PWD/lib
+License information
+-------------------
 
-installation of pyspotify on jaunty for python2.6:
-    python setup.py install --install-layout=deb --prefix=/usr/local
+This package is licensed under the Apache License, Version 2.0.  Please see the
+file doc/LICENSE for more information.
 
-however best for now is something like:
+Introduction
+------------
 
-sudo python setup.py develop
+This package provides a Python interface to Spotify's online music streaming
+service.  This package is API complete, and should provide everything you need
+to write a spotify client in Python.
 
-Try the example1 script with your spotify credentials:
+To use this package you will also need libspotify, availably from Spotify here:
 
-./example1.py -u USERNAME -p PASSWORD
+    http://developer.spotify.com/en/libspotify/overview/
+
+You will need a Spotify Premium account.  You will also need to apply for, and
+receive an API key from spotify.
+
+Finally, and most irksome, you must possess an x86 32-bit userspace somewhere.
+These are getting pretty thin on the ground now and I hope Spotify will at
+least release 64-bit version of the library.  Obviously a proper source package
+would be more welcome, since there are lots of people out there not on x86.  
+
+If you aren't on x86 32-bit, you should have a look at despotify:
+
+    http://despotify.se/
+
+I include a copy of libspotify in this package, to make use of it easier - in
+particular it has some installation issues on Ubuntu that have not been fixed
+yet.
+
+Building the software
+---------------------
+
+See doc/INSTALL
+
+Trying it out
+-------------
+
+Included with this is a simple program, jukebox.py.  Run this with your
+credentials and access to an API key, and it will let you browse and play from
+your playlists, conduct searches and play from spotify URIs.
 

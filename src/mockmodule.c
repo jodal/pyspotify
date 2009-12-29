@@ -90,6 +90,7 @@ struct sp_track {
 };
 
 struct sp_search {
+    int loaded;
     int tracks;
 };
 
@@ -189,11 +190,19 @@ sp_error sp_session_player_play(sp_session *session, bool b) {
 
 /********************************* MOCK SEARCH FUNCTIONS *********************************/
 
-sp_search *sp_search_create (sp_session *session, const char *query, int track_offset, int track_count, int album_offset, int album_count, int artist_offset, int artist_count, search_complete_cb *callback, void *userdata) {
+sp_search *sp_search_create(sp_session *session, const char *query, int track_offset, int track_count, int album_offset, int album_count, int artist_offset, int artist_count, search_complete_cb *callback, void *userdata) {
     fprintf(stderr, "sp_search_create called\n");
-    static sp_search search;
-    callback(&search, userdata);
-    return &search;
+    sp_search *search = malloc(sizeof(sp_search));
+    if(!strncmp(query, "!loaded", 7))
+	search->loaded = 0;
+    if(!strncmp(query, "loaded", 6))
+	search->loaded = 1;
+    callback(search, userdata);
+    return search;
+}
+
+bool sp_search_is_loaded(sp_search *s) {
+    return s->loaded;
 }
 
 

@@ -10,10 +10,13 @@ static PyMemberDef Results_members[] = {
 
 static PyObject *Results_new(PyTypeObject *type, PyObject *args, PyObject *kwds) {
     Results *self;
-
     self = (Results *)type->tp_alloc(type, 0);
     self->_search = NULL;
     return (PyObject *)self;
+}
+
+static PyObject *Results_is_loaded(Results *self) {
+    return Py_BuildValue("i", sp_search_is_loaded(self->_search));
 }
 
 static PyObject *Results_did_you_mean(Results *self) {
@@ -57,6 +60,10 @@ PyObject *Results_str(PyObject *self) {
 }
 
 static PyMethodDef Results_methods[] = {
+    {"is_loaded",
+     (PyCFunction)Results_is_loaded,
+     METH_NOARGS,
+     "True if these results have been loaded"},
     {"did_you_mean",
      (PyCFunction)Results_did_you_mean,
      METH_NOARGS,
@@ -131,6 +138,6 @@ PyTypeObject ResultsType = {
 };
 
 void search_init(PyObject *m) {
-    Py_INCREF(&ResultsType);
     PyModule_AddObject(m, "Results", (PyObject *)&ResultsType);
+    Py_INCREF(&ResultsType);
 }

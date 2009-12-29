@@ -132,17 +132,20 @@ typedef struct {
 } search_trampoline;
 
 void search_complete(sp_search *search, search_trampoline *st) {
+    PyGILState_STATE gstate;
+    gstate = PyGILState_Ensure();
     fprintf(stderr, "Search complete called\n");
-    PyObject *args = PyTuple_New(2);
-    fprintf(stderr, "XXX\n");
     Results *results = (Results *)PyObject_CallObject((PyObject *)&ResultsType, NULL);
-    fprintf(stderr, "Got results\n");
     Py_INCREF(results);
     results->_search = search;
-    PyTuple_SetItem(args, 0, (PyObject *)results);
-    PyTuple_SetItem(args, 1, st->userdata);
-    PyObject_CallObject(st->callback, args);
+    fprintf(stderr, "Got results\n");
+    //PyObject *args = PyTuple_New(2);
+    //PyTuple_SetItem(args, 0, (PyObject *)results);
+    //PyTuple_SetItem(args, 1, st->userdata);
+    //PyObject_CallObject(st->callback, args);
+    PyObject_CallFunctionObjArgs(st->callback, results, st->userdata, NULL);
     Py_DECREF(results);
+    PyGILState_Release(gstate);
 }
 
 static PyObject *Session_search(Session *self, PyObject *args, PyObject *kwds) {
@@ -159,10 +162,8 @@ static PyObject *Session_search(Session *self, PyObject *args, PyObject *kwds) {
 			     "artist_offset", "artist_count",
 			     "userdata", NULL};
     PyArg_ParseTupleAndKeywords(args, kwds, "sO|iiiiiiO", kwlist, &query, &callback, 
-	&track_offset, &track_count, 
-	&album_offset, &album_count, 
-	&artist_offset, &artist_count,
-	&userdata);
+				&track_offset, &track_count, &album_offset, &album_count,
+				&artist_offset, &artist_count, &userdata);
     Py_INCREF(userdata);
     Py_INCREF(callback);
     st = malloc(sizeof(search_trampoline));
@@ -170,10 +171,10 @@ static PyObject *Session_search(Session *self, PyObject *args, PyObject *kwds) {
     st->callback = callback;
     Py_BEGIN_ALLOW_THREADS
     search = sp_search_create(self->_session, query,
-					 track_offset, track_count,
-					 album_offset, album_count,
-					 artist_offset, artist_count,
-					 search_complete, (void *)st);
+			      track_offset, track_count,
+			      album_offset, album_count,
+			      artist_offset, artist_count,
+			      search_complete, (void *)st);
     Py_END_ALLOW_THREADS
     Results *results = (Results *)PyObject_CallObject((PyObject *)&ResultsType, NULL);
     Py_INCREF(results);

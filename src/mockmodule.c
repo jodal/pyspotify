@@ -345,6 +345,10 @@ int sp_link_as_string (sp_link *link, char *buffer, int buffer_size) {
     return strlen(link->data);
 }
 
+sp_linktype sp_link_type(sp_link *link) {
+    return 1;
+}
+
 /*************** MOCK TRACK METHODS ************************/
 
 bool sp_track_is_loaded(sp_track *t) {

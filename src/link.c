@@ -102,8 +102,7 @@ static PyObject *Link_from_playlist(Link *self, PyObject *args) {
 }
 
 static PyObject *Link_type(Link *self) {
-    PyErr_SetString(PyExc_NotImplementedError, "");
-    return NULL;
+    return Py_BuildValue("i", sp_link_type(self->_link));
 }
 
 static PyObject *Link_as_track(Link *self) {
@@ -239,6 +238,13 @@ PyTypeObject LinkType = {
 };
 
 void link_init(PyObject *m) {
-    Py_INCREF(&LinkType);
     PyModule_AddObject(m, "Link", (PyObject *)&LinkType);
+    Py_INCREF(&LinkType);
+    PyMapping_SetItemString(LinkType.tp_dict, "LINK_INVALID", Py_BuildValue("i", SP_LINKTYPE_INVALID));
+    PyMapping_SetItemString(LinkType.tp_dict, "LINK_TRACK", Py_BuildValue("i", SP_LINKTYPE_TRACK));
+    PyMapping_SetItemString(LinkType.tp_dict, "LINK_ALBUM", Py_BuildValue("i", SP_LINKTYPE_ALBUM));
+    PyMapping_SetItemString(LinkType.tp_dict, "LINK_ARTIST", Py_BuildValue("i", SP_LINKTYPE_ARTIST));
+    PyMapping_SetItemString(LinkType.tp_dict, "LINK_SEARCH", Py_BuildValue("i", SP_LINKTYPE_SEARCH));
+    PyMapping_SetItemString(LinkType.tp_dict, "LINK_PLAYLIST", Py_BuildValue("i", SP_LINKTYPE_PLAYLIST));
+    
 }

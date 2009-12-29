@@ -59,12 +59,20 @@ class JukeboxUI(cmd.Cmd, threading.Thread):
         if not line:
             self.jukebox.play()
             return
-        try:
-            playlist, track = map(int, line.split(' ', 1))
-        except ValueError:
-            print "Usage: play playlist track"
-            return
-        self.jukebox.load(playlist, track)
+        if line.startswith("spotify:"):
+            # spotify url
+            l = Link.from_string(line)
+            if not l.type() == Link.LINK_TRACK:
+                print "You can only play tracks!"
+                return
+            self.jukebox.load_track(l.as_track())
+        else:
+            try:
+                playlist, track = map(int, line.split(' ', 1))
+            except ValueError:
+                print "Usage: play [track_link] | [playlist] [track]"
+                return
+            self.jukebox.load(playlist, track)
         self.jukebox.play()
 
     def do_search(self, line):
@@ -138,7 +146,14 @@ class Jukebox(SpotifySessionManager):
             self.ui.start()
         except:
             traceback.print_exc()
-
+            
+    def load_track(self, track):
+        if self.playing:
+            self.stop()
+        
+        self.session.load(track)
+        print "Loading %s" % track.name()
+        
     def load(self, playlist, track):
         if self.playing:
             self.stop()

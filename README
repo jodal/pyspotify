@@ -18,8 +18,10 @@ Introduction
 ------------
 
 This package provides a Python interface to Spotify's online music streaming
-service.  This package is API complete, and should provide everything you need
-to write a spotify client in Python.
+service.  This package is virtually API complete, and should provide everything
+you need to write a spotify client in Python.
+
+The missing parts of the API are: artist browsing, album browsing and the image handling subsystem.  These will be added soon.
 
 To use this package you will also need libspotify, availably from Spotify here:
 

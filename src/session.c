@@ -4,7 +4,7 @@
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at 
+ * You may obtain a copy of the License at
  *
  *  http://www.apache.org/licenses/LICENSE-2.0
  *
@@ -27,6 +27,9 @@
 #include "track.h"
 #include "playlist.h"
 #include "search.h"
+
+// define DEBUG to get lots of extra crap printed out
+//#define DEBUG 1
 
 static int session_constructed = 0;
 
@@ -164,15 +167,15 @@ static PyObject *Session_search(Session *self, PyObject *args, PyObject *kwds) {
     sp_search *search;
     PyObject *callback, *userdata;
     int track_offset=0, track_count=32,
-        album_offset=0, album_count=32, 
+        album_offset=0, album_count=32,
 	artist_offset=0, artist_count=32;
     search_trampoline *st;
-    static char *kwlist[] = {"query", "callback", 
-                             "track_offset", "track_count", 
+    static char *kwlist[] = {"query", "callback",
+                             "track_offset", "track_count",
 			     "album_offset", "album_count",
 			     "artist_offset", "artist_count",
 			     "userdata", NULL};
-    PyArg_ParseTupleAndKeywords(args, kwds, "sO|iiiiiiO", kwlist, &query, &callback, 
+    PyArg_ParseTupleAndKeywords(args, kwds, "sO|iiiiiiO", kwlist, &query, &callback,
 				&track_offset, &track_count, &album_offset, &album_count,
 				&artist_offset, &artist_count, &userdata);
     Py_INCREF(userdata);
@@ -409,11 +412,9 @@ void session_init(PyObject *m) {
 }
 
 char *copystring(PyObject *ob) {
-    char *s1, *s2;
-    int len;
-    PyString_AsStringAndSize(ob, &s1, &len);
-    s2 = malloc(len+1);
-    memcpy(s2, s1, len+1);
+    char *s = PyString_AsString(ob);
+    char *s2 = PyMem_Malloc(strlen(s) +1);
+    strcpy(s2, s);
     return s2;
 }
 
@@ -431,10 +432,13 @@ static sp_session_callbacks g_callbacks = {
 };
 
 PyObject *session_connect(PyObject *self, PyObject *args) {
+#ifdef DEBUG
+    fprintf(stderr, "> entering session_connect\n");
+#endif
     sp_session_config config;
+    PyObject *client;
     sp_session *session;
     sp_error error;
-    PyObject *client;
     PyObject *uobj, *pobj;
     char *username, *password;
 
@@ -447,13 +451,25 @@ PyObject *session_connect(PyObject *self, PyObject *args) {
     config.callbacks = &g_callbacks;
     config.user_agent = "unset";
 
+#ifdef DEBUG
+    fprintf(stderr, "Config mark 1\n");
+#endif
     PyObject *cache_location = PyObject_GetAttr(client, PyString_FromString("cache_location"));
+#ifdef DEBUG
+    fprintf(stderr, "Cache location is '%s'\n", PyString_AsString(cache_location));
+#endif
     if(cache_location == NULL) {
 	PyErr_SetString(SpotifyError, "Client did not provide a cache_location");
         return NULL;
     }
+#ifdef DEBUG
+    fprintf(stderr, "Config mark 1.1\n");
+#endif
     config.cache_location = copystring(cache_location);
 
+#ifdef DEBUG
+    fprintf(stderr, "Config mark 2\n");
+#endif
     PyObject *settings_location = PyObject_GetAttr(client, PyString_FromString("settings_location"));
     if(settings_location == NULL) {
 	PyErr_SetString(SpotifyError, "Client did not provide a settings_location");
@@ -461,6 +477,9 @@ PyObject *session_connect(PyObject *self, PyObject *args) {
     }
     config.settings_location = copystring(settings_location);
 
+#ifdef DEBUG
+    fprintf(stderr, "Config mark 3\n");
+#endif
     PyObject *application_key = PyObject_GetAttr(client, PyString_FromString("application_key"));
     if(application_key == NULL) {
 	PyErr_SetString(SpotifyError, "Client did not provide an application_key");
@@ -469,6 +488,9 @@ PyObject *session_connect(PyObject *self, PyObject *args) {
     config.application_key = copystring(application_key);
     config.application_key_size = PyString_Size(application_key);
 
+#ifdef DEBUG
+    fprintf(stderr, "Config mark 4\n");
+#endif
     PyObject *user_agent = PyObject_GetAttr(client, PyString_FromString("user_agent"));
     if(user_agent == NULL) {
 	PyErr_SetString(SpotifyError, "Client did not provide a user_agent");
@@ -476,6 +498,9 @@ PyObject *session_connect(PyObject *self, PyObject *args) {
     }
     config.user_agent = copystring(user_agent);
 
+#ifdef DEBUG
+    fprintf(stderr, "Config mark 5\n");
+#endif
     uobj = PyObject_GetAttr(client, PyString_FromString("username"));
     if(uobj == NULL) {
 	PyErr_SetString(SpotifyError, "Client did not provide a username");
@@ -491,7 +516,13 @@ PyObject *session_connect(PyObject *self, PyObject *args) {
     password = copystring(pobj);
 
     Py_BEGIN_ALLOW_THREADS
+#ifdef DEBUG
+    fprintf(stderr, "Calling sp_session_init\n");
+#endif
     error = sp_session_init(&config, &session);
+#ifdef DEBUG
+    fprintf(stderr, "Returned from sp_session_init\n");
+#endif
     Py_END_ALLOW_THREADS
     session_constructed = 1;
     if(error != SP_ERROR_OK) {

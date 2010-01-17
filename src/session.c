@@ -485,8 +485,12 @@ PyObject *session_connect(PyObject *self, PyObject *args) {
 	PyErr_SetString(SpotifyError, "Client did not provide an application_key");
         return NULL;
     }
-    config.application_key = copystring(application_key);
-    config.application_key_size = PyString_Size(application_key);
+    char *s_appkey;
+    Py_ssize_t l_appkey;
+    PyString_AsStringAndSize(application_key, &s_appkey, &l_appkey);
+    config.application_key_size = l_appkey;
+    config.application_key = PyMem_Malloc(l_appkey);
+    memcpy(config.application_key, s_appkey, l_appkey);
 
 #ifdef DEBUG
     fprintf(stderr, "Config mark 4\n");

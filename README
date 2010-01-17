@@ -21,7 +21,8 @@ This package provides a Python interface to Spotify's online music streaming
 service.  This package is virtually API complete, and should provide everything
 you need to write a spotify client in Python.
 
-The missing parts of the API are: artist browsing, album browsing and the image handling subsystem.  These will be added soon.
+The missing parts of the API are: artist browsing, album browsing and the image
+handling subsystem.  These will be added soon.
 
 To use this package you will also need libspotify, availably from Spotify here:
 
@@ -29,15 +30,6 @@ To use this package you will also need libspotify, availably from Spotify here:
 
 You will need a Spotify Premium account.  You will also need to apply for, and
 receive an API key from spotify.
-
-Finally, and most irksome, you must possess an x86 32-bit userspace somewhere.
-These are getting pretty thin on the ground now and I hope Spotify will at
-least release 64-bit version of the library.  Obviously a proper source package
-would be more welcome, since there are lots of people out there not on x86.  
-
-If you aren't on x86 32-bit, you should have a look at despotify:
-
-    http://despotify.se/
 
 I include a copy of libspotify in this package, to make use of it easier - in
 particular it has some installation issues on Ubuntu that have not been fixed

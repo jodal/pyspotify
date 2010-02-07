@@ -4,7 +4,7 @@
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at 
+ * You may obtain a copy of the License at
  *
  *  http://www.apache.org/licenses/LICENSE-2.0
  *
@@ -114,6 +114,10 @@ struct sp_search {
     sp_artist *artist[20];
     char *query;
     char *did_you_mean;
+    int error;
+};
+
+struct sp_image {
     int error;
 };
 
@@ -456,6 +460,25 @@ sp_playlist *sp_playlistcontainer_playlist(sp_playlistcontainer *pc, int index) 
 int sp_playlistcontainer_num_playlists(sp_playlistcontainer *pc) {
     return pc->num_playlists;
 }
+
+/*********************** MOCK IMAGE METHODS ************************/
+
+bool sp_image_is_loaded(sp_image *i) {
+    return 1;
+}
+
+sp_imageformat sp_image_format(sp_image *i) {
+    return 1;
+}
+
+sp_error sp_image_error(sp_image *i) {
+    return 0;
+}
+
+const void *sp_image_data(sp_image *i, size_t *t) {
+    return NULL;
+}
+
 
 /*********************** MOCK ALBUM METHODS ************************/
 

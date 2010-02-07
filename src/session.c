@@ -199,12 +199,17 @@ static PyObject *Session_search(Session *self, PyObject *args, PyObject *kwds) {
 
 PyObject *Session_image_create(Session *self, PyObject *args) {
     char *image_id;
-    int len;
+    size_t len;
+    fprintf(stderr, "XXXXX\n");
     if(!PyArg_ParseTuple(args, "s#", &image_id, &len))
 	return NULL;
+    fprintf(stderr, "XXXXX1\n");
     assert(len == 20);
+    fprintf(stderr, "XXXXX2\n");
     Image *i = PyObject_CallObject((PyObject *)&ImageType, NULL);
+    fprintf(stderr, "XXXXX3\n");
     i->_image = sp_image_create(self->_session, image_id);
+    fprintf(stderr, "XXXXX4\n");
     return (PyObject *)i;
 }
 

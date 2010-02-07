@@ -479,6 +479,10 @@ const void *sp_image_data(sp_image *i, size_t *t) {
     return NULL;
 }
 
+sp_image *sp_image_create(sp_session *session, const byte image_id[20]) {
+    return NULL;
+}
+
 
 /*********************** MOCK ALBUM METHODS ************************/
 

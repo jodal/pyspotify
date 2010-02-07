@@ -27,6 +27,7 @@
 #include "track.h"
 #include "playlist.h"
 #include "search.h"
+#include "image.h"
 
 // define DEBUG to get lots of extra crap printed out
 //#define DEBUG 1
@@ -196,6 +197,17 @@ static PyObject *Session_search(Session *self, PyObject *args, PyObject *kwds) {
     return (PyObject *)results;
 }
 
+PyObject *Session_image_create(Session *self, PyObject *args) {
+    char *image_id;
+    int len;
+    if(!PyArg_ParseTuple(args, "s#", &image_id, &len))
+	return NULL;
+    assert(len == 20);
+    Image *i = PyObject_CallObject((PyObject *)&ImageType, NULL);
+    i->_image = sp_image_create(self->_session, image_id);
+    return (PyObject *)i;
+}
+
 static PyMethodDef Session_methods[] = {
     {"username", (PyCFunction)Session_username, METH_NOARGS, "Return the canonical username for the logged in user"},
     {"display_name", (PyCFunction)Session_display_name, METH_NOARGS, "Return the full name for the logged in user"},
@@ -206,6 +218,7 @@ static PyMethodDef Session_methods[] = {
     {"play", (PyCFunction)Session_play, METH_VARARGS, "Play or pause the currently loaded track"},
     {"playlist_container", (PyCFunction)Session_playlist_container, METH_NOARGS, "Return the playlist container for the currently logged in user"},
     {"search", (PyCFunctionWithKeywords)Session_search, METH_KEYWORDS, "Conduct a search, calling the callback when results are available"},
+    {"image_create", (PyCFunction)Session_image_create, METH_VARARGS, "Create an image of album cover art"},
     {NULL}
 };
 

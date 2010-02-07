@@ -55,6 +55,45 @@ static PyObject *Image_data(Image *self) {
 static PyObject *Image_image_id(Image *self) {
 }
 
+typedef struct {
+    PyObject *callback;
+    PyObject *userdata;
+} image_callback_trampoline;
+
+void image_callback(sp_image *image, void *userdata) {
+    image_callback_trampoline *tramp = (image_callback_trampoline *)userdata;
+    PyGILState_STATE gstate;
+    gstate = PyGILState_Ensure();
+    Image *i = PyObject_CallObject((PyObject *)&ImageType, NULL);
+    i->_image = image;
+    PyObject_CallFunctionObjArgs(tramp->callback, i, tramp->userdata, NULL);
+    Py_DECREF(tramp->callback);
+    Py_DECREF(tramp->userdata);
+    free(userdata);
+    PyGILState_Release(gstate);
+}
+
+static PyObject *Image_add_load_callback(Image *self, PyObject *args) {
+    PyObject *callback;
+    PyObject *userdata;
+    image_callback_trampoline *tramp;
+    if(!PyArg_ParseTuple(args, "OO", &callback, &userdata))
+        return NULL;
+    Py_INCREF(callback);
+    Py_INCREF(userdata);
+    tramp = malloc(sizeof(image_callback_trampoline));
+    tramp->userdata = userdata;
+    tramp->callback = callback;
+    Py_BEGIN_ALLOW_THREADS
+    sp_image_add_load_callback(self->_image, image_callback, tramp);
+    Py_END_ALLOW_THREADS
+    Py_INCREF(Py_None);
+    return Py_None;
+}
+
+static PyObject *Image_remove_load_callback(Image *self, PyObject *args) {
+}
+
 static PyMethodDef Image_methods[] = {
     {"is_loaded",
      (PyCFunction)Image_is_loaded,
@@ -76,6 +115,14 @@ static PyMethodDef Image_methods[] = {
      (PyCFunction)Image_image_id,
      METH_NOARGS,
      "Get image ID"},
+    {"add_load_callback",
+     (PyCFunction)Image_add_load_callback,
+     METH_VARARGS,
+     "Add a load callback"},
+    {"remove_load_callback",
+     (PyCFunction)Image_remove_load_callback,
+     METH_VARARGS,
+     "Remove a load callback"},
     {NULL}
 };
 

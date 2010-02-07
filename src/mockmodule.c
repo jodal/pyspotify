@@ -483,6 +483,11 @@ sp_image *sp_image_create(sp_session *session, const byte image_id[20]) {
     return NULL;
 }
 
+void sp_image_add_load_callback(sp_image *i, image_loaded_cb *callback, void *userdata) {
+}
+
+void sp_image_remove_load_callback(sp_image *i, image_loaded_cb *callback, void *userdata) {
+}
 
 /*********************** MOCK ALBUM METHODS ************************/
 

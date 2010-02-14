@@ -4,7 +4,7 @@
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at 
+ * You may obtain a copy of the License at
  *
  *  http://www.apache.org/licenses/LICENSE-2.0
  *
@@ -139,8 +139,8 @@ static PyMethodDef Track_methods[] = {
 PyTypeObject TrackType = {
     PyObject_HEAD_INIT(NULL)
     0,                         /*ob_size*/
-    "spotify.track.Track",       /*tp_name*/
-    sizeof(Track),              /*tp_basicsize*/
+    "spotify.Track",           /*tp_name*/
+    sizeof(Track),             /*tp_basicsize*/
     0,                         /*tp_itemsize*/
     0,                         /*tp_dealloc*/  // TODO: IMPLEMENT THIS WITH sp_track_release
     0,                         /*tp_print*/

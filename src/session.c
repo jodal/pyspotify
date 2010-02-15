@@ -202,6 +202,7 @@ PyObject *Session_image_create(Session *self, PyObject *args) {
     size_t len;
     if(!PyArg_ParseTuple(args, "s#", &image_id, &len))
 	return NULL;
+    assert(len == 20);
     Image *i = PyObject_CallObject((PyObject *)&ImageType, NULL);
     i->_image = sp_image_create(self->_session, image_id);
     return (PyObject *)i;

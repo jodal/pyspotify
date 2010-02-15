@@ -26,6 +26,7 @@
 #include "search.h"
 #include "session.h"
 #include "track.h"
+#include "image.h"
 
 PyObject *SpotifyError;
 PyObject *SpotifyApiVersion;
@@ -54,6 +55,8 @@ PyMODINIT_FUNC init_spotify(void) {
 	return;
     if(PyType_Ready(&TrackType) < 0)
 	return;
+    if(PyType_Ready(&ImageType) < 0)
+	return;
 
     m = Py_InitModule("_spotify", module_methods);
     if(m == NULL)
@@ -75,4 +78,5 @@ PyMODINIT_FUNC init_spotify(void) {
     session_init(m);
     search_init(m);
     track_init(m);
+    image_init(m);
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2006-2009 Spotify Ltd
+ * Copyright (c) 2006-2010 Spotify Ltd
  *
  * The terms of use for this and related files can be read in
  * the associated LICENSE file, usually stored in share/doc/libspotify/LICENSE.
@@ -51,8 +51,6 @@ typedef unsigned char bool;
 
 typedef unsigned char byte;
 
-#include <stddef.h>
-
 /**
  * @defgroup types Spotify types & structs
  *
@@ -72,7 +70,6 @@ typedef struct sp_image sp_image; ///< A handle to an image
 typedef struct sp_user sp_user; ///< A handle to a user
 typedef struct sp_playlist sp_playlist; ///< A playlist handle
 typedef struct sp_playlistcontainer sp_playlistcontainer; ///< A playlist container (playlist containing other playlists) handle
-
 /** @} */
 
 /**
@@ -106,15 +103,11 @@ typedef enum sp_error {
 	SP_ERROR_USER_NEEDS_PREMIUM        = 15, ///< The specified user needs a premium account
 	SP_ERROR_OTHER_TRANSIENT           = 16, ///< A transient error occured.
 	SP_ERROR_IS_LOADING                = 17, ///< The resource is currently loading
+	SP_ERROR_NO_STREAM_AVAILABLE       = 18, ///< Could not find any suitable stream to play
 } sp_error;
 
 /**
  * Convert a numeric libspotify error code to a text string
- *
- * Here is a snippet from \c session_ready.c:
- * @dontinclude session_ready.c
- * @skip sp_session_logout
- * @until }
  *
  * @param[in]   error   The error code to lookup
  */
@@ -142,7 +135,7 @@ SP_LIBEXPORT(const char*) sp_error_message(sp_error error);
  * returned from sp_session_init(). Future versions of the library will provide you with some kind of mechanism
  * to request an updated version of the library.
  */
-#define SPOTIFY_API_VERSION 3
+#define SPOTIFY_API_VERSION 4
 
 /**
  * Describes the current state of the connection
@@ -170,6 +163,15 @@ typedef struct sp_audioformat {
 	int sample_rate;             ///< Audio sample rate, in samples per second.
 	int channels;                ///< Number of channels. Currently 1 or 2.
 } sp_audioformat;
+
+/**
+ * Bitrate definitions for music streaming
+ */
+typedef enum sp_bitrate {
+  SP_BITRATE_160k = 0,
+  SP_BITRATE_320k = 1,
+} sp_bitrate;
+
 
 
 /**
@@ -288,6 +290,28 @@ typedef struct sp_session_callbacks {
 	 * @param[in]  session    Session
 	 */
 	void (SP_CALLCONV *end_of_track)(sp_session *session);
+
+	/**
+	 * Streaming error.
+	 * Called when streaming cannot start or continue
+	 *
+	 * @note This function is invoked from the main thread
+	 *
+	 * @param[in]  session    Session
+	 * @param[in]  errro      Error code describing the error
+	 */
+	void (SP_CALLCONV *streaming_error)(sp_session *session, sp_error error);
+
+	/**
+	 * Called whenever user info has been updated
+	 *
+	 * libspotify will try to resolve the canonical username into displayable usernames
+	 * as soon as a sp_user object is created. 
+	 *
+	 * @param[in]  session    Session
+	 */
+	void (SP_CALLCONV *userinfo_updated)(sp_session *session);
+
 } sp_session_callbacks;
 
 /**
@@ -311,8 +335,8 @@ typedef struct sp_session_config {
  * In the future, this will be renamed to sp_session_create() and will have a
  * corresponding sp_session_release() function.
  *
- * Here is a snippet from \c session.c:
- * @dontinclude session.c
+ * Here is a snippet from \c spshell.c:
+ * @dontinclude spshell.c
  * @skip config.api_version
  * @until }
  *
@@ -327,8 +351,8 @@ SP_LIBEXPORT(sp_error) sp_session_init(const sp_session_config *config, sp_sessi
  * Logs in the specified username/password combo. This initiates the download in the background.
  * A callback is called when login is complete
  *
- * Here is a snippet from \c session.c:
- * @dontinclude session.c
+ * Here is a snippet from \c spshell.c:
+ * @dontinclude spshell.c
  * @skip sp_session_login
  * @until }
  *
@@ -354,11 +378,6 @@ SP_LIBEXPORT(sp_user *) sp_session_user(sp_session *session);
  *
  * Always call this before terminating the application and libspotify is currently
  * logged in. Otherwise, the settings and cache may be lost.
- *
- * Here is a snippet from \c session_ready.c:
- * @dontinclude session_ready.c
- * @skip sp_session_logout
- * @until }
  *
  * @param[in]   session    Your session object
  *
@@ -386,12 +405,6 @@ SP_LIBEXPORT(void *) sp_session_userdata(sp_session *session);
 
 /**
  * Make the specified session process any pending events
- *
- * Here is a snippet from \c session.c:
- * @dontinclude session.c
- * @skip static void loop
- * @until }
- * @until }
  *
  * @param[in]   session         Your session object
  * @param[out]  next_timeout    Stores the time (in milliseconds) until you should call this function again
@@ -452,6 +465,27 @@ SP_LIBEXPORT(void) sp_session_player_unload(sp_session *session);
  */
 SP_LIBEXPORT(sp_playlistcontainer *) sp_session_playlistcontainer(sp_session *session);
 
+/**
+ * Returns the starred list for currently logged in user
+ *
+ * @param[in]  session        Session object
+ *
+ * @return     A playlist.
+ * @note You need to release the playlist when you are done with it.
+ * @see sp_playlist_release()
+ */
+SP_LIBEXPORT(sp_playlist *) sp_session_starred_create(sp_session *session);
+
+/**
+ * Set preferred bitrate for music streaming
+ *
+ * @param[in]  session        Session object
+ * @param[in]  bitrate        Preferred bitrate, see ::sp_bitrate for possible values
+ *
+ */
+SP_LIBEXPORT(void) sp_session_preferred_bitrate(sp_session *session, sp_bitrate bitrate);
+
+
 /** @} */
 
 
@@ -477,11 +511,6 @@ typedef enum {
 
 /**
  * Create a Spotify link given a string
- *
- * Here is a snippet from \c link.c:
- * @dontinclude link.c
- * @skip sp_link_create_from_string
- * @until sp_link_release
  *
  * @param[in]   link       A string representation of a Spotify link
  *
@@ -558,13 +587,6 @@ SP_LIBEXPORT(sp_link *) sp_link_create_from_playlist(sp_playlist *playlist);
 /**
  * Create a string representation of the given Spotify link
  *
- * Here is a snippet from \c link.c:
- * @dontinclude link.c
- * @skip print_link
- * @until }
- * @until }
- * @until }
- *
  * @param[in]   link         The Spotify link whose string representation you are interested in
  * @param[out]  buffer       The buffer to hold the string representation of link
  * @param[in]   buffer_size  The max size of the buffer that will hold the string representation
@@ -578,12 +600,6 @@ SP_LIBEXPORT(int) sp_link_as_string(sp_link *link, char *buffer, int buffer_size
 
 /**
  * The link type of the specified link
- *
- * Here is a snippet from \c link.c:
- * @dontinclude link.c
- * @skip get_link_type_label
- * @until }
- * @until }
  *
  * @param[in]   link       The Spotify link whose type you are interested in
  *
@@ -661,12 +677,6 @@ SP_LIBEXPORT(void) sp_link_release(sp_link *link);
  * Get load status for the specified track. If the track is not loaded yet,
  * all other functions operating on the track return default values.
  *
- * Here is a snippet from \c track.c:
- * @dontinclude track.c
- * @skip try_tracks
- * @skip sp_track_is_loaded
- * @until track = NULL
- *
  * @param[in]   track      The track whose load status you are interested in
  *
  * @return                 True if track is loaded, otherwise false
@@ -693,6 +703,29 @@ SP_LIBEXPORT(sp_error) sp_track_error(sp_track *track);
  * @see sp_track_is_loaded()
  */
 SP_LIBEXPORT(bool) sp_track_is_available(sp_track *track);
+
+/**
+ * Return true if the track is starred by the currently logged in user.
+ *
+ * @param[in]   track      The track
+ *
+ * @return                 True if track is starred.
+ *
+ * @note The track must be loaded or this function will always return false.
+ * @see sp_track_is_loaded()
+ */
+SP_LIBEXPORT(bool) sp_track_is_starred(sp_track *track);
+
+/**
+ * Star/Unstar the specified track
+ *
+ * @param[in]   session    Session
+ * @param[in]   tracks     Array of pointer to tracks.
+ * @param[in]   num_tracks Length of \p tracks array
+ * @param[in]   star       Starred status of the track
+ *
+ */
+SP_LIBEXPORT(void) sp_track_set_starred(sp_session *session, const sp_track **tracks, int num_tracks, bool star);
 
 /**
  * The number of artists performing on the specified track
@@ -728,11 +761,6 @@ SP_LIBEXPORT(sp_album *) sp_track_album(sp_track *track);
 /**
  * The string representation of the specified track's name
  *
- * Here is a snippet from \c track.c:
- * @dontinclude track.c
- * @skip print_track
- * @until }
- *
  * @param[in]   track      A track object
  *
  * @return                 The string representation of the specified track's name.
@@ -744,11 +772,6 @@ SP_LIBEXPORT(const char *) sp_track_name(sp_track *track);
 
 /**
  * The duration, in milliseconds, of the specified track
- *
- * Here is a snippet from \c track.c:
- * @dontinclude track.c
- * @skip print_track
- * @until }
  *
  * @param[in]   track      A track object
  *
@@ -984,11 +1007,6 @@ typedef void SP_CALLCONV albumbrowse_complete_cb(sp_albumbrowse *result, void *u
  *
  * The user is responsible for freeing the returned album browse using sp_albumbrowse_release(). This can be done in the callback.
  *
- * Here is a snippet from \c browse.c:
- * @dontinclude browse.c
- * @skip sp_albumbrowse_create(session
- * @until }
- *
  * @param[in]   session         Session object
  * @param[in]   album           Album to be browsed. The album metadata does not have to be loaded
  * @param[in]   callback        Callback to be invoked when browsing has been completed. Pass NULL if you are not interested in this event.
@@ -1136,11 +1154,6 @@ typedef void SP_CALLCONV artistbrowse_complete_cb(sp_artistbrowse *result, void 
  * Initiate a request for browsing an artist
  *
  * The user is responsible for freeing the returned artist browse using sp_artistbrowse_release(). This can be done in the callback.
- *
- * Here is a snippet from \c browse.c:
- * @dontinclude browse.c
- * @skip sp_artistbrowse_create(session
- * @until }
  *
  * @param[in] session         Session object
  * @param[in] artist          Artist to be browsed. The artist metadata does not have to be loaded
@@ -1316,12 +1329,6 @@ typedef void SP_CALLCONV image_loaded_cb(sp_image *image, void *userdata);
 /**
  * Create an image object
  *
- * Here is a snippet from \c track.c:
- * @dontinclude track.c
- * @skip sp_album_cover
- * @until }
- * @until }
- *
  * @param[in]  session    Session
  * @param[in]  image_id   Spotify image ID
  *
@@ -1338,11 +1345,6 @@ SP_LIBEXPORT(sp_image *) sp_image_create(sp_session *session, const byte image_i
  *
  * If an image is loaded, and loading fails, the image will behave like an
  * empty image.
- *
- * Here is a snippet from \c track.c:
- * @dontinclude track.c
- * @skip g_image = sp_image_create
- * @until sp_image_add_load_callback
  *
  * @param[in]  image      Image object
  * @param[in]  callback   Callback that will be called when image has been
@@ -1437,6 +1439,30 @@ SP_LIBEXPORT(void) sp_image_release(sp_image *image);
  */
 
 /**
+ * List of genres for radio query. Multiple genres can be combined by OR:ing the genres together
+ */
+typedef enum sp_radio_genre {
+  SP_RADIO_GENRE_ALT_POP_ROCK = 0x1,
+  SP_RADIO_GENRE_BLUES        = 0x2,
+  SP_RADIO_GENRE_COUNTRY      = 0x4,
+  SP_RADIO_GENRE_DISCO        = 0x8,
+  SP_RADIO_GENRE_FUNK         = 0x10,
+  SP_RADIO_GENRE_HARD_ROCK    = 0x20,
+  SP_RADIO_GENRE_HEAVY_METAL  = 0x40,
+  SP_RADIO_GENRE_RAP          = 0x80,
+  SP_RADIO_GENRE_HOUSE        = 0x100,
+  SP_RADIO_GENRE_JAZZ         = 0x200,
+  SP_RADIO_GENRE_NEW_WAVE     = 0x400,
+  SP_RADIO_GENRE_RNB          = 0x800,
+  SP_RADIO_GENRE_POP          = 0x1000,
+  SP_RADIO_GENRE_PUNK         = 0x2000,
+  SP_RADIO_GENRE_REGGAE       = 0x4000,
+  SP_RADIO_GENRE_POP_ROCK     = 0x8000,
+  SP_RADIO_GENRE_SOUL         = 0x10000,
+  SP_RADIO_GENRE_TECHNO       = 0x20000,
+} sp_radio_genre;
+
+/**
  * The type of a callback used in sp_search_create()
  *
  * When this callback is called, the sp_track_is_loaded(), sp_album_is_loaded(),
@@ -1450,11 +1476,6 @@ typedef void SP_CALLCONV search_complete_cb(sp_search *result, void *userdata);
 
 /**
  * Create a search object from the given query
- *
- * Here is a snippet from \c search.c:
- * @dontinclude search.c
- * @skip sp_search_create
- * @until }
  *
  * @param[in]  session    Session
  * @param[in]  query      Query search string, e.g. 'The Rolling Stones' or 'album:"The Black Album"'
@@ -1470,6 +1491,21 @@ typedef void SP_CALLCONV search_complete_cb(sp_search *result, void *userdata);
  * @return                Pointer to a search object. To free the object, use sp_search_release()
  */
 SP_LIBEXPORT(sp_search *) sp_search_create(sp_session *session, const char *query, int track_offset, int track_count, int album_offset, int album_count, int artist_offset, int artist_count, search_complete_cb *callback, void *userdata);
+
+/**
+ * Create a search object from the radio channel
+ *
+ * @param[in]  session          Session
+ * @param[in]  from_year        Include tracks starting from this year
+ * @param[in]  to_year          Include tracks up to this year
+ * @param[in]  genres           Bitmask of genres to include
+ * @param[in]  callback         Callback that will be called once the search operation is complete. Pass NULL if you are not interested in this event.
+ * @param[in]  userdata         Opaque pointer passed to \p callback
+ *
+ * @return                      Pointer to a search object. To free the object, use sp_search_release()
+ */
+SP_LIBEXPORT(sp_search *) sp_radio_search_create(sp_session *session, unsigned int from_year, unsigned int to_year, sp_radio_genre genres, search_complete_cb *callback, void *userdata);
+
 
 /**
  * Get load status for the specified search. Before it is loaded, it will behave as an empty search result.
@@ -1657,10 +1693,16 @@ typedef struct sp_playlist_callbacks {
 	/**
 	 * Called when state changed for a playlist.
 	 *
-	 * The \em state in this case are the flags like collaborative or pending.
+	 * There are three states that trigger this callback:
+	 * - Collaboration for this playlist has been turned on or off
+	 * - The playlist started having pending changes, or all pending changes have now been committed
+	 * - The playlist started loading, or finished loading
 	 *
 	 * @param[in]  pl         Playlist object
 	 * @param[in]  userdata   Userdata passed to sp_playlist_add_callbacks()
+	 * @sa sp_playlist_is_collaborative
+	 * @sa sp_playlist_has_pending_changes
+	 * @sa sp_playlist_is_loaded
 	 */
 	void (SP_CALLCONV *playlist_state_changed)(sp_playlist *pl, void *userdata);
 
@@ -1684,11 +1726,13 @@ typedef struct sp_playlist_callbacks {
 	 * @param[in]  userdata   Userdata passed to sp_playlist_add_callbacks()
 	 */
 	void (SP_CALLCONV *playlist_metadata_updated)(sp_playlist *pl, void *userdata);
+
 } sp_playlist_callbacks;
 
 
 /**
- * Get load status for the specified playlist
+ * Get load status for the specified playlist. If it's false, you have to wait until
+ * playlist_state_changed happens, and check again if is_loaded has changed
  *
  * @param[in]  playlist   Playlist object
  *
@@ -1738,7 +1782,7 @@ SP_LIBEXPORT(void) sp_playlist_remove_callbacks(sp_playlist *playlist, sp_playli
 SP_LIBEXPORT(int) sp_playlist_num_tracks(sp_playlist *playlist);
 
 /**
- * Return the track at the given index in the given playlist
+ * Return the track at the given index in a playlist
  *
  * @param[in]  playlist   Playlist object
  * @param[in]  index      Index into playlist container. Should be in the interval [0, sp_playlist_num_tracks() - 1]
@@ -1814,9 +1858,10 @@ SP_LIBEXPORT(bool) sp_playlist_has_pending_changes(sp_playlist *playlist);
  * @param[in]  tracks         Array of pointer to tracks.
  * @param[in]  num_tracks     Length of \p tracks array
  * @param[in]  position       Start position in playlist where to insert the tracks
+ * @param[in]  session        Your session object
  *
  */
-SP_LIBEXPORT(sp_error) sp_playlist_add_tracks(sp_playlist *playlist, const sp_track **tracks, int num_tracks, int position);
+SP_LIBEXPORT(sp_error) sp_playlist_add_tracks(sp_playlist *playlist, const sp_track **tracks, int num_tracks, int position, sp_session *session);
 
 /**
  * Remove tracks from a playlist
@@ -1842,6 +1887,32 @@ SP_LIBEXPORT(sp_error) sp_playlist_remove_tracks(sp_playlist *playlist, const in
  *
  */
 SP_LIBEXPORT(sp_error) sp_playlist_reorder_tracks(sp_playlist *playlist, const int *tracks, int num_tracks, int new_position);
+
+/**
+ * Load an already existing playlist without adding it to a playlistcontainer.
+ *
+ * @param[in]  session        Session object
+ * @param[in]  link           Link object referring to a playlist
+ *
+ * @return     A playlist. The reference is owned by the caller and should be released with sp_playlist_release()
+ *
+ */
+SP_LIBEXPORT(sp_playlist *) sp_playlist_create(sp_session *session, sp_link *link);
+
+/**
+ * Increase the reference count of a playlist
+ *
+ * @param[in]   playlist       The playlist object
+ */
+SP_LIBEXPORT(void) sp_playlist_add_ref(sp_playlist *playlist);
+
+/**
+ * Decrease the reference count of a playlist
+ *
+ * @param[in]   playlist       The playlist object
+ */
+SP_LIBEXPORT(void) sp_playlist_release(sp_playlist *playlist);
+
 
 /**
  * Playlist container callbacks.
@@ -2030,20 +2101,28 @@ SP_LIBEXPORT(bool) sp_user_is_loaded(sp_user *user);
  * Toplist types
  */
 typedef enum {
-	SP_TOPLIST_TYPE_ARTISTS = 0,
-	SP_TOPLIST_TYPE_ALBUMS  = 1,
-	SP_TOPLIST_TYPE_TRACKS  = 2,
+	SP_TOPLIST_TYPE_ARTISTS = 0, ///< Top artists
+	SP_TOPLIST_TYPE_ALBUMS  = 1, ///< Top albums
+	SP_TOPLIST_TYPE_TRACKS  = 2, ///< Top tracks
 } sp_toplisttype;
 
+
 /**
- * Toplist types
+ * Convenience macro to create a toplist region. Toplist regions are ISO 3166-1
+ * country codes (in uppercase) encoded in an integer. There are also some reserved
+ * codes used to denote non-country regions. See sp_toplistregion
+ *
+ * Example: SP_TOPLIST_REGION('S', 'E') // for sweden
+ */
+#define SP_TOPLIST_REGION(a, b) ((a) << 8 | (b))
+
+/**
+ * Special toplist regions
  */
 typedef enum {
-	SP_TOPLIST_REGION_EVERYWHERE = 0,
-	SP_TOPLIST_REGION_MINE = 1,
+	SP_TOPLIST_REGION_EVERYWHERE = 0, ///< Global toplist
+	SP_TOPLIST_REGION_USER = 1,       ///< Toplist for a given user
 } sp_toplistregion;
-
-#define SP_TOPLIST_REGION(a, b) ((a) << 8 | (b))
 
 
 /**
@@ -2175,42 +2254,29 @@ SP_LIBEXPORT(sp_track *) sp_toplistbrowse_track(sp_toplistbrowse *tlb, int index
 
 /** @} */
 
-
-
 #ifdef __cplusplus
 }
 #endif
 
 #endif /* PUBLIC_API_H */
 /**
- * @example session.c
- *
- * The session.c example shows how you can use the session handling functions.
- */
-/**
- * @example session_ready.c
- *
- * The session_ready.c example shows how you can use the session handling functions.
- */
-/**
- * @example link.c
- *
- * The link.c example shows how you can use the link handling functions.
- */
-/**
- * @example track.c
- *
- * The track.c example shows how you can use the track and image functions.
- */
-/**
  * @example browse.c
  *
  * The browse.c example shows how you can use the album, artist, and browse functions.
+ * The example also include some rudimentary playlist browsing.
+ * It is part of the spshell program
  */
 /**
  * @example search.c
  *
  * The search.c example shows how you can use search functions.
+ * It is part of the spshell program
+ */
+/**
+ * @example toplist.c
+ *
+ * The toplist.c example shows how you can use toplist functions.
+ * It is part of the spshell program
  */
 /**
  * @example jukebox.c

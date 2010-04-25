@@ -5,7 +5,10 @@ import traceback
 import time
 
 from spotify.manager import SpotifySessionManager
-from spotify.alsahelper import AlsaController
+try:
+    from spotify.alsahelper import AlsaController
+except ImportError:
+    from spotify.osshelper import OssController as AlsaController
 
 class Example1(SpotifySessionManager):
 

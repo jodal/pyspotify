@@ -24,7 +24,10 @@ import time
 import threading
 
 from spotify.manager import SpotifySessionManager
-from spotify.alsahelper import AlsaController
+try:
+    from spotify.alsahelper import AlsaController
+except ImportError:
+    from spotify.osshelper import OssController as AlsaController
 from spotify import Link
 
 class JukeboxUI(cmd.Cmd, threading.Thread):

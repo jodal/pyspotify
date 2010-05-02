@@ -68,8 +68,7 @@ static PyObject *Playlist_owner(Playlist *self) {
 }
 
 static PyObject *Playlist_is_collaborative(Playlist *self) {
-    PyErr_SetString(PyExc_NotImplementedError, "");
-    return NULL;
+    return Py_BuildValue("i", sp_playlist_is_collaborative(self->_playlist));
 }
 
 static PyObject *Playlist_set_collaborative(Playlist *self, PyObject *args) {
@@ -115,6 +114,10 @@ static PyMethodDef Playlist_methods[] = {
      (PyCFunction)Playlist_is_loaded,
      METH_NOARGS,
      "True if this playlist has been loaded by the client"},
+    {"is_collaborative",
+     (PyCFunction)Playlist_is_collaborative,
+     METH_NOARGS,
+     "Return collaborative status for a playlist. A playlist in collaborative state can be modifed by all users, not only the user owning the list"},
     {"name",
      (PyCFunction)Playlist_name,
      METH_NOARGS,

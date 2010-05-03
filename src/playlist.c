@@ -170,7 +170,7 @@ static PyMethodDef Playlist_methods[] = {
      "Return collaborative status for a playlist. A playlist in collaborative state can be modifed by all users, not only the user owning the list"},
     {"add_tracks_added_callback",
      (PyCFunction)Playlist_add_tracks_added_callback,
-     METH_KEYWORDS,
+     METH_VARARGS,
      "Return collaborative status for a playlist. A playlist in collaborative state can be modifed by all users, not only the user owning the list"},
     {"name",
      (PyCFunction)Playlist_name,

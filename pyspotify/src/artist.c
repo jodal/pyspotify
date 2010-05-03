@@ -17,7 +17,7 @@
 
 #include <Python.h>
 #include <structmember.h>
-#include "spotify/api.h"
+#include "libspotify/api.h"
 #include "pyspotify.h"
 #include "artist.h"
 

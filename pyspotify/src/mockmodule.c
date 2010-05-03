@@ -26,7 +26,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <Python.h>
-#include "spotify/api.h"
+#include "libspotify/api.h"
 #include "pyspotify.h"
 #include "artist.h"
 #include "album.h"

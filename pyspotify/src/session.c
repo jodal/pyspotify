@@ -21,7 +21,7 @@
 #include <unistd.h>
 #include <stdint.h>
 #include <pthread.h>
-#include "spotify/api.h"
+#include "libspotify/api.h"
 #include "pyspotify.h"
 #include "session.h"
 #include "track.h"

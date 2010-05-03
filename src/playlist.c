@@ -42,6 +42,44 @@ static PyObject *Playlist_is_loaded(Playlist *self) {
     return Py_BuildValue("i", sp_playlist_is_loaded(self->_playlist));
 }
 
+static PyObject *Playlist_remove_tracks(Playlist *self, PyObject *args) {
+    PyObject *py_tracks;
+    PyObject *item;
+    sp_error err;
+    int *tracks;
+    int num_tracks;
+    int playlist_length;
+    int i;
+
+    if(!PyArg_ParseTuple(args, "O", &py_tracks))
+        return NULL;
+    if (!PySequence_Check(py_tracks)) {
+        PyErr_SetString(PyExc_TypeError, "expected sequence");
+        return NULL;
+    }
+    num_tracks = PySequence_Size(py_tracks);
+    tracks = (int *) malloc(sizeof(tracks)*num_tracks);
+    playlist_length = sp_playlist_num_tracks(self->_playlist);
+    for (i = 0; i < num_tracks; i++) {
+        item = PySequence_GetItem(py_tracks, i);
+        if (!PyInt_Check(item)) {
+            free(tracks);
+            PyErr_SetString(PyExc_TypeError, "expected sequence of integers");
+            return NULL;
+        }
+        tracks[i] = (int)PyInt_AsLong(item);
+        if (tracks[i] > playlist_length) {
+            PyErr_SetString(PyExc_IndexError, "specified track does not exist");
+            return NULL;
+        }
+        Py_DECREF(item);
+    }
+    Py_BEGIN_ALLOW_THREADS
+    err = sp_playlist_remove_tracks(self->_playlist, tracks, num_tracks);
+    Py_END_ALLOW_THREADS
+    return handle_error(err);
+}
+
 typedef struct {
     PyObject *callback;
     PyObject *userdata;
@@ -240,6 +278,10 @@ static PyMethodDef Playlist_methods[] = {
      (PyCFunction)Playlist_is_collaborative,
      METH_NOARGS,
      "Return collaborative status for a playlist. A playlist in collaborative state can be modifed by all users, not only the user owning the list"},
+    {"remove_tracks",
+     (PyCFunction)Playlist_remove_tracks,
+     METH_VARARGS,
+     "Remove tracks from a playlist"},
     {"add_tracks_added_callback",
      (PyCFunction)Playlist_add_tracks_added_callback,
      METH_VARARGS,

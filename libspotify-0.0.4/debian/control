@@ -1,0 +1,13 @@
+Source: libspotify
+Section: multiverse
+Priority: extra
+Maintainer: Doug Winter <doug.winter@isotoma.com>
+Build-Depends: cdbs, debhelper (>= 7)
+Standards-Version: 3.8.1
+Homepage: http://developer.spotify.com/en/libspotify/overview/
+
+Package: libspotify
+Architecture: amd64
+Depends: ${shlibs:Depends}, ${misc:Depends}
+Description: <insert up to 60 chars description>
+ <insert long description, indented with spaces>

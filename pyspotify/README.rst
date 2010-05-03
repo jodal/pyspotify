@@ -1,7 +1,7 @@
-This is pyspotify version 1.0.0
-===============================
+pyspotify 
+=========
 
-Copyright 2009 Doug Winter
+Copyright 2009-10 Doug Winter
 All rights reserved
 
 License information

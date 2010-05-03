@@ -1,0 +1,65 @@
+.TH "User handling" 3spotify "23 Apr 2010" "libspotify" \" -*- nroff -*-
+.ad l
+.nh
+.SH NAME
+User handling \- 
+.SS "Functions"
+
+.in +1c
+.ti -1c
+.RI "const char * \fBsp_user_canonical_name\fP (\fBsp_user\fP *user)"
+.br
+.ti -1c
+.RI "const char * \fBsp_user_display_name\fP (\fBsp_user\fP *user)"
+.br
+.ti -1c
+.RI "bool \fBsp_user_is_loaded\fP (\fBsp_user\fP *user)"
+.br
+.in -1c
+.SH "Function Documentation"
+.PP 
+.SS "const char* sp_user_canonical_name (\fBsp_user\fP * user)"
+.PP
+Get a pointer to a string representing the user's canonical username.
+.PP
+\fBParameters:\fP
+.RS 4
+\fIuser\fP The Spotify user whose canonical username you would like a string representation of
+.RE
+.PP
+\fBReturns:\fP
+.RS 4
+A string representing the canonical username. 
+.RE
+.PP
+
+.SS "const char* sp_user_display_name (\fBsp_user\fP * user)"
+.PP
+Get a pointer to a string representing the user's displayable username. If there is no difference between the canonical username and the display name, or if the library does not know about the display name yet, the canonical username will be returned.
+.PP
+\fBParameters:\fP
+.RS 4
+\fIuser\fP The Spotify user whose displayable username you would like a string representation of
+.RE
+.PP
+\fBReturns:\fP
+.RS 4
+A string 
+.RE
+.PP
+
+.SS "bool sp_user_is_loaded (\fBsp_user\fP * user)"
+.PP
+Get load status for a user object. Before it is loaded, only the user's canonical username is known.
+.PP
+\fBParameters:\fP
+.RS 4
+\fIuser\fP Spotify user object
+.RE
+.PP
+\fBReturns:\fP
+.RS 4
+True if user object is loaded, otherwise false 
+.RE
+.PP
+

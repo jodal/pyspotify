@@ -1,0 +1,441 @@
+.TH "Session handling" 3spotify "23 Apr 2010" "libspotify" \" -*- nroff -*-
+.ad l
+.nh
+.SH NAME
+Session handling \- 
+.SS "Data Structures"
+
+.in +1c
+.ti -1c
+.RI "struct \fBsp_audioformat\fP"
+.br
+.ti -1c
+.RI "struct \fBsp_session_callbacks\fP"
+.br
+.ti -1c
+.RI "struct \fBsp_session_config\fP"
+.br
+.in -1c
+.SS "Defines"
+
+.in +1c
+.ti -1c
+.RI "#define \fBSPOTIFY_API_VERSION\fP   4"
+.br
+.in -1c
+.SS "Enumerations"
+
+.in +1c
+.ti -1c
+.RI "enum \fBsp_connectionstate\fP { \fBSP_CONNECTION_STATE_LOGGED_OUT\fP =  0, \fBSP_CONNECTION_STATE_LOGGED_IN\fP =  1, \fBSP_CONNECTION_STATE_DISCONNECTED\fP =  2, \fBSP_CONNECTION_STATE_UNDEFINED\fP =  3 }"
+.br
+.ti -1c
+.RI "enum \fBsp_sampletype\fP { \fBSP_SAMPLETYPE_INT16_NATIVE_ENDIAN\fP =  0 }"
+.br
+.ti -1c
+.RI "enum \fBsp_bitrate\fP "
+.br
+.in -1c
+.SS "Functions"
+
+.in +1c
+.ti -1c
+.RI "\fBsp_error\fP \fBsp_session_init\fP (const \fBsp_session_config\fP *config, \fBsp_session\fP **sess)"
+.br
+.ti -1c
+.RI "\fBsp_error\fP \fBsp_session_login\fP (\fBsp_session\fP *session, const char *username, const char *password)"
+.br
+.ti -1c
+.RI "\fBsp_user\fP * \fBsp_session_user\fP (\fBsp_session\fP *session)"
+.br
+.ti -1c
+.RI "\fBsp_error\fP \fBsp_session_logout\fP (\fBsp_session\fP *session)"
+.br
+.ti -1c
+.RI "\fBsp_connectionstate\fP \fBsp_session_connectionstate\fP (\fBsp_session\fP *session)"
+.br
+.ti -1c
+.RI "void * \fBsp_session_userdata\fP (\fBsp_session\fP *session)"
+.br
+.ti -1c
+.RI "void \fBsp_session_process_events\fP (\fBsp_session\fP *session, int *next_timeout)"
+.br
+.ti -1c
+.RI "\fBsp_error\fP \fBsp_session_player_load\fP (\fBsp_session\fP *session, \fBsp_track\fP *track)"
+.br
+.ti -1c
+.RI "\fBsp_error\fP \fBsp_session_player_seek\fP (\fBsp_session\fP *session, int offset)"
+.br
+.ti -1c
+.RI "\fBsp_error\fP \fBsp_session_player_play\fP (\fBsp_session\fP *session, bool play)"
+.br
+.ti -1c
+.RI "void \fBsp_session_player_unload\fP (\fBsp_session\fP *session)"
+.br
+.ti -1c
+.RI "\fBsp_playlistcontainer\fP * \fBsp_session_playlistcontainer\fP (\fBsp_session\fP *session)"
+.br
+.ti -1c
+.RI "\fBsp_playlist\fP * \fBsp_session_starred_create\fP (\fBsp_session\fP *session)"
+.br
+.ti -1c
+.RI "void \fBsp_session_preferred_bitrate\fP (\fBsp_session\fP *session, \fBsp_bitrate\fP bitrate)"
+.br
+.in -1c
+.SH "Detailed Description"
+.PP 
+The concept of a session is fundamental for all communication with the Spotify ecosystem - it is the object responsible for communicating with the Spotify service. You will need to instantiate a session that then can be used to request artist information, perform searches etc. 
+.SH "Define Documentation"
+.PP 
+.SS "#define SPOTIFY_API_VERSION   4"
+.PP
+Current version of the application interface, that is, the API described by this file.
+.PP
+This value should be set in the \fBsp_session_config\fP struct passed to \fBsp_session_init()\fP.
+.PP
+If an (upgraded) library is no longer compatible with this version the error \fBSP_ERROR_BAD_API_VERSION\fP will be returned from \fBsp_session_init()\fP. Future versions of the library will provide you with some kind of mechanism to request an updated version of the library. 
+.PP
+\fBExamples: \fP
+.in +1c
+\fBjukebox.c\fP.
+.SH "Enumeration Type Documentation"
+.PP 
+.SS "enum \fBsp_bitrate\fP"
+.PP
+Bitrate definitions for music streaming 
+.SS "enum \fBsp_connectionstate\fP"
+.PP
+Describes the current state of the connection 
+.PP
+\fBEnumerator: \fP
+.in +1c
+.TP
+\fB\fISP_CONNECTION_STATE_LOGGED_OUT \fP\fP
+User not yet logged in. 
+.TP
+\fB\fISP_CONNECTION_STATE_LOGGED_IN \fP\fP
+Logged in against a Spotify access point. 
+.TP
+\fB\fISP_CONNECTION_STATE_DISCONNECTED \fP\fP
+Was logged in, but has now been disconnected. 
+.TP
+\fB\fISP_CONNECTION_STATE_UNDEFINED \fP\fP
+The connection state is undefined. 
+.SS "enum \fBsp_sampletype\fP"
+.PP
+Sample type descriptor 
+.PP
+\fBEnumerator: \fP
+.in +1c
+.TP
+\fB\fISP_SAMPLETYPE_INT16_NATIVE_ENDIAN \fP\fP
+16-bit signed integer samples 
+.SH "Function Documentation"
+.PP 
+.SS "\fBsp_connectionstate\fP sp_session_connectionstate (\fBsp_session\fP * session)"
+.PP
+The connection state of the specified session.
+.PP
+\fBParameters:\fP
+.RS 4
+\fIsession\fP Your session object
+.RE
+.PP
+\fBReturns:\fP
+.RS 4
+The connection state - see the sp_connectionstate enum for possible values 
+.RE
+.PP
+
+.SS "\fBsp_error\fP sp_session_init (const \fBsp_session_config\fP * config, \fBsp_session\fP ** sess)"
+.PP
+Initialize a session. The session returned will be initialized, but you will need to log in before you can perform any other operation
+.PP
+In the future, this will be renamed to sp_session_create() and will have a corresponding sp_session_release() function.
+.PP
+Here is a snippet from \fCspshell.c:\fP  
+.PP
+.nf
+ config.api_version = SPOTIFY_API_VERSION;
+
+    // The path of the directory to store the cache. This must be specified.
+    // Please read the documentation on preferred values.
+    config.cache_location = 'tmp';
+
+    // The path of the directory to store the settings. 
+    // This must be specified.
+    // Please read the documentation on preferred values.
+    config.settings_location = 'tmp';
+
+    // The key of the application. They are generated by Spotify,
+    // and are specific to each application using libspotify.
+    config.application_key = g_appkey;
+    config.application_key_size = g_appkey_size;
+
+    // This identifies the application using some
+    // free-text string [1, 255] characters.
+    config.user_agent = 'spshell';
+
+    // Register the callbacks.
+    config.callbacks = &callbacks;
+
+    error = sp_session_init(&config, &session);
+    if (SP_ERROR_OK != error) {
+        fprintf(stderr, 'failed to create session: %s\n',
+                        sp_error_message(error));
+        return 2;
+    }
+
+.fi
+.PP
+.PP
+\fBParameters:\fP
+.RS 4
+\fIconfig\fP The configuration to use for the session 
+.br
+\fIsess\fP If successful, a new session - otherwise NULL
+.RE
+.PP
+\fBReturns:\fP
+.RS 4
+Error code \fBsp_error\fP 
+.RE
+.PP
+
+.PP
+\fBExamples: \fP
+.in +1c
+\fBjukebox.c\fP.
+.SS "\fBsp_error\fP sp_session_login (\fBsp_session\fP * session, const char * username, const char * password)"
+.PP
+Logs in the specified username/password combo. This initiates the download in the background. A callback is called when login is complete
+.PP
+Here is a snippet from \fCspshell.c:\fP  
+.PP
+.nf
+    error = sp_session_login(session, username, password);
+
+    if (SP_ERROR_OK != error) {
+        fprintf(stderr, 'failed to login: %s\n',
+                        sp_error_message(error));
+        return 3;
+    }
+
+.fi
+.PP
+.PP
+\fBParameters:\fP
+.RS 4
+\fIsession\fP Your session object 
+.br
+\fIusername\fP The username to log in 
+.br
+\fIpassword\fP The password for the specified username
+.RE
+.PP
+\fBReturns:\fP
+.RS 4
+Result of the operation 
+.RE
+.PP
+
+.PP
+\fBExamples: \fP
+.in +1c
+\fBjukebox.c\fP.
+.SS "\fBsp_error\fP sp_session_logout (\fBsp_session\fP * session)"
+.PP
+Logs out the currently logged in user
+.PP
+Always call this before terminating the application and libspotify is currently logged in. Otherwise, the settings and cache may be lost.
+.PP
+\fBParameters:\fP
+.RS 4
+\fIsession\fP Your session object
+.RE
+.PP
+\fBReturns:\fP
+.RS 4
+Result of the operation 
+.RE
+.PP
+
+.SS "\fBsp_error\fP sp_session_player_load (\fBsp_session\fP * session, \fBsp_track\fP * track)"
+.PP
+Loads the specified track
+.PP
+After successfully loading the track, you have the option of running \fBsp_session_player_play()\fP directly, or using \fBsp_session_player_seek()\fP first. When this call returns, the track will have been loaded, unless an error occurred.
+.PP
+\fBParameters:\fP
+.RS 4
+\fIsession\fP Your session object 
+.br
+\fItrack\fP The track to be loaded
+.RE
+.PP
+\fBReturns:\fP
+.RS 4
+The result of the operation - see the \fBsp_error\fP enum for possible values 
+.RE
+.PP
+
+.PP
+\fBExamples: \fP
+.in +1c
+\fBjukebox.c\fP.
+.SS "\fBsp_error\fP sp_session_player_play (\fBsp_session\fP * session, bool play)"
+.PP
+Play or pause the currently loaded track
+.PP
+\fBParameters:\fP
+.RS 4
+\fIsession\fP Your session object 
+.br
+\fIplay\fP If set to true, playback will occur. If set to false, the playback will be paused.
+.RE
+.PP
+\fBReturns:\fP
+.RS 4
+The result of the operation - see the \fBsp_error\fP enum for possible values 
+.RE
+.PP
+
+.PP
+\fBExamples: \fP
+.in +1c
+\fBjukebox.c\fP.
+.SS "\fBsp_error\fP sp_session_player_seek (\fBsp_session\fP * session, int offset)"
+.PP
+Seek to position in the currently loaded track
+.PP
+\fBParameters:\fP
+.RS 4
+\fIsession\fP Your session object 
+.br
+\fIoffset\fP Track position, in milliseconds.
+.RE
+.PP
+\fBReturns:\fP
+.RS 4
+The result of the operation - see the \fBsp_error\fP enum for possible values 
+.RE
+.PP
+
+.SS "void sp_session_player_unload (\fBsp_session\fP * session)"
+.PP
+Stops the currently playing track
+.PP
+This frees some resources held by libspotify to identify the currently playing track.
+.PP
+\fBParameters:\fP
+.RS 4
+\fIsession\fP Your session object 
+.RE
+.PP
+
+.PP
+\fBExamples: \fP
+.in +1c
+\fBjukebox.c\fP.
+.SS "\fBsp_playlistcontainer\fP* sp_session_playlistcontainer (\fBsp_session\fP * session)"
+.PP
+Returns the playlist container for the currently logged in user.
+.PP
+\fBParameters:\fP
+.RS 4
+\fIsession\fP Your session object
+.RE
+.PP
+\fBReturns:\fP
+.RS 4
+Playlist container object, NULL if not logged in 
+.RE
+.PP
+
+.PP
+\fBExamples: \fP
+.in +1c
+\fBjukebox.c\fP.
+.SS "void sp_session_preferred_bitrate (\fBsp_session\fP * session, \fBsp_bitrate\fP bitrate)"
+.PP
+Set preferred bitrate for music streaming
+.PP
+\fBParameters:\fP
+.RS 4
+\fIsession\fP Session object 
+.br
+\fIbitrate\fP Preferred bitrate, see \fBsp_bitrate\fP for possible values 
+.RE
+.PP
+
+.SS "void sp_session_process_events (\fBsp_session\fP * session, int * next_timeout)"
+.PP
+Make the specified session process any pending events
+.PP
+\fBParameters:\fP
+.RS 4
+\fIsession\fP Your session object 
+.br
+\fInext_timeout\fP Stores the time (in milliseconds) until you should call this function again 
+.RE
+.PP
+
+.PP
+\fBExamples: \fP
+.in +1c
+\fBjukebox.c\fP.
+.SS "\fBsp_playlist\fP* sp_session_starred_create (\fBsp_session\fP * session)"
+.PP
+Returns the starred list for currently logged in user
+.PP
+\fBParameters:\fP
+.RS 4
+\fIsession\fP Session object
+.RE
+.PP
+\fBReturns:\fP
+.RS 4
+A playlist. 
+.RE
+.PP
+\fBNote:\fP
+.RS 4
+You need to release the playlist when you are done with it. 
+.RE
+.PP
+\fBSee also:\fP
+.RS 4
+\fBsp_playlist_release()\fP 
+.RE
+.PP
+
+.SS "\fBsp_user\fP* sp_session_user (\fBsp_session\fP * session)"
+.PP
+Fetches the currently logged in user
+.PP
+\fBParameters:\fP
+.RS 4
+\fIsession\fP Your session object
+.RE
+.PP
+\fBReturns:\fP
+.RS 4
+The logged in user (or NULL if not logged in) 
+.RE
+.PP
+
+.SS "void* sp_session_userdata (\fBsp_session\fP * session)"
+.PP
+The userdata associated with the session
+.PP
+\fBParameters:\fP
+.RS 4
+\fIsession\fP Your session object
+.RE
+.PP
+\fBReturns:\fP
+.RS 4
+The userdata that was passed in on session creation 
+.RE
+.PP
+

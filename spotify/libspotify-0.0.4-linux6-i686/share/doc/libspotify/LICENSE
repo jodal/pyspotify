@@ -1,0 +1,498 @@
+libspotify Terms of Use
+
+Effective as from 7 April 2009
+
+
+The following libspotify Terms of Use ('Terms of Use`) set forth the
+terms and conditions governing your use of the libspotify application
+programming interfaces, client libraries and documentation made
+available to you at http://developer.spotify.com/.
+
+By using any part of the API (as defined below), you are deemed to have
+accepted these Terms of Use in their entirety and to have entered into
+a legally binding agreement with Spotify (sometimes referred to as 'we`
+and 'us`) to abide by the same.  If you are acting as an officer,
+director, employee or representative of an entity, by accepting, you
+represent and warrant you have full legal authority to bind that entity.
+
+   Spotify has the right to amend these Terms of Use at any time for
+any reason without notice to you.  The current version of the Terms of
+Use is posted at
+http://developer.spotify.com/en/libspotify/terms-of-use and any changes
+to the Terms of Use will become effective immediately upon posting.  If
+at any time you do not agree with something in these Terms of Use,
+including any changes made by Spotify, do not use or attempt to use the
+API, because if you do, you are agreeing to be bound by everything in
+these Terms of Use, including, without limitation, any changes we may
+have made.
+
+1 Definitions
+*************
+
+API means the libspotify application programming interface(s), binary
+client libraries and documentation provided by Spotify to you for use
+in creating an Application in accordance with the terms of these Terms
+of Use.
+
+   Application means an authorized end user downloadable application
+utilizing the API developed by you solely for use by Users to access
+the Service via an Approved Device.
+
+'Application Key`
+     means the unique key that Spotify issues to you as part of these
+     Terms of Use for purposes of authenticating an Application to the
+     Service.
+
+'Approved Device`
+     means desktops, laptops and netbook PCs and such other devices
+     that we permit as notified to you from time to time. Approved
+     Device does not include any mobile wireless handset or any other
+     internet-enabled device that is designed to be handheld.
+
+'Content`
+     means the music, album art, artist biographies and any other
+     content that Spotify makes available to users via the Service.
+
+'Spotify Core Marks`
+     means those trade marks of Spotify provided to you solely for use
+     in accordance with these Terms of Use.
+
+'Service`
+     means the subscription music service owned and operated by Spotify
+     which Spotify makes available to end users behind a paid
+     subscriber wall.  Service does not include any other Spotify
+     service, such as the Spotify free-to-the-user,
+     advertising-supported music streaming service.
+
+'Spotify Marks`
+     means any trade marks of Spotify containing the word SPOTIFY or
+     any other trade marks as registered or used by Spotify from time
+     to time.
+
+'User`
+     means a registered subscriber to the Service to whom Spotify has
+     issued a unique user name and password that grant access to the
+     Service.  For avoidance of doubt, 'User` does not include any user
+     of Spotify’s free-to-the-user, advertising-supported music
+     streaming service.
+
+2 Application Key, Developer Account Information
+************************************************
+
+You must have a valid Application Key issued by Spotify in order to
+access the API and develop an Application.  You may only access the API
+with the Application Key issued to you by Spotify.  The Application Key
+must be embedded in your Application, including in all updates and
+revisions thereto, in a secure manner not accessible by third parties.
+You agree not to share, transfer or otherwise disclose your Application
+Key to any other party (it being understood that a group of developers
+working for the same entity may share the key for purposes of jointly
+working on the Application) or use it for any other purpose except in
+connection with the Application you identified when you applied for it.
+You are responsible for any activities engaged in using your
+Application Key, whether or not engaged in by you or a third party.
+You agree to notify Spotify immediately of any actual or suspected
+unauthorized use of any Application Key issued to you and to cooperate
+reasonably with Spotify in the investigation of the same.
+
+   Spotify reserves the right in its sole discretion to revoke your
+Application Key for any reason or no reason, without notice, and to
+block access to the API and Service by the Application, without any
+liability to you or your users.
+
+   You represent and warrant that any and all information you provided
+when you applied for your developer account and any other information
+or data you provide to Spotify is and shall be true, accurate and
+complete when given to us.  You further represent and warrant that in
+providing such information to Spotify you shall not knowingly omit or
+misrepresent any material facts or information and that you shall
+promptly enter corrected or updated account information via the account
+management tools provided by Spotify.
+
+3 Authorizations & Restrictions
+*******************************
+
+3.1 Subject to your compliance at all times with these Terms of Use,
+Spotify grants to you a limited, revocable, non-exclusive,
+non-transferable right to:
+
+   * (i) use the API solely for purposes of developing an Application
+     for an Approved Device;
+
+   * (ii) make an Application available to Users solely as a client
+     application for use in accessing the Service via an Approved
+     Device;
+
+   * (iii) use the Spotify Core Marks specified in Section 10 of these
+     Terms of Use solely for purposes of complying with the branding
+     requirements set forth in Section 10; and
+
+   * (iv) make and use such internal copies of the API as are
+     reasonably necessary for you to exercise the foregoing rights.
+
+3.2 You must use the API in the exact, unaltered form provided to you
+by Spotify and may not utilize it in any manner that is not expressly
+authorized in these Terms of Use.  Without limiting the foregoing, you
+may not:
+
+   * (i) access or permit any person to access the Service or Content
+     in any manner other than through the API in accordance with the
+     terms of these Terms of Use;
+
+   * (ii) modify, edit, disassemble, decompile or reverse-engineer the
+     API, including any client libraries included in the API, or make
+     available such libraries to any person other than in binary form
+     as part of a  Application;
+
+   * (iii) make the API, Service or Content available to any person who
+     is not a User having valid login credentials for the Service
+     issued by Spotify;
+
+   * (iv) sell access to the API, the Service or the Content;
+
+   * (v) use the API or Service for any illegal or unauthorized purpose;
+
+   * (vi) use any robot, spider, site search/retrieval application or
+     other device to retrieve or index any portion of the Service or
+     collect information about Users for any unauthorized purpose;
+
+   * (vii) request, collect, solicit or otherwise obtain access to
+     sign-in names, passwords or other authentication credentials for
+     the Service, other than by directing users to the Service via the
+     means specifically provided for in the API;
+
+   * (viii) attempt to embed or integrate the API into any website or
+     otherwise allow access to the Service via the web rather than via
+     the Application.
+
+   * (ix) make the API available to Users in any manner or form other
+     than as an integral part of an Application residing on a User’s
+     Approved Device.
+
+3.3 You may not charge Users for use of the Application or otherwise
+derive any income from Users' use of the Application, such as through
+e-commerce initiated via the Application or the sale of any
+advertising, sponsorships or promotions on the Application itself.
+
+3.4 You shall not interfere or attempt to interfere in any manner with
+the proper functioning of the API or distribute any Application that
+interferes with or adversely affects the functionality or performance
+of the Service.  You shall not alter or otherwise interfere with any
+Content, including without limitation any metadata or other information
+included in connection therewith.  Your duty not to interfere with the
+API and the Service shall include, but not be limited to, your duty to
+respect all 'geoblocking` IP restrictions implemented by Spotify.  Any
+implementation of the API that circumvents or renders ineffective such
+IP address restrictions, including cloaking any IP address or blocking
+or modifying any IP address restrictions, is expressly prohibited.
+
+3.5 Without limiting other restriction in these Terms of Use, you agree
+that the API may not be used to create an Application that offers or
+promotes services that may be damaging to, disparaging of or otherwise
+detrimental to the Service, to Spotify, or to content providers,
+affiliates and partners.
+
+3.6 Your Application shall not include any viruses, worms, Trojan
+horses or any other harmful code.
+
+3.7 You are solely responsible for your use of the API and for your
+Application.  You shall ensure that the Application complies with all
+applicable laws and regulations, including without limitation laws
+regarding personal data, privacy, copyright and export controls.
+
+3.8 You understand and agree that use of the Service by Users is
+governed by the 'Spotify Beta Terms and Conditions of Use`
+http://www.spotify.com/en/legal/end-user-agreement/ and that the
+Application shall not enable any person to access or use the Service in
+any manner that is not permitted under the Spotify Beta Terms and
+Conditions of Use.  Without limiting the foregoing, you may not include
+any so-called 'stream ripping` or other functionality in the
+Application that enables or makes it easier for Users to capture or
+otherwise make permanent copies of streamed content.  You agree to
+cooperate with Spotify in pursuing any violations of the prohibition
+against ripping or other capture of streamed content.
+
+3.9 You acknowledge and agree that Spotify may be independently
+creating applications and other products or services that may be
+similar to or competitive with your Application, and nothing in these
+Terms of Use will be construed as restricting or preventing Spotify
+from creating and fully exploiting such applications without any
+obligation to you.
+
+3.10 When distributing the Application, you shall require end users to
+agree to an enforceable end user license agreement containing at least
+the following specific minimum terms: (i) a provision stating that you,
+and not Spotify, are responsible for your Application; (ii) a provision
+indicating that the API is provided 'as-is,` without any warranties,
+and that expressly disclaims all implied warranties, including the
+implied warranties of merchantability, fitness for a particular purpose
+and non-infringement; (iii) a prohibition against modifying or creating
+derivative works based on any part of the API; (iv) a prohibition
+against decompiling, reverse-engineering, disassembling, and otherwise
+reducing the API to source code or other human-perceivable form, to the
+full extent allowed by law; (v) a provision indicating that ownership
+of the API and Service resides with Spotify; (vi) a disclaimer of any
+liability on the part of Spotify for any interruptions in the Service
+as accessed via the Application; (vii) a complete and accurate
+disclosure to end users of the privacy practices and policy applicable
+to your Application, including without limitation notice to the end
+user that your collection of data is subject to your privacy policy and
+not Spotify’s.
+
+4 Provision of the API
+**********************
+
+4.1 Spotify reserves the right to modify the API, and to release
+subsequent versions of the API, at any time without notice to you.  You
+understand that you may be required to obtain and use the most recent
+version of the API in order for your Application to continue to
+function with the API and the Service.
+
+4.2 Without limiting any other right of Spotify hereunder, Spotify
+reserves the right to modify, suspend or discontinue the Service at any
+time without notice or liability to you.
+
+4.3 You agree to provide us with access to your Application and other
+materials related to your use of the API as reasonably requested by us
+in order for Spotify to verify your compliance with these Terms of Use.
+You agree that we may survey your Application and you agree not to
+block or interfere with such efforts.
+
+4.4 Spotify may limit the number of service calls that your Application
+may make via the API, the volume of Content that may be accessed, or
+anything else about the API and the Service it accesses as Spotify
+deems appropriate, in its sole discretion, without notice.  In addition
+to its other rights under these Terms of Use, Spotify may utilize
+technical measures to prevent over-usage or stop usage of the API by an
+Application after any usage limitations are exceeded.
+
+4.5 Spotify has no obligation to provide you or your users with
+support, software upgrades, enhancements or modifications to the API.
+You understand and agree that you are solely responsible for providing
+user support and any other technical assistance for your Application.
+
+5 Ownership
+***********
+
+As between Spotify and you, all copyright and other intellectual
+property rights in and to the API, Service, Spotify Marks and any other
+materials provided to you by Spotify for use hereunder ('Spotify
+Intellectual Property`) shall be owned exclusively by Spotify.  For
+avoidance of doubt, nothing in these Terms of Use shall be construed to
+convey, and you by virtue of these Terms of Use shall not acquire, any
+ownership interest in any Spotify Intellectual Property.  You shall not
+contest, or assist others in contesting, the validity, enforceability,
+ownership or title of any Spotify Intellectual Property.
+
+6 Your Additional Warranties, Representations and Covenants
+***********************************************************
+
+In addition to any other warranties, representations and covenants made
+by you, you warrant to Spotify that:
+
+   * (a) you have the legal capacity to enter into these Terms of Use;
+
+   * (b) you possess all authorizations, approvals, consents, licenses,
+     permits, certificates and other rights and permissions necessary
+     to provide your Application and perform your obligations
+     hereunder; and
+
+   * (c)  your use of the API and the Application:
+        * (i)  shall not infringe  any intellectual property or other
+          right of Spotify or any third party, including without
+          limitation, any right of privacy, publicity, copyright, trade
+          mark, patent or contractual right; and
+
+        * (ii) shall comply with all applicable laws, rules and
+          regulations, including without limitation, consumer
+          protection, data security, and privacy laws.
+
+7 Disclaimer of Warranties, LIMITATION OF LIABILITY
+***************************************************
+
+7.1 YOUR USE OF THE API AND THE SERVICE IS AT YOUR SOLE RISK.  THE API
+AND THE SERVICE ARE EACH PROVIDED ON AN "AS IS" AND "AS AVAILABLE"
+BASIS.  TO THE MAXIMUM EXTENT PERMITTED BY LAW, SPOTIFY EXPRESSLY
+DISCLAIMS ALL WARRANTIES AND CONDITIONS OF ANY KIND, WHETHER EXPRESS OR
+IMPLIED, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES AND
+CONDITIONS OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+NON-INFRINGEMENT.
+
+7.2 WITHOUT LIMITING THE FOREGOING, SPOTIFY EXPRESSLY DISCLAIMS ANY
+WARRANTY THAT:
+
+   * (i) THE API OR THE SERVICE WILL MEET ALL OF YOUR REQUIREMENTS;
+
+   * (ii) THE OPERATION OF THE API OR THE SERVICE WILL BE
+     UNINTERRUPTED, TIMELY, SECURE OR ERROR-FREE; OR
+
+   * (iii) THE API WILL PROVIDE RESULTS THAT ARE ACCURATE OR RELIABLE
+     OR CONSISTENT WITH YOUR EXPECTATIONS.
+
+7.3 TO THE MAXIMUM EXTENT PERMITTED BY APPLICABLE LAW, SPOTIFY SHALL
+NOT BE LIABLE TO YOU OR ANY THIRD PARTY FOR ANY DIRECT, INDIRECT,
+INCIDENTAL, SPECIAL, EXEMPLARY, PUNITIVE OR CONSEQUENTIAL DAMAGES, OR
+ANY OTHER FORM OF DAMAGES IN ANY MANNER ARISING OUT OF OR IN CONNECTION
+WITH THESE TERMS OF USE, SERVICE AND YOUR ACCESS TO AND USE OF THE API,
+SERVICE AND CONTENT, REGARDLESS OF THE FORM OF ACTION OR THE BASIS OF
+THE CLAIM OR WHETHER OR NOT SPOTIFY HAS BEEN ADVISED OF THE POSSIBILITY
+OF SUCH DAMAGES.  SOME JURISDICTIONS DO NOT ALLOW THE LIMITATION OR
+EXCLUSION OF LIABILITY FOR INCIDENTAL OR CONSEQUENTIAL DAMAGES.
+ACCORDINGLY, SOME OF THE ABOVE LIMITATIONS AND EXCLUSIONS MAY NOT APPLY
+TO YOU.
+
+8 Indemnification
+*****************
+
+You will indemnify and hold Spotify and its officers, directors,
+employees and representatives harmless from and against any and all
+liabilities, damages, awards, settlements, losses, claims and expenses,
+including reasonable attorneys fees and costs of investigation, due to
+any claim by a third party relating to or arising out of your use of
+the API, the Application, and any breach by you of any of your
+representations, warranties, covenants and obligations hereunder.
+
+9 Term and Termination
+**********************
+
+9.1 These Terms of Use commences upon the date you signify your
+acceptance of the libspotify Terms of Use by clicking "I agree` or
+otherwise commence use of any portion of the API and shall continue in
+force thereafter, unless terminated as provided herein.
+
+9.2 Spotify may amend or discontinue the API or any aspect thereof, or
+may terminate your ability to use the API, in each instance at any time
+prior to, or after, your development of an Application, without notice,
+for any reason or no reason, without any liability to you or your
+users.  You may terminate these Terms of Use by ceasing all use of the
+API, in which case you must remove any and all code from your
+Application that enables your use of the API.
+
+10 Branding
+***********
+
+10.1 In any user interface provided with your Application, you agree to
+display one of the Spotify Core Marks from the page located at
+http://developer.spotify.com/en/libspotify/marks.  If you choose to
+display any other brand identifiers on the user interface of your
+Application, you must not do so in any way that would imply or suggest
+that such brand is associated in any way with the Service, the Content
+or Spotify.  Spotify reserves the right at any time to require you to
+make changes to your user interface as a condition on your continued
+ability to use the API.
+
+10.2 You also agree that your Application must prominently display the
+following statement in the help text or about text, in the
+acknowledgements in the documentation associated with your application
+and on any website associated with the application or other promotional
+material:
+
+   'This product uses SPOTIFY CORE but is not endorsed, certified or
+otherwise approved in any way by Spotify. Spotify is the registered
+trade mark of the Spotify Group.`
+
+10.3 You agree that the Spotify Marks, including without limitation
+'Spotify` and 'Spotify Core` are the intellectual property of Spotify
+and agree not to attempt to use or register any trade mark in your own
+name that include 'Spotify,` any other Spotify Mark, or any name that
+is confusingly similar to any of them.  In addition, you agree not to
+attempt to register any domain name that includes the word 'Spotify,`
+any other Spotify Mark, or any name that is confusingly similar to any
+of them.
+
+10.4 In addition to the foregoing requirements in respect of your use
+of the Spotify Core Marks, you agree to comply with the Spotify Trade
+Mark Guidelines appended to these Terms of Use, as the same may be
+amended by Spotify from time to time in its sole discretion.
+
+11 General
+**********
+
+These Terms of Use shall be governed by and construed in accordance
+with the laws of Sweden and each party consents to the exclusive
+jurisdiction of the Stockholm District Court for the adjudication of
+any disputes arising out of these Terms of Use.  You may not assign any
+of your rights, or delegate any of your duties, in whole or in part, to
+any third party without the written consent of Spotify.  Spotify
+reserves the right, at its sole discretion, to assign or transfer any
+of its rights and delegate any of its duties hereunder, in whole or in
+part, to any person or entity. There is no joint venture, partnership,
+agency or fiduciary relationship existing between the parties and the
+parties do not intend to create any such relationship by these Terms of
+Use.  Spotify’s failure at any time to require full performance of any
+provision hereof will in no manner affect its right at a later time to
+enforce the same.  Should for any reason or to any extent any provision
+of these Terms of Use be held invalid or unenforceable, such invalidity
+or unenforceability shall not in any manner affect or render invalid or
+unenforceable the remaining provisions of these Terms of Use and the
+application of that provision shall be enforced to the extent permitted
+by law.  Each affiliate of Spotify shall be a third party beneficiary
+to these Terms of Use and such affiliates shall be entitled to directly
+enforce, and rely upon, any provision of these Terms of Use which
+confers a benefit on them. Other than as set forth in the preceding
+sentence, nothing in these Terms of Use shall be deemed or interpreted
+to create any third party beneficiaries, or confer any rights in any
+third parties.  The provisions of Sections 1, 2, 5-8, 11 of these Terms
+of Use will survive the expiration or earlier termination of these
+Terms of Use.  These Terms of Use constitutes all the terms and
+conditions agreed upon between you and Spotify and supersede any prior
+agreements whether written or oral. Any addition or different terms or
+conditions in any written oral communication from you to Spotify are
+void. You agree and accept that you have not accepted the terms and
+conditions of these Terms of Use in reliance of or to any oral or
+written representations made by Spotify not contained in these Terms of
+Use.
+
+SPOTIFY TRADE MARK GUIDELINES
+*****************************
+
+Users of the API have a right and an obligation to use the SPOTIFY CORE
+trade marks of Spotify (the 'SPOTIFY CORE Mark`). Use of the SPOTIFY
+CORE Mark is governed by the Libspotify Terms of Use and the following
+guidelines. The guidelines also contain clarifying wording relating to
+all trade marks containing the word SPOTIFY and any other trade marks
+as registered or used by Spotify from time to time (the 'Spotify
+Marks`).
+
+   Do not change the SPOTIFY CORE Mark in any way. Do not remove,
+obstruct, distort, or alter any element of the SPOTIFY CORE Mark. This
+includes but is not limited to the SPOTIFY CORE word mark, e.g. by
+hyphenation, combination abbreviation, or acronym such as: CORE
+SPOTIFIERS, SPOTIFY CORED, SPOTIFYING, SC, SPOTIFY-CORE, SPOTIFIED
+CORE, etc.
+
+   Make sure the SPOTIFY CORE Mark is full and clearly visible, never
+altered or partially covered.
+
+   Do not use the SPOTIFY CORE Mark in ways that (i) imply an
+association with or endorsement of any other product, service, event,
+sponsorship, or organization; (ii) can be reasonably interpreted to
+suggest editorial content was authorised by Spotify; or (iii) represent
+the views or opinions of Spotify or Spotify’s personnel without prior
+written approval from Spotify.
+
+   Do not adopt trade marks, logos, slogans, or designs that are
+confusingly similar to the SPOTIFY CORE Mark, or any other Spotify
+Marks, or imitate the Spotify trade dress, including the look and feel
+of the Spotify clients design or the design of any Spotify website,
+Spotify distinctive colour or colour combinations, typography, graphic
+designs, product or service icons or images associated with Spotify.
+
+   Do not register the SPOTIFY CORE Mark or any other Spotify Marks as
+a domain name or incorporate a trade mark containing the word SPOTIFY
+into you own product names, domain names, service names, trade marks,
+logos or company names.
+
+   Never display the SPOTIFY CORE Mark in a manner that is misleading,
+unfair, defamatory, infringing, libellous, disparaging, obscene or
+otherwise reasonable objectionable to Spotify.
+
+   Never display the SPOTIFY CORE Mark on any website or user interface
+that contains or displays pornographic content, promotes gambling or
+violence, contains hate speech, involves the sale of tobacco or
+alcohol, violates other applicable laws or regulations or is otherwise
+objectionable.
+
+   You do not have the right to use any other Spotify Marks than the
+SPOTIFY CORE Mark.
+

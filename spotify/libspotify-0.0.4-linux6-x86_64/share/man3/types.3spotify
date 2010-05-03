@@ -1,0 +1,61 @@
+.TH "Spotify types & structs" 3spotify "23 Apr 2010" "libspotify" \" -*- nroff -*-
+.ad l
+.nh
+.SH NAME
+Spotify types & structs \- 
+.SS "Typedefs"
+
+.in +1c
+.ti -1c
+.RI "typedef struct \fBsp_session\fP \fBsp_session\fP"
+.br
+.RI "\fIRepresentation of a session. \fP"
+.ti -1c
+.RI "typedef struct \fBsp_track\fP \fBsp_track\fP"
+.br
+.RI "\fIA track handle. \fP"
+.ti -1c
+.RI "typedef struct \fBsp_album\fP \fBsp_album\fP"
+.br
+.RI "\fIAn album handle. \fP"
+.ti -1c
+.RI "typedef struct \fBsp_artist\fP \fBsp_artist\fP"
+.br
+.RI "\fIAn artist handle. \fP"
+.ti -1c
+.RI "typedef struct \fBsp_artistbrowse\fP \fBsp_artistbrowse\fP"
+.br
+.RI "\fIA handle to an artist browse result. \fP"
+.ti -1c
+.RI "typedef struct \fBsp_albumbrowse\fP \fBsp_albumbrowse\fP"
+.br
+.RI "\fIA handle to an album browse result. \fP"
+.ti -1c
+.RI "typedef struct \fBsp_toplistbrowse\fP \fBsp_toplistbrowse\fP"
+.br
+.RI "\fIA handle to a toplist browse result. \fP"
+.ti -1c
+.RI "typedef struct \fBsp_search\fP \fBsp_search\fP"
+.br
+.RI "\fIA handle to a search result. \fP"
+.ti -1c
+.RI "typedef struct \fBsp_link\fP \fBsp_link\fP"
+.br
+.RI "\fIA handle to the libspotify internal representation of a URI. \fP"
+.ti -1c
+.RI "typedef struct \fBsp_image\fP \fBsp_image\fP"
+.br
+.RI "\fIA handle to an image. \fP"
+.ti -1c
+.RI "typedef struct \fBsp_user\fP \fBsp_user\fP"
+.br
+.RI "\fIA handle to a user. \fP"
+.ti -1c
+.RI "typedef struct \fBsp_playlist\fP \fBsp_playlist\fP"
+.br
+.RI "\fIA playlist handle. \fP"
+.ti -1c
+.RI "typedef struct \fBsp_playlistcontainer\fP \fBsp_playlistcontainer\fP"
+.br
+.RI "\fIA playlist container (playlist containing other playlists) handle. \fP"
+.in -1c

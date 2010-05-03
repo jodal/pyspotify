@@ -1,0 +1,77 @@
+.TH "Artist subsystem" 3spotify "23 Apr 2010" "libspotify" \" -*- nroff -*-
+.ad l
+.nh
+.SH NAME
+Artist subsystem \- 
+.SS "Functions"
+
+.in +1c
+.ti -1c
+.RI "const char * \fBsp_artist_name\fP (\fBsp_artist\fP *artist)"
+.br
+.ti -1c
+.RI "bool \fBsp_artist_is_loaded\fP (\fBsp_artist\fP *artist)"
+.br
+.ti -1c
+.RI "void \fBsp_artist_add_ref\fP (\fBsp_artist\fP *artist)"
+.br
+.ti -1c
+.RI "void \fBsp_artist_release\fP (\fBsp_artist\fP *artist)"
+.br
+.in -1c
+.SH "Function Documentation"
+.PP 
+.SS "void sp_artist_add_ref (\fBsp_artist\fP * artist)"
+.PP
+Increase the reference count of a artist
+.PP
+\fBParameters:\fP
+.RS 4
+\fIartist\fP The artist object 
+.RE
+.PP
+
+.SS "bool sp_artist_is_loaded (\fBsp_artist\fP * artist)"
+.PP
+Check if the artist object is populated with data
+.PP
+\fBParameters:\fP
+.RS 4
+\fIartist\fP An artist object
+.RE
+.PP
+\fBReturns:\fP
+.RS 4
+True if metadata is present, false if not 
+.RE
+.PP
+
+.SS "const char* sp_artist_name (\fBsp_artist\fP * artist)"
+.PP
+Return name of artist
+.PP
+\fBParameters:\fP
+.RS 4
+\fIartist\fP Artist object
+.RE
+.PP
+\fBReturns:\fP
+.RS 4
+Name of artist. Returned string is valid as long as the artist object stays allocated and no longer than the next call to \fBsp_session_process_events()\fP 
+.RE
+.PP
+
+.PP
+\fBExamples: \fP
+.in +1c
+\fBbrowse.c\fP, \fBsearch.c\fP, and \fBtoplist.c\fP.
+.SS "void sp_artist_release (\fBsp_artist\fP * artist)"
+.PP
+Decrease the reference count of a artist
+.PP
+\fBParameters:\fP
+.RS 4
+\fIartist\fP The artist object 
+.RE
+.PP
+

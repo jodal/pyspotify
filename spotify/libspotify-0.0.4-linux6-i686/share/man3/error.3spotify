@@ -1,0 +1,103 @@
+.TH "Error Handling" 3spotify "23 Apr 2010" "libspotify" \" -*- nroff -*-
+.ad l
+.nh
+.SH NAME
+Error Handling \- 
+.SS "Enumerations"
+
+.in +1c
+.ti -1c
+.RI "enum \fBsp_error\fP { \fBSP_ERROR_OK\fP =  0, \fBSP_ERROR_BAD_API_VERSION\fP =  1, \fBSP_ERROR_API_INITIALIZATION_FAILED\fP =  2, \fBSP_ERROR_TRACK_NOT_PLAYABLE\fP =  3, \fBSP_ERROR_RESOURCE_NOT_LOADED\fP =  4, \fBSP_ERROR_BAD_APPLICATION_KEY\fP =  5, \fBSP_ERROR_BAD_USERNAME_OR_PASSWORD\fP =  6, \fBSP_ERROR_USER_BANNED\fP =  7, \fBSP_ERROR_UNABLE_TO_CONTACT_SERVER\fP =  8, \fBSP_ERROR_CLIENT_TOO_OLD\fP =  9, \fBSP_ERROR_OTHER_PERMANENT\fP =  10, \fBSP_ERROR_BAD_USER_AGENT\fP =  11, \fBSP_ERROR_MISSING_CALLBACK\fP =  12, \fBSP_ERROR_INVALID_INDATA\fP =  13, \fBSP_ERROR_INDEX_OUT_OF_RANGE\fP =  14, \fBSP_ERROR_USER_NEEDS_PREMIUM\fP =  15, \fBSP_ERROR_OTHER_TRANSIENT\fP =  16, \fBSP_ERROR_IS_LOADING\fP =  17, \fBSP_ERROR_NO_STREAM_AVAILABLE\fP =  18 }"
+.br
+.in -1c
+.SS "Functions"
+
+.in +1c
+.ti -1c
+.RI "const char * \fBsp_error_message\fP (\fBsp_error\fP error)"
+.br
+.in -1c
+.SH "Detailed Description"
+.PP 
+All functions in libspotify use the same set of error codes. Most of them return an error code, and let the result of the operation be stored in an out-parameter. 
+.SH "Enumeration Type Documentation"
+.PP 
+.SS "enum \fBsp_error\fP"
+.PP
+Error codes returned by various functions 
+.PP
+\fBEnumerator: \fP
+.in +1c
+.TP
+\fB\fISP_ERROR_OK \fP\fP
+No errors encountered. 
+.TP
+\fB\fISP_ERROR_BAD_API_VERSION \fP\fP
+The library version targeted does not match the one you claim you support. 
+.TP
+\fB\fISP_ERROR_API_INITIALIZATION_FAILED \fP\fP
+Initialization of library failed - are cache locations etc. valid? 
+.TP
+\fB\fISP_ERROR_TRACK_NOT_PLAYABLE \fP\fP
+The track specified for playing cannot be played. 
+.TP
+\fB\fISP_ERROR_RESOURCE_NOT_LOADED \fP\fP
+One or several of the supplied resources is not yet loaded. 
+.TP
+\fB\fISP_ERROR_BAD_APPLICATION_KEY \fP\fP
+The application key is invalid. 
+.TP
+\fB\fISP_ERROR_BAD_USERNAME_OR_PASSWORD \fP\fP
+Login failed because of bad username and/or password. 
+.TP
+\fB\fISP_ERROR_USER_BANNED \fP\fP
+The specified username is banned. 
+.TP
+\fB\fISP_ERROR_UNABLE_TO_CONTACT_SERVER \fP\fP
+Cannot connect to the Spotify backend system. 
+.TP
+\fB\fISP_ERROR_CLIENT_TOO_OLD \fP\fP
+Client is too old, library will need to be updated. 
+.TP
+\fB\fISP_ERROR_OTHER_PERMANENT \fP\fP
+Some other error occured, and it is permanent (e.g. trying to relogin will not help). 
+.TP
+\fB\fISP_ERROR_BAD_USER_AGENT \fP\fP
+The user agent string is invalid or too long. 
+.TP
+\fB\fISP_ERROR_MISSING_CALLBACK \fP\fP
+No valid callback registered to handle events. 
+.TP
+\fB\fISP_ERROR_INVALID_INDATA \fP\fP
+Input data was either missing or invalid. 
+.TP
+\fB\fISP_ERROR_INDEX_OUT_OF_RANGE \fP\fP
+Index out of range. 
+.TP
+\fB\fISP_ERROR_USER_NEEDS_PREMIUM \fP\fP
+The specified user needs a premium account. 
+.TP
+\fB\fISP_ERROR_OTHER_TRANSIENT \fP\fP
+A transient error occured. 
+.TP
+\fB\fISP_ERROR_IS_LOADING \fP\fP
+The resource is currently loading. 
+.TP
+\fB\fISP_ERROR_NO_STREAM_AVAILABLE \fP\fP
+Could not find any suitable stream to play. 
+.SH "Function Documentation"
+.PP 
+.SS "const char* sp_error_message (\fBsp_error\fP error)"
+.PP
+Convert a numeric libspotify error code to a text string
+.PP
+\fBParameters:\fP
+.RS 4
+\fIerror\fP The error code to lookup 
+.RE
+.PP
+
+.PP
+\fBExamples: \fP
+.in +1c
+\fBbrowse.c\fP, \fBjukebox.c\fP, and \fBsearch.c\fP.

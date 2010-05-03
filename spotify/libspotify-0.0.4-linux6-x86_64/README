@@ -1,0 +1,105 @@
+
+                                 libspotify 0.0.4
+                   ----------------------------------------
+
+                       Copyright © 2006-2010 Spotify Ltd
+
+
+
+1.  INTRODUCTION
+
+    This is the libspotify C API package.  With it, you can write
+    applications that utilize the Spotify music streaming service.
+
+
+2.  PACKAGE STRUCTURE
+
+    The package is structured as follows:
+
+      libspotify/
+        Makefile                       Makefile for easier installation
+        README                         This README file
+        LICENSE                        License governing the library,
+                                       and associated files
+        include/libspotify/api.h       Header file for the library
+        lib/
+          libspotify.so*               Shared object (and versioning symlinks)
+          pkgconfig/libspotify.pc      pkg-config(1) control file
+
+        share/
+          doc/libspotify/
+            examples/                  Root directory for the example
+                                       source code
+            html/                      Documentation in HTML format
+                                       This information is also available
+                                       online.
+            images/                    Graphics for use with applications
+                                       using libspotify. See section 6 below.
+            LICENSE                    License governing the library,
+                                       and associated files
+            README                     This README file
+	    licenses.xhtml 	       License governing third party libraries
+                                       included in libspotify.
+          man/                         Manual pages for libspotify
+
+
+3.  INSTALLATION
+
+    You have probably already unpacked the TAR file. The next step is
+    to decide whether you want to install the package system-wide or
+    to keep it where you unpacked it.
+
+    If you want to install it system-wide, do the following within the
+    tarball directory:
+
+      make install prefix=/usr/local
+
+    where you can set the prefix to anything as long as it is an
+    absolute path.  After this, ensure your PKG_CONFIG_PATH is set to
+    include the libspotify control file, and that the lib directory is
+    in the library search path.  Now you are set to go!
+
+
+4.  APPLICATION KEYS
+
+    The example programs require a file called appkey.c which is not
+    present in the package.  You will need to request an application
+    key at the developer website at http://developer.spotify.com/
+    before being able to run them.
+
+
+5.  EXAMPLES
+
+    To quickly compile and run the examples directly from the unpacked
+    tar archive (without having to install the library anywhere) just
+    do:
+
+      cd share/doc/libspotify/examples
+      make LIBSPOTIFY_PATH=../../../..
+
+    Note that you need to have ALSA's dev package installed
+    (libasound2-dev) to compile the jukebox example and readline dev
+    package (libreadline-dev) to build the spshell example.
+
+    To run the spshell example just do:
+
+      spshell/spshell
+
+    Note that the example makefiles will try to find libspotify via
+    pkg-config(1) if LIBSPOTIFY_PATH is not provided as argument.
+
+
+5.  LOGOTYPES AND TRADEMARK
+
+    The graphics found in the images/ subdirectory are available for
+    use in applications using libspotify. The terms and conditions for
+    the use of these are available on http://developer.spotify.com/.
+
+    A text file is included in images/, containing the text to be used
+    in non-graphical applications.
+
+
+6.  LICENSE
+
+    You should have received a separate LICENSE file together with
+    this README.

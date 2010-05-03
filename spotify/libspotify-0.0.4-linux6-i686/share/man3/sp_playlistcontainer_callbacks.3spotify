@@ -1,0 +1,111 @@
+.TH "sp_playlistcontainer_callbacks" 3spotify "23 Apr 2010" "libspotify" \" -*- nroff -*-
+.ad l
+.nh
+.SH NAME
+sp_playlistcontainer_callbacks \- 
+.SH SYNOPSIS
+.br
+.PP
+\fC#include <api.h>\fP
+.PP
+.SS "Data Fields"
+
+.in +1c
+.ti -1c
+.RI "void(* \fBplaylist_added\fP )(\fBsp_playlistcontainer\fP *pc, \fBsp_playlist\fP *playlist, int position, void *userdata)"
+.br
+.ti -1c
+.RI "void(* \fBplaylist_removed\fP )(\fBsp_playlistcontainer\fP *pc, \fBsp_playlist\fP *playlist, int position, void *userdata)"
+.br
+.ti -1c
+.RI "void(* \fBplaylist_moved\fP )(\fBsp_playlistcontainer\fP *pc, \fBsp_playlist\fP *playlist, int position, int new_position, void *userdata)"
+.br
+.ti -1c
+.RI "void(* \fBcontainer_loaded\fP )(\fBsp_playlistcontainer\fP *pc, void *userdata)"
+.br
+.in -1c
+.SH "Detailed Description"
+.PP 
+Playlist container callbacks. If some callbacks should not be of interest, set them to NULL.
+.PP
+\fBSee also:\fP
+.RS 4
+\fBsp_playlistcontainer_add_callbacks\fP 
+.PP
+\fBsp_playlistcontainer_remove_callbacks\fP 
+.RE
+.PP
+
+.PP
+\fBExamples: \fP
+.in +1c
+.PP
+\fBjukebox.c\fP.
+.SH "Field Documentation"
+.PP 
+.SS "void( * \fBsp_playlistcontainer_callbacks::playlist_added\fP)(\fBsp_playlistcontainer\fP *pc, \fBsp_playlist\fP *playlist, int position, void *userdata)"
+.PP
+Called when a new playlist has been added to the playlist container.
+.PP
+\fBParameters:\fP
+.RS 4
+\fIpc\fP Playlist container 
+.br
+\fIplaylist\fP Playlist object. 
+.br
+\fIposition\fP Position in list 
+.br
+\fIuserdata\fP Userdata as set in \fBsp_playlistcontainer_add_callbacks()\fP 
+.RE
+.PP
+
+.SS "void( * \fBsp_playlistcontainer_callbacks::playlist_removed\fP)(\fBsp_playlistcontainer\fP *pc, \fBsp_playlist\fP *playlist, int position, void *userdata)"
+.PP
+Called when a new playlist has been removed from playlist container
+.PP
+\fBParameters:\fP
+.RS 4
+\fIpc\fP Playlist container 
+.br
+\fIplaylist\fP Playlist object. 
+.br
+\fIposition\fP Position in list 
+.br
+\fIuserdata\fP Userdata as set in \fBsp_playlistcontainer_add_callbacks()\fP 
+.RE
+.PP
+
+.SS "void( * \fBsp_playlistcontainer_callbacks::playlist_moved\fP)(\fBsp_playlistcontainer\fP *pc, \fBsp_playlist\fP *playlist, int position, int new_position, void *userdata)"
+.PP
+Called when a playlist has been moved in the playlist container
+.PP
+\fBParameters:\fP
+.RS 4
+\fIpc\fP Playlist container 
+.br
+\fIplaylist\fP Playlist object. 
+.br
+\fIposition\fP Previous position in playlist container list 
+.br
+\fInew_position\fP New position in playlist container list 
+.br
+\fIuserdata\fP Userdata as set in \fBsp_playlistcontainer_add_callbacks()\fP 
+.RE
+.PP
+
+.SS "void( * \fBsp_playlistcontainer_callbacks::container_loaded\fP)(\fBsp_playlistcontainer\fP *pc, void *userdata)"
+.PP
+Called when the playlist conatiner is loaded
+.PP
+\fBParameters:\fP
+.RS 4
+\fIpc\fP Playlist container 
+.br
+\fIuserdata\fP Userdata as set in \fBsp_playlistcontainer_add_callbacks()\fP 
+.RE
+.PP
+
+
+.SH "Author"
+.PP 
+Generated automatically by Doxygen for libspotify from the source code.

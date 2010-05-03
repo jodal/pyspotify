@@ -1,0 +1,610 @@
+.TH "api.h" 3spotify "23 Apr 2010" "libspotify" \" -*- nroff -*-
+.ad l
+.nh
+.SH NAME
+api.h \- 
+.SH SYNOPSIS
+.br
+.PP
+\fC#include <stddef.h>\fP
+.br
+
+.SS "Data Structures"
+
+.in +1c
+.ti -1c
+.RI "struct \fBsp_audioformat\fP"
+.br
+.ti -1c
+.RI "struct \fBsp_session_callbacks\fP"
+.br
+.ti -1c
+.RI "struct \fBsp_session_config\fP"
+.br
+.ti -1c
+.RI "struct \fBsp_playlist_callbacks\fP"
+.br
+.ti -1c
+.RI "struct \fBsp_playlistcontainer_callbacks\fP"
+.br
+.in -1c
+.SS "Defines"
+
+.in +1c
+.ti -1c
+.RI "#define \fBSPOTIFY_API_VERSION\fP   4"
+.br
+.ti -1c
+.RI "#define \fBSP_TOPLIST_REGION\fP(a, b)   ((a) << 8 | (b))"
+.br
+.in -1c
+.SS "Typedefs"
+
+.in +1c
+.ti -1c
+.RI "typedef struct \fBsp_session\fP \fBsp_session\fP"
+.br
+.RI "\fIRepresentation of a session. \fP"
+.ti -1c
+.RI "typedef struct \fBsp_track\fP \fBsp_track\fP"
+.br
+.RI "\fIA track handle. \fP"
+.ti -1c
+.RI "typedef struct \fBsp_album\fP \fBsp_album\fP"
+.br
+.RI "\fIAn album handle. \fP"
+.ti -1c
+.RI "typedef struct \fBsp_artist\fP \fBsp_artist\fP"
+.br
+.RI "\fIAn artist handle. \fP"
+.ti -1c
+.RI "typedef struct \fBsp_artistbrowse\fP \fBsp_artistbrowse\fP"
+.br
+.RI "\fIA handle to an artist browse result. \fP"
+.ti -1c
+.RI "typedef struct \fBsp_albumbrowse\fP \fBsp_albumbrowse\fP"
+.br
+.RI "\fIA handle to an album browse result. \fP"
+.ti -1c
+.RI "typedef struct \fBsp_toplistbrowse\fP \fBsp_toplistbrowse\fP"
+.br
+.RI "\fIA handle to a toplist browse result. \fP"
+.ti -1c
+.RI "typedef struct \fBsp_search\fP \fBsp_search\fP"
+.br
+.RI "\fIA handle to a search result. \fP"
+.ti -1c
+.RI "typedef struct \fBsp_link\fP \fBsp_link\fP"
+.br
+.RI "\fIA handle to the libspotify internal representation of a URI. \fP"
+.ti -1c
+.RI "typedef struct \fBsp_image\fP \fBsp_image\fP"
+.br
+.RI "\fIA handle to an image. \fP"
+.ti -1c
+.RI "typedef struct \fBsp_user\fP \fBsp_user\fP"
+.br
+.RI "\fIA handle to a user. \fP"
+.ti -1c
+.RI "typedef struct \fBsp_playlist\fP \fBsp_playlist\fP"
+.br
+.RI "\fIA playlist handle. \fP"
+.ti -1c
+.RI "typedef struct \fBsp_playlistcontainer\fP \fBsp_playlistcontainer\fP"
+.br
+.RI "\fIA playlist container (playlist containing other playlists) handle. \fP"
+.ti -1c
+.RI "typedef void \fBalbumbrowse_complete_cb\fP (\fBsp_albumbrowse\fP *result, void *userdata)"
+.br
+.ti -1c
+.RI "typedef void \fBartistbrowse_complete_cb\fP (\fBsp_artistbrowse\fP *result, void *userdata)"
+.br
+.ti -1c
+.RI "typedef void \fBimage_loaded_cb\fP (\fBsp_image\fP *image, void *userdata)"
+.br
+.ti -1c
+.RI "typedef void \fBsearch_complete_cb\fP (\fBsp_search\fP *result, void *userdata)"
+.br
+.ti -1c
+.RI "typedef void \fBtoplistbrowse_complete_cb\fP (\fBsp_toplistbrowse\fP *result, void *userdata)"
+.br
+.in -1c
+.SS "Enumerations"
+
+.in +1c
+.ti -1c
+.RI "enum \fBsp_error\fP { \fBSP_ERROR_OK\fP =  0, \fBSP_ERROR_BAD_API_VERSION\fP =  1, \fBSP_ERROR_API_INITIALIZATION_FAILED\fP =  2, \fBSP_ERROR_TRACK_NOT_PLAYABLE\fP =  3, \fBSP_ERROR_RESOURCE_NOT_LOADED\fP =  4, \fBSP_ERROR_BAD_APPLICATION_KEY\fP =  5, \fBSP_ERROR_BAD_USERNAME_OR_PASSWORD\fP =  6, \fBSP_ERROR_USER_BANNED\fP =  7, \fBSP_ERROR_UNABLE_TO_CONTACT_SERVER\fP =  8, \fBSP_ERROR_CLIENT_TOO_OLD\fP =  9, \fBSP_ERROR_OTHER_PERMANENT\fP =  10, \fBSP_ERROR_BAD_USER_AGENT\fP =  11, \fBSP_ERROR_MISSING_CALLBACK\fP =  12, \fBSP_ERROR_INVALID_INDATA\fP =  13, \fBSP_ERROR_INDEX_OUT_OF_RANGE\fP =  14, \fBSP_ERROR_USER_NEEDS_PREMIUM\fP =  15, \fBSP_ERROR_OTHER_TRANSIENT\fP =  16, \fBSP_ERROR_IS_LOADING\fP =  17, \fBSP_ERROR_NO_STREAM_AVAILABLE\fP =  18 }"
+.br
+.ti -1c
+.RI "enum \fBsp_connectionstate\fP { \fBSP_CONNECTION_STATE_LOGGED_OUT\fP =  0, \fBSP_CONNECTION_STATE_LOGGED_IN\fP =  1, \fBSP_CONNECTION_STATE_DISCONNECTED\fP =  2, \fBSP_CONNECTION_STATE_UNDEFINED\fP =  3 }"
+.br
+.ti -1c
+.RI "enum \fBsp_sampletype\fP { \fBSP_SAMPLETYPE_INT16_NATIVE_ENDIAN\fP =  0 }"
+.br
+.ti -1c
+.RI "enum \fBsp_bitrate\fP "
+.br
+.ti -1c
+.RI "enum \fBsp_linktype\fP { \fBSP_LINKTYPE_INVALID\fP =  0, \fBSP_LINKTYPE_TRACK\fP =  1, \fBSP_LINKTYPE_ALBUM\fP =  2, \fBSP_LINKTYPE_ARTIST\fP =  3, \fBSP_LINKTYPE_SEARCH\fP =  4, \fBSP_LINKTYPE_PLAYLIST\fP =  5 }"
+.br
+.ti -1c
+.RI "enum \fBsp_albumtype\fP { \fBSP_ALBUMTYPE_ALBUM\fP =  0, \fBSP_ALBUMTYPE_SINGLE\fP =  1, \fBSP_ALBUMTYPE_COMPILATION\fP =  2, \fBSP_ALBUMTYPE_UNKNOWN\fP =  3 }"
+.br
+.ti -1c
+.RI "enum \fBsp_imageformat\fP { \fBSP_IMAGE_FORMAT_UNKNOWN\fP =  -1, \fBSP_IMAGE_FORMAT_JPEG\fP =  0 }"
+.br
+.ti -1c
+.RI "enum \fBsp_radio_genre\fP "
+.br
+.ti -1c
+.RI "enum \fBsp_toplisttype\fP { \fBSP_TOPLIST_TYPE_ARTISTS\fP =  0, \fBSP_TOPLIST_TYPE_ALBUMS\fP =  1, \fBSP_TOPLIST_TYPE_TRACKS\fP =  2 }"
+.br
+.ti -1c
+.RI "enum \fBsp_toplistregion\fP { \fBSP_TOPLIST_REGION_EVERYWHERE\fP =  0, \fBSP_TOPLIST_REGION_USER\fP =  1 }"
+.br
+.in -1c
+.SS "Functions"
+
+.in +1c
+.ti -1c
+.RI "const char * \fBsp_error_message\fP (\fBsp_error\fP error)"
+.br
+.ti -1c
+.RI "\fBsp_error\fP \fBsp_session_init\fP (const \fBsp_session_config\fP *config, \fBsp_session\fP **sess)"
+.br
+.ti -1c
+.RI "\fBsp_error\fP \fBsp_session_login\fP (\fBsp_session\fP *session, const char *username, const char *password)"
+.br
+.ti -1c
+.RI "\fBsp_user\fP * \fBsp_session_user\fP (\fBsp_session\fP *session)"
+.br
+.ti -1c
+.RI "\fBsp_error\fP \fBsp_session_logout\fP (\fBsp_session\fP *session)"
+.br
+.ti -1c
+.RI "\fBsp_connectionstate\fP \fBsp_session_connectionstate\fP (\fBsp_session\fP *session)"
+.br
+.ti -1c
+.RI "void * \fBsp_session_userdata\fP (\fBsp_session\fP *session)"
+.br
+.ti -1c
+.RI "void \fBsp_session_process_events\fP (\fBsp_session\fP *session, int *next_timeout)"
+.br
+.ti -1c
+.RI "\fBsp_error\fP \fBsp_session_player_load\fP (\fBsp_session\fP *session, \fBsp_track\fP *track)"
+.br
+.ti -1c
+.RI "\fBsp_error\fP \fBsp_session_player_seek\fP (\fBsp_session\fP *session, int offset)"
+.br
+.ti -1c
+.RI "\fBsp_error\fP \fBsp_session_player_play\fP (\fBsp_session\fP *session, bool play)"
+.br
+.ti -1c
+.RI "void \fBsp_session_player_unload\fP (\fBsp_session\fP *session)"
+.br
+.ti -1c
+.RI "\fBsp_playlistcontainer\fP * \fBsp_session_playlistcontainer\fP (\fBsp_session\fP *session)"
+.br
+.ti -1c
+.RI "\fBsp_playlist\fP * \fBsp_session_starred_create\fP (\fBsp_session\fP *session)"
+.br
+.ti -1c
+.RI "void \fBsp_session_preferred_bitrate\fP (\fBsp_session\fP *session, \fBsp_bitrate\fP bitrate)"
+.br
+.ti -1c
+.RI "\fBsp_link\fP * \fBsp_link_create_from_string\fP (const char *link)"
+.br
+.ti -1c
+.RI "\fBsp_link\fP * \fBsp_link_create_from_track\fP (\fBsp_track\fP *track, int offset)"
+.br
+.ti -1c
+.RI "\fBsp_link\fP * \fBsp_link_create_from_album\fP (\fBsp_album\fP *album)"
+.br
+.ti -1c
+.RI "\fBsp_link\fP * \fBsp_link_create_from_artist\fP (\fBsp_artist\fP *artist)"
+.br
+.ti -1c
+.RI "\fBsp_link\fP * \fBsp_link_create_from_search\fP (\fBsp_search\fP *search)"
+.br
+.ti -1c
+.RI "\fBsp_link\fP * \fBsp_link_create_from_playlist\fP (\fBsp_playlist\fP *playlist)"
+.br
+.ti -1c
+.RI "int \fBsp_link_as_string\fP (\fBsp_link\fP *link, char *buffer, int buffer_size)"
+.br
+.ti -1c
+.RI "\fBsp_linktype\fP \fBsp_link_type\fP (\fBsp_link\fP *link)"
+.br
+.ti -1c
+.RI "\fBsp_track\fP * \fBsp_link_as_track\fP (\fBsp_link\fP *link)"
+.br
+.ti -1c
+.RI "\fBsp_track\fP * \fBsp_link_as_track_and_offset\fP (\fBsp_link\fP *link, int *offset)"
+.br
+.ti -1c
+.RI "\fBsp_album\fP * \fBsp_link_as_album\fP (\fBsp_link\fP *link)"
+.br
+.ti -1c
+.RI "\fBsp_artist\fP * \fBsp_link_as_artist\fP (\fBsp_link\fP *link)"
+.br
+.ti -1c
+.RI "void \fBsp_link_add_ref\fP (\fBsp_link\fP *link)"
+.br
+.ti -1c
+.RI "void \fBsp_link_release\fP (\fBsp_link\fP *link)"
+.br
+.ti -1c
+.RI "bool \fBsp_track_is_loaded\fP (\fBsp_track\fP *track)"
+.br
+.ti -1c
+.RI "\fBsp_error\fP \fBsp_track_error\fP (\fBsp_track\fP *track)"
+.br
+.ti -1c
+.RI "bool \fBsp_track_is_available\fP (\fBsp_track\fP *track)"
+.br
+.ti -1c
+.RI "bool \fBsp_track_is_starred\fP (\fBsp_track\fP *track)"
+.br
+.ti -1c
+.RI "void \fBsp_track_set_starred\fP (\fBsp_session\fP *session, const \fBsp_track\fP **tracks, int num_tracks, bool star)"
+.br
+.ti -1c
+.RI "int \fBsp_track_num_artists\fP (\fBsp_track\fP *track)"
+.br
+.ti -1c
+.RI "\fBsp_artist\fP * \fBsp_track_artist\fP (\fBsp_track\fP *track, int index)"
+.br
+.ti -1c
+.RI "\fBsp_album\fP * \fBsp_track_album\fP (\fBsp_track\fP *track)"
+.br
+.ti -1c
+.RI "const char * \fBsp_track_name\fP (\fBsp_track\fP *track)"
+.br
+.ti -1c
+.RI "int \fBsp_track_duration\fP (\fBsp_track\fP *track)"
+.br
+.ti -1c
+.RI "int \fBsp_track_popularity\fP (\fBsp_track\fP *track)"
+.br
+.ti -1c
+.RI "int \fBsp_track_disc\fP (\fBsp_track\fP *track)"
+.br
+.ti -1c
+.RI "int \fBsp_track_index\fP (\fBsp_track\fP *track)"
+.br
+.ti -1c
+.RI "void \fBsp_track_add_ref\fP (\fBsp_track\fP *track)"
+.br
+.ti -1c
+.RI "void \fBsp_track_release\fP (\fBsp_track\fP *track)"
+.br
+.ti -1c
+.RI "bool \fBsp_album_is_loaded\fP (\fBsp_album\fP *album)"
+.br
+.ti -1c
+.RI "bool \fBsp_album_is_available\fP (\fBsp_album\fP *album)"
+.br
+.ti -1c
+.RI "\fBsp_artist\fP * \fBsp_album_artist\fP (\fBsp_album\fP *album)"
+.br
+.ti -1c
+.RI "const byte * \fBsp_album_cover\fP (\fBsp_album\fP *album)"
+.br
+.ti -1c
+.RI "const char * \fBsp_album_name\fP (\fBsp_album\fP *album)"
+.br
+.ti -1c
+.RI "int \fBsp_album_year\fP (\fBsp_album\fP *album)"
+.br
+.ti -1c
+.RI "\fBsp_albumtype\fP \fBsp_album_type\fP (\fBsp_album\fP *album)"
+.br
+.ti -1c
+.RI "void \fBsp_album_add_ref\fP (\fBsp_album\fP *album)"
+.br
+.ti -1c
+.RI "void \fBsp_album_release\fP (\fBsp_album\fP *album)"
+.br
+.ti -1c
+.RI "const char * \fBsp_artist_name\fP (\fBsp_artist\fP *artist)"
+.br
+.ti -1c
+.RI "bool \fBsp_artist_is_loaded\fP (\fBsp_artist\fP *artist)"
+.br
+.ti -1c
+.RI "void \fBsp_artist_add_ref\fP (\fBsp_artist\fP *artist)"
+.br
+.ti -1c
+.RI "void \fBsp_artist_release\fP (\fBsp_artist\fP *artist)"
+.br
+.ti -1c
+.RI "\fBsp_albumbrowse\fP * \fBsp_albumbrowse_create\fP (\fBsp_session\fP *session, \fBsp_album\fP *album, \fBalbumbrowse_complete_cb\fP *callback, void *userdata)"
+.br
+.ti -1c
+.RI "bool \fBsp_albumbrowse_is_loaded\fP (\fBsp_albumbrowse\fP *alb)"
+.br
+.ti -1c
+.RI "\fBsp_error\fP \fBsp_albumbrowse_error\fP (\fBsp_albumbrowse\fP *alb)"
+.br
+.ti -1c
+.RI "\fBsp_album\fP * \fBsp_albumbrowse_album\fP (\fBsp_albumbrowse\fP *alb)"
+.br
+.ti -1c
+.RI "\fBsp_artist\fP * \fBsp_albumbrowse_artist\fP (\fBsp_albumbrowse\fP *alb)"
+.br
+.ti -1c
+.RI "int \fBsp_albumbrowse_num_copyrights\fP (\fBsp_albumbrowse\fP *alb)"
+.br
+.ti -1c
+.RI "const char * \fBsp_albumbrowse_copyright\fP (\fBsp_albumbrowse\fP *alb, int index)"
+.br
+.ti -1c
+.RI "int \fBsp_albumbrowse_num_tracks\fP (\fBsp_albumbrowse\fP *alb)"
+.br
+.ti -1c
+.RI "\fBsp_track\fP * \fBsp_albumbrowse_track\fP (\fBsp_albumbrowse\fP *alb, int index)"
+.br
+.ti -1c
+.RI "const char * \fBsp_albumbrowse_review\fP (\fBsp_albumbrowse\fP *alb)"
+.br
+.ti -1c
+.RI "void \fBsp_albumbrowse_add_ref\fP (\fBsp_albumbrowse\fP *alb)"
+.br
+.ti -1c
+.RI "void \fBsp_albumbrowse_release\fP (\fBsp_albumbrowse\fP *alb)"
+.br
+.ti -1c
+.RI "\fBsp_artistbrowse\fP * \fBsp_artistbrowse_create\fP (\fBsp_session\fP *session, \fBsp_artist\fP *artist, \fBartistbrowse_complete_cb\fP *callback, void *userdata)"
+.br
+.ti -1c
+.RI "bool \fBsp_artistbrowse_is_loaded\fP (\fBsp_artistbrowse\fP *arb)"
+.br
+.ti -1c
+.RI "\fBsp_error\fP \fBsp_artistbrowse_error\fP (\fBsp_artistbrowse\fP *arb)"
+.br
+.ti -1c
+.RI "\fBsp_artist\fP * \fBsp_artistbrowse_artist\fP (\fBsp_artistbrowse\fP *arb)"
+.br
+.ti -1c
+.RI "int \fBsp_artistbrowse_num_portraits\fP (\fBsp_artistbrowse\fP *arb)"
+.br
+.ti -1c
+.RI "const byte * \fBsp_artistbrowse_portrait\fP (\fBsp_artistbrowse\fP *arb, int index)"
+.br
+.ti -1c
+.RI "int \fBsp_artistbrowse_num_tracks\fP (\fBsp_artistbrowse\fP *arb)"
+.br
+.ti -1c
+.RI "\fBsp_track\fP * \fBsp_artistbrowse_track\fP (\fBsp_artistbrowse\fP *arb, int index)"
+.br
+.ti -1c
+.RI "int \fBsp_artistbrowse_num_albums\fP (\fBsp_artistbrowse\fP *arb)"
+.br
+.ti -1c
+.RI "\fBsp_album\fP * \fBsp_artistbrowse_album\fP (\fBsp_artistbrowse\fP *arb, int index)"
+.br
+.ti -1c
+.RI "int \fBsp_artistbrowse_num_similar_artists\fP (\fBsp_artistbrowse\fP *arb)"
+.br
+.ti -1c
+.RI "\fBsp_artist\fP * \fBsp_artistbrowse_similar_artist\fP (\fBsp_artistbrowse\fP *arb, int index)"
+.br
+.ti -1c
+.RI "const char * \fBsp_artistbrowse_biography\fP (\fBsp_artistbrowse\fP *arb)"
+.br
+.ti -1c
+.RI "void \fBsp_artistbrowse_add_ref\fP (\fBsp_artistbrowse\fP *arb)"
+.br
+.ti -1c
+.RI "void \fBsp_artistbrowse_release\fP (\fBsp_artistbrowse\fP *arb)"
+.br
+.ti -1c
+.RI "\fBsp_image\fP * \fBsp_image_create\fP (\fBsp_session\fP *session, const byte image_id[20])"
+.br
+.ti -1c
+.RI "void \fBsp_image_add_load_callback\fP (\fBsp_image\fP *image, \fBimage_loaded_cb\fP *callback, void *userdata)"
+.br
+.ti -1c
+.RI "void \fBsp_image_remove_load_callback\fP (\fBsp_image\fP *image, \fBimage_loaded_cb\fP *callback, void *userdata)"
+.br
+.ti -1c
+.RI "bool \fBsp_image_is_loaded\fP (\fBsp_image\fP *image)"
+.br
+.ti -1c
+.RI "\fBsp_error\fP \fBsp_image_error\fP (\fBsp_image\fP *image)"
+.br
+.ti -1c
+.RI "\fBsp_imageformat\fP \fBsp_image_format\fP (\fBsp_image\fP *image)"
+.br
+.ti -1c
+.RI "const void * \fBsp_image_data\fP (\fBsp_image\fP *image, size_t *data_size)"
+.br
+.ti -1c
+.RI "const byte * \fBsp_image_image_id\fP (\fBsp_image\fP *image)"
+.br
+.ti -1c
+.RI "void \fBsp_image_add_ref\fP (\fBsp_image\fP *image)"
+.br
+.ti -1c
+.RI "void \fBsp_image_release\fP (\fBsp_image\fP *image)"
+.br
+.ti -1c
+.RI "\fBsp_search\fP * \fBsp_search_create\fP (\fBsp_session\fP *session, const char *query, int track_offset, int track_count, int album_offset, int album_count, int artist_offset, int artist_count, \fBsearch_complete_cb\fP *callback, void *userdata)"
+.br
+.ti -1c
+.RI "\fBsp_search\fP * \fBsp_radio_search_create\fP (\fBsp_session\fP *session, unsigned int from_year, unsigned int to_year, \fBsp_radio_genre\fP genres, \fBsearch_complete_cb\fP *callback, void *userdata)"
+.br
+.ti -1c
+.RI "bool \fBsp_search_is_loaded\fP (\fBsp_search\fP *search)"
+.br
+.ti -1c
+.RI "\fBsp_error\fP \fBsp_search_error\fP (\fBsp_search\fP *search)"
+.br
+.ti -1c
+.RI "int \fBsp_search_num_tracks\fP (\fBsp_search\fP *search)"
+.br
+.ti -1c
+.RI "\fBsp_track\fP * \fBsp_search_track\fP (\fBsp_search\fP *search, int index)"
+.br
+.ti -1c
+.RI "int \fBsp_search_num_albums\fP (\fBsp_search\fP *search)"
+.br
+.ti -1c
+.RI "\fBsp_album\fP * \fBsp_search_album\fP (\fBsp_search\fP *search, int index)"
+.br
+.ti -1c
+.RI "int \fBsp_search_num_artists\fP (\fBsp_search\fP *search)"
+.br
+.ti -1c
+.RI "\fBsp_artist\fP * \fBsp_search_artist\fP (\fBsp_search\fP *search, int index)"
+.br
+.ti -1c
+.RI "const char * \fBsp_search_query\fP (\fBsp_search\fP *search)"
+.br
+.ti -1c
+.RI "const char * \fBsp_search_did_you_mean\fP (\fBsp_search\fP *search)"
+.br
+.ti -1c
+.RI "int \fBsp_search_total_tracks\fP (\fBsp_search\fP *search)"
+.br
+.ti -1c
+.RI "void \fBsp_search_add_ref\fP (\fBsp_search\fP *search)"
+.br
+.ti -1c
+.RI "void \fBsp_search_release\fP (\fBsp_search\fP *search)"
+.br
+.ti -1c
+.RI "bool \fBsp_playlist_is_loaded\fP (\fBsp_playlist\fP *playlist)"
+.br
+.ti -1c
+.RI "void \fBsp_playlist_add_callbacks\fP (\fBsp_playlist\fP *playlist, \fBsp_playlist_callbacks\fP *callbacks, void *userdata)"
+.br
+.ti -1c
+.RI "void \fBsp_playlist_remove_callbacks\fP (\fBsp_playlist\fP *playlist, \fBsp_playlist_callbacks\fP *callbacks, void *userdata)"
+.br
+.ti -1c
+.RI "int \fBsp_playlist_num_tracks\fP (\fBsp_playlist\fP *playlist)"
+.br
+.ti -1c
+.RI "\fBsp_track\fP * \fBsp_playlist_track\fP (\fBsp_playlist\fP *playlist, int index)"
+.br
+.ti -1c
+.RI "const char * \fBsp_playlist_name\fP (\fBsp_playlist\fP *playlist)"
+.br
+.ti -1c
+.RI "\fBsp_error\fP \fBsp_playlist_rename\fP (\fBsp_playlist\fP *playlist, const char *new_name)"
+.br
+.ti -1c
+.RI "\fBsp_user\fP * \fBsp_playlist_owner\fP (\fBsp_playlist\fP *playlist)"
+.br
+.ti -1c
+.RI "bool \fBsp_playlist_is_collaborative\fP (\fBsp_playlist\fP *playlist)"
+.br
+.ti -1c
+.RI "void \fBsp_playlist_set_collaborative\fP (\fBsp_playlist\fP *playlist, bool collaborative)"
+.br
+.ti -1c
+.RI "bool \fBsp_playlist_has_pending_changes\fP (\fBsp_playlist\fP *playlist)"
+.br
+.ti -1c
+.RI "\fBsp_error\fP \fBsp_playlist_add_tracks\fP (\fBsp_playlist\fP *playlist, const \fBsp_track\fP **tracks, int num_tracks, int position, \fBsp_session\fP *session)"
+.br
+.ti -1c
+.RI "\fBsp_error\fP \fBsp_playlist_remove_tracks\fP (\fBsp_playlist\fP *playlist, const int *tracks, int num_tracks)"
+.br
+.ti -1c
+.RI "\fBsp_error\fP \fBsp_playlist_reorder_tracks\fP (\fBsp_playlist\fP *playlist, const int *tracks, int num_tracks, int new_position)"
+.br
+.ti -1c
+.RI "\fBsp_playlist\fP * \fBsp_playlist_create\fP (\fBsp_session\fP *session, \fBsp_link\fP *link)"
+.br
+.ti -1c
+.RI "void \fBsp_playlist_add_ref\fP (\fBsp_playlist\fP *playlist)"
+.br
+.ti -1c
+.RI "void \fBsp_playlist_release\fP (\fBsp_playlist\fP *playlist)"
+.br
+.ti -1c
+.RI "void \fBsp_playlistcontainer_add_callbacks\fP (\fBsp_playlistcontainer\fP *pc, \fBsp_playlistcontainer_callbacks\fP *callbacks, void *userdata)"
+.br
+.ti -1c
+.RI "void \fBsp_playlistcontainer_remove_callbacks\fP (\fBsp_playlistcontainer\fP *pc, \fBsp_playlistcontainer_callbacks\fP *callbacks, void *userdata)"
+.br
+.ti -1c
+.RI "int \fBsp_playlistcontainer_num_playlists\fP (\fBsp_playlistcontainer\fP *pc)"
+.br
+.ti -1c
+.RI "\fBsp_playlist\fP * \fBsp_playlistcontainer_playlist\fP (\fBsp_playlistcontainer\fP *pc, int index)"
+.br
+.ti -1c
+.RI "\fBsp_playlist\fP * \fBsp_playlistcontainer_add_new_playlist\fP (\fBsp_playlistcontainer\fP *pc, const char *name)"
+.br
+.ti -1c
+.RI "\fBsp_playlist\fP * \fBsp_playlistcontainer_add_playlist\fP (\fBsp_playlistcontainer\fP *pc, \fBsp_link\fP *link)"
+.br
+.ti -1c
+.RI "\fBsp_error\fP \fBsp_playlistcontainer_remove_playlist\fP (\fBsp_playlistcontainer\fP *pc, int index)"
+.br
+.ti -1c
+.RI "\fBsp_error\fP \fBsp_playlistcontainer_move_playlist\fP (\fBsp_playlistcontainer\fP *pc, int index, int new_position)"
+.br
+.ti -1c
+.RI "const char * \fBsp_user_canonical_name\fP (\fBsp_user\fP *user)"
+.br
+.ti -1c
+.RI "const char * \fBsp_user_display_name\fP (\fBsp_user\fP *user)"
+.br
+.ti -1c
+.RI "bool \fBsp_user_is_loaded\fP (\fBsp_user\fP *user)"
+.br
+.ti -1c
+.RI "\fBsp_toplistbrowse\fP * \fBsp_toplistbrowse_create\fP (\fBsp_session\fP *session, \fBsp_toplisttype\fP type, \fBsp_toplistregion\fP region, \fBtoplistbrowse_complete_cb\fP *callback, void *userdata)"
+.br
+.ti -1c
+.RI "bool \fBsp_toplistbrowse_is_loaded\fP (\fBsp_toplistbrowse\fP *tlb)"
+.br
+.ti -1c
+.RI "\fBsp_error\fP \fBsp_toplistbrowse_error\fP (\fBsp_toplistbrowse\fP *tlb)"
+.br
+.ti -1c
+.RI "void \fBsp_toplistbrowse_add_ref\fP (\fBsp_toplistbrowse\fP *tlb)"
+.br
+.ti -1c
+.RI "void \fBsp_toplistbrowse_release\fP (\fBsp_toplistbrowse\fP *tlb)"
+.br
+.ti -1c
+.RI "int \fBsp_toplistbrowse_num_artists\fP (\fBsp_toplistbrowse\fP *tlb)"
+.br
+.ti -1c
+.RI "\fBsp_artist\fP * \fBsp_toplistbrowse_artist\fP (\fBsp_toplistbrowse\fP *tlb, int index)"
+.br
+.ti -1c
+.RI "int \fBsp_toplistbrowse_num_albums\fP (\fBsp_toplistbrowse\fP *tlb)"
+.br
+.ti -1c
+.RI "\fBsp_album\fP * \fBsp_toplistbrowse_album\fP (\fBsp_toplistbrowse\fP *tlb, int index)"
+.br
+.ti -1c
+.RI "int \fBsp_toplistbrowse_num_tracks\fP (\fBsp_toplistbrowse\fP *tlb)"
+.br
+.ti -1c
+.RI "\fBsp_track\fP * \fBsp_toplistbrowse_track\fP (\fBsp_toplistbrowse\fP *tlb, int index)"
+.br
+.in -1c
+.SH "Detailed Description"
+.PP 
+Public API for libspotify
+.PP
+\fBNote:\fP
+.RS 4
+All input strings are expected to be in UTF-8 
+.PP
+All output strings are in UTF-8.
+.PP
+All usernames are valid XMPP nodeprep identifiers: http://tools.ietf.org/html/rfc3920#appendix-A If you need to store user data, we strongly advise you to use the canonical form of the username. 
+.RE
+.PP
+
+.SH "Author"
+.PP 
+Generated automatically by Doxygen for libspotify from the source code.

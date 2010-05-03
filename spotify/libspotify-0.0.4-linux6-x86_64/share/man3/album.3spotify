@@ -1,0 +1,217 @@
+.TH "Album subsystem" 3spotify "23 Apr 2010" "libspotify" \" -*- nroff -*-
+.ad l
+.nh
+.SH NAME
+Album subsystem \- 
+.SS "Enumerations"
+
+.in +1c
+.ti -1c
+.RI "enum \fBsp_albumtype\fP { \fBSP_ALBUMTYPE_ALBUM\fP =  0, \fBSP_ALBUMTYPE_SINGLE\fP =  1, \fBSP_ALBUMTYPE_COMPILATION\fP =  2, \fBSP_ALBUMTYPE_UNKNOWN\fP =  3 }"
+.br
+.in -1c
+.SS "Functions"
+
+.in +1c
+.ti -1c
+.RI "bool \fBsp_album_is_loaded\fP (\fBsp_album\fP *album)"
+.br
+.ti -1c
+.RI "bool \fBsp_album_is_available\fP (\fBsp_album\fP *album)"
+.br
+.ti -1c
+.RI "\fBsp_artist\fP * \fBsp_album_artist\fP (\fBsp_album\fP *album)"
+.br
+.ti -1c
+.RI "const byte * \fBsp_album_cover\fP (\fBsp_album\fP *album)"
+.br
+.ti -1c
+.RI "const char * \fBsp_album_name\fP (\fBsp_album\fP *album)"
+.br
+.ti -1c
+.RI "int \fBsp_album_year\fP (\fBsp_album\fP *album)"
+.br
+.ti -1c
+.RI "\fBsp_albumtype\fP \fBsp_album_type\fP (\fBsp_album\fP *album)"
+.br
+.ti -1c
+.RI "void \fBsp_album_add_ref\fP (\fBsp_album\fP *album)"
+.br
+.ti -1c
+.RI "void \fBsp_album_release\fP (\fBsp_album\fP *album)"
+.br
+.in -1c
+.SH "Enumeration Type Documentation"
+.PP 
+.SS "enum \fBsp_albumtype\fP"
+.PP
+Album types 
+.PP
+\fBEnumerator: \fP
+.in +1c
+.TP
+\fB\fISP_ALBUMTYPE_ALBUM \fP\fP
+Normal album. 
+.TP
+\fB\fISP_ALBUMTYPE_SINGLE \fP\fP
+Single. 
+.TP
+\fB\fISP_ALBUMTYPE_COMPILATION \fP\fP
+Compilation. 
+.TP
+\fB\fISP_ALBUMTYPE_UNKNOWN \fP\fP
+Unknown type. 
+.SH "Function Documentation"
+.PP 
+.SS "void sp_album_add_ref (\fBsp_album\fP * album)"
+.PP
+Increase the reference count of an album
+.PP
+\fBParameters:\fP
+.RS 4
+\fIalbum\fP The album object 
+.RE
+.PP
+
+.SS "\fBsp_artist\fP* sp_album_artist (\fBsp_album\fP * album)"
+.PP
+Get the artist associated with the given album
+.PP
+\fBParameters:\fP
+.RS 4
+\fIalbum\fP Album object 
+.RE
+.PP
+\fBReturns:\fP
+.RS 4
+A reference to the artist. NULL if the metadata has not been loaded yet 
+.RE
+.PP
+
+.PP
+\fBExamples: \fP
+.in +1c
+\fBtoplist.c\fP.
+.SS "const byte* sp_album_cover (\fBsp_album\fP * album)"
+.PP
+Return image ID representing the album's coverart.
+.PP
+\fBParameters:\fP
+.RS 4
+\fIalbum\fP Album object
+.RE
+.PP
+\fBReturns:\fP
+.RS 4
+ID byte sequence that can be passed to \fBsp_image_create()\fP If the album has no image or the metadata for the album is not loaded yet, this function returns NULL.
+.RE
+.PP
+\fBSee also:\fP
+.RS 4
+\fBsp_image_create\fP 
+.RE
+.PP
+
+.SS "bool sp_album_is_available (\fBsp_album\fP * album)"
+.PP
+Return true if the album is available in the current region.
+.PP
+\fBParameters:\fP
+.RS 4
+\fIalbum\fP The album
+.RE
+.PP
+\fBReturns:\fP
+.RS 4
+True if album is available for playback, otherwise false.
+.RE
+.PP
+\fBNote:\fP
+.RS 4
+The album must be loaded or this function will always return false. 
+.RE
+.PP
+\fBSee also:\fP
+.RS 4
+\fBsp_album_is_loaded()\fP 
+.RE
+.PP
+
+.SS "bool sp_album_is_loaded (\fBsp_album\fP * album)"
+.PP
+Check if the album object is populated with data
+.PP
+\fBParameters:\fP
+.RS 4
+\fIalbum\fP Album object 
+.RE
+.PP
+\fBReturns:\fP
+.RS 4
+True if metadata is present, false if not 
+.RE
+.PP
+
+.SS "const char* sp_album_name (\fBsp_album\fP * album)"
+.PP
+Return name of album
+.PP
+\fBParameters:\fP
+.RS 4
+\fIalbum\fP Album object
+.RE
+.PP
+\fBReturns:\fP
+.RS 4
+Name of album. Returned string is valid as long as the album object stays allocated and no longer than the next call to \fBsp_session_process_events()\fP 
+.RE
+.PP
+
+.PP
+\fBExamples: \fP
+.in +1c
+\fBbrowse.c\fP, \fBsearch.c\fP, and \fBtoplist.c\fP.
+.SS "void sp_album_release (\fBsp_album\fP * album)"
+.PP
+Decrease the reference count of an album
+.PP
+\fBParameters:\fP
+.RS 4
+\fIalbum\fP The album object 
+.RE
+.PP
+
+.SS "\fBsp_albumtype\fP sp_album_type (\fBsp_album\fP * album)"
+.PP
+Return type of specified album
+.PP
+\fBParameters:\fP
+.RS 4
+\fIalbum\fP Album object
+.RE
+.PP
+\fBReturns:\fP
+.RS 4
+sp_albumtype 
+.RE
+.PP
+
+.SS "int sp_album_year (\fBsp_album\fP * album)"
+.PP
+Return release year of specified album
+.PP
+\fBParameters:\fP
+.RS 4
+\fIalbum\fP Album object
+.RE
+.PP
+\fBReturns:\fP
+.RS 4
+Release year 
+.RE
+.PP
+
+.PP
+\fBExamples: \fP
+.in +1c
+\fBbrowse.c\fP, and \fBsearch.c\fP.

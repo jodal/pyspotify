@@ -1,0 +1,571 @@
+.TH "Playlist subsystem" 3spotify "23 Apr 2010" "libspotify" \" -*- nroff -*-
+.ad l
+.nh
+.SH NAME
+Playlist subsystem \- 
+.SS "Data Structures"
+
+.in +1c
+.ti -1c
+.RI "struct \fBsp_playlist_callbacks\fP"
+.br
+.ti -1c
+.RI "struct \fBsp_playlistcontainer_callbacks\fP"
+.br
+.in -1c
+.SS "Functions"
+
+.in +1c
+.ti -1c
+.RI "bool \fBsp_playlist_is_loaded\fP (\fBsp_playlist\fP *playlist)"
+.br
+.ti -1c
+.RI "void \fBsp_playlist_add_callbacks\fP (\fBsp_playlist\fP *playlist, \fBsp_playlist_callbacks\fP *callbacks, void *userdata)"
+.br
+.ti -1c
+.RI "void \fBsp_playlist_remove_callbacks\fP (\fBsp_playlist\fP *playlist, \fBsp_playlist_callbacks\fP *callbacks, void *userdata)"
+.br
+.ti -1c
+.RI "int \fBsp_playlist_num_tracks\fP (\fBsp_playlist\fP *playlist)"
+.br
+.ti -1c
+.RI "\fBsp_track\fP * \fBsp_playlist_track\fP (\fBsp_playlist\fP *playlist, int index)"
+.br
+.ti -1c
+.RI "const char * \fBsp_playlist_name\fP (\fBsp_playlist\fP *playlist)"
+.br
+.ti -1c
+.RI "\fBsp_error\fP \fBsp_playlist_rename\fP (\fBsp_playlist\fP *playlist, const char *new_name)"
+.br
+.ti -1c
+.RI "\fBsp_user\fP * \fBsp_playlist_owner\fP (\fBsp_playlist\fP *playlist)"
+.br
+.ti -1c
+.RI "bool \fBsp_playlist_is_collaborative\fP (\fBsp_playlist\fP *playlist)"
+.br
+.ti -1c
+.RI "void \fBsp_playlist_set_collaborative\fP (\fBsp_playlist\fP *playlist, bool collaborative)"
+.br
+.ti -1c
+.RI "bool \fBsp_playlist_has_pending_changes\fP (\fBsp_playlist\fP *playlist)"
+.br
+.ti -1c
+.RI "\fBsp_error\fP \fBsp_playlist_add_tracks\fP (\fBsp_playlist\fP *playlist, const \fBsp_track\fP **tracks, int num_tracks, int position, \fBsp_session\fP *session)"
+.br
+.ti -1c
+.RI "\fBsp_error\fP \fBsp_playlist_remove_tracks\fP (\fBsp_playlist\fP *playlist, const int *tracks, int num_tracks)"
+.br
+.ti -1c
+.RI "\fBsp_error\fP \fBsp_playlist_reorder_tracks\fP (\fBsp_playlist\fP *playlist, const int *tracks, int num_tracks, int new_position)"
+.br
+.ti -1c
+.RI "\fBsp_playlist\fP * \fBsp_playlist_create\fP (\fBsp_session\fP *session, \fBsp_link\fP *link)"
+.br
+.ti -1c
+.RI "void \fBsp_playlist_add_ref\fP (\fBsp_playlist\fP *playlist)"
+.br
+.ti -1c
+.RI "void \fBsp_playlist_release\fP (\fBsp_playlist\fP *playlist)"
+.br
+.ti -1c
+.RI "void \fBsp_playlistcontainer_add_callbacks\fP (\fBsp_playlistcontainer\fP *pc, \fBsp_playlistcontainer_callbacks\fP *callbacks, void *userdata)"
+.br
+.ti -1c
+.RI "void \fBsp_playlistcontainer_remove_callbacks\fP (\fBsp_playlistcontainer\fP *pc, \fBsp_playlistcontainer_callbacks\fP *callbacks, void *userdata)"
+.br
+.ti -1c
+.RI "int \fBsp_playlistcontainer_num_playlists\fP (\fBsp_playlistcontainer\fP *pc)"
+.br
+.ti -1c
+.RI "\fBsp_playlist\fP * \fBsp_playlistcontainer_playlist\fP (\fBsp_playlistcontainer\fP *pc, int index)"
+.br
+.ti -1c
+.RI "\fBsp_playlist\fP * \fBsp_playlistcontainer_add_new_playlist\fP (\fBsp_playlistcontainer\fP *pc, const char *name)"
+.br
+.ti -1c
+.RI "\fBsp_playlist\fP * \fBsp_playlistcontainer_add_playlist\fP (\fBsp_playlistcontainer\fP *pc, \fBsp_link\fP *link)"
+.br
+.ti -1c
+.RI "\fBsp_error\fP \fBsp_playlistcontainer_remove_playlist\fP (\fBsp_playlistcontainer\fP *pc, int index)"
+.br
+.ti -1c
+.RI "\fBsp_error\fP \fBsp_playlistcontainer_move_playlist\fP (\fBsp_playlistcontainer\fP *pc, int index, int new_position)"
+.br
+.in -1c
+.SH "Detailed Description"
+.PP 
+The playlist subsystem handles playlists and playlist containers (list of playlists).
+.PP
+The playlist container functions are always valid, but your playlists are not guaranteed to be loaded until the \fBsp_session_callbacks::logged_in\fP callback has been issued. 
+.SH "Function Documentation"
+.PP 
+.SS "void sp_playlist_add_callbacks (\fBsp_playlist\fP * playlist, \fBsp_playlist_callbacks\fP * callbacks, void * userdata)"
+.PP
+Register interest in the given playlist
+.PP
+Here is a snippet from \fCjukebox.c:\fP  
+.PP
+.nf
+  sp_playlist_add_callbacks(pl, &pl_callbacks, NULL);
+
+.fi
+.PP
+.PP
+\fBParameters:\fP
+.RS 4
+\fIplaylist\fP Playlist object 
+.br
+\fIcallbacks\fP Callbacks, see \fBsp_playlist_callbacks\fP 
+.br
+\fIuserdata\fP Userdata to be passed to callbacks 
+.RE
+.PP
+\fBSee also:\fP
+.RS 4
+\fBsp_playlist_remove_callbacks\fP 
+.RE
+.PP
+
+.PP
+\fBExamples: \fP
+.in +1c
+\fBbrowse.c\fP, and \fBjukebox.c\fP.
+.SS "void sp_playlist_add_ref (\fBsp_playlist\fP * playlist)"
+.PP
+Increase the reference count of a playlist
+.PP
+\fBParameters:\fP
+.RS 4
+\fIplaylist\fP The playlist object 
+.RE
+.PP
+
+.SS "\fBsp_error\fP sp_playlist_add_tracks (\fBsp_playlist\fP * playlist, const \fBsp_track\fP ** tracks, int num_tracks, int position, \fBsp_session\fP * session)"
+.PP
+Add tracks to a playlist
+.PP
+\fBParameters:\fP
+.RS 4
+\fIplaylist\fP Playlist object 
+.br
+\fItracks\fP Array of pointer to tracks. 
+.br
+\fInum_tracks\fP Length of \fCtracks\fP array 
+.br
+\fIposition\fP Start position in playlist where to insert the tracks 
+.br
+\fIsession\fP Your session object 
+.RE
+.PP
+
+.SS "\fBsp_playlist\fP* sp_playlist_create (\fBsp_session\fP * session, \fBsp_link\fP * link)"
+.PP
+Load an already existing playlist without adding it to a playlistcontainer.
+.PP
+\fBParameters:\fP
+.RS 4
+\fIsession\fP Session object 
+.br
+\fIlink\fP Link object referring to a playlist
+.RE
+.PP
+\fBReturns:\fP
+.RS 4
+A playlist. The reference is owned by the caller and should be released with \fBsp_playlist_release()\fP 
+.RE
+.PP
+
+.PP
+\fBExamples: \fP
+.in +1c
+\fBbrowse.c\fP.
+.SS "bool sp_playlist_has_pending_changes (\fBsp_playlist\fP * playlist)"
+.PP
+Check if a playlist has pending changes
+.PP
+Pending changes are local changes that have not yet been acknowledged by the server.
+.PP
+\fBParameters:\fP
+.RS 4
+\fIplaylist\fP Playlist object
+.RE
+.PP
+\fBReturns:\fP
+.RS 4
+A flag representing if there are pending changes or not 
+.RE
+.PP
+
+.SS "bool sp_playlist_is_collaborative (\fBsp_playlist\fP * playlist)"
+.PP
+Return collaborative status for a playlist.
+.PP
+A playlist in collaborative state can be modifed by all users, not only the user owning the list
+.PP
+\fBParameters:\fP
+.RS 4
+\fIplaylist\fP Playlist object
+.RE
+.PP
+\fBReturns:\fP
+.RS 4
+true if playlist is collaborative, otherwise false 
+.RE
+.PP
+
+.SS "bool sp_playlist_is_loaded (\fBsp_playlist\fP * playlist)"
+.PP
+Get load status for the specified playlist. If it's false, you have to wait until playlist_state_changed happens, and check again if is_loaded has changed
+.PP
+\fBParameters:\fP
+.RS 4
+\fIplaylist\fP Playlist object
+.RE
+.PP
+\fBReturns:\fP
+.RS 4
+True if playlist is loaded, otherwise false 
+.RE
+.PP
+
+.PP
+\fBExamples: \fP
+.in +1c
+\fBbrowse.c\fP.
+.SS "const char* sp_playlist_name (\fBsp_playlist\fP * playlist)"
+.PP
+Return name of given playlist
+.PP
+\fBParameters:\fP
+.RS 4
+\fIplaylist\fP Playlist object
+.RE
+.PP
+\fBReturns:\fP
+.RS 4
+The name of the given playlist 
+.RE
+.PP
+
+.PP
+\fBExamples: \fP
+.in +1c
+\fBbrowse.c\fP, and \fBjukebox.c\fP.
+.SS "int sp_playlist_num_tracks (\fBsp_playlist\fP * playlist)"
+.PP
+Return number of tracks in the given playlist
+.PP
+\fBParameters:\fP
+.RS 4
+\fIplaylist\fP Playlist object
+.RE
+.PP
+\fBReturns:\fP
+.RS 4
+The number of tracks in the playlist 
+.RE
+.PP
+
+.PP
+\fBExamples: \fP
+.in +1c
+\fBbrowse.c\fP, and \fBjukebox.c\fP.
+.SS "\fBsp_user\fP* sp_playlist_owner (\fBsp_playlist\fP * playlist)"
+.PP
+Return a pointer to the user for the given playlist
+.PP
+\fBParameters:\fP
+.RS 4
+\fIplaylist\fP Playlist object
+.RE
+.PP
+\fBReturns:\fP
+.RS 4
+User object 
+.RE
+.PP
+
+.SS "void sp_playlist_release (\fBsp_playlist\fP * playlist)"
+.PP
+Decrease the reference count of a playlist
+.PP
+\fBParameters:\fP
+.RS 4
+\fIplaylist\fP The playlist object 
+.RE
+.PP
+
+.PP
+\fBExamples: \fP
+.in +1c
+\fBbrowse.c\fP.
+.SS "void sp_playlist_remove_callbacks (\fBsp_playlist\fP * playlist, \fBsp_playlist_callbacks\fP * callbacks, void * userdata)"
+.PP
+Unregister interest in the given playlist
+.PP
+The combination of (\fCcallbacks\fP, \fCuserdata\fP) is used to find the entry to be removed
+.PP
+Here is a snippet from \fCjukebox.c:\fP  
+.PP
+.nf
+ sp_playlist_remove_callbacks(pl, &pl_callbacks, NULL);
+
+.fi
+.PP
+.PP
+\fBParameters:\fP
+.RS 4
+\fIplaylist\fP Playlist object 
+.br
+\fIcallbacks\fP Callbacks, see \fBsp_playlist_callbacks\fP 
+.br
+\fIuserdata\fP Userdata to be passed to callbacks 
+.RE
+.PP
+\fBSee also:\fP
+.RS 4
+\fBsp_playlist_add_callbacks\fP 
+.RE
+.PP
+
+.PP
+\fBExamples: \fP
+.in +1c
+\fBbrowse.c\fP, and \fBjukebox.c\fP.
+.SS "\fBsp_error\fP sp_playlist_remove_tracks (\fBsp_playlist\fP * playlist, const int * tracks, int num_tracks)"
+.PP
+Remove tracks from a playlist
+.PP
+\fBParameters:\fP
+.RS 4
+\fIplaylist\fP Playlist object 
+.br
+\fItracks\fP Array of pointer to track indices. A certain track index should be present at most once, e.g. [0, 1, 2] is valid indata, whereas [0, 1, 1] is invalid. 
+.br
+\fInum_tracks\fP Length of \fCtracks\fP array 
+.RE
+.PP
+
+.PP
+\fBExamples: \fP
+.in +1c
+\fBjukebox.c\fP.
+.SS "\fBsp_error\fP sp_playlist_rename (\fBsp_playlist\fP * playlist, const char * new_name)"
+.PP
+Rename the given playlist The name must not consist of only spaces and it must be shorter than 256 characters.
+.PP
+\fBParameters:\fP
+.RS 4
+\fIplaylist\fP Playlist object 
+.br
+\fInew_name\fP New name for playlist 
+.RE
+.PP
+
+.SS "\fBsp_error\fP sp_playlist_reorder_tracks (\fBsp_playlist\fP * playlist, const int * tracks, int num_tracks, int new_position)"
+.PP
+Move tracks in playlist
+.PP
+\fBParameters:\fP
+.RS 4
+\fIplaylist\fP Playlist object 
+.br
+\fItracks\fP Array of pointer to track indices to be moved. A certain track index should be present at most once, e.g. [0, 1, 2] is valid indata, whereas [0, 1, 1] is invalid. 
+.br
+\fInum_tracks\fP Length of \fCtracks\fP array 
+.br
+\fInew_position\fP New position for tracks 
+.RE
+.PP
+
+.SS "void sp_playlist_set_collaborative (\fBsp_playlist\fP * playlist, bool collaborative)"
+.PP
+Set collaborative status for a playlist.
+.PP
+A playlist in collaborative state can be modifed by all users, not only the user owning the list
+.PP
+\fBParameters:\fP
+.RS 4
+\fIplaylist\fP Playlist object 
+.br
+\fIcollaborative\fP True or false 
+.RE
+.PP
+
+.SS "\fBsp_track\fP* sp_playlist_track (\fBsp_playlist\fP * playlist, int index)"
+.PP
+Return the track at the given index in a playlist
+.PP
+\fBParameters:\fP
+.RS 4
+\fIplaylist\fP Playlist object 
+.br
+\fIindex\fP Index into playlist container. Should be in the interval [0, \fBsp_playlist_num_tracks()\fP - 1]
+.RE
+.PP
+\fBReturns:\fP
+.RS 4
+The track at the given index 
+.RE
+.PP
+
+.PP
+\fBExamples: \fP
+.in +1c
+\fBbrowse.c\fP, and \fBjukebox.c\fP.
+.SS "void sp_playlistcontainer_add_callbacks (\fBsp_playlistcontainer\fP * pc, \fBsp_playlistcontainer_callbacks\fP * callbacks, void * userdata)"
+.PP
+Register interest in changes to a playlist container
+.PP
+\fBParameters:\fP
+.RS 4
+\fIpc\fP Playlist container 
+.br
+\fIcallbacks\fP Callbacks, see \fBsp_playlistcontainer_callbacks\fP 
+.br
+\fIuserdata\fP Opaque value passed to callbacks.
+.RE
+.PP
+\fBSee also:\fP
+.RS 4
+\fBsp_session_playlistcontainer()\fP 
+.PP
+\fBsp_playlistcontainer_remove_callbacks\fP 
+.RE
+.PP
+
+.PP
+\fBExamples: \fP
+.in +1c
+\fBjukebox.c\fP.
+.SS "\fBsp_playlist\fP* sp_playlistcontainer_add_new_playlist (\fBsp_playlistcontainer\fP * pc, const char * name)"
+.PP
+Add an empty playlist at the end of the playlist container. The name must not consist of only spaces and it must be shorter than 256 characters.
+.PP
+\fBParameters:\fP
+.RS 4
+\fIpc\fP Playlist container 
+.br
+\fIname\fP Name of new playlist
+.RE
+.PP
+\fBReturns:\fP
+.RS 4
+Pointer to the new playlist. Can be NULL if the operation fails. 
+.RE
+.PP
+
+.SS "\fBsp_playlist\fP* sp_playlistcontainer_add_playlist (\fBsp_playlistcontainer\fP * pc, \fBsp_link\fP * link)"
+.PP
+Add an existing playlist at the end of the given playlist container
+.PP
+\fBParameters:\fP
+.RS 4
+\fIpc\fP Playlist container 
+.br
+\fIlink\fP Link object pointing to a playlist
+.RE
+.PP
+\fBReturns:\fP
+.RS 4
+Pointer to the new playlist. Will be NULL if the playlist already exists. 
+.RE
+.PP
+
+.SS "\fBsp_error\fP sp_playlistcontainer_move_playlist (\fBsp_playlistcontainer\fP * pc, int index, int new_position)"
+.PP
+Move a playlist in the playlist container
+.PP
+\fBParameters:\fP
+.RS 4
+\fIpc\fP Playlist container 
+.br
+\fIindex\fP Index of playlist to be moved 
+.br
+\fInew_position\fP New position for the playlist 
+.RE
+.PP
+
+.SS "int sp_playlistcontainer_num_playlists (\fBsp_playlistcontainer\fP * pc)"
+.PP
+Return the number of playlists in the given playlist container
+.PP
+\fBParameters:\fP
+.RS 4
+\fIpc\fP Playlist container
+.RE
+.PP
+\fBReturns:\fP
+.RS 4
+Number of playlists, -1 if undefined
+.RE
+.PP
+\fBSee also:\fP
+.RS 4
+\fBsp_session_playlistcontainer()\fP 
+.RE
+.PP
+
+.PP
+\fBExamples: \fP
+.in +1c
+\fBjukebox.c\fP.
+.SS "\fBsp_playlist\fP* sp_playlistcontainer_playlist (\fBsp_playlistcontainer\fP * pc, int index)"
+.PP
+Return a pointer to the playlist at a specific index
+.PP
+\fBParameters:\fP
+.RS 4
+\fIpc\fP Playlist container 
+.br
+\fIindex\fP Index in playlist container. Should be in the interval [0, \fBsp_playlistcontainer_num_playlists()\fP - 1]
+.RE
+.PP
+\fBReturns:\fP
+.RS 4
+Number of playlists.
+.RE
+.PP
+\fBSee also:\fP
+.RS 4
+\fBsp_session_playlistcontainer()\fP 
+.RE
+.PP
+
+.PP
+\fBExamples: \fP
+.in +1c
+\fBjukebox.c\fP.
+.SS "void sp_playlistcontainer_remove_callbacks (\fBsp_playlistcontainer\fP * pc, \fBsp_playlistcontainer_callbacks\fP * callbacks, void * userdata)"
+.PP
+Unregister interest in changes to a playlist container
+.PP
+\fBParameters:\fP
+.RS 4
+\fIpc\fP Playlist container 
+.br
+\fIcallbacks\fP Callbacks, see \fBsp_playlistcontainer_callbacks\fP 
+.br
+\fIuserdata\fP Opaque value passed to callbacks.
+.RE
+.PP
+\fBSee also:\fP
+.RS 4
+\fBsp_session_playlistcontainer()\fP 
+.PP
+\fBsp_playlistcontainer_add_callbacks\fP 
+.RE
+.PP
+
+.SS "\fBsp_error\fP sp_playlistcontainer_remove_playlist (\fBsp_playlistcontainer\fP * pc, int index)"
+.PP
+Remove playlist at index from the given playlist container
+.PP
+\fBParameters:\fP
+.RS 4
+\fIpc\fP Playlist container 
+.br
+\fIindex\fP Index of playlist to be removed 
+.RE
+.PP
+

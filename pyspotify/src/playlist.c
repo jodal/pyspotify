@@ -42,9 +42,169 @@ static PyObject *Playlist_is_loaded(Playlist *self) {
     return Py_BuildValue("i", sp_playlist_is_loaded(self->_playlist));
 }
 
-static PyObject *Playlist_add_callbacks(Playlist *self, PyObject *args) {
-    PyErr_SetString(PyExc_NotImplementedError, "");
-    return NULL;
+static PyObject *Playlist_remove_tracks(Playlist *self, PyObject *args) {
+    PyObject *py_tracks;
+    PyObject *item;
+    sp_error err;
+    int *tracks;
+    int num_tracks;
+    int playlist_length;
+    int i;
+
+    if(!PyArg_ParseTuple(args, "O", &py_tracks))
+        return NULL;
+    if (!PySequence_Check(py_tracks)) {
+        PyErr_SetString(PyExc_TypeError, "expected sequence");
+        return NULL;
+    }
+    num_tracks = PySequence_Size(py_tracks);
+    tracks = (int *) malloc(sizeof(tracks)*num_tracks);
+    playlist_length = sp_playlist_num_tracks(self->_playlist);
+    for (i = 0; i < num_tracks; i++) {
+        item = PySequence_GetItem(py_tracks, i);
+        if (!PyInt_Check(item)) {
+            free(tracks);
+            PyErr_SetString(PyExc_TypeError, "expected sequence of integers");
+            return NULL;
+        }
+        tracks[i] = (int)PyInt_AsLong(item);
+        if (tracks[i] > playlist_length) {
+            PyErr_SetString(PyExc_IndexError, "specified track does not exist");
+            return NULL;
+        }
+        Py_DECREF(item);
+    }
+    Py_BEGIN_ALLOW_THREADS
+    err = sp_playlist_remove_tracks(self->_playlist, tracks, num_tracks);
+    Py_END_ALLOW_THREADS
+    return handle_error(err);
+}
+
+typedef struct {
+    PyObject *callback;
+    PyObject *userdata;
+} playlist_callback_trampoline;
+
+static PyObject *Playlist__add_callback(Playlist *self, PyObject *args, sp_playlist_callbacks pl_callbacks) {
+    PyObject *callback;
+    PyObject *userdata = NULL;
+    playlist_callback_trampoline *tramp;
+    if(!PyArg_ParseTuple(args, "O|O", &callback, &userdata))
+        return NULL;
+    if (userdata == NULL) {
+        userdata = (PyObject *)Py_None;
+        Py_INCREF(Py_None);
+    }
+    Py_INCREF(callback);
+    Py_INCREF(userdata);
+    tramp = malloc(sizeof(playlist_callback_trampoline));
+    tramp->userdata = userdata;
+    tramp->callback = callback;
+    Py_BEGIN_ALLOW_THREADS
+    sp_playlist_add_callbacks(self->_playlist, &pl_callbacks, tramp);
+    Py_END_ALLOW_THREADS
+    Py_INCREF(Py_None);
+    return Py_None;
+}
+
+void playlist_tracks_added_callback(sp_playlist *playlist, sp_track *const *tracks, int num_tracks, int position, void *userdata) {
+    playlist_callback_trampoline *tramp = (playlist_callback_trampoline *)userdata;
+    PyGILState_STATE gstate;
+    PyObject *py_tracks = PyList_New(num_tracks);
+    int i;
+    for (i = 0; i < num_tracks; i++) {
+        Track *t = (Track *)PyObject_CallObject((PyObject *)&TrackType, NULL);
+        t->_track = tracks[i];
+        PyList_SetItem(py_tracks, i, (PyObject *)t);
+    }
+    gstate = PyGILState_Ensure();
+    Playlist *p = (Playlist *)PyObject_CallObject((PyObject *)&PlaylistType, NULL);
+    p->_playlist = playlist;
+    Py_INCREF(p);
+    PyObject_CallFunctionObjArgs(
+        tramp->callback,
+        p,
+        py_tracks,
+        Py_BuildValue("i", num_tracks),
+        Py_BuildValue("i", position),
+        tramp->userdata,
+        NULL
+    );
+    Py_DECREF(py_tracks);
+    Py_DECREF(p);
+    PyGILState_Release(gstate);
+}
+
+static PyObject *Playlist_add_tracks_added_callback(Playlist *self, PyObject *args) {
+    sp_playlist_callbacks pl_callbacks = {
+        .tracks_added = &playlist_tracks_added_callback
+    };
+    return Playlist__add_callback(self, args, pl_callbacks);
+}
+
+void playlist_tracks_removed_callback(sp_playlist *playlist, const int *tracks, int num_tracks, void *userdata) {
+    playlist_callback_trampoline *tramp = (playlist_callback_trampoline *)userdata;
+    PyGILState_STATE gstate;
+    PyObject *py_tracks = PyList_New(num_tracks);
+    int i;
+    for (i = 0; i < num_tracks; i++) {
+        PyList_SetItem(py_tracks, i, Py_BuildValue("i", tracks[i]));
+    }
+    gstate = PyGILState_Ensure();
+    Playlist *p = (Playlist *)PyObject_CallObject((PyObject *)&PlaylistType, NULL);
+    p->_playlist = playlist;
+    Py_INCREF(p);
+    PyObject_CallFunctionObjArgs(
+        tramp->callback,
+        p,
+        py_tracks,
+        Py_BuildValue("i", num_tracks),
+        tramp->userdata,
+        NULL
+    );
+    Py_DECREF(py_tracks);
+    Py_DECREF(p);
+    PyGILState_Release(gstate);
+}
+
+static PyObject *Playlist_add_tracks_removed_callback(Playlist *self, PyObject *args) {
+    sp_playlist_callbacks pl_callbacks = {
+        .tracks_removed = &playlist_tracks_removed_callback
+    };
+    return Playlist__add_callback(self, args, pl_callbacks);
+}
+
+void playlist_tracks_moved_callback(sp_playlist *playlist, const int *tracks, int num_tracks, int new_position, void *userdata) {
+    playlist_callback_trampoline *tramp = (playlist_callback_trampoline *)userdata;
+    PyGILState_STATE gstate;
+    PyObject *py_tracks = PyList_New(num_tracks);
+    int i;
+    for (i = 0; i < num_tracks; i++) {
+        PyList_SetItem(py_tracks, i, Py_BuildValue("i", tracks[i]));
+    }
+    gstate = PyGILState_Ensure();
+    Playlist *p = (Playlist *)PyObject_CallObject((PyObject *)&PlaylistType, NULL);
+    p->_playlist = playlist;
+    Py_INCREF(p);
+    PyObject_CallFunctionObjArgs(
+        tramp->callback,
+        p,
+        py_tracks,
+        Py_BuildValue("i", num_tracks),
+        Py_BuildValue("i", new_position),
+        tramp->userdata,
+        NULL
+    );
+    Py_DECREF(py_tracks);
+    Py_DECREF(p);
+    PyGILState_Release(gstate);
+}
+
+static PyObject *Playlist_add_tracks_moved_callback(Playlist *self, PyObject *args) {
+    sp_playlist_callbacks pl_callbacks = {
+        .tracks_moved = &playlist_tracks_moved_callback
+    };
+    return Playlist__add_callback(self, args, pl_callbacks);
 }
 
 static PyObject *Playlist_remove_callbacks(Playlist *self, PyObject *args) {
@@ -68,8 +228,7 @@ static PyObject *Playlist_owner(Playlist *self) {
 }
 
 static PyObject *Playlist_is_collaborative(Playlist *self) {
-    PyErr_SetString(PyExc_NotImplementedError, "");
-    return NULL;
+    return Py_BuildValue("i", sp_playlist_is_collaborative(self->_playlist));
 }
 
 static PyObject *Playlist_set_collaborative(Playlist *self, PyObject *args) {
@@ -115,6 +274,26 @@ static PyMethodDef Playlist_methods[] = {
      (PyCFunction)Playlist_is_loaded,
      METH_NOARGS,
      "True if this playlist has been loaded by the client"},
+    {"is_collaborative",
+     (PyCFunction)Playlist_is_collaborative,
+     METH_NOARGS,
+     "Return collaborative status for a playlist. A playlist in collaborative state can be modifed by all users, not only the user owning the list"},
+    {"remove_tracks",
+     (PyCFunction)Playlist_remove_tracks,
+     METH_VARARGS,
+     "Remove tracks from a playlist"},
+    {"add_tracks_added_callback",
+     (PyCFunction)Playlist_add_tracks_added_callback,
+     METH_VARARGS,
+     ""},
+    {"add_tracks_removed_callback",
+     (PyCFunction)Playlist_add_tracks_removed_callback,
+     METH_VARARGS,
+     ""},
+    {"add_tracks_moved_callback",
+     (PyCFunction)Playlist_add_tracks_moved_callback,
+     METH_VARARGS,
+     ""},
     {"name",
      (PyCFunction)Playlist_name,
      METH_NOARGS,

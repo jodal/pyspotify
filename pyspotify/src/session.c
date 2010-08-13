@@ -128,6 +128,17 @@ static PyObject *Session_load(Session *self, PyObject *args) {
     return handle_error(err);
 }
 
+static PyObject *Session_seek(Session *self, PyObject *args) {
+    int seek;
+    sp_error err;
+    if(!PyArg_ParseTuple(args, "i", &seek))
+	return NULL;
+    Py_BEGIN_ALLOW_THREADS
+    err = sp_session_player_seek(self->_session, seek);
+    Py_END_ALLOW_THREADS
+    return handle_error(err);
+}
+
 static PyObject *Session_play(Session *self, PyObject *args) {
     int play;
     sp_error err;
@@ -215,6 +226,7 @@ static PyMethodDef Session_methods[] = {
     {"logout", (PyCFunction)Session_logout, METH_NOARGS, "Logout from the session and terminate the main loop"},
     {"process_events", (PyCFunction)Session_process_events, METH_NOARGS, "Process any outstanding events"},
     {"load", (PyCFunction)Session_load, METH_VARARGS, "Load the specified track on the player"},
+    {"seek", (PyCFunction)Session_seek, METH_VARARGS, "Seek the currently loaded track"},
     {"play", (PyCFunction)Session_play, METH_VARARGS, "Play or pause the currently loaded track"},
     {"playlist_container", (PyCFunction)Session_playlist_container, METH_NOARGS, "Return the playlist container for the currently logged in user"},
     {"search", (PyCFunctionWithKeywords)Session_search, METH_KEYWORDS, "Conduct a search, calling the callback when results are available"},

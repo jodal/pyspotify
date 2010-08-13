@@ -56,6 +56,7 @@ class TestSession(unittest.TestCase):
             def logged_in(self, session, error):
                 track = mock_track("foo", 0, mock_album("bar", mock_artist("baz", 1), 0, "", 0), 0, 0, 0, 0, 0, 1)
                 session.load(track)
+                session.seek(40000)
                 session.play(True)
                 session.logout()
                 self.disconnect()

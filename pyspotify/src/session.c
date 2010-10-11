@@ -177,7 +177,7 @@ void search_complete(sp_search *search, search_trampoline *st) {
 static PyObject *Session_search(Session *self, PyObject *args, PyObject *kwds) {
     char *query;
     sp_search *search;
-    PyObject *callback, *userdata;
+    PyObject *callback, *userdata = NULL;
     int track_offset=0, track_count=32,
         album_offset=0, album_count=32,
 	artist_offset=0, artist_count=32;
@@ -190,7 +190,8 @@ static PyObject *Session_search(Session *self, PyObject *args, PyObject *kwds) {
     PyArg_ParseTupleAndKeywords(args, kwds, "sO|iiiiiiO", kwlist, &query, &callback,
 				&track_offset, &track_count, &album_offset, &album_count,
 				&artist_offset, &artist_count, &userdata);
-    Py_INCREF(userdata);
+    if (userdata != NULL)
+        Py_INCREF(userdata);
     Py_INCREF(callback);
     st = malloc(sizeof(search_trampoline));
     st->userdata = userdata;

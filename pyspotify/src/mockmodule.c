@@ -168,7 +168,7 @@ sp_playlistcontainer *sp_session_playlistcontainer(sp_session *session) {
     return _mock_playlistcontainer();
 }
 
-sp_error sp_session_init(const sp_session_config *config, sp_session **sess) {
+sp_error sp_session_create(const sp_session_config *config, sp_session **sess) {
     if(strcmp(config->application_key, "appkey_good"))
         return SP_ERROR_BAD_APPLICATION_KEY;
     g_data.config.cache_location = malloc(strlen(config->cache_location) + 1);
@@ -217,6 +217,10 @@ sp_error sp_session_player_seek(sp_session *session, int offset) {
 
 sp_error sp_session_player_play(sp_session *session, bool b) {
     return 0;
+}
+
+bool sp_track_is_available(sp_session *session, sp_track *t) {
+    return 1;
 }
 
 /********************************* MOCK SEARCH FUNCTIONS *********************************/
@@ -387,10 +391,6 @@ bool sp_track_is_loaded(sp_track *t) {
 
 const char *sp_track_name (sp_track *track) {
     return track->name;
-}
-
-bool sp_track_is_available(sp_track *t) {
-    return 1;
 }
 
 int sp_track_num_artists(sp_track *t) {

@@ -45,10 +45,6 @@ static PyObject *Track_is_loaded(Track *self) {
     return Py_BuildValue("i", sp_track_is_loaded(self->_track));
 }
 
-static PyObject *Track_is_available(Track *self) {
-    return Py_BuildValue("i", sp_track_is_available(self->_track));
-}
-
 static PyObject *Track_artists(Track *self, PyObject *args) {
     int count = sp_track_num_artists(self->_track);
     PyObject *l = PyList_New(count);
@@ -97,10 +93,6 @@ static PyMethodDef Track_methods[] = {
      (PyCFunction)Track_is_loaded,
      METH_NOARGS,
      "Get load status for this track. If the track is not loaded yet, all other functions operating on the track return default values."},
-    {"is_available",
-     (PyCFunction)Track_is_available,
-     METH_NOARGS,
-     "Return true if the track is available for playback."},
     {"artists",
      (PyCFunction)Track_artists,
      METH_VARARGS,

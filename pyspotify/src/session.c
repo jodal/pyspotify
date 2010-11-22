@@ -548,7 +548,7 @@ PyObject *session_connect(PyObject *self, PyObject *args) {
 #ifdef DEBUG
     fprintf(stderr, "Calling sp_session_init\n");
 #endif
-    error = sp_session_init(&config, &session);
+    error = sp_session_create(&config, &session);
 #ifdef DEBUG
     fprintf(stderr, "Returned from sp_session_init\n");
 #endif

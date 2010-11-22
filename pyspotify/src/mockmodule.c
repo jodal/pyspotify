@@ -219,6 +219,10 @@ sp_error sp_session_player_play(sp_session *session, bool b) {
     return 0;
 }
 
+bool sp_track_is_available(sp_session *session, sp_track *t) {
+    return 1;
+}
+
 /********************************* MOCK SEARCH FUNCTIONS *********************************/
 
 sp_search *sp_search_create(sp_session *session, const char *query, int track_offset, int track_count, int album_offset, int album_count, int artist_offset, int artist_count, search_complete_cb *callback, void *userdata) {
@@ -387,10 +391,6 @@ bool sp_track_is_loaded(sp_track *t) {
 
 const char *sp_track_name (sp_track *track) {
     return track->name;
-}
-
-bool sp_track_is_available(sp_track *t) {
-    return 1;
 }
 
 int sp_track_num_artists(sp_track *t) {

@@ -1,16 +1,10 @@
-libspotify and pyspotify
-========================
+pyspotify
+=========
 
-If you are using Ubuntu Karmic 64-bit, then the easiest way to use these packages is to add::
+pyspotify is the Python bindings for libspotify.
 
-    deb http://squealserver.com/ubuntu karmic multiverse
+This is not the original version of pyspotify, as made by `winjer
+<http://github.com/winjer/>`_, but an updated version
+for use with `Mopidy <http://www.mopidy.com/>`_.
 
-To your /etc/apt/sources.list
-
-and then::
-
-    sudo aptitude update
-    sudo aptitude install python-spotify
-
-
-
+Please see the Mopidy web site for further information on pyspotify.

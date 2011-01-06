@@ -1,5 +1,17 @@
-pyspotify 
+pyspotify
 =========
+
+pyspotify is the Python bindings for libspotify.
+
+This is not the original version of pyspotify, as made by `winjer
+<http://github.com/winjer/>`_, but an updated version
+for use with `Mopidy <http://www.mopidy.com/>`_.
+
+Please see the Mopidy web site for further information on pyspotify.
+
+
+Upstream notes
+==============
 
 Copyright 2009-10 Doug Winter
 All rights reserved
@@ -46,4 +58,3 @@ Trying it out
 Included with this is a simple program, jukebox.py.  Run this with your
 credentials and access to an API key, and it will let you browse and play from
 your playlists, conduct searches and play from spotify URIs.
-

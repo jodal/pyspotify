@@ -1,0 +1,10 @@
+=========
+Changelog
+=========
+
+Version 1.2
+===========
+
+ * Applied patch from knutz3n to add seek support
+ * Applied patch from jodal to relocate osssupport
+

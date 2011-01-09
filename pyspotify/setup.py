@@ -19,9 +19,9 @@ use_setuptools()
 from setuptools import setup, find_packages, Extension
 
 setup(name='pyspotify',
-      version='1.1',
+      version='1.2',
       description='Python wrapper for libspotify',
-      long_description= open("README.rst").read(),
+      long_description= open("README.rst").read() + open("CHANGELOG.txt").read(),
       author='Doug Winter',
       author_email='doug.winter@isotoma.com',
       url='http://pypi.python.org/pypi/spotify',

@@ -121,7 +121,7 @@ static PyObject *Link_from_playlist(Link *self, PyObject *args) {
 	return NULL;
     sp_link *link = sp_link_create_from_playlist(playlist->_playlist);
     if(!link) {
-	PyErr_SetString(SpotifyError, "Failed to get link from an album");
+	PyErr_SetString(SpotifyError, "Failed to get link from a playlist");
 	return NULL;
     }
     Link *plink = (Link *)PyObject_CallObject((PyObject *)&LinkType, NULL);

@@ -220,6 +220,13 @@ PyObject *Session_image_create(Session *self, PyObject *args) {
     return (PyObject *)i;
 }
 
+static void Session_set_preferred_bitrate(Session *self, PyObject *args) {
+    const int bitrate;
+    if(!PyArg_ParseTuple(args, "i", &bitrate))
+	return NULL;
+    sp_session_preferred_bitrate(self->_session, bitrate);
+}
+
 static PyMethodDef Session_methods[] = {
     {"username", (PyCFunction)Session_username, METH_NOARGS, "Return the canonical username for the logged in user"},
     {"display_name", (PyCFunction)Session_display_name, METH_NOARGS, "Return the full name for the logged in user"},
@@ -232,6 +239,7 @@ static PyMethodDef Session_methods[] = {
     {"playlist_container", (PyCFunction)Session_playlist_container, METH_NOARGS, "Return the playlist container for the currently logged in user"},
     {"search", (PyCFunctionWithKeywords)Session_search, METH_KEYWORDS, "Conduct a search, calling the callback when results are available"},
     {"image_create", (PyCFunction)Session_image_create, METH_VARARGS, "Create an image of album cover art"},
+    {"set_preferred_bitrate", (PyCFunction)Session_set_preferred_bitrate, METH_VARARGS, "Set the preferred bitrate of the audio stream. 0 = 160k, 1 = 320k"},
     {NULL}
 };
 

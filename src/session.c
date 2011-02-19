@@ -78,14 +78,9 @@ static PyObject *Session_user_is_loaded(Session *self) {
 };
 
 static PyObject *Session_logout(Session *self) {
-    sp_error error;
     Py_BEGIN_ALLOW_THREADS
-    error = sp_session_logout(self->_session);
+    sp_session_logout(self->_session);
     Py_END_ALLOW_THREADS
-    if(error != SP_ERROR_OK) {
-	PyErr_SetString(SpotifyError, "Failed to log out");
-        return NULL;
-    }
     Py_INCREF(Py_None);
     return Py_None;
 };
@@ -130,13 +125,13 @@ static PyObject *Session_load(Session *self, PyObject *args) {
 
 static PyObject *Session_seek(Session *self, PyObject *args) {
     int seek;
-    sp_error err;
     if(!PyArg_ParseTuple(args, "i", &seek))
 	return NULL;
     Py_BEGIN_ALLOW_THREADS
-    err = sp_session_player_seek(self->_session, seek);
+    sp_session_player_seek(self->_session, seek);
     Py_END_ALLOW_THREADS
-    return handle_error(err);
+    Py_INCREF(Py_None);
+    return Py_None;
 }
 
 static PyObject *Track_is_available(Session *self, PyObject *args) {
@@ -149,13 +144,13 @@ static PyObject *Track_is_available(Session *self, PyObject *args) {
 
 static PyObject *Session_play(Session *self, PyObject *args) {
     int play;
-    sp_error err;
     if(!PyArg_ParseTuple(args, "i", &play))
 	return NULL;
     Py_BEGIN_ALLOW_THREADS
-    err = sp_session_player_play(self->_session, play);
+    sp_session_player_play(self->_session, play);
     Py_END_ALLOW_THREADS
-    return handle_error(err);
+    Py_INCREF(Py_None);
+    return Py_None;
 }
 
 static PyObject *Session_process_events(Session *self) {
@@ -577,12 +572,8 @@ PyObject *session_connect(PyObject *self, PyObject *args) {
         return NULL;
     }
     Py_BEGIN_ALLOW_THREADS
-    error = sp_session_login(session, username, password);
+    sp_session_login(session, username, password);
     Py_END_ALLOW_THREADS
-    if(error != SP_ERROR_OK) {
-	PyErr_SetString(SpotifyError, sp_error_message(error));
-        return NULL;
-    }
     Session *psession = (Session *)PyObject_CallObject((PyObject *)&SessionType, NULL);
     Py_INCREF(psession);
     psession->_session = session;

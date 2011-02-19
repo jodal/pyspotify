@@ -142,16 +142,14 @@ int events = 0;
 
 /***************************** MOCK SESSION FUNCTIONS **************************/
 
-sp_error sp_session_login(sp_session *session, const char *username, const char *password) {
+void sp_session_login(sp_session *session, const char *username, const char *password) {
     strcpy(g_data.username, username);
     strcpy(g_data.password, password);
     eventq[events++] = MOCK_LOGGED_IN;
-    return SP_ERROR_OK;
 }
 
-sp_error sp_session_logout(sp_session *session) {
+void sp_session_logout(sp_session *session) {
     eventq[events++] = MOCK_LOGGED_OUT;
-    return SP_ERROR_OK;
 }
 
 const char* sp_error_message(sp_error error) {
@@ -211,12 +209,10 @@ sp_error sp_session_player_load(sp_session *session, sp_track *track) {
     return 0;
 }
 
-sp_error sp_session_player_seek(sp_session *session, int offset) {
-    return 0;
+void sp_session_player_seek(sp_session *session, int offset) {
 }
 
-sp_error sp_session_player_play(sp_session *session, bool b) {
-    return 0;
+void sp_session_player_play(sp_session *session, bool b) {
 }
 
 bool sp_track_is_available(sp_session *session, sp_track *t) {

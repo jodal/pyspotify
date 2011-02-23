@@ -114,6 +114,8 @@ typedef enum sp_error {
 	SP_ERROR_NO_STREAM_AVAILABLE       = 18, ///< Could not find any suitable stream to play
 	SP_ERROR_PERMISSION_DENIED         = 19, ///< Requested operation is not allowed
 	SP_ERROR_INBOX_IS_FULL             = 20, ///< Target inbox is full
+	SP_ERROR_NO_CACHE                  = 21, ///< Cache is not enabled
+	SP_ERROR_NO_SUCH_USER              = 22, ///< Requested user does not exist
 } sp_error;
 
 /**
@@ -145,7 +147,7 @@ SP_LIBEXPORT(const char*) sp_error_message(sp_error error);
  * returned from sp_session_create(). Future versions of the library will provide you with some kind of mechanism
  * to request an updated version of the library.
  */
-#define SPOTIFY_API_VERSION 6
+#define SPOTIFY_API_VERSION 7
 
 /**
  * Describes the current state of the connection
@@ -193,12 +195,21 @@ typedef enum sp_playlist_type {
 } sp_playlist_type;
 
 /**
- * Bitrate definitions for music streaming
+ * Buffer stats used by get_audio_buffer_stats callback
  */
 typedef struct sp_audio_buffer_stats {
 	int samples;                      ///< Samples in buffer
 	int stutter;                      ///< Number of stutters (audio dropouts) since last query
 } sp_audio_buffer_stats;
+
+/**
+ * List of subscribers returned by sp_playlist_subscribers()
+ */
+typedef struct sp_subscribers {
+	unsigned int count;
+	char *subscribers[1];  ///< Actual size is 'count'. Array of pointers to canonical usernames
+} sp_subscribers;
+
 
 /**
  * Session callbacks
@@ -212,7 +223,15 @@ typedef struct sp_session_callbacks {
 	 * Called when login has been processed and was successful
 	 *
 	 * @param[in]  session    Session
-	 * @param[in]  error      Error code ::sp_error
+	 * @param[in]  error      One of the following errors, from ::sp_error
+	 *                        SP_ERROR_OK
+	 *                        SP_ERROR_CLIENT_TOO_OLD
+	 *                        SP_ERROR_UNABLE_TO_CONTACT_SERVER
+	 *                        SP_ERROR_BAD_USERNAME_OR_PASSWORD
+	 *                        SP_ERROR_USER_BANNED
+	 *                        SP_ERROR_USER_NEEDS_PREMIUM
+	 *                        SP_ERROR_OTHER_TRANSIENT
+	 *                        SP_ERROR_OTHER_PERMANENT
 	 */
 	void (SP_CALLCONV *logged_in)(sp_session *session, sp_error error);
 
@@ -242,7 +261,15 @@ typedef struct sp_session_callbacks {
 	 *
 	 *
 	 * @param[in]  session    Session
-	 * @param[in]  error      Status code ::sp_error
+	 * @param[in]  error      One of the following errors, from ::sp_error
+	 *                        SP_ERROR_OK
+	 *                        SP_ERROR_CLIENT_TOO_OLD
+	 *                        SP_ERROR_UNABLE_TO_CONTACT_SERVER
+	 *                        SP_ERROR_BAD_USERNAME_OR_PASSWORD
+	 *                        SP_ERROR_USER_BANNED
+	 *                        SP_ERROR_USER_NEEDS_PREMIUM
+	 *                        SP_ERROR_OTHER_TRANSIENT
+	 *                        SP_ERROR_OTHER_PERMANENT
 	 */
 	void (SP_CALLCONV *connection_error)(sp_session *session, sp_error error);
 
@@ -324,7 +351,10 @@ typedef struct sp_session_callbacks {
 	 * @note This function is invoked from the main thread
 	 *
 	 * @param[in]  session    Session
-	 * @param[in]  errro      Error code describing the error
+	 * @param[in]  error      One of the following errors, from ::sp_error
+	 *                        SP_ERROR_NO_STREAM_AVAILABLE
+	 *                        SP_ERROR_OTHER_TRANSIENT
+	 *                        SP_ERROR_OTHER_PERMANENT
 	 */
 	void (SP_CALLCONV *streaming_error)(sp_session *session, sp_error error);
 
@@ -390,13 +420,30 @@ typedef struct sp_session_config {
 						*/
 	const void *application_key;           ///< Your application key
 	size_t application_key_size;           ///< The size of the application key in bytes
-	const char *user_agent;                ///< "User-Agent" for your application - max 255 characters long
+	const char *user_agent;                /**< "User-Agent" for your application - max 255 characters long
+						     The User-Agent should be a relevant, customer facing identification of your application
+					       */
+
 	const sp_session_callbacks *callbacks; ///< Delivery callbacks for session events, or NULL if you are not interested in any callbacks (not recommended!)
 	void *userdata;                        ///< User supplied data for your application
 
-	bool tiny_settings;                    /**< Try to reduce the amount of data stored in the metadata
-						*   cache without affecting the user experience too much.
-						*/
+	/**
+	 * Compress local copy of playlists, reduces disk space usage
+	 */
+	bool compress_playlists;
+
+	/**
+	 * Don't save metadata for local copies of playlists
+	 * Reduces disk space usage at the expence of needing
+	 * to request metadata from Spotify backend when loading list
+	 */
+	bool dont_save_metadata_for_playlists;
+
+	/**
+	 * Avoid loading playlists into RAM on startup. 
+	 * See sp_playlist_is_in_ram() for more details.
+	 */
+	bool initially_unload_playlists;
 } sp_session_config;
 
 /**
@@ -411,7 +458,12 @@ typedef struct sp_session_config {
  * @param[in]   config    The configuration to use for the session
  * @param[out]  sess      If successful, a new session - otherwise NULL
  *
- * @return                Error code ::sp_error
+ * @return                One of the following errors, from ::sp_error
+ *                        SP_ERROR_OK
+ *                        SP_ERROR_BAD_API_VERSION
+ *                        SP_ERROR_BAD_USER_AGENT
+ *                        SP_ERROR_BAD_APPLICATION_KEY
+ *                        SP_ERROR_API_INITIALIZATION_FAILED
  */
 SP_LIBEXPORT(sp_error) sp_session_create(const sp_session_config *config, sp_session **sess);
 
@@ -435,9 +487,8 @@ SP_LIBEXPORT(void) sp_session_release(sp_session *sess);
  * @param[in]   username   The username to log in
  * @param[in]   password   The password for the specified username
  *
- * @return                 Result of the operation
  */
-SP_LIBEXPORT(sp_error) sp_session_login(sp_session *session, const char *username, const char *password);
+SP_LIBEXPORT(void) sp_session_login(sp_session *session, const char *username, const char *password);
 
 /**
  * Fetches the currently logged in user
@@ -455,10 +506,8 @@ SP_LIBEXPORT(sp_user *) sp_session_user(sp_session *session);
  * logged in. Otherwise, the settings and cache may be lost.
  *
  * @param[in]   session    Your session object
- *
- * @return                 Result of the operation
  */
-SP_LIBEXPORT(sp_error) sp_session_logout(sp_session *session);
+SP_LIBEXPORT(void) sp_session_logout(sp_session *session);
 
 /**
  * The connection state of the specified session.
@@ -506,7 +555,12 @@ SP_LIBEXPORT(void) sp_session_process_events(sp_session *session, int *next_time
  * @param[in]   session    Your session object
  * @param[in]   track      The track to be loaded
  *
- * @return                 The result of the operation - see the ::sp_error enum for possible values
+ * @return                 One of the following errors, from ::sp_error
+ *                         SP_ERROR_OK
+ *                         SP_ERROR_MISSING_CALLBACK
+ *                         SP_ERROR_RESOURCE_NOT_LOADED
+ *                         SP_ERROR_TRACK_NOT_PLAYABLE
+ * 
  */
 SP_LIBEXPORT(sp_error) sp_session_player_load(sp_session *session, sp_track *track);
 
@@ -516,9 +570,8 @@ SP_LIBEXPORT(sp_error) sp_session_player_load(sp_session *session, sp_track *tra
  * @param[in]   session    Your session object
  * @param[in]   offset     Track position, in milliseconds.
  *
- * @return                 The result of the operation - see the ::sp_error enum for possible values
  */
-SP_LIBEXPORT(sp_error) sp_session_player_seek(sp_session *session, int offset);
+SP_LIBEXPORT(void) sp_session_player_seek(sp_session *session, int offset);
 
 /**
  * Play or pause the currently loaded track
@@ -526,9 +579,8 @@ SP_LIBEXPORT(sp_error) sp_session_player_seek(sp_session *session, int offset);
  * @param[in]   session    Your session object
  * @param[in]   play       If set to true, playback will occur. If set to false, the playback will be paused.
  *
- * @return                 The result of the operation - see the ::sp_error enum for possible values
  */
-SP_LIBEXPORT(sp_error) sp_session_player_play(sp_session *session, bool play);
+SP_LIBEXPORT(void) sp_session_player_play(sp_session *session, bool play);
 
 /**
  * Stops the currently playing track
@@ -550,7 +602,9 @@ SP_LIBEXPORT(void) sp_session_player_unload(sp_session *session);
  * @param[in]   session    Your session object
  * @param[in]   track      The track to be prefetched
  *
- * @return                 The result of the operation - see the ::sp_error enum for possible values
+ * @return                 One of the following errors, from ::sp_error
+ *                         SP_ERROR_NO_CACHE
+ *                         SP_ERROR_OK
  *
  * @note Prefetching is only possible if a cache is configured
  *
@@ -598,32 +652,22 @@ SP_LIBEXPORT(sp_playlist *) sp_session_starred_create(sp_session *session);
  * @note You need to release the playlist when you are done with it.
  * @see sp_playlist_release()
  */
-SP_LIBEXPORT(sp_playlist *) sp_session_starred_for_user_create(sp_session *session, const char *username);
+SP_LIBEXPORT(sp_playlist *) sp_session_starred_for_user_create(sp_session *session, const char *canonical_username);
 
 /**
  * Return the published container for a given @a canonical_username,
  * or the currently logged in user if @a canonical_username is NULL.
  *
- * The container can be released when you're done with it, using
- * sp_session_publishedcontainer_fo_user_release(), or it will be
- * released when calling sp_session_logout().
- *
- * Subsequent requests for a published container will return the same
- * object, unless it has been released previously.
+ * When done with the list you should call sp_playlistconatiner_release() to 
+ * decrese the reference you own by having created it.
  *
  * @param[in]   session    Your session object.
- * @param[in]   username   The canonical username, or NULL.
+ * @param[in]   canonical_username   The canonical username, or NULL.
  *
  * @return Playlist container object, NULL if not logged in or not found.
  */
-SP_LIBEXPORT(sp_playlistcontainer *) sp_session_publishedcontainer_for_user(sp_session *session, const char *canonical_username);
+SP_LIBEXPORT(sp_playlistcontainer *) sp_session_publishedcontainer_for_user_create(sp_session *session, const char *canonical_username);
 
-/**
- * Releases the playlistcontainer for @a canonical_username.
- *
- * @param[in]  canonical_username       Canonical username
- */
-SP_LIBEXPORT(void) sp_session_publishedcontainer_for_user_release(sp_session *session, const char *canonical_username);
 
 /**
  * Set preferred bitrate for music streaming
@@ -753,6 +797,11 @@ SP_LIBEXPORT(sp_link *) sp_link_create_from_search(sp_search *search);
  *
  * @note You need to release the link when you are done with it.
  * @see sp_link_release()
+ *
+ * @note Due to reasons in the playlist backend design and the Spotify URI
+ * scheme you need to wait for the playlist to be loaded before you can
+ * successfully construct an URI. If sp_link_create_from_playlist() returns
+ * NULL, try again after teh playlist_state_changed callback has fired.
  */
 SP_LIBEXPORT(sp_link *) sp_link_create_from_playlist(sp_playlist *playlist);
 
@@ -869,12 +918,13 @@ SP_LIBEXPORT(void) sp_link_release(sp_link *link);
  */
 
 /**
- * Get load status for the specified track. If the track is not loaded yet,
- * all other functions operating on the track return default values.
+ * Return whether or not the track metadata is loaded.
  *
- * @param[in]   track      The track whose load status you are interested in
+ * @param[in]   track      The track
  *
- * @return                 True if track is loaded, otherwise false
+ * @return                 True if track is loaded
+ *
+ * @note  This is equivivalent to checking if sp_track_error() not returns SP_ERROR_IS_LOADING.
  */
 SP_LIBEXPORT(bool) sp_track_is_loaded(sp_track *track);
 
@@ -883,7 +933,10 @@ SP_LIBEXPORT(bool) sp_track_is_loaded(sp_track *track);
  *
  * @param[in]   track      The track
  *
- * @return                 Error code
+ * @return                 One of the following errors, from ::sp_error
+ *                         SP_ERROR_OK
+ *                         SP_ERROR_IS_LOADING
+ *                         SP_ERROR_OTHER_PERMANENT
  */
 SP_LIBEXPORT(sp_error) sp_track_error(sp_track *track);
 
@@ -1043,7 +1096,7 @@ SP_LIBEXPORT(int) sp_track_index(sp_track *track);
  * @param[in]   artist     Name of the artist
  * @param[in]   title      Song title
  * @param[in]   album      Name of the album, or an empty string if not available
- * @param[in]   title      Length in MS, or -1 if not available.
+ * @param[in]   length      Length in MS, or -1 if not available.
  *
  * @return                 A track.
  */
@@ -1269,7 +1322,11 @@ SP_LIBEXPORT(bool) sp_albumbrowse_is_loaded(sp_albumbrowse *alb);
 *
 * @param[in]   alb        Album browse object
 *
-* @return                 Error code
+* @return                 One of the following errors, from ::sp_error
+*                         SP_ERROR_OK
+*                         SP_ERROR_IS_LOADING
+*                         SP_ERROR_OTHER_PERMANENT
+*                         SP_ERROR_OTHER_TRANSIENT
 */
 SP_LIBEXPORT(sp_error) sp_albumbrowse_error(sp_albumbrowse *alb);
 
@@ -1416,7 +1473,11 @@ SP_LIBEXPORT(bool) sp_artistbrowse_is_loaded(sp_artistbrowse *arb);
 *
 * @param[in]   arb        Artist browse object
 *
-* @return                 Error code
+* @return                 One of the following errors, from ::sp_error
+*                         SP_ERROR_OK
+*                         SP_ERROR_IS_LOADING
+*                         SP_ERROR_OTHER_PERMANENT
+*                         SP_ERROR_OTHER_TRANSIENT
 */
 SP_LIBEXPORT(sp_error) sp_artistbrowse_error(sp_artistbrowse *arb);
 
@@ -1617,7 +1678,11 @@ SP_LIBEXPORT(bool) sp_image_is_loaded(sp_image *image);
 *
 * @param[in]   image      Image object
 *
-* @return                 Error code
+* @return                 One of the following errors, from ::sp_error
+*                         SP_ERROR_OK
+*                         SP_ERROR_IS_LOADING
+*                         SP_ERROR_OTHER_PERMANENT
+*                         SP_ERROR_OTHER_TRANSIENT
 */
 SP_LIBEXPORT(sp_error) sp_image_error(sp_image *image);
 
@@ -1758,7 +1823,11 @@ SP_LIBEXPORT(bool) sp_search_is_loaded(sp_search *search);
 *
 * @param[in]   search     Search object
 *
-* @return                 Error code
+* @return                 One of the following errors, from ::sp_error
+*                         SP_ERROR_OK
+*                         SP_ERROR_IS_LOADING
+*                         SP_ERROR_OTHER_PERMANENT
+*                         SP_ERROR_OTHER_TRANSIENT
 */
 SP_LIBEXPORT(sp_error) sp_search_error(sp_search *search);
 
@@ -2025,6 +2094,26 @@ typedef struct sp_playlist_callbacks {
 	 */
 	void (SP_CALLCONV *image_changed)(sp_playlist *pl, const byte *image, void *userdata);
 
+
+	/**
+	 * Called when message attribute for a playlist entry changes.
+	 *
+	 * @param[in]  pl         Playlist object
+	 * @param[in]  position   Position in playlist
+	 * @param[in]  message    UTF-8 encoded message
+	 * @param[in]  userdata   Userdata passed to sp_playlist_add_callbacks()
+	 */
+	void (SP_CALLCONV *track_message_changed)(sp_playlist *pl, int position, const char *message, void *userdata);
+
+
+	/**
+	 * Called when playlist subscribers changes (count or list of names)
+	 *
+	 * @param[in]  pl         Playlist object
+	 * @param[in]  userdata   Userdata passed to sp_playlist_add_callbacks()
+	 */
+	void (SP_CALLCONV *subscribers_changed)(sp_playlist *pl, void *userdata);
+
 } sp_playlist_callbacks;
 
 
@@ -2120,6 +2209,29 @@ SP_LIBEXPORT(sp_user *) sp_playlist_track_creator(sp_playlist *playlist, int ind
 SP_LIBEXPORT(bool) sp_playlist_track_seen(sp_playlist *playlist, int index);
 
 /**
+ * Set seen status of a playlist entry
+ *
+ * @param[in]  playlist   Playlist object
+ * @param[in]  index      Index into playlist container. Should be in the interval [0, sp_playlist_num_tracks() - 1]
+ * @param[in]  seen       Seen status to be set
+ *
+ * @return     error     One of the following errors, from ::sp_error
+ *                       SP_ERROR_OK
+ *                       SP_ERROR_INDEX_OUT_OF_RANGE
+ */
+SP_LIBEXPORT(sp_error) sp_playlist_track_set_seen(sp_playlist *playlist, int index, bool seen);
+
+/**
+ * Return a message attached to a playlist item. Typically used on inbox.
+ *
+ * @param[in]  playlist   Playlist object
+ * @param[in]  index      Index into playlist container. Should be in the interval [0, sp_playlist_num_tracks() - 1]
+ *
+ * @return                UTF-8 encoded message, or NULL if no message is present
+ */
+SP_LIBEXPORT(const char *) sp_playlist_track_message(sp_playlist *playlist, int index);
+
+/**
  * Return name of given playlist
  *
  * @param[in]  playlist   Playlist object
@@ -2134,6 +2246,11 @@ SP_LIBEXPORT(const char *) sp_playlist_name(sp_playlist *playlist);
  *
  * @param[in]  playlist   Playlist object
  * @param[in]  new_name   New name for playlist
+ *
+ * @return                One of the following errors, from ::sp_error
+ *                        SP_ERROR_OK
+ *                        SP_ERROR_INVALID_INDATA
+ *                        SP_ERROR_PERMISSION_DENIED
  */
 SP_LIBEXPORT(sp_error) sp_playlist_rename(sp_playlist *playlist, const char *new_name);
 
@@ -2224,6 +2341,10 @@ SP_LIBEXPORT(bool) sp_playlist_has_pending_changes(sp_playlist *playlist);
  * @param[in]  position       Start position in playlist where to insert the tracks
  * @param[in]  session        Your session object
  *
+ * @return                One of the following errors, from ::sp_error
+ *                        SP_ERROR_OK
+ *                        SP_ERROR_INVALID_INDATA - position is > current playlist length
+ *                        SP_ERROR_PERMISSION_DENIED
  */
 SP_LIBEXPORT(sp_error) sp_playlist_add_tracks(sp_playlist *playlist, const sp_track **tracks, int num_tracks, int position, sp_session *session);
 
@@ -2236,6 +2357,9 @@ SP_LIBEXPORT(sp_error) sp_playlist_add_tracks(sp_playlist *playlist, const sp_tr
  *                            whereas [0, 1, 1] is invalid.
  * @param[in]  num_tracks     Length of \p tracks array
  *
+ * @return                    One of the following errors, from ::sp_error
+ *                            SP_ERROR_OK
+ *                            SP_ERROR_PERMISSION_DENIED
  */
 SP_LIBEXPORT(sp_error) sp_playlist_remove_tracks(sp_playlist *playlist, const int *tracks, int num_tracks);
 
@@ -2249,8 +2373,101 @@ SP_LIBEXPORT(sp_error) sp_playlist_remove_tracks(sp_playlist *playlist, const in
  * @param[in]  num_tracks     Length of \p tracks array
  * @param[in]  new_position   New position for tracks
  *
+ * @return                    One of the following errors, from ::sp_error
+ *                            SP_ERROR_OK
+ *                            SP_ERROR_INVALID_INDATA - position is > current playlist length
+ *                            SP_ERROR_PERMISSION_DENIED
  */
 SP_LIBEXPORT(sp_error) sp_playlist_reorder_tracks(sp_playlist *playlist, const int *tracks, int num_tracks, int new_position);
+
+
+/**
+ * Return number of subscribers for a given playlist
+ *
+ * @param[in]  playlist       Playlist object
+ *
+ * @return     Number of subscribers
+ *
+ */
+SP_LIBEXPORT(unsigned int) sp_playlist_num_subscribers(sp_playlist *playlist);
+
+/**
+ * Return subscribers for a playlist
+ *
+ * @param[in]  playlist       Playlist object
+ *
+ * @return     sp_subscribers struct with array of canonical usernames.
+ *             This object should be free'd using sp_playlist_subscribers_free()
+ *
+ * @note       The count returned for this function may be less than those
+ *             returned by sp_playlist_num_subscribers(). Spotify does not
+ *             track each user subscribed to a playlist for playlist with
+ *             many (>500) subscribers.
+ */
+SP_LIBEXPORT(sp_subscribers *) sp_playlist_subscribers(sp_playlist *playlist);
+
+/**
+ * Free object returned from sp_playlist_subscribers()
+ *
+ * @param[in] subscribers   Subscribers object
+ */
+SP_LIBEXPORT(void) sp_playlist_subscribers_free(sp_subscribers *subscribers);
+
+/**
+ * Ask library to update the subscription count for a playlist
+ *
+ * When the subscription info has been fetched from the Spotify backend
+ * the playlist subscribers_changed() callback will be invoked.
+ * In that callback use sp_playlist_num_subscribers() and/or
+ * sp_playlist_subscribers() to get information about the subscribers.
+ * You can call those two functions anytime you want but the information
+ * might not be up to date in such cases
+ *
+ * @param[in]  session        Session object
+ * @param[in]  playlist       Playlist object
+ */
+SP_LIBEXPORT(void) sp_playlist_update_subscribers(sp_session *session, sp_playlist *playlist);
+
+/**
+ * Return whether a playlist is loaded in RAM (as opposed to only
+ * stored on disk)
+ *
+ * @param[in]  session        Session object
+ * @param[in]  playlist       Playlist object
+ *
+ * @return True iff playlist is in RAM, False otherwise
+ *
+ * @note       When a playlist is no longer in RAM it will appear empty.
+ *             However, libspotify will retain information about the
+ *             list metadata  (owner, title, picture, etc) in RAM.
+ *             There is one caveat tough: If libspotify has never seen the
+ *             playlist before this metadata will also be unset.
+ *             In order for libspotify to get the metadata the playlist
+ *             needs to be loaded atleast once.
+ *             In order words, if libspotify starts with an empty playlist
+ *             cache and the application has set 'initially_unload_playlists'
+ *             config parameter to True all playlists will be empty.
+ *             It will not be possible to generate URI's to the playlists
+ *             nor extract playlist title until the application calls
+ *             sp_playlist_set_in_ram(..., true). So an application
+ *             that needs to stay within a low memory profile would need to
+ *             cycle thru all new playlists in order to extract metadata.
+ *
+ *             The easiest way to detect this case is when
+ *             sp_playlist_is_in_ram() returns false and
+ *             sp_link_create_from_playlist() returns NULL
+ */
+SP_LIBEXPORT(bool) sp_playlist_is_in_ram(sp_session *session, sp_playlist *playlist);
+
+/**
+ * Return whether a playlist is loaded in RAM (as opposed to only
+ * stored on disk)
+ *
+ * @param[in]  session        Session object
+ * @param[in]  playlist       Playlist object
+ * @param[in]  in_ram         Controls whether or not to keep the list in RAM
+ */
+SP_LIBEXPORT(void) sp_playlist_set_in_ram(sp_session *session, sp_playlist *playlist, bool in_ram);
 
 /**
  * Load an already existing playlist without adding it to a playlistcontainer.
@@ -2336,6 +2553,11 @@ typedef struct sp_playlistcontainer_callbacks {
  * @param[in]  callbacks Callbacks, see sp_playlistcontainer_callbacks
  * @param[in]  userdata  Opaque value passed to callbacks.
  *
+ * @note Every sp_playlistcontainer_add_callbacks() needs to be paried with a corresponding
+ *       sp_playlistcontainer_remove_callbacks() that is invoked before releasing the
+ *       last reference you own for the container. In other words, you must make sure
+ *       to have removed all the callbacks before the container gets destroyed.
+ *
  * @sa sp_session_playlistcontainer()
  * @sa sp_playlistcontainer_remove_callbacks
  */
@@ -2392,14 +2614,18 @@ SP_LIBEXPORT(sp_playlist_type) sp_playlistcontainer_playlist_type(sp_playlistcon
 /**
  * Return the folder name at @a index
  *
- * @param[in]  pc        Playlist container
- * @param[in]  index     Index in playlist container. Should be in the interval [0, sp_playlistcontainer_num_playlists() - 1]
+ * @param[in]  pc           Playlist container
+ * @param[in]  index        Index in playlist container. Should be in the interval [0, sp_playlistcontainer_num_playlists() - 1]
+ * @param[in]  buffer       Pointer to char[] where to store folder name
+ * @param[in]  buffer_size  Size of array
  *
- * @return               The folder name
+ * @return     error        One of the following errors, from ::sp_error
+ *                          SP_ERROR_OK
+ *                          SP_ERROR_INDEX_OUT_OF_RANGE
  *
  * @sa sp_session_playlistcontainer()
  */
-SP_LIBEXPORT(const char *) sp_playlistcontainer_playlist_folder_name(sp_playlistcontainer *pc, int index);
+SP_LIBEXPORT(sp_error) sp_playlistcontainer_playlist_folder_name(sp_playlistcontainer *pc, int index, char *buffer, int buffer_size);
 
 /**
  * Return the folder id at @a index
@@ -2439,6 +2665,10 @@ SP_LIBEXPORT(sp_playlist *) sp_playlistcontainer_add_playlist(sp_playlistcontain
  *
  * @param[in]  pc        Playlist container
  * @param[in]  index     Index of playlist to be removed
+ *
+ * @return     error     One of the following errors, from ::sp_error
+ *                       SP_ERROR_OK
+ *                       SP_ERROR_INDEX_OUT_OF_RANGE
  */
 SP_LIBEXPORT(sp_error) sp_playlistcontainer_remove_playlist(sp_playlistcontainer *pc, int index);
 
@@ -2448,8 +2678,39 @@ SP_LIBEXPORT(sp_error) sp_playlistcontainer_remove_playlist(sp_playlistcontainer
  * @param[in]  pc           Playlist container
  * @param[in]  index        Index of playlist to be moved
  * @param[in]  new_position New position for the playlist
+ * @param[in]  dry_run      Do not execute the move, only check if it possible
+
+ * @return     error        One of the following errors, from ::sp_error
+ *                          SP_ERROR_OK
+ *                          SP_ERROR_INDEX_OUT_OF_RANGE
+ *                          SP_ERROR_INVALID_INDATA - If trying to move a folder into itself
  */
-SP_LIBEXPORT(sp_error) sp_playlistcontainer_move_playlist(sp_playlistcontainer *pc, int index, int new_position);
+SP_LIBEXPORT(sp_error) sp_playlistcontainer_move_playlist(sp_playlistcontainer *pc, int index, int new_position, bool dry_run);
+
+
+/**
+ * Add a playlist folder
+ *
+ * @param[in]  pc           Playlist container
+ * @param[in]  index        Position of SP_PLAYLIST_TYPE_START_FOLDER entry
+ * @param[in]  name         Name of group
+
+ * @return     error        One of the following errors, from ::sp_error
+ *                          SP_ERROR_OK
+ *                          SP_ERROR_INDEX_OUT_OF_RANGE
+ *
+ * @note This operation will actually create two playlists. One of
+ * type SP_PLAYLIST_TYPE_START_FOLDER and immediately following a
+ * SP_PLAYLIST_TYPE_END_FOLDER one.
+ *
+ * To remove a playlist folder both of these must be deleted or the list
+ * will be left in an inconsistant state.
+ *
+ * There is no way to rename a playlist folder. Instead you need to remove
+ * the folder and recreate it again.
+ */
+SP_LIBEXPORT(sp_error) sp_playlistcontainer_add_folder(sp_playlistcontainer *pc, int index, const char *name);
+
 
 /**
  * Return a pointer to the user object of the owner.
@@ -2458,6 +2719,21 @@ SP_LIBEXPORT(sp_error) sp_playlistcontainer_move_playlist(sp_playlistcontainer *
  * @return          The user object or NULL if unknown or none.     
  */
 SP_LIBEXPORT(sp_user *) sp_playlistcontainer_owner(sp_playlistcontainer *pc);
+
+
+/**
+ * Increase reference count on playlistconatiner object
+ *
+ * @param[in]  pc   Playlist container.
+ */
+SP_LIBEXPORT(void) sp_playlistcontainer_add_ref(sp_playlistcontainer *pc);
+
+/**
+ * Release reference count on playlistconatiner object
+ *
+ * @param[in]  pc   Playlist container.
+ */
+SP_LIBEXPORT(void) sp_playlistcontainer_release(sp_playlistcontainer *pc);
 
 /** @} */
 
@@ -2635,7 +2911,11 @@ SP_LIBEXPORT(bool) sp_toplistbrowse_is_loaded(sp_toplistbrowse *tlb);
 *
 * @param[in]   tlb        Toplist browse object
 *
-* @return                 Error code
+* @return                 One of the following errors, from ::sp_error
+*                         SP_ERROR_OK
+*                         SP_ERROR_IS_LOADING
+*                         SP_ERROR_OTHER_PERMANENT
+*                         SP_ERROR_OTHER_TRANSIENT
 */
 SP_LIBEXPORT(sp_error) sp_toplistbrowse_error(sp_toplistbrowse *tlb);
 
@@ -2743,12 +3023,13 @@ typedef void SP_CALLCONV inboxpost_complete_cb(sp_inbox *result, void *userdata)
  * @param[in]  user       Canonical username of recipient
  * @param[in]  tracks     Array of trancks to post
  * @param[in]  num_tracks Number of tracks in \p tracks
+ * @param[in]  message    Message to attach to tracks. UTF-8
  * @param[in]  callback   Callback to be invoked when the request has completed
  * @param[in]  userdata   Userdata passed to callback
  *
  * @return                sp_inbox object if the request has been sent, NULL if request failed to initialize
  */
-SP_LIBEXPORT(sp_inbox *) sp_inbox_post_tracks(sp_session *session, const char *user, sp_track * const *tracks, int num_tracks, inboxpost_complete_cb *callback, void *userdata);
+SP_LIBEXPORT(sp_inbox *) sp_inbox_post_tracks(sp_session *session, const char *user, sp_track * const *tracks, int num_tracks, const char *message, inboxpost_complete_cb *callback, void *userdata);
 
 
 /**
@@ -2756,7 +3037,14 @@ SP_LIBEXPORT(sp_inbox *) sp_inbox_post_tracks(sp_session *session, const char *u
 *
 * @param[in]   inbox      Inbox object
 *
-* @return                 Error code
+* @return                 One of the following errors, from ::sp_error
+*                         SP_ERROR_OK
+*                         SP_ERROR_OTHER_TRANSIENT
+*                         SP_ERROR_PERMISSION_DENIED
+*                         SP_ERROR_INVALID_INDATA
+*                         SP_ERROR_INBOX_IS_FULL
+*                         SP_ERROR_NO_SUCH_USER
+*                         SP_ERROR_OTHER_PERMANENT
 */
 SP_LIBEXPORT(sp_error) sp_inbox_error(sp_inbox *inbox);
 

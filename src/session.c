@@ -212,22 +212,27 @@ static PyObject *Session_search(Session *self, PyObject *args, PyObject *kwds) {
     return (PyObject *)results;
 }
 
-PyObject *Session_image_create(Session *self, PyObject *args) {
+static PyObject *Session_image_create(Session *self, PyObject *args) {
     char *image_id;
     size_t len;
     if(!PyArg_ParseTuple(args, "s#", &image_id, &len))
 	return NULL;
     assert(len == 20);
     Image *i = PyObject_CallObject((PyObject *)&ImageType, NULL);
+    Py_INCREF(i);
     i->_image = sp_image_create(self->_session, image_id);
     return (PyObject *)i;
 }
 
-static void Session_set_preferred_bitrate(Session *self, PyObject *args) {
-    const int bitrate;
+static PyObject *Session_set_preferred_bitrate(Session *self, PyObject *args) {
+    int bitrate;
     if(!PyArg_ParseTuple(args, "i", &bitrate))
 	return NULL;
+    Py_BEGIN_ALLOW_THREADS
     sp_session_preferred_bitrate(self->_session, bitrate);
+    Py_END_ALLOW_THREADS
+    Py_INCREF(Py_None);
+    return Py_None;
 }
 
 static PyMethodDef Session_methods[] = {

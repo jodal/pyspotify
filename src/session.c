@@ -487,6 +487,8 @@ PyObject *session_connect(PyObject *self, PyObject *args) {
     fprintf(stderr, "> entering session_connect\n");
 #endif
     sp_session_config config;
+    memset(&config, 0, sizeof(config));
+
     PyObject *client;
     sp_session *session;
     sp_error error;
@@ -501,7 +503,6 @@ PyObject *session_connect(PyObject *self, PyObject *args) {
     config.userdata = (void *)client;
     config.callbacks = &g_callbacks;
     config.user_agent = "unset";
-    config.initially_unload_playlists = 0;
 
 #ifdef DEBUG
     fprintf(stderr, "Config mark 1\n");

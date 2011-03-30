@@ -95,6 +95,14 @@ PyObject *handle_error(int err) {
     }
 }
 
+const char *error_message(int err) {
+    if(err != 0) {
+        return sp_error_message(err);
+    } else {
+        return NULL;
+    }
+}
+
 static PyObject *Session_playlist_container(Session *self) {
     sp_playlistcontainer* pc;
     Py_BEGIN_ALLOW_THREADS
@@ -306,7 +314,7 @@ static void logged_in(sp_session *session, sp_error error) {
     Py_INCREF(psession);
     psession->_session = session;
     PyObject *client = (PyObject *)sp_session_userdata(session);
-    PyObject_CallMethod(client, "logged_in", "Oi", psession, error);
+    PyObject_CallMethod(client, "logged_in", "Os", psession, error_message(error));
     Py_DECREF(psession);
     PyGILState_Release(gstate);
 }
@@ -345,7 +353,7 @@ static void connection_error(sp_session *session, sp_error error) {
     Py_INCREF(psession);
     psession->_session = session;
     PyObject *client = (PyObject *)sp_session_userdata(session);
-    PyObject_CallMethod(client, "connection_error", "Oi", psession, error);
+    PyObject_CallMethod(client, "connection_error", "Os", psession, error_message(error));
     Py_DECREF(psession);
     PyGILState_Release(gstate);
 }

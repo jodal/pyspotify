@@ -147,7 +147,15 @@ static PyObject *Track_is_available(Session *self, PyObject *args) {
     if(!PyArg_ParseTuple(args, "O!", &TrackType, &track)) {
     return NULL;
     }
-    return Py_BuildValue("i", sp_track_is_available(self->_session, track));
+    return Py_BuildValue("i", sp_track_is_available(self->_session, track->_track));
+}
+
+static PyObject *Track_is_local(Session *self, PyObject *args) {
+    Track *track;
+    if(!PyArg_ParseTuple(args, "O!", &TrackType, &track)) {
+    return NULL;
+    }
+    return Py_BuildValue("i", sp_track_is_local(self->_session, track->_track));
 }
 
 static PyObject *Session_play(Session *self, PyObject *args) {
@@ -252,7 +260,8 @@ static PyMethodDef Session_methods[] = {
     {"load", (PyCFunction)Session_load, METH_VARARGS, "Load the specified track on the player"},
     {"seek", (PyCFunction)Session_seek, METH_VARARGS, "Seek the currently loaded track"},
     {"play", (PyCFunction)Session_play, METH_VARARGS, "Play or pause the currently loaded track"},
-    {"is_available", (PyCFunction)Track_is_available, METH_NOARGS, "Return true if the track is available for playback."},
+    {"is_available", (PyCFunction)Track_is_available, METH_VARARGS, "Return true if the track is available for playback."},
+    {"is_local", (PyCFunction)Track_is_local, METH_VARARGS, "Return true if the track is a local file."},
     {"playlist_container", (PyCFunction)Session_playlist_container, METH_NOARGS, "Return the playlist container for the currently logged in user"},
     {"search", (PyCFunctionWithKeywords)Session_search, METH_KEYWORDS, "Conduct a search, calling the callback when results are available"},
     {"image_create", (PyCFunction)Session_image_create, METH_VARARGS, "Create an image of album cover art"},

@@ -53,6 +53,9 @@ static PyObject *Image_data(Image *self) {
 }
 
 static PyObject *Image_image_id(Image *self) {
+    /* TODO */
+    Py_INCREF(Py_None);
+    return Py_None;
 }
 
 typedef struct {
@@ -92,6 +95,9 @@ static PyObject *Image_add_load_callback(Image *self, PyObject *args) {
 }
 
 static PyObject *Image_remove_load_callback(Image *self, PyObject *args) {
+    /* TODO */
+    Py_INCREF(Py_None);
+    return Py_None;
 }
 
 static PyMethodDef Image_methods[] = {

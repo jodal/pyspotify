@@ -175,6 +175,11 @@ static PyObject *Session_play(Session *self, PyObject *args) {
     return Py_None;
 }
 
+static PyObject *Session_stop(Session *self, PyObject *args) {
+    sp_session_player_unload(self->_session);
+    Py_RETURN_NONE;
+}
+
 static PyObject *Session_process_events(Session *self) {
     int timeout;
     Py_BEGIN_ALLOW_THREADS
@@ -277,6 +282,7 @@ static PyMethodDef Session_methods[] = {
     {"load", (PyCFunction)Session_load, METH_VARARGS, "Load the specified track on the player"},
     {"seek", (PyCFunction)Session_seek, METH_VARARGS, "Seek the currently loaded track"},
     {"play", (PyCFunction)Session_play, METH_VARARGS, "Play or pause the currently loaded track"},
+    {"stop", (PyCFunction)Session_stop, METH_NOARGS, "Stop currently loaded track"},
     {"is_available", (PyCFunction)Track_is_available, METH_VARARGS, "Return true if the track is available for playback."},
     {"is_local", (PyCFunction)Track_is_local, METH_VARARGS, "Return true if the track is a local file."},
     {"playlist_container", (PyCFunction)Session_playlist_container, METH_NOARGS, "Return the playlist container for the currently logged in user"},

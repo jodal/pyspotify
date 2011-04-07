@@ -170,7 +170,7 @@ sp_playlistcontainer *sp_session_playlistcontainer(sp_session *session) {
 }
 
 sp_error sp_session_create(const sp_session_config *config, sp_session **sess) {
-    if(strcmp(config->application_key, "appkey_good"))
+    if(memcmp(config->application_key, "appkey_good", config->application_key_size))
         return SP_ERROR_BAD_APPLICATION_KEY;
     g_data.config.cache_location = malloc(strlen(config->cache_location) + 1);
     g_data.config.settings_location = malloc(strlen(config->settings_location) + 1);

@@ -243,10 +243,7 @@ static PyObject *Session_browse_album(Session *self, PyObject *args, PyObject *k
     for (i = 0; i < PyObject_Length(args); ++i)
         PyTuple_SetItem(newArgs, i + 1, PyTuple_GetItem(args, i));
 
-    PyObject *result = PyObject_Call((PyObject *)&AlbumBrowserType, newArgs, kwds);
-    Py_DECREF(newArgs);
-
-    return result;
+    return PyObject_Call((PyObject *)&AlbumBrowserType, newArgs, kwds);
 }
 
 static PyObject *Session_image_create(Session *self, PyObject *args) {

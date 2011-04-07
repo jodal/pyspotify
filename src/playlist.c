@@ -21,6 +21,7 @@
 #include "pyspotify.h"
 #include "playlist.h"
 #include "track.h"
+#include "session.h"
 
 static PyMemberDef Playlist_members[] = {
     {NULL}

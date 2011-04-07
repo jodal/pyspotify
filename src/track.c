@@ -58,7 +58,7 @@ static PyObject *Track_artists(Track *self, PyObject *args) {
 }
 
 static PyObject *Track_album(Track *self) {
-    Album *a = PyObject_CallObject((PyObject *)&AlbumType, NULL);
+    Album *a = (Album *)PyObject_CallObject((PyObject *)&AlbumType, NULL);
     a->_album = sp_track_album(self->_track);
     return (PyObject *)a;
 }

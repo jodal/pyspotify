@@ -4,7 +4,7 @@
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at 
+ * You may obtain a copy of the License at
  *
  *  http://www.apache.org/licenses/LICENSE-2.0
  *
@@ -146,8 +146,11 @@ PyTypeObject AlbumType = {
 };
 
 void album_init(PyObject *m) {
-    PyModule_AddObject(m, "Album", (PyObject *)&AlbumType);
+    if (PyType_Ready(&AlbumType) < 0)
+	return;
     Py_INCREF(&AlbumType);
+    PyModule_AddObject(m, "Album", (PyObject *)&AlbumType);
+
     PyMapping_SetItemString(AlbumType.tp_dict, "ALBUM", Py_BuildValue("i", SP_ALBUMTYPE_ALBUM));
     PyMapping_SetItemString(AlbumType.tp_dict, "SINGLE", Py_BuildValue("i", SP_ALBUMTYPE_SINGLE));
     PyMapping_SetItemString(AlbumType.tp_dict, "COMPILATION", Py_BuildValue("i", SP_ALBUMTYPE_COMPILATION));

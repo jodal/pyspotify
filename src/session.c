@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ *  http://www.apache.org/licenses/LICENSE-2.0PyDe
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -23,16 +23,22 @@
 #include <pthread.h>
 #include "libspotify/api.h"
 #include "pyspotify.h"
+#include "album.h"
+#include "albumbrowser.h"
 #include "session.h"
 #include "track.h"
 #include "playlist.h"
 #include "search.h"
 #include "image.h"
 
-// define DEBUG to get lots of extra crap printed out
-//#define DEBUG 1
-
 static int session_constructed = 0;
+
+static delete_trampoline(Callback *tr) {
+    if (tr->userdata)
+        Py_DECREF(tr->userdata);
+    Py_DECREF(tr->callback);
+    free(tr);
+}
 
 static PyObject *Session_new(PyTypeObject *type, PyObject *args, PyObject *kwds) {
     Session *self;
@@ -177,18 +183,14 @@ static PyObject *Session_process_events(Session *self) {
     return Py_BuildValue("i", timeout);
 }
 
-typedef struct {
-    PyObject *callback;
-    PyObject *userdata;
-} search_trampoline;
-
-void search_complete(sp_search *search, search_trampoline *st) {
+void search_complete(sp_search *search, Callback *st) {
     PyGILState_STATE gstate;
     gstate = PyGILState_Ensure();
     Results *results = (Results *)PyObject_CallObject((PyObject *)&ResultsType, NULL);
     Py_INCREF(results);
     results->_search = search;
     PyObject_CallFunctionObjArgs(st->callback, results, st->userdata, NULL);
+    delete_trampoline(st);
     Py_DECREF(results);
     PyGILState_Release(gstate);
 }
@@ -200,7 +202,7 @@ static PyObject *Session_search(Session *self, PyObject *args, PyObject *kwds) {
     int track_offset=0, track_count=32,
         album_offset=0, album_count=32,
 	artist_offset=0, artist_count=32;
-    search_trampoline *st;
+    Callback *st;
     static char *kwlist[] = {"query", "callback",
                              "track_offset", "track_count",
 			     "album_offset", "album_count",
@@ -212,7 +214,7 @@ static PyObject *Session_search(Session *self, PyObject *args, PyObject *kwds) {
     if (userdata != NULL)
         Py_INCREF(userdata);
     Py_INCREF(callback);
-    st = malloc(sizeof(search_trampoline));
+    st = malloc(sizeof(Callback));
     st->userdata = userdata;
     st->callback = callback;
     Py_BEGIN_ALLOW_THREADS
@@ -223,9 +225,28 @@ static PyObject *Session_search(Session *self, PyObject *args, PyObject *kwds) {
 			      search_complete, (void *)st);
     Py_END_ALLOW_THREADS
     Results *results = (Results *)PyObject_CallObject((PyObject *)&ResultsType, NULL);
-    Py_INCREF(results);
     results->_search = search;
     return (PyObject *)results;
+}
+
+static PyObject *Session_browse_album(Session *self, PyObject *args, PyObject *kwds)
+{
+    PyObject *album, *callback, *userdata = NULL;
+    static char *kwlist[] = {"artist", "callback", "userdata", NULL};
+    if (!PyArg_ParseTupleAndKeywords(args, kwds, "O!O|O", kwlist, &AlbumType, &album, &callback, &userdata))
+        return;
+
+    PyObject *newArgs = PyTuple_New(PyObject_Length(args) + 1);
+    PyTuple_SetItem(newArgs, 0, self);
+
+    unsigned i;
+    for (i = 0; i < PyObject_Length(args); ++i)
+        PyTuple_SetItem(newArgs, i + 1, PyTuple_GetItem(args, i));
+
+    PyObject *result = PyObject_Call((PyObject *)&AlbumBrowserType, newArgs, kwds);
+    Py_DECREF(newArgs);
+
+    return result;
 }
 
 static PyObject *Session_image_create(Session *self, PyObject *args) {
@@ -247,8 +268,7 @@ static PyObject *Session_set_preferred_bitrate(Session *self, PyObject *args) {
     Py_BEGIN_ALLOW_THREADS
     sp_session_preferred_bitrate(self->_session, bitrate);
     Py_END_ALLOW_THREADS
-    Py_INCREF(Py_None);
-    return Py_None;
+    Py_RETURN_NONE;
 }
 
 static PyMethodDef Session_methods[] = {
@@ -264,6 +284,8 @@ static PyMethodDef Session_methods[] = {
     {"is_local", (PyCFunction)Track_is_local, METH_VARARGS, "Return true if the track is a local file."},
     {"playlist_container", (PyCFunction)Session_playlist_container, METH_NOARGS, "Return the playlist container for the currently logged in user"},
     {"search", (PyCFunctionWithKeywords)Session_search, METH_KEYWORDS, "Conduct a search, calling the callback when results are available"},
+    {"search", (PyCFunctionWithKeywords)Session_search, METH_KEYWORDS, "Conduct a search, calling the callback when results are available"},
+    {"browse_album", (PyCFunctionWithKeywords)Session_browse_album, METH_VARARGS | METH_KEYWORDS, "Browse an album, calling the callback when the browse request completes"},
     {"image_create", (PyCFunction)Session_image_create, METH_VARARGS, "Create an image of album cover art"},
     {"set_preferred_bitrate", (PyCFunction)Session_set_preferred_bitrate, METH_VARARGS, "Set the preferred bitrate of the audio stream. 0 = 160k, 1 = 320k"},
     {NULL}
@@ -512,6 +534,7 @@ PyObject *session_connect(PyObject *self, PyObject *args) {
     config.userdata = (void *)client;
     config.callbacks = &g_callbacks;
     config.user_agent = "unset";
+
 
 #ifdef DEBUG
     fprintf(stderr, "Config mark 1\n");

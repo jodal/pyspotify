@@ -227,7 +227,7 @@ static PyObject *Session_search(Session *self, PyObject *args, PyObject *kwds) {
 			      track_offset, track_count,
 			      album_offset, album_count,
 			      artist_offset, artist_count,
-			      search_complete, (void *)st);
+			      (search_complete_cb *)search_complete, (void *)st);
     Py_END_ALLOW_THREADS
     Results *results = (Results *)PyObject_CallObject((PyObject *)&ResultsType, NULL);
     results->_search = search;
@@ -252,12 +252,12 @@ static PyObject *Session_browse_album(Session *self, PyObject *args, PyObject *k
 }
 
 static PyObject *Session_image_create(Session *self, PyObject *args) {
-    char *image_id;
+    byte *image_id;
     size_t len;
     if(!PyArg_ParseTuple(args, "s#", &image_id, &len))
 	return NULL;
     assert(len == 20);
-    Image *i = PyObject_CallObject((PyObject *)&ImageType, NULL);
+    Image *i = (Image *)PyObject_CallObject((PyObject *)&ImageType, NULL);
     Py_INCREF(i);
     i->_image = sp_image_create(self->_session, image_id);
     return (PyObject *)i;
@@ -286,9 +286,8 @@ static PyMethodDef Session_methods[] = {
     {"is_available", (PyCFunction)Track_is_available, METH_VARARGS, "Return true if the track is available for playback."},
     {"is_local", (PyCFunction)Track_is_local, METH_VARARGS, "Return true if the track is a local file."},
     {"playlist_container", (PyCFunction)Session_playlist_container, METH_NOARGS, "Return the playlist container for the currently logged in user"},
-    {"search", (PyCFunctionWithKeywords)Session_search, METH_KEYWORDS, "Conduct a search, calling the callback when results are available"},
-    {"search", (PyCFunctionWithKeywords)Session_search, METH_KEYWORDS, "Conduct a search, calling the callback when results are available"},
-    {"browse_album", (PyCFunctionWithKeywords)Session_browse_album, METH_VARARGS | METH_KEYWORDS, "Browse an album, calling the callback when the browse request completes"},
+    {"browse_album", (PyCFunction)Session_browse_album, METH_VARARGS | METH_KEYWORDS, "Browse an album, calling the callback when the browse request completes"},
+    {"search", (PyCFunction)Session_search, METH_VARARGS | METH_KEYWORDS, "Conduct a search, calling the callback when results are available"},
     {"image_create", (PyCFunction)Session_image_create, METH_VARARGS, "Create an image of album cover art"},
     {"set_preferred_bitrate", (PyCFunction)Session_set_preferred_bitrate, METH_VARARGS, "Set the preferred bitrate of the audio stream. 0 = 160k, 1 = 320k"},
     {NULL}
@@ -578,7 +577,7 @@ PyObject *session_connect(PyObject *self, PyObject *args) {
     PyString_AsStringAndSize(application_key, &s_appkey, &l_appkey);
     config.application_key_size = l_appkey;
     config.application_key = PyMem_Malloc(l_appkey);
-    memcpy(config.application_key, s_appkey, l_appkey);
+    memcpy((char *)config.application_key, s_appkey, l_appkey);
 
 #ifdef DEBUG
     fprintf(stderr, "Config mark 4\n");

@@ -39,6 +39,7 @@ class TestSearch(unittest.TestCase):
             global artists
             artists = results.artists()
         session.search("", _)
+        self.assertNotEqual(result, None)
         self.assertEqual(artists[0].name(), "foo")
         self.assertEqual(artists[1].name(), "bar")
         
@@ -49,6 +50,7 @@ class TestSearch(unittest.TestCase):
             global result
             result = search.albums()
         session.search("", _)
+        self.assertNotEqual(result, None)
         self.assertEqual(result[0].name(), "baz")
         self.assertEqual(result[1].name(), "qux")
         self.assertEqual(result[2].name(), "quux")
@@ -60,6 +62,7 @@ class TestSearch(unittest.TestCase):
             global result
             result = search.tracks()
         session.search("", _)
+        self.assertNotEqual(result, None)
         self.assertEqual(result[0].name(), "corge")
         self.assertEqual(result[1].name(), "grault")
         self.assertEqual(result[2].name(), "garply")

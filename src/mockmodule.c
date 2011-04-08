@@ -22,10 +22,9 @@
  * Functions for creating mock instances of all spotify objects are also provided.
  *
 */
-
+#include <Python.h>
 #include <stdio.h>
 #include <string.h>
-#include <Python.h>
 #include "libspotify/api.h"
 #include "pyspotify.h"
 #include "artist.h"
@@ -38,7 +37,8 @@
 
 /***************************** FORWARD DEFINES *****************************/
 
-sp_album *_mock_album(char *name, sp_artist *artist, int year, byte *cover, int type, int loaded);
+sp_album *_mock_album(char *name, sp_artist *artist, int year, byte *cover, 
+int type, int loaded);
 sp_artist *_mock_artist(char *name, int loaded);
 sp_track *_mock_track(char *name, int num_artists, sp_artist **artists,
 		      sp_album *album, int duration, int popularity,
@@ -83,11 +83,13 @@ struct sp_playlist {
     char name[1024];
     sp_track *track[32];
     int num_tracks;
+    sp_playlist_callbacks *callbacks;
 };
 
 struct sp_playlistcontainer {
     sp_playlist *playlist[32];
     int num_playlists;
+    sp_playlistcontainer_callbacks *callbacks;
 };
 
 struct sp_track {
@@ -153,8 +155,9 @@ void sp_session_logout(sp_session *session) {
 }
 
 const char* sp_error_message(sp_error error) {
-    static const char buff[1024];
-    sprintf((char *)buff, "Error number %d", error);
+    char *buff;
+    buff = malloc(128*sizeof(char));
+    sprintf(buff, "Error number %d", error);
     return buff;
 }
 
@@ -167,7 +170,7 @@ sp_playlistcontainer *sp_session_playlistcontainer(sp_session *session) {
 }
 
 sp_error sp_session_create(const sp_session_config *config, sp_session **sess) {
-    if(strcmp(config->application_key, "appkey_good"))
+    if(memcmp(config->application_key, "appkey_good", config->application_key_size))
         return SP_ERROR_BAD_APPLICATION_KEY;
     g_data.config.cache_location = malloc(strlen(config->cache_location) + 1);
     g_data.config.settings_location = malloc(strlen(config->settings_location) + 1);
@@ -188,6 +191,10 @@ sp_error sp_session_create(const sp_session_config *config, sp_session **sess) {
 
 void * sp_session_userdata(sp_session *session) {
     return g_data.config.userdata;
+}
+
+void sp_session_preferred_bitrate(sp_session *s, sp_bitrate b) {
+    // TODO
 }
 
 void sp_session_process_events(sp_session *session, int *next_timeout) {
@@ -237,9 +244,9 @@ sp_search *sp_search_create(sp_session *session, const char *query, int track_of
     search->did_you_mean = "did_you_mean";
     search->artist[0] = _mock_artist("foo", 1);
     search->artist[1] = _mock_artist("bar", 1);
-    search->album[0] = _mock_album("baz", search->artist[0], 2001, "01234567890123456789", 1, 1);
-    search->album[1] = _mock_album("qux", search->artist[1], 2002, "01234567890123456789", 1, 1);
-    search->album[2] = _mock_album("quux", search->artist[0], 2003, "01234567890123456789", 1, 1);
+    search->album[0] = _mock_album("baz", search->artist[0], 2001, (byte *)"01234567890123456789", 1, 1);
+    search->album[1] = _mock_album("qux", search->artist[1], 2002, (byte *)"01234567890123456789", 1, 1);
+    search->album[2] = _mock_album("quux", search->artist[0], 2003, (byte *)"01234567890123456789", 1, 1);
     search->track[0] = _mock_track("corge", 1, search->artist, search->album[0], 99, 72, 1, 1, 0, 1);
     search->track[1] = _mock_track("grault", 1, search->artist, search->album[1], 98, 72, 1, 1, 0, 1);
     search->track[2] = _mock_track("garply", 1, search->artist, search->album[2], 97, 72, 1, 1, 0, 1);
@@ -394,7 +401,7 @@ int sp_track_num_artists(sp_track *t) {
 }
 
 sp_artist *sp_track_artist(sp_track *t, int index) {
-    const static sp_artist *a[3];
+    static sp_artist *a[3];
     a[0] = _mock_artist("a1", 1);
     a[1] = _mock_artist("a2", 1);
     a[2] = _mock_artist("a3", 1);
@@ -425,6 +432,10 @@ sp_album *sp_track_album(sp_track *t) {
     return t->album;
 }
 
+bool sp_track_is_local(sp_session *s, sp_track *t) {
+    return 0;
+}
+
 /*************** MOCK ARTIST METHODS **********************/
 
 const char *sp_artist_name(sp_artist *a) {
@@ -451,6 +462,21 @@ sp_track *sp_playlist_track(sp_playlist *p, int index) {
 
 int sp_playlist_num_tracks(sp_playlist *p) {
     return p->num_tracks;
+}
+
+void sp_playlist_add_callbacks(sp_playlist *p, sp_playlist_callbacks *cb,
+    void *userdata) {
+    p->callbacks = cb;
+}
+
+bool sp_playlist_is_collaborative(sp_playlist *p) {
+    return 0;
+}
+
+sp_error sp_playlist_remove_tracks(sp_playlist *p, const int *tracks,
+    int num_tracks) {
+    // TODO
+    return SP_ERROR_OK;
 }
 
 sp_playlist *sp_playlistcontainer_playlist(sp_playlistcontainer *pc, int index) {

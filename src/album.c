@@ -47,7 +47,7 @@ static PyObject *Album_artist(Album *self) {
     Artist *artist = (Artist *)PyObject_CallObject((PyObject *)&ArtistType, NULL);
     artist->_artist = sp_album_artist(self->_album);
     Py_INCREF(artist);
-    return artist;
+    return (PyObject *)artist;
 }
 
 static PyObject *Album_cover(Album *self) {

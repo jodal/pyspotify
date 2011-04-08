@@ -37,7 +37,7 @@ void AlbumBrowser_browse_complete(sp_albumbrowse *browse, Callback *st)
 static PyObject *AlbumBrowser_new(PyTypeObject *type, PyObject *args, PyObject *kwds)
 {
     PyObject *session, *album, *callback, *userdata = NULL;
-    static char *kwlist[] = {"session", "artist", "callback", "userdata", NULL};
+    static char *kwlist[] = {"session", "album", "callback", "userdata", NULL};
     if (!PyArg_ParseTupleAndKeywords(args, kwds, "O!O!O|O", kwlist, &SessionType, &session, &AlbumType, &album, &callback, &userdata))
         return;
 

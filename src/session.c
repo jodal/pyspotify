@@ -40,6 +40,22 @@ static delete_trampoline(Callback *tr) {
     free(tr);
 }
 
+static PyObject *PyTuple_NewByPreappending(PyObject *firstObject, PyObject *tuple)
+{
+    PyObject *result = PyTuple_New(PyObject_Length(tuple) + 1);
+    PyTuple_SetItem(result, 0, firstObject);
+    Py_XINCREF(firstObject);
+
+    unsigned i;
+    for (i = 0; i < PyObject_Length(tuple); ++i) {
+        PyObject *member = PyTuple_GetItem(tuple, i);
+        Py_XINCREF(member);
+        PyTuple_SetItem(result, i + 1, member);
+    }
+
+    return result;
+}
+
 static PyObject *Session_new(PyTypeObject *type, PyObject *args, PyObject *kwds) {
     Session *self;
 
@@ -241,14 +257,10 @@ static PyObject *Session_browse_album(Session *self, PyObject *args, PyObject *k
     if (!PyArg_ParseTupleAndKeywords(args, kwds, "O!O|O", kwlist, &AlbumType, &album, &callback, &userdata))
         return;
 
-    PyObject *newArgs = PyTuple_New(PyObject_Length(args) + 1);
-    PyTuple_SetItem(newArgs, 0, self);
-
-    unsigned i;
-    for (i = 0; i < PyObject_Length(args); ++i)
-        PyTuple_SetItem(newArgs, i + 1, PyTuple_GetItem(args, i));
-
-    return PyObject_Call((PyObject *)&AlbumBrowserType, newArgs, kwds);
+    args = PyTuple_NewByPreappending(self, args);
+    PyObject *result = PyObject_Call((PyObject *)&AlbumBrowserType, args, kwds);
+    Py_XDECREF(args);
+    return result;
 }
 
 static PyObject *Session_image_create(Session *self, PyObject *args) {

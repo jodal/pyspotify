@@ -103,8 +103,7 @@ static PyObject *Session_logout(Session *self) {
     Py_BEGIN_ALLOW_THREADS
     sp_session_logout(self->_session);
     Py_END_ALLOW_THREADS
-    Py_INCREF(Py_None);
-    return Py_None;
+    Py_RETURN_NONE;
 };
 
 PyObject *handle_error(int err) {
@@ -112,8 +111,7 @@ PyObject *handle_error(int err) {
 	PyErr_SetString(SpotifyError, sp_error_message(err));
 	return NULL;
     } else {
-	Py_INCREF(Py_None);
-	return Py_None;
+	Py_RETURN_NONE;
     }
 }
 
@@ -160,8 +158,7 @@ static PyObject *Session_seek(Session *self, PyObject *args) {
     Py_BEGIN_ALLOW_THREADS
     sp_session_player_seek(self->_session, seek);
     Py_END_ALLOW_THREADS
-    Py_INCREF(Py_None);
-    return Py_None;
+    Py_RETURN_NONE;
 }
 
 static PyObject *Track_is_available(Session *self, PyObject *args) {
@@ -187,8 +184,7 @@ static PyObject *Session_play(Session *self, PyObject *args) {
     Py_BEGIN_ALLOW_THREADS
     sp_session_player_play(self->_session, play);
     Py_END_ALLOW_THREADS
-    Py_INCREF(Py_None);
-    return Py_None;
+    Py_RETURN_NONE;
 }
 
 static PyObject *Session_stop(Session *self, PyObject *args) {

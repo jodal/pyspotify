@@ -16,6 +16,7 @@
 
 import unittest
 from spotify._mockspotify import mock_session
+import pdb,time
 
 session = mock_session()
 
@@ -24,7 +25,7 @@ class TestSearch(unittest.TestCase):
     def test_search_is_loaded(self):
         global is_loaded
         is_loaded = None
-        def _(results,  userdata):
+        def _(results,  userdata=None):
             global is_loaded
             is_loaded = results.is_loaded()
         session.search("!loaded", _)
@@ -33,20 +34,20 @@ class TestSearch(unittest.TestCase):
         self.assertEqual(is_loaded, True)
         
     def test_artists(self):
-        global artists
+        global result
         artists = None
-        def _(results, userdata):
-            global artists
-            artists = results.artists()
+        def _(results, userdata=None):
+            global result
+            result = results.artists()
         session.search("", _)
         self.assertNotEqual(result, None)
-        self.assertEqual(artists[0].name(), "foo")
-        self.assertEqual(artists[1].name(), "bar")
+        self.assertEqual(result[0].name(), "foo")
+        self.assertEqual(result[1].name(), "bar")
         
     def test_albums(self):
         global result
         result = None
-        def _(search, userdata):
+        def _(search, userdata=None):
             global result
             result = search.albums()
         session.search("", _)
@@ -58,7 +59,7 @@ class TestSearch(unittest.TestCase):
     def test_tracks(self):
         global result
         result = None
-        def _(search, userdata):
+        def _(search, userdata=None):
             global result
             result = search.tracks()
         session.search("", _)
@@ -71,7 +72,7 @@ class TestSearch(unittest.TestCase):
     def test_query(self):
         global result
         result = None
-        def _(search, userdata):
+        def _(search, userdata=None):
             global result
             result = search.query()
         session.search("foo", _)
@@ -80,7 +81,7 @@ class TestSearch(unittest.TestCase):
     def test_error(self):
         global result
         result = None
-        def _(search, userdata):
+        def _(search, userdata=None):
             global result
             result = search.error()
         session.search("foo", _)
@@ -89,7 +90,7 @@ class TestSearch(unittest.TestCase):
     def test_did_you_mean(self):
         global result
         result = None
-        def _(search, userdata):
+        def _(search, userdata=None):
             global result
             result = search.did_you_mean()
         session.search("foo", _)
@@ -98,7 +99,7 @@ class TestSearch(unittest.TestCase):
     def test_total_tracks(self):
         global result
         result = None
-        def _(search, userdata):
+        def _(search, userdata=None):
             global result
             result = search.total_tracks()
         session.search("foo", _)

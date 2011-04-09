@@ -104,8 +104,7 @@ static PyObject *Playlist__add_callback(Playlist *self, PyObject *args, sp_playl
     Py_BEGIN_ALLOW_THREADS
     sp_playlist_add_callbacks(self->_playlist, &pl_callbacks, tramp);
     Py_END_ALLOW_THREADS
-    Py_INCREF(Py_None);
-    return Py_None;
+    Py_RETURN_NONE;
 }
 
 void playlist_tracks_added_callback(sp_playlist *playlist, sp_track *const *tracks, int num_tracks, int position, void *userdata) {

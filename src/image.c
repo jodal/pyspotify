@@ -54,8 +54,7 @@ static PyObject *Image_data(Image *self) {
 
 static PyObject *Image_image_id(Image *self) {
     /* TODO */
-    Py_INCREF(Py_None);
-    return Py_None;
+    Py_RETURN_NONE;
 }
 
 typedef struct {
@@ -90,14 +89,12 @@ static PyObject *Image_add_load_callback(Image *self, PyObject *args) {
     Py_BEGIN_ALLOW_THREADS
     sp_image_add_load_callback(self->_image, image_callback, tramp);
     Py_END_ALLOW_THREADS
-    Py_INCREF(Py_None);
-    return Py_None;
+    Py_RETURN_NONE;
 }
 
 static PyObject *Image_remove_load_callback(Image *self, PyObject *args) {
     /* TODO */
-    Py_INCREF(Py_None);
-    return Py_None;
+    Py_RETURN_NONE;;
 }
 
 static PyMethodDef Image_methods[] = {

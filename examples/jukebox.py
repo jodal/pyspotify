@@ -59,6 +59,8 @@ class JukeboxUI(cmd.Cmd, threading.Thread):
                     print "%3d %s" % (i, p.name())
                 else:
                     print "%3d %s" % (i, "loading...")
+            print "%3d Starred tracks" % (i + 1,)
+
         else:
             try:
                 p = int(line)
@@ -69,7 +71,11 @@ class JukeboxUI(cmd.Cmd, threading.Thread):
                 print "That's out of range!"
                 return
             print "Listing playlist #%d" % p
-            for i, t in enumerate(self.jukebox.ctr[p]):
+            if p < len(self.jukebox.ctr):
+                playlist = self.jukebox.ctr[p]
+            else:
+                playlist = self.jukebox.starred
+            for i, t in enumerate(playlist):
                 if t.is_loaded():
                     print "%3d %s" % (i, t.name())
                 else:
@@ -179,6 +185,7 @@ class Jukebox(SpotifySessionManager):
         self.session = session
         try:
             self.ctr = session.playlist_container()
+            self.starred = session.starred()
             self.ui.start()
         except:
             traceback.print_exc()
@@ -195,8 +202,12 @@ class Jukebox(SpotifySessionManager):
     def load(self, playlist, track):
         if self.playing:
             self.stop()
-        self.session.load(self.ctr[playlist][track])
-        print "Loading %s from %s" % (self.ctr[playlist][track].name(), self.ctr[playlist].name())
+        if 0 <= playlist < len(self.ctr):
+            pl = self.ctr[playlist]
+        elif playlist == len(self.ctr):
+            pl = self.starred
+        self.session.load(pl[track])
+        print "Loading %s from %s" % (pl[track].name(), pl.name())
 
     def queue(self, playlist, track):
         if self.playing:

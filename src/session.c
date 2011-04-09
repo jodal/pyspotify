@@ -301,6 +301,17 @@ static PyObject *Session_set_preferred_bitrate(Session *self, PyObject *args) {
     Py_RETURN_NONE;
 }
 
+PyObject *Session_starred(Session *self) {
+    sp_playlist *spl;
+    Py_BEGIN_ALLOW_THREADS
+    spl = sp_session_starred_create(self->_session);
+    Py_END_ALLOW_THREADS
+    Playlist *pl = (Playlist *)PyObject_CallObject((PyObject *)&PlaylistType, NULL);
+    pl->_playlist = spl;
+    Py_INCREF(pl);
+    return (PyObject *)pl;
+}
+
 static PyMethodDef Session_methods[] = {
     {"username", (PyCFunction)Session_username, METH_NOARGS, "Return the canonical username for the logged in user"},
     {"display_name", (PyCFunction)Session_display_name, METH_NOARGS, "Return the full name for the logged in user"},
@@ -319,6 +330,7 @@ static PyMethodDef Session_methods[] = {
     {"search", (PyCFunction)Session_search, METH_VARARGS | METH_KEYWORDS, "Conduct a search, calling the callback when results are available"},
     {"image_create", (PyCFunction)Session_image_create, METH_VARARGS, "Create an image of album cover art"},
     {"set_preferred_bitrate", (PyCFunction)Session_set_preferred_bitrate, METH_VARARGS, "Set the preferred bitrate of the audio stream. 0 = 160k, 1 = 320k"},
+    {"starred", (PyCFunction)Session_starred, METH_NOARGS, "Get the starred playlist for the logged in user"},
     {NULL}
 };
 

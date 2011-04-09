@@ -44,6 +44,7 @@ sp_track *_mock_track(char *name, int num_artists, sp_artist **artists,
 		      sp_album *album, int duration, int popularity,
 		      int disc, int index, sp_error error, int loaded);
 sp_playlistcontainer *_mock_playlistcontainer();
+sp_playlist *_mock_playlist(char *name);
 
 /****************************** GLOBALS ************************************/
 
@@ -57,6 +58,7 @@ typedef struct {
     char username[1024];
     char password[1024];
     sp_session_config config;
+    sp_playlist *starred;
 } mocking_data;
 
 mocking_data g_data;
@@ -207,6 +209,11 @@ void sp_session_process_events(sp_session *session, int *next_timeout) {
     }
     *next_timeout = 1;
 }
+
+sp_playlist *sp_session_starred_create(sp_session *session) {
+    return _mock_playlist("Starred");
+}
+
 
 bool sp_user_is_loaded(sp_user *user) {
     return 0;

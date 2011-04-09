@@ -75,8 +75,8 @@ static PyObject *Session_username(Session *self) {
     sp_user *user;
     user = sp_session_user(self->_session);
     if(user == NULL) {
-	PyErr_SetString(SpotifyError, "no user returned from session");
-	return NULL;
+        PyErr_SetString(SpotifyError, "Not logged in");
+        return NULL;
     }
     const char *username = sp_user_canonical_name(user);
     return PyString_FromString(username);
@@ -86,8 +86,10 @@ static PyObject *Session_display_name(Session *self) {
     sp_user *user;
 
     user = sp_session_user(self->_session);
-    if(user == NULL)
-	return NULL;
+    if(user == NULL) {
+        PyErr_SetString(SpotifyError, "Not logged in");
+        return NULL;
+    }
     const char *username = sp_user_display_name(user);
     return PyString_FromString(username);
 };
@@ -96,8 +98,10 @@ static PyObject *Session_user_is_loaded(Session *self) {
     sp_user *user;
 
     user = sp_session_user(self->_session);
-    if(user == NULL)
-	return NULL;
+    if(user == NULL) {
+        PyErr_SetString(SpotifyError, "Not logged in");
+        return NULL;
+    }
     bool loaded = sp_user_is_loaded(user);
     return Py_BuildValue("i", loaded);
 };

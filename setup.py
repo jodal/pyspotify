@@ -32,7 +32,7 @@ setup(name='pyspotify',
       },
       ext_modules=[
         Extension('spotify._spotify',
-                  ['src/module.c', 'src/session.c', 'src/link.c', 'src/track.c', 'src/album.c', 'src/albumbrowser.c', 'src/artist.c', 'src/search.c', 'src/playlist.c', 'src/image.c',
+                  ['src/module.c', 'src/session.c', 'src/link.c', 'src/track.c', 'src/album.c', 'src/albumbrowser.c', 'src/artist.c', 'src/artistbrowser.c', 'src/search.c', 'src/playlist.c', 'src/image.c',
 ],
                   include_dirs=['src'],
                   libraries=['spotify'],

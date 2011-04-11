@@ -20,6 +20,7 @@
 #include "libspotify/api.h"
 #include "pyspotify.h"
 #include "artist.h"
+#include "artistbrowser.h"
 #include "album.h"
 #include "albumbrowser.h"
 #include "link.h"
@@ -43,6 +44,8 @@ PyMODINIT_FUNC init_spotify(void) {
     if (PyType_Ready(&SessionType) < 0)
 	return;
     if (PyType_Ready(&ArtistType) < 0)
+	return;
+    if (PyType_Ready(&ArtistBrowserType) < 0)
 	return;
     if (PyType_Ready(&LinkType) < 0)
 	return;

@@ -1,6 +1,6 @@
 /* $Id$
  *
- * Copyright 2009 Doug Winter
+ * Copyright 2011 Jamie Kirkpatrick
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,18 +15,14 @@
  * limitations under the License.
 */
 
-#pragma once
-
-// define DEBUG to get lots of extra crap printed out
-// #define DEBUG 1
-
-#include <Python.h>
-
-extern PyObject *SpotifyError;
-extern PyObject *SpotifyApiVersion;
+#include "pyspotify.h"
 
 typedef struct {
-    PyObject *callback;
-    PyObject *userdata;
-} Callback;
+    PyObject_HEAD
+    sp_artistbrowse *_browser;
+    Callback _callback;
+} ArtistBrowser;
 
+extern PyTypeObject ArtistBrowserType;
+
+extern void artistbrowser_init(PyObject *m);

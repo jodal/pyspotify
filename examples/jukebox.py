@@ -22,12 +22,13 @@ import sys
 import traceback
 import time
 import threading
+import os
 
 from spotify.manager import SpotifySessionManager
-try:
-    from spotify.alsahelper import AlsaController
-except ImportError:
-    from spotify.osshelper import OssController as AlsaController
+#try:
+#    from spotify.alsahelper import AlsaController
+#except ImportError:
+#    from spotify.osshelper import OssController as AlsaController
 from spotify import Link
 
 class JukeboxUI(cmd.Cmd, threading.Thread):
@@ -94,6 +95,18 @@ class JukeboxUI(cmd.Cmd, threading.Thread):
             self.jukebox.load(playlist, track)
         self.jukebox.play()
 
+    def do_browse(self, line):
+        if not line or not line.startswith("spotify:"):
+            print "Invalid id provided"
+            return
+        l = Link.from_string(line)
+        if not l.type() == Link.LINK_ALBUM:
+            print "You can only browse albums"
+            return
+        def browse_finished(browser):
+            print "Browse finished"
+        self.jukebox.browse(l, browse_finished)
+
     def do_search(self, line):
         if not line:
             if self.results is False:
@@ -114,10 +127,10 @@ class JukeboxUI(cmd.Cmd, threading.Thread):
                 self.results = False
         else:
             self.results = None
-            def _(results, userdata):
+            def search_finished(results):
                 print "\nSearch results received"
                 self.results = results
-            self.jukebox.search(line, _)
+            self.jukebox.search(line, search_finished)
 
     def do_queue(self, line):
         if not line:
@@ -148,10 +161,11 @@ class Jukebox(SpotifySessionManager):
     queued = False
     playlist = 2
     track = 0
+    appkey_file = os.path.join(os.path.dirname(__file__), 'spotify_appkey.key')
 
     def __init__(self, *a, **kw):
         SpotifySessionManager.__init__(self, *a, **kw)
-        self.audio = AlsaController()
+        #self.audio = AlsaController()
         self.ui = JukeboxUI(self)
         self.ctr = None
         self.playing = False
@@ -159,6 +173,9 @@ class Jukebox(SpotifySessionManager):
         print "Logging in, please wait..."
 
     def logged_in(self, session, error):
+        if error:
+            print error
+            return
         self.session = session
         try:
             self.ctr = session.playlist_container()
@@ -166,10 +183,12 @@ class Jukebox(SpotifySessionManager):
         except:
             traceback.print_exc()
 
+    def logged_out(self, session):
+        self.ui.cmdqueue.append("quit")
+
     def load_track(self, track):
         if self.playing:
             self.stop()
-
         self.session.load(track)
         print "Loading %s" % track.name()
 
@@ -214,6 +233,15 @@ class Jukebox(SpotifySessionManager):
 
     def search(self, query, callback):
         self.session.search(query, callback)
+
+    def browse(self, link, callback):
+        browser = self.session.browse_album(link.as_album(), callback)
+        while not browser.is_loaded():
+            time.sleep(0.1)
+        for track in browser:
+            print track
+        print browser
+
 
 if __name__ == '__main__':
     import optparse

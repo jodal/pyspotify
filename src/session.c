@@ -25,6 +25,8 @@
 #include "pyspotify.h"
 #include "album.h"
 #include "albumbrowser.h"
+#include "artist.h"
+#include "artistbrowser.h"
 #include "session.h"
 #include "track.h"
 #include "playlist.h"
@@ -33,9 +35,10 @@
 
 static int session_constructed = 0;
 
-static delete_trampoline(Callback *tr) {
-    if (tr->userdata)
+static void delete_trampoline(Callback *tr) {
+    if (tr->userdata) {
         Py_DECREF(tr->userdata);
+    }
     Py_DECREF(tr->callback);
     free(tr);
 }
@@ -187,7 +190,7 @@ static PyObject *Session_play(Session *self, PyObject *args) {
     Py_RETURN_NONE;
 }
 
-static PyObject *Session_stop(Session *self, PyObject *args) {
+static PyObject *Session_unload(Session *self) {
     sp_session_player_unload(self->_session);
     Py_RETURN_NONE;
 }
@@ -251,10 +254,23 @@ static PyObject *Session_browse_album(Session *self, PyObject *args, PyObject *k
     PyObject *album, *callback, *userdata = NULL;
     static char *kwlist[] = {"artist", "callback", "userdata", NULL};
     if (!PyArg_ParseTupleAndKeywords(args, kwds, "O!O|O", kwlist, &AlbumType, &album, &callback, &userdata))
-        return;
+        Py_RETURN_NONE;
 
-    args = PyTuple_NewByPreappending(self, args);
+    args = PyTuple_NewByPreappending((PyObject *)self, args);
     PyObject *result = PyObject_Call((PyObject *)&AlbumBrowserType, args, kwds);
+    Py_XDECREF(args);
+    return result;
+}
+
+static PyObject *Session_browse_artist(Session *self, PyObject *args, PyObject *kwds)
+{
+    PyObject *artist, *callback, *userdata = NULL;
+    static char *kwlist[] = {"artist", "callback", "userdata", NULL};
+    if (!PyArg_ParseTupleAndKeywords(args, kwds, "O!O|O", kwlist, &ArtistType, &artist, &callback, &userdata))
+        Py_RETURN_NONE;
+
+    args = PyTuple_NewByPreappending((PyObject *)self, args);
+    PyObject *result = PyObject_Call((PyObject *)&ArtistBrowserType, args, kwds);
     Py_XDECREF(args);
     return result;
 }
@@ -290,11 +306,12 @@ static PyMethodDef Session_methods[] = {
     {"load", (PyCFunction)Session_load, METH_VARARGS, "Load the specified track on the player"},
     {"seek", (PyCFunction)Session_seek, METH_VARARGS, "Seek the currently loaded track"},
     {"play", (PyCFunction)Session_play, METH_VARARGS, "Play or pause the currently loaded track"},
-    {"stop", (PyCFunction)Session_stop, METH_NOARGS, "Stop currently loaded track"},
+    {"unload", (PyCFunction)Session_unload, METH_NOARGS, "Stop the currently playing track"},
     {"is_available", (PyCFunction)Track_is_available, METH_VARARGS, "Return true if the track is available for playback."},
     {"is_local", (PyCFunction)Track_is_local, METH_VARARGS, "Return true if the track is a local file."},
     {"playlist_container", (PyCFunction)Session_playlist_container, METH_NOARGS, "Return the playlist container for the currently logged in user"},
     {"browse_album", (PyCFunction)Session_browse_album, METH_VARARGS | METH_KEYWORDS, "Browse an album, calling the callback when the browse request completes"},
+    {"browse_artist", (PyCFunction)Session_browse_artist, METH_VARARGS | METH_KEYWORDS, "Browse an artist, calling the callback when the browse request completes"},
     {"search", (PyCFunction)Session_search, METH_VARARGS | METH_KEYWORDS, "Conduct a search, calling the callback when results are available"},
     {"image_create", (PyCFunction)Session_image_create, METH_VARARGS, "Create an image of album cover art"},
     {"set_preferred_bitrate", (PyCFunction)Session_set_preferred_bitrate, METH_VARARGS, "Set the preferred bitrate of the audio stream. 0 = 160k, 1 = 320k"},
@@ -554,7 +571,7 @@ PyObject *session_connect(PyObject *self, PyObject *args) {
     fprintf(stderr, "Cache location is '%s'\n", PyString_AsString(cache_location));
 #endif
     if(cache_location == NULL) {
-	PyErr_SetString(SpotifyError, "Client did not provide a cache_location");
+
         return NULL;
     }
 #ifdef DEBUG

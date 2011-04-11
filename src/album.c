@@ -39,8 +39,7 @@ static PyObject *Album_is_loaded(Album *self) {
 }
 
 static PyObject *Album_is_available(Album *self) {
-    PyErr_SetString(PyExc_NotImplementedError, "");
-    return NULL;
+    return Py_BuildValue("i", sp_album_is_available(self->_album));
 }
 
 static PyObject *Album_artist(Album *self) {

@@ -301,7 +301,7 @@ static PyObject *Session_set_preferred_bitrate(Session *self, PyObject *args) {
     Py_RETURN_NONE;
 }
 
-PyObject *Session_starred(Session *self) {
+static PyObject *Session_starred(Session *self) {
     sp_playlist *spl;
     Py_BEGIN_ALLOW_THREADS
     spl = sp_session_starred_create(self->_session);

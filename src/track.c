@@ -89,7 +89,7 @@ static PyObject *Track_error(Track *self) {
     return Py_BuildValue("i", sp_track_error(self->_track));
 }
 
-PyObject *Track_starred(Track *self, PyObject *args, PyObject *kwds) {
+static PyObject *Track_starred(Track *self, PyObject *args, PyObject *kwds) {
     int starred;
     int set;
     PyObject *bset = NULL;

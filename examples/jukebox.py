@@ -25,10 +25,10 @@ import threading
 import os
 
 from spotify.manager import SpotifySessionManager
-#try:
-#    from spotify.alsahelper import AlsaController
-#except ImportError:
-#    from spotify.osshelper import OssController as AlsaController
+try:
+    from spotify.alsahelper import AlsaController
+except ImportError:
+    from spotify.osshelper import OssController as AlsaController
 from spotify import Link
 
 class JukeboxUI(cmd.Cmd, threading.Thread):
@@ -171,7 +171,7 @@ class Jukebox(SpotifySessionManager):
 
     def __init__(self, *a, **kw):
         SpotifySessionManager.__init__(self, *a, **kw)
-        #self.audio = AlsaController()
+        self.audio = AlsaController()
         self.ui = JukeboxUI(self)
         self.ctr = None
         self.playing = False

@@ -59,6 +59,7 @@ typedef struct {
     char password[1024];
     sp_session_config config;
     sp_playlist *starred;
+    int bitrate;
 } mocking_data;
 
 mocking_data g_data;
@@ -105,6 +106,7 @@ struct sp_track {
     int index;
     sp_error error;
     int loaded;
+    int starred;
 };
 
 struct sp_search {
@@ -443,6 +445,17 @@ bool sp_track_is_local(sp_session *s, sp_track *t) {
     return 0;
 }
 
+bool sp_track_is_starred(sp_session *s, sp_track *t) {
+    return t->starred;
+}
+
+void sp_track_set_starred(sp_session *s, const sp_track **ts, int n, bool starred) {
+    int i;
+
+    for (i = 0; i < n; i++)
+        ((sp_track *)ts[i])->starred = starred;
+}
+
 /*************** MOCK ARTIST METHODS **********************/
 
 const char *sp_artist_name(sp_artist *a) {
@@ -589,6 +602,7 @@ sp_track *_mock_track(char *name, int num_artists, sp_artist **artists,
     t->duration = duration;
     t->popularity = popularity;
     t->album = album;
+    t->starred = 0;
     return t;
 }
 

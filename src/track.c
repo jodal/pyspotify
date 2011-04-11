@@ -22,6 +22,7 @@
 #include "track.h"
 #include "artist.h"
 #include "album.h"
+#include "session.h"
 
 static PyMemberDef Track_members[] = {
     {NULL}
@@ -88,6 +89,26 @@ static PyObject *Track_error(Track *self) {
     return Py_BuildValue("i", sp_track_error(self->_track));
 }
 
+PyObject *Track_starred(Track *self, PyObject *args, PyObject *kwds) {
+    int starred;
+    int set;
+    PyObject *bset = NULL;
+    Session *session;
+    static char *kwlist[] = {"session", "set", NULL};
+
+    if (!PyArg_ParseTupleAndKeywords(args, kwds, "O!|O!", kwlist,
+        &SessionType, &session, &PyBool_Type, &bset))
+        return NULL;
+    if (bset) {
+        set = (bset == Py_True);
+        sp_track_set_starred(session->_session,
+                             (const sp_track **)&(self->_track), 1, set);
+    }
+    return (PyObject *)PyBool_FromLong((long) sp_track_is_starred(
+        session->_session, self->_track));
+}
+
+
 static PyMethodDef Track_methods[] = {
     {"is_loaded",
      (PyCFunction)Track_is_loaded,
@@ -125,6 +146,10 @@ static PyMethodDef Track_methods[] = {
      (PyCFunction)Track_error,
      METH_NOARGS,
      "The error associated with this track"},
+     {"starred",
+     (PyCFunction)Track_starred,
+     METH_VARARGS | METH_KEYWORDS,
+     "Get/set the starred property of the track"},
     {NULL}
 };
 

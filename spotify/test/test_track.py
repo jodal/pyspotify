@@ -15,7 +15,7 @@
 # limitations under the License.
 
 import unittest
-from spotify._mockspotify import mock_track, mock_album, mock_artist
+from spotify._mockspotify import mock_track, mock_album, mock_artist, mock_session
 
 class TestTrack(unittest.TestCase):
 
@@ -48,4 +48,11 @@ class TestTrack(unittest.TestCase):
     def test_is_loaded(self):
         self.assertEqual(self.track.is_loaded(), 1)
 
+    def test_starred(self):
+        session = mock_session()
+        self.assertEqual(self.track.starred(session), False)
+        self.track.starred(session, set=True)
+        self.assertEqual(self.track.starred(session), True)
+        self.track.starred(session, set=False)
+        self.assertEqual(self.track.starred(session), False)
 

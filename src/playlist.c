@@ -39,6 +39,12 @@ static PyObject *Playlist_new(PyTypeObject *type, PyObject *args, PyObject *kwds
     return (PyObject *)self;
 }
 
+static void Playlist_dealloc(Playlist *self) {
+    if (self->_playlist)
+        sp_playlist_release(self->_playlist);
+    self->ob_type->tp_free(self);
+}
+
 static PyObject *Playlist_is_loaded(Playlist *self) {
     return Py_BuildValue("i", sp_playlist_is_loaded(self->_playlist));
 }
@@ -318,7 +324,7 @@ PyTypeObject PlaylistType = {
     "spotify.Playlist",        /*tp_name*/
     sizeof(Playlist),             /*tp_basicsize*/
     0,                         /*tp_itemsize*/
-    0,                         /*tp_dealloc*/  // TODO: IMPLEMENT THIS WITH sp_playlist_release
+    (destructor)Playlist_dealloc, /*tp_dealloc*/
     0,                         /*tp_print*/
     0,                         /*tp_getattr*/
     0,                         /*tp_setattr*/
@@ -360,6 +366,12 @@ static PyObject *PlaylistContainer_new(PyTypeObject *type, PyObject *args, PyObj
     self = (PlaylistContainer *)type->tp_alloc(type, 0);
     self->_playlistcontainer = NULL;
     return (PyObject *)self;
+}
+
+static void PlaylistContainer_dealloc(PlaylistContainer *self) {
+    if (self->_playlistcontainer)
+        sp_playlistcontainer_release(self->_playlistcontainer);
+    self->ob_type->tp_free(self);
 }
 
 static PyMethodDef PlaylistContainer_methods[] = {
@@ -414,7 +426,7 @@ PyTypeObject PlaylistContainerType = {
     "spotify.playlist.PlaylistContainer",     /*tp_name*/
     sizeof(PlaylistContainer),             /*tp_basicsize*/
     0,                         /*tp_itemsize*/
-    0,                         /*tp_dealloc*/  // TODO: IMPLEMENT THIS WITH sp_playlist_release
+    (destructor)PlaylistContainer_dealloc, /*tp_dealloc*/
     0,                         /*tp_print*/
     0,                         /*tp_getattr*/
     0,                         /*tp_setattr*/

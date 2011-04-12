@@ -33,6 +33,12 @@ static PyObject *Artist_new(PyTypeObject *type, PyObject *args, PyObject *kwds) 
     return (PyObject *)self;
 }
 
+static void Artist_dealloc(Artist *self) {
+    if (self->_artist)
+        sp_artist_release(self->_artist);
+    self->ob_type->tp_free(self);
+}
+
 static PyObject *Artist_is_loaded(Artist *self) {
     return Py_BuildValue("i", sp_artist_is_loaded(self->_artist));
 }
@@ -68,7 +74,7 @@ PyTypeObject ArtistType = {
     "spotify.artist.Artist",     /*tp_name*/
     sizeof(Artist),             /*tp_basicsize*/
     0,                         /*tp_itemsize*/
-    0,                         /*tp_dealloc*/  // TODO: IMPLEMENT THIS WITH sp_artist_release
+    (destructor)Artist_dealloc,/*tp_dealloc*/
     0,                         /*tp_print*/
     0,                         /*tp_getattr*/
     0,                         /*tp_setattr*/

@@ -34,6 +34,12 @@ static PyObject *Album_new(PyTypeObject *type, PyObject *args, PyObject *kwds) {
     return (PyObject *)self;
 }
 
+static void Album_dealloc(Album *self) {
+    if (self->_album)
+        sp_album_release(self->_album);
+    self->ob_type->tp_free(self);
+}
+
 static PyObject *Album_is_loaded(Album *self) {
     return Py_BuildValue("i", sp_album_is_loaded(self->_album));
 }
@@ -108,7 +114,7 @@ PyTypeObject AlbumType = {
     "spotify.album.Album",     /*tp_name*/
     sizeof(Album),             /*tp_basicsize*/
     0,                         /*tp_itemsize*/
-    0,                         /*tp_dealloc*/  // TODO: IMPLEMENT THIS WITH sp_album_release
+    (destructor)Album_dealloc, /*tp_dealloc*/
     0,                         /*tp_print*/
     0,                         /*tp_getattr*/
     0,                         /*tp_setattr*/

@@ -36,6 +36,12 @@ static PyObject *Track_new(PyTypeObject *type, PyObject *args, PyObject *kwds) {
     return (PyObject *)self;
 }
 
+static void Track_dealloc(Track *self) {
+    if (self->_track)
+        sp_track_release(self->_track);
+    self->ob_type->tp_free(self);
+}
+
 static PyObject *Track_str(PyObject *oself) {
     Track *self = (Track *)oself;
     const char *s = sp_track_name(self->_track);
@@ -157,7 +163,7 @@ PyTypeObject TrackType = {
     "spotify.Track",           /*tp_name*/
     sizeof(Track),             /*tp_basicsize*/
     0,                         /*tp_itemsize*/
-    0,                         /*tp_dealloc*/  // TODO: IMPLEMENT THIS WITH sp_track_release
+    (destructor)Track_dealloc, /*tp_dealloc*/
     0,                         /*tp_print*/
     0,                         /*tp_getattr*/
     0,                         /*tp_setattr*/

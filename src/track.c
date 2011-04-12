@@ -90,7 +90,6 @@ static PyObject *Track_error(Track *self) {
 }
 
 static PyObject *Track_starred(Track *self, PyObject *args, PyObject *kwds) {
-    int starred;
     int set;
     PyObject *bset = NULL;
     Session *session;
@@ -107,7 +106,6 @@ static PyObject *Track_starred(Track *self, PyObject *args, PyObject *kwds) {
     return (PyObject *)PyBool_FromLong((long) sp_track_is_starred(
         session->_session, self->_track));
 }
-
 
 static PyMethodDef Track_methods[] = {
     {"is_loaded",

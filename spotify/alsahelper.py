@@ -4,7 +4,7 @@
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at 
+# You may obtain a copy of the License at
 #
 # http://www.apache.org/licenses/LICENSE-2.0
 #
@@ -22,7 +22,7 @@ class AlsaController(object):
     spotify client is very simple, just create one and then call
     music_delivery every time you get packets from spotify. """
 
-    def __init__(self, mode=alsaaudio.PCM_NONBLOCK):
+    def __init__(self, mode=alsaaudio.PCM_NORMAL):
         self.out = alsaaudio.PCM(alsaaudio.PCM_PLAYBACK, mode=mode)
         self.out.setformat(alsaaudio.PCM_FORMAT_S16_LE) # actually native endian
         self.__rate = None
@@ -36,7 +36,7 @@ class AlsaController(object):
         """ Interface specifically provided to make it easy to play music from
         spotify. See the examples. """
         try:
-            self.channels = 2
+            self.channels = channels
             self.periodsize = num_frames
             self.rate = sample_rate
             written = self.playsamples(frames)

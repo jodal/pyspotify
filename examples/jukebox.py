@@ -106,8 +106,8 @@ class JukeboxUI(cmd.Cmd, threading.Thread):
             print "Invalid id provided"
             return
         l = Link.from_string(line)
-        if not l.type() == Link.LINK_ALBUM:
-            print "You can only browse albums"
+        if not l.type() in [Link.LINK_ALBUM, Link.LINK_ARTIST]:
+            print "You can only browse albums and artists"
             return
         def browse_finished(browser):
             print "Browse finished"
@@ -246,12 +246,19 @@ class Jukebox(SpotifySessionManager):
         self.session.search(query, callback)
 
     def browse(self, link, callback):
-        browser = self.session.browse_album(link.as_album(), callback)
-        while not browser.is_loaded():
-            time.sleep(0.1)
-        for track in browser:
-            print track
-        print browser
+        if link.type() == link.LINK_ALBUM:
+            browser = self.session.browse_album(link.as_album(), callback)
+            while not browser.is_loaded():
+                time.sleep(0.1)
+            for track in browser:
+                print track
+        if link.type() == link.LINK_ARTIST:
+            browser = self.session.browse_artist(link.as_artist(), callback)
+            while not browser.is_loaded():
+                time.sleep(0.1)
+            for album in browser:
+                print album.name()
+        callback(browser)
 
 
 if __name__ == '__main__':

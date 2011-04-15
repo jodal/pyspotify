@@ -89,6 +89,7 @@ PyObject *ArtistBrowser_sq_item(ArtistBrowser *self, Py_ssize_t index) {
     }
     sp_album *album = sp_artistbrowse_album(self->_browser, (int)index);
     Album *wrapper = (Album *)PyObject_CallObject((PyObject *)&AlbumType, NULL);
+    sp_album_add_ref(album);
     wrapper->_album = album;
     return (PyObject *)wrapper;
 }

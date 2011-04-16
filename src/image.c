@@ -48,11 +48,13 @@ static PyObject *Image_format(Image *self) {
 static PyObject *Image_data(Image *self) {
     size_t data_size;
     void *ptr;
-    ptr = sp_image_data(self->_image, &data_size);
+    ptr = (void *)sp_image_data(self->_image, &data_size);
     return PyBuffer_FromMemory(ptr, data_size);
 }
 
 static PyObject *Image_image_id(Image *self) {
+    /* TODO */
+    Py_RETURN_NONE;
 }
 
 typedef struct {
@@ -64,7 +66,7 @@ void image_callback(sp_image *image, void *userdata) {
     image_callback_trampoline *tramp = (image_callback_trampoline *)userdata;
     PyGILState_STATE gstate;
     gstate = PyGILState_Ensure();
-    Image *i = PyObject_CallObject((PyObject *)&ImageType, NULL);
+    Image *i = (Image *)PyObject_CallObject((PyObject *)&ImageType, NULL);
     i->_image = image;
     PyObject_CallFunctionObjArgs(tramp->callback, i, tramp->userdata, NULL);
     Py_DECREF(tramp->callback);
@@ -87,11 +89,12 @@ static PyObject *Image_add_load_callback(Image *self, PyObject *args) {
     Py_BEGIN_ALLOW_THREADS
     sp_image_add_load_callback(self->_image, image_callback, tramp);
     Py_END_ALLOW_THREADS
-    Py_INCREF(Py_None);
-    return Py_None;
+    Py_RETURN_NONE;
 }
 
 static PyObject *Image_remove_load_callback(Image *self, PyObject *args) {
+    /* TODO */
+    Py_RETURN_NONE;;
 }
 
 static PyMethodDef Image_methods[] = {

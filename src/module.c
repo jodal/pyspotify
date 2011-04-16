@@ -4,7 +4,7 @@
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at 
+ * You may obtain a copy of the License at
  *
  *  http://www.apache.org/licenses/LICENSE-2.0
  *
@@ -20,7 +20,9 @@
 #include "libspotify/api.h"
 #include "pyspotify.h"
 #include "artist.h"
+#include "artistbrowser.h"
 #include "album.h"
+#include "albumbrowser.h"
 #include "link.h"
 #include "playlist.h"
 #include "search.h"
@@ -39,23 +41,23 @@ static PyMethodDef module_methods[] = {
 PyMODINIT_FUNC init_spotify(void) {
     PyObject *m;
 
-    if(PyType_Ready(&SessionType) < 0)
+    if (PyType_Ready(&SessionType) < 0)
 	return;
-    if(PyType_Ready(&AlbumType) < 0)
+    if (PyType_Ready(&ArtistType) < 0)
 	return;
-    if(PyType_Ready(&ArtistType) < 0)
+    if (PyType_Ready(&ArtistBrowserType) < 0)
 	return;
-    if(PyType_Ready(&LinkType) < 0)
+    if (PyType_Ready(&LinkType) < 0)
 	return;
-    if(PyType_Ready(&PlaylistType) < 0)
+    if (PyType_Ready(&PlaylistType) < 0)
 	return;
-    if(PyType_Ready(&PlaylistContainerType) < 0)
+    if (PyType_Ready(&PlaylistContainerType) < 0)
 	return;
-    if(PyType_Ready(&ResultsType) < 0)
+    if (PyType_Ready(&ResultsType) < 0)
 	return;
-    if(PyType_Ready(&TrackType) < 0)
+    if (PyType_Ready(&TrackType) < 0)
 	return;
-    if(PyType_Ready(&ImageType) < 0)
+    if (PyType_Ready(&ImageType) < 0)
 	return;
 
     m = Py_InitModule("_spotify", module_methods);
@@ -72,6 +74,7 @@ PyMODINIT_FUNC init_spotify(void) {
     Py_INCREF(SpotifyApiVersion);
     PyModule_AddObject(m, "api_version", SpotifyApiVersion);
     album_init(m);
+    albumbrowser_init(m);
     artist_init(m);
     link_init(m);
     playlist_init(m);

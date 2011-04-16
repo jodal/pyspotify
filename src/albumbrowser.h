@@ -1,10 +1,10 @@
 /* $Id$
  *
- * Copyright 2009 Doug Winter
+ * Copyright 2011 Jamie Kirkpatrick
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at 
+ * You may obtain a copy of the License at
  *
  *  http://www.apache.org/licenses/LICENSE-2.0
  *
@@ -15,14 +15,14 @@
  * limitations under the License.
 */
 
+#include "pyspotify.h"
+
 typedef struct {
     PyObject_HEAD
-    sp_session *_session;
-    PyObject *client;
-} Session;
+    sp_albumbrowse *_browser;
+    Callback _callback;
+} AlbumBrowser;
 
-extern PyTypeObject SessionType;
-extern void session_init(PyObject *m);
-extern PyObject *session_connect(PyObject *self, PyObject *args);
+extern PyTypeObject AlbumBrowserType;
 
-extern PyObject *handle_error(int error);
+extern void albumbrowser_init(PyObject *m);

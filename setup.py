@@ -4,7 +4,7 @@
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at 
+# You may obtain a copy of the License at
 #
 # http://www.apache.org/licenses/LICENSE-2.0
 #
@@ -32,7 +32,7 @@ setup(name='pyspotify',
       },
       ext_modules=[
         Extension('spotify._spotify',
-                  ['src/module.c', 'src/session.c', 'src/link.c', 'src/track.c', 'src/album.c', 'src/artist.c', 'src/search.c', 'src/playlist.c', 'src/image.c',
+                  ['src/module.c', 'src/session.c', 'src/link.c', 'src/track.c', 'src/album.c', 'src/albumbrowser.c', 'src/artist.c', 'src/artistbrowser.c', 'src/search.c', 'src/playlist.c', 'src/image.c',
 ],
                   include_dirs=['src'],
                   libraries=['spotify'],

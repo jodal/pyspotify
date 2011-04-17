@@ -39,7 +39,7 @@ static PyObject *ArtistBrowser_new(PyTypeObject *type, PyObject *args, PyObject 
     PyObject *session, *artist, *callback, *userdata = NULL;
     static char *kwlist[] = {"session", "artist", "callback", "userdata", NULL};
     if (!PyArg_ParseTupleAndKeywords(args, kwds, "O!O!O|O", kwlist, &SessionType, &session, &ArtistType, &artist, &callback, &userdata))
-        return;
+        return NULL;
 
     ArtistBrowser *self = (ArtistBrowser *)type->tp_alloc(type, 0);
     self->_callback.callback = callback;
@@ -52,7 +52,7 @@ static PyObject *ArtistBrowser_new(PyTypeObject *type, PyObject *args, PyObject 
     self->_browser = sp_artistbrowse_create(
         ((Session *)session)->_session,
         ((Artist *)artist)->_artist,
-        ArtistBrowser_browse_complete,
+        (artistbrowse_complete_cb *)ArtistBrowser_browse_complete,
         (void *)&self->_callback
     );
 
@@ -89,15 +89,16 @@ PyObject *ArtistBrowser_sq_item(ArtistBrowser *self, Py_ssize_t index) {
     }
     sp_album *album = sp_artistbrowse_album(self->_browser, (int)index);
     Album *wrapper = (Album *)PyObject_CallObject((PyObject *)&AlbumType, NULL);
+    sp_album_add_ref(album);
     wrapper->_album = album;
     return (PyObject *)wrapper;
 }
 
 PySequenceMethods ArtistBrowser_as_sequence = {
-    ArtistBrowser_sq_length,	       // sq_length
+    (lenfunc)ArtistBrowser_sq_length,	       // sq_length
     0,				       // sq_concat
     0,				       // sq_repeat
-    ArtistBrowser_sq_item,	       // sq_item
+    (ssizeargfunc)ArtistBrowser_sq_item,	       // sq_item
     0,		                       // sq_ass_item
     0,				       // sq_contains
     0,				       // sq_inplace_concat

@@ -132,7 +132,7 @@ static PyMethodDef Image_methods[] = {
 PyTypeObject ImageType = {
     PyObject_HEAD_INIT(NULL)
     0,                         /*ob_size*/
-    "spotify.Image.Image",     /*tp_name*/
+    "spotify.Image",           /*tp_name*/
     sizeof(Image),             /*tp_basicsize*/
     0,                         /*tp_itemsize*/
     0,                         /*tp_dealloc*/

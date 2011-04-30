@@ -111,7 +111,7 @@ static PyMethodDef Album_methods[] = {
 PyTypeObject AlbumType = {
     PyObject_HEAD_INIT(NULL)
     0,                         /*ob_size*/
-    "spotify.album.Album",     /*tp_name*/
+    "spotify.Album",           /*tp_name*/
     sizeof(Album),             /*tp_basicsize*/
     0,                         /*tp_itemsize*/
     (destructor)Album_dealloc, /*tp_dealloc*/

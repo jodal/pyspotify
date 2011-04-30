@@ -40,6 +40,10 @@ class SpotifySessionManager(object):
         self.finished = False
 
     def connect(self):
+        """
+        Connect to the Spotify API using the given username and password.
+        This method calls the :func:`spotify.connect` function.
+        """
         sess = spotify.connect(self)
         self.loop(sess) # returns on disconnect
 
@@ -56,6 +60,9 @@ class SpotifySessionManager(object):
             self.awoken.wait()
 
     def terminate(self):
+        """
+        Terminate the current Spotify session.
+        """
         self.finished = True
         self.wake()
 
@@ -68,34 +75,123 @@ class SpotifySessionManager(object):
         self.awoken.set()
 
     def logged_in(self, session, error):
-        """ Called when the user has successfully logged in. You almost
-        certainly want to do something with session.playlist_container() at
-        this point. """
+        """
+        Callback.
+
+        :param session:     the current session.
+        :type session:      :class:`Session <spotify.Session>`
+        :param error:       an error message, ``None`` if all went well.
+        :type error:        string
+
+        Called when the login process has ended. You almost
+        certainly want to do something with
+        :meth:`session.playlist_container() <spotify.Session.playlist_container>`
+        if the login succeded.
+        """
         pass
 
     def logged_out(self, sess):
+        """
+        Callback.
+
+        :param sess:    the current session.
+        :type sess:     :class:`Session <spotify.Session>`
+
+        The user has or has been logged out from Spotify.
+        """
         pass
 
     def metadata_updated(self, sess):
+        """
+        Callback.
+
+        :param sess:    the current session.
+        :type sess:     :class:`Session <spotify.Session>`
+
+        The current user's metadata has been updated.
+        """
         pass
 
     def connection_error(self, sess, error):
+        """
+        Callback.
+
+        :param sess:    the current session.
+        :type sess:     :class:`Session <spotify.Session>`
+        :param error:   an error message. If ``None``, the connection is back.
+        :type error:    string
+
+
+        A connection error occured in *libspotify*.
+        """
         pass
 
     def message_to_user(self, sess, message):
+        """
+        Callback.
+
+        :param sess:    the current session.
+        :type sess:     :class:`Session <spotify.Session>`
+        :param message: a message.
+        :type message:  string
+
+        An informative message from *libspotify*, destinated to the user.
+        """
         pass
 
     def notify_main_thread(self, sess):
+        """
+        Callback.
+
+        :param sess:    the current session.
+        :type sess:     :class:`Session <spotify.Session>`
+
+        You should call :meth:`sess.process_events()
+        <spotify.Session.process_events>` at this point.
+        """
         pass
 
     def music_delivery(self, sess, frames, frame_size, num_frames, sample_type, sample_rate, channels):
+        """
+        Callback.
+
+        :param sess:    the current session.
+        :type sess:     :class:`Session <spotify.Session>`
+
+        Music data from *libspotify*.
+        """
         pass
 
     def play_token_lost(self, sess):
+        """
+        Callback.
+
+        :param sess:    the current session.
+        :type sess:     :class:`Session <spotify.Session>`
+
+        The playback stopped because a track was played from another
+        application, with the same account.
+        """
         pass
 
     def log_message(self, sess, data):
+        """
+        Callback.
+
+        :param sess:    the current session.
+        :type sess:     :class:`Session <spotify.Session>`
+
+        A log message from *libspotify*.
+        """
         pass
 
     def end_of_track(self, sess):
+        """
+        Callback.
+
+        :param sess:    the current session.
+        :type sess:     :class:`Session <spotify.Session>`
+
+        Playback has reached the end of the current track.
+        """
         pass

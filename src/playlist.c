@@ -423,7 +423,7 @@ PySequenceMethods PlaylistContainer_as_sequence = {
 PyTypeObject PlaylistContainerType = {
     PyObject_HEAD_INIT(NULL)
     0,                         /*ob_size*/
-    "spotify.playlist.PlaylistContainer",     /*tp_name*/
+    "spotify.PlaylistContainer",     /*tp_name*/
     sizeof(PlaylistContainer),             /*tp_basicsize*/
     0,                         /*tp_itemsize*/
     (destructor)PlaylistContainer_dealloc, /*tp_dealloc*/

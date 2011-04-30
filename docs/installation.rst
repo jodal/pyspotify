@@ -20,7 +20,7 @@ Using PIP
 
 The ``pip`` program for installing Python packages is usually found is the
 ``python-pip`` package of your linux distribution. 
-To install ``pyspotify``, run as root:::
+To install ``pyspotify``, run as root::
 
     # pip install -U pyspotify
 

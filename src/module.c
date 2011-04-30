@@ -76,6 +76,7 @@ PyMODINIT_FUNC init_spotify(void) {
     album_init(m);
     albumbrowser_init(m);
     artist_init(m);
+    artistbrowser_init(m);
     link_init(m);
     playlist_init(m);
     session_init(m);

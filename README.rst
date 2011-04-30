@@ -20,7 +20,7 @@ License information
 -------------------
 
 This package is licensed under the Apache License, Version 2.0.  Please see the
-file doc/LICENSE for more information.
+file docs/LICENSE for more information.
 
 This product uses SPOTIFY(R) CORE but is not endorsed, certified or otherwise
 approved in any way by Spotify. Spotify is the registered trade mark of the
@@ -30,11 +30,7 @@ Introduction
 ------------
 
 This package provides a Python interface to Spotify's online music streaming
-service.  This package is virtually API complete, and should provide everything
-you need to write a spotify client in Python.
-
-The missing parts of the API are: artist browsing, album browsing and the image
-handling subsystem.  These will be added soon.
+service.
 
 To use this package you will also need libspotify, availably from Spotify here:
 
@@ -43,14 +39,38 @@ To use this package you will also need libspotify, availably from Spotify here:
 You will need a Spotify Premium account.  You will also need to apply for, and
 receive an API key from spotify.
 
-I include a copy of libspotify in this package, to make use of it easier - in
-particular it has some installation issues on Ubuntu that have not been fixed
-yet.
+Completion status
+-----------------
+
+Pyspotify is very usable, and implements most of the Spotify API. The table
+below shows what is done and what is left to be done.
+
+
+
+ ==================================  ==================================
+ Subsystem                           Status
+ ==================================  ==================================
+ Error handling                      Fully implemented
+ Session handling                    Fully implemented
+ Link subsystem                      Fully implemented
+ Track subsystem                     Fully implemented
+ Album subsystem                     Fully implemented
+ Artist subsystem                    Fully implemented
+ Album browsing                      Fully implemented
+ Artist browsing                     Fully implemented
+ Image handling                      Partially implemented
+ Search subsystem                    Fully implemented
+ Playlist subsystem                  Partially implemented
+ User handling                       Not implemented
+ Toplist handling                    Not implemented
+ Inbox subsystem                     Not implemented
+ ==================================  ==================================
+
 
 Building the software
 ---------------------
 
-See doc/INSTALL
+See docs/installation.rst
 
 Trying it out
 -------------

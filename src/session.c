@@ -35,14 +35,6 @@
 
 static int session_constructed = 0;
 
-static void delete_trampoline(Callback *tr) {
-    if (tr->userdata) {
-        Py_DECREF(tr->userdata);
-    }
-    Py_DECREF(tr->callback);
-    free(tr);
-}
-
 static PyObject *PyTuple_NewByPreappending(PyObject *firstObject, PyObject *tuple)
 {
     PyObject *result = PyTuple_New(PyObject_Length(tuple) + 1);

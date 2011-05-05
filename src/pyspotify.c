@@ -1,6 +1,6 @@
 /* $Id$
  *
- * Copyright 2009 Doug Winter
+ * Copyright 2011 Antoine Pierlot-Garcin
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,21 +15,27 @@
  * limitations under the License.
 */
 
-#pragma once
-
-// define DEBUG to get lots of extra crap printed out
-// #define DEBUG 1
-
 #include <Python.h>
+#include <pyspotify.h>
 
-extern PyObject *SpotifyError;
-extern PyObject *SpotifyApiVersion;
+Callback *create_trampoline(PyObject *callback, PyObject *userdata) {
+    Callback *tr = NULL;
 
-typedef struct {
-    PyObject *callback;
-    PyObject *userdata;
-} Callback;
+    tr = malloc(sizeof(Callback));
+    Py_INCREF(callback);
+    Py_XINCREF(userdata);
+    tr->callback = callback;
+    tr->userdata = userdata;
+    return tr;
+}
 
-Callback *create_trampoline(PyObject *callback, PyObject *userdata);
-void delete_trampoline(Callback *tr);
+void delete_trampoline(Callback *tr) {
+    PyGILState_STATE gstate;
+
+    gstate = PyGILState_Ensure();
+    Py_XDECREF(tr->userdata);
+    Py_DECREF(tr->callback);
+    free(tr);
+    PyGILState_Release(gstate);
+}
 

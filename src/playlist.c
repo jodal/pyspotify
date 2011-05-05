@@ -17,11 +17,22 @@
 
 #include <Python.h>
 #include <structmember.h>
-#include "libspotify/api.h"
+#include <libspotify/api.h>
 #include "pyspotify.h"
 #include "playlist.h"
 #include "track.h"
 #include "session.h"
+
+/* This is the playlist callbacks table.
+ *
+ * It is a linked list of entries keeping enough information into pyspotify
+ * to be able to remove the callbacks after a while, especially when dealing
+ * with a different python Playlist object than the one the callbacks were
+ * added from. Each entry corresponds to a spotify playlist on which
+ * callbacks have been added. When all callbacks are removed from a playlist,
+ * the entry is free'd from memory.
+ */
+static pl_cb_entry *playlist_callbacks_table = NULL;
 
 static PyMemberDef Playlist_members[] = {
     {NULL}
@@ -87,43 +98,128 @@ static PyObject *Playlist_remove_tracks(Playlist *self, PyObject *args) {
     return handle_error(err);
 }
 
-typedef struct {
-    PyObject *callback;
-    PyObject *userdata;
-} playlist_callback_trampoline;
+static void pl_callbacks_table_add(Playlist *pl, playlist_callback *cb) {
+    pl_cb_entry *curr, *entry = NULL;
 
-static PyObject *Playlist__add_callback(Playlist *self, PyObject *args, sp_playlist_callbacks pl_callbacks) {
+    /* Look for an existing entry for this playlist */
+    curr = playlist_callbacks_table;
+    while (curr) {
+        if (curr->playlist == pl->_playlist) {
+            entry = curr;
+            break;
+        }
+        curr = curr->next;
+    }
+    /* Update callbacks entry */
+    if (entry) {
+        cb->next = entry->callbacks;
+        entry->callbacks = cb;
+    } else {
+        cb->next = NULL;
+        entry = malloc(sizeof(pl_cb_entry));
+        sp_playlist_add_ref(pl->_playlist);
+        entry->playlist = pl->_playlist;
+        entry->callbacks = cb;
+        entry->next = playlist_callbacks_table;
+        playlist_callbacks_table = entry;
+    }
+}
+
+static playlist_callback *pl_callbacks_table_remove(Playlist *pl,
+    PyObject *callback, PyObject *userdata) {
+    pl_cb_entry *e_prev = NULL, *e_curr, *entry = NULL;
+    playlist_callback *c_prev = NULL, *c_curr;
+    playlist_callback *result = NULL;
+    PyObject *code1, *code2;
+
+    /* Look for an existing entry for this playlist */
+    e_curr = playlist_callbacks_table;
+    while (e_curr) {
+        if (e_curr->playlist == pl->_playlist) {
+            entry = e_curr;
+            break;
+        }
+        e_prev = e_curr;
+        e_curr = e_curr->next;
+    }
+    /* Update callbacks entry */
+    if (!entry) {
+        return NULL;
+    } else {
+        c_curr = entry->callbacks;
+        while (c_curr) {
+            /* Note: a sole Python function can be represented by several
+             * Python Function objects. However, to each function corresponds
+             * an unique Code object.
+             */
+            code1 = PyFunction_GetCode(c_curr->trampoline->callback);
+            code2 = PyFunction_GetCode(callback);
+            if (code1 == code2 &&
+                c_curr->trampoline->userdata == userdata) {
+                result = c_curr;
+                if (c_prev) {
+                    c_prev->next = c_curr->next;
+                } else {
+                    entry->callbacks = c_curr->next;
+                };
+                break;
+            }
+            c_prev = c_curr;
+            c_curr = c_curr->next;
+        }
+    }
+    if (!result)
+        return NULL;
+    /* Cleanup */
+    if (!entry->callbacks) {
+       if (e_prev) {
+           e_prev->next = entry->next;
+       } else {
+           playlist_callbacks_table = entry->next;
+       }
+       sp_playlist_release(entry->playlist);
+       free(entry);
+   }
+   return result;
+}
+
+static PyObject *Playlist_add_callback(Playlist *self, PyObject *args,
+    sp_playlist_callbacks *pl_callbacks) {
     PyObject *callback;
     PyObject *userdata = NULL;
-    playlist_callback_trampoline *tramp;
+    Callback *tramp;
+    playlist_callback *head, *to_add;
+
     if(!PyArg_ParseTuple(args, "O|O", &callback, &userdata))
         return NULL;
     if (userdata == NULL) {
-        userdata = (PyObject *)Py_None;
-        Py_INCREF(Py_None);
+        userdata = Py_None;
     }
-    Py_INCREF(callback);
-    Py_INCREF(userdata);
-    tramp = malloc(sizeof(playlist_callback_trampoline));
-    tramp->userdata = userdata;
-    tramp->callback = callback;
-    Py_BEGIN_ALLOW_THREADS
-    sp_playlist_add_callbacks(self->_playlist, &pl_callbacks, tramp);
-    Py_END_ALLOW_THREADS
+    tramp = create_trampoline(callback, userdata);
+    to_add = malloc(sizeof(playlist_callback));
+    to_add->callback = pl_callbacks;
+    to_add->trampoline = tramp;
+    pl_callbacks_table_add(self, to_add);
+#ifdef DEBUG
+    fprintf(stderr, "[DEBUG]-playlist- adding callback (%p,%p) py(%p,%p)\n",
+        pl_callbacks, tramp, PyFunction_GetCode(tramp->callback), tramp->userdata);
+#endif
+    sp_playlist_add_callbacks(self->_playlist, pl_callbacks, tramp);
     Py_RETURN_NONE;
 }
 
 void playlist_tracks_added_callback(sp_playlist *playlist, sp_track *const *tracks, int num_tracks, int position, void *userdata) {
-    playlist_callback_trampoline *tramp = (playlist_callback_trampoline *)userdata;
+    Callback *tramp = (Callback *)userdata;
     PyGILState_STATE gstate;
     PyObject *py_tracks = PyList_New(num_tracks);
     int i;
+
+    gstate = PyGILState_Ensure();
     for (i = 0; i < num_tracks; i++) {
         Track *t = (Track *)PyObject_CallObject((PyObject *)&TrackType, NULL);
         t->_track = tracks[i];
         PyList_SetItem(py_tracks, i, (PyObject *)t);
     }
-    gstate = PyGILState_Ensure();
     Playlist *p = (Playlist *)PyObject_CallObject((PyObject *)&PlaylistType, NULL);
     p->_playlist = playlist;
     Py_INCREF(p);
@@ -142,17 +238,21 @@ void playlist_tracks_added_callback(sp_playlist *playlist, sp_track *const *trac
 }
 
 static PyObject *Playlist_add_tracks_added_callback(Playlist *self, PyObject *args) {
-    sp_playlist_callbacks pl_callbacks = {
-        .tracks_added = &playlist_tracks_added_callback
-    };
-    return Playlist__add_callback(self, args, pl_callbacks);
+    sp_playlist_callbacks *spl_callbacks;
+
+    spl_callbacks = malloc(sizeof(sp_playlist_callbacks));
+    memset(spl_callbacks, 0, sizeof(sp_playlist_callbacks));
+    spl_callbacks->tracks_added = &playlist_tracks_added_callback;
+    return Playlist_add_callback(self, args, spl_callbacks);
 }
 
-void playlist_tracks_removed_callback(sp_playlist *playlist, const int *tracks, int num_tracks, void *userdata) {
-    playlist_callback_trampoline *tramp = (playlist_callback_trampoline *)userdata;
+void playlist_tracks_removed_callback(sp_playlist *playlist, const int *tracks,
+    int num_tracks, void *userdata) {
+    Callback *tramp = (Callback *)userdata;
     PyGILState_STATE gstate;
     PyObject *py_tracks = PyList_New(num_tracks);
     int i;
+
     for (i = 0; i < num_tracks; i++) {
         PyList_SetItem(py_tracks, i, Py_BuildValue("i", tracks[i]));
     }
@@ -174,17 +274,21 @@ void playlist_tracks_removed_callback(sp_playlist *playlist, const int *tracks, 
 }
 
 static PyObject *Playlist_add_tracks_removed_callback(Playlist *self, PyObject *args) {
-    sp_playlist_callbacks pl_callbacks = {
-        .tracks_removed = &playlist_tracks_removed_callback
-    };
-    return Playlist__add_callback(self, args, pl_callbacks);
+    sp_playlist_callbacks *spl_callbacks;
+
+    spl_callbacks = malloc(sizeof(sp_playlist_callbacks));
+    memset(spl_callbacks, 0, sizeof(sp_playlist_callbacks));
+    spl_callbacks->tracks_removed = &playlist_tracks_removed_callback;
+    return Playlist_add_callback(self, args, spl_callbacks);
 }
 
-void playlist_tracks_moved_callback(sp_playlist *playlist, const int *tracks, int num_tracks, int new_position, void *userdata) {
-    playlist_callback_trampoline *tramp = (playlist_callback_trampoline *)userdata;
+void playlist_tracks_moved_callback(sp_playlist *playlist, const int *tracks,
+    int num_tracks, int new_position, void *userdata) {
+    Callback *tramp = (Callback *)userdata;
     PyGILState_STATE gstate;
     PyObject *py_tracks = PyList_New(num_tracks);
     int i;
+
     for (i = 0; i < num_tracks; i++) {
         PyList_SetItem(py_tracks, i, Py_BuildValue("i", tracks[i]));
     }
@@ -207,15 +311,42 @@ void playlist_tracks_moved_callback(sp_playlist *playlist, const int *tracks, in
 }
 
 static PyObject *Playlist_add_tracks_moved_callback(Playlist *self, PyObject *args) {
-    sp_playlist_callbacks pl_callbacks = {
-        .tracks_moved = &playlist_tracks_moved_callback
-    };
-    return Playlist__add_callback(self, args, pl_callbacks);
+    sp_playlist_callbacks *spl_callbacks;
+
+    spl_callbacks = malloc(sizeof(sp_playlist_callbacks));
+    memset(spl_callbacks, 0, sizeof(sp_playlist_callbacks));
+    spl_callbacks->tracks_moved = &playlist_tracks_moved_callback;
+    return Playlist_add_callback(self, args, spl_callbacks);
 }
 
-static PyObject *Playlist_remove_callbacks(Playlist *self, PyObject *args) {
-    PyErr_SetString(PyExc_NotImplementedError, "");
-    return NULL;
+static PyObject *Playlist_remove_callback(Playlist *self, PyObject *args) {
+    PyObject *callback, *userdata = NULL;
+    playlist_callback *pl_callback;
+
+    if (!PyArg_ParseTuple(args, "O|O", &callback, &userdata))
+        return NULL;
+    if (!userdata) {
+        userdata = Py_None;
+    }
+#ifdef DEBUG
+    fprintf(stderr, "[DEBUG]-playlist- looking for callback py(%p,%p)\n",
+        PyFunction_GetCode(callback), userdata);
+#endif
+    pl_callback = pl_callbacks_table_remove(self, callback, userdata);
+    if (!pl_callback) {
+        PyErr_SetString(SpotifyError, "This callback was not added");
+        return NULL;
+    }
+#ifdef DEBUG
+    fprintf(stderr, "[DEBUG]-playlist- removing callback (%p,%p)\n",
+        pl_callback->callback, pl_callback->trampoline);
+#endif
+    sp_playlist_remove_callbacks(self->_playlist, pl_callback->callback,
+        pl_callback->trampoline);
+    delete_trampoline(pl_callback->trampoline);
+    free(pl_callback->callback);
+    free(pl_callback);
+    Py_RETURN_NONE;
 }
 
 static PyObject *Playlist_name(Playlist *self) {
@@ -300,6 +431,10 @@ static PyMethodDef Playlist_methods[] = {
      (PyCFunction)Playlist_add_tracks_moved_callback,
      METH_VARARGS,
      ""},
+    {"remove_callback",
+    (PyCFunction)Playlist_remove_callback,
+    METH_VARARGS,
+    ""},
     {"name",
      (PyCFunction)Playlist_name,
      METH_NOARGS,

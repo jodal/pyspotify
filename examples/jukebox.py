@@ -29,7 +29,7 @@ try:
     from spotify.alsahelper import AlsaController
 except ImportError:
     from spotify.osshelper import OssController as AlsaController
-from spotify import Link
+from spotify import Link,SpotifyError
 
 class JukeboxUI(cmd.Cmd, threading.Thread):
 
@@ -159,6 +159,35 @@ class JukeboxUI(cmd.Cmd, threading.Thread):
     def emptyline(self):
         pass
 
+    def do_watch(self, line):
+        if not line:
+            print """Usage: watch [playlist]
+You will be notified when tracks are added, moved or removed from the playlist."""
+        else:
+            try:
+                p = int(line)
+            except ValueError:
+                print "That's not a number!"
+                return
+            if p < 0 or p >= len(self.jukebox.ctr):
+                print "That's out of range!"
+                return
+            self.jukebox.watch(self.jukebox.ctr[p])
+
+    def do_unwatch(self, line):
+        if not line:
+            print "Usage: unwatch [playlist]"
+        else:
+            try:
+                p = int(line)
+            except ValueError:
+                print "That's not a number!"
+                return
+            if p < 0 or p >= len(self.jukebox.ctr):
+                print "That's out of range!"
+                return
+            self.jukebox.watch(self.jukebox.ctr[p], True)
+
     do_ls = do_list
     do_EOF = do_quit
 
@@ -178,13 +207,17 @@ class Jukebox(SpotifySessionManager):
         self._queue = []
         print "Logging in, please wait..."
 
+
     def logged_in(self, session, error):
+        def plc_loaded(container, userdata):
+            print "Playlist container loaded!"
         if error:
             print error
             return
         self.session = session
         try:
             self.ctr = session.playlist_container()
+            self.ctr.add_loaded_callback(plc_loaded)
             self.starred = session.starred()
             self.ui.start()
         except:
@@ -260,6 +293,28 @@ class Jukebox(SpotifySessionManager):
                 print album.name()
         callback(browser)
 
+    def watch(self, p, unwatch=False):
+        def callback_added(pl, tracks, num, pos, userdata=None):
+            print "\nTracks added in playlist: %s <%s>" % (pl.name(),userdata)
+        def callback_removed(pl, tracks, num, userdata=None):
+            print "\nTracks removed in playlist %s <%s>" % (pl.name(),userdata)
+        def callback_moved(pl, tracks, num, pos, userdata=None):
+            print "\nTracks moved in playlist: %s <%s>" % (pl.name(),userdata)
+        if not unwatch:
+            print "Watching playlist: %s" % p.name()
+            p.add_tracks_added_callback(callback_added)
+            p.add_tracks_removed_callback(callback_removed)
+            p.add_tracks_moved_callback(callback_moved, "cb1")
+            p.add_tracks_moved_callback(callback_moved, "cb2")
+            p.remove_callback(callback_moved, "cb1");
+        else:
+            try:
+                print "Unatching playlist: %s" % p.name()
+                p.remove_callback(callback_added);
+                p.remove_callback(callback_moved, "cb2");
+                p.remove_callback(callback_removed);
+            except SpotifyError, e:
+                print "Spotify error: %s" % e
 
 if __name__ == '__main__':
     import optparse

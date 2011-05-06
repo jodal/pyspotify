@@ -31,13 +31,14 @@
 #include "album.h"
 #include "link.h"
 #include "playlist.h"
+#include "playlistcontainer.h"
 #include "search.h"
 #include "session.h"
 #include "track.h"
 
 /***************************** FORWARD DEFINES *****************************/
 
-sp_album *_mock_album(char *name, sp_artist *artist, int year, byte *cover, 
+sp_album *_mock_album(char *name, sp_artist *artist, int year, byte *cover,
 int type, int loaded);
 sp_artist *_mock_artist(char *name, int loaded);
 sp_track *_mock_track(char *name, int num_artists, sp_artist **artists,
@@ -769,6 +770,7 @@ PyMODINIT_FUNC init_mockspotify(void) {
     artist_init(m);
     link_init(m);
     playlist_init(m);
+    playlistcontainer_init(m);
     session_init(m);
     search_init(m);
     track_init(m);

@@ -30,6 +30,7 @@
 #include "session.h"
 #include "track.h"
 #include "playlist.h"
+#include "playlistcontainer.h"
 #include "search.h"
 #include "image.h"
 

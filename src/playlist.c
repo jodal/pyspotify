@@ -191,6 +191,8 @@ static PyObject *Playlist_add_callback(Playlist *self, PyObject *args,
     if (userdata == NULL) {
         userdata = Py_None;
     }
+    if (!(callback = as_function(callback)))
+        return NULL;
     tramp = create_trampoline(callback, userdata);
     to_add = malloc(sizeof(playlist_callback));
     to_add->callback = pl_callbacks;
@@ -324,6 +326,8 @@ static PyObject *Playlist_remove_callback(Playlist *self, PyObject *args) {
     if (!userdata) {
         userdata = Py_None;
     }
+    if (!(callback = as_function(callback)))
+        return NULL;
 #ifdef DEBUG
     fprintf(stderr, "[DEBUG]-playlist- looking for callback py(%p,%p)\n",
         PyFunction_GetCode(callback), userdata);

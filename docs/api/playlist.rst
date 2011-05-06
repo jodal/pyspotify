@@ -70,8 +70,6 @@ objects.
 
         Removes the corresponding callback, userdata couple.
 
-        :warning: Not implemented yet.
-
     .. method:: remove_tracks(tracks)
 
         :param tracks:  A list of tracks to be removed from the playlist.

@@ -22,10 +22,20 @@
 #include "playlistcontainer.h"
 #include "playlist.h"
 
+/* This is the playlist container callbacks table.
+ *
+ * It is a linked list of entries keeping enough information into pyspotify
+ * to be able to remove the callbacks after a while, especially when dealing
+ * with a different python PlaylistContainer object than the one the callbacks
+ * were added from. Each entry corresponds to a spotify playlist container on
+ * which callbacks have been added. When all callbacks are removed from a
+ * playlist container, the entry is free'd from memory.
+ */
+static plc_cb_entry *playlistcontainer_callbacks_table = NULL;
+
 static PyMemberDef PlaylistContainer_members[] = {
     {NULL}
 };
-
 
 static PyObject *PlaylistContainer_new(PyTypeObject *type, PyObject *args, PyObject *kwds) {
     PlaylistContainer *self;
@@ -41,9 +51,154 @@ static void PlaylistContainer_dealloc(PlaylistContainer *self) {
     self->ob_type->tp_free(self);
 }
 
-static PyMethodDef PlaylistContainer_methods[] = {
-    {NULL}
-};
+static void plc_callbacks_table_add(PlaylistContainer *plc,
+    playlistcontainer_callback *cb)
+{
+    plc_cb_entry *curr, *entry = NULL;
+
+    /* Look for an existing entry for this playlist */
+    curr = playlistcontainer_callbacks_table;
+    while (curr) {
+        if (curr->playlistcontainer == plc->_playlistcontainer) {
+            entry = curr;
+            break;
+        }
+        curr = curr->next;
+    }
+    /* Update callbacks entry */
+    if (entry) {
+        cb->next = entry->callbacks;
+        entry->callbacks = cb;
+    } else {
+        cb->next = NULL;
+        entry = malloc(sizeof(plc_cb_entry));
+        sp_playlistcontainer_add_ref(plc->_playlistcontainer);
+        entry->playlistcontainer = plc->_playlistcontainer;
+        entry->callbacks = cb;
+        entry->next = playlistcontainer_callbacks_table;
+        playlistcontainer_callbacks_table = entry;
+    }
+}
+
+static playlistcontainer_callback *plc_callbacks_table_remove(
+    PlaylistContainer *plc, PyObject *callback, PyObject *userdata)
+{
+    plc_cb_entry *e_prev = NULL, *e_curr, *entry = NULL;
+    playlistcontainer_callback *c_prev = NULL, *c_curr;
+    playlistcontainer_callback *result = NULL;
+    PyObject *code1, *code2;
+
+    /* Look for an existing entry for this playlist */
+    e_curr = playlistcontainer_callbacks_table;
+    while (e_curr) {
+        if (e_curr->playlistcontainer == plc->_playlistcontainer) {
+            entry = e_curr;
+            break;
+        }
+        e_prev = e_curr;
+        e_curr = e_curr->next;
+    }
+    /* Update callbacks entry */
+    if (!entry) {
+        return NULL;
+    } else {
+        c_curr = entry->callbacks;
+        while (c_curr) {
+            /* Note: a sole Python function can be represented by several
+             * Python Function objects. However, to each function corresponds
+             * an unique Code object.
+             */
+            code1 = PyFunction_GetCode(c_curr->trampoline->callback);
+            code2 = PyFunction_GetCode(callback);
+            if (code1 == code2 &&
+                c_curr->trampoline->userdata == userdata) {
+                result = c_curr;
+                if (c_prev) {
+                    c_prev->next = c_curr->next;
+                } else {
+                    entry->callbacks = c_curr->next;
+                };
+                break;
+            }
+            c_prev = c_curr;
+            c_curr = c_curr->next;
+        }
+    }
+    if (!result)
+        return NULL;
+    /* Cleanup */
+    if (!entry->callbacks) {
+       if (e_prev) {
+           e_prev->next = entry->next;
+       } else {
+           playlistcontainer_callbacks_table = entry->next;
+       }
+       sp_playlistcontainer_release(entry->playlistcontainer);
+       free(entry);
+   }
+   return result;
+}
+
+static PyObject *PlaylistContainer_add_callback(PlaylistContainer *self,
+    PyObject *args, sp_playlistcontainer_callbacks *plc_callbacks)
+{
+    PyObject *callback;
+    PyObject *userdata = NULL;
+    Callback *tramp;
+    playlistcontainer_callback *head, *to_add;
+
+    if(!PyArg_ParseTuple(args, "O|O", &callback, &userdata))
+        return NULL;
+    if (userdata == NULL)
+        userdata = Py_None;
+    if (!(callback = as_function(callback)))
+        return NULL;
+    tramp = create_trampoline(callback, userdata);
+    to_add = malloc(sizeof(playlistcontainer_callback));
+    to_add->callback = plc_callbacks;
+    to_add->trampoline = tramp;
+    plc_callbacks_table_add(self, to_add);
+#ifdef DEBUG
+    fprintf(stderr, "[DEBUG]-plcontainer- adding callback (%p,%p) py(%p,%p)\n",
+        plc_callbacks, tramp, PyFunction_GetCode(tramp->callback),
+        tramp->userdata);
+#endif
+    sp_playlistcontainer_add_callbacks(self->_playlistcontainer, plc_callbacks,
+        tramp);
+    Py_RETURN_NONE;
+}
+
+void playlistcontainer_loaded_callback(sp_playlistcontainer *playlistcontainer,
+    void *userdata)
+{
+    Callback *tramp = (Callback *)userdata;
+    PyGILState_STATE gstate;
+
+    gstate = PyGILState_Ensure();
+    PlaylistContainer *pc = (PlaylistContainer *)PyObject_CallObject(
+        (PyObject *)&PlaylistContainerType, NULL);
+    pc->_playlistcontainer = playlistcontainer;
+    Py_INCREF(pc);
+    PyObject_CallFunctionObjArgs(
+        tramp->callback,
+        pc,
+        tramp->userdata,
+        NULL
+    );
+    Py_DECREF(pc);
+    PyGILState_Release(gstate);
+}
+
+static PyObject *PlaylistContainer_add_loaded_callback(PlaylistContainer *self,
+    PyObject *args)
+{
+    sp_playlistcontainer_callbacks *splc_callbacks;
+
+    splc_callbacks = malloc(sizeof(sp_playlistcontainer_callbacks));
+    memset(splc_callbacks, 0, sizeof(sp_playlistcontainer_callbacks));
+    splc_callbacks->container_loaded = &playlistcontainer_loaded_callback;
+    return PlaylistContainer_add_callback(self, args, splc_callbacks);
+}
 
 static PyObject *PlaylistContainer_str(PyObject *o) {
     Playlist *self = (Playlist *)o;
@@ -85,6 +240,14 @@ PySequenceMethods PlaylistContainer_as_sequence = {
     0,						// sq_contains
     0,						// sq_inplace_concat
     0,						// sq_inplace_repeat
+};
+
+static PyMethodDef PlaylistContainer_methods[] = {
+    {"add_loaded_callback",
+     (PyCFunction)PlaylistContainer_add_loaded_callback,
+     METH_VARARGS,
+     ""},
+    {NULL}
 };
 
 PyTypeObject PlaylistContainerType = {

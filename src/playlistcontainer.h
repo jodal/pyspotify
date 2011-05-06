@@ -33,3 +33,10 @@ typedef struct _playlistcontainer_callback {
     Callback *trampoline;
     struct _playlistcontainer_callback *next;
 } playlistcontainer_callback;
+
+/* An entry in the playlist container callback table */
+typedef struct _plc_cb_entry {
+    sp_playlistcontainer *playlistcontainer;
+    playlistcontainer_callback *callbacks;
+    struct _plc_cb_entry *next;
+} plc_cb_entry;

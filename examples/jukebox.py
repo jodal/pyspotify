@@ -211,6 +211,13 @@ class Jukebox(SpotifySessionManager):
     def logged_in(self, session, error):
         def plc_loaded(container, userdata):
             print "Playlist container loaded!"
+        def plc_added(container, playlist, position, userdata):
+            print "Playlist %s added at position %s" % (playlist.name(), position)
+        def plc_moved(container, playlist, position, new_position, userdata):
+            print "Playlist %s moved from position %s to %s" % \
+                (playlist.name(), position, new_position)
+        def plc_removed(container, playlist, position, userdata):
+            print "Playlist %s removed from position %s" % (playlist.name(), position)
         if error:
             print error
             return
@@ -218,6 +225,9 @@ class Jukebox(SpotifySessionManager):
         try:
             self.ctr = session.playlist_container()
             self.ctr.add_loaded_callback(plc_loaded)
+            self.ctr.add_playlist_added_callback(plc_added)
+            self.ctr.add_playlist_moved_callback(plc_moved)
+            self.ctr.add_playlist_removed_callback(plc_removed)
             self.starred = session.starred()
             self.ui.start()
         except:

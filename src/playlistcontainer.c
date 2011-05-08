@@ -200,6 +200,125 @@ static PyObject *PlaylistContainer_add_loaded_callback(PlaylistContainer *self,
     return PlaylistContainer_add_callback(self, args, splc_callbacks);
 }
 
+void playlistcontainer_playlist_added_callback(sp_playlistcontainer *playlistcontainer,
+    sp_playlist *playlist, int position, void *userdata)
+{
+    Callback *tramp;
+    PlaylistContainer *pc;
+    Playlist *p;
+    PyObject *pos;
+    PyGILState_STATE gstate;
+
+    gstate = PyGILState_Ensure();
+    tramp = (Callback *)userdata;
+    pc = (PlaylistContainer *)PyObject_CallObject(
+        (PyObject *)&PlaylistContainerType, NULL);
+    pc->_playlistcontainer = playlistcontainer;
+    p = (Playlist *)PyObject_CallObject((PyObject *)&PlaylistType, NULL);
+    p->_playlist = playlist;
+    pos = Py_BuildValue("i", position);
+    PyObject_CallFunctionObjArgs(
+        tramp->callback,
+        pc,
+        p,
+        pos,
+        tramp->userdata,
+        NULL
+    );
+    PyGILState_Release(gstate);
+}
+
+static PyObject *PlaylistContainer_add_playlist_added_callback(PlaylistContainer *self,
+    PyObject *args)
+{
+    sp_playlistcontainer_callbacks *splc_callbacks;
+
+    splc_callbacks = malloc(sizeof(sp_playlistcontainer_callbacks));
+    memset(splc_callbacks, 0, sizeof(sp_playlistcontainer_callbacks));
+    splc_callbacks->playlist_added = &playlistcontainer_playlist_added_callback;
+    return PlaylistContainer_add_callback(self, args, splc_callbacks);
+}
+
+void playlistcontainer_playlist_moved_callback(sp_playlistcontainer *playlistcontainer,
+    sp_playlist *playlist, int position, int new_position, void *userdata)
+{
+    Callback *tramp;
+    PlaylistContainer *pc;
+    Playlist *p;
+    PyObject *pos, *new_pos;
+    PyGILState_STATE gstate;
+
+    gstate = PyGILState_Ensure();
+    tramp = (Callback *)userdata;
+    pc = (PlaylistContainer *)PyObject_CallObject(
+        (PyObject *)&PlaylistContainerType, NULL);
+    pc->_playlistcontainer = playlistcontainer;
+    p = (Playlist *)PyObject_CallObject((PyObject *)&PlaylistType, NULL);
+    p->_playlist = playlist;
+    pos = Py_BuildValue("i", position);
+    new_pos = Py_BuildValue("i", new_position);
+    PyObject_CallFunctionObjArgs(
+        tramp->callback,
+        pc,
+        p,
+        pos,
+        new_pos,
+        tramp->userdata,
+        NULL
+    );
+    PyGILState_Release(gstate);
+}
+
+static PyObject *PlaylistContainer_add_playlist_moved_callback(PlaylistContainer *self,
+    PyObject *args)
+{
+    sp_playlistcontainer_callbacks *splc_callbacks;
+
+    splc_callbacks = malloc(sizeof(sp_playlistcontainer_callbacks));
+    memset(splc_callbacks, 0, sizeof(sp_playlistcontainer_callbacks));
+    splc_callbacks->playlist_moved = &playlistcontainer_playlist_moved_callback;
+    return PlaylistContainer_add_callback(self, args, splc_callbacks);
+}
+
+void playlistcontainer_playlist_removed_callback(sp_playlistcontainer *playlistcontainer,
+    sp_playlist *playlist, int position, void *userdata)
+{
+    Callback *tramp;
+    PlaylistContainer *pc;
+    Playlist *p;
+    PyObject *pos;
+    PyGILState_STATE gstate;
+
+    gstate = PyGILState_Ensure();
+    tramp = (Callback *)userdata;
+    pc = (PlaylistContainer *)PyObject_CallObject(
+        (PyObject *)&PlaylistContainerType, NULL);
+    pc->_playlistcontainer = playlistcontainer;
+    p = (Playlist *)PyObject_CallObject((PyObject *)&PlaylistType, NULL);
+    p->_playlist = playlist;
+    pos = Py_BuildValue("i", position);
+    PyObject_CallFunctionObjArgs(
+        tramp->callback,
+        pc,
+        p,
+        pos,
+        tramp->userdata,
+        NULL
+    );
+    PyGILState_Release(gstate);
+}
+
+static PyObject *PlaylistContainer_add_playlist_removed_callback(PlaylistContainer *self,
+    PyObject *args)
+{
+    sp_playlistcontainer_callbacks *splc_callbacks;
+
+    splc_callbacks = malloc(sizeof(sp_playlistcontainer_callbacks));
+    memset(splc_callbacks, 0, sizeof(sp_playlistcontainer_callbacks));
+    splc_callbacks->playlist_removed = &playlistcontainer_playlist_removed_callback;
+    return PlaylistContainer_add_callback(self, args, splc_callbacks);
+}
+
 static PyObject *PlaylistContainer_str(PyObject *o) {
     Playlist *self = (Playlist *)o;
     PyErr_SetString(PyExc_NotImplementedError, "");
@@ -245,6 +364,18 @@ PySequenceMethods PlaylistContainer_as_sequence = {
 static PyMethodDef PlaylistContainer_methods[] = {
     {"add_loaded_callback",
      (PyCFunction)PlaylistContainer_add_loaded_callback,
+     METH_VARARGS,
+     ""},
+    {"add_playlist_added_callback",
+     (PyCFunction)PlaylistContainer_add_playlist_added_callback,
+     METH_VARARGS,
+     ""},
+    {"add_playlist_moved_callback",
+     (PyCFunction)PlaylistContainer_add_playlist_moved_callback,
+     METH_VARARGS,
+     ""},
+    {"add_playlist_removed_callback",
+     (PyCFunction)PlaylistContainer_add_playlist_removed_callback,
      METH_VARARGS,
      ""},
     {NULL}

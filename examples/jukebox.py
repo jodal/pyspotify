@@ -24,7 +24,8 @@ import time
 import threading
 import os
 
-from spotify.manager import SpotifySessionManager
+from spotify.managers import SpotifySessionManager, SpotifyPlaylistManager, \
+    SpotifyContainerManager
 try:
     from spotify.alsahelper import AlsaController
 except ImportError:
@@ -191,6 +192,32 @@ You will be notified when tracks are added, moved or removed from the playlist."
     do_ls = do_list
     do_EOF = do_quit
 
+
+## playlist callbacks ##
+class JukeboxPlaylistManager(SpotifyPlaylistManager):
+    def tracks_added(p, t, i, u):
+        print 'Tracks added to playlist %s' % p.name()
+
+    def tracks_moved(p, t, i, u):
+        print 'Tracks moved in playlist %s' % p.name()
+
+    def tracks_removed(p, t, u):
+        print 'Tracks removed from playlist %s' % p.name()
+
+## container calllbacks ##
+class JukeboxContainerManager(SpotifyContainerManager):
+    def container_loaded(c, u):
+        print 'Container loaded !'
+
+    def playlist_added(c, p, i, u):
+        print 'Container: playlist "%s" added.' % p.name()
+
+    def playlist_moved(c, p, oi, ni, u):
+        print 'Container: playlist "%s" moved.' % p.name()
+
+    def playlist_removed(c, p, i, u):
+        print 'Container: playlist "%s" removed.' % p.name()
+
 class Jukebox(SpotifySessionManager):
 
     queued = False
@@ -205,29 +232,19 @@ class Jukebox(SpotifySessionManager):
         self.ctr = None
         self.playing = False
         self._queue = []
+        self.playlist_manager = JukeboxPlaylistManager()
+        self.container_manager = JukeboxContainerManager()
         print "Logging in, please wait..."
 
 
     def logged_in(self, session, error):
-        def plc_loaded(container, userdata):
-            print "Playlist container loaded!"
-        def plc_added(container, playlist, position, userdata):
-            print "Playlist %s added at position %s" % (playlist.name(), position)
-        def plc_moved(container, playlist, position, new_position, userdata):
-            print "Playlist %s moved from position %s to %s" % \
-                (playlist.name(), position, new_position)
-        def plc_removed(container, playlist, position, userdata):
-            print "Playlist %s removed from position %s" % (playlist.name(), position)
         if error:
             print error
             return
         self.session = session
         try:
             self.ctr = session.playlist_container()
-            self.ctr.add_loaded_callback(plc_loaded)
-            self.ctr.add_playlist_added_callback(plc_added)
-            self.ctr.add_playlist_moved_callback(plc_moved)
-            self.ctr.add_playlist_removed_callback(plc_removed)
+            self.container_manager.watch(self.ctr)
             self.starred = session.starred()
             self.ui.start()
         except:
@@ -304,27 +321,12 @@ class Jukebox(SpotifySessionManager):
         callback(browser)
 
     def watch(self, p, unwatch=False):
-        def callback_added(pl, tracks, num, pos, userdata=None):
-            print "\nTracks added in playlist: %s <%s>" % (pl.name(),userdata)
-        def callback_removed(pl, tracks, num, userdata=None):
-            print "\nTracks removed in playlist %s <%s>" % (pl.name(),userdata)
-        def callback_moved(pl, tracks, num, pos, userdata=None):
-            print "\nTracks moved in playlist: %s <%s>" % (pl.name(),userdata)
         if not unwatch:
             print "Watching playlist: %s" % p.name()
-            p.add_tracks_added_callback(callback_added)
-            p.add_tracks_removed_callback(callback_removed)
-            p.add_tracks_moved_callback(callback_moved, "cb1")
-            p.add_tracks_moved_callback(callback_moved, "cb2")
-            p.remove_callback(callback_moved, "cb1");
+            self.playlist_manager.watch(p);
         else:
-            try:
-                print "Unatching playlist: %s" % p.name()
-                p.remove_callback(callback_added);
-                p.remove_callback(callback_moved, "cb2");
-                p.remove_callback(callback_removed);
-            except SpotifyError, e:
-                print "Spotify error: %s" % e
+            print "Unatching playlist: %s" % p.name()
+            self.playlist_manager.unwatch(p)
 
 if __name__ == '__main__':
     import optparse

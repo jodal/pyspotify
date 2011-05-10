@@ -225,7 +225,6 @@ void playlist_tracks_added_callback(sp_playlist *playlist, sp_track *const *trac
         tramp->callback,
         p,
         py_tracks,
-        Py_BuildValue("i", num_tracks),
         Py_BuildValue("i", position),
         tramp->userdata,
         NULL
@@ -262,7 +261,6 @@ void playlist_tracks_removed_callback(sp_playlist *playlist, const int *tracks,
         tramp->callback,
         p,
         py_tracks,
-        Py_BuildValue("i", num_tracks),
         tramp->userdata,
         NULL
     );
@@ -298,7 +296,6 @@ void playlist_tracks_moved_callback(sp_playlist *playlist, const int *tracks,
         tramp->callback,
         p,
         py_tracks,
-        Py_BuildValue("i", num_tracks),
         Py_BuildValue("i", new_position),
         tramp->userdata,
         NULL

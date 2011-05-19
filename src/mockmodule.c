@@ -25,10 +25,12 @@
 #include <Python.h>
 #include <stdio.h>
 #include <string.h>
-#include "libspotify/api.h"
+#include <libspotify/api.h>
 #include "pyspotify.h"
-#include "artist.h"
 #include "album.h"
+#include "albumbrowser.h"
+#include "artist.h"
+#include "artistbrowser.h"
 #include "link.h"
 #include "playlist.h"
 #include "playlistcontainer.h"
@@ -39,13 +41,15 @@
 /***************************** FORWARD DEFINES *****************************/
 
 sp_album *_mock_album(char *name, sp_artist *artist, int year, byte *cover,
-int type, int loaded);
+                                        int type, int loaded, int available);
 sp_artist *_mock_artist(char *name, int loaded);
 sp_track *_mock_track(char *name, int num_artists, sp_artist **artists,
 		      sp_album *album, int duration, int popularity,
 		      int disc, int index, sp_error error, int loaded);
 sp_playlistcontainer *_mock_playlistcontainer();
 sp_playlist *_mock_playlist(char *name);
+sp_albumbrowse *_mock_albumbrowse(sp_album *album, bool loaded);
+sp_artistbrowse *_mock_artistbrowse(sp_artist *artist, bool loaded);
 
 /****************************** GLOBALS ************************************/
 
@@ -74,12 +78,23 @@ struct sp_artist {
     int loaded;
 };
 
+struct sp_artistbrowse {
+    sp_artist *artist;
+    int loaded;
+};
+
 struct sp_album {
     char name[1024];
     sp_artist *artist;
     int year;
     byte cover[20];
     int type;
+    int loaded;
+    bool available;
+};
+
+struct sp_albumbrowse {
+    sp_album *album;
     int loaded;
 };
 
@@ -232,6 +247,9 @@ void sp_session_player_seek(sp_session *session, int offset) {
 void sp_session_player_play(sp_session *session, bool b) {
 }
 
+void sp_session_player_unload(sp_session *session) {
+}
+
 bool sp_track_is_available(sp_session *session, sp_track *t) {
     return 1;
 }
@@ -254,9 +272,12 @@ sp_search *sp_search_create(sp_session *session, const char *query, int track_of
     search->did_you_mean = "did_you_mean";
     search->artist[0] = _mock_artist("foo", 1);
     search->artist[1] = _mock_artist("bar", 1);
-    search->album[0] = _mock_album("baz", search->artist[0], 2001, (byte *)"01234567890123456789", 1, 1);
-    search->album[1] = _mock_album("qux", search->artist[1], 2002, (byte *)"01234567890123456789", 1, 1);
-    search->album[2] = _mock_album("quux", search->artist[0], 2003, (byte *)"01234567890123456789", 1, 1);
+    search->album[0] = _mock_album("baz", search->artist[0], 2001,
+                                    (byte *)"01234567890123456789", 1, 1, 1);
+    search->album[1] = _mock_album("qux", search->artist[1], 2002,
+                                    (byte *)"01234567890123456789", 1, 1, 1);
+    search->album[2] = _mock_album("quux", search->artist[0], 2003,
+                                    (byte *)"01234567890123456789", 1, 1, 1);
     search->track[0] = _mock_track("corge", 1, search->artist, search->album[0], 99, 72, 1, 1, 0, 1);
     search->track[1] = _mock_track("grault", 1, search->artist, search->album[1], 98, 72, 1, 1, 0, 1);
     search->track[2] = _mock_track("garply", 1, search->artist, search->album[2], 97, 72, 1, 1, 0, 1);
@@ -341,7 +362,9 @@ sp_artist *sp_link_as_artist(sp_link *link) {
 sp_album *sp_link_as_album(sp_link *link) {
     if(strncmp(link->data, "link:album:", strlen("link:album:")))
 	return NULL;
-    return _mock_album(link->data + strlen("link:album:"), _mock_artist("mock", 1), 1901, (byte *)"", SP_ALBUMTYPE_ALBUM, 1);
+    return _mock_album(link->data + strlen("link:album:"),
+                            _mock_artist("mock", 1), 1901, (byte *)"",
+                            SP_ALBUMTYPE_ALBUM, 1, 1);
 }
 
 sp_link* sp_link_create_from_track(sp_track *track,int offset) {
@@ -457,6 +480,12 @@ void sp_track_set_starred(sp_session *s, const sp_track **ts, int n, bool starre
         ((sp_track *)ts[i])->starred = starred;
 }
 
+void sp_track_add_ref(sp_track *track) {
+}
+
+void sp_track_release(sp_track *track) {
+}
+
 /*************** MOCK ARTIST METHODS **********************/
 
 const char *sp_artist_name(sp_artist *a) {
@@ -467,7 +496,16 @@ bool sp_artist_is_loaded(sp_artist *a) {
     return a->loaded;
 }
 
+void sp_artist_release(sp_artist *a){
+}
+
 /**************** MOCK PLAYLIST METHODS *****************/
+
+void sp_playlist_add_ref(sp_playlist * p) {
+}
+
+void sp_playlist_release(sp_playlist * p) {
+}
 
 bool sp_playlist_is_loaded(sp_playlist *p) {
     return 1;
@@ -490,6 +528,11 @@ void sp_playlist_add_callbacks(sp_playlist *p, sp_playlist_callbacks *cb,
     p->callbacks = cb;
 }
 
+void sp_playlist_remove_callbacks(sp_playlist *p, sp_playlist_callbacks *cb,
+    void *userdata) {
+    p->callbacks = NULL;
+}
+
 bool sp_playlist_is_collaborative(sp_playlist *p) {
     return 0;
 }
@@ -500,12 +543,25 @@ sp_error sp_playlist_remove_tracks(sp_playlist *p, const int *tracks,
     return SP_ERROR_OK;
 }
 
+/********************* MOCK PLAYLIST CONTAINER METHODS ************/
+
+void sp_playlistcontainer_add_ref(sp_playlistcontainer * p) {
+}
+
+void sp_playlistcontainer_release(sp_playlistcontainer * p) {
+}
+
 sp_playlist *sp_playlistcontainer_playlist(sp_playlistcontainer *pc, int index) {
     return pc->playlist[index];
 }
 
 int sp_playlistcontainer_num_playlists(sp_playlistcontainer *pc) {
     return pc->num_playlists;
+}
+
+void sp_playlistcontainer_add_callbacks(sp_playlistcontainer *pc,
+                        sp_playlistcontainer_callbacks *cb, void *userdata) {
+    pc->callbacks = cb;
 }
 
 /*********************** MOCK IMAGE METHODS ************************/
@@ -538,8 +594,18 @@ void sp_image_remove_load_callback(sp_image *i, image_loaded_cb *callback, void 
 
 /*********************** MOCK ALBUM METHODS ************************/
 
+void sp_album_add_ref(sp_album *a) {
+}
+
+void sp_album_release(sp_album *a) {
+}
+
 bool sp_album_is_loaded(sp_album *a) {
     return a->loaded;
+}
+
+bool sp_album_is_available(sp_album *a) {
+    return a->available;
 }
 
 sp_artist *sp_album_artist(sp_album *a) {
@@ -562,7 +628,191 @@ sp_albumtype sp_album_type(sp_album *a) {
     return a->type;
 }
 
+/**************** MOCK ALBUM BROWSING ******************/
+
+void sp_albumbrowse_add_ref(sp_albumbrowse *ab) {
+}
+
+void sp_albumbrowse_release(sp_albumbrowse *ab) {
+}
+
+sp_track *sp_albumbrowse_track(sp_albumbrowse *ab, int index) {
+    sp_track *track;
+
+    switch (index) {
+        case 0:
+            track = _mock_track("foo", 1, &(ab->album->artist), ab->album,
+                                            123, 0, 1, 1, SP_ERROR_OK, 1);
+            break;
+        case 1:
+            track = _mock_track("bar", 1, &(ab->album->artist), ab->album,
+                                            123, 0, 1, 2, SP_ERROR_OK, 1);
+            break;
+        case 2:
+            track = _mock_track("baz", 1, &(ab->album->artist), ab->album,
+                                            123, 0, 1, 3, SP_ERROR_OK, 1);
+            break;
+        default:
+            track = NULL;
+            break;
+    }
+    return track;
+}
+
+int sp_albumbrowse_num_tracks(sp_albumbrowse *ab) {
+    return 3;
+}
+
+bool sp_albumbrowse_is_loaded(sp_albumbrowse *ab) {
+    return ab->loaded;
+}
+
+sp_albumbrowse *sp_albumbrowse_create(sp_session *s, sp_album* a,
+                                      albumbrowse_complete_cb cb,
+                                      void *userdata) {
+    sp_albumbrowse *ab;
+
+    ab = _mock_albumbrowse(a, 1);
+    if (cb)
+        cb(ab, userdata);
+    return ab;
+}
+
+/**************** MOCK ARTIST BROWSING *****************/
+
+void sp_artistbrowse_add_ref(sp_artistbrowse *ab) {
+}
+
+void sp_artistbrowse_release(sp_artistbrowse *ab) {
+}
+
+sp_artistbrowse *sp_artistbrowse_create(sp_session *s, sp_artist* a,
+                                        artistbrowse_complete_cb cb,
+                                        void *userdata) {
+    sp_artistbrowse *ab;
+
+    ab = _mock_artistbrowse(a, 1);
+    if (cb)
+        cb(ab, userdata);
+    return ab;
+}
+
+sp_track *sp_artistbrowse_track(sp_artistbrowse *ab, int index) {
+    sp_album *album;
+    sp_track *track;
+
+    album = _mock_album("fool-album", ab->artist, 2001,
+                                (byte *)"01234567890123456789",1, 1, 1);
+    switch (index) {
+        case 0:
+            track = _mock_track("foo", 1, &(album->artist), album,
+                                            123, 0, 1, 1, SP_ERROR_OK, 1);
+            break;
+        case 1:
+            track = _mock_track("bar", 1, &(album->artist), album,
+                                            123, 0, 1, 2, SP_ERROR_OK, 1);
+            break;
+        case 2:
+            track = _mock_track("baz", 1, &(album->artist), album,
+                                            123, 0, 1, 3, SP_ERROR_OK, 1);
+            break;
+        default:
+            track = NULL;
+            break;
+    }
+    return track;
+}
+
+sp_album *sp_artistbrowse_album(sp_artistbrowse *ab, int index) {
+    sp_album *album;
+
+    switch (index) {
+        case 0:
+            album = _mock_album("foo", ab->artist, 2001,
+                    (byte *)"01234567890123456789",1, 1, 1);
+            break;
+        case 1:
+            album = _mock_album("bar", ab->artist, 2002,
+                    (byte *)"01234567890123456789",1, 1, 1);
+            break;
+        case 2:
+            album = _mock_album("baz", ab->artist, 2003,
+                    (byte *)"01234567890123456789",1, 1, 1);
+            break;
+        default:
+            album = NULL;
+            break;
+    }
+    return album;
+}
+
+int sp_artistbrowse_num_albums(sp_artistbrowse *ab) {
+    return 3;
+}
+
+int sp_artistbrowse_num_tracks(sp_artistbrowse *ab) {
+    return 3;
+}
+
+bool sp_artistbrowse_is_loaded(sp_artistbrowse *ab) {
+    return ab->loaded;
+}
+
 /**************** MOCKING NEW OBJECTS *******************/
+
+/// Generate a mock sp_albumbrowse structure
+sp_albumbrowse *_mock_albumbrowse(sp_album *album, bool loaded) {
+    sp_albumbrowse *ab;
+    ab = malloc(sizeof(sp_albumbrowse));
+    ab->loaded = loaded;
+    ab->album = album;
+    return ab;
+}
+
+/// Generate a mock spotify.Albumbrowse object
+PyObject *mock_albumbrowse(PyObject *self, PyObject *args) {
+    AlbumBrowser *ab;
+    int loaded;
+    sp_album *album;
+    sp_albumbrowse *mab;
+
+    album = _mock_album("foo", _mock_artist("bar", 1), 2011,
+            (byte *)"01234567890123456789", SP_ALBUMTYPE_ALBUM, 1, 1);
+    if (!PyArg_ParseTuple(args, "i", &loaded))
+        return NULL;
+    mab = _mock_albumbrowse(album, loaded);
+    ab = (AlbumBrowser *)PyObject_CallObject((PyObject *)&AlbumBrowserType, NULL);
+    ab->_browser = mab;
+    Py_INCREF(ab);
+    return (PyObject *)ab;
+}
+
+
+/// Generate a mock sp_artistbrowse structure
+sp_artistbrowse *_mock_artistbrowse(sp_artist *artist, bool loaded) {
+    sp_artistbrowse *ab;
+    ab = malloc(sizeof(sp_artistbrowse));
+    ab->loaded = loaded;
+    ab->artist = artist;
+    return ab;
+}
+
+/// Generate a mock spotify.Artistbrowse object
+PyObject *mock_artistbrowse(PyObject *self, PyObject *args) {
+    ArtistBrowser *ab;
+    sp_artistbrowse *mab;
+    int loaded;
+    sp_artist *artist;
+
+    artist = _mock_artist("foo", 1);
+    if (!PyArg_ParseTuple(args, "i", &loaded))
+        return NULL;
+    mab = _mock_artistbrowse(artist, loaded);
+    ab = (ArtistBrowser *)PyObject_CallObject((PyObject *)&ArtistBrowserType, NULL);
+    ab->_browser = mab;
+    Py_INCREF(ab);
+    return (PyObject *)ab;
+}
 
 /// Generate a mock sp_artist structure
 sp_artist *_mock_artist(char *name, int loaded) {
@@ -628,7 +878,9 @@ PyObject *mock_track(PyObject *self, PyObject *args) {
     return (PyObject *)track;
 }
 
-sp_album *_mock_album(char *name, sp_artist *artist, int year, byte *cover, int type, int loaded) {
+sp_album *_mock_album(char *name, sp_artist *artist, int year, byte *cover,
+                                        int type, int loaded, int available)
+{
     sp_album *a;
     a = malloc(sizeof(sp_album));
     memset(a, 0, sizeof(sp_album));
@@ -638,6 +890,7 @@ sp_album *_mock_album(char *name, sp_artist *artist, int year, byte *cover, int 
     memcpy(a->cover, cover, 20);
     a->type = type;
     a->loaded = loaded;
+    a->available = available;
     return a;
 }
 
@@ -645,11 +898,13 @@ PyObject *mock_album(PyObject *self, PyObject *args) {
     Artist *artist;
     byte *cover;
     char *name;
-    int year, type, loaded;
-    if(!PyArg_ParseTuple(args, "sO!isii", &name, &ArtistType, &artist, &year, &cover, &type, &loaded))
-	return NULL;
+    int year, type, loaded, available;
+    if(!PyArg_ParseTuple(args, "sO!isiii", &name, &ArtistType, &artist, &year,
+                            &cover, &type, &loaded, &available))
+	    return NULL;
     Album *album = (Album *)PyObject_CallObject((PyObject *)&AlbumType, NULL);
-    album->_album = _mock_album(name, artist->_artist, year, cover, type, loaded);
+    album->_album = _mock_album(name, artist->_artist, year, cover, type,
+                                                        loaded, available);
     return (PyObject *)album;
 }
 

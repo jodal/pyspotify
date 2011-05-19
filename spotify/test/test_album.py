@@ -4,7 +4,7 @@
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at 
+# You may obtain a copy of the License at
 #
 # http://www.apache.org/licenses/LICENSE-2.0
 #
@@ -19,7 +19,8 @@ from spotify._mockspotify import mock_album, mock_artist, Album
 
 class TestAlbum(unittest.TestCase):
 
-    album = mock_album("foo", mock_artist("bar", 1), 2006, "01234567890123456789", Album.ALBUM, 1)
+    album = mock_album("foo", mock_artist("bar", 1), 2006,
+                       "01234567890123456789", Album.ALBUM, 1, 1)
 
     def test_is_loaded(self):
         self.assertEqual(self.album.is_loaded(), 1)

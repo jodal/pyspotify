@@ -18,9 +18,9 @@ import unittest
 import threading
 
 from spotify import _mockspotify
-from spotify import managers
+import spotify.managers.session
 # monkeypatch for testing
-managers.spotify = _mockspotify
+spotify.managers.session.spotify = spotify._mockspotify
 
 from spotify.managers import SpotifySessionManager
 from spotify._mockspotify import mock_track, mock_album

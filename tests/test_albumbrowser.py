@@ -30,7 +30,6 @@ class TestAlbumbrowser(unittest.TestCase):
     def callback(browser, userdata):
         callback_called = True
         callback_userdata = userdata
-        pass
 
     def test_is_loaded(self):
         browser = mock_albumbrowse(self.session, self.album, 1, self.callback)

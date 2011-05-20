@@ -27,7 +27,6 @@ class TestAlbumbrowser(unittest.TestCase):
     def callback(browser, userdata):
         callback_called = True
         callback_userdata = userdata
-        pass
 
     def test_is_loaded(self):
         browser = mock_artistbrowse(self.session, self.artist, 1, self.callback)

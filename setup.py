@@ -26,6 +26,7 @@ setup(name='pyspotify',
       author_email='doug.winter@isotoma.com',
       url='http://pypi.python.org/pypi/spotify',
       zip_safe=False,
+      test_suite="nose.collector",
       packages=find_packages(exclude='tests'),
       package_data = {
         '': ['README.rst', 'CHANGES.txt'],

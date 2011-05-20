@@ -770,19 +770,30 @@ sp_albumbrowse *_mock_albumbrowse(sp_album *album, bool loaded) {
 }
 
 /// Generate a mock spotify.Albumbrowse object
-PyObject *mock_albumbrowse(PyObject *self, PyObject *args) {
+PyObject *mock_albumbrowse(PyObject *self, PyObject *args, PyObject *kwds) {
     AlbumBrowser *ab;
     int loaded;
-    sp_album *album;
+    PyObject *session, *album, *callback, *userdata = NULL;
+    PyObject *new_args;
     sp_albumbrowse *mab;
+    static char *kwlist[] = {"session", "album", "loaded", "callback", "userdata", NULL};
 
-    album = _mock_album("foo", _mock_artist("bar", 1), 2011,
-            (byte *)"01234567890123456789", SP_ALBUMTYPE_ALBUM, 1, 1);
-    if (!PyArg_ParseTuple(args, "i", &loaded))
+    if (!PyArg_ParseTupleAndKeywords(args, kwds, "O!O!iO|O", kwlist,
+                                        &SessionType, &session,
+                                        &AlbumType, &album, &loaded,
+                                        &callback, &userdata))
         return NULL;
-    mab = _mock_albumbrowse(album, loaded);
-    ab = (AlbumBrowser *)PyObject_CallObject((PyObject *)&AlbumBrowserType, NULL);
-    ab->_browser = mab;
+    if (!userdata) {
+        userdata = Py_None;
+        Py_INCREF(Py_None);
+    }
+    new_args = PyTuple_New(4);
+    PyTuple_SetItem(new_args, 0, session);
+    PyTuple_SetItem(new_args, 1, album);
+    PyTuple_SetItem(new_args, 2, callback);
+    PyTuple_SetItem(new_args, 3, userdata);
+    ab = (AlbumBrowser *)PyObject_Call((PyObject *)&AlbumBrowserType, new_args, NULL);
+    ab->_browser->loaded = loaded;
     Py_INCREF(ab);
     return (PyObject *)ab;
 }
@@ -798,18 +809,30 @@ sp_artistbrowse *_mock_artistbrowse(sp_artist *artist, bool loaded) {
 }
 
 /// Generate a mock spotify.Artistbrowse object
-PyObject *mock_artistbrowse(PyObject *self, PyObject *args) {
+PyObject *mock_artistbrowse(PyObject *self, PyObject *args, PyObject *kwds) {
     ArtistBrowser *ab;
-    sp_artistbrowse *mab;
     int loaded;
-    sp_artist *artist;
+    PyObject *session, *artist, *callback, *userdata = NULL;
+    PyObject *new_args;
+    sp_artistbrowse *mab;
+    static char *kwlist[] = {"session", "artist", "loaded", "callback", "userdata", NULL};
 
-    artist = _mock_artist("foo", 1);
-    if (!PyArg_ParseTuple(args, "i", &loaded))
+    if (!PyArg_ParseTupleAndKeywords(args, kwds, "O!O!iO|O", kwlist,
+                                        &SessionType, &session,
+                                        &ArtistType, &artist, &loaded,
+                                        &callback, &userdata))
         return NULL;
-    mab = _mock_artistbrowse(artist, loaded);
-    ab = (ArtistBrowser *)PyObject_CallObject((PyObject *)&ArtistBrowserType, NULL);
-    ab->_browser = mab;
+    if (!userdata) {
+        userdata = Py_None;
+        Py_INCREF(Py_None);
+    }
+    new_args = PyTuple_New(4);
+    PyTuple_SetItem(new_args, 0, session);
+    PyTuple_SetItem(new_args, 1, artist);
+    PyTuple_SetItem(new_args, 2, callback);
+    PyTuple_SetItem(new_args, 3, userdata);
+    ab = (ArtistBrowser *)PyObject_Call((PyObject *)&ArtistBrowserType, new_args, NULL);
+    ab->_browser->loaded = loaded;
     Py_INCREF(ab);
     return (PyObject *)ab;
 }
@@ -980,7 +1003,11 @@ static PyMethodDef module_methods[] = {
     {"connect", session_connect, METH_VARARGS, "Run the spotify subsystem.  this will return on error, or after spotify is logged out."},
     {"mock_track", mock_track, METH_VARARGS, "Create a mock track"},
     {"mock_album", mock_album, METH_VARARGS, "Create a mock album"},
+    {"mock_albumbrowse", (PyCFunction)mock_albumbrowse,
+        METH_VARARGS | METH_KEYWORDS, "Create a mock album browser"},
     {"mock_artist", mock_artist, METH_VARARGS, "Create a mock artist"},
+    {"mock_artistbrowse", (PyCFunction)mock_artistbrowse,
+        METH_VARARGS | METH_KEYWORDS, "Create a mock artist browser"},
     {"mock_playlist", mock_playlist, METH_VARARGS, "Create a mock playlist"},
     {"mock_playlistcontainer", mock_playlistcontainer, METH_VARARGS, "Create a mock playlist container"},
     {"mock_search", mock_search, METH_VARARGS, "Create mock search results"},
@@ -995,7 +1022,11 @@ PyMODINIT_FUNC init_mockspotify(void) {
 	return;
     if(PyType_Ready(&AlbumType) < 0)
 	return;
+    if(PyType_Ready(&AlbumBrowserType) < 0)
+	return;
     if(PyType_Ready(&ArtistType) < 0)
+	return;
+    if(PyType_Ready(&ArtistBrowserType) < 0)
 	return;
     if(PyType_Ready(&LinkType) < 0)
 	return;
@@ -1022,7 +1053,9 @@ PyMODINIT_FUNC init_mockspotify(void) {
     Py_INCREF(SpotifyApiVersion);
     PyModule_AddObject(m, "api_version", SpotifyApiVersion);
     album_init(m);
+    albumbrowser_init(m);
     artist_init(m);
+    artistbrowser_init(m);
     link_init(m);
     playlist_init(m);
     playlistcontainer_init(m);

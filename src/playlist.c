@@ -182,18 +182,19 @@ static playlist_callback *pl_callbacks_table_remove(Playlist *pl,
 static PyObject *Playlist_add_callback(Playlist *self, PyObject *args,
     sp_playlist_callbacks *pl_callbacks) {
     PyObject *callback;
-    PyObject *userdata = NULL;
+    PyObject *manager = NULL, *userdata = NULL;
     Callback *tramp;
     playlist_callback *head, *to_add;
 
-    if(!PyArg_ParseTuple(args, "O|O", &callback, &userdata))
+    if(!PyArg_ParseTuple(args, "O|OO", &callback, &manager, &userdata))
         return NULL;
-    if (userdata == NULL) {
+    if (!userdata)
         userdata = Py_None;
-    }
+    if (!manager)
+        manager = Py_None;
     if (!(callback = as_function(callback)))
         return NULL;
-    tramp = create_trampoline(callback, userdata);
+    tramp = create_trampoline(callback, manager, userdata);
     to_add = malloc(sizeof(playlist_callback));
     to_add->callback = pl_callbacks;
     to_add->trampoline = tramp;
@@ -223,6 +224,7 @@ void playlist_tracks_added_callback(sp_playlist *playlist, sp_track *const *trac
     Py_INCREF(p);
     PyObject_CallFunctionObjArgs(
         tramp->callback,
+        tramp->manager,
         p,
         py_tracks,
         Py_BuildValue("i", position),
@@ -259,6 +261,7 @@ void playlist_tracks_removed_callback(sp_playlist *playlist, const int *tracks,
     Py_INCREF(p);
     PyObject_CallFunctionObjArgs(
         tramp->callback,
+        tramp->manager,
         p,
         py_tracks,
         tramp->userdata,
@@ -294,6 +297,7 @@ void playlist_tracks_moved_callback(sp_playlist *playlist, const int *tracks,
     Py_INCREF(p);
     PyObject_CallFunctionObjArgs(
         tramp->callback,
+        tramp->manager,
         p,
         py_tracks,
         Py_BuildValue("i", new_position),

@@ -25,9 +25,10 @@ class SpotifyPlaylistManager:
         """
         Listen to modifications events on a playlist.
         """
-        playlist.add_tracks_added_callback(self.tracks_added, userdata)
-        playlist.add_tracks_moved_callback(self.tracks_moved, userdata)
-        playlist.add_tracks_removed_callback(self.tracks_removed, userdata)
+        playlist.add_tracks_added_callback(self.tracks_added, self, userdata)
+        playlist.add_tracks_moved_callback(self.tracks_moved, self, userdata)
+        playlist.add_tracks_removed_callback(self.tracks_removed, self,
+                                                                    userdata)
 
     def unwatch(self, playlist, userdata=None):
         """
@@ -42,7 +43,7 @@ class SpotifyPlaylistManager:
 
 ######## CALLBACKS ########
 
-    def tracks_added(playlist, tracks, position, userdata):
+    def tracks_added(self, playlist, tracks, position, userdata):
         """
         Callback
 
@@ -57,7 +58,7 @@ class SpotifyPlaylistManager:
         """
         pass
 
-    def tracks_moved(playlist, tracks, new_position, userdata):
+    def tracks_moved(self, playlist, tracks, new_position, userdata):
         """
         Callback
 
@@ -72,7 +73,7 @@ class SpotifyPlaylistManager:
         """
         pass
 
-    def tracks_removed(playlist, tracks, userdata):
+    def tracks_removed(self, playlist, tracks, userdata):
         """
         Callback
 

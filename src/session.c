@@ -233,6 +233,7 @@ static PyObject *Session_search(Session *self, PyObject *args, PyObject *kwds) {
     Py_INCREF(callback);
     st = malloc(sizeof(Callback));
     st->userdata = userdata;
+    st->manager = NULL;
     st->callback = callback;
     Py_BEGIN_ALLOW_THREADS
     search = sp_search_create(self->_session, query,

@@ -25,10 +25,13 @@ class SpotifyContainerManager:
         """
         Listen to modifications events on a container.
         """
-        container.add_loaded_callback(self.container_loaded, userdata)
-        container.add_playlist_added_callback(self.playlist_added, userdata)
-        container.add_playlist_moved_callback(self.playlist_moved, userdata)
-        container.add_playlist_removed_callback(self.playlist_removed, userdata)
+        container.add_loaded_callback(self.container_loaded, self, userdata)
+        container.add_playlist_added_callback(self.playlist_added, self,
+                                                                    userdata)
+        container.add_playlist_moved_callback(self.playlist_moved, self,
+                                                                    userdata)
+        container.add_playlist_removed_callback(self.playlist_removed, self,
+                                                                    userdata)
 
     def unwatch(self, container, userdata=None):
         """
@@ -44,7 +47,7 @@ class SpotifyContainerManager:
 
 ######## CALLBACKS ########
 
-    def container_loaded(container, userdata):
+    def container_loaded(self, container, userdata):
         """
         Callback
 
@@ -57,7 +60,7 @@ class SpotifyContainerManager:
         """
         pass
 
-    def playlist_added(container, playlist, position, userdata):
+    def playlist_added(self, container, playlist, position, userdata):
         """
         Callback
 
@@ -72,7 +75,7 @@ class SpotifyContainerManager:
         """
         pass
 
-    def playlist_moved(container, playlist, position, new_position,  userdata):
+    def playlist_moved(self, container, playlist, position, new_position,  userdata):
         """
         Callback
 
@@ -89,7 +92,7 @@ class SpotifyContainerManager:
         """
         pass
 
-    def playlist_removed(container, playlist, position, userdata):
+    def playlist_removed(self, container, playlist, position, userdata):
         """
         Callback
 

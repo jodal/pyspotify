@@ -143,17 +143,19 @@ static PyObject *PlaylistContainer_add_callback(PlaylistContainer *self,
     PyObject *args, sp_playlistcontainer_callbacks *plc_callbacks)
 {
     PyObject *callback;
-    PyObject *userdata = NULL;
+    PyObject *manager = NULL, *userdata = NULL;
     Callback *tramp;
     playlistcontainer_callback *head, *to_add;
 
-    if(!PyArg_ParseTuple(args, "O|O", &callback, &userdata))
+    if(!PyArg_ParseTuple(args, "O|OO", &callback, &manager, &userdata))
         return NULL;
-    if (userdata == NULL)
+    if (!userdata)
         userdata = Py_None;
+    if (!manager)
+        manager = Py_None;
     if (!(callback = as_function(callback)))
         return NULL;
-    tramp = create_trampoline(callback, userdata);
+    tramp = create_trampoline(callback, manager, userdata);
     to_add = malloc(sizeof(playlistcontainer_callback));
     to_add->callback = plc_callbacks;
     to_add->trampoline = tramp;
@@ -181,6 +183,7 @@ void playlistcontainer_loaded_callback(sp_playlistcontainer *playlistcontainer,
     Py_INCREF(pc);
     PyObject_CallFunctionObjArgs(
         tramp->callback,
+        tramp->manager,
         pc,
         tramp->userdata,
         NULL
@@ -219,6 +222,7 @@ void playlistcontainer_playlist_added_callback(sp_playlistcontainer *playlistcon
     pos = Py_BuildValue("i", position);
     PyObject_CallFunctionObjArgs(
         tramp->callback,
+        tramp->manager,
         pc,
         p,
         pos,
@@ -259,6 +263,7 @@ void playlistcontainer_playlist_moved_callback(sp_playlistcontainer *playlistcon
     new_pos = Py_BuildValue("i", new_position);
     PyObject_CallFunctionObjArgs(
         tramp->callback,
+        tramp->manager,
         pc,
         p,
         pos,
@@ -299,6 +304,7 @@ void playlistcontainer_playlist_removed_callback(sp_playlistcontainer *playlistc
     pos = Py_BuildValue("i", position);
     PyObject_CallFunctionObjArgs(
         tramp->callback,
+        tramp->manager,
         pc,
         p,
         pos,

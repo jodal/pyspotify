@@ -1,7 +1,7 @@
 Managers
 ========
 
-.. module:: spotify.managers
+.. module:: spotify.manager
 
 The role of the *pyspotify* managers is to help the developper by abstracting
 basic operations of the spotify library. They include callbacks that you can

@@ -1,6 +1,6 @@
 Session manager
 ****************
-.. currentmodule:: spotify.managers
+.. currentmodule:: spotify.manager
 
 .. autoclass:: SpotifySessionManager
     :members:

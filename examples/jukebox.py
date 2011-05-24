@@ -24,7 +24,7 @@ import time
 import threading
 import os
 
-from spotify.managers import SpotifySessionManager, SpotifyPlaylistManager, \
+from spotify.manager import SpotifySessionManager, SpotifyPlaylistManager, \
     SpotifyContainerManager
 try:
     from spotify.alsahelper import AlsaController

@@ -206,16 +206,16 @@ class JukeboxPlaylistManager(SpotifyPlaylistManager):
 
 ## container calllbacks ##
 class JukeboxContainerManager(SpotifyContainerManager):
-    def container_loaded(c, u):
+    def container_loaded(self, c, u):
         print 'Container loaded !'
 
-    def playlist_added(c, p, i, u):
+    def playlist_added(self, c, p, i, u):
         print 'Container: playlist "%s" added.' % p.name()
 
-    def playlist_moved(c, p, oi, ni, u):
+    def playlist_moved(self, c, p, oi, ni, u):
         print 'Container: playlist "%s" moved.' % p.name()
 
-    def playlist_removed(c, p, i, u):
+    def playlist_removed(self, c, p, i, u):
         print 'Container: playlist "%s" removed.' % p.name()
 
 class Jukebox(SpotifySessionManager):

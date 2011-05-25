@@ -39,7 +39,8 @@
 #include "track.h"
 
 /***************************** FORWARD DEFINES *****************************/
-
+void mock_playlist_event(int event, sp_playlist *p);
+void mock_playlistcontainer_event(int event, sp_playlistcontainer *pc);
 sp_album *_mock_album(char *name, sp_artist *artist, int year, byte *cover,
                                         int type, int loaded, int available);
 sp_artist *_mock_artist(char *name, int loaded);
@@ -103,12 +104,14 @@ struct sp_playlist {
     sp_track *track[32];
     int num_tracks;
     sp_playlist_callbacks *callbacks;
+    void *userdata;
 };
 
 struct sp_playlistcontainer {
     sp_playlist *playlist[32];
     int num_playlists;
     sp_playlistcontainer_callbacks *callbacks;
+    void *userdata;
 };
 
 struct sp_track {
@@ -147,20 +150,55 @@ struct sp_image {
 
 
 typedef enum event_type {
+    // SESSION EVENTS
     MOCK_LOGGED_IN                   = 0,
     MOCK_LOGGED_OUT                  = 1,
     MOCK_METADATA_UPDATED            = 2,
     MOCK_CONNECTION_ERROR            = 3,
-//    message_to_user             = 4,
-//    notify_main_thread          = 5,
-//    music_delivery              = 6,
-//    play_token_lost             = 7,
-//    log_message                 = 8
+
+    // PLAYLIST EVENTS
+    MOCK_PLAYLIST_TRACKS_ADDED       = 4,
+    MOCK_PLAYLIST_TRACKS_MOVED       = 5,
+    MOCK_PLAYLIST_TRACKS_REMOVED     = 6,
+
+    // CONTAINER EVENTS
+    MOCK_CONTAINER_LOADED            = 7,
+    MOCK_CONTAINER_PLAYLIST_ADDED    = 8,
+    MOCK_CONTAINER_PLAYLIST_MOVED    = 9,
+    MOCK_CONTAINER_PLAYLIST_REMOVED  = 10
 } event_type;
 
 
 event_type eventq[16];
 int events = 0;
+
+PyObject *event_trigger(PyObject *self, PyObject *args)
+{
+    event_type event;
+    PyObject *data = NULL;
+
+    if (!PyArg_ParseTuple(args, "i|O", &event, &data))
+            return NULL;
+    switch (event) {
+        case MOCK_PLAYLIST_TRACKS_ADDED:
+        case MOCK_PLAYLIST_TRACKS_MOVED:
+        case MOCK_PLAYLIST_TRACKS_REMOVED:
+            mock_playlist_event(event, ((Playlist *)data)->_playlist);
+            break;
+
+        case MOCK_CONTAINER_LOADED:
+        case MOCK_CONTAINER_PLAYLIST_ADDED:
+        case MOCK_CONTAINER_PLAYLIST_MOVED:
+        case MOCK_CONTAINER_PLAYLIST_REMOVED:
+            mock_playlistcontainer_event(event,
+                    ((PlaylistContainer *)data)->_playlistcontainer);
+            break;
+
+        default:
+            break;
+    }
+    Py_RETURN_NONE;
+}
 
 /***************************** MOCK SESSION FUNCTIONS **************************/
 
@@ -524,8 +562,10 @@ int sp_playlist_num_tracks(sp_playlist *p) {
 }
 
 void sp_playlist_add_callbacks(sp_playlist *p, sp_playlist_callbacks *cb,
-    void *userdata) {
+    void *userdata)
+{
     p->callbacks = cb;
+    p->userdata = userdata;
 }
 
 void sp_playlist_remove_callbacks(sp_playlist *p, sp_playlist_callbacks *cb,
@@ -541,6 +581,45 @@ sp_error sp_playlist_remove_tracks(sp_playlist *p, const int *tracks,
     int num_tracks) {
     // TODO
     return SP_ERROR_OK;
+}
+
+void mock_playlist_event(int event, sp_playlist *p)
+{
+    sp_artist *artist = _mock_artist("foo_", 1);
+    sp_album *album = _mock_album("bar_", artist, 2011,
+            "01234567890123456789", 0, 1, 1);
+    sp_track *tracks[3] = {
+        _mock_track("foo", 1, &artist, album, 0, 0, 0, 0, 0, 1),
+        _mock_track("bar", 1, &artist, album, 0, 0, 0, 0, 0, 1),
+        _mock_track("baz", 1, &artist, album, 0, 0, 0, 0, 0, 1)
+    };
+    int nums[3] = {0,1,2};
+
+    switch (event) {
+        case MOCK_PLAYLIST_TRACKS_ADDED:
+#ifdef DEBUG
+            fprintf(stderr, "[DEBUG]-mock- calling tracks_added callback\n");
+#endif
+            if (p->callbacks->tracks_added)
+                p->callbacks->tracks_added(p, tracks, 3, 0, p->userdata);
+            break;
+        case MOCK_PLAYLIST_TRACKS_MOVED:
+#ifdef DEBUG
+            fprintf(stderr, "[DEBUG]-mock- calling tracks_moved callback\n");
+#endif
+            if (p->callbacks->tracks_moved)
+                p->callbacks->tracks_moved(p, nums, 3, 0, p->userdata);
+            break;
+        case MOCK_PLAYLIST_TRACKS_REMOVED:
+#ifdef DEBUG
+            fprintf(stderr, "[DEBUG]-mock- calling tracks_removed callback\n");
+#endif
+            if (p->callbacks->tracks_removed)
+                p->callbacks->tracks_removed(p, nums, 3, p->userdata);
+            break;
+        default:
+            break;
+    }
 }
 
 /********************* MOCK PLAYLIST CONTAINER METHODS ************/
@@ -562,6 +641,33 @@ int sp_playlistcontainer_num_playlists(sp_playlistcontainer *pc) {
 void sp_playlistcontainer_add_callbacks(sp_playlistcontainer *pc,
                         sp_playlistcontainer_callbacks *cb, void *userdata) {
     pc->callbacks = cb;
+    pc->userdata = userdata;
+}
+
+void mock_playlistcontainer_event(int event, sp_playlistcontainer *c)
+{
+    sp_playlist *playlist = _mock_playlist("foo");
+
+    switch (event) {
+        case MOCK_CONTAINER_LOADED:
+            if (c->callbacks->container_loaded)
+                c->callbacks->container_loaded(c, c->userdata);
+            break;
+        case MOCK_CONTAINER_PLAYLIST_ADDED:
+            if (c->callbacks->playlist_added)
+                c->callbacks->playlist_added(c, playlist, 0, c->userdata);
+            break;
+        case MOCK_CONTAINER_PLAYLIST_MOVED:
+            if (c->callbacks->playlist_moved)
+                c->callbacks->playlist_moved(c, playlist, 0, 1, c->userdata);
+            break;
+        case MOCK_CONTAINER_PLAYLIST_REMOVED:
+            if (c->callbacks->playlist_removed)
+                c->callbacks->playlist_removed(c, playlist, 0, c->userdata);
+            break;
+        default:
+            break;
+    }
 }
 
 /*********************** MOCK IMAGE METHODS ************************/
@@ -1012,6 +1118,7 @@ static PyMethodDef module_methods[] = {
     {"mock_playlistcontainer", mock_playlistcontainer, METH_VARARGS, "Create a mock playlist container"},
     {"mock_search", mock_search, METH_VARARGS, "Create mock search results"},
     {"mock_session", mock_session, METH_VARARGS, "Create a mock session"},
+    {"mock_event_trigger", event_trigger, METH_VARARGS, "Triggers an event"},
     {NULL, NULL, 0, NULL}
 };
 

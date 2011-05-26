@@ -318,6 +318,383 @@ static PyObject *Playlist_add_tracks_moved_callback(Playlist *self, PyObject *ar
     return Playlist_add_callback(self, args, spl_callbacks);
 }
 
+void playlist_renamed_callback(sp_playlist *playlist, void *userdata)
+{
+    PyGILState_STATE gstate;
+    Callback *tramp;
+    Playlist *p;
+    PyObject *res;
+
+    gstate = PyGILState_Ensure();
+    tramp = (Callback *)userdata;
+    p = (Playlist *)PyObject_CallObject((PyObject *)&PlaylistType, NULL);
+    p->_playlist = playlist;
+    res = PyObject_CallFunctionObjArgs(
+        tramp->callback,
+        tramp->manager,
+        p,
+        tramp->userdata,
+        NULL
+    );
+    Py_XDECREF(res);
+    Py_DECREF(p);
+    PyGILState_Release(gstate);
+}
+
+static PyObject *Playlist_add_playlist_renamed_callback(Playlist *self,
+                                                            PyObject *args)
+{
+    sp_playlist_callbacks *spl_callbacks;
+
+    spl_callbacks = malloc(sizeof(sp_playlist_callbacks));
+    memset(spl_callbacks, 0, sizeof(sp_playlist_callbacks));
+    spl_callbacks->playlist_renamed = &playlist_renamed_callback;
+    return Playlist_add_callback(self, args, spl_callbacks);
+}
+
+void playlist_state_changed_callback(sp_playlist *playlist, void *userdata)
+{
+    PyGILState_STATE gstate;
+    Callback *tramp;
+    Playlist *p;
+    PyObject *res;
+
+    gstate = PyGILState_Ensure();
+    tramp = (Callback *)userdata;
+    p = (Playlist *)PyObject_CallObject((PyObject *)&PlaylistType, NULL);
+    p->_playlist = playlist;
+    res = PyObject_CallFunctionObjArgs(
+        tramp->callback,
+        tramp->manager,
+        p,
+        tramp->userdata,
+        NULL
+    );
+    Py_XDECREF(res);
+    Py_DECREF(p);
+    PyGILState_Release(gstate);
+}
+
+static PyObject *Playlist_add_playlist_state_changed_callback(Playlist *self,
+                                                            PyObject *args)
+{
+    sp_playlist_callbacks *spl_callbacks;
+
+    spl_callbacks = malloc(sizeof(sp_playlist_callbacks));
+    memset(spl_callbacks, 0, sizeof(sp_playlist_callbacks));
+    spl_callbacks->playlist_state_changed = &playlist_state_changed_callback;
+    return Playlist_add_callback(self, args, spl_callbacks);
+}
+
+void playlist_update_in_progress_callback(sp_playlist *playlist,
+                                                bool done, void *userdata)
+{
+    PyGILState_STATE gstate;
+    Callback *tramp;
+    Playlist *p;
+    PyObject *res, *pdone;
+
+    gstate = PyGILState_Ensure();
+    tramp = (Callback *)userdata;
+    pdone = PyBool_FromLong(done);
+    p = (Playlist *)PyObject_CallObject((PyObject *)&PlaylistType, NULL);
+    p->_playlist = playlist;
+    res = PyObject_CallFunctionObjArgs(
+        tramp->callback,
+        tramp->manager,
+        p,
+        pdone,
+        tramp->userdata,
+        NULL
+    );
+    Py_XDECREF(res);
+    Py_DECREF(p);
+    Py_DECREF(pdone);
+    PyGILState_Release(gstate);
+}
+
+static PyObject *Playlist_add_playlist_update_in_progress_callback(Playlist *self,
+                                                            PyObject *args)
+{
+    sp_playlist_callbacks *spl_callbacks;
+
+    spl_callbacks = malloc(sizeof(sp_playlist_callbacks));
+    memset(spl_callbacks, 0, sizeof(sp_playlist_callbacks));
+    spl_callbacks->playlist_update_in_progress = &playlist_update_in_progress_callback;
+    return Playlist_add_callback(self, args, spl_callbacks);
+}
+
+void playlist_metadata_updated_callback(sp_playlist *playlist, void *userdata)
+{
+    PyGILState_STATE gstate;
+    Callback *tramp;
+    Playlist *p;
+    PyObject *res;
+
+    gstate = PyGILState_Ensure();
+    tramp = (Callback *)userdata;
+    p = (Playlist *)PyObject_CallObject((PyObject *)&PlaylistType, NULL);
+    p->_playlist = playlist;
+    res = PyObject_CallFunctionObjArgs(
+        tramp->callback,
+        tramp->manager,
+        p,
+        tramp->userdata,
+        NULL
+    );
+    Py_XDECREF(res);
+    Py_DECREF(p);
+    PyGILState_Release(gstate);
+}
+
+static PyObject *Playlist_add_playlist_metadata_updated_callback(Playlist *self,
+                                                            PyObject *args)
+{
+    sp_playlist_callbacks *spl_callbacks;
+
+    spl_callbacks = malloc(sizeof(sp_playlist_callbacks));
+    memset(spl_callbacks, 0, sizeof(sp_playlist_callbacks));
+    spl_callbacks->playlist_metadata_updated = &playlist_metadata_updated_callback;
+    return Playlist_add_callback(self, args, spl_callbacks);
+}
+
+void playlist_track_created_changed_callback(sp_playlist *playlist,
+                    int position, sp_user *user, int when, void *userdata)
+{
+    PyGILState_STATE gstate;
+    Callback *tramp;
+    Playlist *p;
+    PyObject *res, *ppos, *puser, *pwhen;
+
+    gstate = PyGILState_Ensure();
+    tramp = (Callback *)userdata;
+    p = (Playlist *)PyObject_CallObject((PyObject *)&PlaylistType, NULL);
+    p->_playlist = playlist;
+    ppos = PyInt_FromLong(position);
+    puser = Py_None;    //TODO: implement with User
+    Py_INCREF(Py_None); //
+    pwhen = PyInt_FromLong(when);
+    res = PyObject_CallFunctionObjArgs(
+        tramp->callback,
+        tramp->manager,
+        p,
+        ppos,
+        puser,
+        pwhen,
+        tramp->userdata,
+        NULL
+    );
+    Py_XDECREF(res);
+    Py_DECREF(p);
+    Py_DECREF(ppos);
+    Py_DECREF(puser);
+    Py_DECREF(pwhen);
+    PyGILState_Release(gstate);
+}
+
+static PyObject *Playlist_add_track_created_changed_callback(Playlist *self,
+                                                                PyObject *args)
+{
+    sp_playlist_callbacks *spl_callbacks;
+
+    spl_callbacks = malloc(sizeof(sp_playlist_callbacks));
+    memset(spl_callbacks, 0, sizeof(sp_playlist_callbacks));
+    spl_callbacks->track_created_changed = &playlist_track_created_changed_callback;
+    return Playlist_add_callback(self, args, spl_callbacks);
+}
+
+void playlist_track_message_changed_callback(sp_playlist *playlist,
+                        int position, const char *message, void *userdata)
+{
+    PyGILState_STATE gstate;
+    Callback *tramp;
+    Playlist *p;
+    PyObject *res, *ppos, *pmess;
+
+    gstate = PyGILState_Ensure();
+    tramp = (Callback *)userdata;
+    p = (Playlist *)PyObject_CallObject((PyObject *)&PlaylistType, NULL);
+    p->_playlist = playlist;
+    ppos = PyInt_FromLong(position);
+    pmess = PyUnicode_FromString(message);
+    res = PyObject_CallFunctionObjArgs(
+        tramp->callback,
+        tramp->manager,
+        p,
+        ppos,
+        pmess,
+        tramp->userdata,
+        NULL
+    );
+    Py_XDECREF(res);
+    Py_DECREF(p);
+    Py_DECREF(ppos);
+    Py_DECREF(pmess);
+    PyGILState_Release(gstate);
+}
+
+static PyObject *Playlist_add_track_message_changed_callback(Playlist *self,
+                                                            PyObject *args)
+{
+    sp_playlist_callbacks *spl_callbacks;
+
+    spl_callbacks = malloc(sizeof(sp_playlist_callbacks));
+    memset(spl_callbacks, 0, sizeof(sp_playlist_callbacks));
+    spl_callbacks->track_message_changed = &playlist_track_message_changed_callback;
+    return Playlist_add_callback(self, args, spl_callbacks);
+}
+
+void playlist_track_seen_changed_callback(sp_playlist *playlist,
+                            int position, bool seen, void *userdata)
+{
+    PyGILState_STATE gstate;
+    Callback *tramp;
+    Playlist *p;
+    PyObject *res, *ppos, *pseen;
+
+    gstate = PyGILState_Ensure();
+    tramp = (Callback *)userdata;
+    p = (Playlist *)PyObject_CallObject((PyObject *)&PlaylistType, NULL);
+    p->_playlist = playlist;
+    ppos = PyInt_FromLong(position);
+    pseen = PyBool_FromLong(seen);
+    res = PyObject_CallFunctionObjArgs(
+        tramp->callback,
+        tramp->manager,
+        p,
+        ppos,
+        pseen,
+        tramp->userdata,
+        NULL
+    );
+    Py_XDECREF(res);
+    Py_DECREF(p);
+    Py_DECREF(ppos);
+    Py_DECREF(pseen);
+    PyGILState_Release(gstate);
+}
+
+static PyObject *Playlist_add_track_seen_changed_callback(Playlist *self,
+                                                            PyObject *args)
+{
+    sp_playlist_callbacks *spl_callbacks;
+
+    spl_callbacks = malloc(sizeof(sp_playlist_callbacks));
+    memset(spl_callbacks, 0, sizeof(sp_playlist_callbacks));
+    spl_callbacks->track_seen_changed = &playlist_track_seen_changed_callback;
+    return Playlist_add_callback(self, args, spl_callbacks);
+}
+
+void playlist_description_changed_callback(sp_playlist *playlist,
+                                const char *description, void *userdata)
+{
+    PyGILState_STATE gstate;
+    Callback *tramp;
+    Playlist *p;
+    PyObject *res, *pdesc;
+
+    gstate = PyGILState_Ensure();
+    tramp = (Callback *)userdata;
+    p = (Playlist *)PyObject_CallObject((PyObject *)&PlaylistType, NULL);
+    p->_playlist = playlist;
+    pdesc = PyUnicode_FromString(description);
+    res = PyObject_CallFunctionObjArgs(
+        tramp->callback,
+        tramp->manager,
+        p,
+        pdesc,
+        tramp->userdata,
+        NULL
+    );
+    Py_XDECREF(res);
+    Py_DECREF(p);
+    Py_DECREF(pdesc);
+    PyGILState_Release(gstate);
+}
+
+static PyObject *Playlist_add_description_changed_callback(Playlist *self,
+                                                            PyObject *args)
+{
+    sp_playlist_callbacks *spl_callbacks;
+
+    spl_callbacks = malloc(sizeof(sp_playlist_callbacks));
+    memset(spl_callbacks, 0, sizeof(sp_playlist_callbacks));
+    spl_callbacks->description_changed = &playlist_description_changed_callback;
+    return Playlist_add_callback(self, args, spl_callbacks);
+}
+
+void playlist_subscribers_changed_callback(sp_playlist *playlist, void *userdata)
+{
+    PyGILState_STATE gstate;
+    Callback *tramp;
+    Playlist *p;
+    PyObject *res;
+
+    gstate = PyGILState_Ensure();
+    tramp = (Callback *)userdata;
+    p = (Playlist *)PyObject_CallObject((PyObject *)&PlaylistType, NULL);
+    p->_playlist = playlist;
+    res = PyObject_CallFunctionObjArgs(
+        tramp->callback,
+        tramp->manager,
+        p,
+        tramp->userdata,
+        NULL
+    );
+    Py_XDECREF(res);
+    Py_DECREF(p);
+    PyGILState_Release(gstate);
+}
+
+static PyObject *Playlist_add_subscribers_changed_callback(Playlist *self,
+                                                            PyObject *args)
+{
+    sp_playlist_callbacks *spl_callbacks;
+
+    spl_callbacks = malloc(sizeof(sp_playlist_callbacks));
+    memset(spl_callbacks, 0, sizeof(sp_playlist_callbacks));
+    spl_callbacks->subscribers_changed = &playlist_subscribers_changed_callback;
+    return Playlist_add_callback(self, args, spl_callbacks);
+}
+
+void playlist_image_changed_callback(sp_playlist *playlist, const byte *image,
+                                                                void *userdata)
+{
+    PyGILState_STATE gstate;
+    Callback *tramp;
+    Playlist *p;
+    PyObject *res, *pimage;
+
+    gstate = PyGILState_Ensure();
+    tramp = (Callback *)userdata;
+    p = (Playlist *)PyObject_CallObject((PyObject *)&PlaylistType, NULL);
+    p->_playlist = playlist;
+    pimage = PyBytes_FromStringAndSize((const char*)image, 20); //TODO: return Image
+    res = PyObject_CallFunctionObjArgs(
+        tramp->callback,
+        tramp->manager,
+        p,
+        pimage,
+        tramp->userdata,
+        NULL
+    );
+    Py_XDECREF(res);
+    Py_DECREF(p);
+    Py_DECREF(pimage);
+    PyGILState_Release(gstate);
+}
+
+static PyObject *Playlist_add_image_changed_callback(Playlist *self,
+                                                            PyObject *args)
+{
+    sp_playlist_callbacks *spl_callbacks;
+
+    spl_callbacks = malloc(sizeof(sp_playlist_callbacks));
+    memset(spl_callbacks, 0, sizeof(sp_playlist_callbacks));
+    spl_callbacks->image_changed = &playlist_image_changed_callback;
+    return Playlist_add_callback(self, args, spl_callbacks);
+}
+
 static PyObject *Playlist_remove_callback(Playlist *self, PyObject *args) {
     PyObject *callback, *userdata = NULL;
     playlist_callback *pl_callback;
@@ -430,6 +807,46 @@ static PyMethodDef Playlist_methods[] = {
      ""},
     {"add_tracks_moved_callback",
      (PyCFunction)Playlist_add_tracks_moved_callback,
+     METH_VARARGS,
+     ""},
+    {"add_playlist_renamed_callback",
+     (PyCFunction)Playlist_add_playlist_renamed_callback,
+     METH_VARARGS,
+     ""},
+    {"add_playlist_state_changed_callback",
+     (PyCFunction)Playlist_add_playlist_state_changed_callback,
+     METH_VARARGS,
+     ""},
+    {"add_playlist_update_in_progress_callback",
+     (PyCFunction)Playlist_add_playlist_update_in_progress_callback,
+     METH_VARARGS,
+     ""},
+    {"add_playlist_metadata_updated_callback",
+     (PyCFunction)Playlist_add_playlist_metadata_updated_callback,
+     METH_VARARGS,
+     ""},
+    {"add_track_created_changed_callback",
+     (PyCFunction)Playlist_add_track_created_changed_callback,
+     METH_VARARGS,
+     ""},
+    {"add_track_message_changed_callback",
+     (PyCFunction)Playlist_add_track_message_changed_callback,
+     METH_VARARGS,
+     ""},
+    {"add_track_seen_changed_callback",
+     (PyCFunction)Playlist_add_track_seen_changed_callback,
+     METH_VARARGS,
+     ""},
+    {"add_description_changed_callback",
+     (PyCFunction)Playlist_add_description_changed_callback,
+     METH_VARARGS,
+     ""},
+    {"add_subscribers_changed_callback",
+     (PyCFunction)Playlist_add_subscribers_changed_callback,
+     METH_VARARGS,
+     ""},
+    {"add_image_changed_callback",
+     (PyCFunction)Playlist_add_image_changed_callback,
      METH_VARARGS,
      ""},
     {"remove_callback",

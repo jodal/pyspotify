@@ -22,8 +22,6 @@ objects.
         Add this callback if you want to be notified  whenever tracks are added
         to the playlist.
 
-        :warning: Currently broken.
-
     .. method:: add_tracks_moved_callback(callback[, manager, userdata])
 
         :param callback:    signature: (manager, :class:`Playlist` p, list of
@@ -34,8 +32,6 @@ objects.
         Add this callback if you want to be notified whenever tracks are moved
         in the playlist.
 
-        :warning: Currently broken.
-
     .. method:: add_tracks_removed_callback(callback[, manager, userdata])
 
         :param callback:    signature: (manager, :class:`Playlist` p, list of
@@ -45,8 +41,6 @@ objects.
 
         Add this callback if you want to be notified whenever tracks are removed
         from the playlist.
-
-        :warning: Currently broken.
 
     .. method:: is_collaborative
 

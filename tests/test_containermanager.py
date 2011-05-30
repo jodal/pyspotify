@@ -51,7 +51,7 @@ class TestPlaylistManager(unittest.TestCase):
         global callback_called
         callback = self.manager.container_loaded
         self.container.add_loaded_callback(callback, self.manager)
-        mock_event_trigger(7, self.container)
+        mock_event_trigger(40, self.container)
 
         self.assertNotEqual(callback_called, None)
         name, args = callback_called
@@ -64,7 +64,7 @@ class TestPlaylistManager(unittest.TestCase):
         global callback_called
         callback = self.manager.playlist_added
         self.container.add_playlist_added_callback(callback, self.manager)
-        mock_event_trigger(8, self.container)
+        mock_event_trigger(41, self.container)
 
         self.assertNotEqual(callback_called, None)
         name, args = callback_called
@@ -80,7 +80,7 @@ class TestPlaylistManager(unittest.TestCase):
         global callback_called
         callback = self.manager.playlist_moved
         self.container.add_playlist_moved_callback(callback, self.manager)
-        mock_event_trigger(9, self.container)
+        mock_event_trigger(42, self.container)
 
         self.assertNotEqual(callback_called, None)
         name, args = callback_called
@@ -97,7 +97,7 @@ class TestPlaylistManager(unittest.TestCase):
         global callback_called
         callback = self.manager.playlist_removed
         self.container.add_playlist_removed_callback(callback, self.manager)
-        mock_event_trigger(10, self.container)
+        mock_event_trigger(43, self.container)
 
         self.assertNotEqual(callback_called, None)
         name, args = callback_called

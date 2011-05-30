@@ -151,21 +151,31 @@ struct sp_image {
 
 typedef enum event_type {
     // SESSION EVENTS
-    MOCK_LOGGED_IN                   = 0,
-    MOCK_LOGGED_OUT                  = 1,
-    MOCK_METADATA_UPDATED            = 2,
-    MOCK_CONNECTION_ERROR            = 3,
+    MOCK_LOGGED_IN                          = 0,
+    MOCK_LOGGED_OUT                         = 1,
+    MOCK_METADATA_UPDATED                   = 2,
+    MOCK_CONNECTION_ERROR                   = 3,
 
     // PLAYLIST EVENTS
-    MOCK_PLAYLIST_TRACKS_ADDED       = 4,
-    MOCK_PLAYLIST_TRACKS_MOVED       = 5,
-    MOCK_PLAYLIST_TRACKS_REMOVED     = 6,
+    MOCK_PLAYLIST_TRACKS_ADDED              = 20,
+    MOCK_PLAYLIST_TRACKS_MOVED              = 21,
+    MOCK_PLAYLIST_TRACKS_REMOVED            = 22,
+    MOCK_PLAYLIST_RENAMED                   = 23,
+    MOCK_PLAYLIST_STATE_CHANGED             = 24,
+    MOCK_PLAYLIST_UPDATE_IN_PROGRESS        = 25,
+    MOCK_PLAYLIST_METADATA_UPDATED          = 26,
+    MOCK_PLAYLIST_TRACK_CREATED_CHANGED     = 27,
+    MOCK_PLAYLIST_TRACK_MESSAGE_CHANGED     = 28,
+    MOCK_PLAYLIST_TRACK_SEEN_CHANGED        = 29,
+    MOCK_PLAYLIST_DESCRIPTION_CHANGED       = 30,
+    MOCK_PLAYLIST_SUBSCRIBERS_CHANGED       = 31,
+    MOCK_PLAYLIST_IMAGE_CHANGED             = 32,
 
     // CONTAINER EVENTS
-    MOCK_CONTAINER_LOADED            = 7,
-    MOCK_CONTAINER_PLAYLIST_ADDED    = 8,
-    MOCK_CONTAINER_PLAYLIST_MOVED    = 9,
-    MOCK_CONTAINER_PLAYLIST_REMOVED  = 10
+    MOCK_CONTAINER_LOADED                   = 40,
+    MOCK_CONTAINER_PLAYLIST_ADDED           = 41,
+    MOCK_CONTAINER_PLAYLIST_MOVED           = 42,
+    MOCK_CONTAINER_PLAYLIST_REMOVED         = 43
 } event_type;
 
 
@@ -179,23 +189,13 @@ PyObject *event_trigger(PyObject *self, PyObject *args)
 
     if (!PyArg_ParseTuple(args, "i|O", &event, &data))
             return NULL;
-    switch (event) {
-        case MOCK_PLAYLIST_TRACKS_ADDED:
-        case MOCK_PLAYLIST_TRACKS_MOVED:
-        case MOCK_PLAYLIST_TRACKS_REMOVED:
-            mock_playlist_event(event, ((Playlist *)data)->_playlist);
-            break;
-
-        case MOCK_CONTAINER_LOADED:
-        case MOCK_CONTAINER_PLAYLIST_ADDED:
-        case MOCK_CONTAINER_PLAYLIST_MOVED:
-        case MOCK_CONTAINER_PLAYLIST_REMOVED:
-            mock_playlistcontainer_event(event,
+    if (20 <= event &&  event <= 39) {
+        /* Playlist event */
+        mock_playlist_event(event, ((Playlist *)data)->_playlist);
+    } else if (40 <= event) {
+        /* Container event */
+        mock_playlistcontainer_event(event,
                     ((PlaylistContainer *)data)->_playlistcontainer);
-            break;
-
-        default:
-            break;
     }
     Py_RETURN_NONE;
 }
@@ -587,7 +587,7 @@ void mock_playlist_event(int event, sp_playlist *p)
 {
     sp_artist *artist = _mock_artist("foo_", 1);
     sp_album *album = _mock_album("bar_", artist, 2011,
-            "01234567890123456789", 0, 1, 1);
+                                    (byte *) "01234567890123456789", 0, 1, 1);
     sp_track *tracks[3] = {
         _mock_track("foo", 1, &artist, album, 0, 0, 0, 0, 0, 1),
         _mock_track("bar", 1, &artist, album, 0, 0, 0, 0, 0, 1),
@@ -597,26 +597,70 @@ void mock_playlist_event(int event, sp_playlist *p)
 
     switch (event) {
         case MOCK_PLAYLIST_TRACKS_ADDED:
-#ifdef DEBUG
-            fprintf(stderr, "[DEBUG]-mock- calling tracks_added callback\n");
-#endif
             if (p->callbacks->tracks_added)
                 p->callbacks->tracks_added(p, tracks, 3, 0, p->userdata);
             break;
         case MOCK_PLAYLIST_TRACKS_MOVED:
-#ifdef DEBUG
-            fprintf(stderr, "[DEBUG]-mock- calling tracks_moved callback\n");
-#endif
             if (p->callbacks->tracks_moved)
                 p->callbacks->tracks_moved(p, nums, 3, 0, p->userdata);
             break;
         case MOCK_PLAYLIST_TRACKS_REMOVED:
-#ifdef DEBUG
-            fprintf(stderr, "[DEBUG]-mock- calling tracks_removed callback\n");
-#endif
             if (p->callbacks->tracks_removed)
                 p->callbacks->tracks_removed(p, nums, 3, p->userdata);
             break;
+
+        case MOCK_PLAYLIST_RENAMED:
+            if (p->callbacks->playlist_renamed)
+                p->callbacks->playlist_renamed(p, p->userdata);
+            break;
+
+        case MOCK_PLAYLIST_STATE_CHANGED:
+            if (p->callbacks->playlist_state_changed)
+                p->callbacks->playlist_state_changed(p, p->userdata);
+            break;
+
+        case MOCK_PLAYLIST_UPDATE_IN_PROGRESS:
+            if (p->callbacks->playlist_update_in_progress)
+                p->callbacks->playlist_update_in_progress(p, 1, p->userdata);
+            break;
+
+        case MOCK_PLAYLIST_METADATA_UPDATED:
+            if (p->callbacks->playlist_metadata_updated)
+                p->callbacks->playlist_metadata_updated(p, p->userdata);
+            break;
+
+        case MOCK_PLAYLIST_TRACK_CREATED_CHANGED:
+            if (p->callbacks->track_created_changed)
+                p->callbacks->track_created_changed(p, 1, NULL, 123,
+                                                            p->userdata);
+            break;
+
+        case MOCK_PLAYLIST_TRACK_MESSAGE_CHANGED:
+            if (p->callbacks->track_message_changed)
+                p->callbacks->track_message_changed(p, 1, "foo", p->userdata);
+            break;
+
+        case MOCK_PLAYLIST_TRACK_SEEN_CHANGED:
+            if (p->callbacks->track_seen_changed)
+                p->callbacks->track_seen_changed(p, 1, 0, p->userdata);
+            break;
+
+        case MOCK_PLAYLIST_DESCRIPTION_CHANGED:
+            if (p->callbacks->description_changed)
+                p->callbacks->description_changed(p, "foo", p->userdata);
+            break;
+
+        case MOCK_PLAYLIST_SUBSCRIBERS_CHANGED:
+            if (p->callbacks->subscribers_changed)
+                p->callbacks->subscribers_changed(p, p->userdata);
+            break;
+
+        case MOCK_PLAYLIST_IMAGE_CHANGED:
+            if (p->callbacks->image_changed)
+                p->callbacks->image_changed(p, (byte *) "01234567890123456789",
+                                                                 p->userdata);
+            break;
+
         default:
             break;
     }

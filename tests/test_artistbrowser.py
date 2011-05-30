@@ -19,7 +19,7 @@ from spotify._mockspotify import mock_artistbrowse, mock_artist, mock_session
 callback_called = False
 callback_userdata = None
 
-class TestAlbumbrowser(unittest.TestCase):
+class TestArtistbrowser(unittest.TestCase):
 
     session = mock_session()
     artist = mock_artist("foo0", 1)

@@ -25,6 +25,7 @@
 #include "albumbrowser.h"
 #include "link.h"
 #include "playlist.h"
+#include "playlistcontainer.h"
 #include "search.h"
 #include "session.h"
 #include "track.h"
@@ -79,6 +80,7 @@ PyMODINIT_FUNC init_spotify(void) {
     artistbrowser_init(m);
     link_init(m);
     playlist_init(m);
+    playlistcontainer_init(m);
     session_init(m);
     search_init(m);
     track_init(m);

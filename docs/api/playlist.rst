@@ -1,5 +1,5 @@
-Playlist subsystem
-******************
+Playlists
+*********
 
 The :class:`Playlist` class
 ===========================
@@ -12,48 +12,146 @@ objects.
 
     Playlist objects.
 
-    .. method:: add_tracks_added_callback(callback[, userdata])
+    .. method:: add_tracks_added_callback(callback[, manager, userdata])
 
-        :param callback:    signature: (:class:`Playlist` p, list of
-            :class:`Track` tracks, :class:`int` num_tracks,
-            :class:`int` position, :class:`Object` userdata)
-        :param userdata:    any object you would like to access in the callback
-
-        Add this callback if you want to be notified  whenever tracks are added
-        to the playlist.
-
-        :warning: Currently broken.
-
-    .. method:: add_tracks_moved_callback(callback[, userdata])
-
-        :param callback:    signature: (:class:`Playlist` p, list of
-            :class:`Track` tracks, :class:`int` num_tracks,
-            :class:`int` new_position, :class:`Object` userdata)
-        :param userdata:    any object you would like to access in the callback
-
-        Add this callback if you want to be notified whenever tracks are moved
-        in the playlist.
-
-        :warning: Currently broken.
-
-    .. method:: add_tracks_removed_callback(callback[, userdata])
-
-        :param callback:    signature: (:class:`Playlist` p, list of
-            :class:`Track` tracks, :class:`int` num_tracks,
+        :param callback:    signature: (manager, :class:`Playlist` p, list of
+            :class:`Track` tracks, :class:`int` position,
             :class:`Object` userdata)
+        :param manager:     a :class:`SpotifyPlaylistManager
+            <manager.SpotifyPlaylistManager>` object
         :param userdata:    any object you would like to access in the callback
 
-        Add this callback if you want to be notified whenever tracks are removed
-        from the playlist.
+    .. method:: add_tracks_moved_callback(callback[, manager, userdata])
 
-        :warning: Currently broken.
+        :param callback:    signature: (manager, :class:`Playlist` p, list of
+            :class:`Track` tracks, :class:`int` new_position,
+            :class:`Object` userdata)
+        :param manager:     a :class:`SpotifyPlaylistManager
+            <manager.SpotifyPlaylistManager>` object
+        :param userdata:    any object you would like to access in the callback
+
+    .. method:: add_tracks_removed_callback(callback[, manager, userdata])
+
+        :param callback:    signature: (manager, :class:`Playlist` p, list of
+            :class:`Track` tracks, :class:`Object` userdata)
+        :param manager:     a :class:`SpotifyPlaylistManager
+            <manager.SpotifyPlaylistManager>` object
+        :param userdata:    any object you would like to access in the callback
+
+    .. method:: add_playlist_renamed_callback(callback[, manager, userdata])
+
+        :param callback:    signature: (manager, :class:`Playlist` p,
+            :class:`Object` userdata)
+        :param manager:     a :class:`SpotifyPlaylistManager
+            <manager.SpotifyPlaylistManager>` object
+        :param userdata:    any object you would like to access in the callback
+
+    .. method:: add_playlist_state_changed_callback(callback[, manager, \
+        userdata])
+
+        :param callback:    signature: (manager, :class:`Playlist` p,
+            :class:`Object` userdata)
+        :param manager:     a :class:`SpotifyPlaylistManager
+            <manager.SpotifyPlaylistManager>` object
+        :param userdata:    any object you would like to access in the callback
+
+
+        Called when state changed for a playlist.
+
+        There are three states that trigger this callback:
+
+        - Collaboration for this playlist has been turned on or off
+        - The playlist started having pending changes, or all pending
+            changes have now been committed
+        - The playlist started loading, or finished loading
+
+
+    .. method:: add_playlist_update_in_progress_callback(callback[, manager, \
+        userdata])
+
+        :param callback:    signature: (manager, :class:`Playlist` p,
+            :class:`bool` done, :class:`Object` userdata)
+        :param manager:     a :class:`SpotifyPlaylistManager
+            <manager.SpotifyPlaylistManager>` object
+        :param userdata:    any object you would like to access in the callback
+
+        Called when a playlist is updating or is done updating.
+
+        This is called before and after a series of changes are applied to the
+        playlist. It allows e.g. the user interface to defer updating until the
+        entire operation is complete.
+
+    .. method:: add_playlist_metadata_updated_callback(callback[, manager, \
+        userdata])
+
+        :param callback:    signature: (manager, :class:`Playlist` p,
+            :class:`Object` userdata)
+        :param manager:     a :class:`SpotifyPlaylistManager
+            <manager.SpotifyPlaylistManager>` object
+        :param userdata:    any object you would like to access in the callback
+
+    .. method:: add_track_created_changed_callback(callback[, manager, \
+        userdata])
+
+        :param callback:    signature: (manager, :class:`Playlist` p,
+            :class:`int` position, :class:`User` user, :class:`int` when,
+            :class:`Object` userdata)
+        :param manager:     a :class:`SpotifyPlaylistManager
+            <manager.SpotifyPlaylistManager>` object
+        :param userdata:    any object you would like to access in the callback
+
+        *user* is the new user information and *when* is a time in seconds
+        since the UNIX Epoch.
+
+    .. method:: add_track_message_changed_callback(callback[, manager, \
+        userdata])
+
+        :param callback:    signature: (manager, :class:`Playlist` p,
+            :class:`int` position, :class:`unicode` message,
+            :class:`Object` userdata)
+        :param manager:     a :class:`SpotifyPlaylistManager
+            <manager.SpotifyPlaylistManager>` object
+        :param userdata:    any object you would like to access in the callback
+
+    .. method:: add_track_seen_changed_callback(callback[, manager, userdata])
+
+        :param callback:    signature: (manager, :class:`Playlist` p,
+            :class:`int` position, :class:`bool` seen,
+            :class:`Object` userdata)
+        :param manager:     a :class:`SpotifyPlaylistManager
+            <manager.SpotifyPlaylistManager>` object
+        :param userdata:    any object you would like to access in the callback
+
+    .. method:: add_description_changed_callback(callback[, manager, userdata])
+
+        :param callback:    signature: (manager, :class:`Playlist` p,
+            :class:`unicode` description, :class:`Object` userdata)
+        :param manager:     a :class:`SpotifyPlaylistManager
+            <manager.SpotifyPlaylistManager>` object
+        :param userdata:    any object you would like to access in the callback
+
+    .. method:: add_subscribers_changed_callback(callback[, manager, userdata])
+
+        :param callback:    signature: (manager, :class:`Playlist` p,
+            :class:`Object` userdata)
+        :param manager:     a :class:`SpotifyPlaylistManager
+            <manager.SpotifyPlaylistManager>` object
+        :param userdata:    any object you would like to access in the callback
+
+    .. method:: add_image_changed_callback(callback[, manager, userdata])
+
+        :param callback:    signature: (manager, :class:`Playlist` p,
+            :class:`str` image_id, :class:`Object` userdata)
+        :param manager:     a :class:`SpotifyPlaylistManager
+            <manager.SpotifyPlaylistManager>` object
+        :param userdata:    any object you would like to access in the callback
 
     .. method:: is_collaborative
 
         :rtype:     :class:`int`
         :returns:   collaborative status for a playlist.
 
-        ..note:: A playlist in collaborative state can be modifed by all
+        .. note:: A playlist in collaborative state can be modifed by all
             users, not only the user owning the list.
 
     .. method:: is_loaded
@@ -70,22 +168,7 @@ objects.
 
         Removes the corresponding callback, userdata couple.
 
-        :warning: Not implemented yet.
-
     .. method:: remove_tracks(tracks)
 
         :param tracks:  A list of tracks to be removed from the playlist.
         :type tracks:   list of :class:`Track`
-
-
-The :class:`PlaylistContainer` class
-====================================
-
-The playlist container contains all the playlists attached to a session.
-It is a list of :class:`Playlist` objects.
-
-.. autoclass:: PlaylistContainer
-    :members:
-    :undoc-members:
-
-

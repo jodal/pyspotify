@@ -30,18 +30,11 @@
 #include "session.h"
 #include "track.h"
 #include "playlist.h"
+#include "playlistcontainer.h"
 #include "search.h"
 #include "image.h"
 
 static int session_constructed = 0;
-
-static void delete_trampoline(Callback *tr) {
-    if (tr->userdata) {
-        Py_DECREF(tr->userdata);
-    }
-    Py_DECREF(tr->callback);
-    free(tr);
-}
 
 static PyObject *PyTuple_NewByPreappending(PyObject *firstObject, PyObject *tuple)
 {
@@ -240,6 +233,7 @@ static PyObject *Session_search(Session *self, PyObject *args, PyObject *kwds) {
     Py_INCREF(callback);
     st = malloc(sizeof(Callback));
     st->userdata = userdata;
+    st->manager = NULL;
     st->callback = callback;
     Py_BEGIN_ALLOW_THREADS
     search = sp_search_create(self->_session, query,

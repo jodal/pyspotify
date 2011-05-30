@@ -4,7 +4,7 @@
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at 
+# You may obtain a copy of the License at
 #
 # http://www.apache.org/licenses/LICENSE-2.0
 #
@@ -19,7 +19,8 @@ from spotify._mockspotify import mock_track, mock_album, mock_artist, mock_sessi
 
 class TestTrack(unittest.TestCase):
 
-    track = mock_track("foo", 3, mock_album("bar", mock_artist("baz", 1), 0, "", 0, 1), 10, 20, 30, 40, 0, 1)
+    track = mock_track("foo", 3, mock_album("bar", mock_artist("baz", 1), 0, "",
+                                            0, 1, 1), 10, 20, 30, 40, 0, 1)
 
     def test_artists(self):
         self.assertEqual([x.name() for x in self.track.artists()], ["a1", "a2", "a3"])

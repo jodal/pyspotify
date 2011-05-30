@@ -4,7 +4,7 @@
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at 
+# You may obtain a copy of the License at
 #
 # http://www.apache.org/licenses/LICENSE-2.0
 #
@@ -45,7 +45,9 @@ class TestPlaylistContainer(unittest.TestCase):
 class TestPlaylist(unittest.TestCase):
 
     def _mock_track(self, name):
-        return mock_track(name, 0, mock_album("foo", mock_artist("bar", 1), 2006, "01234567890123456789", Album.ALBUM, 1), 0, 0, 0, 0, 0, 1)
+        return mock_track(name, 0, mock_album("foo", mock_artist("bar", 1),
+                                2006, "01234567890123456789", Album.ALBUM, 1, 1),
+                                0, 0, 0, 0, 0, 1)
 
     def test_name(self):
         p1 = _mockspotify.mock_playlist("foo", [])

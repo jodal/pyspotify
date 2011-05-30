@@ -4,7 +4,7 @@
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at 
+# You may obtain a copy of the License at
 #
 # http://www.apache.org/licenses/LICENSE-2.0
 #
@@ -28,12 +28,13 @@ class TestLink(unittest.TestCase):
         self.assertEqual(str(l), "link:from_string_test")
 
     def test_from_track(self):
-        t = mock_track("foo", 0, mock_album("bar", mock_artist("baz", 1), 0, "", 0, 1), 0, 0, 0, 0, 0, 1)
+        t = mock_track("foo", 0, mock_album("bar", mock_artist("baz", 1), 0, "",
+                                            0, 1, 1), 0, 0, 0, 0, 0, 1)
         l2 = Link.from_track(t, 42)
         self.assertEqual(str(l2), "link:track:foo/42")
 
     def test_from_album(self):
-        a = mock_album("bar", mock_artist("baz", 1), 0, "", 0, 1)
+        a = mock_album("bar", mock_artist("baz", 1), 0, "", 0, 1, 1)
         l2 = Link.from_album(a)
         self.assertEqual(str(l2), "link:album:bar")
 
@@ -53,7 +54,8 @@ class TestLink(unittest.TestCase):
         self.assertEqual(str(l), "link:playlist:foo")
 
     def test_type(self):
-        t = mock_track("foo", 0, mock_album("bar", mock_artist("baz", 1), 0, "", 0, 1), 0, 0, 0, 0, 0, 1)
+        t = mock_track("foo", 0, mock_album("bar", mock_artist("baz", 1), 0, "",
+                                            0, 1, 1), 0, 0, 0, 0, 0, 1)
         l2 = Link.from_track(t, 42)
         self.assertEqual(l2.type(), Link.LINK_TRACK)
 

@@ -20,23 +20,23 @@
 
 typedef struct {
     PyObject_HEAD
-    sp_playlist *_playlist;
-} Playlist;
+    sp_playlistcontainer *_playlistcontainer;
+} PlaylistContainer;
 
-extern PyTypeObject PlaylistType;
+extern PyTypeObject PlaylistContainerType;
 
-extern void playlist_init(PyObject *m);
+extern void playlistcontainer_init(PyObject *m);
 
-/* Keep track of callbacks added to a playlist */
-typedef struct _playlist_callback {
-    sp_playlist_callbacks *callback;
+/* Keep track of callbacks added to a playlist container */
+typedef struct _playlistcontainer_callback {
+    sp_playlistcontainer_callbacks *callback;
     Callback *trampoline;
-    struct _playlist_callback *next;
-} playlist_callback;
+    struct _playlistcontainer_callback *next;
+} playlistcontainer_callback;
 
-/* An entry in the playlist callback table */
-typedef struct _pl_cb_entry {
-    sp_playlist *playlist;
-    playlist_callback *callbacks;
-    struct _pl_cb_entry *next;
-} pl_cb_entry;
+/* An entry in the playlist container callback table */
+typedef struct _plc_cb_entry {
+    sp_playlistcontainer *playlistcontainer;
+    playlistcontainer_callback *callbacks;
+    struct _plc_cb_entry *next;
+} plc_cb_entry;

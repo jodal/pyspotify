@@ -24,12 +24,13 @@ import time
 import threading
 import os
 
-from spotify.manager import SpotifySessionManager
+from spotify.manager import SpotifySessionManager, SpotifyPlaylistManager, \
+    SpotifyContainerManager
 try:
     from spotify.alsahelper import AlsaController
 except ImportError:
     from spotify.osshelper import OssController as AlsaController
-from spotify import Link
+from spotify import Link,SpotifyError
 
 class JukeboxUI(cmd.Cmd, threading.Thread):
 
@@ -159,8 +160,63 @@ class JukeboxUI(cmd.Cmd, threading.Thread):
     def emptyline(self):
         pass
 
+    def do_watch(self, line):
+        if not line:
+            print """Usage: watch [playlist]
+You will be notified when tracks are added, moved or removed from the playlist."""
+        else:
+            try:
+                p = int(line)
+            except ValueError:
+                print "That's not a number!"
+                return
+            if p < 0 or p >= len(self.jukebox.ctr):
+                print "That's out of range!"
+                return
+            self.jukebox.watch(self.jukebox.ctr[p])
+
+    def do_unwatch(self, line):
+        if not line:
+            print "Usage: unwatch [playlist]"
+        else:
+            try:
+                p = int(line)
+            except ValueError:
+                print "That's not a number!"
+                return
+            if p < 0 or p >= len(self.jukebox.ctr):
+                print "That's out of range!"
+                return
+            self.jukebox.watch(self.jukebox.ctr[p], True)
+
     do_ls = do_list
     do_EOF = do_quit
+
+
+## playlist callbacks ##
+class JukeboxPlaylistManager(SpotifyPlaylistManager):
+    def tracks_added(p, t, i, u):
+        print 'Tracks added to playlist %s' % p.name()
+
+    def tracks_moved(p, t, i, u):
+        print 'Tracks moved in playlist %s' % p.name()
+
+    def tracks_removed(p, t, u):
+        print 'Tracks removed from playlist %s' % p.name()
+
+## container calllbacks ##
+class JukeboxContainerManager(SpotifyContainerManager):
+    def container_loaded(self, c, u):
+        print 'Container loaded !'
+
+    def playlist_added(self, c, p, i, u):
+        print 'Container: playlist "%s" added.' % p.name()
+
+    def playlist_moved(self, c, p, oi, ni, u):
+        print 'Container: playlist "%s" moved.' % p.name()
+
+    def playlist_removed(self, c, p, i, u):
+        print 'Container: playlist "%s" removed.' % p.name()
 
 class Jukebox(SpotifySessionManager):
 
@@ -176,7 +232,10 @@ class Jukebox(SpotifySessionManager):
         self.ctr = None
         self.playing = False
         self._queue = []
+        self.playlist_manager = JukeboxPlaylistManager()
+        self.container_manager = JukeboxContainerManager()
         print "Logging in, please wait..."
+
 
     def logged_in(self, session, error):
         if error:
@@ -185,6 +244,7 @@ class Jukebox(SpotifySessionManager):
         self.session = session
         try:
             self.ctr = session.playlist_container()
+            self.container_manager.watch(self.ctr)
             self.starred = session.starred()
             self.ui.start()
         except:
@@ -260,6 +320,13 @@ class Jukebox(SpotifySessionManager):
                 print album.name()
         callback(browser)
 
+    def watch(self, p, unwatch=False):
+        if not unwatch:
+            print "Watching playlist: %s" % p.name()
+            self.playlist_manager.watch(p);
+        else:
+            print "Unatching playlist: %s" % p.name()
+            self.playlist_manager.unwatch(p)
 
 if __name__ == '__main__':
     import optparse

@@ -23,6 +23,7 @@ All the classes and sub-modules of **pyspotify** are contained in the
     image
     search
     playlist
+    container
     user
     toplist
     inbox

@@ -7,6 +7,7 @@ Contents
     :maxdepth: 2
 
     installation
+    managers/index
     api/index
 
 Indices and tables

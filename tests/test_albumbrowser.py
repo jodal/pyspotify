@@ -46,6 +46,7 @@ class TestAlbumbrowser(unittest.TestCase):
         assert browser[1].name() == 'bar'
         assert browser[2].name() == 'baz'
 
+    @unittest.skip('Not implemented')
     def test_callback(self):
         callback_called = False
         browser = mock_albumbrowse(self.session, self.album, 0, self.callback,

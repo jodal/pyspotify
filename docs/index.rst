@@ -10,6 +10,7 @@ Table of contents
     installation
     managers/index
     api/index
+    changes
     development
     authors
     licenses

@@ -1,11 +1,12 @@
 .. include:: ../README.rst
 
-Contents
-========
+Table of contents
+=================
 
 .. toctree::
     :maxdepth: 2
 
+    introduction
     installation
     managers/index
     api/index

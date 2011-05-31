@@ -9,11 +9,3 @@ Contents
     installation
     managers/index
     api/index
-
-Indices and tables
-==================
-
-* :ref:`genindex`
-* :ref:`modindex`
-* :ref:`search`
-

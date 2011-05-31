@@ -49,7 +49,7 @@ master_doc = 'index'
 
 # General information about the project.
 project = u'pyspotify'
-copyright = u'2009-2010, Doug Winter'
+copyright = u'2009-2011, Doug Winter and contributors'
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the
@@ -187,7 +187,7 @@ htmlhelp_basename = 'pyspotifydoc'
 # (source start file, target name, title, author, documentclass [howto/manual]).
 latex_documents = [
   ('index', 'pyspotify.tex', u'pyspotify Documentation',
-   u'Doug Winter', 'manual'),
+   u'Doug Winter and contributors', 'manual'),
 ]
 
 # The name of an image file (relative to this directory) to place at the top of
@@ -220,5 +220,5 @@ latex_documents = [
 # (source start file, name, description, authors, manual section).
 man_pages = [
     ('index', 'pyspotify', u'pyspotify Documentation',
-     [u'Doug Winter'], 1)
+     [u'Doug Winter and contributors'], 1)
 ]

@@ -13,8 +13,7 @@ Please see the Mopidy web site for further information on pyspotify.
 Upstream notes
 ==============
 
-Copyright 2009-10 Doug Winter
-All rights reserved
+Copyright 2009-2011 Doug Winter and contributors
 
 License information
 -------------------

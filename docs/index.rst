@@ -10,5 +10,6 @@ Table of contents
     installation
     managers/index
     api/index
+    development
     authors
     licenses

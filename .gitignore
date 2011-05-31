@@ -1,7 +1,10 @@
+*.egg-info
 *.pyc
 *.so
-*.egg-info
-build
-spotify_appkey.key
-*.wpu
+*.swp
 *.wpr
+*.wpu
+_build
+build
+dist
+spotify_appkey.key

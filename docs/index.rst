@@ -9,3 +9,5 @@ Contents
     installation
     managers/index
     api/index
+    authors
+    licenses

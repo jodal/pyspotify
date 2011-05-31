@@ -13,18 +13,6 @@ Please see the Mopidy web site for further information on pyspotify.
 Upstream notes
 ==============
 
-Copyright 2009-2011 Doug Winter and contributors
-
-License information
--------------------
-
-This package is licensed under the Apache License, Version 2.0.  Please see the
-file docs/LICENSE for more information.
-
-This product uses SPOTIFY(R) CORE but is not endorsed, certified or otherwise
-approved in any way by Spotify. Spotify is the registered trade mark of the
-Spotify Group.
-
 Introduction
 ------------
 

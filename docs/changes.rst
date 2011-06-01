@@ -17,8 +17,15 @@ pyspotify, both on catching up with the features of libspotify, fixing and
 extending the test suite, writing documentation, and on fixing bugs. A big
 thanks to him!
 
-- TODO: bok should fill out here
-
+- Upgraded to libspotify 0.0.8
+- New managers: *SpotifyPlaylistManager* and *SpotifyContainerManager* \
+  giving access to all the Playlist{,Container} callbacks
+- Artist and Album browsing available
+- Added a method to stop the playback
+- Better error messages when not logged in and accessing user information
+- Added support for a playlist of all starred tracks
+- Get/Set starred status for a track
+- Better memory management
 
 v1.1+mopidy20110405 (2011-04-05)
 ================================

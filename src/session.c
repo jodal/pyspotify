@@ -477,7 +477,7 @@ static int music_delivery(sp_session *session, const sp_audioformat *format, con
     PyObject *client = (PyObject *)sp_session_userdata(session);
     PyObject *c= PyObject_CallMethod(client, "music_delivery", "OOiiiii", psession, pyframes, siz, num_frames, format->sample_type, format->sample_rate, format->channels);
     int consumed = num_frames; // assume all consumed
-    if(PyObject_TypeCheck(c, &PyInt_Type)) {
+    if(c != NULL && PyObject_TypeCheck(c, &PyInt_Type)) {
 	consumed = (int)PyInt_AsLong(c);
     }
     Py_DECREF(pyframes);

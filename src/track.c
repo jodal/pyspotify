@@ -68,6 +68,8 @@ static PyObject *Track_album(Track *self) {
     sp_album *album;
 
     album = sp_track_album(self->_track);
+    if (!album)
+        Py_RETURN_NONE;
     Album *a = (Album *)PyObject_CallObject((PyObject *)&AlbumType, NULL);
     sp_album_add_ref(album);
     a->_album = album;

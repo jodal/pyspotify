@@ -49,9 +49,13 @@ static PyObject *Album_is_available(Album *self) {
 }
 
 static PyObject *Album_artist(Album *self) {
+    sp_artist *spa;
+
+    spa = sp_album_artist(self->_album);
+    if (!spa)
+        Py_RETURN_NONE;
     Artist *artist = (Artist *)PyObject_CallObject((PyObject *)&ArtistType, NULL);
-    artist->_artist = sp_album_artist(self->_album);
-    Py_INCREF(artist);
+    artist->_artist = spa;
     return (PyObject *)artist;
 }
 

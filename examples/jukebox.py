@@ -195,13 +195,13 @@ You will be notified when tracks are added, moved or removed from the playlist."
 
 ## playlist callbacks ##
 class JukeboxPlaylistManager(SpotifyPlaylistManager):
-    def tracks_added(p, t, i, u):
+    def tracks_added(self, p, t, i, u):
         print 'Tracks added to playlist %s' % p.name()
 
-    def tracks_moved(p, t, i, u):
+    def tracks_moved(self, p, t, i, u):
         print 'Tracks moved in playlist %s' % p.name()
 
-    def tracks_removed(p, t, u):
+    def tracks_removed(self, p, t, u):
         print 'Tracks removed from playlist %s' % p.name()
 
 ## container calllbacks ##

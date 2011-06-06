@@ -124,9 +124,10 @@ Image_add_load_callback(Image * self, PyObject *args)
     tramp = malloc(sizeof(image_callback_trampoline));
     tramp->userdata = userdata;
     tramp->callback = callback;
-    Py_BEGIN_ALLOW_THREADS
-        sp_image_add_load_callback(self->_image, image_callback, tramp);
-    Py_END_ALLOW_THREADS Py_RETURN_NONE;
+    Py_BEGIN_ALLOW_THREADS;
+    sp_image_add_load_callback(self->_image, image_callback, tramp);
+    Py_END_ALLOW_THREADS;
+    Py_RETURN_NONE;
 }
 
 static PyObject *

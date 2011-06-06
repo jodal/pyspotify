@@ -1454,8 +1454,9 @@ mock_playlistcontainer(PyObject *self, PyObject *args)
         Playlist *item = (Playlist *) PySequence_GetItem(seq, i);
 
         Py_INCREF(item);
-        pc->_playlistcontainer->playlist[pc->_playlistcontainer->
-                                         num_playlists++] = item->_playlist;
+        pc->_playlistcontainer->playlist[pc->
+                                         _playlistcontainer->num_playlists++] =
+            item->_playlist;
     }
     return (PyObject *)pc;
 }

@@ -54,14 +54,15 @@ AlbumBrowser_new(PyTypeObject * type, PyObject *args, PyObject *kwds)
     Py_XINCREF(callback);
     Py_XINCREF(userdata);
 
-    Py_BEGIN_ALLOW_THREADS
-        self->_browser = sp_albumbrowse_create(((Session *) session)->_session,
-                                               ((Album *) album)->_album,
-                                               (albumbrowse_complete_cb *)
-                                               AlbumBrowser_browse_complete,
-                                               (void *)&self->_callback);
+    Py_BEGIN_ALLOW_THREADS;
+    self->_browser = sp_albumbrowse_create(((Session *) session)->_session,
+                                           ((Album *) album)->_album,
+                                           (albumbrowse_complete_cb *)
+                                           AlbumBrowser_browse_complete,
+                                           (void *)&self->_callback);
 
-    Py_END_ALLOW_THREADS return (PyObject *)self;
+    Py_END_ALLOW_THREADS;
+    return (PyObject *)self;
 }
 
 static void

@@ -54,15 +54,15 @@ ArtistBrowser_new(PyTypeObject * type, PyObject *args, PyObject *kwds)
     Py_XINCREF(callback);
     Py_XINCREF(userdata);
 
-    Py_BEGIN_ALLOW_THREADS
-        self->_browser =
+    Py_BEGIN_ALLOW_THREADS;
+    self->_browser =
         sp_artistbrowse_create(((Session *) session)->_session,
                                ((Artist *) artist)->_artist,
                                (artistbrowse_complete_cb *)
                                ArtistBrowser_browse_complete,
                                (void *)&self->_callback);
-
-    Py_END_ALLOW_THREADS return (PyObject *)self;
+    Py_END_ALLOW_THREADS;
+    return (PyObject *)self;
 }
 
 static void

@@ -297,6 +297,9 @@ bool sp_track_is_available(sp_session *session, sp_track *t) {
 void sp_search_add_ref(sp_search *search) {
 }
 
+void sp_search_release(sp_search *search) {
+}
+
 sp_search *sp_search_create(sp_session *session, const char *query, int track_offset, int track_count, int album_offset, int album_count, int artist_offset, int artist_count, search_complete_cb *callback, void *userdata) {
     sp_search *search = malloc(sizeof(sp_search));
     if(!strncmp(query, "!loaded", 7))
@@ -386,6 +389,9 @@ const char * sp_user_display_name(sp_user *user) {
 
 
 void sp_link_add_ref(sp_link *link) {
+}
+
+void sp_link_release(sp_link *link) {
 }
 
 sp_track* sp_link_as_track(sp_link *link) {
@@ -726,6 +732,9 @@ void mock_playlistcontainer_event(int event, sp_playlistcontainer *c)
 /*********************** MOCK IMAGE METHODS ************************/
 
 void sp_image_add_ref(sp_image *image) {
+}
+
+void sp_image_release(sp_image *image) {
 }
 
 bool sp_image_is_loaded(sp_image *i) {

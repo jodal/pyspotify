@@ -41,6 +41,13 @@ PyObject *Image_FromSpotify(sp_image *image)
     return i;
 }
 
+static void Image_dealloc(Image *self)
+{
+        if (self->_image)
+                    sp_image_release(self->_image);
+            self->ob_type->tp_free(self);
+}
+
 static PyObject *Image_is_loaded(Image *self) {
     return Py_BuildValue("i", sp_image_is_loaded(self->_image));
 }
@@ -145,7 +152,7 @@ PyTypeObject ImageType = {
     "spotify.Image",           /*tp_name*/
     sizeof(Image),             /*tp_basicsize*/
     0,                         /*tp_itemsize*/
-    0,                         /*tp_dealloc*/
+    (destructor)Image_dealloc, /*tp_dealloc*/
     0,                         /*tp_print*/
     0,                         /*tp_getattr*/
     0,                         /*tp_setattr*/

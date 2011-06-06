@@ -46,6 +46,13 @@ PyObject *Link_FromSpotify(sp_link *link)
     return l;
 }
 
+static void Link_dealloc(Link *self)
+{
+    if (self->_link)
+        sp_link_release(self->_link);
+    self->ob_type->tp_free(self);
+}
+
 static PyObject *Link_from_string(Link *self, PyObject *args) {
     char *s, *s2;
     PyObject *plink;
@@ -239,7 +246,7 @@ PyTypeObject LinkType = {
     "_spotify.Link",           /*tp_name*/
     sizeof(Link),              /*tp_basicsize*/
     0,                         /*tp_itemsize*/
-    0,                         /*tp_dealloc*/  // TODO: IMPLEMENT THIS WITH sp_link_release
+    (destructor)Link_dealloc,  /*tp_dealloc*/
     0,                         /*tp_print*/
     0,                         /*tp_getattr*/
     0,                         /*tp_setattr*/

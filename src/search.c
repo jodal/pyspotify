@@ -43,6 +43,13 @@ PyObject *Results_FromSpotify(sp_search *search)
     return results;
 }
 
+static void Results_dealloc(Results *self)
+{
+    if (self->_search)
+                sp_search_release(self->_search);
+        self->ob_type->tp_free(self);
+}
+
 static PyObject *Results_is_loaded(Results *self) {
     return Py_BuildValue("i", sp_search_is_loaded(self->_search));
 }
@@ -146,7 +153,7 @@ PyTypeObject ResultsType = {
     "spotify.Results",         /*tp_name*/
     sizeof(Results),           /*tp_basicsize*/
     0,                         /*tp_itemsize*/
-    0,                         /*tp_dealloc*/  // TODO: IMPLEMENT THIS WITH sp_results_release
+    (destructor)Results_dealloc, /*tp_dealloc*/
     0,                         /*tp_print*/
     0,                         /*tp_getattr*/
     0,                         /*tp_setattr*/

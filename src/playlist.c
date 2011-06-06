@@ -46,6 +46,15 @@ static PyObject *Playlist_new(PyTypeObject *type, PyObject *args, PyObject *kwds
     return (PyObject *)self;
 }
 
+PyObject *Playlist_FromSpotify(sp_playlist *spl)
+{
+    Playlist *playlist = (Playlist *)PyObject_CallObject(
+                            (PyObject *)&PlaylistType, NULL);
+    playlist->_playlist = spl;
+    sp_playlist_add_ref(spl);
+    return (PyObject *)playlist;
+}
+
 static void Playlist_dealloc(Playlist *self) {
     if (self->_playlist)
         sp_playlist_release(self->_playlist);
@@ -212,17 +221,15 @@ void playlist_tracks_added_callback(sp_playlist *playlist, sp_track *const *trac
     PyGILState_STATE gstate;
     PyObject *py_tracks = PyList_New(num_tracks);
     int i;
+    PyObject *res;
 
     gstate = PyGILState_Ensure();
     for (i = 0; i < num_tracks; i++) {
-        Track *t = (Track *)PyObject_CallObject((PyObject *)&TrackType, NULL);
-        t->_track = tracks[i];
-        PyList_SetItem(py_tracks, i, (PyObject *)t);
+        PyObject *track = Track_FromSpotify(tracks[i]);
+        PyList_SetItem(py_tracks, i, track);
     }
-    Playlist *p = (Playlist *)PyObject_CallObject((PyObject *)&PlaylistType, NULL);
-    p->_playlist = playlist;
-    Py_INCREF(p);
-    PyObject_CallFunctionObjArgs(
+    PyObject *p = Playlist_FromSpotify(playlist);
+    res = PyObject_CallFunctionObjArgs(
         tramp->callback,
         tramp->manager,
         p,
@@ -231,6 +238,7 @@ void playlist_tracks_added_callback(sp_playlist *playlist, sp_track *const *trac
         tramp->userdata,
         NULL
     );
+    Py_XDECREF(res);
     Py_DECREF(py_tracks);
     Py_DECREF(p);
     PyGILState_Release(gstate);
@@ -251,15 +259,14 @@ void playlist_tracks_removed_callback(sp_playlist *playlist, const int *tracks,
     PyGILState_STATE gstate;
     PyObject *py_tracks = PyList_New(num_tracks);
     int i;
+    PyObject *res;
 
     for (i = 0; i < num_tracks; i++) {
         PyList_SetItem(py_tracks, i, Py_BuildValue("i", tracks[i]));
     }
     gstate = PyGILState_Ensure();
-    Playlist *p = (Playlist *)PyObject_CallObject((PyObject *)&PlaylistType, NULL);
-    p->_playlist = playlist;
-    Py_INCREF(p);
-    PyObject_CallFunctionObjArgs(
+    PyObject *p = Playlist_FromSpotify(playlist);
+    res = PyObject_CallFunctionObjArgs(
         tramp->callback,
         tramp->manager,
         p,
@@ -267,6 +274,7 @@ void playlist_tracks_removed_callback(sp_playlist *playlist, const int *tracks,
         tramp->userdata,
         NULL
     );
+    Py_XDECREF(res);
     Py_DECREF(py_tracks);
     Py_DECREF(p);
     PyGILState_Release(gstate);
@@ -287,15 +295,14 @@ void playlist_tracks_moved_callback(sp_playlist *playlist, const int *tracks,
     PyGILState_STATE gstate;
     PyObject *py_tracks = PyList_New(num_tracks);
     int i;
+    PyObject *res;
 
     for (i = 0; i < num_tracks; i++) {
         PyList_SetItem(py_tracks, i, Py_BuildValue("i", tracks[i]));
     }
     gstate = PyGILState_Ensure();
-    Playlist *p = (Playlist *)PyObject_CallObject((PyObject *)&PlaylistType, NULL);
-    p->_playlist = playlist;
-    Py_INCREF(p);
-    PyObject_CallFunctionObjArgs(
+    PyObject *p = Playlist_FromSpotify(playlist);
+    res = PyObject_CallFunctionObjArgs(
         tramp->callback,
         tramp->manager,
         p,
@@ -304,6 +311,7 @@ void playlist_tracks_moved_callback(sp_playlist *playlist, const int *tracks,
         tramp->userdata,
         NULL
     );
+    Py_XDECREF(res);
     Py_DECREF(py_tracks);
     Py_DECREF(p);
     PyGILState_Release(gstate);
@@ -322,13 +330,11 @@ void playlist_renamed_callback(sp_playlist *playlist, void *userdata)
 {
     PyGILState_STATE gstate;
     Callback *tramp;
-    Playlist *p;
     PyObject *res;
 
     gstate = PyGILState_Ensure();
     tramp = (Callback *)userdata;
-    p = (Playlist *)PyObject_CallObject((PyObject *)&PlaylistType, NULL);
-    p->_playlist = playlist;
+    PyObject *p = Playlist_FromSpotify(playlist);
     res = PyObject_CallFunctionObjArgs(
         tramp->callback,
         tramp->manager,
@@ -356,13 +362,11 @@ void playlist_state_changed_callback(sp_playlist *playlist, void *userdata)
 {
     PyGILState_STATE gstate;
     Callback *tramp;
-    Playlist *p;
     PyObject *res;
 
     gstate = PyGILState_Ensure();
     tramp = (Callback *)userdata;
-    p = (Playlist *)PyObject_CallObject((PyObject *)&PlaylistType, NULL);
-    p->_playlist = playlist;
+    PyObject *p = Playlist_FromSpotify(playlist);
     res = PyObject_CallFunctionObjArgs(
         tramp->callback,
         tramp->manager,
@@ -391,14 +395,12 @@ void playlist_update_in_progress_callback(sp_playlist *playlist,
 {
     PyGILState_STATE gstate;
     Callback *tramp;
-    Playlist *p;
     PyObject *res, *pdone;
 
     gstate = PyGILState_Ensure();
     tramp = (Callback *)userdata;
     pdone = PyBool_FromLong(done);
-    p = (Playlist *)PyObject_CallObject((PyObject *)&PlaylistType, NULL);
-    p->_playlist = playlist;
+    PyObject *p = Playlist_FromSpotify(playlist);
     res = PyObject_CallFunctionObjArgs(
         tramp->callback,
         tramp->manager,
@@ -428,13 +430,11 @@ void playlist_metadata_updated_callback(sp_playlist *playlist, void *userdata)
 {
     PyGILState_STATE gstate;
     Callback *tramp;
-    Playlist *p;
     PyObject *res;
 
     gstate = PyGILState_Ensure();
     tramp = (Callback *)userdata;
-    p = (Playlist *)PyObject_CallObject((PyObject *)&PlaylistType, NULL);
-    p->_playlist = playlist;
+    PyObject *p = Playlist_FromSpotify(playlist);
     res = PyObject_CallFunctionObjArgs(
         tramp->callback,
         tramp->manager,
@@ -463,13 +463,11 @@ void playlist_track_created_changed_callback(sp_playlist *playlist,
 {
     PyGILState_STATE gstate;
     Callback *tramp;
-    Playlist *p;
     PyObject *res, *ppos, *puser, *pwhen;
 
     gstate = PyGILState_Ensure();
     tramp = (Callback *)userdata;
-    p = (Playlist *)PyObject_CallObject((PyObject *)&PlaylistType, NULL);
-    p->_playlist = playlist;
+    PyObject *p = Playlist_FromSpotify(playlist);
     ppos = PyInt_FromLong(position);
     puser = Py_None;    //TODO: implement with User
     Py_INCREF(Py_None); //
@@ -508,13 +506,11 @@ void playlist_track_message_changed_callback(sp_playlist *playlist,
 {
     PyGILState_STATE gstate;
     Callback *tramp;
-    Playlist *p;
     PyObject *res, *ppos, *pmess;
 
     gstate = PyGILState_Ensure();
     tramp = (Callback *)userdata;
-    p = (Playlist *)PyObject_CallObject((PyObject *)&PlaylistType, NULL);
-    p->_playlist = playlist;
+    PyObject *p = Playlist_FromSpotify(playlist);
     ppos = PyInt_FromLong(position);
     pmess = PyUnicode_FromString(message);
     res = PyObject_CallFunctionObjArgs(
@@ -549,13 +545,11 @@ void playlist_track_seen_changed_callback(sp_playlist *playlist,
 {
     PyGILState_STATE gstate;
     Callback *tramp;
-    Playlist *p;
     PyObject *res, *ppos, *pseen;
 
     gstate = PyGILState_Ensure();
     tramp = (Callback *)userdata;
-    p = (Playlist *)PyObject_CallObject((PyObject *)&PlaylistType, NULL);
-    p->_playlist = playlist;
+    PyObject *p = Playlist_FromSpotify(playlist);
     ppos = PyInt_FromLong(position);
     pseen = PyBool_FromLong(seen);
     res = PyObject_CallFunctionObjArgs(
@@ -590,13 +584,11 @@ void playlist_description_changed_callback(sp_playlist *playlist,
 {
     PyGILState_STATE gstate;
     Callback *tramp;
-    Playlist *p;
     PyObject *res, *pdesc;
 
     gstate = PyGILState_Ensure();
     tramp = (Callback *)userdata;
-    p = (Playlist *)PyObject_CallObject((PyObject *)&PlaylistType, NULL);
-    p->_playlist = playlist;
+    PyObject *p = Playlist_FromSpotify(playlist);
     pdesc = PyUnicode_FromString(description);
     res = PyObject_CallFunctionObjArgs(
         tramp->callback,
@@ -627,13 +619,11 @@ void playlist_subscribers_changed_callback(sp_playlist *playlist, void *userdata
 {
     PyGILState_STATE gstate;
     Callback *tramp;
-    Playlist *p;
     PyObject *res;
 
     gstate = PyGILState_Ensure();
     tramp = (Callback *)userdata;
-    p = (Playlist *)PyObject_CallObject((PyObject *)&PlaylistType, NULL);
-    p->_playlist = playlist;
+    PyObject *p = Playlist_FromSpotify(playlist);
     res = PyObject_CallFunctionObjArgs(
         tramp->callback,
         tramp->manager,
@@ -662,13 +652,11 @@ void playlist_image_changed_callback(sp_playlist *playlist, const byte *image,
 {
     PyGILState_STATE gstate;
     Callback *tramp;
-    Playlist *p;
     PyObject *res, *pimage;
 
     gstate = PyGILState_Ensure();
     tramp = (Callback *)userdata;
-    p = (Playlist *)PyObject_CallObject((PyObject *)&PlaylistType, NULL);
-    p->_playlist = playlist;
+    PyObject *p = Playlist_FromSpotify(playlist);
     pimage = PyBytes_FromStringAndSize((const char*)image, 20); //TODO: return Image
     res = PyObject_CallFunctionObjArgs(
         tramp->callback,
@@ -765,10 +753,8 @@ PyObject *Playlist_sq_item(PyObject *o, Py_ssize_t index) {
         return NULL;
     }
     sp_track *tr = sp_playlist_track(self->_playlist, (int)index);
-    Track *t = (Track *)PyObject_CallObject((PyObject *)&TrackType, NULL);
-    Py_INCREF(t);
-    t->_track = tr;
-    return (PyObject *)t;
+    PyObject *track = Track_FromSpotify(tr);
+    return track;
 }
 
 int Playlist_sq_ass_item(PyObject *o, Py_ssize_t index, PyObject *args) {

@@ -34,6 +34,14 @@ static PyObject *Album_new(PyTypeObject *type, PyObject *args, PyObject *kwds) {
     return (PyObject *)self;
 }
 
+PyObject *Album_FromSpotify(sp_album *album)
+{
+    PyObject *a = PyObject_CallObject((PyObject *)&AlbumType, NULL);
+    ((Album *)a)->_album = album;
+    sp_album_add_ref(album);
+    return a;
+}
+
 static void Album_dealloc(Album *self) {
     if (self->_album)
         sp_album_release(self->_album);
@@ -54,9 +62,8 @@ static PyObject *Album_artist(Album *self) {
     spa = sp_album_artist(self->_album);
     if (!spa)
         Py_RETURN_NONE;
-    Artist *artist = (Artist *)PyObject_CallObject((PyObject *)&ArtistType, NULL);
-    artist->_artist = spa;
-    return (PyObject *)artist;
+    PyObject *artist = Artist_FromSpotify(spa);
+    return artist;
 }
 
 static PyObject *Album_cover(Album *self) {

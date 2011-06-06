@@ -36,6 +36,14 @@ static PyObject *Track_new(PyTypeObject *type, PyObject *args, PyObject *kwds) {
     return (PyObject *)self;
 }
 
+PyObject *Track_FromSpotify(sp_track *track)
+{
+    PyObject *t = PyObject_CallObject((PyObject *)&TrackType, NULL);
+    ((Track *)t)->_track = track;
+    sp_track_add_ref(track);
+    return t;
+}
+
 static void Track_dealloc(Track *self) {
     if (self->_track)
         sp_track_release(self->_track);
@@ -53,13 +61,14 @@ static PyObject *Track_is_loaded(Track *self) {
 }
 
 static PyObject *Track_artists(Track *self, PyObject *args) {
+    sp_artist *artist;
     int count = sp_track_num_artists(self->_track);
     PyObject *l = PyList_New(count);
     int i;
     for(i=0;i < count; i++) {
-        Artist *a = (Artist *)PyObject_CallObject((PyObject *)&ArtistType, NULL);
-        a->_artist = sp_track_artist(self->_track, i);
-        PyList_SetItem(l, i, (PyObject *)a);
+        artist = sp_track_artist(self->_track, i);
+        PyObject *a = Artist_FromSpotify(artist);
+        PyList_SetItem(l, i, a);
     }
     return l;
 }
@@ -70,10 +79,8 @@ static PyObject *Track_album(Track *self) {
     album = sp_track_album(self->_track);
     if (!album)
         Py_RETURN_NONE;
-    Album *a = (Album *)PyObject_CallObject((PyObject *)&AlbumType, NULL);
-    sp_album_add_ref(album);
-    a->_album = album;
-    return (PyObject *)a;
+    PyObject *a = Album_FromSpotify(album);
+    return a;
 }
 
 static PyObject *Track_name(Track *self) {

@@ -88,10 +88,8 @@ PyObject *AlbumBrowser_sq_item(AlbumBrowser *self, Py_ssize_t index) {
         return NULL;
     }
     sp_track *track = sp_albumbrowse_track(self->_browser, (int)index);
-    Track *wrapper = (Track *)PyObject_CallObject((PyObject *)&TrackType, NULL);
-    sp_track_add_ref(track);
-    wrapper->_track = track;
-    return (PyObject *)wrapper;
+    PyObject *wrapper = Track_FromSpotify(track);
+    return wrapper;
 }
 
 PySequenceMethods AlbumBrowser_as_sequence = {

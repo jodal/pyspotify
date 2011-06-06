@@ -33,6 +33,14 @@ static PyObject *Image_new(PyTypeObject *type, PyObject *args, PyObject *kwds) {
     return (PyObject *)self;
 }
 
+PyObject *Image_FromSpotify(sp_image *image)
+{
+    PyObject *i = PyObject_CallObject((PyObject *)&ImageType, NULL);
+    ((Image *)i)->_image = image;
+    sp_image_add_ref(image);
+    return i;
+}
+
 static PyObject *Image_is_loaded(Image *self) {
     return Py_BuildValue("i", sp_image_is_loaded(self->_image));
 }
@@ -64,11 +72,13 @@ typedef struct {
 
 void image_callback(sp_image *image, void *userdata) {
     image_callback_trampoline *tramp = (image_callback_trampoline *)userdata;
+    PyObject *i;
     PyGILState_STATE gstate;
+
     gstate = PyGILState_Ensure();
-    Image *i = (Image *)PyObject_CallObject((PyObject *)&ImageType, NULL);
-    i->_image = image;
+    i = Image_FromSpotify(image);
     PyObject_CallFunctionObjArgs(tramp->callback, i, tramp->userdata, NULL);
+    Py_DECREF(i);
     Py_DECREF(tramp->callback);
     Py_DECREF(tramp->userdata);
     free(userdata);

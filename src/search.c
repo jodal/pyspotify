@@ -35,6 +35,14 @@ static PyObject *Results_new(PyTypeObject *type, PyObject *args, PyObject *kwds)
     return (PyObject *)self;
 }
 
+PyObject *Results_FromSpotify(sp_search *search)
+{
+    PyObject *results = PyObject_CallObject((PyObject *)&ResultsType, NULL);
+    ((Results *)results)->_search = search;
+    sp_search_add_ref(search);
+    return results;
+}
+
 static PyObject *Results_is_loaded(Results *self) {
     return Py_BuildValue("i", sp_search_is_loaded(self->_search));
 }
@@ -48,28 +56,28 @@ static PyObject *Results_error(Results *self) {
 }
 
 static PyObject *Results_artists(Results *self) {
+    sp_artist *artist;
     int count = sp_search_num_artists(self->_search);
     PyObject *l = PyList_New(count);
     int i;
     for(i=0;i<count;++i) {
-        Artist *a = (Artist *)PyObject_CallObject((PyObject *)&ArtistType, NULL);
-        a->_artist = sp_search_artist(self->_search, i);
-        PyList_SetItem(l, i, (PyObject *)a);
+        artist = sp_search_artist(self->_search, i);
+        PyObject *a = Artist_FromSpotify(artist);
+        PyList_SetItem(l, i, a);
     }
-    Py_INCREF(l);
     return l;
 }
 
 static PyObject *Results_albums(Results *self) {
+    sp_album *album;
     int count = sp_search_num_albums(self->_search);
     PyObject *l = PyList_New(count);
     int i;
     for(i=0;i<count;++i) {
-        Album *a = (Album *)PyObject_CallObject((PyObject *)&AlbumType, NULL);
-        a->_album = sp_search_album(self->_search, i);
-        PyList_SetItem(l, i, (PyObject *)a);
+        album = sp_search_album(self->_search, i);
+        PyObject *a = Album_FromSpotify(album);
+        PyList_SetItem(l, i, a);
     }
-    Py_INCREF(l);
     return l;
 }
 
@@ -78,11 +86,9 @@ static PyObject *Results_tracks(Results *self) {
     PyObject *l = PyList_New(count);
     int i;
     for(i=0;i<count;++i) {
-        Track *a = (Track *)PyObject_CallObject((PyObject *)&TrackType, NULL);
-        a->_track = sp_search_track(self->_search, i);
-        PyList_SetItem(l, i, (PyObject *)a);
+        PyObject *a = Track_FromSpotify(sp_search_track(self->_search, i));
+        PyList_SetItem(l, i, a);
     }
-    Py_INCREF(l);
     return l;
 }
 

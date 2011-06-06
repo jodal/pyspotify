@@ -4,7 +4,7 @@
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at 
+ * You may obtain a copy of the License at
  *
  *  http://www.apache.org/licenses/LICENSE-2.0
  *
@@ -38,8 +38,18 @@ static PyObject *Link_new(PyTypeObject *type, PyObject *args, PyObject *kwds) {
     return (PyObject *)self;
 }
 
+PyObject *Link_FromSpotify(sp_link *link)
+{
+    PyObject *l = PyObject_CallObject((PyObject *)&LinkType, NULL);
+    ((Link *)l)->_link = link;
+    sp_link_add_ref(link);
+    return l;
+}
+
 static PyObject *Link_from_string(Link *self, PyObject *args) {
     char *s, *s2;
+    PyObject *plink;
+
     if(!PyArg_ParseTuple(args, "s", &s))
 	return NULL;
     s2 = malloc(strlen(s) +1);
@@ -49,15 +59,15 @@ static PyObject *Link_from_string(Link *self, PyObject *args) {
 	PyErr_SetString(SpotifyError, "Failed to get link from a Spotify URI");
 	return NULL;
     }
-    Link *plink = (Link *)PyObject_CallObject((PyObject *)&LinkType, NULL);
-    Py_INCREF(plink);
-    plink->_link = link;
-    return (PyObject *)plink;
+    plink = Link_FromSpotify(link);
+    return plink;
 }
 
 static PyObject *Link_from_track(Link *self, PyObject *args) {
     Track *track;
     int offset;
+    PyObject *plink;
+
     if(!PyArg_ParseTuple(args, "O!i", &TrackType, &track, &offset)) {
 	return NULL;
     }
@@ -66,13 +76,14 @@ static PyObject *Link_from_track(Link *self, PyObject *args) {
 	PyErr_SetString(SpotifyError, "Failed to get track from a Link");
 	return NULL;
     }
-    Link *plink = (Link *)PyObject_CallObject((PyObject *)&LinkType, NULL);
-    plink->_link = link;
-    return (PyObject *)plink;
+    plink = Link_FromSpotify(link);
+    return plink;
 }
 
 static PyObject *Link_from_album(Link *self, PyObject *args) {
     Album *album;
+    PyObject *plink;
+
     if(!PyArg_ParseTuple(args, "O!", &AlbumType, &album))
 	return NULL;
     sp_link *link = sp_link_create_from_album(album->_album);
@@ -80,43 +91,46 @@ static PyObject *Link_from_album(Link *self, PyObject *args) {
 	PyErr_SetString(SpotifyError, "Failed to get link from an album");
 	return NULL;
     }
-    Link *plink = (Link *)PyObject_CallObject((PyObject *)&LinkType, NULL);
-    plink->_link = link;
-    return (PyObject *)plink;
+    plink = Link_FromSpotify(link);
+    return plink;
 }
 
 static PyObject *Link_from_artist(Link *self, PyObject *args) {
     Artist *artist;
+    PyObject *plink;
+
     if(!PyArg_ParseTuple(args, "O!", &ArtistType, &artist)) {
 	return NULL;
     }
-    sp_link *l = sp_link_create_from_artist(artist->_artist);
-    if(!l) {
+    sp_link *link = sp_link_create_from_artist(artist->_artist);
+    if(!link) {
 	PyErr_SetString(SpotifyError, "Failed to get track from a Link");
 	return NULL;
     }
-    Link *link = (Link *)PyObject_CallObject((PyObject *)&LinkType, NULL);
-    link->_link = l;
-    return (PyObject *)link;
+    plink = Link_FromSpotify(link);
+    return plink;
 }
 
 static PyObject *Link_from_search(Link *self, PyObject *args) {
     Results *results;
+    PyObject *plink;
+
     if(!PyArg_ParseTuple(args, "O!", &ResultsType, &results)) {
 	return NULL;
     }
-    sp_link *l = sp_link_create_from_search(results->_search);
-    if(!l) {
+    sp_link *link = sp_link_create_from_search(results->_search);
+    if(!link) {
 	PyErr_SetString(SpotifyError, "Failed to get link from a search");
 	return NULL;
     }
-    Link *link = (Link *)PyObject_CallObject((PyObject *)&LinkType, NULL);
-    link->_link = l;
-    return (PyObject *)link;
+    plink = Link_FromSpotify(link);
+    return plink;
 }
 
 static PyObject *Link_from_playlist(Link *self, PyObject *args) {
     Playlist *playlist;
+    PyObject *plink;
+
     if(!PyArg_ParseTuple(args, "O!", &PlaylistType, &playlist))
 	return NULL;
     sp_link *link = sp_link_create_from_playlist(playlist->_playlist);
@@ -124,9 +138,8 @@ static PyObject *Link_from_playlist(Link *self, PyObject *args) {
 	PyErr_SetString(SpotifyError, "Failed to get link from a playlist");
 	return NULL;
     }
-    Link *plink = (Link *)PyObject_CallObject((PyObject *)&LinkType, NULL);
-    plink->_link = link;
-    return (PyObject *)plink;
+    plink = Link_FromSpotify(link);
+    return plink;
 }
 
 static PyObject *Link_type(Link *self) {
@@ -139,10 +152,8 @@ static PyObject *Link_as_track(Link *self) {
 	PyErr_SetString(SpotifyError, "Not a track link");
 	return NULL;
     }
-    Track *ptrack = (Track *)PyObject_CallObject((PyObject *)&TrackType, NULL);
-    ptrack->_track = track;
-    Py_INCREF(ptrack);
-    return (PyObject *)ptrack;
+    PyObject *ptrack = Track_FromSpotify(track);
+    return ptrack;
 }
 
 static PyObject *Link_as_album(Link *self) {
@@ -151,10 +162,8 @@ static PyObject *Link_as_album(Link *self) {
 	PyErr_SetString(SpotifyError, "Not an album link");
 	return NULL;
     }
-    Album *album = (Album *)PyObject_CallObject((PyObject *)&AlbumType, NULL);
-    album->_album = a;
-    Py_INCREF(album);
-    return (PyObject *)album;
+    PyObject *album = Album_FromSpotify(a);
+    return album;
 }
 
 static PyObject *Link_as_artist(Link *self) {
@@ -163,20 +172,21 @@ static PyObject *Link_as_artist(Link *self) {
 	PyErr_SetString(SpotifyError, "Not an artist link");
 	return NULL;
     }
-    Artist *artist = (Artist *)PyObject_CallObject((PyObject *)&ArtistType, NULL);
-    artist->_artist = a;
-    Py_INCREF(artist);
-    return (PyObject *)artist;
+    PyObject *artist = Artist_FromSpotify(a);
+    return artist;
 }
 
 static PyObject *Link_str(PyObject *oself) {
     Link *self = (Link *)oself;
     char uri[1024];
-    if(0 > sp_link_as_string(self->_link, uri, sizeof(uri))) {
+    int len;
+
+    len = sp_link_as_string(self->_link, uri, sizeof(uri));
+    if (len < 0) {
 	PyErr_SetString(SpotifyError, "failed to render Spotify URI from link");
 	return NULL;
     }
-    return Py_BuildValue("s", uri);
+    return Py_BuildValue("s#", uri, len);
 }
 
 static PyMethodDef Link_methods[] = {

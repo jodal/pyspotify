@@ -294,6 +294,9 @@ bool sp_track_is_available(sp_session *session, sp_track *t) {
 
 /********************************* MOCK SEARCH FUNCTIONS *********************************/
 
+void sp_search_add_ref(sp_search *search) {
+}
+
 sp_search *sp_search_create(sp_session *session, const char *query, int track_offset, int track_count, int album_offset, int album_count, int artist_offset, int artist_count, search_complete_cb *callback, void *userdata) {
     sp_search *search = malloc(sizeof(sp_search));
     if(!strncmp(query, "!loaded", 7))
@@ -381,6 +384,9 @@ const char * sp_user_display_name(sp_user *user) {
 
 /********************************* MOCK LINK FUNCTIONS ***********************************/
 
+
+void sp_link_add_ref(sp_link *link) {
+}
 
 sp_track* sp_link_as_track(sp_link *link) {
     if(strncmp(link->data, "link:track:", strlen("link:track:")))
@@ -525,6 +531,9 @@ void sp_track_release(sp_track *track) {
 }
 
 /*************** MOCK ARTIST METHODS **********************/
+
+void sp_artist_add_ref(sp_artist *a){
+}
 
 const char *sp_artist_name(sp_artist *a) {
     return a->name;
@@ -715,6 +724,9 @@ void mock_playlistcontainer_event(int event, sp_playlistcontainer *c)
 }
 
 /*********************** MOCK IMAGE METHODS ************************/
+
+void sp_image_add_ref(sp_image *image) {
+}
 
 bool sp_image_is_loaded(sp_image *i) {
     return 1;

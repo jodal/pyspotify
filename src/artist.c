@@ -33,6 +33,14 @@ static PyObject *Artist_new(PyTypeObject *type, PyObject *args, PyObject *kwds) 
     return (PyObject *)self;
 }
 
+PyObject * Artist_FromSpotify(sp_artist *artist)
+{
+    PyObject *a = PyObject_CallObject((PyObject *)&ArtistType, NULL);
+    ((Artist *)a)->_artist = artist;
+    sp_artist_add_ref(artist);
+    return a;
+}
+
 static void Artist_dealloc(Artist *self) {
     if (self->_artist)
         sp_artist_release(self->_artist);

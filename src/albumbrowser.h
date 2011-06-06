@@ -18,8 +18,7 @@
 #include "pyspotify.h"
 
 typedef struct {
-    PyObject_HEAD
-    sp_albumbrowse *_browser;
+    PyObject_HEAD sp_albumbrowse *_browser;
     Callback _callback;
 } AlbumBrowser;
 

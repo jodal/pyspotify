@@ -35,39 +35,43 @@ PyObject *SpotifyError;
 PyObject *SpotifyApiVersion;
 
 static PyMethodDef module_methods[] = {
-    {"connect", session_connect, METH_VARARGS, "Run the spotify subsystem.  this will return on error, or after spotify is logged out."},
+    {"connect", session_connect, METH_VARARGS,
+     "Run the spotify subsystem.  this will return on error, or after spotify is logged out."},
     {NULL, NULL, 0, NULL}
 };
 
-PyMODINIT_FUNC init_spotify(void) {
+PyMODINIT_FUNC
+init_spotify(void)
+{
     PyObject *m;
 
     if (PyType_Ready(&SessionType) < 0)
-	return;
+        return;
     if (PyType_Ready(&ArtistType) < 0)
-	return;
+        return;
     if (PyType_Ready(&ArtistBrowserType) < 0)
-	return;
+        return;
     if (PyType_Ready(&LinkType) < 0)
-	return;
+        return;
     if (PyType_Ready(&PlaylistType) < 0)
-	return;
+        return;
     if (PyType_Ready(&PlaylistContainerType) < 0)
-	return;
+        return;
     if (PyType_Ready(&ResultsType) < 0)
-	return;
+        return;
     if (PyType_Ready(&TrackType) < 0)
-	return;
+        return;
     if (PyType_Ready(&ImageType) < 0)
-	return;
+        return;
 
     m = Py_InitModule("_spotify", module_methods);
-    if(m == NULL)
+    if (m == NULL)
         return;
 
     PyObject *spotify = PyImport_ImportModule("spotify");
     PyObject *d = PyModule_GetDict(spotify);
     PyObject *s = PyString_FromString("SpotifyError");
+
     SpotifyError = PyDict_GetItem(d, s);
     Py_INCREF(SpotifyError);
 

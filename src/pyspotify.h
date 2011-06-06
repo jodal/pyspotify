@@ -33,8 +33,8 @@ typedef struct {
 
 /* Trampolines for callback handling */
 Callback *create_trampoline(PyObject *callback, PyObject *manager,
-                                                    PyObject *userdata);
-void delete_trampoline(Callback *tr);
+                            PyObject *userdata);
+void delete_trampoline(Callback * tr);
 
 /* Returns o as a function, making type checks.
  * 3 cases:

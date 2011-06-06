@@ -19,15 +19,14 @@
 #include "pyspotify.h"
 
 typedef struct {
-    PyObject_HEAD
-    sp_playlistcontainer *_playlistcontainer;
+    PyObject_HEAD sp_playlistcontainer *_playlistcontainer;
 } PlaylistContainer;
 
 extern PyTypeObject PlaylistContainerType;
 
 extern void playlistcontainer_init(PyObject *m);
 
-PyObject *PlaylistContainer_FromSpotify(sp_playlistcontainer *container);
+PyObject *PlaylistContainer_FromSpotify(sp_playlistcontainer * container);
 
 /* Keep track of callbacks added to a playlist container */
 typedef struct _playlistcontainer_callback {

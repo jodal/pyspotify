@@ -9,8 +9,7 @@ Development of pyspotify is coordinated through the IRC channel ``#mopidy`` at
 Code style
 ==========
 
-TBD: For C code, follow `Kernighan and Ritchie (K&R) style
-<http://en.wikipedia.org/wiki/Indent_style#K.26R_style>`_, in the 1TBS variant?
+For C code, follow the style of the Python C API, as outlined in :pep:`7`.
 
 For Python code, follow `Mopidy's
 <http://www.mopidy.com/docs/master/development/contributing/#code-style>`_

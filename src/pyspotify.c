@@ -18,8 +18,8 @@
 #include <Python.h>
 #include <pyspotify.h>
 
-Callback *create_trampoline(PyObject *callback, PyObject *manager,
-                                                PyObject *userdata)
+Callback *
+create_trampoline(PyObject *callback, PyObject *manager, PyObject *userdata)
 {
     Callback *tr = NULL;
 
@@ -33,7 +33,8 @@ Callback *create_trampoline(PyObject *callback, PyObject *manager,
     return tr;
 }
 
-void delete_trampoline(Callback *tr)
+void
+delete_trampoline(Callback * tr)
 {
     PyGILState_STATE gstate;
 
@@ -45,15 +46,18 @@ void delete_trampoline(Callback *tr)
     PyGILState_Release(gstate);
 }
 
-PyObject *as_function(PyObject *o)
+PyObject *
+as_function(PyObject *o)
 {
     if (PyFunction_Check(o)) {
         return o;
-    } else if (PyMethod_Check(o)) {
+    }
+    else if (PyMethod_Check(o)) {
         return PyMethod_GET_FUNCTION(o);
-    } else {
+    }
+    else {
         PyErr_SetString(SpotifyError,
-            "Expected function or method for a callback.");
+                        "Expected function or method for a callback.");
         return NULL;
     }
 }

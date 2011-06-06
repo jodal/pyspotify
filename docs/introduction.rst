@@ -9,7 +9,7 @@ online music streaming service.
 Completion status
 =================
 
-pyspotify is very usable, and implements most of the libspotify 0.0.7 API. The
+pyspotify is very usable, and implements most of the libspotify 0.0.8 API. The
 table below shows what is done and what is left to be done.
 
 ==================================  ==================================
@@ -29,6 +29,7 @@ Playlist subsystem                  Partially implemented
 User handling                       Not implemented
 Toplist handling                    Not implemented
 Inbox subsystem                     Not implemented
+Offline synchronization             Not implemented
 ==================================  ==================================
 
 

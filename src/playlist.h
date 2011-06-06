@@ -40,3 +40,5 @@ typedef struct _pl_cb_entry {
     playlist_callback *callbacks;
     struct _pl_cb_entry *next;
 } pl_cb_entry;
+
+PyObject *Playlist_FromSpotify(sp_playlist *spl);

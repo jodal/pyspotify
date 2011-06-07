@@ -2,8 +2,8 @@
 Changes
 =======
 
-v1.2 (in development)
-=====================
+v1.2 (2011-06-07)
+=================
 
 As of May 2011, Doug Winter transfered the maintenance of pyspotify to the
 `Mopidy <http://www.mopidy.com/>`_ project. The Mopidy developers, which

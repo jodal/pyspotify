@@ -1,4 +1,3 @@
-
 class SpotifyError(Exception):
     pass
 

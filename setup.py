@@ -77,7 +77,7 @@ mockspotify_ext = Extension('spotify._mockspotify',
 
 setup(
     name='pyspotify',
-    version='1.2',
+    version='1.3',
     description='Python wrapper for libspotify',
     long_description=open('README.rst').read(),
     author='Doug Winter',

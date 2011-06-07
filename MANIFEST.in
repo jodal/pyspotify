@@ -1,5 +1,4 @@
 include LICENSE *.rst
-include ez_setup.py
 
 recursive-include src *.c *.h
 

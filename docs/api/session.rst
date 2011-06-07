@@ -4,9 +4,8 @@ Session handling
 .. currentmodule:: spotify
 
 The session handling is usually done by inheriting the
-:class:`SpotifySessionManager <spotify.managers.SpotifySessionManager>` class
-from the :mod:`manager` module.
-Then the manager's :meth:`connect` method calls the
+:class:`spotify.managers.SpotifySessionManager` class from the :mod:`manager`
+module.  Then the manager's :meth:`connect` method calls the
 :func:`spotify.connect` function.
 
 .. function:: connect(session_manager)

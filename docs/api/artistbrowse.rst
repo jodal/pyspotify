@@ -2,9 +2,8 @@ Artist browsing
 ***************
 .. currentmodule:: spotify
 
-Artist browsers are created by the method
-:meth:`browse_artist <Session.browse_artist>` of a :class:`Session <Session>`
-object. They are iterable objects.
+Artist browsers are created by :meth:`Session.browse_artist` object. They are
+iterable objects.
 
 
 The :class:`ArtistBrowser` class

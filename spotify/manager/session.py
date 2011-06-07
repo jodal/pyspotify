@@ -18,10 +18,13 @@ import spotify
 import threading
 
 class SpotifySessionManager(object):
+    """
+    Client for Spotify. Inherit from this class to have your callbacks
+    called on the appropriate events.
 
-    """ Client for spotify. Inherit from this class to have your callbacks
-    called on the appropriate events. Exceptions raised in your callback
-    handlers will be silently discarded unless you handle them! """
+    Exceptions raised in your callback handlers will be silently discarded
+    unless you handle them!
+    """
 
     api_version = spotify.api_version
     cache_location = 'tmp'
@@ -44,17 +47,20 @@ class SpotifySessionManager(object):
         Connect to the Spotify API using the given username and password.
         This method calls the :func:`spotify.connect` function.
         """
-        sess = spotify.connect(self)
-        self.loop(sess) # returns on disconnect
+        session = spotify.connect(self)
+        self.loop(session) # returns on disconnect
 
-    def loop(self, sess):
-        """ The main loop. This processes events and then either waits for an
-        event. The event is either triggered by a timer expiring, or by a
-        notification from within the spotify subsystem (it calls the wake
-        method below). """
+    def loop(self, session):
+        """
+        The main loop.
+
+        This processes events and then either waits for an event. The event is
+        either triggered by a timer expiring, or by a notification from within
+        the Spotify subsystem (which calls :meth:`wake`).
+        """
         while not self.finished:
             self.awoken.clear()
-            timeout = sess.process_events()
+            timeout = session.process_events()
             self.timer = threading.Timer(timeout/1000.0, self.awoken.set)
             self.timer.start()
             self.awoken.wait()
@@ -68,8 +74,10 @@ class SpotifySessionManager(object):
 
     disconnect = terminate
 
-    def wake(self, sess=None):
-        """ This is called by the spotify subsystem to wake up the main loop. """
+    def wake(self, session=None):
+        """
+        This is called by the Spotify subsystem to wake up the main loop.
+        """
         if self.timer is not None:
             self.timer.cancel()
         self.awoken.set()
@@ -78,120 +86,136 @@ class SpotifySessionManager(object):
         """
         Callback.
 
-        :param session:     the current session.
-        :type session:      :class:`Session <spotify.Session>`
-        :param error:       an error message, ``None`` if all went well.
-        :type error:        string
-
-        Called when the login process has ended. You almost
+        Called when the login completes. You almost
         certainly want to do something with
         :meth:`session.playlist_container() <spotify.Session.playlist_container>`
         if the login succeded.
+
+        :param session: the current session.
+        :type session: :class:`spotify.Session`
+        :param error: an error message, :class:`None` if all went well.
+        :type error: string or :class:`None`
         """
         pass
 
-    def logged_out(self, sess):
+    def logged_out(self, session):
         """
         Callback.
-
-        :param sess:    the current session.
-        :type sess:     :class:`Session <spotify.Session>`
 
         The user has or has been logged out from Spotify.
+
+        :param session: the current session.
+        :type session: :class:`spotify.Session`
         """
         pass
 
-    def metadata_updated(self, sess):
+    def metadata_updated(self, session):
         """
         Callback.
-
-        :param sess:    the current session.
-        :type sess:     :class:`Session <spotify.Session>`
 
         The current user's metadata has been updated.
+
+        :param session: the current session.
+        :type session: :class:`spotify.Session`
         """
         pass
 
-    def connection_error(self, sess, error):
+    def connection_error(self, session, error):
         """
         Callback.
 
-        :param sess:    the current session.
-        :type sess:     :class:`Session <spotify.Session>`
-        :param error:   an error message. If ``None``, the connection is back.
-        :type error:    string
+        A connection error occured in ``libspotify``.
 
-
-        A connection error occured in *libspotify*.
+        :param session: the current session.
+        :type session: :class:`spotify.Session`
+        :param error: an error message. If :class:`None`, the connection is
+          back.
+        :type error: string or :class:`None`
         """
         pass
 
-    def message_to_user(self, sess, message):
+    def message_to_user(self, session, message):
         """
         Callback.
 
-        :param sess:    the current session.
-        :type sess:     :class:`Session <spotify.Session>`
+        An informative message from ``libspotify``, destinated to the user.
+
+        :param session: the current session.
+        :type session: :class:`spotify.Session`
         :param message: a message.
-        :type message:  string
-
-        An informative message from *libspotify*, destinated to the user.
+        :type message: string
         """
         pass
 
-    def notify_main_thread(self, sess):
+    def notify_main_thread(self, session):
         """
         Callback.
 
-        :param sess:    the current session.
-        :type sess:     :class:`Session <spotify.Session>`
-
-        You should call :meth:`sess.process_events()
+        You should call :meth:`session.process_events()
         <spotify.Session.process_events>` at this point.
+
+        :param session: the current session.
+        :type session: :class:`spotify.Session`
         """
         pass
 
-    def music_delivery(self, sess, frames, frame_size, num_frames, sample_type, sample_rate, channels):
+    def music_delivery(self, session, frames, frame_size, num_frames,
+            sample_type, sample_rate, channels):
         """
         Callback.
 
-        :param sess:    the current session.
-        :type sess:     :class:`Session <spotify.Session>`
+        Music data from `libspotify`.
 
-        Music data from *libspotify*.
+        :param session: the current session.
+        :type session: :class:`spotify.Session`
+        :param frames: the audio data.
+        :type frames: buffer
+        :param frame_size: bytes per frame.
+        :type frame_size: int
+        :param num_frames: number of frames in this delivery.
+        :type num_frames: int
+        :param sample_type: currently this is always 0 which means 16-bit signed
+            native endian integer samples.
+        :type sample_type: int
+        :param sample_rate: audio sample rate, in samples per second.
+        :type sample_rate: int
+        :param channels: number of audio channels. Currently 1 or 2.
+        :type channels: int
         """
         pass
 
-    def play_token_lost(self, sess):
+    def play_token_lost(self, session):
         """
         Callback.
-
-        :param sess:    the current session.
-        :type sess:     :class:`Session <spotify.Session>`
 
         The playback stopped because a track was played from another
         application, with the same account.
+
+        :param session: the current session.
+        :type session: :class:`spotify.Session`
         """
         pass
 
-    def log_message(self, sess, data):
+    def log_message(self, session, message):
         """
         Callback.
 
-        :param sess:    the current session.
-        :type sess:     :class:`Session <spotify.Session>`
+        A log message from ``libspotify``.
 
-        A log message from *libspotify*.
+        :param session: the current session.
+        :type session: :class:`spotify.Session`
+        :param message: the message.
+        :type message: string
         """
         pass
 
-    def end_of_track(self, sess):
+    def end_of_track(self, session):
         """
         Callback.
-
-        :param sess:    the current session.
-        :type sess:     :class:`Session <spotify.Session>`
 
         Playback has reached the end of the current track.
+
+        :param session: the current session.
+        :type session: :class:`spotify.Session`
         """
         pass

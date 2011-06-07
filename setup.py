@@ -1,61 +1,89 @@
 #! /usr/bin/env python
 
-from ez_setup import use_setuptools
-use_setuptools()
-from setuptools import setup, find_packages, Extension
+from distutils.core import setup, Extension
+import os
 
-setup(name='pyspotify',
-      version='1.2',
-      description='Python wrapper for libspotify',
-      long_description= open("README.rst").read(),
-      author='Doug Winter',
-      author_email='doug.winter@isotoma.com',
-      url='http://pyspotify.mopidy.com/',
-      zip_safe=False,
-      test_suite="nose.collector",
-      packages=find_packages(exclude='tests'),
-      package_data = {
-        '': ['README.rst', 'CHANGES.txt'],
-      },
-      ext_modules=[
-        Extension('spotify._spotify',
-                  ['src/module.c',
-                   'src/session.c',
-                   'src/link.c',
-                   'src/track.c',
-                   'src/album.c',
-                   'src/albumbrowser.c',
-                   'src/artist.c',
-                   'src/artistbrowser.c',
-                   'src/search.c',
-                   'src/playlist.c',
-                   'src/playlistcontainer.c',
-                   'src/image.c',
-                   'src/pyspotify.c',
-                  ],
-                  include_dirs=['src'],
-                  libraries=['spotify'],
-                  library_dirs=["lib"],
-                 ),
-        Extension('spotify._mockspotify',
-                  ['src/mockmodule.c',
-                   'src/session.c',
-                   'src/link.c',
-                   'src/track.c',
-                   'src/album.c',
-                   'src/albumbrowser.c',
-                   'src/artist.c',
-                   'src/artistbrowser.c',
-                   'src/search.c',
-                   'src/playlist.c',
-                   'src/playlistcontainer.c',
-                   'src/image.c',
-                   'src/pyspotify.c'
-                  ],
-                  include_dirs=['src'],
-                  library_dirs=["lib"],
-                 )
-      ],
-      )
+def fullsplit(path, result=None):
+    """
+    Split a pathname into components (the opposite of os.path.join) in a
+    platform-neutral way.
+    """
+    if result is None:
+        result = []
+    head, tail = os.path.split(path)
+    if head == '':
+        return [tail] + result
+    if head == path:
+        return result
+    return fullsplit(head, [tail] + result)
 
+# Compile the list of packages available, because distutils doesn't have
+# an easy way to do this.
+packages, data_files = [], []
+root_dir = os.path.dirname(__file__)
+if root_dir != '':
+    os.chdir(root_dir)
+project_dir = 'spotify'
 
+for dirpath, dirnames, filenames in os.walk(project_dir):
+    # Ignore dirnames that start with '.'
+    for i, dirname in enumerate(dirnames):
+        if dirname.startswith('.'):
+            del dirnames[i]
+    if '__init__.py' in filenames:
+        packages.append('.'.join(fullsplit(dirpath)))
+    elif filenames:
+        data_files.append([dirpath,
+            [os.path.join(dirpath, f) for f in filenames]])
+
+spotify_ext = Extension('spotify._spotify',
+    [
+        'src/module.c',
+        'src/session.c',
+        'src/link.c',
+        'src/track.c',
+        'src/album.c',
+        'src/albumbrowser.c',
+        'src/artist.c',
+        'src/artistbrowser.c',
+        'src/search.c',
+        'src/playlist.c',
+        'src/playlistcontainer.c',
+        'src/image.c',
+        'src/pyspotify.c',
+    ],
+    include_dirs=['src'],
+    libraries=['spotify'],
+)
+
+mockspotify_ext = Extension('spotify._mockspotify',
+    [
+        'src/mockmodule.c',
+        'src/session.c',
+        'src/link.c',
+        'src/track.c',
+        'src/album.c',
+        'src/albumbrowser.c',
+        'src/artist.c',
+        'src/artistbrowser.c',
+        'src/search.c',
+        'src/playlist.c',
+        'src/playlistcontainer.c',
+        'src/image.c',
+        'src/pyspotify.c'
+    ],
+    include_dirs=['src'],
+)
+
+setup(
+    name='pyspotify',
+    version='1.2',
+    description='Python wrapper for libspotify',
+    long_description=open('README.rst').read(),
+    author='Doug Winter',
+    author_email='doug.winter@isotoma.com',
+    url='http://pyspotify.mopidy.com/',
+    packages=packages,
+    data_files=data_files,
+    ext_modules=[spotify_ext, mockspotify_ext],
+)

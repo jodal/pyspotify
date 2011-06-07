@@ -4,6 +4,7 @@
 *.swp
 *.wpr
 *.wpu
+MANIFEST
 _build
 build
 dist

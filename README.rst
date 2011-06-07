@@ -1,16 +1,20 @@
-libspotify and pyspotify
-========================
+=========
+pyspotify
+=========
 
-If you are using Ubuntu Karmic 64-bit, then the easiest way to use these packages is to add::
+pyspotify provides a Python interface to `Spotify's <http://www.spotify.com/>`_
+online music streaming service.
 
-    deb http://squealserver.com/ubuntu karmic multiverse
-
-To your /etc/apt/sources.list
-
-and then::
-
-    sudo aptitude update
-    sudo aptitude install python-spotify
+To use this package you will also need `libspotify
+<http://developer.spotify.com/en/libspotify/overview/>`_, which is available
+from Spotify. You will need a Spotify Premium account. You will also need to
+apply for, and receive an API key from Spotify.
 
 
+Project resources
+=================
 
+- `Documentation <http://pyspotify.mopidy.com/>`_
+- `Source code <http://github.com/mopidy/pyspotify>`_
+- `Issue tracker <http://github.com/mopidy/pyspotify/issues>`_
+- `Download development snapshot <http://github.com/mopidy/pyspotify/tarball/develop#egg=pyspotify-dev>`_

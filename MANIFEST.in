@@ -1,0 +1,11 @@
+include LICENSE *.rst
+include ez_setup.py
+
+recursive-include src *.c *.h
+
+recursive-include spotify *.py
+
+recursive-include docs *
+prune docs/_build
+
+recursive-include tests *.py

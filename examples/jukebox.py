@@ -62,7 +62,7 @@ class JukeboxUI(cmd.Cmd, threading.Thread):
                 playlist = self.jukebox.starred
             for i, t in enumerate(playlist):
                 if t.is_loaded():
-                    print "%3d %s" % (i, t.name())
+                    print "%3d %s - %s" % (i, t.artists()[0].name(), t.name())
                 else:
                     print "%3d %s" % (i, "loading...")
 

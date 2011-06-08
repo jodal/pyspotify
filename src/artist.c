@@ -48,18 +48,18 @@ Artist_name(Artist * self)
     const char *s = sp_artist_name(self->_artist);
 
     if (!s)
-        return NULL;
+        Py_RETURN_NONE;
     return PyUnicode_FromString(s);
 }
 
-PyObject *
+static PyObject *
 Artist_str(PyObject *self)
 {
     Artist *a = (Artist *) self;
     const char *s = sp_artist_name(a->_artist);
 
     if (!s)
-        return NULL;
+        Py_RETURN_NONE;
     return PyUnicode_FromString(s);
 }
 

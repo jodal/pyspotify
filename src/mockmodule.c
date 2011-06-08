@@ -702,6 +702,11 @@ sp_playlist_release(sp_playlist * p)
 {
 }
 
+void
+sp_playlist_set_autolink_tracks(sp_playlist *p, bool set)
+{
+}
+
 bool
 sp_playlist_is_loaded(sp_playlist * p)
 {

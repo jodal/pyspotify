@@ -71,7 +71,7 @@ Album_cover(Album * self)
 static PyObject *
 Album_name(Album * self)
 {
-    return Py_BuildValue("s", sp_album_name(self->_album));
+    return PyUnicode_FromString(sp_album_name(self->_album));
 }
 
 static PyObject *
@@ -87,11 +87,9 @@ Album_type(Album * self)
 }
 
 static PyObject *
-Album_str(PyObject *self)
+Album_str(Album *self)
 {
-    Album *a = (Album *) self;
-
-    return Py_BuildValue("s", sp_album_name(a->_album));
+    return Album_name(self);
 }
 
 static PyMethodDef Album_methods[] = {
@@ -142,7 +140,7 @@ PyTypeObject AlbumType = {
     0,                  /*tp_as_mapping */
     0,                  /*tp_hash */
     0,                  /*tp_call */
-    Album_str,          /*tp_str */
+    (reprfunc) Album_str,   /*tp_str */
     0,                  /*tp_getattro */
     0,                  /*tp_setattro */
     0,                  /*tp_as_buffer */

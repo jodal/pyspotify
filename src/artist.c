@@ -49,7 +49,7 @@ Artist_name(Artist * self)
 
     if (!s)
         return NULL;
-    return PyString_FromString(s);
+    return PyUnicode_FromString(s);
 }
 
 PyObject *
@@ -60,7 +60,7 @@ Artist_str(PyObject *self)
 
     if (!s)
         return NULL;
-    return PyString_FromString(s);
+    return PyUnicode_FromString(s);
 }
 
 static PyMethodDef Artist_methods[] = {

@@ -48,7 +48,7 @@ Results_is_loaded(Results * self)
 static PyObject *
 Results_did_you_mean(Results * self)
 {
-    return PyString_FromString(sp_search_did_you_mean(self->_search));
+    return PyUnicode_FromString(sp_search_did_you_mean(self->_search));
 }
 
 static PyObject *
@@ -115,13 +115,13 @@ Results_total_tracks(Results * self)
 static PyObject *
 Results_query(Results * self)
 {
-    return PyString_FromString(sp_search_query(self->_search));
+    return PyUnicode_FromString(sp_search_query(self->_search));
 }
 
 PyObject *
 Results_str(PyObject *self)
 {
-    return PyString_FromString(sp_search_query(((Results *) self)->_search));
+    return PyUnicode_FromString(sp_search_query(((Results *) self)->_search));
 }
 
 static PyMethodDef Results_methods[] = {

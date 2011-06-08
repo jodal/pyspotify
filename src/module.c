@@ -53,7 +53,7 @@ init_spotify(void)
 
     PyObject *spotify = PyImport_ImportModule("spotify");
     PyObject *d = PyModule_GetDict(spotify);
-    PyObject *s = PyString_FromString("SpotifyError");
+    PyObject *s = PyUnicode_FromString("SpotifyError");
 
     SpotifyError = PyDict_GetItem(d, s);
     Py_INCREF(SpotifyError);

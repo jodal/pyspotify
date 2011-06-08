@@ -1,4 +1,4 @@
-# $Id$
+# encoding: utf-8
 #
 # Copyright 2009 Doug Winter
 #
@@ -37,10 +37,33 @@ class BaseMockClient(SpotifySessionManager):
         SpotifySessionManager.__init__(self, "username_good", "password_good")
         self.awoken = threading.Event() # used to block until awoken
 
+class BaseMockUnicodeClient(SpotifySessionManager):
+
+    cache_location = u'/f××'
+    settings_location = u'/f××'
+    application_key = "appkey_good"
+    user_agent = u'üser_âgent_f©©'
+
+    def __init__(self):
+        SpotifySessionManager.__init__(self, "username_good", "password_good")
+        self.awoken = threading.Event() # used to block until awoken
+
 class TestSession(unittest.TestCase):
 
     def test_initialisation(self):
         class MockClient(BaseMockClient):
+            def logged_in(self, session, error):
+                username = session.username()
+                self.found_username = username
+                session.logout()
+                self.disconnect()
+
+        c = MockClient()
+        c.connect()
+        self.assertEqual(c.username, c.found_username)
+
+    def test_unicode(self):
+        class MockClient(BaseMockUnicodeClient):
             def logged_in(self, session, error):
                 username = session.username()
                 self.found_username = username

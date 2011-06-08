@@ -1,3 +1,5 @@
+# encoding: utf-8
+
 import unittest
 from spotify._mockspotify import mock_album, mock_artist, Album
 

@@ -1,4 +1,4 @@
-# $Id$
+# encoding: utf-8
 #
 # Copyright 2009 Doug Winter
 #
@@ -52,6 +52,10 @@ class TestPlaylist(unittest.TestCase):
     def test_name(self):
         p1 = _mockspotify.mock_playlist("foo", [])
         self.assertEqual(p1.name(), "foo")
+
+    def test_unicode(self):
+        p1 = _mockspotify.mock_playlist(u'æâ€êþÿ', [])
+        self.assertEqual(p1.name(), u'æâ€êþÿ')
 
     def test_len(self):
         p1 = self._mock_track("foo")

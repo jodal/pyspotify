@@ -715,7 +715,7 @@ Playlist_name(Playlist * self)
 {
     const char *name = sp_playlist_name(self->_playlist);
 
-    return Py_BuildValue("s", name);
+    return PyUnicode_FromString(name);
 }
 
 static PyObject *

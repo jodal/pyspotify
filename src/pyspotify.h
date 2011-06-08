@@ -5,6 +5,8 @@
 
 #include <Python.h>
 
+#define ENCODING "utf-8"
+
 extern PyObject *SpotifyError;
 extern PyObject *SpotifyApiVersion;
 

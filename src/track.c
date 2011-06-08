@@ -45,7 +45,7 @@ Track_str(PyObject *oself)
     Track *self = (Track *) oself;
     const char *s = sp_track_name(self->_track);
 
-    return Py_BuildValue("s", s);
+    return PyUnicode_FromString(s);
 }
 
 static PyObject *
@@ -89,7 +89,7 @@ Track_name(Track * self)
 {
     const char *s = sp_track_name(self->_track);
 
-    return Py_BuildValue("s", s);
+    return PyUnicode_FromString(s);
 }
 
 static PyObject *

@@ -8,4 +8,5 @@ MANIFEST
 _build
 build
 dist
+nosetests.xml
 spotify_appkey.key

@@ -2,6 +2,12 @@
 Changes
 =======
 
+v1.3 (in development)
+=====================
+
+- All strings returned by pyspotify has been changed from UTF-8 encoded
+  bytestrings to unicode objects.
+
 v1.2 (2011-06-07)
 =================
 

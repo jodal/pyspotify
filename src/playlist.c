@@ -38,6 +38,7 @@ Playlist_FromSpotify(sp_playlist * spl)
         (Playlist *) PyObject_CallObject((PyObject *)&PlaylistType, NULL);
     playlist->_playlist = spl;
     sp_playlist_add_ref(spl);
+    sp_playlist_set_autolink_tracks(spl, 1);
     return (PyObject *)playlist;
 }
 

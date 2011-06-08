@@ -710,11 +710,10 @@ session_init(PyObject *m)
 char *
 PySpotify_GetConfigString(PyObject *client, const char *attr)
 {
-    PyObject *py_attr, *py_value, *py_uvalue;
+    PyObject *py_value, *py_uvalue;
     char *value;
 
-    py_attr = PyBytes_FromString(attr);
-    py_value = PyObject_GetAttr(client, py_attr);
+    py_value = PyObject_GetAttrString(client, attr);
     if (!py_value) {
         PyErr_Format(SpotifyError, "%s not set", attr);
         return NULL;

@@ -1,4 +1,4 @@
-# $Id$
+# encoding: utf-8
 #
 # Copyright 2009 Doug Winter
 #
@@ -19,7 +19,7 @@ from spotify._mockspotify import mock_track, mock_album, mock_artist, mock_sessi
 
 class TestTrack(unittest.TestCase):
 
-    track = mock_track("foo", 3, mock_album("bar", mock_artist("baz", 1), 0, "",
+    track = mock_track(u'æâ€êþÿ', 3, mock_album("bar", mock_artist("baz", 1), 0, "",
                                             0, 1, 1), 10, 20, 30, 40, 0, 1)
 
     def test_artists(self):
@@ -29,7 +29,7 @@ class TestTrack(unittest.TestCase):
         self.assertEqual(self.track.album().name(), "bar")
 
     def test_name(self):
-        self.assertEqual(self.track.name(), "foo")
+        self.assertEqual(self.track.name(), u'æâ€êþÿ')
 
     def test_duration(self):
         self.assertEqual(self.track.duration(), 10)

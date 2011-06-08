@@ -1274,7 +1274,7 @@ mock_artist(PyObject *self, PyObject *args)
     char *s;
     int loaded;
 
-    if (!PyArg_ParseTuple(args, "si", &s, &loaded))
+    if (!PyArg_ParseTuple(args, "esi", ENCODING, &s, &loaded))
         return NULL;
     Artist *artist =
         (Artist *) PyObject_CallObject((PyObject *)&ArtistType, NULL);
@@ -1323,8 +1323,8 @@ mock_track(PyObject *self, PyObject *args)
     int loaded;
 
     if (!PyArg_ParseTuple
-        (args, "siO!iiiiii", &name, &num_artists, &AlbumType, &album,
-         &duration, &popularity, &disc, &index, &error, &loaded))
+        (args, "esiO!iiiiii", ENCODING, &name, &num_artists, &AlbumType,
+         &album, &duration, &popularity, &disc, &index, &error, &loaded))
         return NULL;
     sp_track *t = _mock_track(name, num_artists, NULL, album->_album, duration,
                               popularity,
@@ -1362,8 +1362,8 @@ mock_album(PyObject *self, PyObject *args)
     char *name;
     int year, type, loaded, available;
 
-    if (!PyArg_ParseTuple(args, "sO!isiii", &name, &ArtistType, &artist, &year,
-                          &cover, &type, &loaded, &available))
+    if (!PyArg_ParseTuple(args, "esO!isiii", ENCODING, &name, &ArtistType,
+                          &artist, &year, &cover, &type, &loaded, &available))
         return NULL;
     Album *album = (Album *) PyObject_CallObject((PyObject *)&AlbumType, NULL);
 
@@ -1391,7 +1391,7 @@ mock_playlist(PyObject *self, PyObject *args)
     int i;
     PyObject *tracks;
 
-    if (!PyArg_ParseTuple(args, "sO", &s, &tracks))
+    if (!PyArg_ParseTuple(args, "esO", ENCODING, &s, &tracks))
         return NULL;
     Playlist *playlist =
         (Playlist *) PyObject_CallObject((PyObject *)&PlaylistType, NULL);
@@ -1522,7 +1522,7 @@ init_mockspotify(void)
 
     PyObject *spotify = PyImport_ImportModule("spotify");
     PyObject *d = PyModule_GetDict(spotify);
-    PyObject *s = PyString_FromString("SpotifyError");
+    PyObject *s = PyUnicode_FromString("SpotifyError");
 
     SpotifyError = PyDict_GetItem(d, s);
     Py_DECREF(s);

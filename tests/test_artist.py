@@ -1,10 +1,10 @@
-# $Id$
+# encoding: utf-8
 #
 # Copyright 2009 Doug Winter
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at 
+# You may obtain a copy of the License at
 #
 # http://www.apache.org/licenses/LICENSE-2.0
 #
@@ -34,3 +34,6 @@ class TestArtist(unittest.TestCase):
         artist = mock_artist("test_name", 1)
         self.assertEqual(artist.name(), "test_name")
 
+    def test_unicode(self):
+        artist = mock_artist(u'æâ€êþÿ', 1)
+        self.assertEqual(artist.name(), u'æâ€êþÿ')

@@ -461,10 +461,12 @@ PyTypeObject SessionType = {
 static void
 logged_in(sp_session * session, sp_error error)
 {
-    fprintf(stderr, "----------> logged_in called\n");
     PyGILState_STATE gstate;
     PyObject *res, *err;
 
+#ifdef DEBUG
+    fprintf(stderr, "[DEBUG]-session- >> logged_in called\n");
+#endif
     gstate = PyGILState_Ensure();
     Session *psession =
         (Session *) PyObject_CallObject((PyObject *)&SessionType, NULL);
@@ -482,10 +484,12 @@ logged_in(sp_session * session, sp_error error)
 static void
 logged_out(sp_session * session)
 {
-    // fprintf(stderr, "----------> logged_out called\n");
     PyGILState_STATE gstate;
     PyObject *res;
 
+#ifdef DEBUG
+        fprintf(stderr, "[DEBUG]-session- >> logged_out called\n");
+#endif
     gstate = PyGILState_Ensure();
     Session *psession =
         (Session *) PyObject_CallObject((PyObject *)&SessionType, NULL);
@@ -501,10 +505,12 @@ logged_out(sp_session * session)
 static void
 metadata_updated(sp_session * session)
 {
-    // fprintf(stderr, "----------> metadata_updated called\n");
     PyGILState_STATE gstate;
     PyObject *res;
 
+#ifdef DEBUG
+        fprintf(stderr, "[DEBUG]-session- >> metadata_updated called\n");
+#endif
     gstate = PyGILState_Ensure();
     Session *psession =
         (Session *) PyObject_CallObject((PyObject *)&SessionType, NULL);
@@ -520,10 +526,12 @@ metadata_updated(sp_session * session)
 static void
 connection_error(sp_session * session, sp_error error)
 {
-    // fprintf(stderr, "----------> connection_error called\n");
     PyGILState_STATE gstate;
     PyObject *res, *err;
 
+#ifdef DEBUG
+        fprintf(stderr, "[DEBUG]-session- >> connection_error called\n");
+#endif
     gstate = PyGILState_Ensure();
     Session *psession =
         (Session *) PyObject_CallObject((PyObject *)&SessionType, NULL);
@@ -540,10 +548,12 @@ connection_error(sp_session * session, sp_error error)
 static void
 message_to_user(sp_session * session, const char *message)
 {
-    // fprintf(stderr, "----------> message to user: %s\n", message);
     PyGILState_STATE gstate;
     PyObject *res;
 
+#ifdef DEBUG
+        fprintf(stderr, "[DEBUG]-session- >> message to user: %s\n", message);
+#endif
     gstate = PyGILState_Ensure();
     Session *psession =
         (Session *) PyObject_CallObject((PyObject *)&SessionType, NULL);
@@ -561,10 +571,12 @@ message_to_user(sp_session * session, const char *message)
 static void
 notify_main_thread(sp_session * session)
 {
-    // fprintf(stderr, "----------> notify_main_thread\n");
     PyGILState_STATE gstate;
     PyObject *res = NULL;
 
+#ifdef DEBUG
+        fprintf(stderr, "[DEBUG]-session- >> notify_main_thread called\n");
+#endif
     if (!session_constructed)
         return;
     gstate = PyGILState_Ensure();
@@ -599,6 +611,9 @@ music_delivery(sp_session * session, const sp_audioformat * format,
 {
     PyGILState_STATE gstate;
 
+#ifdef DEBUG
+        fprintf(stderr, "[DEBUG]-session- >> music_delivery called\n");
+#endif
     gstate = PyGILState_Ensure();
     int siz = frame_size(format);
     PyObject *pyframes = PyBuffer_FromMemory((void *)frames, num_frames * siz);
@@ -625,10 +640,12 @@ music_delivery(sp_session * session, const sp_audioformat * format,
 static void
 play_token_lost(sp_session * session)
 {
-    // fprintf(stderr, "----------> play_token_lost called\n");
     PyGILState_STATE gstate;
     PyObject *res;
 
+#ifdef DEBUG
+        fprintf(stderr, "[DEBUG]-session- >> play_token_lost called\n");
+#endif
     gstate = PyGILState_Ensure();
     Session *psession =
         (Session *) PyObject_CallObject((PyObject *)&SessionType, NULL);
@@ -644,10 +661,12 @@ play_token_lost(sp_session * session)
 static void
 log_message(sp_session * session, const char *data)
 {
-    // fprintf(stderr, "----------> log_message called: %s\n", data);
     PyGILState_STATE gstate;
     PyObject *res;
 
+#ifdef DEBUG
+        fprintf(stderr, "[DEBUG]-session- >> log message: %s\n", data);
+#endif
     gstate = PyGILState_Ensure();
     Session *psession =
         (Session *) PyObject_CallObject((PyObject *)&SessionType, NULL);
@@ -663,10 +682,12 @@ log_message(sp_session * session, const char *data)
 static void
 end_of_track(sp_session * session)
 {
-    // fprintf(stderr, "----------> end_of_track called\n");
     PyGILState_STATE gstate;
     PyObject *res;
 
+#ifdef DEBUG
+        fprintf(stderr, "[DEBUG]-session- >> end_of_track called\n");
+#endif
     gstate = PyGILState_Ensure();
     Session *psession =
         (Session *) PyObject_CallObject((PyObject *)&SessionType, NULL);

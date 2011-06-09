@@ -65,7 +65,10 @@ Album_artist(Album * self)
 static PyObject *
 Album_cover(Album * self)
 {
-    return Py_BuildValue("s#", sp_album_cover(self->_album), 20);
+    char *cover = sp_album_cover(self->_album);
+    if (!cover)
+        Py_RETURN_NONE;
+    return Py_BuildValue("s#", cover, 20);
 }
 
 static PyObject *

@@ -2,6 +2,7 @@ import unittest
 from spotify._mockspotify import mock_albumbrowse, mock_album, mock_artist
 from spotify._mockspotify import mock_session
 from spotify import Album
+from tests import SkipTest
 
 callback_called = False
 callback_userdata = None
@@ -31,8 +32,8 @@ class TestAlbumbrowser(unittest.TestCase):
         assert browser[1].name() == 'bar'
         assert browser[2].name() == 'baz'
 
-    @unittest.skip('Not implemented')
     def test_callback(self):
+        raise SkipTest
         callback_called = False
         browser = mock_albumbrowse(self.session, self.album, 0, self.callback,
                                    self)

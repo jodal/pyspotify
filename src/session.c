@@ -337,8 +337,15 @@ Session_image_create(Session * self, PyObject *args)
 
     if (!PyArg_ParseTuple(args, "s#", &image_id, &len))
         return NULL;
-    assert(len == 20);
+    if (len != 20) {
+        PyErr_SetString(SpotifyError, "Image id length != 20");
+        return NULL;
+    }
     image = sp_image_create(self->_session, image_id);
+    if (sp_image_error(image)) {
+        PyErr_SetString(SpotifyError, "error occured during image creation");
+        return NULL;
+    }
     i = Image_FromSpotify(image);
     return i;
 }

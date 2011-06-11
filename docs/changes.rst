@@ -8,6 +8,9 @@ v1.3 (in development)
 - All strings returned by pyspotify has been changed from UTF-8 encoded
   bytestrings to unicode objects.
 - Track autolinking enabled for all playlists.
+- Add :attr:`spotify.__version__` which exposes the current pyspotify version.
+  The API version of the libspotify used is already available as
+  :attr:`spotify.api_version`.
 
 v1.2 (2011-06-07)
 =================

@@ -1,3 +1,5 @@
+__version__ = '1.3'
+
 class SpotifyError(Exception):
     pass
 

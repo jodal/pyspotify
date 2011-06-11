@@ -2,8 +2,12 @@
 Changes
 =======
 
-v1.3 (in development)
-=====================
+v1.3 (2011-06-11)
+=================
+
+It has only been four days since the v1.2 release, but we would like to get the
+change from bytestrings to unicode objects released before more projects start
+using pyspotify, as this change is really backwards incompatible.
 
 - All strings returned by pyspotify has been changed from UTF-8 encoded
   bytestrings to unicode objects.

@@ -1,18 +1,4 @@
-# $Id$
-#
-# Copyright 2009 Doug Winter
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-# http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
+# encoding: utf-8
 
 import unittest
 import threading
@@ -37,10 +23,33 @@ class BaseMockClient(SpotifySessionManager):
         SpotifySessionManager.__init__(self, "username_good", "password_good")
         self.awoken = threading.Event() # used to block until awoken
 
+class BaseMockUnicodeClient(SpotifySessionManager):
+
+    cache_location = u'/f××'
+    settings_location = u'/f××'
+    application_key = "appkey_good"
+    user_agent = u'üser_âgent_f©©'
+
+    def __init__(self):
+        SpotifySessionManager.__init__(self, "username_good", "password_good")
+        self.awoken = threading.Event() # used to block until awoken
+
 class TestSession(unittest.TestCase):
 
     def test_initialisation(self):
         class MockClient(BaseMockClient):
+            def logged_in(self, session, error):
+                username = session.username()
+                self.found_username = username
+                session.logout()
+                self.disconnect()
+
+        c = MockClient()
+        c.connect()
+        self.assertEqual(c.username, c.found_username)
+
+    def test_unicode(self):
+        class MockClient(BaseMockUnicodeClient):
             def logged_in(self, session, error):
                 username = session.username()
                 self.found_username = username

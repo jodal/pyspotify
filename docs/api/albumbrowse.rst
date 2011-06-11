@@ -2,9 +2,8 @@ Album browsing
 **************
 .. currentmodule:: spotify
 
-Album browsers are created by the method
-:meth:`browse_album <Session.browse_album>` of a :class:`Session <Session>`
-object. They are iterable objects.
+Album browsers are created by :meth:`Session.browse_album` object. They are
+iterable objects.
 
 
 The :class:`AlbumBrowser` class

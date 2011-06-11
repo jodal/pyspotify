@@ -1,25 +1,10 @@
-/* $Id$
- *
- * Copyright 2009 Doug Winter
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *  http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
-*/
-
 /*
- * Provides mocking for the entire libspotify library.  All sp_ calls are mocked here to provide
- * something approximate to what libspotify would provide.
+ * Provides mocking for the entire libspotify library.  All sp_ calls are
+ * mocked here to provide something approximate to what libspotify would
+ * provide.
  *
- * Functions for creating mock instances of all spotify objects are also provided.
+ * Functions for creating mock instances of all spotify objects are also
+ * provided.
  *
 */
 #include <Python.h>
@@ -717,6 +702,11 @@ sp_playlist_release(sp_playlist * p)
 {
 }
 
+void
+sp_playlist_set_autolink_tracks(sp_playlist *p, bool set)
+{
+}
+
 bool
 sp_playlist_is_loaded(sp_playlist * p)
 {
@@ -1289,7 +1279,7 @@ mock_artist(PyObject *self, PyObject *args)
     char *s;
     int loaded;
 
-    if (!PyArg_ParseTuple(args, "si", &s, &loaded))
+    if (!PyArg_ParseTuple(args, "esi", ENCODING, &s, &loaded))
         return NULL;
     Artist *artist =
         (Artist *) PyObject_CallObject((PyObject *)&ArtistType, NULL);
@@ -1338,8 +1328,8 @@ mock_track(PyObject *self, PyObject *args)
     int loaded;
 
     if (!PyArg_ParseTuple
-        (args, "siO!iiiiii", &name, &num_artists, &AlbumType, &album,
-         &duration, &popularity, &disc, &index, &error, &loaded))
+        (args, "esiO!iiiiii", ENCODING, &name, &num_artists, &AlbumType,
+         &album, &duration, &popularity, &disc, &index, &error, &loaded))
         return NULL;
     sp_track *t = _mock_track(name, num_artists, NULL, album->_album, duration,
                               popularity,
@@ -1377,8 +1367,8 @@ mock_album(PyObject *self, PyObject *args)
     char *name;
     int year, type, loaded, available;
 
-    if (!PyArg_ParseTuple(args, "sO!isiii", &name, &ArtistType, &artist, &year,
-                          &cover, &type, &loaded, &available))
+    if (!PyArg_ParseTuple(args, "esO!isiii", ENCODING, &name, &ArtistType,
+                          &artist, &year, &cover, &type, &loaded, &available))
         return NULL;
     Album *album = (Album *) PyObject_CallObject((PyObject *)&AlbumType, NULL);
 
@@ -1406,7 +1396,7 @@ mock_playlist(PyObject *self, PyObject *args)
     int i;
     PyObject *tracks;
 
-    if (!PyArg_ParseTuple(args, "sO", &s, &tracks))
+    if (!PyArg_ParseTuple(args, "esO", ENCODING, &s, &tracks))
         return NULL;
     Playlist *playlist =
         (Playlist *) PyObject_CallObject((PyObject *)&PlaylistType, NULL);
@@ -1537,7 +1527,7 @@ init_mockspotify(void)
 
     PyObject *spotify = PyImport_ImportModule("spotify");
     PyObject *d = PyModule_GetDict(spotify);
-    PyObject *s = PyString_FromString("SpotifyError");
+    PyObject *s = PyUnicode_FromString("SpotifyError");
 
     SpotifyError = PyDict_GetItem(d, s);
     Py_DECREF(s);

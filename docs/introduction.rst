@@ -58,35 +58,38 @@ Arch Linux package
 
 Install the ``pyspotify-git`` package from the AUR.
 
-Using Pip
----------
+Using Pip (latest stable release)
+---------------------------------
 
 The ``pip`` program for installing Python packages is usually found is the
-``python-pip`` package of your linux distribution.
+``python-pip`` package of your Linux distribution.
 
-To install ``pyspotify``, run as root::
+To install ``pyspotify``, run::
 
-    pip install -U pyspotify
+    sudo pip install -U pyspotify
 
 To update an existing installation, simply use the same command.
+
+Using Pip (latest development version)
+--------------------------------------
+
+To install the very latest git version of pyspotify::
+
+    sudo pip install -U pyspotify==dev
 
 Using setuptools (latest git version)
 -------------------------------------
 
 You will have first to clone the `git repository <http://github.com/mopidy/pyspotify>`_.
 
-On Ubuntu or other Debian-based distributions::
+Then to install it::
 
-    python setup.py install --install-layout=deb
-
-On other::
-
-    python setup.py install
+    sudo python setup.py install
 
 
 Trying it out
 =============
 
-Included with pyspotify is a simple program, `examples/jukebox.py`.  Run this
+Included with pyspotify is a simple program, ``examples/jukebox.py``.  Run this
 with your credentials and access to an API key, and it will let you browse and
 play from your playlists, conduct searches and play from Spotify URIs.

@@ -2,6 +2,12 @@
 
 from distutils.core import setup, Extension
 import os
+import re
+
+def get_version():
+    init_py = open('spotify/__init__.py').read()
+    metadata = dict(re.findall("__([a-z]+)__ = '([^']+)'", init_py))
+    return metadata['version']
 
 def fullsplit(path, result=None):
     """
@@ -77,7 +83,7 @@ mockspotify_ext = Extension('spotify._mockspotify',
 
 setup(
     name='pyspotify',
-    version='1.2',
+    version=get_version(),
     description='Python wrapper for libspotify',
     long_description=open('README.rst').read(),
     author='Doug Winter',

@@ -7,8 +7,8 @@ structured similarly to the `libspotify API documentation
 
 .. module:: spotify
 
-All the classes and sub-modules of **pyspotify** are contained in the
-:mod:`spotify` parent module.
+All the classes and submodules of pyspotify are contained in the :mod:`spotify`
+parent module.
 
 .. toctree::
 
@@ -27,4 +27,3 @@ All the classes and sub-modules of **pyspotify** are contained in the
     user
     toplist
     inbox
-

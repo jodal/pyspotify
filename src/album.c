@@ -1,20 +1,3 @@
-/* $Id$
- *
- * Copyright 2009 Doug Winter
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *  http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
-*/
-
 #include <Python.h>
 #include <structmember.h>
 #include "libspotify/api.h"
@@ -82,13 +65,16 @@ Album_artist(Album * self)
 static PyObject *
 Album_cover(Album * self)
 {
-    return Py_BuildValue("s#", sp_album_cover(self->_album), 20);
+    char *cover = sp_album_cover(self->_album);
+    if (!cover)
+        Py_RETURN_NONE;
+    return Py_BuildValue("s#", cover, 20);
 }
 
 static PyObject *
 Album_name(Album * self)
 {
-    return Py_BuildValue("s", sp_album_name(self->_album));
+    return PyUnicode_FromString(sp_album_name(self->_album));
 }
 
 static PyObject *
@@ -104,11 +90,9 @@ Album_type(Album * self)
 }
 
 static PyObject *
-Album_str(PyObject *self)
+Album_str(Album *self)
 {
-    Album *a = (Album *) self;
-
-    return Py_BuildValue("s", sp_album_name(a->_album));
+    return Album_name(self);
 }
 
 static PyMethodDef Album_methods[] = {
@@ -159,7 +143,7 @@ PyTypeObject AlbumType = {
     0,                  /*tp_as_mapping */
     0,                  /*tp_hash */
     0,                  /*tp_call */
-    Album_str,          /*tp_str */
+    (reprfunc) Album_str,   /*tp_str */
     0,                  /*tp_getattro */
     0,                  /*tp_setattro */
     0,                  /*tp_as_buffer */

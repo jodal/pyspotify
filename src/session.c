@@ -1,20 +1,3 @@
-/* $Id$
- *
- * Copyright 2009 Doug Winter
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *  http://www.apache.org/licenses/LICENSE-2.0PyDe
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
-*/
-
 #include <Python.h>
 #include <structmember.h>
 #include <libgen.h>
@@ -82,7 +65,7 @@ Session_username(Session * self)
     }
     const char *username = sp_user_canonical_name(user);
 
-    return PyString_FromString(username);
+    return PyUnicode_FromString(username);
 };
 
 static PyObject *
@@ -97,7 +80,7 @@ Session_display_name(Session * self)
     }
     const char *username = sp_user_display_name(user);
 
-    return PyString_FromString(username);
+    return PyUnicode_FromString(username);
 };
 
 static PyObject *
@@ -137,14 +120,14 @@ handle_error(int err)
     }
 }
 
-const char *
+PyObject *
 error_message(int err)
 {
     if (err != 0) {
-        return sp_error_message(err);
+        return PyUnicode_FromString(sp_error_message(err));
     }
     else {
-        return NULL;
+        Py_RETURN_NONE;
     }
 }
 
@@ -354,8 +337,15 @@ Session_image_create(Session * self, PyObject *args)
 
     if (!PyArg_ParseTuple(args, "s#", &image_id, &len))
         return NULL;
-    assert(len == 20);
+    if (len != 20) {
+        PyErr_SetString(SpotifyError, "Image id length != 20");
+        return NULL;
+    }
     image = sp_image_create(self->_session, image_id);
+    if (sp_image_error(image)) {
+        PyErr_SetString(SpotifyError, "error occured during image creation");
+        return NULL;
+    }
     i = Image_FromSpotify(image);
     return i;
 }
@@ -478,20 +468,22 @@ PyTypeObject SessionType = {
 static void
 logged_in(sp_session * session, sp_error error)
 {
-    // fprintf(stderr, "----------> logged_in called\n");
     PyGILState_STATE gstate;
-    PyObject *res;
+    PyObject *res, *err;
 
+#ifdef DEBUG
+    fprintf(stderr, "[DEBUG]-session- >> logged_in called\n");
+#endif
     gstate = PyGILState_Ensure();
     Session *psession =
         (Session *) PyObject_CallObject((PyObject *)&SessionType, NULL);
     psession->_session = session;
     PyObject *client = (PyObject *)sp_session_userdata(session);
+    err = error_message(error);
 
-    res =
-        PyObject_CallMethod(client, "logged_in", "Os", psession,
-                            error_message(error));
+    res = PyObject_CallMethod(client, "logged_in", "OO", psession, err);
     Py_DECREF(psession);
+    Py_DECREF(err);
     Py_XDECREF(res);
     PyGILState_Release(gstate);
 }
@@ -499,10 +491,12 @@ logged_in(sp_session * session, sp_error error)
 static void
 logged_out(sp_session * session)
 {
-    // fprintf(stderr, "----------> logged_out called\n");
     PyGILState_STATE gstate;
     PyObject *res;
 
+#ifdef DEBUG
+        fprintf(stderr, "[DEBUG]-session- >> logged_out called\n");
+#endif
     gstate = PyGILState_Ensure();
     Session *psession =
         (Session *) PyObject_CallObject((PyObject *)&SessionType, NULL);
@@ -518,10 +512,12 @@ logged_out(sp_session * session)
 static void
 metadata_updated(sp_session * session)
 {
-    // fprintf(stderr, "----------> metadata_updated called\n");
     PyGILState_STATE gstate;
     PyObject *res;
 
+#ifdef DEBUG
+        fprintf(stderr, "[DEBUG]-session- >> metadata_updated called\n");
+#endif
     gstate = PyGILState_Ensure();
     Session *psession =
         (Session *) PyObject_CallObject((PyObject *)&SessionType, NULL);
@@ -537,20 +533,21 @@ metadata_updated(sp_session * session)
 static void
 connection_error(sp_session * session, sp_error error)
 {
-    // fprintf(stderr, "----------> connection_error called\n");
     PyGILState_STATE gstate;
-    PyObject *res;
+    PyObject *res, *err;
 
+#ifdef DEBUG
+        fprintf(stderr, "[DEBUG]-session- >> connection_error called\n");
+#endif
     gstate = PyGILState_Ensure();
     Session *psession =
         (Session *) PyObject_CallObject((PyObject *)&SessionType, NULL);
     psession->_session = session;
     PyObject *client = (PyObject *)sp_session_userdata(session);
-
-    res =
-        PyObject_CallMethod(client, "connection_error", "Os", psession,
-                            error_message(error));
+    err = error_message(error);
+    res = PyObject_CallMethod(client, "connection_error", "OO", psession, err);
     Py_DECREF(psession);
+    Py_DECREF(err);
     Py_XDECREF(res);
     PyGILState_Release(gstate);
 }
@@ -558,10 +555,12 @@ connection_error(sp_session * session, sp_error error)
 static void
 message_to_user(sp_session * session, const char *message)
 {
-    // fprintf(stderr, "----------> message to user: %s\n", message);
     PyGILState_STATE gstate;
     PyObject *res;
 
+#ifdef DEBUG
+        fprintf(stderr, "[DEBUG]-session- >> message to user: %s\n", message);
+#endif
     gstate = PyGILState_Ensure();
     Session *psession =
         (Session *) PyObject_CallObject((PyObject *)&SessionType, NULL);
@@ -579,10 +578,12 @@ message_to_user(sp_session * session, const char *message)
 static void
 notify_main_thread(sp_session * session)
 {
-    // fprintf(stderr, "----------> notify_main_thread\n");
     PyGILState_STATE gstate;
     PyObject *res = NULL;
 
+#ifdef DEBUG
+        fprintf(stderr, "[DEBUG]-session- >> notify_main_thread called\n");
+#endif
     if (!session_constructed)
         return;
     gstate = PyGILState_Ensure();
@@ -617,6 +618,9 @@ music_delivery(sp_session * session, const sp_audioformat * format,
 {
     PyGILState_STATE gstate;
 
+#ifdef DEBUG
+        fprintf(stderr, "[DEBUG]-session- >> music_delivery called\n");
+#endif
     gstate = PyGILState_Ensure();
     int siz = frame_size(format);
     PyObject *pyframes = PyBuffer_FromMemory((void *)frames, num_frames * siz);
@@ -643,10 +647,12 @@ music_delivery(sp_session * session, const sp_audioformat * format,
 static void
 play_token_lost(sp_session * session)
 {
-    // fprintf(stderr, "----------> play_token_lost called\n");
     PyGILState_STATE gstate;
     PyObject *res;
 
+#ifdef DEBUG
+        fprintf(stderr, "[DEBUG]-session- >> play_token_lost called\n");
+#endif
     gstate = PyGILState_Ensure();
     Session *psession =
         (Session *) PyObject_CallObject((PyObject *)&SessionType, NULL);
@@ -662,10 +668,12 @@ play_token_lost(sp_session * session)
 static void
 log_message(sp_session * session, const char *data)
 {
-    // fprintf(stderr, "----------> log_message called: %s\n", data);
     PyGILState_STATE gstate;
     PyObject *res;
 
+#ifdef DEBUG
+        fprintf(stderr, "[DEBUG]-session- >> log message: %s\n", data);
+#endif
     gstate = PyGILState_Ensure();
     Session *psession =
         (Session *) PyObject_CallObject((PyObject *)&SessionType, NULL);
@@ -681,10 +689,12 @@ log_message(sp_session * session, const char *data)
 static void
 end_of_track(sp_session * session)
 {
-    // fprintf(stderr, "----------> end_of_track called\n");
     PyGILState_STATE gstate;
     PyObject *res;
 
+#ifdef DEBUG
+        fprintf(stderr, "[DEBUG]-session- >> end_of_track called\n");
+#endif
     gstate = PyGILState_Ensure();
     Session *psession =
         (Session *) PyObject_CallObject((PyObject *)&SessionType, NULL);
@@ -705,13 +715,31 @@ session_init(PyObject *m)
 }
 
 char *
-copystring(PyObject *ob)
+PySpotify_GetConfigString(PyObject *client, const char *attr)
 {
-    char *s = PyString_AsString(ob);
-    char *s2 = PyMem_Malloc(strlen(s) + 1);
+    PyObject *py_value, *py_uvalue;
+    char *value;
 
-    strcpy(s2, s);
-    return s2;
+    py_value = PyObject_GetAttrString(client, attr);
+    if (!py_value) {
+        PyErr_Format(SpotifyError, "%s not set", attr);
+        return NULL;
+    }
+    if (PyUnicode_Check(py_value)) {
+        py_uvalue = py_value;
+        py_value = PyUnicode_AsEncodedString(py_uvalue, ENCODING, "replace");
+        Py_DECREF(py_uvalue);
+    }
+    else if (!PyBytes_Check(py_value)) {
+        PyErr_Format(SpotifyError,
+                     "configuration value '%s' must be a string/unicode object",
+                     attr);
+        return NULL;
+    }
+    value = PyMem_Malloc(strlen(PyBytes_AS_STRING(py_value)) + 1);
+    strcpy(value, PyBytes_AS_STRING(py_value));
+    Py_DECREF(py_value);
+    return value;
 }
 
 static sp_session_callbacks g_callbacks = {
@@ -730,122 +758,96 @@ static sp_session_callbacks g_callbacks = {
 PyObject *
 session_connect(PyObject *self, PyObject *args)
 {
-#ifdef DEBUG
-    fprintf(stderr, "> entering session_connect\n");
-#endif
     sp_session_config config;
-
-    memset(&config, 0, sizeof(config));
-
     PyObject *client;
     sp_session *session;
     sp_error error;
     PyObject *uobj, *pobj;
     char *username, *password;
+    char *cache_location, *settings_location, *user_agent;
 
     if (!PyArg_ParseTuple(args, "O", &client))
         return NULL;
-
     PyEval_InitThreads();
+
+    memset(&config, 0, sizeof(config));
     config.api_version = SPOTIFY_API_VERSION;
     config.userdata = (void *)client;
     config.callbacks = &g_callbacks;
-    config.user_agent = "unset";
 
-#ifdef DEBUG
-    fprintf(stderr, "Config mark 1\n");
-#endif
-    PyObject *cache_location =
-        PyObject_GetAttr(client, PyString_FromString("cache_location"));
-#ifdef DEBUG
-    fprintf(stderr, "Cache location is '%s'\n",
-            PyString_AsString(cache_location));
-#endif
-    if (cache_location == NULL) {
-
+    cache_location = PySpotify_GetConfigString(client, "cache_location");
+    if (!cache_location)
         return NULL;
-    }
+    config.cache_location = cache_location;
 #ifdef DEBUG
-    fprintf(stderr, "Config mark 1.1\n");
+    fprintf(stderr, "[DEBUG]-session- Cache location is '%s'\n",
+            cache_location);
 #endif
-    config.cache_location = copystring(cache_location);
 
+    settings_location = PySpotify_GetConfigString(client, "settings_location");
+    config.settings_location = settings_location;
 #ifdef DEBUG
-    fprintf(stderr, "Config mark 2\n");
+    fprintf(stderr, "[DEBUG]-session- Settings location is '%s'\n",
+            settings_location);
 #endif
-    PyObject *settings_location =
-        PyObject_GetAttr(client, PyString_FromString("settings_location"));
-    if (settings_location == NULL) {
-        PyErr_SetString(SpotifyError,
-                        "Client did not provide a settings_location");
-        return NULL;
-    }
-    config.settings_location = copystring(settings_location);
 
-#ifdef DEBUG
-    fprintf(stderr, "Config mark 3\n");
-#endif
     PyObject *application_key =
-        PyObject_GetAttr(client, PyString_FromString("application_key"));
-    if (application_key == NULL) {
+        PyObject_GetAttr(client, PyBytes_FromString("application_key"));
+    if (!application_key) {
         PyErr_SetString(SpotifyError,
-                        "Client did not provide an application_key");
+                        "application_key not set");
+        return NULL;
+    }
+    else if (!PyBytes_Check(application_key)) {
+        PyErr_SetString(SpotifyError,
+                        "application_key must be a byte string");
         return NULL;
     }
     char *s_appkey;
     Py_ssize_t l_appkey;
 
-    PyString_AsStringAndSize(application_key, &s_appkey, &l_appkey);
+    PyBytes_AsStringAndSize(application_key, &s_appkey, &l_appkey);
     config.application_key_size = l_appkey;
     config.application_key = PyMem_Malloc(l_appkey);
     memcpy((char *)config.application_key, s_appkey, l_appkey);
 
+    user_agent = PySpotify_GetConfigString(client, "user_agent");
+    if (!user_agent)
+        return NULL;
+    if (strlen(user_agent) > 255) {
+        PyErr_SetString(SpotifyError, "user agent must be 255 characters max");
+    }
+    config.user_agent = user_agent;
 #ifdef DEBUG
-    fprintf(stderr, "Config mark 4\n");
+        fprintf(stderr, "[DEBUG]-session- User agent set to '%s'\n",
+                            user_agent);
 #endif
-    PyObject *user_agent =
-        PyObject_GetAttr(client, PyString_FromString("user_agent"));
-    if (user_agent == NULL) {
-        PyErr_SetString(SpotifyError, "Client did not provide a user_agent");
+    username = PySpotify_GetConfigString(client, "username");
+    if (!username)
         return NULL;
-    }
-    config.user_agent = copystring(user_agent);
 
-#ifdef DEBUG
-    fprintf(stderr, "Config mark 5\n");
-#endif
-    uobj = PyObject_GetAttr(client, PyString_FromString("username"));
-    if (uobj == NULL) {
-        PyErr_SetString(SpotifyError, "Client did not provide a username");
+    password = PySpotify_GetConfigString(client, "password");
+    if (!password)
         return NULL;
-    }
-    username = copystring(uobj);
-
-    pobj = PyObject_GetAttr(client, PyString_FromString("password"));
-    if (pobj == NULL) {
-        PyErr_SetString(SpotifyError, "Client did not provide a password");
-        return NULL;
-    }
-    password = copystring(pobj);
 
     Py_BEGIN_ALLOW_THREADS;
 #ifdef DEBUG
-    fprintf(stderr, "Calling sp_session_init\n");
+    fprintf(stderr, "[DEBUG]-session- creating session...\n");
 #endif
     error = sp_session_create(&config, &session);
-#ifdef DEBUG
-    fprintf(stderr, "Returned from sp_session_init\n");
-#endif
     Py_END_ALLOW_THREADS;
-    session_constructed = 1;
-
     if (error != SP_ERROR_OK) {
         PyErr_SetString(SpotifyError, sp_error_message(error));
         return NULL;
     }
+    session_constructed = 1;
+
+#ifdef DEBUG
+    fprintf(stderr, "[DEBUG]-session- login as %s in progress...\n",
+            username);
+#endif
     Py_BEGIN_ALLOW_THREADS;
     sp_session_login(session, username, password);
-
     Py_END_ALLOW_THREADS;
     Session *psession =
         (Session *) PyObject_CallObject((PyObject *)&SessionType, NULL);

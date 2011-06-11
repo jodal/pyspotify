@@ -9,4 +9,6 @@ recursive-include spotify *.py
 recursive-include docs *
 prune docs/_build
 
+recursive-include examples *
+
 recursive-include tests *.py

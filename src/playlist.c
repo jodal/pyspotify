@@ -196,7 +196,7 @@ Playlist_add_callback(Playlist * self, PyObject *args,
     PyObject *callback;
     PyObject *manager = NULL, *userdata = NULL;
     Callback *tramp;
-    playlist_callback *head, *to_add;
+    playlist_callback *to_add;
 
     if (!PyArg_ParseTuple(args, "O|OO", &callback, &manager, &userdata))
         return NULL;

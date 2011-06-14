@@ -149,7 +149,7 @@ PlaylistContainer_add_callback(PlaylistContainer * self,
     PyObject *callback;
     PyObject *manager = NULL, *userdata = NULL;
     Callback *tramp;
-    playlistcontainer_callback *head, *to_add;
+    playlistcontainer_callback *to_add;
 
     if (!PyArg_ParseTuple(args, "O|OO", &callback, &manager, &userdata))
         return NULL;

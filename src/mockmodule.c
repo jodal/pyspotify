@@ -32,7 +32,7 @@ sp_artist *_mock_artist(char *name, int loaded);
 sp_track *_mock_track(char *name, int num_artists, sp_artist ** artists,
                       sp_album * album, int duration, int popularity,
                       int disc, int index, sp_error error, int loaded);
-sp_playlistcontainer *_mock_playlistcontainer();
+sp_playlistcontainer *_mock_playlistcontainer(void);
 sp_playlist *_mock_playlist(char *name);
 sp_albumbrowse *_mock_albumbrowse(sp_album * album, bool loaded);
 sp_artistbrowse *_mock_artistbrowse(sp_artist * artist, bool loaded);
@@ -1420,7 +1420,7 @@ mock_playlist(PyObject *self, PyObject *args)
 }
 
 sp_playlistcontainer *
-_mock_playlistcontainer()
+_mock_playlistcontainer(void)
 {
     sp_playlistcontainer *pc;
 

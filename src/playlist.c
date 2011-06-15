@@ -196,7 +196,7 @@ Playlist_add_callback(Playlist * self, PyObject *args,
     PyObject *callback;
     PyObject *manager = NULL, *userdata = NULL;
     Callback *tramp;
-    playlist_callback *head, *to_add;
+    playlist_callback *to_add;
 
     if (!PyArg_ParseTuple(args, "O|OO", &callback, &manager, &userdata))
         return NULL;
@@ -722,8 +722,25 @@ Playlist_name(Playlist * self)
 static PyObject *
 Playlist_rename(Playlist * self, PyObject *args)
 {
-    PyErr_SetString(PyExc_NotImplementedError, "");
-    return NULL;
+    char *name = NULL;
+    int len;
+    sp_error error;
+
+    if (!PyArg_ParseTuple(args, "es#", ENCODING, &name, &len))
+        return NULL;
+    if (len > 255) {
+        PyErr_SetString(PyExc_ValueError, "Name too long (255ch max).");
+        PyMem_Free(name);
+        return NULL;
+    }
+    error = sp_playlist_rename(self->_playlist, (const char *) name);
+    if (error) {
+        PyErr_SetString(SpotifyError, sp_error_message(error));
+        PyMem_Free(name);
+        return NULL;
+    }
+    PyMem_Free(name);
+    Py_RETURN_NONE;
 }
 
 static PyObject *
@@ -737,13 +754,6 @@ static PyObject *
 Playlist_is_collaborative(Playlist * self)
 {
     return Py_BuildValue("i", sp_playlist_is_collaborative(self->_playlist));
-}
-
-static PyObject *
-Playlist_set_collaborative(Playlist * self, PyObject *args)
-{
-    PyErr_SetString(PyExc_NotImplementedError, "");
-    return NULL;
 }
 
 /////////////// SEQUENCE PROTOCOL
@@ -771,21 +781,11 @@ Playlist_sq_item(PyObject *o, Py_ssize_t index)
     return track;
 }
 
-int
-Playlist_sq_ass_item(PyObject *o, Py_ssize_t index, PyObject *args)
-{
-    Playlist *self = (Playlist *) o;
-
-    return 0;
-}
-
 /////////////// ADDITIONAL METHODS
 
 static PyObject *
 Playlist_str(PyObject *o)
 {
-    Playlist *self = (Playlist *) o;
-
     PyErr_SetString(PyExc_NotImplementedError, "");
     return NULL;
 }
@@ -863,6 +863,14 @@ static PyMethodDef Playlist_methods[] = {
      (PyCFunction)Playlist_name,
      METH_NOARGS,
      "Returns the name of the playlist"},
+    {"rename",
+     (PyCFunction)Playlist_rename,
+     METH_VARARGS,
+     "Renames the playlist."},
+    {"owner",
+     (PyCFunction)Playlist_owner,
+     METH_NOARGS,
+     "Returns the owner of the playlist"},
     {NULL}
 };
 

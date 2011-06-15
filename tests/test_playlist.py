@@ -1,6 +1,8 @@
 # encoding: utf-8
 
 import unittest
+from nose.tools import raises
+
 from spotify import _mockspotify
 from spotify._mockspotify import mock_album, mock_artist, mock_track
 from spotify import Album
@@ -39,9 +41,24 @@ class TestPlaylist(unittest.TestCase):
         p1 = _mockspotify.mock_playlist("foo", [])
         self.assertEqual(p1.name(), "foo")
 
-    def test_unicode(self):
+    def test_name_unicode(self):
         p1 = _mockspotify.mock_playlist(u'æâ€êþÿ', [])
         self.assertEqual(p1.name(), u'æâ€êþÿ')
+
+    def test_rename(self):
+        p1 = _mockspotify.mock_playlist(u'foo', [])
+        p1.rename(u'bar')
+        self.assertEqual(p1.name(), u'bar')
+
+    def test_rename_unicode(self):
+        p1 = _mockspotify.mock_playlist(u'foo', [])
+        p1.rename(u'bąr')
+        self.assertEqual(p1.name(), u'bąr')
+
+    @raises(ValueError)
+    def test_rename_too_long(self):
+        p1 = _mockspotify.mock_playlist(u'foo', [])
+        p1.rename(u'bar' * 100)
 
     def test_len(self):
         p1 = self._mock_track("foo")

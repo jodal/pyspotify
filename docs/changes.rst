@@ -2,6 +2,11 @@
 Changes
 =======
 
+v1.4 (in development)
+=====================
+
+- New Playlist method: rename.
+
 v1.3 (2011-06-11)
 =================
 

@@ -762,7 +762,6 @@ session_connect(PyObject *self, PyObject *args)
     PyObject *client;
     sp_session *session;
     sp_error error;
-    PyObject *uobj, *pobj;
     char *username, *password;
     char *cache_location, *settings_location, *user_agent;
 

@@ -32,7 +32,7 @@ sp_artist *_mock_artist(char *name, int loaded);
 sp_track *_mock_track(char *name, int num_artists, sp_artist ** artists,
                       sp_album * album, int duration, int popularity,
                       int disc, int index, sp_error error, int loaded);
-sp_playlistcontainer *_mock_playlistcontainer();
+sp_playlistcontainer *_mock_playlistcontainer(void);
 sp_playlist *_mock_playlist(char *name);
 sp_albumbrowse *_mock_albumbrowse(sp_album * album, bool loaded);
 sp_artistbrowse *_mock_artistbrowse(sp_artist * artist, bool loaded);
@@ -719,6 +719,13 @@ sp_playlist_name(sp_playlist * p)
     return p->name;
 }
 
+sp_error
+sp_playlist_rename(sp_playlist *p, const char *new_name)
+{
+    strcpy(p->name, new_name);
+    return SP_ERROR_OK;
+}
+
 sp_track *
 sp_playlist_track(sp_playlist * p, int index)
 {
@@ -1189,7 +1196,6 @@ mock_albumbrowse(PyObject *self, PyObject *args, PyObject *kwds)
     int loaded;
     PyObject *session, *album, *callback, *userdata = NULL;
     PyObject *new_args;
-    sp_albumbrowse *mab;
     static char *kwlist[] =
         { "session", "album", "loaded", "callback", "userdata", NULL };
 
@@ -1234,7 +1240,6 @@ mock_artistbrowse(PyObject *self, PyObject *args, PyObject *kwds)
     int loaded;
     PyObject *session, *artist, *callback, *userdata = NULL;
     PyObject *new_args;
-    sp_artistbrowse *mab;
     static char *kwlist[] =
         { "session", "artist", "loaded", "callback", "userdata", NULL };
 
@@ -1415,7 +1420,7 @@ mock_playlist(PyObject *self, PyObject *args)
 }
 
 sp_playlistcontainer *
-_mock_playlistcontainer()
+_mock_playlistcontainer(void)
 {
     sp_playlistcontainer *pc;
 

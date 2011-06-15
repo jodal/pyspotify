@@ -786,8 +786,6 @@ Playlist_sq_item(PyObject *o, Py_ssize_t index)
 static PyObject *
 Playlist_str(PyObject *o)
 {
-    Playlist *self = (Playlist *) o;
-
     PyErr_SetString(PyExc_NotImplementedError, "");
     return NULL;
 }

@@ -262,8 +262,6 @@ PlaylistContainer_add_playlist_removed_callback(PlaylistContainer * self,
 static PyObject *
 PlaylistContainer_str(PyObject *o)
 {
-    PlaylistContainer *self = (PlaylistContainer *) o;
-
     PyErr_SetString(PyExc_NotImplementedError, "");
     return NULL;
 }

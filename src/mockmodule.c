@@ -1196,7 +1196,6 @@ mock_albumbrowse(PyObject *self, PyObject *args, PyObject *kwds)
     int loaded;
     PyObject *session, *album, *callback, *userdata = NULL;
     PyObject *new_args;
-    sp_albumbrowse *mab;
     static char *kwlist[] =
         { "session", "album", "loaded", "callback", "userdata", NULL };
 
@@ -1241,7 +1240,6 @@ mock_artistbrowse(PyObject *self, PyObject *args, PyObject *kwds)
     int loaded;
     PyObject *session, *artist, *callback, *userdata = NULL;
     PyObject *new_args;
-    sp_artistbrowse *mab;
     static char *kwlist[] =
         { "session", "artist", "loaded", "callback", "userdata", NULL };
 

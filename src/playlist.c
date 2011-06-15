@@ -722,8 +722,25 @@ Playlist_name(Playlist * self)
 static PyObject *
 Playlist_rename(Playlist * self, PyObject *args)
 {
-    PyErr_SetString(PyExc_NotImplementedError, "");
-    return NULL;
+    char *name = NULL;
+    int len;
+    sp_error error;
+
+    if (!PyArg_ParseTuple(args, "es#", ENCODING, &name, &len))
+        return NULL;
+    if (len > 255) {
+        PyErr_SetString(PyExc_ValueError, "Name too long (255ch max).");
+        PyMem_Free(name);
+        return NULL;
+    }
+    error = sp_playlist_rename(self->_playlist, (const char *) name);
+    if (error) {
+        PyErr_SetString(SpotifyError, sp_error_message(error));
+        PyMem_Free(name);
+        return NULL;
+    }
+    PyMem_Free(name);
+    Py_RETURN_NONE;
 }
 
 static PyObject *
@@ -863,6 +880,10 @@ static PyMethodDef Playlist_methods[] = {
      (PyCFunction)Playlist_name,
      METH_NOARGS,
      "Returns the name of the playlist"},
+    {"rename",
+     (PyCFunction)Playlist_rename,
+     METH_VARARGS,
+     "Renames the playlist."},
     {NULL}
 };
 

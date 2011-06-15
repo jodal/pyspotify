@@ -719,6 +719,13 @@ sp_playlist_name(sp_playlist * p)
     return p->name;
 }
 
+sp_error
+sp_playlist_rename(sp_playlist *p, const char *new_name)
+{
+    strcpy(p->name, new_name);
+    return SP_ERROR_OK;
+}
+
 sp_track *
 sp_playlist_track(sp_playlist * p, int index)
 {

@@ -756,13 +756,6 @@ Playlist_is_collaborative(Playlist * self)
     return Py_BuildValue("i", sp_playlist_is_collaborative(self->_playlist));
 }
 
-static PyObject *
-Playlist_set_collaborative(Playlist * self, PyObject *args)
-{
-    PyErr_SetString(PyExc_NotImplementedError, "");
-    return NULL;
-}
-
 /////////////// SEQUENCE PROTOCOL
 
 Py_ssize_t
@@ -786,14 +779,6 @@ Playlist_sq_item(PyObject *o, Py_ssize_t index)
     PyObject *track = Track_FromSpotify(tr);
 
     return track;
-}
-
-int
-Playlist_sq_ass_item(PyObject *o, Py_ssize_t index, PyObject *args)
-{
-    Playlist *self = (Playlist *) o;
-
-    return 0;
 }
 
 /////////////// ADDITIONAL METHODS
@@ -884,6 +869,10 @@ static PyMethodDef Playlist_methods[] = {
      (PyCFunction)Playlist_rename,
      METH_VARARGS,
      "Renames the playlist."},
+    {"owner",
+     (PyCFunction)Playlist_owner,
+     METH_NOARGS,
+     "Returns the owner of the playlist"},
     {NULL}
 };
 

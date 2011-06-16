@@ -20,4 +20,5 @@ Project resources
   <http://pyspotify.mopidy.com/docs/develop/>`_
 - `Source code <http://github.com/mopidy/pyspotify>`_
 - `Issue tracker <http://github.com/mopidy/pyspotify/issues>`_
+- IRC: ``#mopidy`` at `irc.freenode.net <http://freenode.net/>`_
 - `Download development snapshot <http://github.com/mopidy/pyspotify/tarball/develop#egg=pyspotify-dev>`_

@@ -26,7 +26,7 @@ Artist browsing                     Fully implemented
 Image handling                      Partially implemented
 Search subsystem                    Fully implemented
 Playlist subsystem                  Partially implemented
-User handling                       Not implemented
+User handling                       Fully implemented
 Toplist handling                    Not implemented
 Inbox subsystem                     Not implemented
 Offline synchronization             Not implemented

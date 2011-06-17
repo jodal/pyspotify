@@ -5,6 +5,7 @@
 #include "playlist.h"
 #include "track.h"
 #include "session.h"
+#include "user.h"
 
 /* This is the playlist callbacks table.
  *
@@ -479,8 +480,7 @@ playlist_track_created_changed_callback(sp_playlist * playlist,
     PyObject *p = Playlist_FromSpotify(playlist);
 
     ppos = PyInt_FromLong(position);
-    puser = Py_None;    //TODO: implement with User
-    Py_INCREF(Py_None); //
+    puser = User_FromSpotify(user);
     pwhen = PyInt_FromLong(when);
     res = PyObject_CallFunctionObjArgs(tramp->callback,
                                        tramp->manager,

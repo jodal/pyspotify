@@ -193,8 +193,11 @@ class TestPlaylistManager(unittest.TestCase):
         self.assertEqual(args[1].name(), self.playlist.name())
         self.assertEqual(type(args[2]), int)
         self.assertEqual(args[2], 1)
-        #self.assertEqual(type(args[3], spotify.User)
-        #self.assertEqual(args[3].name, u'foo')
+        self.assertEqual(str(type(args[3])),str(spotify.User)) # dirty hack
+                                                       # until I
+                                                       # figure why the
+                                                       # comparison fails
+        self.assertEqual(args[3].canonical_name(), u'foo')
         self.assertEqual(type(args[4]), int)
         self.assertEqual(args[4], 123)
 

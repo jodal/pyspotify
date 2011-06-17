@@ -848,6 +848,7 @@ session_connect(PyObject *self, PyObject *args)
     Py_BEGIN_ALLOW_THREADS;
     sp_session_login(session, username, password);
     Py_END_ALLOW_THREADS;
+    g_session = session;
     Session *psession =
         (Session *) PyObject_CallObject((PyObject *)&SessionType, NULL);
     psession->_session = session;

@@ -812,7 +812,7 @@ mock_playlist_event(int event, sp_playlist * p)
     sp_artist *artist = _mock_artist("foo_", 1);
     sp_album *album = _mock_album("bar_", artist, 2011,
                                   (byte *) "01234567890123456789", 0, 1, 1);
-
+    sp_user *user = _mock_user("foo", "", "", "", 0, 0);
     sp_track *tracks[3] = {
         _mock_track("foo", 1, &artist, album, 0, 0, 0, 0, 0, 1),
         _mock_track("bar", 1, &artist, album, 0, 0, 0, 0, 0, 1),
@@ -856,7 +856,7 @@ mock_playlist_event(int event, sp_playlist * p)
 
     case MOCK_PLAYLIST_TRACK_CREATED_CHANGED:
         if (p->callbacks->track_created_changed)
-            p->callbacks->track_created_changed(p, 1, NULL, 123, p->userdata);
+            p->callbacks->track_created_changed(p, 1, user, 123, p->userdata);
         break;
 
     case MOCK_PLAYLIST_TRACK_MESSAGE_CHANGED:

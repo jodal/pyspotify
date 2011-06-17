@@ -127,7 +127,8 @@ static PyMethodDef User_methods[] = {
 };
 
 PyTypeObject UserType = {
-    PyObject_HEAD_INIT(NULL) 0, /*ob_size */
+    PyObject_HEAD_INIT(NULL)
+    0,                  /*ob_size */
     "spotify.User",     /*tp_name */
     sizeof(User),       /*tp_basicsize */
     0,                  /*tp_itemsize */

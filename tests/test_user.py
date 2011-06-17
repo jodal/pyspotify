@@ -13,9 +13,9 @@ class TestUser(unittest.TestCase):
 
     def test_is_loaded(self):
         user = mock_user('','','','',0,1);
-        self.assertEqual(user.is_loaded(), 1)
+        self.assertEqual(user.is_loaded(), True)
         user = mock_user('','','','',0,0);
-        self.assertEqual(user.is_loaded(), 0)
+        self.assertEqual(user.is_loaded(), False)
 
     def test_canonical_name(self):
         user = mock_user(u'foo',u'bar',u'baz',u'url',0,1);

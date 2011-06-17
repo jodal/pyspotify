@@ -40,7 +40,7 @@ User_dealloc(User * self)
 static PyObject *
 User_is_loaded(User * self)
 {
-    return Py_BuildValue("i", sp_user_is_loaded(self->_user));
+    return PyBool_FromLong(sp_user_is_loaded(self->_user));
 }
 
 static PyObject *

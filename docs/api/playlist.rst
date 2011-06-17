@@ -164,6 +164,11 @@ objects.
         :rtype:     string
         :returns:   the name of the playlist.
 
+    .. method:: rename(name)
+
+        :param name:    the new name
+        :type name:     :class:`unicode`
+
     .. method:: remove_callback(callback[, userdata])
 
         Removes the corresponding callback, userdata couple.

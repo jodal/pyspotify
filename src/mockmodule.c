@@ -22,6 +22,7 @@
 #include "search.h"
 #include "session.h"
 #include "track.h"
+#include "user.h"
 
 /***************************** FORWARD DEFINES *****************************/
 void mock_playlist_event(int event, sp_playlist * p);
@@ -36,6 +37,8 @@ sp_playlistcontainer *_mock_playlistcontainer(void);
 sp_playlist *_mock_playlist(char *name);
 sp_albumbrowse *_mock_albumbrowse(sp_album * album, bool loaded);
 sp_artistbrowse *_mock_artistbrowse(sp_artist * artist, bool loaded);
+sp_user *_mock_user(char *canonical_name, char *display_name, char *full_name,
+                    char *picture, sp_relation_type relation, bool loaded);
 
 /****************************** GLOBALS ************************************/
 
@@ -131,6 +134,15 @@ struct sp_image {
     int error;
 };
 
+struct sp_user {
+    bool loaded;
+    char *canonical_name;
+    char *display_name;
+    char *full_name;
+    char *picture;
+    sp_relation_type relation;
+};
+
 /***************************** MOCK EVENT GENERATION ***************************/
 
 typedef enum event_type {
@@ -215,7 +227,7 @@ sp_error_message(sp_error error)
 sp_user *
 sp_session_user(sp_session * session)
 {
-    return (sp_user *) - 1;
+    return _mock_user(g_data.username, "", NULL, "", 0, 1);
 }
 
 sp_playlistcontainer *
@@ -281,12 +293,6 @@ sp_playlist *
 sp_session_starred_create(sp_session * session)
 {
     return _mock_playlist("Starred");
-}
-
-bool
-sp_user_is_loaded(sp_user * user)
-{
-    return 0;
 }
 
 sp_error
@@ -440,16 +446,50 @@ sp_search_did_you_mean(sp_search * s)
 
 /********************************* MOCK USER FUNCTIONS ***********************************/
 
-const char *
-sp_user_canonical_name(sp_user * user)
+void
+sp_user_add_ref(sp_user *user)
 {
-    return g_data.username;
+}
+
+void
+sp_user_release(sp_user *user)
+{
+}
+
+bool
+sp_user_is_loaded(sp_user *user)
+{
+    return user->loaded;
 }
 
 const char *
-sp_user_display_name(sp_user * user)
+sp_user_canonical_name(sp_user *user)
 {
-    return "Mock display name";
+    return user->canonical_name;
+}
+
+const char *
+sp_user_display_name(sp_user *user)
+{
+    return user->display_name;
+}
+
+const char *
+sp_user_full_name(sp_user *user)
+{
+    return user->loaded ? user->full_name : NULL;
+}
+
+const char *
+sp_user_picture(sp_user *user)
+{
+    return user->loaded ? user->picture : NULL;
+}
+
+sp_relation_type
+sp_user_relation_type(sp_session *session, sp_user *user)
+{
+    return user->relation;
 }
 
 /********************************* MOCK LINK FUNCTIONS ***********************************/
@@ -1176,6 +1216,42 @@ sp_artistbrowse_is_loaded(sp_artistbrowse * ab)
 
 /**************** MOCKING NEW OBJECTS *******************/
 
+/// Generate a mock sp_user structure
+sp_user *_mock_user(char *canonical_name, char *display_name, char *full_name,
+                    char *picture, sp_relation_type relation, bool loaded)
+{
+    sp_user *user;
+
+    user = malloc(sizeof(sp_user));
+    user->canonical_name = canonical_name;
+    user->display_name = display_name;
+    user->full_name = full_name;
+    user->picture = picture;
+    user->relation = relation;
+    user->loaded = loaded;
+
+    return user;
+}
+
+/// Generate a mock spotify.User object
+PyObject *
+mock_user(PyObject *self, PyObject *args)
+{
+    char *canonical_name, *display_name, *full_name, *picture;
+    int relation;
+    int loaded;
+    sp_user *user;
+
+    if (!PyArg_ParseTuple(args, "esesesesii", ENCODING, &canonical_name,
+                          ENCODING, &display_name, ENCODING, &full_name,
+                          ENCODING, &picture, &relation, &loaded))
+        return NULL;
+
+    user = _mock_user(canonical_name, display_name, full_name, picture,
+                      relation, loaded);
+    return User_FromSpotify(user);
+}
+
 /// Generate a mock sp_albumbrowse structure
 sp_albumbrowse *
 _mock_albumbrowse(sp_album * album, bool loaded)
@@ -1497,6 +1573,7 @@ static PyMethodDef module_methods[] = {
     {"mock_search", mock_search, METH_VARARGS, "Create mock search results"},
     {"mock_session", mock_session, METH_VARARGS, "Create a mock session"},
     {"mock_event_trigger", event_trigger, METH_VARARGS, "Triggers an event"},
+    {"mock_user", mock_user, METH_VARARGS, "Create a mock user."},
     {NULL, NULL, 0, NULL}
 };
 
@@ -1525,6 +1602,8 @@ init_mockspotify(void)
         return;
     if (PyType_Ready(&TrackType) < 0)
         return;
+    if (PyType_Ready(&UserType) < 0)
+        return;
 
     m = Py_InitModule("_mockspotify", module_methods);
     if (m == NULL)
@@ -1550,4 +1629,5 @@ init_mockspotify(void)
     session_init(m);
     search_init(m);
     track_init(m);
+    user_init(m);
 }

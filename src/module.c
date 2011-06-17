@@ -13,6 +13,7 @@
 #include "session.h"
 #include "track.h"
 #include "image.h"
+#include "user.h"
 
 PyObject *SpotifyError;
 PyObject *SpotifyApiVersion;
@@ -46,6 +47,8 @@ init_spotify(void)
         return;
     if (PyType_Ready(&ImageType) < 0)
         return;
+    if (PyType_Ready(&UserType) < 0)
+        return;
 
     m = Py_InitModule("_spotify", module_methods);
     if (m == NULL)
@@ -72,4 +75,5 @@ init_spotify(void)
     search_init(m);
     track_init(m);
     image_init(m);
+    user_init(m);
 }

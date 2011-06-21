@@ -125,6 +125,8 @@ playlistcontainer_loaded_callback(sp_playlistcontainer * playlistcontainer,
     res = PyObject_CallFunctionObjArgs(tramp->callback,
                                        tramp->manager,
                                        pc, tramp->userdata, NULL);
+    if (!res)
+        PyErr_WriteUnraisable(tramp->callback);
     Py_DECREF(pc);
     Py_XDECREF(res);
     PyGILState_Release(gstate);
@@ -159,6 +161,8 @@ playlistcontainer_playlist_added_callback(sp_playlistcontainer *
     res = PyObject_CallFunctionObjArgs(tramp->callback,
                                        tramp->manager,
                                        pc, p, pos, tramp->userdata, NULL);
+    if (!res)
+        PyErr_WriteUnraisable(tramp->callback);
     Py_DECREF(pc);
     Py_DECREF(p);
     Py_DECREF(pos);
@@ -200,6 +204,8 @@ playlistcontainer_playlist_moved_callback(sp_playlistcontainer *
                                        tramp->manager,
                                        pc,
                                        p, pos, new_pos, tramp->userdata, NULL);
+    if (!res)
+        PyErr_WriteUnraisable(tramp->callback);
     Py_DECREF(pc);
     Py_DECREF(p);
     Py_DECREF(pos);
@@ -239,6 +245,8 @@ playlistcontainer_playlist_removed_callback(sp_playlistcontainer *
     res = PyObject_CallFunctionObjArgs(tramp->callback,
                                        tramp->manager,
                                        pc, p, pos, tramp->userdata, NULL);
+    if (!res)
+        PyErr_WriteUnraisable(tramp->callback);
     Py_DECREF(pc);
     Py_DECREF(p);
     Py_DECREF(pos);

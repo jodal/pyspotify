@@ -10,10 +10,12 @@ New features:
 - User handling
 - New Playlist method: rename.
 - Exceptions raised in callbacks are written to ``stderr``.
+- Unicode queries in Session.search
 
 Bug fixes:
 
 - log_message callbacks used ``str`` in place of ``unicode``.
+- argument errors were unchecked in Session.search
 
 v1.3 (2011-06-11)
 =================

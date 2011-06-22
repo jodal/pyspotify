@@ -272,17 +272,15 @@ Session_search(Session * self, PyObject *args, PyObject *kwds)
         "artist_offset", "artist_count",
         "userdata", NULL
     };
-    PyArg_ParseTupleAndKeywords(args, kwds, "sO|iiiiiiO", kwlist, &query,
-                                &callback, &track_offset, &track_count,
-                                &album_offset, &album_count, &artist_offset,
-                                &artist_count, &userdata);
-    if (userdata != NULL)
-        Py_INCREF(userdata);
-    Py_INCREF(callback);
-    st = malloc(sizeof(Callback));
-    st->userdata = userdata;
-    st->manager = NULL;
-    st->callback = callback;
+    if (!PyArg_ParseTupleAndKeywords(args, kwds, "esO|iiiiiiO", kwlist,
+                                     ENCODING, &query, &callback,
+                                     &track_offset, &track_count,
+                                     &album_offset, &album_count,
+                                     &artist_offset, &artist_count, &userdata))
+        return NULL;
+    if (!userdata)
+        userdata = Py_None;
+    st = create_trampoline(callback, NULL, userdata);
     Py_BEGIN_ALLOW_THREADS;
     search = sp_search_create(self->_session, query,
                               track_offset, track_count,
@@ -292,7 +290,6 @@ Session_search(Session * self, PyObject *args, PyObject *kwds)
                               (void *)st);
     Py_END_ALLOW_THREADS;
     results = Results_FromSpotify(search);
-
     return results;
 }
 

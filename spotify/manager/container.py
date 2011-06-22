@@ -2,6 +2,9 @@ class SpotifyContainerManager:
     """
     Handles Spotify playlist container callbacks. To implement you own
     callbacks, inherit from this class.
+
+    Exceptions raised in your callback handlers will be displayed on the
+    standard error output (stderr).
     """
 
     def __init__(self):

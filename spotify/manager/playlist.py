@@ -2,6 +2,9 @@ class SpotifyPlaylistManager:
     """
     Handles Spotify playlists callbacks. To implement you own callbacks,
     inherit from this class.
+
+    Exceptions raised in your callback handlers will be displayed on the
+    standard error output (stderr).
     """
 
     def __init__(self):

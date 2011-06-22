@@ -6,8 +6,8 @@ class SpotifySessionManager(object):
     Client for Spotify. Inherit from this class to have your callbacks
     called on the appropriate events.
 
-    Exceptions raised in your callback handlers will be silently discarded
-    unless you handle them!
+    Exceptions raised in your callback handlers will be displayed on the
+    standard error output (stderr).
     """
 
     api_version = spotify.api_version

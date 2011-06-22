@@ -5,8 +5,15 @@ Changes
 v1.4 (in development)
 =====================
 
+New features:
+
 - User handling
 - New Playlist method: rename.
+- Exceptions raised in callbacks are written to ``stderr``.
+
+Bug fixes:
+
+- log_message callbacks used ``str`` in place of ``unicode``.
 
 v1.3 (2011-06-11)
 =================

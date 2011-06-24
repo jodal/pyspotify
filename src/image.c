@@ -88,7 +88,7 @@ image_callback(sp_image * image, void *userdata)
     PyObject_CallFunctionObjArgs(tramp->callback, i, tramp->userdata, NULL);
     Py_DECREF(i);
     Py_DECREF(tramp->callback);
-    Py_DECREF(tramp->userdata);
+    Py_XDECREF(tramp->userdata);
     free(userdata);
     PyGILState_Release(gstate);
 }
@@ -96,14 +96,14 @@ image_callback(sp_image * image, void *userdata)
 static PyObject *
 Image_add_load_callback(Image * self, PyObject *args)
 {
-    PyObject *callback;
-    PyObject *userdata;
+    PyObject *callback = NULL;
+    PyObject *userdata = NULL;
     image_callback_trampoline *tramp;
 
-    if (!PyArg_ParseTuple(args, "OO", &callback, &userdata))
+    if (!PyArg_ParseTuple(args, "O|O", &callback, &userdata))
         return NULL;
-    Py_INCREF(callback);
-    Py_INCREF(userdata);
+    Py_XINCREF(callback);
+    Py_XINCREF(userdata);
     tramp = malloc(sizeof(image_callback_trampoline));
     tramp->userdata = userdata;
     tramp->callback = callback;

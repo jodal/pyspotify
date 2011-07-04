@@ -317,10 +317,14 @@ if __name__ == '__main__':
     op = optparse.OptionParser(version="%prog 0.1")
     op.add_option("-u", "--username", help="spotify username")
     op.add_option("-p", "--password", help="spotify password")
+    op.add_option("--shell", action='store_true', default=False)
     (options, args) = op.parse_args()
     if not options.username or not options.password:
         op.print_help()
         raise SystemExit
-    s = Jukebox(options.username, options.password)
-    s.connect()
-
+    session_m = Jukebox(options.username, options.password)
+    session_m.connect()
+    if options.shell:
+        import code
+        shell = code.InteractiveConsole(globals())
+        shell.interact()

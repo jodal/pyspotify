@@ -120,17 +120,6 @@ handle_error(int err)
     }
 }
 
-PyObject *
-error_message(int err)
-{
-    if (err != 0) {
-        return PyUnicode_FromString(sp_error_message(err));
-    }
-    else {
-        Py_RETURN_NONE;
-    }
-}
-
 static PyObject *
 Session_playlist_container(Session * self)
 {

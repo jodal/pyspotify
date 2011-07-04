@@ -28,3 +28,7 @@ void delete_trampoline(Callback * tr);
  *   o is another object   : sets an exception and returns NULL
  */
 PyObject *as_function(PyObject *o);
+
+
+/* Returns a Python string for the error, or None if SP_ERROR_OK */
+PyObject *error_message(int err);

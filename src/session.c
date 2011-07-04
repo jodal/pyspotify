@@ -18,6 +18,7 @@
 #include "image.h"
 
 static int session_constructed = 0;
+sp_session *g_session;
 
 static PyObject *
 PyTuple_NewByPreappending(PyObject *firstObject, PyObject *tuple)

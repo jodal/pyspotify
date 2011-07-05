@@ -1292,7 +1292,6 @@ mock_albumbrowse(PyObject *self, PyObject *args, PyObject *kwds)
     ab = (AlbumBrowser *) PyObject_Call((PyObject *)&AlbumBrowserType,
                                         new_args, NULL);
     ab->_browser->loaded = loaded;
-    Py_INCREF(ab);
     return (PyObject *)ab;
 }
 
@@ -1336,7 +1335,6 @@ mock_artistbrowse(PyObject *self, PyObject *args, PyObject *kwds)
     ab = (ArtistBrowser *) PyObject_Call((PyObject *)&ArtistBrowserType,
                                          new_args, NULL);
     ab->_browser->loaded = loaded;
-    Py_INCREF(ab);
     return (PyObject *)ab;
 }
 

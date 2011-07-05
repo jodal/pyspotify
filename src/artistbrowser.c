@@ -15,7 +15,7 @@ ArtistBrowser_FromSpotify(sp_artistbrowse * browse)
     b->_browser = browse;
     sp_artistbrowse_add_ref(browse);
 
-    return b;
+    return (PyObject *)b;
 }
 
 void
@@ -24,11 +24,15 @@ ArtistBrowser_browse_complete(sp_artistbrowse * browse, Callback * st)
 #ifdef DEBUG
     fprintf(stderr, "Artist browse complete\n");
 #endif
-
     PyGILState_STATE gstate = PyGILState_Ensure();
-    ArtistBrowser * browser = ArtistBrowser_FromSpotify(browse);
+    PyObject *browser = ArtistBrowser_FromSpotify(browse);
 
-    PyObject_CallFunctionObjArgs(st->callback, browser, NULL);
+    PyObject *res = PyObject_CallFunctionObjArgs(st->callback, browser,
+                                                 st->userdata, NULL);
+    if (!res)
+        PyErr_WriteUnraisable(st->callback);
+    Py_DECREF(browser);
+    Py_XDECREF(res);
     PyGILState_Release(gstate);
 }
 

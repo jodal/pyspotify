@@ -7,15 +7,32 @@
 #include "album.h"
 #include "session.h"
 
+static PyObject *
+ArtistBrowser_FromSpotify(sp_artistbrowse * browse)
+{
+    ArtistBrowser *b = (ArtistBrowser *)ArtistBrowserType.tp_alloc(&ArtistBrowserType, 0);
+
+    b->_browser = browse;
+    sp_artistbrowse_add_ref(browse);
+
+    return (PyObject *)b;
+}
+
 void
 ArtistBrowser_browse_complete(sp_artistbrowse * browse, Callback * st)
 {
-    PyGILState_STATE gstate;
-
-    gstate = PyGILState_Ensure();
 #ifdef DEBUG
     fprintf(stderr, "Artist browse complete\n");
 #endif
+    PyGILState_STATE gstate = PyGILState_Ensure();
+    PyObject *browser = ArtistBrowser_FromSpotify(browse);
+
+    PyObject *res = PyObject_CallFunctionObjArgs(st->callback, browser,
+                                                 st->userdata, NULL);
+    if (!res)
+        PyErr_WriteUnraisable(st->callback);
+    Py_DECREF(browser);
+    Py_XDECREF(res);
     PyGILState_Release(gstate);
 }
 

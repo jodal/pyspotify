@@ -10,7 +10,9 @@ class TestArtistbrowser(unittest.TestCase):
     session = mock_session()
     artist = mock_artist("foo0", 1)
 
-    def callback(browser, userdata):
+    def callback(self, browser, userdata):
+        global callback_called
+        global callback_userdata
         callback_called = True
         callback_userdata = userdata
 
@@ -30,9 +32,10 @@ class TestArtistbrowser(unittest.TestCase):
         assert browser[2].name() == 'baz'
 
     def test_callback(self):
-        raise SkipTest
+        global callback_called
+        global callback_userdata
         callback_called = False
         browser = mock_artistbrowse(self.session, self.artist, 0, self.callback,
                                    self)
-        assert callback_called
-        assert userdata is self
+        self.assertTrue(callback_called)
+        self.assertEqual(callback_userdata, self)

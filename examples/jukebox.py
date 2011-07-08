@@ -8,6 +8,7 @@ import time
 import threading
 import os
 
+import spotify
 from spotify.manager import SpotifySessionManager, SpotifyPlaylistManager, \
     SpotifyContainerManager
 try:
@@ -184,6 +185,8 @@ You will be notified when tracks are added, moved or removed from the playlist."
             else:
                 self.jukebox.toplist(*args)
 
+    def do_shell(self, line):
+        self.jukebox.shell()
 
     do_ls = do_list
     do_EOF = do_quit
@@ -333,19 +336,19 @@ class Jukebox(SpotifySessionManager):
 
         tb = ToplistBrowser(tl_type, tl_region, callback)
 
+    def shell(self):
+        import code
+        shell = code.InteractiveConsole(globals())
+        shell.interact()
+
 if __name__ == '__main__':
     import optparse
     op = optparse.OptionParser(version="%prog 0.1")
     op.add_option("-u", "--username", help="spotify username")
     op.add_option("-p", "--password", help="spotify password")
-    op.add_option("--shell", action='store_true', default=False)
     (options, args) = op.parse_args()
     if not options.username or not options.password:
         op.print_help()
         raise SystemExit
     session_m = Jukebox(options.username, options.password)
     session_m.connect()
-    if options.shell:
-        import code
-        shell = code.InteractiveConsole(globals())
-        shell.interact()

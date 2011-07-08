@@ -4,7 +4,7 @@ typedef struct {
     PyObject *client;
 } Session;
 
-sp_session *g_session;
+extern sp_session *g_session;
 
 extern PyTypeObject SessionType;
 extern void session_init(PyObject *m);

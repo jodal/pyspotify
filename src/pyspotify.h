@@ -7,6 +7,15 @@
 
 #define ENCODING "utf-8"
 
+#if (PY_MAJOR_VERSION == 2 && PY_MINOR_VERSION < 6)
+#define PyBytes_AS_STRING            PyString_AS_STRING
+#define PyBytes_AsStringAndSize      PyString_AsStringAndSize
+#define PyBytes_Check                PyString_Check
+#define PyBytes_FromString           PyString_FromString
+#define PyBytes_FromStringAndSize    PyString_FromStringAndSize
+#define PyUnicode_FromString         PyString_FromString
+#endif
+
 extern PyObject *SpotifyError;
 extern PyObject *SpotifyApiVersion;
 
@@ -28,7 +37,6 @@ void delete_trampoline(Callback * tr);
  *   o is another object   : sets an exception and returns NULL
  */
 PyObject *as_function(PyObject *o);
-
 
 /* Returns a Python string for the error, or None if SP_ERROR_OK */
 PyObject *error_message(int err);

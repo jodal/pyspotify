@@ -18,6 +18,7 @@
 #include "image.h"
 
 static int session_constructed = 0;
+sp_session *g_session;
 
 static PyObject *
 PyTuple_NewByPreappending(PyObject *firstObject, PyObject *tuple)
@@ -331,12 +332,7 @@ Session_image_create(Session * self, PyObject *args)
         return NULL;
     }
     image = sp_image_create(self->_session, image_id);
-    if (sp_image_error(image)) {
-        PyErr_SetString(SpotifyError, "error occured during image creation");
-        return NULL;
-    }
-    i = Image_FromSpotify(image);
-    return i;
+    return Image_FromSpotify(image);
 }
 
 static PyObject *

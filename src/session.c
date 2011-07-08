@@ -121,17 +121,6 @@ handle_error(int err)
     }
 }
 
-PyObject *
-error_message(int err)
-{
-    if (err != 0) {
-        return PyUnicode_FromString(sp_error_message(err));
-    }
-    else {
-        Py_RETURN_NONE;
-    }
-}
-
 static PyObject *
 Session_playlist_container(Session * self)
 {
@@ -334,7 +323,6 @@ Session_image_create(Session * self, PyObject *args)
     byte *image_id;
     size_t len;
     sp_image *image;
-    PyObject *i;
 
     if (!PyArg_ParseTuple(args, "s#", &image_id, &len))
         return NULL;

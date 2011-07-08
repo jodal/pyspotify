@@ -8,13 +8,14 @@ import time
 import threading
 import os
 
+import spotify
 from spotify.manager import SpotifySessionManager, SpotifyPlaylistManager, \
     SpotifyContainerManager
 try:
     from spotify.alsahelper import AlsaController
 except ImportError:
     from spotify.osshelper import OssController as AlsaController
-from spotify import Link,SpotifyError
+from spotify import Link, SpotifyError, ToplistBrowser
 
 class JukeboxUI(cmd.Cmd, threading.Thread):
 
@@ -173,6 +174,20 @@ You will be notified when tracks are added, moved or removed from the playlist."
                 return
             self.jukebox.watch(self.jukebox.ctr[p], True)
 
+    def do_toplist(self, line):
+        usage = "Usage: toplist (albums|artists|tracks) (GB|FR|..|NO|all|current)"
+        if not line:
+            print usage
+        else:
+            args = line.split(' ')
+            if len(args) != 2:
+                print usage
+            else:
+                self.jukebox.toplist(*args)
+
+    def do_shell(self, line):
+        self.jukebox.shell()
+
     do_ls = do_list
     do_EOF = do_quit
 
@@ -312,6 +327,20 @@ class Jukebox(SpotifySessionManager):
             print "Unatching playlist: %s" % p.name()
             self.playlist_manager.unwatch(p)
 
+    def toplist(self, tl_type, tl_region):
+        print repr(tl_type)
+        print repr(tl_region)
+        def callback(tb, ud):
+            for i in xrange(len(tb)):
+                print '%3d: %s' % (i+1, tb[i].name())
+
+        tb = ToplistBrowser(tl_type, tl_region, callback)
+
+    def shell(self):
+        import code
+        shell = code.InteractiveConsole(globals())
+        shell.interact()
+
 if __name__ == '__main__':
     import optparse
     op = optparse.OptionParser(version="%prog 0.1")
@@ -321,6 +350,5 @@ if __name__ == '__main__':
     if not options.username or not options.password:
         op.print_help()
         raise SystemExit
-    s = Jukebox(options.username, options.password)
-    s.connect()
-
+    session_m = Jukebox(options.username, options.password)
+    session_m.connect()

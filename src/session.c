@@ -323,7 +323,6 @@ Session_image_create(Session * self, PyObject *args)
     byte *image_id;
     size_t len;
     sp_image *image;
-    PyObject *i;
 
     if (!PyArg_ParseTuple(args, "s#", &image_id, &len))
         return NULL;

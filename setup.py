@@ -81,6 +81,7 @@ mockspotify_ext = Extension('spotify._mockspotify',
         'src/pyspotify.c'
     ],
     include_dirs=['src'],
+    libraries=['mockspotify'],
 )
 
 setup(

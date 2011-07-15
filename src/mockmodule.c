@@ -32,8 +32,6 @@ sp_playlistcontainer *_mock_playlistcontainer(void);
 sp_playlist *_mock_playlist(char *name);
 sp_albumbrowse *_mock_albumbrowse(sp_album * album, bool loaded);
 sp_artistbrowse *_mock_artistbrowse(sp_artist * artist, bool loaded);
-sp_user *_mock_user(char *canonical_name, char *display_name, char *full_name,
-                    char *picture, sp_relation_type relation, bool loaded);
 
 /****************************** GLOBALS ************************************/
 
@@ -98,15 +96,6 @@ struct sp_search {
 
 struct sp_image {
     int error;
-};
-
-struct sp_user {
-    bool loaded;
-    char *canonical_name;
-    char *display_name;
-    char *full_name;
-    char *picture;
-    sp_relation_type relation;
 };
 
 /***************************** MOCK EVENT GENERATION ***************************/
@@ -193,7 +182,7 @@ sp_error_message(sp_error error)
 sp_user *
 sp_session_user(sp_session * session)
 {
-    return _mock_user(g_data.username, "", NULL, "", 0, 1);
+    return mocksp_user_create(g_data.username, "", NULL, "", 0, 1);
 }
 
 sp_playlistcontainer *
@@ -404,54 +393,6 @@ sp_search_did_you_mean(sp_search * s)
     return s->did_you_mean;
 }
 
-/********************************* MOCK USER FUNCTIONS ***********************************/
-
-void
-sp_user_add_ref(sp_user *user)
-{
-}
-
-void
-sp_user_release(sp_user *user)
-{
-}
-
-bool
-sp_user_is_loaded(sp_user *user)
-{
-    return user->loaded;
-}
-
-const char *
-sp_user_canonical_name(sp_user *user)
-{
-    return user->canonical_name;
-}
-
-const char *
-sp_user_display_name(sp_user *user)
-{
-    return user->display_name;
-}
-
-const char *
-sp_user_full_name(sp_user *user)
-{
-    return user->loaded ? user->full_name : NULL;
-}
-
-const char *
-sp_user_picture(sp_user *user)
-{
-    return user->loaded ? user->picture : NULL;
-}
-
-sp_relation_type
-sp_user_relation_type(sp_session *session, sp_user *user)
-{
-    return user->relation;
-}
-
 /********************************* MOCK LINK FUNCTIONS ***********************************/
 
 void
@@ -649,7 +590,7 @@ mock_playlist_event(int event, sp_playlist * p)
     sp_artist *artist = mocksp_artist_create("foo_", 1);
     sp_album *album = mocksp_album_create("bar_", artist, 2011,
                                   (byte *) "01234567890123456789", 0, 1, 1);
-    sp_user *user = _mock_user("foo", "", "", "", 0, 0);
+    sp_user *user = mocksp_user_create("foo", "", "", "", 0, 0);
     sp_track *tracks[3] = {
         mocksp_track_create("foo", 1, &artist, album, 0, 0, 0, 0, 0, 1),
         mocksp_track_create("bar", 1, &artist, album, 0, 0, 0, 0, 0, 1),
@@ -999,23 +940,6 @@ sp_artistbrowse_is_loaded(sp_artistbrowse * ab)
 
 /**************** MOCKING NEW OBJECTS *******************/
 
-/// Generate a mock sp_user structure
-sp_user *_mock_user(char *canonical_name, char *display_name, char *full_name,
-                    char *picture, sp_relation_type relation, bool loaded)
-{
-    sp_user *user;
-
-    user = malloc(sizeof(sp_user));
-    user->canonical_name = canonical_name;
-    user->display_name = display_name;
-    user->full_name = full_name;
-    user->picture = picture;
-    user->relation = relation;
-    user->loaded = loaded;
-
-    return user;
-}
-
 /// Generate a mock spotify.User object
 PyObject *
 mock_user(PyObject *self, PyObject *args)
@@ -1030,7 +954,7 @@ mock_user(PyObject *self, PyObject *args)
                           ENCODING, &picture, &relation, &loaded))
         return NULL;
 
-    user = _mock_user(canonical_name, display_name, full_name, picture,
+    user = mocksp_user_create(canonical_name, display_name, full_name, picture,
                       relation, loaded);
     return User_FromSpotify(user);
 }

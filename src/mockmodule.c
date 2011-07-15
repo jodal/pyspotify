@@ -163,16 +163,6 @@ sp_session_logout(sp_session * session)
     eventq[events++] = MOCK_LOGGED_OUT;
 }
 
-const char *
-sp_error_message(sp_error error)
-{
-    char *buff;
-
-    buff = malloc(128 * sizeof(char));
-    sprintf(buff, "Error number %d", error);
-    return buff;
-}
-
 sp_user *
 sp_session_user(sp_session * session)
 {

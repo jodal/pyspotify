@@ -30,7 +30,6 @@ void mock_playlist_event(int event, sp_playlist * p);
 void mock_playlistcontainer_event(int event, sp_playlistcontainer * pc);
 sp_playlistcontainer *_mock_playlistcontainer(void);
 sp_playlist *_mock_playlist(char *name);
-sp_albumbrowse *_mock_albumbrowse(sp_album * album, bool loaded);
 sp_artistbrowse *_mock_artistbrowse(sp_artist * artist, bool loaded);
 
 /****************************** GLOBALS ************************************/
@@ -57,11 +56,6 @@ struct sp_link {
 
 struct sp_artistbrowse {
     sp_artist *artist;
-    int loaded;
-};
-
-struct sp_albumbrowse {
-    sp_album *album;
     int loaded;
 };
 
@@ -782,67 +776,6 @@ sp_image_remove_load_callback(sp_image * i, image_loaded_cb * callback,
 {
 }
 
-/**************** MOCK ALBUM BROWSING ******************/
-
-void
-sp_albumbrowse_add_ref(sp_albumbrowse * ab)
-{
-}
-
-void
-sp_albumbrowse_release(sp_albumbrowse * ab)
-{
-}
-
-sp_track *
-sp_albumbrowse_track(sp_albumbrowse * ab, int index)
-{
-    sp_track *track;
-
-    switch (index) {
-    case 0:
-        track = mocksp_track_create("foo", 1, &(ab->album->artist), ab->album,
-                            123, 0, 1, 1, SP_ERROR_OK, 1);
-        break;
-    case 1:
-        track = mocksp_track_create("bar", 1, &(ab->album->artist), ab->album,
-                            123, 0, 1, 2, SP_ERROR_OK, 1);
-        break;
-    case 2:
-        track = mocksp_track_create("baz", 1, &(ab->album->artist), ab->album,
-                            123, 0, 1, 3, SP_ERROR_OK, 1);
-        break;
-    default:
-        track = NULL;
-        break;
-    }
-    return track;
-}
-
-int
-sp_albumbrowse_num_tracks(sp_albumbrowse * ab)
-{
-    return 3;
-}
-
-bool
-sp_albumbrowse_is_loaded(sp_albumbrowse * ab)
-{
-    return ab->loaded;
-}
-
-sp_albumbrowse *
-sp_albumbrowse_create(sp_session * s, sp_album * a,
-                      albumbrowse_complete_cb cb, void *userdata)
-{
-    sp_albumbrowse *ab;
-
-    ab = _mock_albumbrowse(a, 1);
-    if (cb)
-        cb(ab, userdata);
-    return ab;
-}
-
 /**************** MOCK ARTIST BROWSING *****************/
 
 void
@@ -957,18 +890,6 @@ mock_user(PyObject *self, PyObject *args)
     user = mocksp_user_create(canonical_name, display_name, full_name, picture,
                       relation, loaded);
     return User_FromSpotify(user);
-}
-
-/// Generate a mock sp_albumbrowse structure
-sp_albumbrowse *
-_mock_albumbrowse(sp_album * album, bool loaded)
-{
-    sp_albumbrowse *ab;
-
-    ab = malloc(sizeof(sp_albumbrowse));
-    ab->loaded = loaded;
-    ab->album = album;
-    return ab;
 }
 
 /// Generate a mock spotify.Albumbrowse object

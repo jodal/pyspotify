@@ -28,9 +28,6 @@
 /***************************** FORWARD DEFINES *****************************/
 void mock_playlist_event(int event, sp_playlist * p);
 void mock_playlistcontainer_event(int event, sp_playlistcontainer * pc);
-sp_track *_mock_track(char *name, int num_artists, sp_artist ** artists,
-                      sp_album * album, int duration, int popularity,
-                      int disc, int index, sp_error error, int loaded);
 sp_playlistcontainer *_mock_playlistcontainer(void);
 sp_playlist *_mock_playlist(char *name);
 sp_albumbrowse *_mock_albumbrowse(sp_album * album, bool loaded);
@@ -83,20 +80,6 @@ struct sp_playlistcontainer {
     int num_playlists;
     sp_playlistcontainer_callbacks *callbacks;
     void *userdata;
-};
-
-struct sp_track {
-    char name[1024];
-    int num_artists;
-    sp_artist *artists[16];
-    sp_album *album;
-    int duration;
-    int popularity;
-    int disc;
-    int index;
-    sp_error error;
-    int loaded;
-    int starred;
 };
 
 struct sp_search {
@@ -299,12 +282,6 @@ sp_session_player_unload(sp_session * session)
 {
 }
 
-bool
-sp_track_is_available(sp_session * session, sp_track * t)
-{
-    return 1;
-}
-
 /********************************* MOCK SEARCH FUNCTIONS *********************************/
 
 void
@@ -346,16 +323,16 @@ sp_search_create(sp_session * session, const char *query, int track_offset,
     search->album[2] = mocksp_album_create("quux", search->artist[0], 2003,
                                    (byte *) "01234567890123456789", 1, 1, 1);
     search->track[0] =
-        _mock_track("corge", 1, search->artist, search->album[0], 99, 72, 1, 1,
+        mocksp_track_create("corge", 1, search->artist, search->album[0], 99, 72, 1, 1,
                     0, 1);
     search->track[1] =
-        _mock_track("grault", 1, search->artist, search->album[1], 98, 72, 1,
+        mocksp_track_create("grault", 1, search->artist, search->album[1], 98, 72, 1,
                     1, 0, 1);
     search->track[2] =
-        _mock_track("garply", 1, search->artist, search->album[2], 97, 72, 1,
+        mocksp_track_create("garply", 1, search->artist, search->album[2], 97, 72, 1,
                     1, 0, 1);
     search->track[3] =
-        _mock_track("waldo", 1, search->artist, search->album[0], 96, 72, 1, 1,
+        mocksp_track_create("waldo", 1, search->artist, search->album[0], 96, 72, 1, 1,
                     0, 1);
     callback(search, userdata);
     return search;
@@ -495,7 +472,7 @@ sp_link_as_track(sp_link * link)
     sp_track *t = malloc(sizeof(sp_track));
 
     memset(t, 0, sizeof(sp_track));
-    return _mock_track(link->data + strlen("link:track:"), 0, NULL, NULL, 0,
+    return mocksp_track_create(link->data + strlen("link:track:"), 0, NULL, NULL, 0,
                        0, 0, 0, 0, 1);
     return t;
 }
@@ -590,105 +567,6 @@ sp_link_type(sp_link * link)
 {
     return 1;
 }
-
-/*************** MOCK TRACK METHODS ************************/
-
-bool
-sp_track_is_loaded(sp_track * t)
-{
-    return t->loaded;
-}
-
-const char *
-sp_track_name(sp_track * track)
-{
-    return track->name;
-}
-
-int
-sp_track_num_artists(sp_track * t)
-{
-    return 3;
-}
-
-sp_artist *
-sp_track_artist(sp_track * t, int index)
-{
-    static sp_artist *a[3];
-
-    a[0] = mocksp_artist_create("a1", 1);
-    a[1] = mocksp_artist_create("a2", 1);
-    a[2] = mocksp_artist_create("a3", 1);
-    return a[index];
-}
-
-int
-sp_track_disc(sp_track * t)
-{
-    return t->disc;
-}
-
-int
-sp_track_index(sp_track * t)
-{
-    return t->index;
-}
-
-int
-sp_track_popularity(sp_track * t)
-{
-    return t->popularity;
-}
-
-int
-sp_track_duration(sp_track * t)
-{
-    return t->duration;
-}
-
-sp_error
-sp_track_error(sp_track * t)
-{
-    return t->error;
-}
-
-sp_album *
-sp_track_album(sp_track * t)
-{
-    return t->album;
-}
-
-bool
-sp_track_is_local(sp_session * s, sp_track * t)
-{
-    return 0;
-}
-
-bool
-sp_track_is_starred(sp_session * s, sp_track * t)
-{
-    return t->starred;
-}
-
-void
-sp_track_set_starred(sp_session * s, const sp_track ** ts, int n, bool starred)
-{
-    int i;
-
-    for (i = 0; i < n; i++)
-        ((sp_track *) ts[i])->starred = starred;
-}
-
-void
-sp_track_add_ref(sp_track * track)
-{
-}
-
-void
-sp_track_release(sp_track * track)
-{
-}
-
 /**************** MOCK PLAYLIST METHODS *****************/
 
 void
@@ -773,9 +651,9 @@ mock_playlist_event(int event, sp_playlist * p)
                                   (byte *) "01234567890123456789", 0, 1, 1);
     sp_user *user = _mock_user("foo", "", "", "", 0, 0);
     sp_track *tracks[3] = {
-        _mock_track("foo", 1, &artist, album, 0, 0, 0, 0, 0, 1),
-        _mock_track("bar", 1, &artist, album, 0, 0, 0, 0, 0, 1),
-        _mock_track("baz", 1, &artist, album, 0, 0, 0, 0, 0, 1)
+        mocksp_track_create("foo", 1, &artist, album, 0, 0, 0, 0, 0, 1),
+        mocksp_track_create("bar", 1, &artist, album, 0, 0, 0, 0, 0, 1),
+        mocksp_track_create("baz", 1, &artist, album, 0, 0, 0, 0, 0, 1)
     };
     int nums[3] = { 0, 1, 2 };
 
@@ -982,15 +860,15 @@ sp_albumbrowse_track(sp_albumbrowse * ab, int index)
 
     switch (index) {
     case 0:
-        track = _mock_track("foo", 1, &(ab->album->artist), ab->album,
+        track = mocksp_track_create("foo", 1, &(ab->album->artist), ab->album,
                             123, 0, 1, 1, SP_ERROR_OK, 1);
         break;
     case 1:
-        track = _mock_track("bar", 1, &(ab->album->artist), ab->album,
+        track = mocksp_track_create("bar", 1, &(ab->album->artist), ab->album,
                             123, 0, 1, 2, SP_ERROR_OK, 1);
         break;
     case 2:
-        track = _mock_track("baz", 1, &(ab->album->artist), ab->album,
+        track = mocksp_track_create("baz", 1, &(ab->album->artist), ab->album,
                             123, 0, 1, 3, SP_ERROR_OK, 1);
         break;
     default:
@@ -1058,15 +936,15 @@ sp_artistbrowse_track(sp_artistbrowse * ab, int index)
                         (byte *) "01234567890123456789", 1, 1, 1);
     switch (index) {
     case 0:
-        track = _mock_track("foo", 1, &(album->artist), album,
+        track = mocksp_track_create("foo", 1, &(album->artist), album,
                             123, 0, 1, 1, SP_ERROR_OK, 1);
         break;
     case 1:
-        track = _mock_track("bar", 1, &(album->artist), album,
+        track = mocksp_track_create("bar", 1, &(album->artist), album,
                             123, 0, 1, 2, SP_ERROR_OK, 1);
         break;
     case 2:
-        track = _mock_track("baz", 1, &(album->artist), album,
+        track = mocksp_track_create("baz", 1, &(album->artist), album,
                             123, 0, 1, 3, SP_ERROR_OK, 1);
         break;
     default:
@@ -1261,28 +1139,6 @@ mock_artist(PyObject *self, PyObject *args)
     return (PyObject *)artist;
 }
 
-/// Generate a mock sp_track structure
-sp_track *
-_mock_track(char *name, int num_artists, sp_artist ** artists,
-            sp_album * album, int duration, int popularity,
-            int disc, int index, sp_error error, int loaded)
-{
-    sp_track *t;
-
-    t = malloc(sizeof(sp_track));
-    memset(t, 0, sizeof(sp_track));
-    strcpy(t->name, name);
-    t->loaded = loaded;
-    t->disc = disc;
-    t->index = index;
-    t->error = error;
-    t->duration = duration;
-    t->popularity = popularity;
-    t->album = album;
-    t->starred = 0;
-    return t;
-}
-
 PyObject *
 mock_track(PyObject *self, PyObject *args)
 {
@@ -1302,7 +1158,7 @@ mock_track(PyObject *self, PyObject *args)
         (args, "esiO!iiiiii", ENCODING, &name, &num_artists, &AlbumType,
          &album, &duration, &popularity, &disc, &index, &error, &loaded))
         return NULL;
-    sp_track *t = _mock_track(name, num_artists, NULL, album->_album, duration,
+    sp_track *t = mocksp_track_create(name, num_artists, NULL, album->_album, duration,
                               popularity,
                               disc, index, error, loaded);
     Track *track = (Track *) PyObject_CallObject((PyObject *)&TrackType, NULL);

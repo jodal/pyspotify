@@ -42,8 +42,8 @@ ToplistBrowser_new(PyTypeObject *potype, PyObject *args, PyObject *kwds)
 {
     PyObject *self, *callback = NULL, *userdata = NULL, *region;
     sp_toplistbrowse *browser;
-    sp_toplisttype tl_type;
-    sp_toplistregion tl_region;
+    sp_toplisttype tl_type = 0;
+    sp_toplistregion tl_region = 0;
     char *type, *username = NULL;
     Callback *tramp = NULL;
     static char *kwlist[] =

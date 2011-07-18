@@ -1,5 +1,6 @@
 #include <Python.h>
-#include <pyspotify.h>
+#include <libspotify/api.h>
+#include "pyspotify.h"
 
 Callback *
 create_trampoline(PyObject *callback, PyObject *manager, PyObject *userdata)
@@ -42,5 +43,16 @@ as_function(PyObject *o)
         PyErr_SetString(SpotifyError,
                         "Expected function or method for a callback.");
         return NULL;
+    }
+}
+
+PyObject *
+error_message(int err)
+{
+    if (err != 0) {
+        return PyUnicode_FromString(sp_error_message(err));
+    }
+    else {
+        Py_RETURN_NONE;
     }
 }

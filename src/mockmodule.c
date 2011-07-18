@@ -29,8 +29,6 @@
 void mock_playlist_event(int event, sp_playlist * p);
 void mock_playlistcontainer_event(int event, sp_playlistcontainer * pc);
 sp_playlistcontainer *_mock_playlistcontainer(void);
-sp_playlist *_mock_playlist(char *name);
-sp_artistbrowse *_mock_artistbrowse(sp_artist * artist, bool loaded);
 
 /****************************** GLOBALS ************************************/
 
@@ -54,14 +52,6 @@ struct sp_link {
     char data[1024];
 };
 
-struct sp_playlist {
-    char name[1024];
-    sp_track *track[32];
-    int num_tracks;
-    sp_playlist_callbacks *callbacks;
-    void *userdata;
-};
-
 struct sp_playlistcontainer {
     sp_playlist *playlist[32];
     int num_playlists;
@@ -70,35 +60,6 @@ struct sp_playlistcontainer {
 };
 
 /***************************** MOCK EVENT GENERATION ***************************/
-
-typedef enum event_type {
-    // SESSION EVENTS
-    MOCK_LOGGED_IN = 0,
-    MOCK_LOGGED_OUT = 1,
-    MOCK_METADATA_UPDATED = 2,
-    MOCK_CONNECTION_ERROR = 3,
-
-    // PLAYLIST EVENTS
-    MOCK_PLAYLIST_TRACKS_ADDED = 20,
-    MOCK_PLAYLIST_TRACKS_MOVED = 21,
-    MOCK_PLAYLIST_TRACKS_REMOVED = 22,
-    MOCK_PLAYLIST_RENAMED = 23,
-    MOCK_PLAYLIST_STATE_CHANGED = 24,
-    MOCK_PLAYLIST_UPDATE_IN_PROGRESS = 25,
-    MOCK_PLAYLIST_METADATA_UPDATED = 26,
-    MOCK_PLAYLIST_TRACK_CREATED_CHANGED = 27,
-    MOCK_PLAYLIST_TRACK_MESSAGE_CHANGED = 28,
-    MOCK_PLAYLIST_TRACK_SEEN_CHANGED = 29,
-    MOCK_PLAYLIST_DESCRIPTION_CHANGED = 30,
-    MOCK_PLAYLIST_SUBSCRIBERS_CHANGED = 31,
-    MOCK_PLAYLIST_IMAGE_CHANGED = 32,
-
-    // CONTAINER EVENTS
-    MOCK_CONTAINER_LOADED = 40,
-    MOCK_CONTAINER_PLAYLIST_ADDED = 41,
-    MOCK_CONTAINER_PLAYLIST_MOVED = 42,
-    MOCK_CONTAINER_PLAYLIST_REMOVED = 43
-} event_type;
 
 event_type eventq[16];
 int events = 0;
@@ -113,7 +74,7 @@ event_trigger(PyObject *self, PyObject *args)
         return NULL;
     if (20 <= event && event <= 39) {
         /* Playlist event */
-        mock_playlist_event(event, ((Playlist *) data)->_playlist);
+        mocksp_playlist_event(event, ((Playlist *) data)->_playlist);
     }
     else if (40 <= event) {
         /* Container event */
@@ -208,7 +169,7 @@ sp_session_process_events(sp_session * session, int *next_timeout)
 sp_playlist *
 sp_session_starred_create(sp_session * session)
 {
-    return _mock_playlist("Starred");
+    return mocksp_playlist_create("Starred");
 }
 
 sp_error
@@ -347,165 +308,6 @@ sp_link_type(sp_link * link)
 {
     return 1;
 }
-/**************** MOCK PLAYLIST METHODS *****************/
-
-void
-sp_playlist_add_ref(sp_playlist * p)
-{
-}
-
-void
-sp_playlist_release(sp_playlist * p)
-{
-}
-
-void
-sp_playlist_set_autolink_tracks(sp_playlist *p, bool set)
-{
-}
-
-bool
-sp_playlist_is_loaded(sp_playlist * p)
-{
-    return 1;
-}
-
-const char *
-sp_playlist_name(sp_playlist * p)
-{
-    return p->name;
-}
-
-sp_error
-sp_playlist_rename(sp_playlist *p, const char *new_name)
-{
-    strcpy(p->name, new_name);
-    return SP_ERROR_OK;
-}
-
-sp_track *
-sp_playlist_track(sp_playlist * p, int index)
-{
-    return p->track[index];
-}
-
-int
-sp_playlist_num_tracks(sp_playlist * p)
-{
-    return p->num_tracks;
-}
-
-void
-sp_playlist_add_callbacks(sp_playlist * p, sp_playlist_callbacks * cb,
-                          void *userdata)
-{
-    p->callbacks = cb;
-    p->userdata = userdata;
-}
-
-void
-sp_playlist_remove_callbacks(sp_playlist * p, sp_playlist_callbacks * cb,
-                             void *userdata)
-{
-    p->callbacks = NULL;
-}
-
-bool
-sp_playlist_is_collaborative(sp_playlist * p)
-{
-    return 0;
-}
-
-sp_error
-sp_playlist_remove_tracks(sp_playlist * p, const int *tracks, int num_tracks)
-{
-    // TODO
-    return SP_ERROR_OK;
-}
-
-void
-mock_playlist_event(int event, sp_playlist * p)
-{
-    sp_artist *artist = mocksp_artist_create("foo_", 1);
-    sp_album *album = mocksp_album_create("bar_", artist, 2011,
-                                  (byte *) "01234567890123456789", 0, 1, 1);
-    sp_user *user = mocksp_user_create("foo", "", "", "", 0, 0);
-    sp_track *tracks[3] = {
-        mocksp_track_create("foo", 1, &artist, album, 0, 0, 0, 0, 0, 1),
-        mocksp_track_create("bar", 1, &artist, album, 0, 0, 0, 0, 0, 1),
-        mocksp_track_create("baz", 1, &artist, album, 0, 0, 0, 0, 0, 1)
-    };
-    int nums[3] = { 0, 1, 2 };
-
-    switch (event) {
-    case MOCK_PLAYLIST_TRACKS_ADDED:
-        if (p->callbacks->tracks_added)
-            p->callbacks->tracks_added(p, tracks, 3, 0, p->userdata);
-        break;
-    case MOCK_PLAYLIST_TRACKS_MOVED:
-        if (p->callbacks->tracks_moved)
-            p->callbacks->tracks_moved(p, nums, 3, 0, p->userdata);
-        break;
-    case MOCK_PLAYLIST_TRACKS_REMOVED:
-        if (p->callbacks->tracks_removed)
-            p->callbacks->tracks_removed(p, nums, 3, p->userdata);
-        break;
-
-    case MOCK_PLAYLIST_RENAMED:
-        if (p->callbacks->playlist_renamed)
-            p->callbacks->playlist_renamed(p, p->userdata);
-        break;
-
-    case MOCK_PLAYLIST_STATE_CHANGED:
-        if (p->callbacks->playlist_state_changed)
-            p->callbacks->playlist_state_changed(p, p->userdata);
-        break;
-
-    case MOCK_PLAYLIST_UPDATE_IN_PROGRESS:
-        if (p->callbacks->playlist_update_in_progress)
-            p->callbacks->playlist_update_in_progress(p, 1, p->userdata);
-        break;
-
-    case MOCK_PLAYLIST_METADATA_UPDATED:
-        if (p->callbacks->playlist_metadata_updated)
-            p->callbacks->playlist_metadata_updated(p, p->userdata);
-        break;
-
-    case MOCK_PLAYLIST_TRACK_CREATED_CHANGED:
-        if (p->callbacks->track_created_changed)
-            p->callbacks->track_created_changed(p, 1, user, 123, p->userdata);
-        break;
-
-    case MOCK_PLAYLIST_TRACK_MESSAGE_CHANGED:
-        if (p->callbacks->track_message_changed)
-            p->callbacks->track_message_changed(p, 1, "foo", p->userdata);
-        break;
-
-    case MOCK_PLAYLIST_TRACK_SEEN_CHANGED:
-        if (p->callbacks->track_seen_changed)
-            p->callbacks->track_seen_changed(p, 1, 0, p->userdata);
-        break;
-
-    case MOCK_PLAYLIST_DESCRIPTION_CHANGED:
-        if (p->callbacks->description_changed)
-            p->callbacks->description_changed(p, "foo", p->userdata);
-        break;
-
-    case MOCK_PLAYLIST_SUBSCRIBERS_CHANGED:
-        if (p->callbacks->subscribers_changed)
-            p->callbacks->subscribers_changed(p, p->userdata);
-        break;
-
-    case MOCK_PLAYLIST_IMAGE_CHANGED:
-        if (p->callbacks->image_changed)
-            p->callbacks->image_changed(p, (byte *) "01234567890123456789",
-                                        p->userdata);
-        break;
-
-    default:
-        break;
-    }
-}
 
 /********************* MOCK PLAYLIST CONTAINER METHODS ************/
 
@@ -543,7 +345,7 @@ sp_playlistcontainer_add_callbacks(sp_playlistcontainer * pc,
 void
 mock_playlistcontainer_event(int event, sp_playlistcontainer * c)
 {
-    sp_playlist *playlist = _mock_playlist("foo");
+    sp_playlist *playlist = mocksp_playlist_create("foo");
 
     switch (event) {
     case MOCK_CONTAINER_LOADED:
@@ -717,7 +519,7 @@ mock_album(PyObject *self, PyObject *args)
 }
 
 sp_playlist *
-_mock_playlist(char *name)
+mocksp_playlist_create(char *name)
 {
     sp_playlist *p;
 
@@ -741,7 +543,7 @@ mock_playlist(PyObject *self, PyObject *args)
     if (!playlist)
         return NULL;
     Py_INCREF(playlist);
-    playlist->_playlist = _mock_playlist(s);
+    playlist->_playlist = mocksp_playlist_create(s);
     for (i = 0; i < PySequence_Length(tracks); i++) {
         Track *t = (Track *) PySequence_GetItem(tracks, i);
 

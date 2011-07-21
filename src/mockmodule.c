@@ -25,11 +25,6 @@
 #include "track.h"
 #include "user.h"
 
-/***************************** FORWARD DEFINES *****************************/
-void mock_playlist_event(int event, sp_playlist * p);
-void mock_playlistcontainer_event(int event, sp_playlistcontainer * pc);
-sp_playlistcontainer *_mock_playlistcontainer(void);
-
 /****************************** GLOBALS ************************************/
 
 PyObject *SpotifyError;
@@ -52,13 +47,6 @@ struct sp_link {
     char data[1024];
 };
 
-struct sp_playlistcontainer {
-    sp_playlist *playlist[32];
-    int num_playlists;
-    sp_playlistcontainer_callbacks *callbacks;
-    void *userdata;
-};
-
 /***************************** MOCK EVENT GENERATION ***************************/
 
 event_type eventq[16];
@@ -78,7 +66,7 @@ event_trigger(PyObject *self, PyObject *args)
     }
     else if (40 <= event) {
         /* Container event */
-        mock_playlistcontainer_event(event, ((PlaylistContainer *)
+        mocksp_playlistcontainer_event(event, ((PlaylistContainer *)
                                              data)->_playlistcontainer);
     }
     Py_RETURN_NONE;
@@ -110,7 +98,7 @@ sp_session_user(sp_session * session)
 sp_playlistcontainer *
 sp_session_playlistcontainer(sp_session * session)
 {
-    return _mock_playlistcontainer();
+    return mocksp_playlistcontainer_create();
 }
 
 sp_error
@@ -309,66 +297,6 @@ sp_link_type(sp_link * link)
     return 1;
 }
 
-/********************* MOCK PLAYLIST CONTAINER METHODS ************/
-
-void
-sp_playlistcontainer_add_ref(sp_playlistcontainer * p)
-{
-}
-
-void
-sp_playlistcontainer_release(sp_playlistcontainer * p)
-{
-}
-
-sp_playlist *
-sp_playlistcontainer_playlist(sp_playlistcontainer * pc, int index)
-{
-    return pc->playlist[index];
-}
-
-int
-sp_playlistcontainer_num_playlists(sp_playlistcontainer * pc)
-{
-    return pc->num_playlists;
-}
-
-void
-sp_playlistcontainer_add_callbacks(sp_playlistcontainer * pc,
-                                   sp_playlistcontainer_callbacks * cb,
-                                   void *userdata)
-{
-    pc->callbacks = cb;
-    pc->userdata = userdata;
-}
-
-void
-mock_playlistcontainer_event(int event, sp_playlistcontainer * c)
-{
-    sp_playlist *playlist = mocksp_playlist_create("foo");
-
-    switch (event) {
-    case MOCK_CONTAINER_LOADED:
-        if (c->callbacks->container_loaded)
-            c->callbacks->container_loaded(c, c->userdata);
-        break;
-    case MOCK_CONTAINER_PLAYLIST_ADDED:
-        if (c->callbacks->playlist_added)
-            c->callbacks->playlist_added(c, playlist, 0, c->userdata);
-        break;
-    case MOCK_CONTAINER_PLAYLIST_MOVED:
-        if (c->callbacks->playlist_moved)
-            c->callbacks->playlist_moved(c, playlist, 0, 1, c->userdata);
-        break;
-    case MOCK_CONTAINER_PLAYLIST_REMOVED:
-        if (c->callbacks->playlist_removed)
-            c->callbacks->playlist_removed(c, playlist, 0, c->userdata);
-        break;
-    default:
-        break;
-    }
-}
-
 /**************** MOCKING NEW OBJECTS *******************/
 
 /// Generate a mock spotify.User object
@@ -554,16 +482,6 @@ mock_playlist(PyObject *self, PyObject *args)
     return (PyObject *)playlist;
 }
 
-sp_playlistcontainer *
-_mock_playlistcontainer(void)
-{
-    sp_playlistcontainer *pc;
-
-    pc = malloc(sizeof(sp_playlistcontainer));
-    memset(pc, 0, sizeof(sp_playlistcontainer));
-    return pc;
-}
-
 PyObject *
 mock_playlistcontainer(PyObject *self, PyObject *args)
 {
@@ -576,7 +494,7 @@ mock_playlistcontainer(PyObject *self, PyObject *args)
                                                   &PlaylistContainerType,
                                                   NULL);
 
-    pc->_playlistcontainer = _mock_playlistcontainer();
+    pc->_playlistcontainer = mocksp_playlistcontainer_create();
     int len = PySequence_Length(seq);
     int i;
 

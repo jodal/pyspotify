@@ -16,6 +16,7 @@
 #include "playlistcontainer.h"
 #include "search.h"
 #include "image.h"
+#include "user.h"
 
 static int session_constructed = 0;
 sp_session *g_session;
@@ -82,6 +83,21 @@ Session_display_name(Session * self)
     const char *username = sp_user_display_name(user);
 
     return PyUnicode_FromString(username);
+};
+
+static PyObject *
+Session_get_friends(Session * self)
+{
+    int i, friends_count = sp_session_num_friends(self->_session);
+    PyObject *user;
+    PyObject *friends_list = PyList_New(friends_count);
+
+    for(i = 0; i < friends_count; i++) {
+        user = User_FromSpotify(sp_session_friend(self->_session, i));
+        PyList_SetItem(friends_list, i, user);
+    }
+
+    return friends_list;
 };
 
 static PyObject *
@@ -365,6 +381,8 @@ static PyMethodDef Session_methods[] = {
      "Return the canonical username for the logged in user"},
     {"display_name", (PyCFunction)Session_display_name, METH_NOARGS,
      "Return the full name for the logged in user"},
+    {"get_friends", (PyCFunction)Session_get_friends, METH_NOARGS,
+     "Return a list of friends for the logged in user"},
     {"user_is_loaded", (PyCFunction)Session_user_is_loaded, METH_NOARGS,
      "Return whether the user is loaded or not"},
     {"logout", (PyCFunction)Session_logout, METH_NOARGS,

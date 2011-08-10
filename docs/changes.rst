@@ -12,6 +12,7 @@ New features:
 - New Playlist method: rename.
 - Exceptions raised in callbacks are written to ``stderr``.
 - Unicode queries in Session.search
+- New Session method: get_friends.
 
 Bug fixes:
 

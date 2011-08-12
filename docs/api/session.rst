@@ -57,6 +57,11 @@ The :class:`Session` class
 
         Raises :exc:`SpotifyError` if not logged in.
 
+    .. method:: get_friends()
+
+        :rtype:     list of :class:`User`
+        :returns:   the list of friends for the current user.
+
     .. method:: image_create(id)
 
         :param string id:   the id of the image to be fetched.

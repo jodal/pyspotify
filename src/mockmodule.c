@@ -23,6 +23,7 @@
 #include "session.h"
 #include "track.h"
 #include "user.h"
+#include "toplistbrowser.h"
 
 /***************************** FORWARD DEFINES *****************************/
 void mock_playlist_event(int event, sp_playlist * p);
@@ -141,6 +142,15 @@ struct sp_user {
     char *full_name;
     char *picture;
     sp_relation_type relation;
+};
+
+struct sp_toplistbrowse {
+    bool                loaded;
+    sp_toplisttype      type;
+    sp_toplistregion    region;
+    sp_album            *albums[3];
+    sp_artist           *artists[3];
+    sp_track            *tracks[3];
 };
 
 /***************************** MOCK EVENT GENERATION ***************************/
@@ -320,6 +330,22 @@ bool
 sp_track_is_available(sp_session * session, sp_track * t)
 {
     return 1;
+}
+
+int
+sp_session_num_friends(sp_session *session)
+{
+    return 3;
+}
+
+sp_user *
+sp_session_friend(sp_session *session, int index)
+{
+    char *names[3] = {"foo", "bar", "baz"};
+
+    if (index > 3) return NULL;
+    return _mock_user(names[index], names[index], names[index],
+                      "1245678901234567890", 0, 1);
 }
 
 /********************************* MOCK SEARCH FUNCTIONS *********************************/
@@ -1214,6 +1240,98 @@ sp_artistbrowse_is_loaded(sp_artistbrowse * ab)
     return ab->loaded;
 }
 
+
+/**************** MOCK TOPLIST BROWSING ****************/
+void
+sp_toplistbrowse_add_ref(sp_toplistbrowse *tb)
+{
+}
+
+void
+sp_toplistbrowse_release(sp_toplistbrowse *tb)
+{
+}
+
+bool
+sp_toplistbrowse_is_loaded(sp_toplistbrowse *tb)
+{
+    return tb->loaded;
+}
+
+sp_error
+sp_toplistbrowse_error(sp_toplistbrowse *tb)
+{
+    return SP_ERROR_OK;
+}
+
+int
+sp_toplistbrowse_num_albums(sp_toplistbrowse *tb)
+{
+    return tb->type == SP_TOPLIST_TYPE_ALBUMS ? 3 : 0;
+}
+
+int
+sp_toplistbrowse_num_artists(sp_toplistbrowse *tb)
+{
+    return tb->type == SP_TOPLIST_TYPE_ARTISTS ? 3 : 0;
+}
+
+int
+sp_toplistbrowse_num_tracks(sp_toplistbrowse *tb)
+{
+    return tb->type == SP_TOPLIST_TYPE_TRACKS ? 3 : 0;
+}
+
+sp_album *
+sp_toplistbrowse_album(sp_toplistbrowse *tb, int index)
+{
+    return tb->albums[index];
+}
+
+sp_artist *
+sp_toplistbrowse_artist(sp_toplistbrowse *tb, int index)
+{
+    return tb->artists[index];
+}
+
+sp_track *
+sp_toplistbrowse_track(sp_toplistbrowse *tb, int index)
+{
+    return tb->tracks[index];
+}
+
+sp_toplistbrowse *
+sp_toplistbrowse_create(sp_session *session,
+                        sp_toplisttype type, sp_toplistregion region,
+                        const char* username,
+                        toplistbrowse_complete_cb *cb, void *userdata)
+{
+    sp_toplistbrowse *tb;
+
+    tb = (sp_toplistbrowse *)PyMem_Malloc(sizeof(struct sp_toplistbrowse));
+    tb->albums[0] = _mock_album("foo", NULL, 2001,
+                                    (byte *) "01234567890123456789", 1, 1, 1);
+    tb->albums[1] = _mock_album("bar", NULL, 2001,
+                                    (byte *) "01234567890123456789", 1, 1, 1);
+    tb->albums[2] = _mock_album("baz", NULL, 2001,
+                                    (byte *) "01234567890123456789", 1, 1, 1);
+    tb->artists[0] = _mock_artist("foo", 1);
+    tb->artists[1] = _mock_artist("bar", 1);
+    tb->artists[2] = _mock_artist("baz", 1);
+    tb->tracks[0] = _mock_track("foo", 1, NULL, NULL, 5, 0, 1, 1,
+                                                                SP_ERROR_OK, 1);
+    tb->tracks[1] = _mock_track("bar", 1, NULL, NULL, 5, 0, 1, 1,
+                                                                SP_ERROR_OK, 1);
+    tb->tracks[2] = _mock_track("baz", 1, NULL, NULL, 5, 0, 1, 1,
+                                                                SP_ERROR_OK, 1);
+    tb->type = type;
+    tb->region = region;
+    tb->loaded = 1;
+    cb(tb, userdata);
+    return tb;
+}
+
+
 /**************** MOCKING NEW OBJECTS *******************/
 
 /// Generate a mock sp_user structure
@@ -1602,6 +1720,8 @@ init_mockspotify(void)
         return;
     if (PyType_Ready(&UserType) < 0)
         return;
+    if (PyType_Ready(&ToplistBrowserType) < 0)
+        return;
 
     m = Py_InitModule("_mockspotify", module_methods);
     if (m == NULL)
@@ -1628,4 +1748,5 @@ init_mockspotify(void)
     search_init(m);
     track_init(m);
     user_init(m);
+    toplistbrowser_init(m);
 }

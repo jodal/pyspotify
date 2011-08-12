@@ -16,6 +16,7 @@
 #include "playlistcontainer.h"
 #include "search.h"
 #include "image.h"
+#include "user.h"
 
 static int session_constructed = 0;
 sp_session *g_session;
@@ -85,6 +86,21 @@ Session_display_name(Session * self)
 };
 
 static PyObject *
+Session_get_friends(Session * self)
+{
+    int i, friends_count = sp_session_num_friends(self->_session);
+    PyObject *user;
+    PyObject *friends_list = PyList_New(friends_count);
+
+    for(i = 0; i < friends_count; i++) {
+        user = User_FromSpotify(sp_session_friend(self->_session, i));
+        PyList_SetItem(friends_list, i, user);
+    }
+
+    return friends_list;
+};
+
+static PyObject *
 Session_user_is_loaded(Session * self)
 {
     sp_user *user;
@@ -115,17 +131,6 @@ handle_error(int err)
     if (err != 0) {
         PyErr_SetString(SpotifyError, sp_error_message(err));
         return NULL;
-    }
-    else {
-        Py_RETURN_NONE;
-    }
-}
-
-PyObject *
-error_message(int err)
-{
-    if (err != 0) {
-        return PyUnicode_FromString(sp_error_message(err));
     }
     else {
         Py_RETURN_NONE;
@@ -334,7 +339,6 @@ Session_image_create(Session * self, PyObject *args)
     byte *image_id;
     size_t len;
     sp_image *image;
-    PyObject *i;
 
     if (!PyArg_ParseTuple(args, "s#", &image_id, &len))
         return NULL;
@@ -377,6 +381,8 @@ static PyMethodDef Session_methods[] = {
      "Return the canonical username for the logged in user"},
     {"display_name", (PyCFunction)Session_display_name, METH_NOARGS,
      "Return the full name for the logged in user"},
+    {"get_friends", (PyCFunction)Session_get_friends, METH_NOARGS,
+     "Return a list of friends for the logged in user"},
     {"user_is_loaded", (PyCFunction)Session_user_is_loaded, METH_NOARGS,
      "Return whether the user is loaded or not"},
     {"logout", (PyCFunction)Session_logout, METH_NOARGS,

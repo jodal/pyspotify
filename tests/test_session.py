@@ -60,6 +60,19 @@ class TestSession(unittest.TestCase):
         c.connect()
         self.assertEqual(c.username, c.found_username)
 
+    def test_friends(self):
+        class MockClient(BaseMockClient):
+            def logged_in(self, session, error):
+                username = session.username()
+                self.friends = session.get_friends()
+                session.logout()
+                self.disconnect()
+
+        c = MockClient()
+        c.connect()
+        self.assertEqual([f.canonical_name() for f in c.friends],
+                         ['foo', 'bar', 'baz'])
+
     def NOtest_load(self):
         class MockClient(BaseMockClient):
             def logged_in(self, session, error):

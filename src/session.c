@@ -663,12 +663,15 @@ music_delivery(sp_session * session, const sp_audioformat * format,
     int consumed = num_frames;  // assume all consumed
     if (!res)
         PyErr_WriteUnraisable(method);
-    if (!PyInt_Check(res)) {
+    if (PyInt_Check(res))
+        consumed = (int)PyInt_AsLong(res);
+    else if (PyLong_Check(res))
+        consumed = (int)PyLong_AsLong(res);
+    else {
         PyErr_SetString(PyExc_TypeError,
                         "music_delivery must return an integer");
         PyErr_WriteUnraisable(method);
     }
-    consumed = (int)PyInt_AsLong(res);
     Py_DECREF(pyframes);
     Py_DECREF(psession);
     Py_XDECREF(res);

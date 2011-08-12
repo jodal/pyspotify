@@ -332,6 +332,22 @@ sp_track_is_available(sp_session * session, sp_track * t)
     return 1;
 }
 
+int
+sp_session_num_friends(sp_session *session)
+{
+    return 3;
+}
+
+sp_user *
+sp_session_friend(sp_session *session, int index)
+{
+    char *names[3] = {"foo", "bar", "baz"};
+
+    if (index > 3) return NULL;
+    return _mock_user(names[index], names[index], names[index],
+                      "1245678901234567890", 0, 1);
+}
+
 /********************************* MOCK SEARCH FUNCTIONS *********************************/
 
 void

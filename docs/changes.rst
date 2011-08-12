@@ -22,6 +22,7 @@ Bug fixes:
 - Keep compatibility with Python 2.5 (jkp)
 - Callbacks given at artist/album browser creation are now called by pyspotify
   (jkp)
+- Fix exception when a ``long`` was returned from music_delivery.
 
 v1.3 (2011-06-11)
 =================

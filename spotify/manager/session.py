@@ -166,7 +166,7 @@ class SpotifySessionManager(object):
         :param channels: number of audio channels. Currently 1 or 2.
         :type channels: int
         """
-        pass
+        return 0
 
     def play_token_lost(self, session):
         """

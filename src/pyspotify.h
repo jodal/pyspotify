@@ -30,11 +30,9 @@ Callback *create_trampoline(PyObject *callback, PyObject *manager,
                             PyObject *userdata);
 void delete_trampoline(Callback * tr);
 
-/* Returns o as a function, making type checks.
- * 3 cases:
+/* Returns o as a function ; o must be a method or a function object
  *   o is a Function object: returns o
  *   o is a Method object  : returns the corresponding function
- *   o is another object   : sets an exception and returns NULL
  */
 PyObject *as_function(PyObject *o);
 

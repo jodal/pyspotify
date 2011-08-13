@@ -33,16 +33,11 @@ delete_trampoline(Callback * tr)
 PyObject *
 as_function(PyObject *o)
 {
-    if (PyFunction_Check(o)) {
-        return o;
-    }
-    else if (PyMethod_Check(o)) {
+    if (PyMethod_Check(o)) {
         return PyMethod_GET_FUNCTION(o);
     }
     else {
-        PyErr_SetString(SpotifyError,
-                        "Expected function or method for a callback.");
-        return NULL;
+        return o;
     }
 }
 

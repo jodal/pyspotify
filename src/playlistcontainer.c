@@ -84,20 +84,20 @@ PlaylistContainer_add_callback(PlaylistContainer * self,
                                PyObject *args,
                                sp_playlistcontainer_callbacks * plc_callbacks)
 {
-    PyObject *callback;
-    PyObject *manager = NULL, *userdata = NULL;
+    PyObject *callback, *userdata = NULL;
     Callback *tramp;
     playlistcontainer_callback *to_add;
 
-    if (!PyArg_ParseTuple(args, "O|OO", &callback, &manager, &userdata))
+    if (!PyArg_ParseTuple(args, "O|O", &callback, &userdata))
         return NULL;
     if (!userdata)
         userdata = Py_None;
-    if (!manager)
-        manager = Py_None;
-    if (!(callback = as_function(callback)))
+    if (!(PyFunction_Check(callback) || PyMethod_Check(callback))) {
+        PyErr_SetString(PyExc_TypeError,
+                    "callback argument must be of function or method type");
         return NULL;
-    tramp = create_trampoline(callback, manager, userdata);
+    }
+    tramp = create_trampoline(callback, Py_None, userdata);
     to_add = malloc(sizeof(playlistcontainer_callback));
     to_add->callback = plc_callbacks;
     to_add->trampoline = tramp;
@@ -123,7 +123,6 @@ playlistcontainer_loaded_callback(sp_playlistcontainer * playlistcontainer,
     gstate = PyGILState_Ensure();
     pc = PlaylistContainer_FromSpotify(playlistcontainer);
     res = PyObject_CallFunctionObjArgs(tramp->callback,
-                                       tramp->manager,
                                        pc, tramp->userdata, NULL);
     if (!res)
         PyErr_WriteUnraisable(tramp->callback);
@@ -159,7 +158,6 @@ playlistcontainer_playlist_added_callback(sp_playlistcontainer *
     p = Playlist_FromSpotify(playlist);
     pos = Py_BuildValue("i", position);
     res = PyObject_CallFunctionObjArgs(tramp->callback,
-                                       tramp->manager,
                                        pc, p, pos, tramp->userdata, NULL);
     if (!res)
         PyErr_WriteUnraisable(tramp->callback);
@@ -201,7 +199,6 @@ playlistcontainer_playlist_moved_callback(sp_playlistcontainer *
     pos = Py_BuildValue("i", position);
     new_pos = Py_BuildValue("i", new_position);
     res = PyObject_CallFunctionObjArgs(tramp->callback,
-                                       tramp->manager,
                                        pc,
                                        p, pos, new_pos, tramp->userdata, NULL);
     if (!res)
@@ -243,7 +240,6 @@ playlistcontainer_playlist_removed_callback(sp_playlistcontainer *
     p = Playlist_FromSpotify(playlist);
     pos = Py_BuildValue("i", position);
     res = PyObject_CallFunctionObjArgs(tramp->callback,
-                                       tramp->manager,
                                        pc, p, pos, tramp->userdata, NULL);
     if (!res)
         PyErr_WriteUnraisable(tramp->callback);

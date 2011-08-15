@@ -193,7 +193,7 @@ You will be notified when tracks are added, moved or removed from the playlist."
           new_playlist = self.jukebox.ctr.add_new_playlist(line)
           print new_playlist.name(), " added"
         else:
-          print "\nThere's no PlaytlistContainer to add the playlist to."
+          print "\nThere's no PlaytlistContainer to add the playlist to. "
     do_ls = do_list
     do_EOF = do_quit
 

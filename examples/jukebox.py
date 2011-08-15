@@ -188,6 +188,12 @@ You will be notified when tracks are added, moved or removed from the playlist."
     def do_shell(self, line):
         self.jukebox.shell()
 
+    def do_add_new_playlist(self, line):
+        if(self.jukebox.ctr):
+          new_playlist = self.jukebox.ctr.add_new_playlist(line)
+          print new_playlist.name(), " added"
+        else:
+          print "\nThere's no PlaytlistContainer to add the playlist to."
     do_ls = do_list
     do_EOF = do_quit
 

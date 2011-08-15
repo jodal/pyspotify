@@ -12,7 +12,7 @@ build
 cover
 dist
 nosetests.xml
+examples/spotify_appkey.key
 spotify_appkey.key
-examples/_spotify.so
-spotify/_spotify.so
 .idea
+examples/tmp

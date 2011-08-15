@@ -13,3 +13,5 @@ cover
 dist
 nosetests.xml
 spotify_appkey.key
+examples/_spotify.so
+spotify/_spotify.so

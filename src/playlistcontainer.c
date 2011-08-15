@@ -278,6 +278,28 @@ PlaylistContainer_sq_length(PyObject *o)
     return sp_playlistcontainer_num_playlists(self->_playlistcontainer);
 }
 
+/// PlaylistContainer Add New Playlist
+static PyObject *
+PlaylistContainer_add_new_playlist(PyObject *o, PyObject * args)
+{
+
+    PlaylistContainer *pc = (PlaylistContainer *) o;
+
+    const char *name;
+    if(!PyArg_ParseTuple( args, "s", &name)){
+        PyErr_SetString(PyExc_RuntimeError, "Couldn't parse new playlist name");
+    }
+    if(pc->_playlistcontainer != NULL){
+        sp_playlist *playlist = sp_playlistcontainer_add_new_playlist(pc->_playlistcontainer, name);
+        PyObject *p = Playlist_FromSpotify(playlist);
+        return p;
+    }else{
+        PyErr_SetString(PyExc_RuntimeError, "I have no PlaylistContainer to add the new playlist to..");
+    }
+
+    return NULL;
+}
+
 /// PlaylistContainer Get Item []
 PyObject *
 PlaylistContainer_sq_item(PyObject *o, Py_ssize_t index)
@@ -312,6 +334,7 @@ PySequenceMethods PlaylistContainer_as_sequence = {
     0,                  // sq_contains
     0,                  // sq_inplace_concat
     0,                  // sq_inplace_repeat
+    PlaylistContainer_add_new_playlist, // TODO: Is this the right place for this?
 };
 
 static PyMethodDef PlaylistContainer_methods[] = {
@@ -329,6 +352,10 @@ static PyMethodDef PlaylistContainer_methods[] = {
      ""},
     {"add_playlist_removed_callback",
      (PyCFunction)PlaylistContainer_add_playlist_removed_callback,
+     METH_VARARGS,
+     ""},
+    {"add_new_playlist",
+     (PyCFunction)PlaylistContainer_add_new_playlist,
      METH_VARARGS,
      ""},
     {NULL}

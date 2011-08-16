@@ -246,12 +246,15 @@ Session_process_events(Session * self)
 void
 search_complete(sp_search * search, Callback * st)
 {
-    PyObject *results, *res;
+    PyObject *res;//*results
     PyGILState_STATE gstate;
+
+    Results *results; //For some reason I had to change this
 
     gstate = PyGILState_Ensure();
     results = Results_FromSpotify(search);
-    res = PyObject_CallFunctionObjArgs(st->callback, results, st->userdata, NULL);
+    res = PyObject_CallFunctionObjArgs(st->callback, results, NULL);
+    //res = PyObject_CallFunctionObjArgs(st->callback, results, st->userdata, NULL);
     if (!res)
         PyErr_WriteUnraisable(st->callback);
     delete_trampoline(st);

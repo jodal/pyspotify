@@ -197,6 +197,7 @@ You will be notified when tracks are added, moved or removed from the playlist."
 
     def do_add_to_playlist(self, line):
         usage = "Usage: add_to_playlist playlist_index insert_point search_result_indecies"
+        #when adding tracks to empty/new playlist it seems like the first result index need to be 0.
         args = line.split(' ')
         if len(args) < 3:
             print usage

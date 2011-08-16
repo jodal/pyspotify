@@ -216,7 +216,7 @@ You will be notified when tracks are added, moved or removed from the playlist."
                     for a in tracks[int(i)].artists():
                         print u'{}. {} - {} '.format(i,a.name(),tracks[int(i)].name())
                 print u'adding them to {} '.format(self.jukebox.ctr[index].name())
-                self.jukebox.ctr[index].add_tracks(insert,tracks)
+                self.jukebox.ctr[index].add_tracks(insert,[tracks[int(i)] for i in args])
                 
                     
 

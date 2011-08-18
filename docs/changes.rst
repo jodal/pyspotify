@@ -7,7 +7,7 @@ v1.4 (in development)
 
 **API changes**
 
-- All callbacks with optionnal userdata are now called with the ``userdata``
+- All callbacks with optional userdata are now called with the ``userdata``
   parameter set to ``None``, which means they are called with the same number
   of parameters every time.
 - Messages from the Spotify service (log & user) have been converted to

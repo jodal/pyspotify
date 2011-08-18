@@ -575,7 +575,7 @@ static void
 message_to_user(sp_session * session, const char *message)
 {
     PyGILState_STATE gstate;
-    PyObject *res, *method;
+    PyObject *res, *method, *msg;
 
 #ifdef DEBUG
         fprintf(stderr, "[DEBUG]-session- >> message to user: %s\n", message);
@@ -586,9 +586,10 @@ message_to_user(sp_session * session, const char *message)
     psession->_session = session;
     PyObject *client = (PyObject *)sp_session_userdata(session);
 
+    msg = PyUnicode_FromString(message);
     method = PyObject_GetAttrString(client, "message_to_user");
     res =
-        PyObject_CallFunctionObjArgs(method, psession, message, NULL);
+        PyObject_CallFunctionObjArgs(method, psession, msg, NULL);
     if (!res)
         PyErr_WriteUnraisable(method);
     Py_DECREF(psession);

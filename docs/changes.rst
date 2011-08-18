@@ -25,6 +25,7 @@ New features:
 Bug fixes:
 
 - log_message callbacks used ``str`` in place of ``unicode``.
+- message_to_user callbacks used ``str`` in place of ``unicode``.
 - argument errors were unchecked in Session.search
 - Fix fail on valid error at image creation (jkp)
 - Keep compatibility with Python 2.5 (jkp)

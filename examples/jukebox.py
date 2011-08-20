@@ -119,7 +119,7 @@ class JukeboxUI(cmd.Cmd, threading.Thread):
                 #self.results = False
         else:
             self.results = None
-            def search_finished(results):
+            def search_finished(results, userdata):
                 print "\nSearch results received"
                 self.results = results
             self.jukebox.search(line, search_finished)
@@ -335,8 +335,8 @@ class Jukebox(SpotifySessionManager):
         print "track ends."
         self.next()
 
-    def search(self, query, callback):
-        self.session.search(query, callback)
+    def search(self, *args, **kwargs):
+        self.session.search(*args, **kwargs)
 
     def browse(self, link, callback):
         if link.type() == link.LINK_ALBUM:

@@ -5,6 +5,14 @@ Changes
 v1.4 (in development)
 =====================
 
+**API changes**
+
+- All callbacks with optional userdata are now called with the ``userdata``
+  parameter set to ``None``, which means they are called with the same number
+  of parameters every time.
+- Messages from the Spotify service (log & user) have been converted to
+  ``unicode`` objects.
+
 New features:
 
 - User handling
@@ -17,6 +25,7 @@ New features:
 Bug fixes:
 
 - log_message callbacks used ``str`` in place of ``unicode``.
+- message_to_user callbacks used ``str`` in place of ``unicode``.
 - argument errors were unchecked in Session.search
 - Fix fail on valid error at image creation (jkp)
 - Keep compatibility with Python 2.5 (jkp)

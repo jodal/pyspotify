@@ -13,7 +13,5 @@ build
 cover
 dist
 nosetests.xml
-examples/spotify_appkey.key
 spotify_appkey.key
-.idea
-examples/tmp
+tmp/

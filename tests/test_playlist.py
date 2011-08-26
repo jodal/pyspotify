@@ -30,6 +30,13 @@ class TestPlaylistContainer(unittest.TestCase):
             return pc[2]
         self.assertRaises(IndexError, _)
 
+    def test_add_new_playlist(self):
+        pc = _mockspotify.mock_playlistcontainer([])
+        pc.add_new_playlist('foo');
+        pc.add_new_playlist(u'bȧr');
+        with self.assertRaises(ValueError):
+            pc.add_new_playlist('foo' * 100)
+
 class TestPlaylist(unittest.TestCase):
 
     def _mock_track(self, name):

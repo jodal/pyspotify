@@ -936,6 +936,12 @@ sp_playlistcontainer_release(sp_playlistcontainer * p)
 {
 }
 
+bool
+sp_playlistcontainer_is_loaded(sp_playlistcontainer *p)
+{
+    return 1;
+}
+
 sp_playlist *
 sp_playlistcontainer_playlist(sp_playlistcontainer * pc, int index)
 {
@@ -959,8 +965,7 @@ sp_playlist *
 sp_playlistcontainer_add_new_playlist(sp_playlistcontainer *pc,
                                       const char* name)
 {
-    // TODO
-    return NULL;
+    return _mock_playlist((char *)name);
 }
 
 void

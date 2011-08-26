@@ -13,3 +13,4 @@ cover
 dist
 nosetests.xml
 spotify_appkey.key
+tmp/

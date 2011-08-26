@@ -10,6 +10,11 @@ It is a list of :class:`Playlist` objects.
 
 .. class:: PlaylistContainer
 
+    .. method:: add_new_playlist(name):
+
+        :param name:        name of the new playlist
+        :type name:         :class:`unicode` or ascii :class:`str`
+
     .. method:: add_loaded_callback(callback[, userdata]):
 
         :param callback:    signature: (:class:`PlaylistContainer` pc,

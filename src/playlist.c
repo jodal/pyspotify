@@ -771,65 +771,48 @@ Playlist_is_collaborative(Playlist * self)
     return Py_BuildValue("i", sp_playlist_is_collaborative(self->_playlist));
 }
 
-
-//Playlist Add Tracks
 static PyObject *
 Playlist_add_tracks(Playlist *self, PyObject *args)
 {
     int position, num_tracks;
     PyObject *tracks;
     int i;
-    sp_link *l;
     sp_error err;
 
-    if(!sp_playlist_is_loaded(self->_playlist))
-        return Py_BuildValue("i",1);
-
-    l = sp_link_create_from_playlist(self->_playlist);
-    if(l == NULL)
-        return Py_BuildValue("i",2);
-    sp_link_release(l);
-
-    if(g_session == NULL)
-        return Py_BuildValue("i",3);
-
-    if (!PyArg_ParseTuple(args, "iO", &position, &tracks))
-        return Py_BuildValue("i",4);
-
-    num_tracks = PySequence_Length(tracks);
-
-    if(num_tracks <=0)
-        return Py_BuildValue("i",5);
+    if(!sp_playlist_is_loaded(self->_playlist)) {
+        PyErr_SetString(SpotifyError, "Playlist not loaded");
+        return NULL;
+    }
+    if (!PyArg_ParseTuple(args, "iO!", &position, &PyList_Type, &tracks))
+        return NULL;
+    num_tracks = PyList_GET_SIZE(tracks);
+    if(num_tracks <= 0)
+        Py_RETURN_NONE;
 
     const sp_track *ts[num_tracks];
-
-    for (i = 0; i < PySequence_Length(tracks); i++) {
-        Track *t = (Track *) PySequence_GetItem(tracks, i);
-        ts[i] = t->_track;
+    for (i = 0; i < num_tracks; i++) {
+        PyObject *t = PyList_GetItem(tracks, i);
+        if (t->ob_type != &TrackType) {
+            PyErr_SetString(PyExc_TypeError,
+                    "Expected a list of spotify.Track objects");
+            return NULL;
+        }
+        ts[i] = ((Track *)t)->_track;
     }
-
-
-    fprintf(stderr, "Playlist loaded, applying changes ... ");
-
     err = sp_playlist_add_tracks(self->_playlist, ts,
         num_tracks, position, g_session);
-
     switch(err) {
-    case SP_ERROR_OK:
-        fprintf(stderr, "OK\n");
-        break;
-    case SP_ERROR_INVALID_INDATA:
-        fprintf(stderr, "Invalid position\n");
-        break;
-
-    case SP_ERROR_PERMISSION_DENIED:
-        fprintf(stderr, "Access denied\n");
-        break;
-    default:
-        fprintf(stderr, "Other error (should not happen)\n");
-        break;
+        case SP_ERROR_OK:
+            break;
+        case SP_ERROR_INVALID_INDATA:
+            PyErr_SetString(PyExc_IndexError,
+                            "Cannot add tracks at this position");
+            return NULL;
+        default:
+            PyErr_SetString(SpotifyError, sp_error_message(err));
+            return NULL;
     }
-    return Py_BuildValue("i",0);
+    Py_RETURN_NONE;
 }
 
 /////////////// SEQUENCE PROTOCOL

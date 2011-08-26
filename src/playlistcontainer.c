@@ -278,26 +278,30 @@ PlaylistContainer_sq_length(PyObject *o)
     return sp_playlistcontainer_num_playlists(self->_playlistcontainer);
 }
 
-/// PlaylistContainer Add New Playlist
 static PyObject *
-PlaylistContainer_add_new_playlist(PyObject *o, PyObject * args)
+PlaylistContainer_add_new_playlist(PlaylistContainer *pc, PyObject *args)
 {
-
-    PlaylistContainer *pc = (PlaylistContainer *) o;
-
     const char *name;
-    if(!PyArg_ParseTuple( args, "s", &name)){
-        PyErr_SetString(PyExc_RuntimeError, "Couldn't parse new playlist name");
-    }
-    if(pc->_playlistcontainer != NULL){
-        sp_playlist *playlist = sp_playlistcontainer_add_new_playlist(pc->_playlistcontainer, name);
-        PyObject *p = Playlist_FromSpotify(playlist);
-        return p;
-    }else{
-        PyErr_SetString(PyExc_RuntimeError, "I have no PlaylistContainer to add the new playlist to..");
-    }
+    sp_playlist *playlist;
 
-    return NULL;
+    if(!sp_playlistcontainer_is_loaded(pc->_playlistcontainer)) {
+        PyErr_SetString(SpotifyError, "PlaylistContainer not loaded");
+        return NULL;
+    }
+    if (!PyArg_ParseTuple(args, "es", ENCODING, &name))
+        return NULL;
+    if (strnlen(name, 256) > 255) {
+        PyErr_SetString(PyExc_ValueError,
+                "Playlist name must be < 255 characters long");
+        return NULL;
+    }
+    playlist =
+        sp_playlistcontainer_add_new_playlist(pc->_playlistcontainer, name);
+    if (!playlist) {
+        PyErr_SetString(SpotifyError, "Operation failed.");
+        return NULL;
+    }
+    return Playlist_FromSpotify(playlist);
 }
 
 /// PlaylistContainer Get Item []
@@ -334,7 +338,6 @@ PySequenceMethods PlaylistContainer_as_sequence = {
     0,                  // sq_contains
     0,                  // sq_inplace_concat
     0,                  // sq_inplace_repeat
-    PlaylistContainer_add_new_playlist, // TODO: Is this the right place for this?
 };
 
 static PyMethodDef PlaylistContainer_methods[] = {
@@ -357,7 +360,7 @@ static PyMethodDef PlaylistContainer_methods[] = {
     {"add_new_playlist",
      (PyCFunction)PlaylistContainer_add_new_playlist,
      METH_VARARGS,
-     ""},
+     "Add a new empty playlist to the playlist container."},
     {NULL}
 };
 

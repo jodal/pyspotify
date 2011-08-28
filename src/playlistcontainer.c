@@ -284,7 +284,7 @@ PlaylistContainer_add_new_playlist(PlaylistContainer *pc, PyObject *args)
     const char *name;
     sp_playlist *playlist;
 
-    if(!sp_playlistcontainer_is_loaded(pc->_playlistcontainer)) {
+    if (!sp_playlistcontainer_is_loaded(pc->_playlistcontainer)) {
         PyErr_SetString(SpotifyError, "PlaylistContainer not loaded");
         return NULL;
     }

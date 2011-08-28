@@ -827,7 +827,7 @@ sp_playlist_is_collaborative(sp_playlist * p)
 
 sp_error
 sp_playlist_add_tracks(sp_playlist *p, const sp_track **tracks, int num_tracks,
-                       int position, sp_session *session){
+                       int position, sp_session *session) {
     if (position > p->num_tracks - 1)
         return SP_ERROR_INVALID_INDATA;
     return SP_ERROR_OK;
@@ -963,7 +963,7 @@ sp_playlistcontainer_add_playlist(sp_playlistcontainer *pc, sp_link *link)
 
 sp_playlist *
 sp_playlistcontainer_add_new_playlist(sp_playlistcontainer *pc,
-                                      const char* name)
+                                      const char *name)
 {
     return _mock_playlist((char *)name);
 }

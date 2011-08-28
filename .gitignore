@@ -4,7 +4,6 @@
 *.swp
 *.wpr
 *.wpu
-.gitignore
 .coverage
 .pc
 MANIFEST

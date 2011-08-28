@@ -779,14 +779,14 @@ Playlist_add_tracks(Playlist *self, PyObject *args)
     int i;
     sp_error err;
 
-    if(!sp_playlist_is_loaded(self->_playlist)) {
+    if (!sp_playlist_is_loaded(self->_playlist)) {
         PyErr_SetString(SpotifyError, "Playlist not loaded");
         return NULL;
     }
     if (!PyArg_ParseTuple(args, "iO!", &position, &PyList_Type, &tracks))
         return NULL;
     num_tracks = PyList_GET_SIZE(tracks);
-    if(num_tracks <= 0)
+    if (num_tracks <= 0)
         Py_RETURN_NONE;
 
     const sp_track *ts[num_tracks];
@@ -800,7 +800,7 @@ Playlist_add_tracks(Playlist *self, PyObject *args)
         ts[i] = ((Track *)t)->_track;
     }
     err = sp_playlist_add_tracks(self->_playlist, ts,
-        num_tracks, position, g_session);
+                                 num_tracks, position, g_session);
     switch(err) {
         case SP_ERROR_OK:
             break;

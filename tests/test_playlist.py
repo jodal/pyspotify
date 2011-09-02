@@ -72,3 +72,11 @@ class TestPlaylist(unittest.TestCase):
         pc = _mockspotify.mock_playlist("foobar", [p1, p2])
         self.assertEqual(pc[0].name(), "foo")
         self.assertEqual(pc[1].name(), "bar")
+
+    def test_num_subscribers(self):
+        pl = _mockspotify.mock_playlist('foo', [])
+        self.assertEqual(pl.num_subscribers(), 42)
+
+    def test_subscribers(self):
+        pl = _mockspotify.mock_playlist('foo', [])
+        self.assertEqual(pl.subscribers(), [u'foo', u'bar', u'baz'])

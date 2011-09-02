@@ -832,6 +832,34 @@ sp_playlist_remove_tracks(sp_playlist * p, const int *tracks, int num_tracks)
     return SP_ERROR_OK;
 }
 
+unsigned int
+sp_playlist_num_subscribers(sp_playlist *p)
+{
+    return 42;
+}
+
+sp_subscribers *
+sp_playlist_subscribers(sp_playlist *p)
+{
+    typedef struct {
+        unsigned int count;
+        char *names[3];
+    } sub_t;
+
+    sub_t *s = PyMem_Malloc(sizeof(sub_t));
+    s->names[0] = "foo";
+    s->names[1] = "bar";
+    s->names[2] = "baz";
+    s->count = 3;
+    return (sp_subscribers *)s;
+}
+
+void
+sp_playlist_subscribers_free(sp_subscribers *sub)
+{
+    PyMem_Free(sub);
+}
+
 void
 mock_playlist_event(int event, sp_playlist * p)
 {

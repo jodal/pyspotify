@@ -771,6 +771,29 @@ Playlist_is_collaborative(Playlist * self)
     return Py_BuildValue("i", sp_playlist_is_collaborative(self->_playlist));
 }
 
+static PyObject *
+Playlist_num_subscribers(Playlist *self)
+{
+    return Py_BuildValue("i", sp_playlist_num_subscribers(self->_playlist));
+}
+
+static PyObject *
+Playlist_subscribers(Playlist *self)
+{
+    sp_subscribers *subscribers;
+    PyObject *list;
+    unsigned int i;
+
+    subscribers = sp_playlist_subscribers(self->_playlist);
+    list = PyList_New(subscribers->count);
+    for (i = 0; i < subscribers->count; i++) {
+        PyList_SET_ITEM(list, i, PyUnicode_FromString(
+                                        subscribers->subscribers[i]));
+    }
+    sp_playlist_subscribers_free(subscribers);
+    return list;
+}
+
 /////////////// SEQUENCE PROTOCOL
 
 Py_ssize_t
@@ -886,6 +909,14 @@ static PyMethodDef Playlist_methods[] = {
      (PyCFunction)Playlist_owner,
      METH_NOARGS,
      "Returns the owner of the playlist"},
+    {"num_subscribers",
+     (PyCFunction)Playlist_num_subscribers,
+     METH_NOARGS,
+     "Returns the number of subscribers this playlist currently has"},
+    {"subscribers",
+     (PyCFunction)Playlist_subscribers,
+     METH_NOARGS,
+     "Returns a list of subscribers (canonical_name) to this playlist"},
     {NULL}
 };
 

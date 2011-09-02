@@ -4,7 +4,7 @@ import unittest
 from nose.tools import raises
 
 from spotify import _mockspotify
-from spotify._mockspotify import mock_album, mock_artist, mock_track
+from spotify._mockspotify import mock_album, mock_artist, mock_track, mock_playlist
 from spotify import Album
 
 class TestPlaylistContainer(unittest.TestCase):
@@ -29,6 +29,13 @@ class TestPlaylistContainer(unittest.TestCase):
         def _():
             return pc[2]
         self.assertRaises(IndexError, _)
+
+    def test_add_new_playlist(self):
+        pc = _mockspotify.mock_playlistcontainer([])
+        pc.add_new_playlist('foo');
+        pc.add_new_playlist(u'bȧr');
+        with self.assertRaises(ValueError):
+            pc.add_new_playlist('foo' * 100)
 
 class TestPlaylist(unittest.TestCase):
 
@@ -80,3 +87,24 @@ class TestPlaylist(unittest.TestCase):
     def test_subscribers(self):
         pl = _mockspotify.mock_playlist('foo', [])
         self.assertEqual(pl.subscribers(), [u'foo', u'bar', u'baz'])
+
+    def test_add_tracks_ok(self):
+        p1 = self._mock_track("foo")
+        p2 = self._mock_track("bar")
+        pl = mock_playlist("foobar", [p1])
+        pl.add_tracks(0, [p2])
+
+    @raises(IndexError)
+    def test_add_tracks_wrong_position(self):
+        p1 = self._mock_track("foo")
+        p2 = self._mock_track("bar")
+        pl = mock_playlist("foobar", [p1])
+        pl.add_tracks(99, [p2])
+
+    def test_add_tracks_wrong_types(self):
+        p1 = self._mock_track("foo")
+        pl = mock_playlist("foobar", [p1])
+        with self.assertRaises(TypeError):
+            pl.add_tracks(0, True)
+        with self.assertRaises(TypeError):
+            pl.add_tracks(0, [False])

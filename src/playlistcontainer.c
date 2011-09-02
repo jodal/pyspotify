@@ -281,27 +281,32 @@ PlaylistContainer_sq_length(PyObject *o)
 static PyObject *
 PlaylistContainer_add_new_playlist(PlaylistContainer *pc, PyObject *args)
 {
-    const char *name;
+    char *name = NULL;
+    int len;
     sp_playlist *playlist;
 
     if (!sp_playlistcontainer_is_loaded(pc->_playlistcontainer)) {
         PyErr_SetString(SpotifyError, "PlaylistContainer not loaded");
         return NULL;
     }
-    if (!PyArg_ParseTuple(args, "es", ENCODING, &name))
+    if (!PyArg_ParseTuple(args, "es#", ENCODING, &name, &len))
         return NULL;
-    if (strnlen(name, 256) > 255) {
+    if (len > 255) {
         PyErr_SetString(PyExc_ValueError,
                 "Playlist name must be < 255 characters long");
-        return NULL;
+        goto error;
     }
     playlist =
         sp_playlistcontainer_add_new_playlist(pc->_playlistcontainer, name);
     if (!playlist) {
         PyErr_SetString(SpotifyError, "Operation failed.");
-        return NULL;
+        goto error;
     }
     return Playlist_FromSpotify(playlist);
+
+    error:
+        PyMem_Free(name);
+        return NULL;
 }
 
 /// PlaylistContainer Get Item []

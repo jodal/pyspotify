@@ -116,7 +116,6 @@ class JukeboxUI(cmd.Cmd, threading.Thread):
                 for a in self.results.tracks():
                     print "    ", Link.from_track(a, 0), a.name()
                 print self.results.total_tracks() - len(self.results.tracks()), "Tracks not shown"
-                self.results = False
         else:
             self.results = None
             def search_finished(results, userdata):
@@ -187,6 +186,35 @@ You will be notified when tracks are added, moved or removed from the playlist."
 
     def do_shell(self, line):
         self.jukebox.shell()
+
+    def do_add_new_playlist(self, line):
+        if not line:
+            print "Usage: add_new_playlist <name>"
+        else:
+          new_playlist = self.jukebox.ctr.add_new_playlist(line)
+
+    def do_add_to_playlist(self, line):
+        usage = "Usage: add_to_playlist <playlist_index> <insert_point>" + \
+                " <search_result_indecies>"
+        if not line:
+            print usage
+            return
+        args = line.split(' ')
+        if len(args) < 3:
+            print usage
+        else:
+            if not self.results:
+                print "No search results"
+            else:
+                index = int(args.pop(0))
+                insert = int(args.pop(0))
+                artists = self.results.artists()
+                tracks = self.results.tracks()
+                for i in args:
+                    for a in tracks[int(i)].artists():
+                        print u'{}. {} - {} '.format(i,a.name(),tracks[int(i)].name())
+                print u'adding them to {} '.format(self.jukebox.ctr[index].name())
+                self.jukebox.ctr[index].add_tracks(insert,[tracks[int(i)] for i in args])
 
     do_ls = do_list
     do_EOF = do_quit

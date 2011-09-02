@@ -12,6 +12,13 @@ objects.
 
     Playlist objects.
 
+    .. method:: add_tracks(position, tracks)
+
+        :param position:    where to add the tracks in the playlist
+        :type position:     :class:`int`
+        :param tracks:      tracks to add to the playlist
+        :type tracks:       list of :class:`Track`
+
     .. method:: add_tracks_added_callback(callback[, userdata])
 
         :param callback:    signature: (:class:`Playlist` p, list of

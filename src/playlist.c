@@ -771,6 +771,50 @@ Playlist_is_collaborative(Playlist * self)
     return Py_BuildValue("i", sp_playlist_is_collaborative(self->_playlist));
 }
 
+static PyObject *
+Playlist_add_tracks(Playlist *self, PyObject *args)
+{
+    int position, num_tracks;
+    PyObject *tracks;
+    int i;
+    sp_error err;
+
+    if (!sp_playlist_is_loaded(self->_playlist)) {
+        PyErr_SetString(SpotifyError, "Playlist not loaded");
+        return NULL;
+    }
+    if (!PyArg_ParseTuple(args, "iO!", &position, &PyList_Type, &tracks))
+        return NULL;
+    num_tracks = PyList_GET_SIZE(tracks);
+    if (num_tracks <= 0)
+        Py_RETURN_NONE;
+
+    const sp_track *ts[num_tracks];
+    for (i = 0; i < num_tracks; i++) {
+        PyObject *t = PyList_GetItem(tracks, i);
+        if (t->ob_type != &TrackType) {
+            PyErr_SetString(PyExc_TypeError,
+                    "Expected a list of spotify.Track objects");
+            return NULL;
+        }
+        ts[i] = ((Track *)t)->_track;
+    }
+    err = sp_playlist_add_tracks(self->_playlist, ts,
+                                 num_tracks, position, g_session);
+    switch(err) {
+        case SP_ERROR_OK:
+            break;
+        case SP_ERROR_INVALID_INDATA:
+            PyErr_SetString(PyExc_IndexError,
+                            "Cannot add tracks at this position");
+            return NULL;
+        default:
+            PyErr_SetString(SpotifyError, sp_error_message(err));
+            return NULL;
+    }
+    Py_RETURN_NONE;
+}
+
 /////////////// SEQUENCE PROTOCOL
 
 Py_ssize_t
@@ -814,6 +858,10 @@ static PyMethodDef Playlist_methods[] = {
      (PyCFunction)Playlist_is_collaborative,
      METH_NOARGS,
      "Return collaborative status for a playlist. A playlist in collaborative state can be modifed by all users, not only the user owning the list"},
+    {"add_tracks",
+     (PyCFunction)Playlist_add_tracks,
+     METH_VARARGS,
+     ""},
     {"remove_tracks",
      (PyCFunction)Playlist_remove_tracks,
      METH_VARARGS,

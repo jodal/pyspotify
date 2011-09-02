@@ -34,8 +34,7 @@ class TestPlaylistContainer(unittest.TestCase):
         pc = _mockspotify.mock_playlistcontainer([])
         pc.add_new_playlist('foo');
         pc.add_new_playlist(u'bȧr');
-        with self.assertRaises(ValueError):
-            pc.add_new_playlist('foo' * 100)
+        self.assertRaises(ValueError, pc.add_new_playlist, 'foo' * 100)
 
 class TestPlaylist(unittest.TestCase):
 
@@ -96,7 +95,5 @@ class TestPlaylist(unittest.TestCase):
     def test_add_tracks_wrong_types(self):
         p1 = self._mock_track("foo")
         pl = mock_playlist("foobar", [p1])
-        with self.assertRaises(TypeError):
-            pl.add_tracks(0, True)
-        with self.assertRaises(TypeError):
-            pl.add_tracks(0, [False])
+        self.assertRaises(TypeError, pl.add_tracks, 0, True)
+        self.assertRaises(TypeError, pl.add_tracks, [False])

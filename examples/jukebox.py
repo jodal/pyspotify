@@ -203,13 +203,11 @@ You will be notified when tracks are added, moved or removed from the playlist."
         if len(args) < 3:
             print usage
         else:
-            if self.results is False:
-                print "No search results"
-            elif self.results is None:
+            if not self.results:
                 print "No search results"
             else:
                 index = int(args.pop(0))
-                insert = int(args.pop(1))
+                insert = int(args.pop(0))
                 artists = self.results.artists()
                 tracks = self.results.tracks()
                 for i in args:

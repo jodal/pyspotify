@@ -246,7 +246,7 @@ Session_process_events(Session * self)
 void
 search_complete(sp_search * search, Callback * st)
 {
-    PyObject *results, *res;
+    PyObject *res, *results;
     PyGILState_STATE gstate;
 
     gstate = PyGILState_Ensure();

@@ -278,6 +278,32 @@ PlaylistContainer_sq_length(PyObject *o)
     return sp_playlistcontainer_num_playlists(self->_playlistcontainer);
 }
 
+static PyObject *
+PlaylistContainer_add_new_playlist(PlaylistContainer *pc, PyObject *args)
+{
+    const char *name;
+    sp_playlist *playlist;
+
+    if (!sp_playlistcontainer_is_loaded(pc->_playlistcontainer)) {
+        PyErr_SetString(SpotifyError, "PlaylistContainer not loaded");
+        return NULL;
+    }
+    if (!PyArg_ParseTuple(args, "es", ENCODING, &name))
+        return NULL;
+    if (strnlen(name, 256) > 255) {
+        PyErr_SetString(PyExc_ValueError,
+                "Playlist name must be < 255 characters long");
+        return NULL;
+    }
+    playlist =
+        sp_playlistcontainer_add_new_playlist(pc->_playlistcontainer, name);
+    if (!playlist) {
+        PyErr_SetString(SpotifyError, "Operation failed.");
+        return NULL;
+    }
+    return Playlist_FromSpotify(playlist);
+}
+
 /// PlaylistContainer Get Item []
 PyObject *
 PlaylistContainer_sq_item(PyObject *o, Py_ssize_t index)
@@ -331,6 +357,10 @@ static PyMethodDef PlaylistContainer_methods[] = {
      (PyCFunction)PlaylistContainer_add_playlist_removed_callback,
      METH_VARARGS,
      ""},
+    {"add_new_playlist",
+     (PyCFunction)PlaylistContainer_add_new_playlist,
+     METH_VARARGS,
+     "Add a new empty playlist to the playlist container."},
     {NULL}
 };
 

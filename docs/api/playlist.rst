@@ -145,6 +145,11 @@ objects.
         :rtype:     string
         :returns:   the name of the playlist.
 
+    .. method:: num_subscribers
+
+        :rtype:     :class:`int`
+        :returns:   The number of subscribers of this playlist
+
     .. method:: rename(name)
 
         :param name:    the new name
@@ -158,3 +163,14 @@ objects.
 
         :param tracks:  A list of tracks to be removed from the playlist.
         :type tracks:   list of :class:`Track`
+
+    .. method:: subscribers
+
+        :rtype:     list of :class:`unicode`
+        :returns:   a list of canonical names of subscribers of this playlist.
+
+        .. note:: The count returned for this function may be less than those
+            returned by :meth:`num_subscribers`. Spotify does not track each
+            user subscribed to a playlist for playlist with many (>500)
+            subscribers.
+

@@ -21,7 +21,7 @@ New features:
 - Exceptions raised in callbacks are written to ``stderr``.
 - Unicode queries in Session.search
 - New Session method: get_friends.
-- New Playlist method: add_tracks
+- New Playlist methods: add_tracks, subscribers, num_subscribers
 - New PlaylistContainer method: add_new_playlist
 
 Bug fixes:

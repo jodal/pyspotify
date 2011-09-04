@@ -795,6 +795,17 @@ Playlist_subscribers(Playlist *self)
 }
 
 static PyObject *
+Playlist_update_subscribers(Playlist *self)
+{
+    if (!g_session) {
+        PyErr_SetString(SpotifyError, "Not logged in.");
+        return NULL;
+    }
+    sp_playlist_update_subscribers(g_session, self->_playlist);
+    Py_RETURN_NONE;
+}
+
+static PyObject *
 Playlist_add_tracks(Playlist *self, PyObject *args)
 {
     int position, num_tracks;
@@ -965,6 +976,10 @@ static PyMethodDef Playlist_methods[] = {
      (PyCFunction)Playlist_subscribers,
      METH_NOARGS,
      "Returns a list of subscribers (canonical_name) to this playlist"},
+    {"update_subscribers",
+     (PyCFunction)Playlist_update_subscribers,
+     METH_NOARGS,
+     "Update the subscribers information for this playlist"},
     {NULL}
 };
 

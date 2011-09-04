@@ -191,7 +191,7 @@ You will be notified when tracks are added, moved or removed from the playlist."
         if not line:
             print "Usage: add_new_playlist <name>"
         else:
-          new_playlist = self.jukebox.ctr.add_new_playlist(line)
+          new_playlist = self.jukebox.ctr.add_new_playlist(line.decode('utf-8'))
 
     def do_add_to_playlist(self, line):
         usage = "Usage: add_to_playlist <playlist_index> <insert_point>" + \

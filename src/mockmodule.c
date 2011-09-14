@@ -211,7 +211,7 @@ event_trigger(PyObject *self, PyObject *args)
 
 void
 sp_session_login(sp_session * session, const char *username,
-                 const char *password)
+                 const char *password, bool rememberme)
 {
     strcpy(g_data.username, username);
     strcpy(g_data.password, password);
@@ -714,7 +714,7 @@ sp_track_is_starred(sp_session * s, sp_track * t)
 }
 
 void
-sp_track_set_starred(sp_session * s, const sp_track ** ts, int n, bool starred)
+sp_track_set_starred(sp_session *session, sp_track *const*ts, int n, bool starred)
 {
     int i;
 
@@ -826,7 +826,7 @@ sp_playlist_is_collaborative(sp_playlist * p)
 }
 
 sp_error
-sp_playlist_add_tracks(sp_playlist *p, const sp_track **tracks, int num_tracks,
+sp_playlist_add_tracks(sp_playlist *p, sp_track *const*tracks, int num_tracks,
                        int position, sp_session *session) {
     if (position > p->num_tracks - 1)
         return SP_ERROR_INVALID_INDATA;

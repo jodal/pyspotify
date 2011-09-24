@@ -77,7 +77,7 @@ static PyMethodDef Artist_methods[] = {
 
 PyTypeObject ArtistType = {
     PyObject_HEAD_INIT(NULL) 0, /*ob_size */
-    "spotify.artist.Artist",    /*tp_name */
+    "spotify.Artist",   /*tp_name */
     sizeof(Artist),     /*tp_basicsize */
     0,                  /*tp_itemsize */
     (destructor) Artist_dealloc,        /*tp_dealloc */

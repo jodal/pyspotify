@@ -16,8 +16,10 @@
 #include "playlistcontainer.h"
 #include "search.h"
 #include "image.h"
+#include "user.h"
 
 static int session_constructed = 0;
+sp_session *g_session;
 
 static PyObject *
 PyTuple_NewByPreappending(PyObject *firstObject, PyObject *tuple)
@@ -84,6 +86,21 @@ Session_display_name(Session * self)
 };
 
 static PyObject *
+Session_get_friends(Session * self)
+{
+    int i, friends_count = sp_session_num_friends(self->_session);
+    PyObject *user;
+    PyObject *friends_list = PyList_New(friends_count);
+
+    for(i = 0; i < friends_count; i++) {
+        user = User_FromSpotify(sp_session_friend(self->_session, i));
+        PyList_SetItem(friends_list, i, user);
+    }
+
+    return friends_list;
+};
+
+static PyObject *
 Session_user_is_loaded(Session * self)
 {
     sp_user *user;
@@ -114,17 +131,6 @@ handle_error(int err)
     if (err != 0) {
         PyErr_SetString(SpotifyError, sp_error_message(err));
         return NULL;
-    }
-    else {
-        Py_RETURN_NONE;
-    }
-}
-
-PyObject *
-error_message(int err)
-{
-    if (err != 0) {
-        return PyUnicode_FromString(sp_error_message(err));
     }
     else {
         Py_RETURN_NONE;
@@ -240,13 +246,16 @@ Session_process_events(Session * self)
 void
 search_complete(sp_search * search, Callback * st)
 {
-    PyObject *results;
+    PyObject *res, *results;
     PyGILState_STATE gstate;
 
     gstate = PyGILState_Ensure();
     results = Results_FromSpotify(search);
-    PyObject_CallFunctionObjArgs(st->callback, results, st->userdata, NULL);
+    res = PyObject_CallFunctionObjArgs(st->callback, results, st->userdata, NULL);
+    if (!res)
+        PyErr_WriteUnraisable(st->callback);
     delete_trampoline(st);
+    Py_XDECREF(res);
     Py_DECREF(results);
     PyGILState_Release(gstate);
 }
@@ -269,17 +278,15 @@ Session_search(Session * self, PyObject *args, PyObject *kwds)
         "artist_offset", "artist_count",
         "userdata", NULL
     };
-    PyArg_ParseTupleAndKeywords(args, kwds, "sO|iiiiiiO", kwlist, &query,
-                                &callback, &track_offset, &track_count,
-                                &album_offset, &album_count, &artist_offset,
-                                &artist_count, &userdata);
-    if (userdata != NULL)
-        Py_INCREF(userdata);
-    Py_INCREF(callback);
-    st = malloc(sizeof(Callback));
-    st->userdata = userdata;
-    st->manager = NULL;
-    st->callback = callback;
+    if (!PyArg_ParseTupleAndKeywords(args, kwds, "esO|iiiiiiO", kwlist,
+                                     ENCODING, &query, &callback,
+                                     &track_offset, &track_count,
+                                     &album_offset, &album_count,
+                                     &artist_offset, &artist_count, &userdata))
+        return NULL;
+    if (!userdata)
+        userdata = Py_None;
+    st = create_trampoline(callback, NULL, userdata);
     Py_BEGIN_ALLOW_THREADS;
     search = sp_search_create(self->_session, query,
                               track_offset, track_count,
@@ -289,7 +296,6 @@ Session_search(Session * self, PyObject *args, PyObject *kwds)
                               (void *)st);
     Py_END_ALLOW_THREADS;
     results = Results_FromSpotify(search);
-
     return results;
 }
 
@@ -333,7 +339,6 @@ Session_image_create(Session * self, PyObject *args)
     byte *image_id;
     size_t len;
     sp_image *image;
-    PyObject *i;
 
     if (!PyArg_ParseTuple(args, "s#", &image_id, &len))
         return NULL;
@@ -342,12 +347,7 @@ Session_image_create(Session * self, PyObject *args)
         return NULL;
     }
     image = sp_image_create(self->_session, image_id);
-    if (sp_image_error(image)) {
-        PyErr_SetString(SpotifyError, "error occured during image creation");
-        return NULL;
-    }
-    i = Image_FromSpotify(image);
-    return i;
+    return Image_FromSpotify(image);
 }
 
 static PyObject *
@@ -381,6 +381,8 @@ static PyMethodDef Session_methods[] = {
      "Return the canonical username for the logged in user"},
     {"display_name", (PyCFunction)Session_display_name, METH_NOARGS,
      "Return the full name for the logged in user"},
+    {"get_friends", (PyCFunction)Session_get_friends, METH_NOARGS,
+     "Return a list of friends for the logged in user"},
     {"user_is_loaded", (PyCFunction)Session_user_is_loaded, METH_NOARGS,
      "Return whether the user is loaded or not"},
     {"logout", (PyCFunction)Session_logout, METH_NOARGS,
@@ -469,7 +471,7 @@ static void
 logged_in(sp_session * session, sp_error error)
 {
     PyGILState_STATE gstate;
-    PyObject *res, *err;
+    PyObject *res, *err, *method;
 
 #ifdef DEBUG
     fprintf(stderr, "[DEBUG]-session- >> logged_in called\n");
@@ -479,12 +481,16 @@ logged_in(sp_session * session, sp_error error)
         (Session *) PyObject_CallObject((PyObject *)&SessionType, NULL);
     psession->_session = session;
     PyObject *client = (PyObject *)sp_session_userdata(session);
-    err = error_message(error);
 
-    res = PyObject_CallMethod(client, "logged_in", "OO", psession, err);
+    err = error_message(error);
+    method = PyObject_GetAttrString(client, "logged_in");
+    res = PyObject_CallFunctionObjArgs(method, psession, err, NULL);
+    if (!res)
+        PyErr_WriteUnraisable(method);
     Py_DECREF(psession);
     Py_DECREF(err);
     Py_XDECREF(res);
+    Py_DECREF(method);
     PyGILState_Release(gstate);
 }
 
@@ -492,7 +498,7 @@ static void
 logged_out(sp_session * session)
 {
     PyGILState_STATE gstate;
-    PyObject *res;
+    PyObject *res, *method;
 
 #ifdef DEBUG
         fprintf(stderr, "[DEBUG]-session- >> logged_out called\n");
@@ -503,9 +509,13 @@ logged_out(sp_session * session)
     psession->_session = session;
     PyObject *client = (PyObject *)sp_session_userdata(session);
 
-    res = PyObject_CallMethod(client, "logged_out", "O", psession);
+    method = PyObject_GetAttrString(client, "logged_out");
+    res = PyObject_CallFunctionObjArgs(method, psession, NULL);
+    if (!res)
+        PyErr_WriteUnraisable(method);
     Py_DECREF(psession);
     Py_XDECREF(res);
+    Py_DECREF(method);
     PyGILState_Release(gstate);
 }
 
@@ -513,7 +523,7 @@ static void
 metadata_updated(sp_session * session)
 {
     PyGILState_STATE gstate;
-    PyObject *res;
+    PyObject *res, *method;
 
 #ifdef DEBUG
         fprintf(stderr, "[DEBUG]-session- >> metadata_updated called\n");
@@ -524,9 +534,13 @@ metadata_updated(sp_session * session)
     psession->_session = session;
     PyObject *client = (PyObject *)sp_session_userdata(session);
 
-    res = PyObject_CallMethod(client, "metadata_updated", "O", psession);
+    method = PyObject_GetAttrString(client, "metadata_updated");
+    res = PyObject_CallFunctionObjArgs(method, psession, NULL);
+    if (!res)
+        PyErr_WriteUnraisable(method);
     Py_DECREF(psession);
     Py_XDECREF(res);
+    Py_DECREF(method);
     PyGILState_Release(gstate);
 }
 
@@ -534,7 +548,7 @@ static void
 connection_error(sp_session * session, sp_error error)
 {
     PyGILState_STATE gstate;
-    PyObject *res, *err;
+    PyObject *res, *err, *method;
 
 #ifdef DEBUG
         fprintf(stderr, "[DEBUG]-session- >> connection_error called\n");
@@ -544,11 +558,16 @@ connection_error(sp_session * session, sp_error error)
         (Session *) PyObject_CallObject((PyObject *)&SessionType, NULL);
     psession->_session = session;
     PyObject *client = (PyObject *)sp_session_userdata(session);
+
     err = error_message(error);
-    res = PyObject_CallMethod(client, "connection_error", "OO", psession, err);
+    method = PyObject_GetAttrString(client, "connection_error");
+    res = PyObject_CallFunctionObjArgs(method, psession, err, NULL);
+    if (!res)
+        PyErr_WriteUnraisable(method);
     Py_DECREF(psession);
     Py_DECREF(err);
     Py_XDECREF(res);
+    Py_DECREF(method);
     PyGILState_Release(gstate);
 }
 
@@ -556,7 +575,7 @@ static void
 message_to_user(sp_session * session, const char *message)
 {
     PyGILState_STATE gstate;
-    PyObject *res;
+    PyObject *res, *method, *msg;
 
 #ifdef DEBUG
         fprintf(stderr, "[DEBUG]-session- >> message to user: %s\n", message);
@@ -567,11 +586,15 @@ message_to_user(sp_session * session, const char *message)
     psession->_session = session;
     PyObject *client = (PyObject *)sp_session_userdata(session);
 
+    msg = PyUnicode_FromString(message);
+    method = PyObject_GetAttrString(client, "message_to_user");
     res =
-        PyObject_CallMethod(client, "message_to_user", "Os", psession,
-                            message);
+        PyObject_CallFunctionObjArgs(method, psession, msg, NULL);
+    if (!res)
+        PyErr_WriteUnraisable(method);
     Py_DECREF(psession);
     Py_XDECREF(res);
+    Py_DECREF(method);
     PyGILState_Release(gstate);
 }
 
@@ -579,7 +602,7 @@ static void
 notify_main_thread(sp_session * session)
 {
     PyGILState_STATE gstate;
-    PyObject *res = NULL;
+    PyObject *res, *method;
 
 #ifdef DEBUG
         fprintf(stderr, "[DEBUG]-session- >> notify_main_thread called\n");
@@ -593,10 +616,14 @@ notify_main_thread(sp_session * session)
     PyObject *client = (PyObject *)sp_session_userdata(session);
 
     if (client != NULL) {
-        res = PyObject_CallMethod(client, "wake", "O", psession);
+        method = PyObject_GetAttrString(client, "wake");
+        res = PyObject_CallFunctionObjArgs(method, psession, NULL);
+        if (!res)
+            PyErr_WriteUnraisable(method);
+        Py_XDECREF(res);
+        Py_DECREF(method);
     }
     Py_DECREF(psession);
-    Py_XDECREF(res);
     PyGILState_Release(gstate);
 }
 
@@ -617,6 +644,7 @@ music_delivery(sp_session * session, const sp_audioformat * format,
                const void *frames, int num_frames)
 {
     PyGILState_STATE gstate;
+    PyObject *res, *method;
 
 #ifdef DEBUG
         fprintf(stderr, "[DEBUG]-session- >> music_delivery called\n");
@@ -628,18 +656,27 @@ music_delivery(sp_session * session, const sp_audioformat * format,
         (Session *) PyObject_CallObject((PyObject *)&SessionType, NULL);
     psession->_session = session;
     PyObject *client = (PyObject *)sp_session_userdata(session);
-    PyObject *c =
-        PyObject_CallMethod(client, "music_delivery", "OOiiiii", psession,
-                            pyframes, siz, num_frames, format->sample_type,
-                            format->sample_rate, format->channels);
+    method = PyObject_GetAttrString(client, "music_delivery");
+    res =
+        PyObject_CallFunction(method, "OOiiiii", psession,
+                              pyframes, siz, num_frames, format->sample_type,
+                              format->sample_rate, format->channels);
     int consumed = num_frames;  // assume all consumed
-
-    if (c != NULL && PyObject_TypeCheck(c, &PyInt_Type)) {
-        consumed = (int)PyInt_AsLong(c);
+    if (!res)
+        PyErr_WriteUnraisable(method);
+    if (PyInt_Check(res))
+        consumed = (int)PyInt_AsLong(res);
+    else if (PyLong_Check(res))
+        consumed = (int)PyLong_AsLong(res);
+    else {
+        PyErr_SetString(PyExc_TypeError,
+                        "music_delivery must return an integer");
+        PyErr_WriteUnraisable(method);
     }
     Py_DECREF(pyframes);
     Py_DECREF(psession);
-    Py_XDECREF(c);
+    Py_XDECREF(res);
+    Py_DECREF(method);
     PyGILState_Release(gstate);
     return consumed;
 }
@@ -648,7 +685,7 @@ static void
 play_token_lost(sp_session * session)
 {
     PyGILState_STATE gstate;
-    PyObject *res;
+    PyObject *res, *method;
 
 #ifdef DEBUG
         fprintf(stderr, "[DEBUG]-session- >> play_token_lost called\n");
@@ -659,9 +696,13 @@ play_token_lost(sp_session * session)
     psession->_session = session;
     PyObject *client = (PyObject *)sp_session_userdata(session);
 
-    res = PyObject_CallMethod(client, "play_token_lost", "O", psession);
+    method = PyObject_GetAttrString(client, "play_token_lost");
+    res = PyObject_CallFunctionObjArgs(method, psession, NULL);
+    if (!res)
+        PyErr_WriteUnraisable(method);
     Py_DECREF(psession);
     Py_XDECREF(res);
+    Py_DECREF(method);
     PyGILState_Release(gstate);
 }
 
@@ -669,7 +710,7 @@ static void
 log_message(sp_session * session, const char *data)
 {
     PyGILState_STATE gstate;
-    PyObject *res;
+    PyObject *res, *method, *msg;
 
 #ifdef DEBUG
         fprintf(stderr, "[DEBUG]-session- >> log message: %s\n", data);
@@ -680,9 +721,15 @@ log_message(sp_session * session, const char *data)
     psession->_session = session;
     PyObject *client = (PyObject *)sp_session_userdata(session);
 
-    res = PyObject_CallMethod(client, "log_message", "Os", psession, data);
+    msg = PyUnicode_FromString(data);
+    method = PyObject_GetAttrString(client, "log_message");
+    res = PyObject_CallFunctionObjArgs(method, psession, msg, NULL);
+    if (!res)
+        PyErr_WriteUnraisable(method);
     Py_DECREF(psession);
     Py_XDECREF(res);
+    Py_DECREF(msg);
+    Py_DECREF(method);
     PyGILState_Release(gstate);
 }
 
@@ -690,7 +737,7 @@ static void
 end_of_track(sp_session * session)
 {
     PyGILState_STATE gstate;
-    PyObject *res;
+    PyObject *res, *method;
 
 #ifdef DEBUG
         fprintf(stderr, "[DEBUG]-session- >> end_of_track called\n");
@@ -701,9 +748,13 @@ end_of_track(sp_session * session)
     psession->_session = session;
     PyObject *client = (PyObject *)sp_session_userdata(session);
 
-    res = PyObject_CallMethod(client, "end_of_track", "O", psession);
+    method = PyObject_GetAttrString(client, "end_of_track");
+    res = PyObject_CallFunctionObjArgs(method, psession, NULL);
+    if (!res)
+        PyErr_WriteUnraisable(method);
     Py_DECREF(psession);
     Py_XDECREF(res);
+    Py_DECREF(method);
     PyGILState_Release(gstate);
 }
 
@@ -762,7 +813,6 @@ session_connect(PyObject *self, PyObject *args)
     PyObject *client;
     sp_session *session;
     sp_error error;
-    PyObject *uobj, *pobj;
     char *username, *password;
     char *cache_location, *settings_location, *user_agent;
 
@@ -849,6 +899,7 @@ session_connect(PyObject *self, PyObject *args)
     Py_BEGIN_ALLOW_THREADS;
     sp_session_login(session, username, password);
     Py_END_ALLOW_THREADS;
+    g_session = session;
     Session *psession =
         (Session *) PyObject_CallObject((PyObject *)&SessionType, NULL);
     psession->_session = session;

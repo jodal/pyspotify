@@ -5,10 +5,12 @@
 *.wpr
 *.wpu
 .coverage
+.pc
 MANIFEST
 _build
 build
+cover
 dist
 nosetests.xml
 spotify_appkey.key
-cover
+tmp/

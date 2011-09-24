@@ -12,47 +12,44 @@ objects.
 
     Playlist objects.
 
-    .. method:: add_tracks_added_callback(callback[, manager, userdata])
+    .. method:: add_tracks(position, tracks)
 
-        :param callback:    signature: (manager, :class:`Playlist` p, list of
+        :param position:    where to add the tracks in the playlist
+        :type position:     :class:`int`
+        :param tracks:      tracks to add to the playlist
+        :type tracks:       list of :class:`Track`
+
+    .. method:: add_tracks_added_callback(callback[, userdata])
+
+        :param callback:    signature: (:class:`Playlist` p, list of
             :class:`Track` tracks, :class:`int` position,
             :class:`Object` userdata)
-        :param manager:     a :class:`SpotifyPlaylistManager
-            <manager.SpotifyPlaylistManager>` object
         :param userdata:    any object you would like to access in the callback
 
-    .. method:: add_tracks_moved_callback(callback[, manager, userdata])
+    .. method:: add_tracks_moved_callback(callback[, userdata])
 
-        :param callback:    signature: (manager, :class:`Playlist` p, list of
+        :param callback:    signature: (:class:`Playlist` p, list of
             :class:`Track` tracks, :class:`int` new_position,
             :class:`Object` userdata)
-        :param manager:     a :class:`SpotifyPlaylistManager
-            <manager.SpotifyPlaylistManager>` object
         :param userdata:    any object you would like to access in the callback
 
-    .. method:: add_tracks_removed_callback(callback[, manager, userdata])
+    .. method:: add_tracks_removed_callback(callback[, userdata])
 
-        :param callback:    signature: (manager, :class:`Playlist` p, list of
+        :param callback:    signature: (:class:`Playlist` p, list of
             :class:`Track` tracks, :class:`Object` userdata)
-        :param manager:     a :class:`SpotifyPlaylistManager
-            <manager.SpotifyPlaylistManager>` object
         :param userdata:    any object you would like to access in the callback
 
-    .. method:: add_playlist_renamed_callback(callback[, manager, userdata])
+    .. method:: add_playlist_renamed_callback(callback[, userdata])
 
-        :param callback:    signature: (manager, :class:`Playlist` p,
+        :param callback:    signature: (:class:`Playlist` p,
             :class:`Object` userdata)
-        :param manager:     a :class:`SpotifyPlaylistManager
-            <manager.SpotifyPlaylistManager>` object
         :param userdata:    any object you would like to access in the callback
 
-    .. method:: add_playlist_state_changed_callback(callback[, manager, \
+    .. method:: add_playlist_state_changed_callback(callback[, \
         userdata])
 
-        :param callback:    signature: (manager, :class:`Playlist` p,
+        :param callback:    signature: (:class:`Playlist` p,
             :class:`Object` userdata)
-        :param manager:     a :class:`SpotifyPlaylistManager
-            <manager.SpotifyPlaylistManager>` object
         :param userdata:    any object you would like to access in the callback
 
 
@@ -66,13 +63,11 @@ objects.
         - The playlist started loading, or finished loading
 
 
-    .. method:: add_playlist_update_in_progress_callback(callback[, manager, \
+    .. method:: add_playlist_update_in_progress_callback(callback[, \
         userdata])
 
-        :param callback:    signature: (manager, :class:`Playlist` p,
+        :param callback:    signature: (:class:`Playlist` p,
             :class:`bool` done, :class:`Object` userdata)
-        :param manager:     a :class:`SpotifyPlaylistManager
-            <manager.SpotifyPlaylistManager>` object
         :param userdata:    any object you would like to access in the callback
 
         Called when a playlist is updating or is done updating.
@@ -81,69 +76,55 @@ objects.
         playlist. It allows e.g. the user interface to defer updating until the
         entire operation is complete.
 
-    .. method:: add_playlist_metadata_updated_callback(callback[, manager, \
+    .. method:: add_playlist_metadata_updated_callback(callback[, \
         userdata])
 
-        :param callback:    signature: (manager, :class:`Playlist` p,
+        :param callback:    signature: (:class:`Playlist` p,
             :class:`Object` userdata)
-        :param manager:     a :class:`SpotifyPlaylistManager
-            <manager.SpotifyPlaylistManager>` object
         :param userdata:    any object you would like to access in the callback
 
-    .. method:: add_track_created_changed_callback(callback[, manager, \
+    .. method:: add_track_created_changed_callback(callback[, \
         userdata])
 
-        :param callback:    signature: (manager, :class:`Playlist` p,
+        :param callback:    signature: (:class:`Playlist` p,
             :class:`int` position, :class:`User` user, :class:`int` when,
             :class:`Object` userdata)
-        :param manager:     a :class:`SpotifyPlaylistManager
-            <manager.SpotifyPlaylistManager>` object
         :param userdata:    any object you would like to access in the callback
 
         *user* is the new user information and *when* is a time in seconds
         since the UNIX Epoch.
 
-    .. method:: add_track_message_changed_callback(callback[, manager, \
+    .. method:: add_track_message_changed_callback(callback[, \
         userdata])
 
-        :param callback:    signature: (manager, :class:`Playlist` p,
+        :param callback:    signature: (:class:`Playlist` p,
             :class:`int` position, :class:`unicode` message,
             :class:`Object` userdata)
-        :param manager:     a :class:`SpotifyPlaylistManager
-            <manager.SpotifyPlaylistManager>` object
         :param userdata:    any object you would like to access in the callback
 
-    .. method:: add_track_seen_changed_callback(callback[, manager, userdata])
+    .. method:: add_track_seen_changed_callback(callback[, userdata])
 
-        :param callback:    signature: (manager, :class:`Playlist` p,
+        :param callback:    signature: (:class:`Playlist` p,
             :class:`int` position, :class:`bool` seen,
             :class:`Object` userdata)
-        :param manager:     a :class:`SpotifyPlaylistManager
-            <manager.SpotifyPlaylistManager>` object
         :param userdata:    any object you would like to access in the callback
 
-    .. method:: add_description_changed_callback(callback[, manager, userdata])
+    .. method:: add_description_changed_callback(callback[, userdata])
 
-        :param callback:    signature: (manager, :class:`Playlist` p,
+        :param callback:    signature: (:class:`Playlist` p,
             :class:`unicode` description, :class:`Object` userdata)
-        :param manager:     a :class:`SpotifyPlaylistManager
-            <manager.SpotifyPlaylistManager>` object
         :param userdata:    any object you would like to access in the callback
 
-    .. method:: add_subscribers_changed_callback(callback[, manager, userdata])
+    .. method:: add_subscribers_changed_callback(callback[, userdata])
 
-        :param callback:    signature: (manager, :class:`Playlist` p,
+        :param callback:    signature: (:class:`Playlist` p,
             :class:`Object` userdata)
-        :param manager:     a :class:`SpotifyPlaylistManager
-            <manager.SpotifyPlaylistManager>` object
         :param userdata:    any object you would like to access in the callback
 
-    .. method:: add_image_changed_callback(callback[, manager, userdata])
+    .. method:: add_image_changed_callback(callback[, userdata])
 
-        :param callback:    signature: (manager, :class:`Playlist` p,
+        :param callback:    signature: (:class:`Playlist` p,
             :class:`str` image_id, :class:`Object` userdata)
-        :param manager:     a :class:`SpotifyPlaylistManager
-            <manager.SpotifyPlaylistManager>` object
         :param userdata:    any object you would like to access in the callback
 
     .. method:: is_collaborative
@@ -163,6 +144,11 @@ objects.
 
         :rtype:     string
         :returns:   the name of the playlist.
+
+    .. method:: rename(name)
+
+        :param name:    the new name
+        :type name:     :class:`unicode`
 
     .. method:: remove_callback(callback[, userdata])
 

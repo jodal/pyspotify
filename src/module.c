@@ -11,8 +11,10 @@
 #include "playlistcontainer.h"
 #include "search.h"
 #include "session.h"
+#include "toplistbrowser.h"
 #include "track.h"
 #include "image.h"
+#include "user.h"
 
 PyObject *SpotifyError;
 PyObject *SpotifyApiVersion;
@@ -42,9 +44,13 @@ init_spotify(void)
         return;
     if (PyType_Ready(&ResultsType) < 0)
         return;
+    if (PyType_Ready(&ToplistBrowserType) < 0)
+        return;
     if (PyType_Ready(&TrackType) < 0)
         return;
     if (PyType_Ready(&ImageType) < 0)
+        return;
+    if (PyType_Ready(&UserType) < 0)
         return;
 
     m = Py_InitModule("_spotify", module_methods);
@@ -70,6 +76,8 @@ init_spotify(void)
     playlistcontainer_init(m);
     session_init(m);
     search_init(m);
+    toplistbrowser_init(m);
     track_init(m);
     image_init(m);
+    user_init(m);
 }

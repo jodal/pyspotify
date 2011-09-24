@@ -6,8 +6,8 @@ class SpotifySessionManager(object):
     Client for Spotify. Inherit from this class to have your callbacks
     called on the appropriate events.
 
-    Exceptions raised in your callback handlers will be silently discarded
-    unless you handle them!
+    Exceptions raised in your callback handlers will be displayed on the
+    standard error output (stderr).
     """
 
     api_version = spotify.api_version
@@ -166,7 +166,7 @@ class SpotifySessionManager(object):
         :param channels: number of audio channels. Currently 1 or 2.
         :type channels: int
         """
-        pass
+        return 0
 
     def play_token_lost(self, session):
         """

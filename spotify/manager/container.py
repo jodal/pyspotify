@@ -2,6 +2,9 @@ class SpotifyContainerManager:
     """
     Handles Spotify playlist container callbacks. To implement you own
     callbacks, inherit from this class.
+
+    Exceptions raised in your callback handlers will be displayed on the
+    standard error output (stderr).
     """
 
     def __init__(self):
@@ -11,13 +14,11 @@ class SpotifyContainerManager:
         """
         Listen to modifications events on a container.
         """
-        container.add_loaded_callback(self.container_loaded, self, userdata)
-        container.add_playlist_added_callback(
-            self.playlist_added, self, userdata)
-        container.add_playlist_moved_callback(
-            self.playlist_moved, self, userdata)
-        container.add_playlist_removed_callback(
-            self.playlist_removed, self, userdata)
+        container.add_loaded_callback(self.container_loaded, userdata)
+        container.add_playlist_added_callback(self.playlist_added, userdata)
+        container.add_playlist_moved_callback(self.playlist_moved, userdata)
+        container.add_playlist_removed_callback(self.playlist_removed,
+                                                userdata)
 
     def unwatch(self, container, userdata=None):
         """

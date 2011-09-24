@@ -27,3 +27,4 @@ parent module.
     user
     toplist
     inbox
+    constants

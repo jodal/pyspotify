@@ -2,8 +2,8 @@
 Changes
 =======
 
-v1.4 (in development)
-=====================
+v1.4 (2011-09-24)
+=================
 
 pyspotify v1.4 only works with libspotify v0.0.8. As libspotify v9.x has been
 released, this release of pyspotify will probably be the last release to work

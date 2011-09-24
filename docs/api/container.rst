@@ -10,12 +10,14 @@ It is a list of :class:`Playlist` objects.
 
 .. class:: PlaylistContainer
 
-    .. method:: add_new_playlist(name):
+    .. method:: add_new_playlist(name)
 
         :param name:        name of the new playlist
         :type name:         :class:`unicode` or ascii :class:`str`
 
-    .. method:: add_loaded_callback(callback[, userdata]):
+        Add a new playlist to the container.
+
+    .. method:: add_loaded_callback(callback[, userdata])
 
         :param callback:    signature: (:class:`PlaylistContainer` pc,
             :class:`Object` userdata).
@@ -24,7 +26,7 @@ It is a list of :class:`Playlist` objects.
         The callback will be called when all metadata in the playlist container
         has finished loading.
 
-    .. method:: add_playlist_added_callback(callback[ , userdata]):
+    .. method:: add_playlist_added_callback(callback[ , userdata])
 
         :param callback:    signature: (:class:`PlaylistContainer` pc,
             :class:`Playlist`: p, :class:`int` position,
@@ -34,7 +36,7 @@ It is a list of :class:`Playlist` objects.
         The callback will be called when a playlist is added to the playlist
         container.
 
-    .. method:: add_playlist_moved_callback(callback[, userdata]):
+    .. method:: add_playlist_moved_callback(callback[, userdata])
 
         :param callback:    signature: (:class:`PlaylistContainer` pc,
             :class:`Playlist` p, :class:`int` position,
@@ -44,7 +46,7 @@ It is a list of :class:`Playlist` objects.
         The callback will be called when a playlist is moved from *position* to
         *new_position*.
 
-    .. method:: add_playlist_removed_callback(callback[, userdata]):
+    .. method:: add_playlist_removed_callback(callback[, userdata])
 
         :param callback:    signature: (:class:`PlaylistContainer` pc,
             :class:`Playlist` p, :class:`int` position,

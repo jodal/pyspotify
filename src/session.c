@@ -424,7 +424,7 @@ static PyMethodDef Session_methods[] = {
 
 PyTypeObject SessionType = {
     PyObject_HEAD_INIT(NULL) 0, /*ob_size */
-    "_spotify.Session", /*tp_name */
+    "spotify.Session", /*tp_name */
     sizeof(Session),    /*tp_basicsize */
     0,                  /*tp_itemsize */
     0,                  /*tp_dealloc */
@@ -766,15 +766,20 @@ session_init(PyObject *m)
 }
 
 char *
-PySpotify_GetConfigString(PyObject *client, const char *attr)
+PySpotify_GetConfigString(PyObject *client, const char *attr, bool optional)
 {
     PyObject *py_value, *py_uvalue;
     char *value;
 
     py_value = PyObject_GetAttrString(client, attr);
-    if (!py_value) {
-        PyErr_Format(SpotifyError, "%s not set", attr);
-        return NULL;
+    if (!py_value || py_value == Py_None) {
+        if (optional) {
+            return (char *)-1;
+        }
+        else {
+            PyErr_Format(SpotifyError, "%s not set", attr);
+            return NULL;
+        }
     }
     if (PyUnicode_Check(py_value)) {
         py_uvalue = py_value;
@@ -815,6 +820,7 @@ session_connect(PyObject *self, PyObject *args)
     sp_error error;
     char *username, *password;
     char *cache_location, *settings_location, *user_agent;
+    bool relogin = 0, remember_me;
 
     if (!PyArg_ParseTuple(args, "O", &client))
         return NULL;
@@ -825,7 +831,7 @@ session_connect(PyObject *self, PyObject *args)
     config.userdata = (void *)client;
     config.callbacks = &g_callbacks;
 
-    cache_location = PySpotify_GetConfigString(client, "cache_location");
+    cache_location = PySpotify_GetConfigString(client, "cache_location", 0);
     if (!cache_location)
         return NULL;
     config.cache_location = cache_location;
@@ -834,7 +840,8 @@ session_connect(PyObject *self, PyObject *args)
             cache_location);
 #endif
 
-    settings_location = PySpotify_GetConfigString(client, "settings_location");
+    settings_location = PySpotify_GetConfigString(client,
+                                                  "settings_location", 0);
     config.settings_location = settings_location;
 #ifdef DEBUG
     fprintf(stderr, "[DEBUG]-session- Settings location is '%s'\n",
@@ -861,44 +868,60 @@ session_connect(PyObject *self, PyObject *args)
     config.application_key = PyMem_Malloc(l_appkey);
     memcpy((char *)config.application_key, s_appkey, l_appkey);
 
-    user_agent = PySpotify_GetConfigString(client, "user_agent");
+    user_agent = PySpotify_GetConfigString(client, "user_agent", 0);
     if (!user_agent)
         return NULL;
     if (strlen(user_agent) > 255) {
         PyErr_SetString(SpotifyError, "user agent must be 255 characters max");
+        return NULL;
     }
     config.user_agent = user_agent;
 #ifdef DEBUG
         fprintf(stderr, "[DEBUG]-session- User agent set to '%s'\n",
                             user_agent);
 #endif
-    username = PySpotify_GetConfigString(client, "username");
+    username = PySpotify_GetConfigString(client, "username", 1);
     if (!username)
         return NULL;
 
-    password = PySpotify_GetConfigString(client, "password");
+    password = PySpotify_GetConfigString(client, "password", 1);
     if (!password)
         return NULL;
 
-    Py_BEGIN_ALLOW_THREADS;
+    if ((int) username < 0 || (int) password < 0)
+        relogin = 1;
+
+    PyObject *remember = PyObject_GetAttr(client, PyBytes_FromString("remember_me"));
+    remember_me = (remember == Py_True);
+    PyErr_Clear();
+    Py_XDECREF(remember);
+
 #ifdef DEBUG
     fprintf(stderr, "[DEBUG]-session- creating session...\n");
 #endif
     error = sp_session_create(&config, &session);
-    Py_END_ALLOW_THREADS;
     if (error != SP_ERROR_OK) {
         PyErr_SetString(SpotifyError, sp_error_message(error));
         return NULL;
     }
     session_constructed = 1;
 
+    if (relogin) {
+#ifdef DEBUG
+    fprintf(stderr, "[DEBUG]-session- relogin in progress...\n");
+#endif
+        error = sp_session_relogin(session);
+        if (error != SP_ERROR_OK) {
+            PyErr_SetString(SpotifyError, sp_error_message(error));
+            return NULL;
+        }
+    } else {
 #ifdef DEBUG
     fprintf(stderr, "[DEBUG]-session- login as %s in progress...\n",
             username);
 #endif
-    Py_BEGIN_ALLOW_THREADS;
-    sp_session_login(session, username, password);
-    Py_END_ALLOW_THREADS;
+        sp_session_login(session, username, password, remember_me);
+    }
     g_session = session;
     Session *psession =
         (Session *) PyObject_CallObject((PyObject *)&SessionType, NULL);

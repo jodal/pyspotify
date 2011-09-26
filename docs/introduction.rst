@@ -61,7 +61,7 @@ Install the ``pyspotify-git`` package from the AUR.
 Using Pip (latest stable release)
 ---------------------------------
 
-The ``pip`` program for installing Python packages is usually found is the
+The ``pip`` program for installing Python packages is usually found in the
 ``python-pip`` package of your Linux distribution.
 
 To install ``pyspotify``, run::

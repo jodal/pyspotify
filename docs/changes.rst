@@ -2,6 +2,19 @@
 Changes
 =======
 
+v1.5 (in development)
+=====================
+
+Updated to libspotify 9.1.32:
+
+**New features**
+
+- Remember me: when setting the ``remember_me`` parameter to ``True`` at
+  first login, it is possible to log in again without specifying the
+  ``username`` and ``password`` attributes. Don't forget to logout in order to
+  store the credentials.
+
+
 v1.4 (2011-09-24)
 =================
 

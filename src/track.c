@@ -137,7 +137,7 @@ Track_starred(Track * self, PyObject *args, PyObject *kwds)
     if (bset) {
         set = (bset == Py_True);
         sp_track_set_starred(session->_session,
-                             (const sp_track **)&(self->_track), 1, set);
+                             (sp_track * const*)&(self->_track), 1, set);
     }
     return (PyObject *)PyBool_FromLong((long)
                                        sp_track_is_starred(session->_session,

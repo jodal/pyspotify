@@ -17,7 +17,7 @@ class SpotifySessionManager(object):
     appkey_file = 'spotify_appkey.key'
     user_agent = 'pyspotify-example'
 
-    def __init__(self, username = None, password = None, remember_me = False):
+    def __init__(self, username=None, password=None, remember_me=False):
         self.username = username
         self.password = password
         self.remember_me = remember_me

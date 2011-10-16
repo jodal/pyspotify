@@ -823,7 +823,7 @@ Playlist_add_tracks(Playlist *self, PyObject *args)
     if (num_tracks <= 0)
         Py_RETURN_NONE;
 
-    const sp_track *ts[num_tracks];
+    sp_track *ts[num_tracks];
     for (i = 0; i < num_tracks; i++) {
         PyObject *t = PyList_GetItem(tracks, i);
         if (t->ob_type != &TrackType) {
@@ -833,7 +833,7 @@ Playlist_add_tracks(Playlist *self, PyObject *args)
         }
         ts[i] = ((Track *)t)->_track;
     }
-    err = sp_playlist_add_tracks(self->_playlist, ts,
+    err = sp_playlist_add_tracks(self->_playlist, (sp_track *const *)ts,
                                  num_tracks, position, g_session);
     switch(err) {
         case SP_ERROR_OK:

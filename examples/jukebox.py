@@ -32,6 +32,9 @@ class JukeboxUI(cmd.Cmd, threading.Thread):
     def run(self):
         self.cmdloop()
 
+    def do_logout(self, line):
+        self.jukebox.session.logout()
+
     def do_quit(self, line):
         print "Goodbye!"
         self.jukebox.terminate()
@@ -191,7 +194,7 @@ You will be notified when tracks are added, moved or removed from the playlist."
         if not line:
             print "Usage: add_new_playlist <name>"
         else:
-          new_playlist = self.jukebox.ctr.add_new_playlist(line)
+          new_playlist = self.jukebox.ctr.add_new_playlist(line.decode('utf-8'))
 
     def do_add_to_playlist(self, line):
         usage = "Usage: add_to_playlist <playlist_index> <insert_point>" + \
@@ -375,8 +378,5 @@ if __name__ == '__main__':
     op.add_option("-u", "--username", help="spotify username")
     op.add_option("-p", "--password", help="spotify password")
     (options, args) = op.parse_args()
-    if not options.username or not options.password:
-        op.print_help()
-        raise SystemExit
-    session_m = Jukebox(options.username, options.password)
+    session_m = Jukebox(options.username, options.password, True)
     session_m.connect()

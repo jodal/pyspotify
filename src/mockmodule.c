@@ -872,6 +872,11 @@ sp_playlist_subscribers(sp_playlist *p)
 }
 
 void
+sp_playlist_update_subscribers(sp_session *s, sp_playlist *p)
+{
+}
+
+void
 sp_playlist_subscribers_free(sp_subscribers *sub)
 {
     PyMem_Free(sub);

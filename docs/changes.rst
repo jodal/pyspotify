@@ -13,7 +13,9 @@ Updated to libspotify 9.1.32:
   first login, it is possible to log in again without specifying the
   ``username`` and ``password`` attributes. Don't forget to logout in order to
   store the credentials.
-
+- Add new method: :meth:`spotify.Playlist.subscribers`
+- Add new method: :meth:`spotify.Playlist.num_subscribers`
+- Add new method: :meth:`spotify.Playlist.update_subscribers`
 
 v1.4 (2011-09-24)
 =================

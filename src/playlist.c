@@ -772,6 +772,40 @@ Playlist_is_collaborative(Playlist * self)
 }
 
 static PyObject *
+Playlist_num_subscribers(Playlist *self)
+{
+    return Py_BuildValue("i", sp_playlist_num_subscribers(self->_playlist));
+}
+
+static PyObject *
+Playlist_subscribers(Playlist *self)
+{
+    sp_subscribers *subscribers;
+    PyObject *list;
+    unsigned int i;
+
+    subscribers = sp_playlist_subscribers(self->_playlist);
+    list = PyList_New(subscribers->count);
+    for (i = 0; i < subscribers->count; i++) {
+        PyList_SET_ITEM(list, i, PyUnicode_FromString(
+                                        subscribers->subscribers[i]));
+    }
+    sp_playlist_subscribers_free(subscribers);
+    return list;
+}
+
+static PyObject *
+Playlist_update_subscribers(Playlist *self)
+{
+    if (!g_session) {
+        PyErr_SetString(SpotifyError, "Not logged in.");
+        return NULL;
+    }
+    sp_playlist_update_subscribers(g_session, self->_playlist);
+    Py_RETURN_NONE;
+}
+
+static PyObject *
 Playlist_add_tracks(Playlist *self, PyObject *args)
 {
     int position, num_tracks;
@@ -934,6 +968,18 @@ static PyMethodDef Playlist_methods[] = {
      (PyCFunction)Playlist_owner,
      METH_NOARGS,
      "Returns the owner of the playlist"},
+    {"num_subscribers",
+     (PyCFunction)Playlist_num_subscribers,
+     METH_NOARGS,
+     "Returns the number of subscribers this playlist currently has"},
+    {"subscribers",
+     (PyCFunction)Playlist_subscribers,
+     METH_NOARGS,
+     "Returns a list of subscribers (canonical_name) to this playlist"},
+    {"update_subscribers",
+     (PyCFunction)Playlist_update_subscribers,
+     METH_NOARGS,
+     "Update the subscribers information for this playlist"},
     {NULL}
 };
 

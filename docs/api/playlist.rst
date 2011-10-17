@@ -174,3 +174,14 @@ objects.
             user subscribed to a playlist for playlist with many (>500)
             subscribers.
 
+    .. method:: update_subscribers
+
+        Ask library to update the subscription count for a playlist.
+
+        When the subscription info has been fetched from the Spotify backend
+        the :meth:`manager.SpotifyPlaylistManager.subscribers_changed`
+        callback will be invoked. In that callback use
+        :meth:`num_subscribers` and/or :meth:`subscribers` to get information
+        about the subscribers. You
+        can call those two functions anytime you want but the information might
+        not be up to date in such cases

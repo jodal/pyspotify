@@ -174,6 +174,10 @@ objects.
             user subscribed to a playlist for playlist with many (>500)
             subscribers.
 
+    .. method:: type
+
+        returns ``'playlist'``
+
     .. method:: update_subscribers
 
         Ask library to update the subscription count for a playlist.
@@ -185,3 +189,29 @@ objects.
         about the subscribers. You
         can call those two functions anytime you want but the information might
         not be up to date in such cases
+
+The :class:`PlaylistFolder` class
+=================================
+
+.. class:: PlaylistFolder
+
+    An entry in a playlist container that is not a playlist (often folder
+    boundaries).
+
+    .. method:: id
+
+        if type is ``'folder_start'``, returns the id of the folder, else
+        returns 0.
+
+    .. method:: is_loaded
+
+        returns ``True`` when the container it belongs to is loaded.
+
+    .. method:: name
+
+        if type is ``'folder_start'``, returns the name of the folder, else
+        returns an empty string.
+
+    .. method:: type
+
+        returns ``'folder_start'``, ``'folder_end'`` or ``'placeholder'``.

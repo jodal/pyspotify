@@ -9,6 +9,7 @@
 #include "link.h"
 #include "playlist.h"
 #include "playlistcontainer.h"
+#include "playlistfolder.h"
 #include "search.h"
 #include "session.h"
 #include "toplistbrowser.h"
@@ -42,6 +43,8 @@ init_spotify(void)
         return;
     if (PyType_Ready(&PlaylistContainerType) < 0)
         return;
+    if (PyType_Ready(&PlaylistFolderType) < 0)
+        return;
     if (PyType_Ready(&ResultsType) < 0)
         return;
     if (PyType_Ready(&ToplistBrowserType) < 0)
@@ -74,6 +77,7 @@ init_spotify(void)
     link_init(m);
     playlist_init(m);
     playlistcontainer_init(m);
+    playlistfolder_init(m);
     session_init(m);
     search_init(m);
     toplistbrowser_init(m);

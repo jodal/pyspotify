@@ -6,7 +6,7 @@ The :class:`PlaylistContainer` class
 .. currentmodule:: spotify
 
 The playlist container contains all the playlists attached to a session.
-It is a list of :class:`Playlist` objects.
+It is a list of :class:`Playlist` and :class:`PlaylistFolder` objects.
 
 .. class:: PlaylistContainer
 

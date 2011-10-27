@@ -36,6 +36,17 @@ class TestPlaylistContainer(unittest.TestCase):
         pc.add_new_playlist(u'bȧr');
         self.assertRaises(ValueError, pc.add_new_playlist, 'foo' * 100)
 
+    def test_playlistfolder(self):
+        p1 = _mockspotify.mock_playlistfolder("folder_start", "foo")
+        p2 = _mockspotify.mock_playlistfolder("folder_end", "")
+        pc = _mockspotify.mock_playlistcontainer([p1, p2])
+        f1,f2  = pc[0],pc[1]
+        self.assertEqual(f1.name(), u'foo')
+        self.assertEqual(f1.type(), 'folder_start')
+        self.assertEqual(f2.type(), 'folder_end')
+        self.assertEqual(f1.id(), 42)
+        self.assertTrue(f1.is_loaded())
+
 class TestPlaylist(unittest.TestCase):
 
     def _mock_track(self, name):

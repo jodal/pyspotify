@@ -4,6 +4,7 @@
 #include "pyspotify.h"
 #include "playlistcontainer.h"
 #include "playlist.h"
+#include "playlistfolder.h"
 
 /* This is the playlist container callbacks table.
  *
@@ -314,15 +315,22 @@ PyObject *
 PlaylistContainer_sq_item(PyObject *o, Py_ssize_t index)
 {
     PlaylistContainer *pc = (PlaylistContainer *) o;
+    PyObject *p;
+    sp_playlist_type type;
 
     if (index >= sp_playlistcontainer_num_playlists(pc->_playlistcontainer)) {
         PyErr_SetString(PyExc_IndexError, "");
         return NULL;
     }
-    sp_playlist *playlist =
-        sp_playlistcontainer_playlist(pc->_playlistcontainer, (int)index);
-    PyObject *p = Playlist_FromSpotify(playlist);
-
+    type = sp_playlistcontainer_playlist_type(pc->_playlistcontainer, (int)index);
+    if (type == SP_PLAYLIST_TYPE_PLAYLIST) {
+        p = Playlist_FromSpotify(sp_playlistcontainer_playlist(
+                    pc->_playlistcontainer, (int)index));
+    }
+    else {
+        p = PlaylistFolder_FromSpotify(pc->_playlistcontainer,
+                                                (int)index, type);
+    }
     return p;
 }
 

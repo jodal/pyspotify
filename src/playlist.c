@@ -849,6 +849,12 @@ Playlist_add_tracks(Playlist *self, PyObject *args)
     Py_RETURN_NONE;
 }
 
+static PyObject *
+Playlist_type(Playlist *self)
+{
+    return PyBytes_FromString("playlist");
+}
+
 /////////////// SEQUENCE PROTOCOL
 
 Py_ssize_t
@@ -980,6 +986,10 @@ static PyMethodDef Playlist_methods[] = {
      (PyCFunction)Playlist_update_subscribers,
      METH_NOARGS,
      "Update the subscribers information for this playlist"},
+    {"type",
+     (PyCFunction)Playlist_type,
+     METH_NOARGS,
+     ""},
     {NULL}
 };
 

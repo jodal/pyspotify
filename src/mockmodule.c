@@ -19,6 +19,7 @@
 #include "link.h"
 #include "playlist.h"
 #include "playlistcontainer.h"
+#include "playlistfolder.h"
 #include "search.h"
 #include "session.h"
 #include "track.h"
@@ -94,6 +95,7 @@ struct sp_playlist {
     int num_tracks;
     sp_playlist_callbacks *callbacks;
     void *userdata;
+    sp_playlist_type type;
 };
 
 struct sp_playlistcontainer {
@@ -990,6 +992,29 @@ sp_playlistcontainer_playlist(sp_playlistcontainer * pc, int index)
     return pc->playlist[index];
 }
 
+sp_playlist_type
+sp_playlistcontainer_playlist_type(sp_playlistcontainer *pc, int index)
+{
+    return pc->playlist[index]->type;
+}
+
+sp_error
+sp_playlistcontainer_playlist_folder_name(sp_playlistcontainer *pc, int index,
+                                          char *buffer, int size)
+{
+    if (pc->playlist[index]->type == SP_PLAYLIST_TYPE_START_FOLDER)
+        strncpy(buffer, pc->playlist[index]->name, size);
+    else
+        buffer[0] = 0;
+    return SP_ERROR_OK;
+}
+
+sp_uint64
+sp_playlistcontainer_playlist_folder_id(sp_playlistcontainer *pc, int index)
+{
+    return 42;
+}
+
 int
 sp_playlistcontainer_num_playlists(sp_playlistcontainer * pc)
 {
@@ -1653,6 +1678,7 @@ _mock_playlist(char *name)
     p = malloc(sizeof(sp_playlist));
     memset(p, 0, sizeof(sp_playlist));
     strcpy(p->name, name);
+    p->type = SP_PLAYLIST_TYPE_PLAYLIST;
     return p;
 }
 
@@ -1694,7 +1720,8 @@ _mock_playlistcontainer(void)
 PyObject *
 mock_playlistcontainer(PyObject *self, PyObject *args)
 {
-    PyObject *seq;
+    PyObject *seq, *item;
+    sp_playlist *p;
 
     if (!PyArg_ParseTuple(args, "O", &seq))
         return NULL;
@@ -1702,20 +1729,65 @@ mock_playlistcontainer(PyObject *self, PyObject *args)
         (PlaylistContainer *) PyObject_CallObject((PyObject *)
                                                   &PlaylistContainerType,
                                                   NULL);
-
     pc->_playlistcontainer = _mock_playlistcontainer();
     int len = PySequence_Length(seq);
     int i;
 
     for (i = 0; i < len; ++i) {
-        Playlist *item = (Playlist *) PySequence_GetItem(seq, i);
-
-        Py_INCREF(item);
-        pc->_playlistcontainer->playlist[pc->
-                                         _playlistcontainer->num_playlists++] =
-            item->_playlist;
+        item = PySequence_GetItem(seq, i);
+        PyObject *ptype = PyObject_CallMethod(item, "type", NULL);
+        if (ptype) {
+            if (strcmp(PyBytes_AS_STRING(ptype), "playlist") == 0) {
+                p = ((Playlist *)item)->_playlist;
+            }
+            else if (strcmp(PyBytes_AS_STRING(ptype), "folder_start") == 0) {
+                p = _mock_playlist(((PlaylistFolder *)item)->_name);
+                p->type = SP_PLAYLIST_TYPE_START_FOLDER;
+            }
+            else if (strcmp(PyBytes_AS_STRING(ptype), "folder_end") == 0) {
+                p = _mock_playlist("");
+                p->type = SP_PLAYLIST_TYPE_END_FOLDER;
+            }
+            else {
+                p = _mock_playlist("");
+                p->type = SP_PLAYLIST_TYPE_PLACEHOLDER;
+            }
+        }
+        else return NULL;
+        pc->_playlistcontainer->playlist[
+            pc->_playlistcontainer->num_playlists++] = p;
     }
     return (PyObject *)pc;
+}
+
+PyObject *
+mock_playlistfolder(PyObject *self, PyObject *args)
+{
+    PlaylistFolder *pf;
+    char *type, *name = NULL;
+
+    if (!PyArg_ParseTuple(args, "s|s", &type, &name))
+            return NULL;
+    pf = (PlaylistFolder *)PyObject_CallObject((PyObject *)&PlaylistFolderType,
+                                               NULL);
+    if (strcmp(type, "folder_start") == 0) {
+        if (name) {
+            pf->_type = SP_PLAYLIST_TYPE_START_FOLDER;
+            pf->_name = PyMem_New(char, 256);
+            strncpy(pf->_name, name, 256);
+        }
+        else {
+            PyErr_SetString(PyExc_ValueError, "must provide name");
+            return NULL;
+        }
+    }
+    else if (strcmp(type, "folder_end") == 0) {
+        pf->_type = SP_PLAYLIST_TYPE_END_FOLDER;
+    }
+    else {
+        pf->_type = SP_PLAYLIST_TYPE_PLACEHOLDER;
+    }
+    return (PyObject *)pf;
 }
 
 PyObject *
@@ -1756,6 +1828,8 @@ static PyMethodDef module_methods[] = {
     {"mock_playlist", mock_playlist, METH_VARARGS, "Create a mock playlist"},
     {"mock_playlistcontainer", mock_playlistcontainer, METH_VARARGS,
      "Create a mock playlist container"},
+    {"mock_playlistfolder", mock_playlistfolder, METH_VARARGS,
+        "Create a mock playlist folder"},
     {"mock_search", mock_search, METH_VARARGS, "Create mock search results"},
     {"mock_session", mock_session, METH_VARARGS, "Create a mock session"},
     {"mock_event_trigger", event_trigger, METH_VARARGS, "Triggers an event"},
@@ -1783,6 +1857,8 @@ init_mockspotify(void)
     if (PyType_Ready(&PlaylistType) < 0)
         return;
     if (PyType_Ready(&PlaylistContainerType) < 0)
+        return;
+    if (PyType_Ready(&PlaylistFolderType) < 0)
         return;
     if (PyType_Ready(&ResultsType) < 0)
         return;
@@ -1814,6 +1890,7 @@ init_mockspotify(void)
     link_init(m);
     playlist_init(m);
     playlistcontainer_init(m);
+    playlistfolder_init(m);
     session_init(m);
     search_init(m);
     track_init(m);

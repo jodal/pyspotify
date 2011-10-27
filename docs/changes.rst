@@ -16,6 +16,11 @@ Updated to libspotify 9.1.32:
 - Add new method: :meth:`spotify.Playlist.subscribers`
 - Add new method: :meth:`spotify.Playlist.num_subscribers`
 - Add new method: :meth:`spotify.Playlist.update_subscribers`
+- Playlist folder boundaries are now recognized. Playlist containers now
+  contain both :class:`spotify.Playlist` and :class:`spotify.PlaylistFolder`.
+  Both classes got a ``type()`` method, which returns the string ``playlist``,
+  ``folder_start``, ``folder_end``, or ``placeholder``.
+
 
 v1.4 (2011-09-24)
 =================

@@ -43,3 +43,5 @@ class TestTrack(unittest.TestCase):
         self.track.starred(session, set=False)
         self.assertEqual(self.track.starred(session), False)
 
+    def test_availability(self):
+        self.assertEqual(self.track.availability(), 1)

@@ -2,8 +2,8 @@
 Changes
 =======
 
-v1.6 (in developpement)
-=======================
+v1.6 (in development)
+=====================
 
 Updated to work with libspotify 10.1.11.
 

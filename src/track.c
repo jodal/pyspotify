@@ -144,7 +144,18 @@ Track_starred(Track * self, PyObject *args, PyObject *kwds)
                                                            self->_track));
 }
 
+static PyObject *
+Track_availability(Track* self)
+{
+    return Py_BuildValue("i",
+                         sp_track_get_availability(g_session, self->_track));
+}
+
 static PyMethodDef Track_methods[] = {
+    {"availability",
+     (PyCFunction)Track_availability,
+     METH_NOARGS,
+     "Get availability status for this track."},
     {"is_loaded",
      (PyCFunction)Track_is_loaded,
      METH_NOARGS,

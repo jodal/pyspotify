@@ -39,8 +39,7 @@ sp_playlistcontainer *_mock_playlistcontainer(void);
 sp_playlist *_mock_playlist(char *name);
 sp_albumbrowse *_mock_albumbrowse(sp_album * album, bool loaded);
 sp_artistbrowse *_mock_artistbrowse(sp_artist * artist, bool loaded);
-sp_user *_mock_user(char *canonical_name, char *display_name, char *full_name,
-                    char *picture, sp_relation_type relation, bool loaded);
+sp_user *_mock_user(char *canonical_name, char *display_name, bool loaded);
 
 /****************************** GLOBALS ************************************/
 
@@ -141,9 +140,6 @@ struct sp_user {
     bool loaded;
     char *canonical_name;
     char *display_name;
-    char *full_name;
-    char *picture;
-    sp_relation_type relation;
 };
 
 struct sp_toplistbrowse {
@@ -248,7 +244,7 @@ sp_error_message(sp_error error)
 sp_user *
 sp_session_user(sp_session * session)
 {
-    return _mock_user(g_data.username, "", NULL, "", 0, 1);
+    return _mock_user(g_data.username, "", 1);
 }
 
 sp_playlistcontainer *
@@ -337,26 +333,10 @@ sp_session_player_unload(sp_session * session)
 {
 }
 
-bool
-sp_track_is_available(sp_session * session, sp_track * t)
+sp_track_availability
+sp_track_get_availability(sp_session *session, sp_track *t)
 {
     return 1;
-}
-
-int
-sp_session_num_friends(sp_session *session)
-{
-    return 3;
-}
-
-sp_user *
-sp_session_friend(sp_session *session, int index)
-{
-    char *names[3] = {"foo", "bar", "baz"};
-
-    if (index > 3) return NULL;
-    return _mock_user(names[index], names[index], names[index],
-                      "1245678901234567890", 0, 1);
 }
 
 /********************************* MOCK SEARCH FUNCTIONS *********************************/
@@ -509,24 +489,6 @@ const char *
 sp_user_display_name(sp_user *user)
 {
     return user->display_name;
-}
-
-const char *
-sp_user_full_name(sp_user *user)
-{
-    return user->loaded ? user->full_name : NULL;
-}
-
-const char *
-sp_user_picture(sp_user *user)
-{
-    return user->loaded ? user->picture : NULL;
-}
-
-sp_relation_type
-sp_user_relation_type(sp_session *session, sp_user *user)
-{
-    return user->relation;
 }
 
 /********************************* MOCK LINK FUNCTIONS ***********************************/
@@ -890,7 +852,7 @@ mock_playlist_event(int event, sp_playlist * p)
     sp_artist *artist = _mock_artist("foo_", 1);
     sp_album *album = _mock_album("bar_", artist, 2011,
                                   (byte *) "01234567890123456789", 0, 1, 1);
-    sp_user *user = _mock_user("foo", "", "", "", 0, 0);
+    sp_user *user = _mock_user("foo", "", 0);
     sp_track *tracks[3] = {
         _mock_track("foo", 1, &artist, album, 0, 0, 0, 0, 0, 1),
         _mock_track("bar", 1, &artist, album, 0, 0, 0, 0, 0, 1),
@@ -1254,7 +1216,9 @@ sp_artistbrowse_release(sp_artistbrowse * ab)
 
 sp_artistbrowse *
 sp_artistbrowse_create(sp_session * s, sp_artist * a,
-                       artistbrowse_complete_cb cb, void *userdata)
+                       sp_artistbrowse_type type,
+                       artistbrowse_complete_cb cb,
+                       void *userdata)
 {
     sp_artistbrowse *ab;
 
@@ -1430,17 +1394,13 @@ sp_toplistbrowse_create(sp_session *session,
 /**************** MOCKING NEW OBJECTS *******************/
 
 /// Generate a mock sp_user structure
-sp_user *_mock_user(char *canonical_name, char *display_name, char *full_name,
-                    char *picture, sp_relation_type relation, bool loaded)
+sp_user *_mock_user(char *canonical_name, char *display_name, bool loaded)
 {
     sp_user *user;
 
     user = malloc(sizeof(sp_user));
     user->canonical_name = canonical_name;
     user->display_name = display_name;
-    user->full_name = full_name;
-    user->picture = picture;
-    user->relation = relation;
     user->loaded = loaded;
 
     return user;
@@ -1450,18 +1410,15 @@ sp_user *_mock_user(char *canonical_name, char *display_name, char *full_name,
 PyObject *
 mock_user(PyObject *self, PyObject *args)
 {
-    char *canonical_name, *display_name, *full_name, *picture;
-    int relation;
+    char *canonical_name, *display_name;
     int loaded;
     sp_user *user;
 
-    if (!PyArg_ParseTuple(args, "esesesesii", ENCODING, &canonical_name,
-                          ENCODING, &display_name, ENCODING, &full_name,
-                          ENCODING, &picture, &relation, &loaded))
+    if (!PyArg_ParseTuple(args, "esesi", ENCODING, &canonical_name,
+                          ENCODING, &display_name, &loaded))
         return NULL;
 
-    user = _mock_user(canonical_name, display_name, full_name, picture,
-                      relation, loaded);
+    user = _mock_user(canonical_name, display_name, loaded);
     return User_FromSpotify(user);
 }
 

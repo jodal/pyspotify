@@ -2,6 +2,26 @@
 Changes
 =======
 
+v1.5 (2011-10-30)
+=================
+
+Updated to work with libspotify 9.1.32.
+
+**New features**
+
+- Remember me: when setting the ``remember_me`` parameter to ``True`` at
+  first login, it is possible to log in again without specifying the
+  ``username`` and ``password`` attributes. Don't forget to logout in order to
+  store the credentials.
+- Add new method: :meth:`spotify.Playlist.subscribers`
+- Add new method: :meth:`spotify.Playlist.num_subscribers`
+- Add new method: :meth:`spotify.Playlist.update_subscribers`
+- Playlist folder boundaries are now recognized. Playlist containers
+  contain both :class:`spotify.Playlist` and :class:`spotify.PlaylistFolder`
+  objects. Both classes got a ``type()`` method, which returns the string
+  ``playlist``, ``folder_start``, ``folder_end``, or ``placeholder``.
+
+
 v1.4 (2011-09-24)
 =================
 

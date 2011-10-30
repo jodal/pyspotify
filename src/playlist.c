@@ -772,6 +772,40 @@ Playlist_is_collaborative(Playlist * self)
 }
 
 static PyObject *
+Playlist_num_subscribers(Playlist *self)
+{
+    return Py_BuildValue("i", sp_playlist_num_subscribers(self->_playlist));
+}
+
+static PyObject *
+Playlist_subscribers(Playlist *self)
+{
+    sp_subscribers *subscribers;
+    PyObject *list;
+    unsigned int i;
+
+    subscribers = sp_playlist_subscribers(self->_playlist);
+    list = PyList_New(subscribers->count);
+    for (i = 0; i < subscribers->count; i++) {
+        PyList_SET_ITEM(list, i, PyUnicode_FromString(
+                                        subscribers->subscribers[i]));
+    }
+    sp_playlist_subscribers_free(subscribers);
+    return list;
+}
+
+static PyObject *
+Playlist_update_subscribers(Playlist *self)
+{
+    if (!g_session) {
+        PyErr_SetString(SpotifyError, "Not logged in.");
+        return NULL;
+    }
+    sp_playlist_update_subscribers(g_session, self->_playlist);
+    Py_RETURN_NONE;
+}
+
+static PyObject *
 Playlist_add_tracks(Playlist *self, PyObject *args)
 {
     int position, num_tracks;
@@ -789,7 +823,7 @@ Playlist_add_tracks(Playlist *self, PyObject *args)
     if (num_tracks <= 0)
         Py_RETURN_NONE;
 
-    const sp_track *ts[num_tracks];
+    sp_track *ts[num_tracks];
     for (i = 0; i < num_tracks; i++) {
         PyObject *t = PyList_GetItem(tracks, i);
         if (t->ob_type != &TrackType) {
@@ -799,7 +833,7 @@ Playlist_add_tracks(Playlist *self, PyObject *args)
         }
         ts[i] = ((Track *)t)->_track;
     }
-    err = sp_playlist_add_tracks(self->_playlist, ts,
+    err = sp_playlist_add_tracks(self->_playlist, (sp_track *const *)ts,
                                  num_tracks, position, g_session);
     switch(err) {
         case SP_ERROR_OK:
@@ -813,6 +847,12 @@ Playlist_add_tracks(Playlist *self, PyObject *args)
             return NULL;
     }
     Py_RETURN_NONE;
+}
+
+static PyObject *
+Playlist_type(Playlist *self)
+{
+    return PyBytes_FromString("playlist");
 }
 
 /////////////// SEQUENCE PROTOCOL
@@ -934,6 +974,22 @@ static PyMethodDef Playlist_methods[] = {
      (PyCFunction)Playlist_owner,
      METH_NOARGS,
      "Returns the owner of the playlist"},
+    {"num_subscribers",
+     (PyCFunction)Playlist_num_subscribers,
+     METH_NOARGS,
+     "Returns the number of subscribers this playlist currently has"},
+    {"subscribers",
+     (PyCFunction)Playlist_subscribers,
+     METH_NOARGS,
+     "Returns a list of subscribers (canonical_name) to this playlist"},
+    {"update_subscribers",
+     (PyCFunction)Playlist_update_subscribers,
+     METH_NOARGS,
+     "Update the subscribers information for this playlist"},
+    {"type",
+     (PyCFunction)Playlist_type,
+     METH_NOARGS,
+     ""},
     {NULL}
 };
 

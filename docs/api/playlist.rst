@@ -145,6 +145,11 @@ objects.
         :rtype:     string
         :returns:   the name of the playlist.
 
+    .. method:: num_subscribers
+
+        :rtype:     :class:`int`
+        :returns:   The number of subscribers of this playlist
+
     .. method:: rename(name)
 
         :param name:    the new name
@@ -158,3 +163,55 @@ objects.
 
         :param tracks:  A list of tracks to be removed from the playlist.
         :type tracks:   list of :class:`Track`
+
+    .. method:: subscribers
+
+        :rtype:     list of :class:`unicode`
+        :returns:   a list of canonical names of subscribers of this playlist.
+
+        .. note:: The count returned for this function may be less than those
+            returned by :meth:`num_subscribers`. Spotify does not track each
+            user subscribed to a playlist for playlist with many (>500)
+            subscribers.
+
+    .. method:: type
+
+        returns ``'playlist'``
+
+    .. method:: update_subscribers
+
+        Ask library to update the subscription count for a playlist.
+
+        When the subscription info has been fetched from the Spotify backend
+        the :meth:`manager.SpotifyPlaylistManager.subscribers_changed`
+        callback will be invoked. In that callback use
+        :meth:`num_subscribers` and/or :meth:`subscribers` to get information
+        about the subscribers. You
+        can call those two functions anytime you want but the information might
+        not be up to date in such cases
+
+The :class:`PlaylistFolder` class
+=================================
+
+.. class:: PlaylistFolder
+
+    An entry in a playlist container that is not a playlist (often folder
+    boundaries).
+
+    .. method:: id
+
+        if type is ``'folder_start'``, returns the id of the folder, else
+        returns 0.
+
+    .. method:: is_loaded
+
+        returns ``True`` when the container it belongs to is loaded.
+
+    .. method:: name
+
+        if type is ``'folder_start'``, returns the name of the folder, else
+        returns an empty string.
+
+    .. method:: type
+
+        returns ``'folder_start'``, ``'folder_end'`` or ``'placeholder'``.

@@ -53,6 +53,14 @@ The :class:`Track` class
         .. note:: If the track is not loaded yet, all other functions operating
             on the track return default values.
 
+    .. method:: is_local()
+
+        :rtype:     :class:`bool`
+        :returns:   ``True`` if track is a local file.
+
+        .. note:: The track must be loaded or this function will always return
+        ``False``.
+
     .. method:: name()
 
         :rtype:     :class:`String`

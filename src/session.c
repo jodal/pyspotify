@@ -174,18 +174,6 @@ Session_seek(Session * self, PyObject *args)
 }
 
 static PyObject *
-Track_is_local(Session * self, PyObject *args)
-{
-    Track *track;
-
-    if (!PyArg_ParseTuple(args, "O!", &TrackType, &track)) {
-        return NULL;
-    }
-    return Py_BuildValue("i",
-                         sp_track_is_local(self->_session, track->_track));
-}
-
-static PyObject *
 Session_play(Session * self, PyObject *args)
 {
     int play;
@@ -368,8 +356,6 @@ static PyMethodDef Session_methods[] = {
      "Play or pause the currently loaded track"},
     {"unload", (PyCFunction)Session_unload, METH_NOARGS,
      "Stop the currently playing track"},
-    {"is_local", (PyCFunction)Track_is_local, METH_VARARGS,
-     "Return true if the track is a local file."},
     {"playlist_container", (PyCFunction)Session_playlist_container,
      METH_NOARGS,
      "Return the playlist container for the currently logged in user"},

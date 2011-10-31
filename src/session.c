@@ -843,7 +843,7 @@ session_connect(PyObject *self, PyObject *args)
     if (!password)
         return NULL;
 
-    if ((int) username < 0 || (int) password < 0)
+    if ((long) username < 0 || (long) password < 0)
         relogin = 1;
 
     PyObject *remember = PyObject_GetAttr(client, PyBytes_FromString("remember_me"));

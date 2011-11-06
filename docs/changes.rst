@@ -2,6 +2,20 @@
 Changes
 =======
 
+v1.6 (in developement)
+======================
+
+Updated to work with libspotify 10.1.16.
+
+**API changes**
+
+- ``Session.is_available(track)`` has been moved to
+  :meth:`spotify.Track.availability()`, and returns a detailed availability
+  status of the track.
+- Removed methods: ``Session.get_friends``, ``User.full_name``,
+  ``User.picture``, and``User.relation``, as they was removed from the
+  libspotify API.
+
 v1.5 (2011-10-30)
 =================
 

@@ -58,6 +58,7 @@ ArtistBrowser_new(PyTypeObject * type, PyObject *args, PyObject *kwds)
     self->_browser =
         sp_artistbrowse_create(((Session *) session)->_session,
                                ((Artist *) artist)->_artist,
+                               SP_ARTISTBROWSE_FULL,
                                (artistbrowse_complete_cb *)
                                ArtistBrowser_browse_complete,
                                (void *)&self->_callback);

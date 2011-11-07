@@ -3,7 +3,6 @@
 import unittest
 
 from spotify._mockspotify import User, mock_user, mock_session
-from spotify.constant import RELATION_TYPE_BIDIRECTIONAL
 
 class TestUser(unittest.TestCase):
 

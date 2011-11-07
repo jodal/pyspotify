@@ -2,8 +2,8 @@
 Changes
 =======
 
-v1.6 (in developement)
-======================
+v1.6 (in development)
+=====================
 
 Updated to work with libspotify 10.1.16.
 
@@ -12,6 +12,8 @@ Updated to work with libspotify 10.1.16.
 - ``Session.is_available(track)`` has been moved to
   :meth:`spotify.Track.availability()`, and returns a detailed availability
   status of the track.
+- ``Session.is_local(track)`` is now
+  :meth:`spotify.Track.is_local()`, and returns a boolean.
 - Removed methods: ``Session.get_friends``, ``User.full_name``,
   ``User.picture``, and``User.relation``, as they was removed from the
   libspotify API.

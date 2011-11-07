@@ -174,18 +174,6 @@ Session_seek(Session * self, PyObject *args)
 }
 
 static PyObject *
-Track_is_local(Session * self, PyObject *args)
-{
-    Track *track;
-
-    if (!PyArg_ParseTuple(args, "O!", &TrackType, &track)) {
-        return NULL;
-    }
-    return Py_BuildValue("i",
-                         sp_track_is_local(self->_session, track->_track));
-}
-
-static PyObject *
 Session_play(Session * self, PyObject *args)
 {
     int play;
@@ -368,8 +356,6 @@ static PyMethodDef Session_methods[] = {
      "Play or pause the currently loaded track"},
     {"unload", (PyCFunction)Session_unload, METH_NOARGS,
      "Stop the currently playing track"},
-    {"is_local", (PyCFunction)Track_is_local, METH_VARARGS,
-     "Return true if the track is a local file."},
     {"playlist_container", (PyCFunction)Session_playlist_container,
      METH_NOARGS,
      "Return the playlist container for the currently logged in user"},
@@ -857,7 +843,7 @@ session_connect(PyObject *self, PyObject *args)
     if (!password)
         return NULL;
 
-    if ((int) username < 0 || (int) password < 0)
+    if ((long) username < 0 || (long) password < 0)
         relogin = 1;
 
     PyObject *remember = PyObject_GetAttr(client, PyBytes_FromString("remember_me"));

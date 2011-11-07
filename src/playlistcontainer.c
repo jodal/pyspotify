@@ -105,8 +105,7 @@ PlaylistContainer_add_callback(PlaylistContainer * self,
     plc_callbacks_table_add(self, to_add);
 #ifdef DEBUG
     fprintf(stderr, "[DEBUG]-plcontainer- adding callback (%p,%p) py(%p,%p)\n",
-            plc_callbacks, tramp, PyFunction_GetCode(tramp->callback),
-            tramp->userdata);
+            plc_callbacks, tramp, tramp->callback, tramp->userdata);
 #endif
     sp_playlistcontainer_add_callbacks(self->_playlistcontainer, plc_callbacks,
                                        tramp);

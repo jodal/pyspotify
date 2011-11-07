@@ -70,7 +70,7 @@ The :class:`Track` class
         :returns:   ``True`` if track is a local file.
 
         .. note:: The track must be loaded or this function will always return
-        ``False``.
+            ``False``.
 
     .. method:: name()
 

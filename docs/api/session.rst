@@ -71,10 +71,6 @@ The :class:`Session` class
         :rtype:         :class:`int`
         :returns:       Wether the track is available for playback.
 
-    .. method:: is_local(track)
-
-        Return ``1`` if the track is a local file, ``0`` if not.
-
     .. method:: load(track)
 
         :param track:   a track

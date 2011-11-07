@@ -45,3 +45,6 @@ class TestTrack(unittest.TestCase):
 
     def test_availability(self):
         self.assertEqual(self.track.availability(), 1)
+
+    def test_is_local(self):
+        self.assertFalse(self.track.is_local())

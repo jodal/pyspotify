@@ -19,6 +19,17 @@ The :class:`Track` class
         :rtype:     List of :class:`Artist`
         :returns:   The artists who performed on this track.
 
+    .. method:: availability()
+
+        :rtype:     integer
+        :returns:   The availability status of this track.
+
+        Possible values:
+            - 0: Track is not available
+            - 1: Track is available and can be played
+            - 2: Track can not be streamed using this account
+            - 3: Track not available on artist's request
+
     .. method:: disc()
 
         :rtype:     :class:`int`
@@ -52,6 +63,14 @@ The :class:`Track` class
 
         .. note:: If the track is not loaded yet, all other functions operating
             on the track return default values.
+
+    .. method:: is_local()
+
+        :rtype:     :class:`bool`
+        :returns:   ``True`` if track is a local file.
+
+        .. note:: The track must be loaded or this function will always return
+        ``False``.
 
     .. method:: name()
 

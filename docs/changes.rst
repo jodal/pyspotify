@@ -15,7 +15,7 @@ Updated to work with libspotify 10.1.16.
 - ``Session.is_local(track)`` is now
   :meth:`spotify.Track.is_local()`, and returns a boolean.
 - Removed methods: ``Session.get_friends``, ``User.full_name``,
-  ``User.picture``, and``User.relation``, as they was removed from the
+  ``User.picture``, and ``User.relation``, as they was removed from the
   libspotify API.
 
 v1.5 (2011-10-30)

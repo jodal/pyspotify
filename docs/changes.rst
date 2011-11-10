@@ -18,6 +18,11 @@ Updated to work with libspotify 10.1.16.
   ``User.picture``, and ``User.relation``, as they was removed from the
   libspotify API.
 
+**New features**
+
+- Add new method: :meth:`spotify.Playlist.track_create_time`
+
+
 v1.5 (2011-10-30)
 =================
 

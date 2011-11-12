@@ -1,6 +1,6 @@
 #!/usr/bin/env python
-
 import cmd
+import getpass
 import readline
 import sys
 import traceback
@@ -375,8 +375,12 @@ class Jukebox(SpotifySessionManager):
 if __name__ == '__main__':
     import optparse
     op = optparse.OptionParser(version="%prog 0.1")
-    op.add_option("-u", "--username", help="spotify username")
-    op.add_option("-p", "--password", help="spotify password")
+    op.add_option("-u", 
+                  "--username", 
+                  help="spotify username")
+    password = getpass.getpass('Password: ')
     (options, args) = op.parse_args()
-    session_m = Jukebox(options.username, options.password, True)
+    session_m = Jukebox(options.username, 
+                        password, 
+                        True)
     session_m.connect()

@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+
 import cmd
 import getpass
 import readline
@@ -43,6 +44,7 @@ class JukeboxUI(cmd.Cmd, threading.Thread):
     def do_list(self, line):
         """ List the playlists, or the contents of a playlist """
         if not line:
+            i = 0
             for i, p in enumerate(self.jukebox.ctr):
                 if p.is_loaded():
                     print "%3d %s" % (i, p.name())
@@ -85,9 +87,17 @@ class JukeboxUI(cmd.Cmd, threading.Thread):
             try:
                 playlist, track = map(int, line.split(' ', 1))
             except ValueError:
-                print "Usage: play [track_link] | [playlist] [track]"
-                return
-            self.jukebox.load(playlist, track)
+                try:
+                    playlist = int(line)
+                except ValueError:
+                    print("Usage: play [track_link] | "
+                          "[playlist] [track] | [playlist]")
+                    return
+
+                else:
+                    self.jukebox.load_playlist(playlist)
+            else:
+                self.jukebox.load(playlist, track)
         self.jukebox.play()
 
     def do_browse(self, line):
@@ -299,6 +309,21 @@ class Jukebox(SpotifySessionManager):
         self.session.load(pl[track])
         print "Loading %s from %s" % (pl[track].name(), pl.name())
 
+    def load_playlist(self, playlist):
+        if self.playing:
+            self.stop()
+        if 0 <= playlist < len(self.ctr):
+            pl = self.ctr[playlist]
+        elif playlist == len(self.ctr):
+            pl = self.starred
+        print repr(pl)
+        if len(pl):
+            self.session.load(pl[0])
+        for i, track in enumerate(pl):
+            if i == 0:
+                continue
+            self._queue.append((playlist, i))
+
     def queue(self, playlist, track):
         if self.playing:
             self._queue.append((playlist, track))
@@ -322,7 +347,7 @@ class Jukebox(SpotifySessionManager):
     def next(self):
         self.stop()
         if self._queue:
-            t = self._queue.pop()
+            t = self._queue.pop(0)
             self.load(*t)
             self.play()
         else:
@@ -375,12 +400,8 @@ class Jukebox(SpotifySessionManager):
 if __name__ == '__main__':
     import optparse
     op = optparse.OptionParser(version="%prog 0.1")
-    op.add_option("-u", 
-                  "--username", 
-                  help="spotify username")
-    password = getpass.getpass('Password: ')
+    op.add_option("-u", "--username", help="spotify username")
+    password = getpass.getpass('Password:')
     (options, args) = op.parse_args()
-    session_m = Jukebox(options.username, 
-                        password, 
-                        True)
+    session_m = Jukebox(options.username, password, True)
     session_m.connect()

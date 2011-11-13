@@ -15,7 +15,10 @@ from spotify.manager import SpotifySessionManager, SpotifyPlaylistManager, \
 try:
     from spotify.alsahelper import AlsaController
 except ImportError:
-    from spotify.osshelper import OssController as AlsaController
+    try:
+        from spotify.osshelper import OssController as AlsaController
+    except ImportError:
+        from spotify.gstreamer import GstreamerAudioController as AlsaController
 from spotify import Link, SpotifyError, ToplistBrowser
 
 class JukeboxUI(cmd.Cmd, threading.Thread):
@@ -335,11 +338,15 @@ class Jukebox(SpotifySessionManager):
         self.session.play(1)
         print "Playing"
         self.playing = True
+        if hasattr(self.audio, 'start'):
+            self.audio.start()
 
     def stop(self):
         self.session.play(0)
         print "Stopping"
         self.playing = False
+        if hasattr(self.audio, 'stop'):
+            self.audio.stop()
 
     def music_delivery(self, *a, **kw):
         return self.audio.music_delivery(*a, **kw)

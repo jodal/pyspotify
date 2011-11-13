@@ -1,6 +1,6 @@
 import gst
 import gobject
-import threading
+gobject.threads_init()
 
 DEFAULT_CAPSET = gst.Caps('''\
 audio/x-raw-int,
@@ -23,9 +23,6 @@ class GstreamerAudioController(object):
                                                     'autoaudiosink']))
         self.source = self.pipeline.get_by_name('application_src')
         self.source.set_property('caps', DEFAULT_CAPSET)
-        self.t = threading.Thread(target=gobject.MainLoop)
-        self.t.setDaemon(True)
-        self.t.start()
 
     def music_delivery(self,
                        session,

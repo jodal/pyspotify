@@ -120,6 +120,19 @@ class JukeboxUI(cmd.Cmd, threading.Thread):
             print "Browse finished"
         self.jukebox.browse(l, browse_finished)
 
+    def print_search_results(self):
+        print "Artists:"
+        for a in self.results.artists():
+            print "    ", Link.from_artist(a), a.name()
+        print "Albums:"
+        for a in self.results.albums():
+            print "    ", Link.from_album(a), a.name()
+        print "Tracks:"
+        for a in self.results.tracks():
+            print "    ", Link.from_track(a, 0), a.name()
+        print self.results.total_tracks() - len(self.results.tracks()), \
+            "Tracks not shown"
+
     def do_search(self, line):
         if not line:
             if self.results is False:
@@ -127,21 +140,13 @@ class JukeboxUI(cmd.Cmd, threading.Thread):
             elif self.results is None:
                 print "Searching is in progress"
             else:
-                print "Artists:"
-                for a in self.results.artists():
-                    print "    ", Link.from_artist(a), a.name()
-                print "Albums:"
-                for a in self.results.albums():
-                    print "    ", Link.from_album(a), a.name()
-                print "Tracks:"
-                for a in self.results.tracks():
-                    print "    ", Link.from_track(a, 0), a.name()
-                print self.results.total_tracks() - len(self.results.tracks()), "Tracks not shown"
+                self.print_search_results()
         else:
             self.results = None
             def search_finished(results, userdata):
                 print "\nSearch results received"
                 self.results = results
+                self.print_search_results()
             self.jukebox.search(line, search_finished)
 
     def do_queue(self, line):

@@ -281,6 +281,10 @@ class Jukebox(SpotifySessionManager):
     def __init__(self, *a, **kw):
         SpotifySessionManager.__init__(self, *a, **kw)
         self.audio = AlsaController()
+        if hasattr(self.audio, 'set_backend'):
+            self.audio.set_backend(self)
+        if hasattr(self.audio, 'start'):
+            self.audio.start()
         self.ui = JukeboxUI(self)
         self.ctr = None
         self.playing = False
@@ -356,7 +360,7 @@ class Jukebox(SpotifySessionManager):
         print "Stopping"
         self.playing = False
         if hasattr(self.audio, 'stop'):
-            self.audio.stop()
+            self.audio.pause()
 
     def music_delivery(self, *a, **kw):
         return self.audio.music_delivery(*a, **kw)

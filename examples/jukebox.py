@@ -34,7 +34,12 @@ class JukeboxUI(cmd.Cmd, threading.Thread):
         self.results = False
 
     def run(self):
-        self.cmdloop()
+        try:
+            self.cmdloop()
+        except Exception, e:
+            import traceback
+            traceback.print_exc(e)
+        self.do_quit(None)
 
     def do_logout(self, line):
         self.jukebox.session.logout()

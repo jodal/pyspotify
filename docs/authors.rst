@@ -11,3 +11,6 @@ Contributors to pyspotify in the order of appearance:
 - Johannes Knutsen <johannes@knutseninfo.no>
 - Antoine Pierlot-Garcin <antoine@bokbox.com>
 - Jamie Kirkpatrick <jkp@kirkconsulting.co.uk>
+- Francisco Jordano <arcturus@ardeenelinfierno.com>
+- triptec
+- Benjamin Chapus <xben@free.fr>

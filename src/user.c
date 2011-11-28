@@ -60,42 +60,12 @@ User_display_name(User * self)
 }
 
 static PyObject *
-User_full_name(User * self)
-{
-    const char *s = sp_user_full_name(self->_user);
-
-    if (!s)
-        Py_RETURN_NONE;
-    return PyUnicode_FromString(s);
-}
-
-static PyObject *
 User_str(PyObject *self)
 {
     User *a = (User *) self;
     const char *s = sp_user_canonical_name(a->_user);
 
     return PyUnicode_FromString(s);
-}
-
-static PyObject *
-User_picture(User *self)
-{
-    const char *picture;
-
-    picture = sp_user_picture(self->_user);
-    if (!picture)
-        Py_RETURN_NONE;
-    return PyUnicode_FromString(picture);
-}
-
-static PyObject *
-User_relation(User *self)
-{
-    sp_relation_type relation;
-
-    relation = sp_user_relation_type(g_session, self->_user);
-    return Py_BuildValue("i", relation);
 }
 
 static PyMethodDef User_methods[] = {
@@ -111,18 +81,6 @@ static PyMethodDef User_methods[] = {
      (PyCFunction) User_display_name,
      METH_NOARGS,
      "Returns the display name of the user"},
-    {"full_name",
-     (PyCFunction) User_full_name,
-     METH_NOARGS,
-     "Returns the full name of the user"},
-    {"picture",
-     (PyCFunction) User_picture,
-     METH_NOARGS,
-     "Returns an url to this user's picture."},
-    {"relation",
-     (PyCFunction) User_relation,
-     METH_NOARGS,
-     "Returns the current user's relation type with this user."},
     {NULL}
 };
 

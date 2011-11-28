@@ -116,3 +116,8 @@ class TestPlaylist(unittest.TestCase):
         pl = mock_playlist("foobar", [p1])
         self.assertRaises(TypeError, pl.add_tracks, 0, True)
         self.assertRaises(TypeError, pl.add_tracks, [False])
+
+    def test_track_create_time(self):
+        p1 = self._mock_track("foo")
+        pl = mock_playlist("foobar", [p1])
+        self.assertEqual(pl.track_create_time(0), 1320961109)

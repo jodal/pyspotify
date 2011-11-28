@@ -57,11 +57,6 @@ The :class:`Session` class
 
         Raises :exc:`SpotifyError` if not logged in.
 
-    .. method:: get_friends()
-
-        :rtype:     list of :class:`User`
-        :returns:   the list of friends for the current user.
-
     .. method:: image_create(id)
 
         :param string id:   the id of the image to be fetched.
@@ -75,10 +70,6 @@ The :class:`Session` class
         :type track:    :class:`Track`
         :rtype:         :class:`int`
         :returns:       Wether the track is available for playback.
-
-    .. method:: is_local(track)
-
-        Return ``1`` if the track is a local file, ``0`` if not.
 
     .. method:: load(track)
 

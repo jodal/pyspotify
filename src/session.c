@@ -86,21 +86,6 @@ Session_display_name(Session * self)
 };
 
 static PyObject *
-Session_get_friends(Session * self)
-{
-    int i, friends_count = sp_session_num_friends(self->_session);
-    PyObject *user;
-    PyObject *friends_list = PyList_New(friends_count);
-
-    for(i = 0; i < friends_count; i++) {
-        user = User_FromSpotify(sp_session_friend(self->_session, i));
-        PyList_SetItem(friends_list, i, user);
-    }
-
-    return friends_list;
-};
-
-static PyObject *
 Session_user_is_loaded(Session * self)
 {
     sp_user *user;
@@ -186,30 +171,6 @@ Session_seek(Session * self, PyObject *args)
     sp_session_player_seek(self->_session, seek);
     Py_END_ALLOW_THREADS;
     Py_RETURN_NONE;
-}
-
-static PyObject *
-Track_is_available(Session * self, PyObject *args)
-{
-    Track *track;
-
-    if (!PyArg_ParseTuple(args, "O!", &TrackType, &track)) {
-        return NULL;
-    }
-    return Py_BuildValue("i",
-                         sp_track_is_available(self->_session, track->_track));
-}
-
-static PyObject *
-Track_is_local(Session * self, PyObject *args)
-{
-    Track *track;
-
-    if (!PyArg_ParseTuple(args, "O!", &TrackType, &track)) {
-        return NULL;
-    }
-    return Py_BuildValue("i",
-                         sp_track_is_local(self->_session, track->_track));
 }
 
 static PyObject *
@@ -381,8 +342,6 @@ static PyMethodDef Session_methods[] = {
      "Return the canonical username for the logged in user"},
     {"display_name", (PyCFunction)Session_display_name, METH_NOARGS,
      "Return the full name for the logged in user"},
-    {"get_friends", (PyCFunction)Session_get_friends, METH_NOARGS,
-     "Return a list of friends for the logged in user"},
     {"user_is_loaded", (PyCFunction)Session_user_is_loaded, METH_NOARGS,
      "Return whether the user is loaded or not"},
     {"logout", (PyCFunction)Session_logout, METH_NOARGS,
@@ -397,10 +356,6 @@ static PyMethodDef Session_methods[] = {
      "Play or pause the currently loaded track"},
     {"unload", (PyCFunction)Session_unload, METH_NOARGS,
      "Stop the currently playing track"},
-    {"is_available", (PyCFunction)Track_is_available, METH_VARARGS,
-     "Return true if the track is available for playback."},
-    {"is_local", (PyCFunction)Track_is_local, METH_VARARGS,
-     "Return true if the track is a local file."},
     {"playlist_container", (PyCFunction)Session_playlist_container,
      METH_NOARGS,
      "Return the playlist container for the currently logged in user"},
@@ -888,7 +843,7 @@ session_connect(PyObject *self, PyObject *args)
     if (!password)
         return NULL;
 
-    if ((int) username < 0 || (int) password < 0)
+    if ((long) username < 0 || (long) password < 0)
         relogin = 1;
 
     PyObject *remember = PyObject_GetAttr(client, PyBytes_FromString("remember_me"));

@@ -216,7 +216,7 @@ Playlist_add_callback(Playlist * self, PyObject *args,
     pl_callbacks_table_add(self, to_add);
 #ifdef DEBUG
     fprintf(stderr, "[DEBUG]-playlist- adding callback (%p,%p) py(%p,%p)\n",
-            pl_callbacks, tramp, PyFunction_GetCode(tramp->callback),
+            pl_callbacks, tramp, tramp->callback,
             tramp->userdata);
 #endif
     sp_playlist_add_callbacks(self->_playlist, pl_callbacks, tramp);
@@ -707,7 +707,7 @@ Playlist_remove_callback(Playlist * self, PyObject *args)
         return NULL;
 #ifdef DEBUG
     fprintf(stderr, "[DEBUG]-playlist- looking for callback py(%p,%p)\n",
-            PyFunction_GetCode(callback), userdata);
+            callback, userdata);
 #endif
     pl_callback = pl_callbacks_table_remove(self, callback, userdata);
     if (!pl_callback) {
@@ -724,6 +724,17 @@ Playlist_remove_callback(Playlist * self, PyObject *args)
     free(pl_callback->callback);
     free(pl_callback);
     Py_RETURN_NONE;
+}
+
+static PyObject *
+Playlist_track_create_time(Playlist * self, PyObject *args)
+{
+	int num_track;
+	if (!PyArg_ParseTuple(args, "i", &num_track))
+        return NULL;
+
+	int when = sp_playlist_track_create_time(self->_playlist, num_track);
+	return Py_BuildValue("i", when);
 }
 
 static PyObject *
@@ -962,6 +973,10 @@ static PyMethodDef Playlist_methods[] = {
      (PyCFunction)Playlist_remove_callback,
      METH_VARARGS,
      ""},
+ 	{"track_create_time",
+     (PyCFunction)Playlist_track_create_time,
+     METH_VARARGS,
+     "Return when the given index was added to the playlist"},
     {"name",
      (PyCFunction)Playlist_name,
      METH_NOARGS,

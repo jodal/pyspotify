@@ -772,6 +772,12 @@ sp_playlist_track(sp_playlist * p, int index)
 }
 
 int
+sp_playlist_track_create_time(sp_playlist * p, int index)
+{
+    return 1320961109;
+}
+
+int
 sp_playlist_num_tracks(sp_playlist * p)
 {
     return p->num_tracks;

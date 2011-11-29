@@ -87,8 +87,8 @@ with libspotify v0.0.8.
 - Argument errors were unchecked in :meth:`spotify.Session.search`
 - Fix crash on valid error at image creation. Fixed by Jamie Kirkpatrick.
 - Keep compatibility with Python 2.5. Contributed by Jamie Kirkpatrick.
-- Callbacks given at artist/album browser creation are now called by pyspotify
-  (jkp)
+- Callbacks given at artist/album browser creation are now called by pyspotify.
+  Fixed by Jamie Kirkpatrick.
 - Fix exception when a ``long`` was returned from
   :meth:`spotify.manager.SpotifySessionManager.music_delivery`
 

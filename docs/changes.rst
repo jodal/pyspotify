@@ -74,9 +74,10 @@ with libspotify v0.0.8.
 - Add new method: :meth:`spotify.Playlist.rename`
 - Add new method: :meth:`spotify.Session.get_friends`. Contributed by Francisco
   Jordano.
-- Add new method: :meth:`spotify.Playlist.add_tracks`. Contributed by triptec.
+- Add new method: :meth:`spotify.Playlist.add_tracks`. Contributed by Andreas
+  Franzén.
 - Add new method: :meth:`spotify.PlaylistContainer.add_new_playlist`.
-  Contributed by triptec.
+  Contributed by Andreas Franzén.
 
 **Bug fixes**
 

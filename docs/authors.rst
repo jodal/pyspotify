@@ -12,5 +12,5 @@ Contributors to pyspotify in the order of appearance:
 - Antoine Pierlot-Garcin <antoine@bokbox.com>
 - Jamie Kirkpatrick <jkp@kirkconsulting.co.uk>
 - Francisco Jordano <arcturus@ardeenelinfierno.com>
-- triptec
+- Andreas Franzén aka triptec
 - Benjamin Chapus <xben@free.fr>

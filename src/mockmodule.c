@@ -1440,27 +1440,17 @@ mock_albumbrowse(PyObject *self, PyObject *args, PyObject *kwds)
 {
     AlbumBrowser *ab;
     int loaded;
-    PyObject *session, *album, *callback, *userdata = NULL;
-    PyObject *new_args;
+    PyObject *album, *callback = NULL, *userdata = NULL;
     static char *kwlist[] =
-        { "session", "album", "loaded", "callback", "userdata", NULL };
+        { "album", "loaded", "callback", "userdata", NULL };
 
-    if (!PyArg_ParseTupleAndKeywords(args, kwds, "O!O!iO|O", kwlist,
-                                     &SessionType, &session,
+    if (!PyArg_ParseTupleAndKeywords(args, kwds, "O!i|OO", kwlist,
                                      &AlbumType, &album, &loaded,
                                      &callback, &userdata))
         return NULL;
-    if (!userdata) {
-        userdata = Py_None;
-        Py_INCREF(Py_None);
-    }
-    new_args = PyTuple_New(4);
-    PyTuple_SetItem(new_args, 0, session);
-    PyTuple_SetItem(new_args, 1, album);
-    PyTuple_SetItem(new_args, 2, callback);
-    PyTuple_SetItem(new_args, 3, userdata);
-    ab = (AlbumBrowser *) PyObject_Call((PyObject *)&AlbumBrowserType,
-                                        new_args, NULL);
+    ab = (AlbumBrowser *) PyObject_CallFunctionObjArgs((PyObject *)&AlbumBrowserType,
+                                                album, callback,
+                                                userdata, NULL);
     ab->_browser->loaded = loaded;
     return (PyObject *)ab;
 }

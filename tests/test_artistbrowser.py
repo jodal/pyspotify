@@ -1,5 +1,5 @@
 import unittest
-from spotify._mockspotify import mock_artistbrowse, mock_artist, mock_session
+from spotify._mockspotify import mock_artistbrowse, mock_artist
 from tests import SkipTest
 
 callback_called = False

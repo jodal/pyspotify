@@ -1483,27 +1483,17 @@ mock_artistbrowse(PyObject *self, PyObject *args, PyObject *kwds)
 {
     ArtistBrowser *ab;
     int loaded;
-    PyObject *session, *artist, *callback, *userdata = NULL;
-    PyObject *new_args;
+    PyObject *artist, *callback = NULL, *userdata = NULL;
     static char *kwlist[] =
-        { "session", "artist", "loaded", "callback", "userdata", NULL };
+        { "artist", "loaded", "callback", "userdata", NULL };
 
-    if (!PyArg_ParseTupleAndKeywords(args, kwds, "O!O!iO|O", kwlist,
-                                     &SessionType, &session,
+    if (!PyArg_ParseTupleAndKeywords(args, kwds, "O!i|OO", kwlist,
                                      &ArtistType, &artist, &loaded,
                                      &callback, &userdata))
         return NULL;
-    if (!userdata) {
-        userdata = Py_None;
-        Py_INCREF(Py_None);
-    }
-    new_args = PyTuple_New(4);
-    PyTuple_SetItem(new_args, 0, session);
-    PyTuple_SetItem(new_args, 1, artist);
-    PyTuple_SetItem(new_args, 2, callback);
-    PyTuple_SetItem(new_args, 3, userdata);
-    ab = (ArtistBrowser *) PyObject_Call((PyObject *)&ArtistBrowserType,
-                                         new_args, NULL);
+    ab = (ArtistBrowser *) PyObject_CallFunctionObjArgs((PyObject *)&ArtistBrowserType,
+                                                artist, callback,
+                                                userdata, NULL);
     ab->_browser->loaded = loaded;
     return (PyObject *)ab;
 }

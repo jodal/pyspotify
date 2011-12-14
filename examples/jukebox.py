@@ -121,6 +121,7 @@ class JukeboxUI(cmd.Cmd, threading.Thread):
                     print "    ", Link.from_track(a, 0), a.name()
                 print self.results.total_tracks() - len(self.results.tracks()), "Tracks not shown"
         else:
+            line = line.decode('utf-8')
             self.results = None
             def search_finished(results, userdata):
                 print "\nSearch results received"

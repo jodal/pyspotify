@@ -263,34 +263,18 @@ Session_search(Session * self, PyObject *args, PyObject *kwds)
 static PyObject *
 Session_browse_album(Session * self, PyObject *args, PyObject *kwds)
 {
-    PyObject *album, *callback, *userdata = NULL;
-    static char *kwlist[] = { "artist", "callback", "userdata", NULL };
-    if (!PyArg_ParseTupleAndKeywords
-        (args, kwds, "O!O|O", kwlist, &AlbumType, &album, &callback,
-         &userdata))
-        return NULL;
-
-    args = PyTuple_NewByPreappending((PyObject *)self, args);
+    /* Deprecated, calls the AlbumBrowserType object */
     PyObject *result =
         PyObject_Call((PyObject *)&AlbumBrowserType, args, kwds);
-    Py_XDECREF(args);
     return result;
 }
 
 static PyObject *
 Session_browse_artist(Session * self, PyObject *args, PyObject *kwds)
 {
-    PyObject *artist, *callback, *userdata = NULL;
-    static char *kwlist[] = { "artist", "callback", "userdata", NULL };
-    if (!PyArg_ParseTupleAndKeywords
-        (args, kwds, "O!O|O", kwlist, &ArtistType, &artist, &callback,
-         &userdata))
-        return NULL;
-
-    args = PyTuple_NewByPreappending((PyObject *)self, args);
+    /* Deprecated, calls the ArtistBrowserType object */
     PyObject *result =
         PyObject_Call((PyObject *)&ArtistBrowserType, args, kwds);
-    Py_XDECREF(args);
     return result;
 }
 

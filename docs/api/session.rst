@@ -37,6 +37,8 @@ The :class:`Session` class
         :param userdata: any object
         :returns: An :class:`AlbumBrowser` object containing the results
 
+        .. note:: DEPRECATED, use :class:`AlbumBrowser` instead.
+
 
     .. method:: browse_artist(artist, callback[, userdata])
 
@@ -48,6 +50,8 @@ The :class:`Session` class
         :param callback: signature : ``(ArtistBrowser browser, Object userdata)``
         :param userdata: any object
         :returns: An :class:`ArtistBrowser` object containing the results.
+
+        .. note:: DEPRECATED, use :class:`ArtistBrowser` instead.
 
 
     .. method:: display_name()

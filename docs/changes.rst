@@ -1,11 +1,17 @@
 =======
 Changes
 =======
+.. currentmodule:: spotify
 
 v1.7 (in development)
 =====================
 
-- None
+**API changes**
+
+- Artist and album browsers are now created directly from the
+  :class:`ArtistBrowser` and :class:`AlbumBrowser` class constructors. The
+  :meth:`Session.browse_artist` and :meth:`Session.browse_album` methods still
+  work but have been deprecated.
 
 
 v1.6 (2011-11-29)

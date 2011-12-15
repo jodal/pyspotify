@@ -343,7 +343,7 @@ class Jukebox(SpotifySessionManager):
             while not browser.is_loaded():
                 time.sleep(0.1)
             for track in browser:
-                print track
+                print track.name()
         if link.type() == link.LINK_ARTIST:
             browser = ArtistBrowser(link.as_artist())
             while not browser.is_loaded():

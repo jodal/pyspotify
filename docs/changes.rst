@@ -11,7 +11,8 @@ v1.7 (in development)
 - Artist and album browsers are now created directly from the
   :class:`ArtistBrowser` and :class:`AlbumBrowser` class constructors. The
   :meth:`Session.browse_artist` and :meth:`Session.browse_album` methods still
-  work but have been deprecated.
+  work but have been deprecated. Also, callbacks are optional for the two
+  browsers.
 
 
 v1.6 (2011-11-29)

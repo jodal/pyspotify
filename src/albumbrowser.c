@@ -22,8 +22,9 @@ static void
 AlbumBrowser_browse_complete(sp_albumbrowse * browse, Callback * st)
 {
 #ifdef DEBUG
-    fprintf(stderr, "Album browse complete\n");
+    fprintf(stderr, "[DEBUG]-albbrw- browse complete (%p, %p)\n", browse, st);
 #endif
+    if (!st) return;
     PyGILState_STATE gstate = PyGILState_Ensure();
     PyObject *browser = AlbumBrowser_FromSpotify(browse);
 
@@ -31,47 +32,43 @@ AlbumBrowser_browse_complete(sp_albumbrowse * browse, Callback * st)
                                                  st->userdata, NULL);
     if (!res)
         PyErr_WriteUnraisable(st->callback);
+    delete_trampoline(st);
     Py_DECREF(browser);
     Py_XDECREF(res);
     PyGILState_Release(gstate);
 }
 
 static PyObject *
-AlbumBrowser_new(PyTypeObject * type, PyObject *args, PyObject *kwds)
+AlbumBrowser_new(PyTypeObject *type, PyObject *args, PyObject *kwds)
 {
-    PyObject *session, *album, *callback, *userdata = NULL;
+    PyObject *album, *callback = NULL, *userdata = NULL;
+    Callback *cb = NULL;
+    AlbumBrowser *self;
     static char *kwlist[] =
-        { "session", "album", "callback", "userdata", NULL };
+        { "album", "callback", "userdata", NULL };
+
     if (!PyArg_ParseTupleAndKeywords
-        (args, kwds, "O!O!O|O", kwlist, &SessionType, &session, &AlbumType,
-         &album, &callback, &userdata))
+        (args, kwds, "O!|OO", kwlist, &AlbumType, &album, &callback,
+            &userdata))
         return NULL;
-
-    AlbumBrowser *self = (AlbumBrowser *) type->tp_alloc(type, 0);
-
-    self->_callback.callback = callback;
-    self->_callback.userdata = userdata;
-    Py_XINCREF(callback);
-    Py_XINCREF(userdata);
-
-    Py_BEGIN_ALLOW_THREADS;
-    self->_browser = sp_albumbrowse_create(((Session *) session)->_session,
-                                           ((Album *) album)->_album,
-                                           (albumbrowse_complete_cb *)
-                                           AlbumBrowser_browse_complete,
-                                           (void *)&self->_callback);
-
-    Py_END_ALLOW_THREADS;
+    self = (AlbumBrowser *) type->tp_alloc(type, 0);
+    if (callback) {
+        if (!userdata)
+            userdata = Py_None;
+        cb = create_trampoline(callback, NULL, userdata);
+    }
+    self->_browser =
+        sp_albumbrowse_create(g_session,
+                               ((Album *) album)->_album,
+                               (albumbrowse_complete_cb *)
+                               AlbumBrowser_browse_complete,
+                               cb);
     return (PyObject *)self;
 }
 
 static void
 AlbumBrowser_dealloc(PyObject *arg)
 {
-#ifdef DEBUG
-    fprintf(stderr, "Deallocating album browser");
-#endif
-
     AlbumBrowser *self = (AlbumBrowser *) arg;
 
     Py_XDECREF(self->_callback.callback);

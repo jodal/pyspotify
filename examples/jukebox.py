@@ -16,6 +16,7 @@ try:
 except ImportError:
     from spotify.osshelper import OssController as AlsaController
 from spotify import Link, SpotifyError, ToplistBrowser
+from spotify import AlbumBrowser, ArtistBrowser
 
 class JukeboxUI(cmd.Cmd, threading.Thread):
 
@@ -98,8 +99,8 @@ class JukeboxUI(cmd.Cmd, threading.Thread):
         if not l.type() in [Link.LINK_ALBUM, Link.LINK_ARTIST]:
             print "You can only browse albums and artists"
             return
-        def browse_finished(browser):
-            print "Browse finished"
+        def browse_finished(browser, userdata):
+            print "Browse finished, %s" % (userdata)
         self.jukebox.browse(l, browse_finished)
 
     def do_search(self, line):
@@ -342,14 +343,13 @@ class Jukebox(SpotifySessionManager):
             while not browser.is_loaded():
                 time.sleep(0.1)
             for track in browser:
-                print track
+                print track.name()
         if link.type() == link.LINK_ARTIST:
-            browser = self.session.browse_artist(link.as_artist(), callback)
+            browser = ArtistBrowser(link.as_artist())
             while not browser.is_loaded():
                 time.sleep(0.1)
             for album in browser:
                 print album.name()
-        callback(browser)
 
     def watch(self, p, unwatch=False):
         if not unwatch:

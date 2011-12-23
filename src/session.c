@@ -22,26 +22,6 @@ static int session_constructed = 0;
 sp_session *g_session;
 
 static PyObject *
-PyTuple_NewByPreappending(PyObject *firstObject, PyObject *tuple)
-{
-    PyObject *result = PyTuple_New(PyObject_Length(tuple) + 1);
-
-    PyTuple_SetItem(result, 0, firstObject);
-    Py_XINCREF(firstObject);
-
-    unsigned i;
-
-    for (i = 0; i < PyObject_Length(tuple); ++i) {
-        PyObject *member = PyTuple_GetItem(tuple, i);
-
-        Py_XINCREF(member);
-        PyTuple_SetItem(result, i + 1, member);
-    }
-
-    return result;
-}
-
-static PyObject *
 Session_new(PyTypeObject * type, PyObject *args, PyObject *kwds)
 {
     Session *self;

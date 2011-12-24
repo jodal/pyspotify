@@ -17,57 +17,80 @@ The :class:`Link` class
 
     .. data:: LINK_TRACK
 
-
     .. data:: LINK_ALBUM
-
 
     .. data:: LINK_ARTIST
 
-
     .. data:: LINK_SEARCH
-
 
     .. data:: LINK_PLAYLIST
 
+    .. method:: type()
+
+        Return the type of the link as an :class:`int`. Check value
+        against the :data:`LINK_*` types.
 
     .. method:: as_album()
 
-        Return this link as an :class:`Album` object.
+        :return: the link as an :class:`Album` object.
+        :rtype: :class:`Album`
 
     .. method:: as_artist()
 
-        Return this link as an :class:`Artist` object.
+        :return: the link as an :class:`Artist` object.
+        :rtype: :class:`Artist`
 
     .. method:: as_track()
 
-        Return this link as a :class:`Track` object.
+        :return: the link as a :class:`Track` object.
+        :rtype: :class:`Track`
 
     .. staticmethod:: from_album(album)
 
+        :param album: an album
+        :type album: :class:`Album`
+        :return: link to the album
+        :rtype: :class:`Link`
         :raises: :exc:`SpotifyError`
 
         Create a new :class:`Link` object from an :class:`Album` object.
 
     .. staticmethod:: from_artist(artist)
 
-       :raises: :exc:`SpotifyError`
+        :param artist: an artist
+        :type artist: :class:`Artist`
+        :return: link to the artist
+        :rtype: :class:`Link`
+        :raises: :exc:`SpotifyError`
 
-       Create a new :class:`Link` object from an :class:`Artist` object.
+        Create a new :class:`Link` object from an :class:`Artist` object.
 
     .. staticmethod:: from_playlist(playlist)
 
-       :raises: :exc:`SpotifyError`
+        :param playlist: a playlist
+        :type playlist: :class:`Playlist`
+        :return: link to the playlist
+        :rtype: :class:`Link`
+        :raises: :exc:`SpotifyError`
 
-       Create a new :class:`Link` object from a :class:`Playlist` object.
+        Create a new :class:`Link` object from a :class:`Playlist` object.
 
     .. staticmethod:: from_search(results)
 
-       :raises: :exc:`SpotifyError`
+        :param results: a result set
+        :type results: :class:`Results`
+        :return: link to the result set
+        :rtype: :class:`Link`
+        :raises: :exc:`SpotifyError`
 
-       Create a new :class:`Link` object from a :class:`Results` object.
+        Create a new :class:`Link` object from a :class:`Results` object.
 
     .. staticmethod:: from_string(s)
 
+        :param s: a Spotify URI
+        :type s: :class:`string`
+        :return: link to the same resource as the URI string
+        :rtype: :class:`Link`
         :raises: :exc:`SpotifyError`
 
         Create a new :class:`Link` object from a string.
@@ -75,13 +98,13 @@ The :class:`Link` class
 
     .. staticmethod:: from_track(track[, offset])
 
+        :param track: a track
+        :type track: :class:`Track`
+        :param offset: offset in milliseconds from the start of the track
+        :type offset: :class:`int`
+        :return: link to the result set
+        :rtype: :class:`Link`
         :raises: :exc:`SpotifyError`
 
         Create a new :class:`Link` object from a :class:`Track` object, and
         optionally a time offset in milliseconds from the start of the track.
-
-    .. method:: type()
-
-        Return the type of the link as an :class:`int`. Check value
-        against the :data:`LINK_*` types.
-

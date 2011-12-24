@@ -73,15 +73,15 @@ The :class:`Link` class
         Create a new :class:`Link` object from a string.
         Raises an exception if the string is not a valid Spotify URI.
 
-    .. staticmethod:: from_track()
+    .. staticmethod:: from_track(track[, offset])
 
         :raises: :exc:`SpotifyError`
 
-        Create a new :class:`Link` object from a :class:`Track` object.
+        Create a new :class:`Link` object from a :class:`Track` object, and
+        optionally a time offset in milliseconds from the start of the track.
 
     .. method:: type()
 
         Return the type of the link as an :class:`int`. Check value
         against the :data:`LINK_*` types.
-
 

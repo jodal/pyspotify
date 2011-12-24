@@ -583,7 +583,7 @@ music_delivery(sp_session * session, const sp_audioformat * format,
     int consumed = num_frames;  // assume all consumed
     if (!res)
         PyErr_WriteUnraisable(method);
-    if (PyInt_Check(res))
+    else if (PyInt_Check(res))
         consumed = (int)PyInt_AsLong(res);
     else if (PyLong_Check(res))
         consumed = (int)PyLong_AsLong(res);

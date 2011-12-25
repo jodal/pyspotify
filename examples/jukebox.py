@@ -8,13 +8,34 @@ import time
 import threading
 import os
 
+import spotify
 from spotify.manager import SpotifySessionManager, SpotifyPlaylistManager, \
     SpotifyContainerManager
-try:
-    from spotify.alsahelper import AlsaController
-except ImportError:
-    from spotify.osshelper import OssController as AlsaController
-from spotify import Link,SpotifyError
+from spotify import Link, SpotifyError, ToplistBrowser
+from spotify import AlbumBrowser, ArtistBrowser
+
+AUDIO_CONTROLLERS = (
+    ('spotify.alsahelper', 'AlsaController'),
+    ('spotify.osshelper', 'OssController'),
+    ('spotify.portaudiohelper', 'PortAudioController')
+)
+
+def import_audio_controller():
+    error_messages = []
+    for module, cls in AUDIO_CONTROLLERS:
+        try:
+            module = __import__(module, fromlist=[cls])
+            cls = getattr(module, cls)
+            return cls
+        except:
+            error_messages.append(
+                "Tried to use %s.%s as audio controller, but failed:"
+                % (module, cls))
+            error_messages.append(traceback.format_exc())
+    error_messages.append("Was not able to import any of the audio helpers")
+    raise ImportError, error_messages.join("\n")
+
+AudioController = import_audio_controller()
 
 class JukeboxUI(cmd.Cmd, threading.Thread):
 
@@ -30,6 +51,9 @@ class JukeboxUI(cmd.Cmd, threading.Thread):
 
     def run(self):
         self.cmdloop()
+
+    def do_logout(self, line):
+        self.jukebox.session.logout()
 
     def do_quit(self, line):
         print "Goodbye!"
@@ -94,8 +118,8 @@ class JukeboxUI(cmd.Cmd, threading.Thread):
         if not l.type() in [Link.LINK_ALBUM, Link.LINK_ARTIST]:
             print "You can only browse albums and artists"
             return
-        def browse_finished(browser):
-            print "Browse finished"
+        def browse_finished(browser, userdata):
+            print "Browse finished, %s" % (userdata)
         self.jukebox.browse(l, browse_finished)
 
     def do_search(self, line):
@@ -115,10 +139,10 @@ class JukeboxUI(cmd.Cmd, threading.Thread):
                 for a in self.results.tracks():
                     print "    ", Link.from_track(a, 0), a.name()
                 print self.results.total_tracks() - len(self.results.tracks()), "Tracks not shown"
-                self.results = False
         else:
+            line = line.decode('utf-8')
             self.results = None
-            def search_finished(results):
+            def search_finished(results, userdata):
                 print "\nSearch results received"
                 self.results = results
             self.jukebox.search(line, search_finished)
@@ -173,6 +197,49 @@ You will be notified when tracks are added, moved or removed from the playlist."
                 return
             self.jukebox.watch(self.jukebox.ctr[p], True)
 
+    def do_toplist(self, line):
+        usage = "Usage: toplist (albums|artists|tracks) (GB|FR|..|NO|all|current)"
+        if not line:
+            print usage
+        else:
+            args = line.split(' ')
+            if len(args) != 2:
+                print usage
+            else:
+                self.jukebox.toplist(*args)
+
+    def do_shell(self, line):
+        self.jukebox.shell()
+
+    def do_add_new_playlist(self, line):
+        if not line:
+            print "Usage: add_new_playlist <name>"
+        else:
+          new_playlist = self.jukebox.ctr.add_new_playlist(line.decode('utf-8'))
+
+    def do_add_to_playlist(self, line):
+        usage = "Usage: add_to_playlist <playlist_index> <insert_point>" + \
+                " <search_result_indecies>"
+        if not line:
+            print usage
+            return
+        args = line.split(' ')
+        if len(args) < 3:
+            print usage
+        else:
+            if not self.results:
+                print "No search results"
+            else:
+                index = int(args.pop(0))
+                insert = int(args.pop(0))
+                artists = self.results.artists()
+                tracks = self.results.tracks()
+                for i in args:
+                    for a in tracks[int(i)].artists():
+                        print u'{}. {} - {} '.format(i,a.name(),tracks[int(i)].name())
+                print u'adding them to {} '.format(self.jukebox.ctr[index].name())
+                self.jukebox.ctr[index].add_tracks(insert,[tracks[int(i)] for i in args])
+
     do_ls = do_list
     do_EOF = do_quit
 
@@ -211,7 +278,7 @@ class Jukebox(SpotifySessionManager):
 
     def __init__(self, *a, **kw):
         SpotifySessionManager.__init__(self, *a, **kw)
-        self.audio = AlsaController()
+        self.audio = AudioController()
         self.ui = JukeboxUI(self)
         self.ctr = None
         self.playing = False
@@ -286,8 +353,8 @@ class Jukebox(SpotifySessionManager):
         print "track ends."
         self.next()
 
-    def search(self, query, callback):
-        self.session.search(query, callback)
+    def search(self, *args, **kwargs):
+        self.session.search(*args, **kwargs)
 
     def browse(self, link, callback):
         if link.type() == link.LINK_ALBUM:
@@ -295,14 +362,13 @@ class Jukebox(SpotifySessionManager):
             while not browser.is_loaded():
                 time.sleep(0.1)
             for track in browser:
-                print track
+                print track.name()
         if link.type() == link.LINK_ARTIST:
-            browser = self.session.browse_artist(link.as_artist(), callback)
+            browser = ArtistBrowser(link.as_artist())
             while not browser.is_loaded():
                 time.sleep(0.1)
             for album in browser:
                 print album.name()
-        callback(browser)
 
     def watch(self, p, unwatch=False):
         if not unwatch:
@@ -312,15 +378,25 @@ class Jukebox(SpotifySessionManager):
             print "Unatching playlist: %s" % p.name()
             self.playlist_manager.unwatch(p)
 
+    def toplist(self, tl_type, tl_region):
+        print repr(tl_type)
+        print repr(tl_region)
+        def callback(tb, ud):
+            for i in xrange(len(tb)):
+                print '%3d: %s' % (i+1, tb[i].name())
+
+        tb = ToplistBrowser(tl_type, tl_region, callback)
+
+    def shell(self):
+        import code
+        shell = code.InteractiveConsole(globals())
+        shell.interact()
+
 if __name__ == '__main__':
     import optparse
     op = optparse.OptionParser(version="%prog 0.1")
     op.add_option("-u", "--username", help="spotify username")
     op.add_option("-p", "--password", help="spotify password")
     (options, args) = op.parse_args()
-    if not options.username or not options.password:
-        op.print_help()
-        raise SystemExit
-    s = Jukebox(options.username, options.password)
-    s.connect()
-
+    session_m = Jukebox(options.username, options.password, True)
+    session_m.connect()

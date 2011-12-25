@@ -158,8 +158,10 @@ pl_callbacks_table_remove(Playlist * pl,
              * Python Function objects. However, to each function corresponds
              * an unique Code object.
              */
-            code1 = PyFunction_GetCode(c_curr->trampoline->callback);
-            code2 = PyFunction_GetCode(callback);
+            PyObject *tmp1 = as_function(c_curr->trampoline->callback);
+            PyObject *tmp2 = as_function(callback);
+            code1 = PyFunction_GetCode(tmp1);
+            code2 = PyFunction_GetCode(tmp2);
             if (code1 == code2 && c_curr->trampoline->userdata == userdata) {
                 result = c_curr;
                 if (c_prev) {
@@ -194,27 +196,27 @@ static PyObject *
 Playlist_add_callback(Playlist * self, PyObject *args,
                       sp_playlist_callbacks * pl_callbacks)
 {
-    PyObject *callback;
-    PyObject *manager = NULL, *userdata = NULL;
+    PyObject *callback, *userdata = NULL;
     Callback *tramp;
     playlist_callback *to_add;
 
-    if (!PyArg_ParseTuple(args, "O|OO", &callback, &manager, &userdata))
+    if (!PyArg_ParseTuple(args, "O|O", &callback, &userdata))
         return NULL;
     if (!userdata)
         userdata = Py_None;
-    if (!manager)
-        manager = Py_None;
-    if (!(callback = as_function(callback)))
+    if (!(PyFunction_Check(callback) || PyMethod_Check(callback))) {
+        PyErr_SetString(PyExc_TypeError,
+                    "callback argument must be of function or method type");
         return NULL;
-    tramp = create_trampoline(callback, manager, userdata);
+    }
+    tramp = create_trampoline(callback, Py_None, userdata);
     to_add = malloc(sizeof(playlist_callback));
     to_add->callback = pl_callbacks;
     to_add->trampoline = tramp;
     pl_callbacks_table_add(self, to_add);
 #ifdef DEBUG
     fprintf(stderr, "[DEBUG]-playlist- adding callback (%p,%p) py(%p,%p)\n",
-            pl_callbacks, tramp, PyFunction_GetCode(tramp->callback),
+            pl_callbacks, tramp, tramp->callback,
             tramp->userdata);
 #endif
     sp_playlist_add_callbacks(self->_playlist, pl_callbacks, tramp);
@@ -241,7 +243,6 @@ playlist_tracks_added_callback(sp_playlist * playlist,
     PyObject *p = Playlist_FromSpotify(playlist);
 
     res = PyObject_CallFunctionObjArgs(tramp->callback,
-                                       tramp->manager,
                                        p,
                                        py_tracks,
                                        Py_BuildValue("i", position),
@@ -282,7 +283,6 @@ playlist_tracks_removed_callback(sp_playlist * playlist, const int *tracks,
     PyObject *p = Playlist_FromSpotify(playlist);
 
     res = PyObject_CallFunctionObjArgs(tramp->callback,
-                                       tramp->manager,
                                        p, py_tracks, tramp->userdata, NULL);
     if (!res)
         PyErr_WriteUnraisable(tramp->callback);
@@ -321,7 +321,6 @@ playlist_tracks_moved_callback(sp_playlist * playlist, const int *tracks,
     PyObject *p = Playlist_FromSpotify(playlist);
 
     res = PyObject_CallFunctionObjArgs(tramp->callback,
-                                       tramp->manager,
                                        p,
                                        py_tracks,
                                        Py_BuildValue("i", new_position),
@@ -357,7 +356,6 @@ playlist_renamed_callback(sp_playlist * playlist, void *userdata)
     PyObject *p = Playlist_FromSpotify(playlist);
 
     res = PyObject_CallFunctionObjArgs(tramp->callback,
-                                       tramp->manager,
                                        p, tramp->userdata, NULL);
     if (!res)
         PyErr_WriteUnraisable(tramp->callback);
@@ -389,7 +387,6 @@ playlist_state_changed_callback(sp_playlist * playlist, void *userdata)
     PyObject *p = Playlist_FromSpotify(playlist);
 
     res = PyObject_CallFunctionObjArgs(tramp->callback,
-                                       tramp->manager,
                                        p, tramp->userdata, NULL);
     if (!res)
         PyErr_WriteUnraisable(tramp->callback);
@@ -423,7 +420,6 @@ playlist_update_in_progress_callback(sp_playlist * playlist,
     PyObject *p = Playlist_FromSpotify(playlist);
 
     res = PyObject_CallFunctionObjArgs(tramp->callback,
-                                       tramp->manager,
                                        p, pdone, tramp->userdata, NULL);
     if (!res)
         PyErr_WriteUnraisable(tramp->callback);
@@ -458,7 +454,6 @@ playlist_metadata_updated_callback(sp_playlist * playlist, void *userdata)
     PyObject *p = Playlist_FromSpotify(playlist);
 
     res = PyObject_CallFunctionObjArgs(tramp->callback,
-                                       tramp->manager,
                                        p, tramp->userdata, NULL);
     if (!res)
         PyErr_WriteUnraisable(tramp->callback);
@@ -497,7 +492,6 @@ playlist_track_created_changed_callback(sp_playlist * playlist,
     puser = User_FromSpotify(user);
     pwhen = PyInt_FromLong(when);
     res = PyObject_CallFunctionObjArgs(tramp->callback,
-                                       tramp->manager,
                                        p,
                                        ppos,
                                        puser, pwhen, tramp->userdata, NULL);
@@ -539,7 +533,6 @@ playlist_track_message_changed_callback(sp_playlist * playlist,
     ppos = PyInt_FromLong(position);
     pmess = PyUnicode_FromString(message);
     res = PyObject_CallFunctionObjArgs(tramp->callback,
-                                       tramp->manager,
                                        p, ppos, pmess, tramp->userdata, NULL);
     if (!res)
         PyErr_WriteUnraisable(tramp->callback);
@@ -577,7 +570,6 @@ playlist_track_seen_changed_callback(sp_playlist * playlist,
     ppos = PyInt_FromLong(position);
     pseen = PyBool_FromLong(seen);
     res = PyObject_CallFunctionObjArgs(tramp->callback,
-                                       tramp->manager,
                                        p, ppos, pseen, tramp->userdata, NULL);
     if (!res)
         PyErr_WriteUnraisable(tramp->callback);
@@ -613,7 +605,6 @@ playlist_description_changed_callback(sp_playlist * playlist,
 
     pdesc = PyUnicode_FromString(description);
     res = PyObject_CallFunctionObjArgs(tramp->callback,
-                                       tramp->manager,
                                        p, pdesc, tramp->userdata, NULL);
     if (!res)
         PyErr_WriteUnraisable(tramp->callback);
@@ -647,7 +638,6 @@ playlist_subscribers_changed_callback(sp_playlist * playlist, void *userdata)
     PyObject *p = Playlist_FromSpotify(playlist);
 
     res = PyObject_CallFunctionObjArgs(tramp->callback,
-                                       tramp->manager,
                                        p, tramp->userdata, NULL);
     if (!res)
         PyErr_WriteUnraisable(tramp->callback);
@@ -682,7 +672,6 @@ playlist_image_changed_callback(sp_playlist * playlist, const byte * image,
 
     pimage = PyBytes_FromStringAndSize((const char *)image, 20);        //TODO: return Image
     res = PyObject_CallFunctionObjArgs(tramp->callback,
-                                       tramp->manager,
                                        p, pimage, tramp->userdata, NULL);
     if (!res)
         PyErr_WriteUnraisable(tramp->callback);
@@ -718,7 +707,7 @@ Playlist_remove_callback(Playlist * self, PyObject *args)
         return NULL;
 #ifdef DEBUG
     fprintf(stderr, "[DEBUG]-playlist- looking for callback py(%p,%p)\n",
-            PyFunction_GetCode(callback), userdata);
+            callback, userdata);
 #endif
     pl_callback = pl_callbacks_table_remove(self, callback, userdata);
     if (!pl_callback) {
@@ -735,6 +724,17 @@ Playlist_remove_callback(Playlist * self, PyObject *args)
     free(pl_callback->callback);
     free(pl_callback);
     Py_RETURN_NONE;
+}
+
+static PyObject *
+Playlist_track_create_time(Playlist * self, PyObject *args)
+{
+	int num_track;
+	if (!PyArg_ParseTuple(args, "i", &num_track))
+        return NULL;
+
+	int when = sp_playlist_track_create_time(self->_playlist, num_track);
+	return Py_BuildValue("i", when);
 }
 
 static PyObject *
@@ -782,6 +782,90 @@ Playlist_is_collaborative(Playlist * self)
     return Py_BuildValue("i", sp_playlist_is_collaborative(self->_playlist));
 }
 
+static PyObject *
+Playlist_num_subscribers(Playlist *self)
+{
+    return Py_BuildValue("i", sp_playlist_num_subscribers(self->_playlist));
+}
+
+static PyObject *
+Playlist_subscribers(Playlist *self)
+{
+    sp_subscribers *subscribers;
+    PyObject *list;
+    unsigned int i;
+
+    subscribers = sp_playlist_subscribers(self->_playlist);
+    list = PyList_New(subscribers->count);
+    for (i = 0; i < subscribers->count; i++) {
+        PyList_SET_ITEM(list, i, PyUnicode_FromString(
+                                        subscribers->subscribers[i]));
+    }
+    sp_playlist_subscribers_free(subscribers);
+    return list;
+}
+
+static PyObject *
+Playlist_update_subscribers(Playlist *self)
+{
+    if (!g_session) {
+        PyErr_SetString(SpotifyError, "Not logged in.");
+        return NULL;
+    }
+    sp_playlist_update_subscribers(g_session, self->_playlist);
+    Py_RETURN_NONE;
+}
+
+static PyObject *
+Playlist_add_tracks(Playlist *self, PyObject *args)
+{
+    int position, num_tracks;
+    PyObject *tracks;
+    int i;
+    sp_error err;
+
+    if (!sp_playlist_is_loaded(self->_playlist)) {
+        PyErr_SetString(SpotifyError, "Playlist not loaded");
+        return NULL;
+    }
+    if (!PyArg_ParseTuple(args, "iO!", &position, &PyList_Type, &tracks))
+        return NULL;
+    num_tracks = PyList_GET_SIZE(tracks);
+    if (num_tracks <= 0)
+        Py_RETURN_NONE;
+
+    sp_track *ts[num_tracks];
+    for (i = 0; i < num_tracks; i++) {
+        PyObject *t = PyList_GetItem(tracks, i);
+        if (t->ob_type != &TrackType) {
+            PyErr_SetString(PyExc_TypeError,
+                    "Expected a list of spotify.Track objects");
+            return NULL;
+        }
+        ts[i] = ((Track *)t)->_track;
+    }
+    err = sp_playlist_add_tracks(self->_playlist, (sp_track *const *)ts,
+                                 num_tracks, position, g_session);
+    switch(err) {
+        case SP_ERROR_OK:
+            break;
+        case SP_ERROR_INVALID_INDATA:
+            PyErr_SetString(PyExc_IndexError,
+                            "Cannot add tracks at this position");
+            return NULL;
+        default:
+            PyErr_SetString(SpotifyError, sp_error_message(err));
+            return NULL;
+    }
+    Py_RETURN_NONE;
+}
+
+static PyObject *
+Playlist_type(Playlist *self)
+{
+    return PyBytes_FromString("playlist");
+}
+
 /////////////// SEQUENCE PROTOCOL
 
 Py_ssize_t
@@ -825,6 +909,10 @@ static PyMethodDef Playlist_methods[] = {
      (PyCFunction)Playlist_is_collaborative,
      METH_NOARGS,
      "Return collaborative status for a playlist. A playlist in collaborative state can be modifed by all users, not only the user owning the list"},
+    {"add_tracks",
+     (PyCFunction)Playlist_add_tracks,
+     METH_VARARGS,
+     ""},
     {"remove_tracks",
      (PyCFunction)Playlist_remove_tracks,
      METH_VARARGS,
@@ -885,6 +973,10 @@ static PyMethodDef Playlist_methods[] = {
      (PyCFunction)Playlist_remove_callback,
      METH_VARARGS,
      ""},
+ 	{"track_create_time",
+     (PyCFunction)Playlist_track_create_time,
+     METH_VARARGS,
+     "Return when the given index was added to the playlist"},
     {"name",
      (PyCFunction)Playlist_name,
      METH_NOARGS,
@@ -897,6 +989,22 @@ static PyMethodDef Playlist_methods[] = {
      (PyCFunction)Playlist_owner,
      METH_NOARGS,
      "Returns the owner of the playlist"},
+    {"num_subscribers",
+     (PyCFunction)Playlist_num_subscribers,
+     METH_NOARGS,
+     "Returns the number of subscribers this playlist currently has"},
+    {"subscribers",
+     (PyCFunction)Playlist_subscribers,
+     METH_NOARGS,
+     "Returns a list of subscribers (canonical_name) to this playlist"},
+    {"update_subscribers",
+     (PyCFunction)Playlist_update_subscribers,
+     METH_NOARGS,
+     "Update the subscribers information for this playlist"},
+    {"type",
+     (PyCFunction)Playlist_type,
+     METH_NOARGS,
+     ""},
     {NULL}
 };
 

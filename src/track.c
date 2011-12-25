@@ -137,18 +137,39 @@ Track_starred(Track * self, PyObject *args, PyObject *kwds)
     if (bset) {
         set = (bset == Py_True);
         sp_track_set_starred(session->_session,
-                             (const sp_track **)&(self->_track), 1, set);
+                             (sp_track * const*)&(self->_track), 1, set);
     }
     return (PyObject *)PyBool_FromLong((long)
                                        sp_track_is_starred(session->_session,
                                                            self->_track));
 }
 
+static PyObject *
+Track_availability(Track *self)
+{
+    return Py_BuildValue("i",
+                         sp_track_get_availability(g_session, self->_track));
+}
+
+static PyObject *
+Track_is_local(Track *self)
+{
+    return PyBool_FromLong(sp_track_is_local(g_session, self->_track));
+}
+
 static PyMethodDef Track_methods[] = {
+    {"availability",
+     (PyCFunction)Track_availability,
+     METH_NOARGS,
+     "Get availability status for this track."},
     {"is_loaded",
      (PyCFunction)Track_is_loaded,
      METH_NOARGS,
      "Get load status for this track. If the track is not loaded yet, all other functions operating on the track return default values."},
+    {"is_local",
+     (PyCFunction)Track_is_local,
+     METH_NOARGS,
+     "Returns wether this track is local, ie. created with the API."},
     {"artists",
      (PyCFunction)Track_artists,
      METH_VARARGS,

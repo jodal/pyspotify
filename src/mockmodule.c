@@ -16,10 +16,12 @@
 #include "link.h"
 #include "playlist.h"
 #include "playlistcontainer.h"
+#include "playlistfolder.h"
 #include "search.h"
 #include "session.h"
 #include "track.h"
 #include "user.h"
+#include "toplistbrowser.h"
 
 /****************************** GLOBALS ************************************/
 
@@ -54,18 +56,15 @@ event_trigger(PyObject *self, PyObject *args)
 PyObject *
 mock_user(PyObject *self, PyObject *args)
 {
-    char *canonical_name, *display_name, *full_name, *picture;
-    int relation;
+    char *canonical_name, *display_name;
     int loaded;
     sp_user *user;
 
-    if (!PyArg_ParseTuple(args, "esesesesii", ENCODING, &canonical_name,
-                          ENCODING, &display_name, ENCODING, &full_name,
-                          ENCODING, &picture, &relation, &loaded))
+    if (!PyArg_ParseTuple(args, "esesi", ENCODING, &canonical_name,
+                          ENCODING, &display_name, &loaded))
         return NULL;
 
-    user = mocksp_user_create(canonical_name, display_name, full_name, picture,
-                      relation, loaded);
+    user = mocksp_user_create(canonical_name, display_name, loaded);
     return User_FromSpotify(user);
 }
 
@@ -75,27 +74,17 @@ mock_albumbrowse(PyObject *self, PyObject *args, PyObject *kwds)
 {
     AlbumBrowser *ab;
     int loaded;
-    PyObject *session, *album, *callback, *userdata = NULL;
-    PyObject *new_args;
+    PyObject *album, *callback = NULL, *userdata = NULL;
     static char *kwlist[] =
-        { "session", "album", "loaded", "callback", "userdata", NULL };
+        { "album", "loaded", "callback", "userdata", NULL };
 
-    if (!PyArg_ParseTupleAndKeywords(args, kwds, "O!O!iO|O", kwlist,
-                                     &SessionType, &session,
+    if (!PyArg_ParseTupleAndKeywords(args, kwds, "O!i|OO", kwlist,
                                      &AlbumType, &album, &loaded,
                                      &callback, &userdata))
         return NULL;
-    if (!userdata) {
-        userdata = Py_None;
-        Py_INCREF(Py_None);
-    }
-    new_args = PyTuple_New(4);
-    PyTuple_SetItem(new_args, 0, session);
-    PyTuple_SetItem(new_args, 1, album);
-    PyTuple_SetItem(new_args, 2, callback);
-    PyTuple_SetItem(new_args, 3, userdata);
-    ab = (AlbumBrowser *) PyObject_Call((PyObject *)&AlbumBrowserType,
-                                        new_args, NULL);
+    ab = (AlbumBrowser *) PyObject_CallFunctionObjArgs((PyObject *)&AlbumBrowserType,
+                                                album, callback,
+                                                userdata, NULL);
     ab->_browser->loaded = loaded;
     return (PyObject *)ab;
 }
@@ -106,27 +95,17 @@ mock_artistbrowse(PyObject *self, PyObject *args, PyObject *kwds)
 {
     ArtistBrowser *ab;
     int loaded;
-    PyObject *session, *artist, *callback, *userdata = NULL;
-    PyObject *new_args;
+    PyObject *artist, *callback = NULL, *userdata = NULL;
     static char *kwlist[] =
-        { "session", "artist", "loaded", "callback", "userdata", NULL };
+        { "artist", "loaded", "callback", "userdata", NULL };
 
-    if (!PyArg_ParseTupleAndKeywords(args, kwds, "O!O!iO|O", kwlist,
-                                     &SessionType, &session,
+    if (!PyArg_ParseTupleAndKeywords(args, kwds, "O!i|OO", kwlist,
                                      &ArtistType, &artist, &loaded,
                                      &callback, &userdata))
         return NULL;
-    if (!userdata) {
-        userdata = Py_None;
-        Py_INCREF(Py_None);
-    }
-    new_args = PyTuple_New(4);
-    PyTuple_SetItem(new_args, 0, session);
-    PyTuple_SetItem(new_args, 1, artist);
-    PyTuple_SetItem(new_args, 2, callback);
-    PyTuple_SetItem(new_args, 3, userdata);
-    ab = (ArtistBrowser *) PyObject_Call((PyObject *)&ArtistBrowserType,
-                                         new_args, NULL);
+    ab = (ArtistBrowser *) PyObject_CallFunctionObjArgs((PyObject *)&ArtistBrowserType,
+                                                artist, callback,
+                                                userdata, NULL);
     ab->_browser->loaded = loaded;
     return (PyObject *)ab;
 }
@@ -225,7 +204,8 @@ mock_playlist(PyObject *self, PyObject *args)
 PyObject *
 mock_playlistcontainer(PyObject *self, PyObject *args)
 {
-    PyObject *seq;
+    PyObject *seq, *item;
+    sp_playlist *p;
 
     if (!PyArg_ParseTuple(args, "O", &seq))
         return NULL;
@@ -233,20 +213,65 @@ mock_playlistcontainer(PyObject *self, PyObject *args)
         (PlaylistContainer *) PyObject_CallObject((PyObject *)
                                                   &PlaylistContainerType,
                                                   NULL);
-
     pc->_playlistcontainer = mocksp_playlistcontainer_create();
     int len = PySequence_Length(seq);
     int i;
 
     for (i = 0; i < len; ++i) {
-        Playlist *item = (Playlist *) PySequence_GetItem(seq, i);
-
-        Py_INCREF(item);
-        pc->_playlistcontainer->playlist[pc->
-                                         _playlistcontainer->num_playlists++] =
-            item->_playlist;
+        item = PySequence_GetItem(seq, i);
+        PyObject *ptype = PyObject_CallMethod(item, "type", NULL);
+        if (ptype) {
+            if (strcmp(PyBytes_AS_STRING(ptype), "playlist") == 0) {
+                p = ((Playlist *)item)->_playlist;
+            }
+            else if (strcmp(PyBytes_AS_STRING(ptype), "folder_start") == 0) {
+                p = mocksp_playlist_create(((PlaylistFolder *)item)->_name);
+                p->type = SP_PLAYLIST_TYPE_START_FOLDER;
+            }
+            else if (strcmp(PyBytes_AS_STRING(ptype), "folder_end") == 0) {
+                p = mocksp_playlist_create("");
+                p->type = SP_PLAYLIST_TYPE_END_FOLDER;
+            }
+            else {
+                p = mocksp_playlist_create("");
+                p->type = SP_PLAYLIST_TYPE_PLACEHOLDER;
+            }
+        }
+        else return NULL;
+        pc->_playlistcontainer->playlist[
+            pc->_playlistcontainer->num_playlists++] = p;
     }
     return (PyObject *)pc;
+}
+
+PyObject *
+mock_playlistfolder(PyObject *self, PyObject *args)
+{
+    PlaylistFolder *pf;
+    char *type, *name = NULL;
+
+    if (!PyArg_ParseTuple(args, "s|s", &type, &name))
+            return NULL;
+    pf = (PlaylistFolder *)PyObject_CallObject((PyObject *)&PlaylistFolderType,
+                                               NULL);
+    if (strcmp(type, "folder_start") == 0) {
+        if (name) {
+            pf->_type = SP_PLAYLIST_TYPE_START_FOLDER;
+            pf->_name = PyMem_New(char, 256);
+            strncpy(pf->_name, name, 256);
+        }
+        else {
+            PyErr_SetString(PyExc_ValueError, "must provide name");
+            return NULL;
+        }
+    }
+    else if (strcmp(type, "folder_end") == 0) {
+        pf->_type = SP_PLAYLIST_TYPE_END_FOLDER;
+    }
+    else {
+        pf->_type = SP_PLAYLIST_TYPE_PLACEHOLDER;
+    }
+    return (PyObject *)pf;
 }
 
 PyObject *
@@ -287,6 +312,8 @@ static PyMethodDef module_methods[] = {
     {"mock_playlist", mock_playlist, METH_VARARGS, "Create a mock playlist"},
     {"mock_playlistcontainer", mock_playlistcontainer, METH_VARARGS,
      "Create a mock playlist container"},
+    {"mock_playlistfolder", mock_playlistfolder, METH_VARARGS,
+        "Create a mock playlist folder"},
     {"mock_search", mock_search, METH_VARARGS, "Create mock search results"},
     {"mock_session", mock_session, METH_VARARGS, "Create a mock session"},
     {"mock_event_trigger", event_trigger, METH_VARARGS, "Triggers an event"},
@@ -315,11 +342,15 @@ init_mockspotify(void)
         return;
     if (PyType_Ready(&PlaylistContainerType) < 0)
         return;
+    if (PyType_Ready(&PlaylistFolderType) < 0)
+        return;
     if (PyType_Ready(&ResultsType) < 0)
         return;
     if (PyType_Ready(&TrackType) < 0)
         return;
     if (PyType_Ready(&UserType) < 0)
+        return;
+    if (PyType_Ready(&ToplistBrowserType) < 0)
         return;
 
     m = Py_InitModule("_mockspotify", module_methods);
@@ -343,8 +374,10 @@ init_mockspotify(void)
     link_init(m);
     playlist_init(m);
     playlistcontainer_init(m);
+    playlistfolder_init(m);
     session_init(m);
     search_init(m);
     track_init(m);
     user_init(m);
+    toplistbrowser_init(m);
 }

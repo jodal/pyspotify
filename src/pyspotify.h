@@ -7,6 +7,15 @@
 
 #define ENCODING "utf-8"
 
+#if (PY_MAJOR_VERSION == 2 && PY_MINOR_VERSION < 6)
+#define PyBytes_AS_STRING            PyString_AS_STRING
+#define PyBytes_AsStringAndSize      PyString_AsStringAndSize
+#define PyBytes_Check                PyString_Check
+#define PyBytes_FromString           PyString_FromString
+#define PyBytes_FromStringAndSize    PyString_FromStringAndSize
+#define PyUnicode_FromString         PyString_FromString
+#endif
+
 extern PyObject *SpotifyError;
 extern PyObject *SpotifyApiVersion;
 
@@ -21,19 +30,11 @@ Callback *create_trampoline(PyObject *callback, PyObject *manager,
                             PyObject *userdata);
 void delete_trampoline(Callback * tr);
 
-/* Returns o as a function, making type checks.
- * 3 cases:
+/* Returns o as a function ; o must be a method or a function object
  *   o is a Function object: returns o
  *   o is a Method object  : returns the corresponding function
- *   o is another object   : sets an exception and returns NULL
  */
 PyObject *as_function(PyObject *o);
 
-#if (PY_MAJOR_VERSION == 2 && PY_MINOR_VERSION < 6)
-#define PyBytes_AS_STRING            PyString_AS_STRING
-#define PyBytes_AsStringAndSize      PyString_AsStringAndSize
-#define PyBytes_Check                PyString_Check
-#define PyBytes_FromString           PyString_FromString
-#define PyBytes_FromStringAndSize    PyString_FromStringAndSize
-#define PyUnicode_FromString         PyString_FromString
-#endif
+/* Returns a Python string for the error, or None if SP_ERROR_OK */
+PyObject *error_message(int err);

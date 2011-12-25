@@ -13,14 +13,14 @@ from spotify.manager import SpotifySessionManager, SpotifyPlaylistManager, \
     SpotifyContainerManager
 from spotify import Link, SpotifyError, ToplistBrowser
 
-ALSA_HELPERS = (
+AUDIO_CONTROLLERS = (
     ('spotify.alsahelper', 'AlsaController'),
     ('spotify.osshelper', 'OssController'), 
     ('spotify.portaudiohelper', 'portAudioController')
 )
 
-def import_alsa_controller():
-    for module, cls in ALSA_HELPERS:
+def import_audio_controller():
+    for module, cls in AUDIO_CONTROLLERS:
         try:
             module = __import__(module, fromlist=[cls])
             cls = getattr(module, cls)
@@ -30,7 +30,7 @@ def import_alsa_controller():
         return cls
     raise ImportError, "was not able to import any of the alsa helper"
 
-AlsaController = import_alsa_controller()
+AudioController = import_audio_controller()
 
 class JukeboxUI(cmd.Cmd, threading.Thread):
 
@@ -272,7 +272,7 @@ class Jukebox(SpotifySessionManager):
 
     def __init__(self, *a, **kw):
         SpotifySessionManager.__init__(self, *a, **kw)
-        self.audio = AlsaController()
+        self.audio = AudioController()
         self.ui = JukeboxUI(self)
         self.ctr = None
         self.playing = False

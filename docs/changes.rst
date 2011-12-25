@@ -1,6 +1,7 @@
 =======
 Changes
 =======
+
 .. currentmodule:: spotify
 
 v1.7 (in development)
@@ -13,6 +14,13 @@ v1.7 (in development)
   :meth:`Session.browse_artist` and :meth:`Session.browse_album` methods still
   work but have been deprecated. Also, callbacks are optional for the two
   browsers.
+
+**New features**
+
+- The bundled jukebox example now supports `PortAudio
+  <http://www.portaudio.com/>`_ in addition to OSS and ALSA audio output. In
+  other words, the jukebox can now easily be used on Mac OS X. Contributed by
+  Tommaso Barbugli.
 
 
 v1.6 (2011-11-29)

@@ -14,3 +14,4 @@ Contributors to pyspotify in the order of appearance:
 - Francisco Jordano <arcturus@ardeenelinfierno.com>
 - Andreas Franzén <andreas.franzen@osynlig.se>
 - Benjamin Chapus <xben@free.fr>
+- Tommaso Barbugli <tbarbugli@gmail.com>

@@ -11,7 +11,7 @@ class portAudioController(object):
         self.channels = 2
         self.rate = 44100
         self.stream = self.out.open(format=pyaudio.paInt16,
-            frames_per_buffer=self.periodsize, channels=self.channels, 
+            frames_per_buffer=self.periodsize, channels=self.channels,
             rate=self.rate, output=True)
 
     def _reconfigure_stream(self):
@@ -47,7 +47,7 @@ class portAudioController(object):
             self.__periodsize = siz
 
     periodsize = property(getperiodsize, setperiodsize)
-    
+
     def getrate(self):
         return self.__rate
 

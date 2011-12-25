@@ -16,7 +16,7 @@ class PortAudioController(object):
 
     def _reconfigure_stream(self):
         """
-        reopen the stream with new channel, rate settings
+        Reopen the stream with new channel, rate settings
         """
         self.stream.close()
         self.stream = self.out.open(format=pyaudio.paInt16,
@@ -24,8 +24,10 @@ class PortAudioController(object):
             rate=self.rate, output=True)
 
     def music_delivery(self, session, frames, frame_size, num_frames, sample_type, sample_rate, channels):
-        """ Interface specifically provided to make it easy to play music from
-        spotify. See the examples. """
+        """
+        Interface specifically provided to make it easy to play music from
+        Spotify. See the examples.
+        """
         try:
             self.channels = channels
             self.periodsize = num_frames

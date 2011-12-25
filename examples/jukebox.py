@@ -28,7 +28,7 @@ def import_audio_controller():
             traceback.print_exc()
             continue
         return cls
-    raise ImportError, "was not able to import any of the alsa helper"
+    raise ImportError, "Was not able to import any of the audio helpers"
 
 AudioController = import_audio_controller()
 

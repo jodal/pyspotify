@@ -24,10 +24,9 @@ def import_audio_controller():
         try:
             module = __import__(module, fromlist=[cls])
             cls = getattr(module, cls)
+            return cls
         except:
             traceback.print_exc()
-            continue
-        return cls
     raise ImportError, "Was not able to import any of the audio helpers"
 
 AudioController = import_audio_controller()

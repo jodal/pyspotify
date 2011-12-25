@@ -22,26 +22,6 @@ static int session_constructed = 0;
 sp_session *g_session;
 
 static PyObject *
-PyTuple_NewByPreappending(PyObject *firstObject, PyObject *tuple)
-{
-    PyObject *result = PyTuple_New(PyObject_Length(tuple) + 1);
-
-    PyTuple_SetItem(result, 0, firstObject);
-    Py_XINCREF(firstObject);
-
-    unsigned i;
-
-    for (i = 0; i < PyObject_Length(tuple); ++i) {
-        PyObject *member = PyTuple_GetItem(tuple, i);
-
-        Py_XINCREF(member);
-        PyTuple_SetItem(result, i + 1, member);
-    }
-
-    return result;
-}
-
-static PyObject *
 Session_new(PyTypeObject * type, PyObject *args, PyObject *kwds)
 {
     Session *self;
@@ -263,34 +243,18 @@ Session_search(Session * self, PyObject *args, PyObject *kwds)
 static PyObject *
 Session_browse_album(Session * self, PyObject *args, PyObject *kwds)
 {
-    PyObject *album, *callback, *userdata = NULL;
-    static char *kwlist[] = { "artist", "callback", "userdata", NULL };
-    if (!PyArg_ParseTupleAndKeywords
-        (args, kwds, "O!O|O", kwlist, &AlbumType, &album, &callback,
-         &userdata))
-        return NULL;
-
-    args = PyTuple_NewByPreappending((PyObject *)self, args);
+    /* Deprecated, calls the AlbumBrowserType object */
     PyObject *result =
         PyObject_Call((PyObject *)&AlbumBrowserType, args, kwds);
-    Py_XDECREF(args);
     return result;
 }
 
 static PyObject *
 Session_browse_artist(Session * self, PyObject *args, PyObject *kwds)
 {
-    PyObject *artist, *callback, *userdata = NULL;
-    static char *kwlist[] = { "artist", "callback", "userdata", NULL };
-    if (!PyArg_ParseTupleAndKeywords
-        (args, kwds, "O!O|O", kwlist, &ArtistType, &artist, &callback,
-         &userdata))
-        return NULL;
-
-    args = PyTuple_NewByPreappending((PyObject *)self, args);
+    /* Deprecated, calls the ArtistBrowserType object */
     PyObject *result =
         PyObject_Call((PyObject *)&ArtistBrowserType, args, kwds);
-    Py_XDECREF(args);
     return result;
 }
 
@@ -619,7 +583,7 @@ music_delivery(sp_session * session, const sp_audioformat * format,
     int consumed = num_frames;  // assume all consumed
     if (!res)
         PyErr_WriteUnraisable(method);
-    if (PyInt_Check(res))
+    else if (PyInt_Check(res))
         consumed = (int)PyInt_AsLong(res);
     else if (PyLong_Check(res))
         consumed = (int)PyLong_AsLong(res);

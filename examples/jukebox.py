@@ -20,14 +20,19 @@ AUDIO_CONTROLLERS = (
 )
 
 def import_audio_controller():
+    error_messages = []
     for module, cls in AUDIO_CONTROLLERS:
         try:
             module = __import__(module, fromlist=[cls])
             cls = getattr(module, cls)
             return cls
         except:
-            traceback.print_exc()
-    raise ImportError, "Was not able to import any of the audio helpers"
+            error_messages.append(
+                "Tried to use %s.%s as audio controller, but failed:"
+                % (module, cls))
+            error_messages.append(traceback.format_exc())
+    error_messages.append("Was not able to import any of the audio helpers")
+    raise ImportError, error_messages.join("\n")
 
 AudioController = import_audio_controller()
 

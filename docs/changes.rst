@@ -24,7 +24,7 @@ v1.7 (in development)
 
 **Other changes**
 
-- For developpers: *pyspotify* now uses `libmockspotify
+- For developers: *pyspotify* now uses `libmockspotify
   <https://github.com/mopidy/libmockspotify>`_ for its mocking needs. The
   mock module only contains Python bindings to the *libmockspotify* API.
 

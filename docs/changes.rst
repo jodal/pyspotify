@@ -22,6 +22,11 @@ v1.7 (in development)
   other words, the jukebox can now easily be used on Mac OS X. Contributed by
   Tommaso Barbugli.
 
+**Other changes**
+
+- For developpers: *pyspotify* now uses `libmockspotify
+  <https://github.com/mopidy/libmockspotify>`_ for its mocking needs. The
+  mock module only contains Python bindings to the *libmockspotify* API.
 
 v1.6 (2011-11-29)
 =================

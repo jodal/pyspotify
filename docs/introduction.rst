@@ -15,21 +15,21 @@ table below shows what is done and what is left to be done.
 ==================================  ==================================
 Subsystem                           Status
 ==================================  ==================================
-Error handling                      Fully implemented
-Session handling                    Fully implemented
-Link subsystem                      Fully implemented
-Track subsystem                     Fully implemented
-Album subsystem                     Fully implemented
-Artist subsystem                    Fully implemented
-Album browsing                      Fully implemented
-Artist browsing                     Fully implemented
-Image handling                      Partially implemented
-Search subsystem                    Fully implemented
-Playlist subsystem                  Partially implemented
-User handling                       Fully implemented
-Toplist handling                    Not implemented
-Inbox subsystem                     Not implemented
-Offline synchronization             Not implemented
+Error handling                      Complete
+Session handling                    Complete
+Link subsystem                      Complete
+Track subsystem                     Complete
+Album subsystem                     Complete
+Artist subsystem                    Complete
+Album browsing                      Complete
+Artist browsing                     Complete
+Image handling                      Incomplete
+Search subsystem                    Complete
+Playlist subsystem                  Incomplete
+User handling                       Complete
+Toplist handling                    Complete
+Inbox subsystem                     Not available
+Offline synchronization             Not available
 ==================================  ==================================
 
 
@@ -61,7 +61,7 @@ Install the ``pyspotify-git`` package from the AUR.
 Using Pip (latest stable release)
 ---------------------------------
 
-The ``pip`` program for installing Python packages is usually found is the
+The ``pip`` program for installing Python packages is usually found in the
 ``python-pip`` package of your Linux distribution.
 
 To install ``pyspotify``, run::

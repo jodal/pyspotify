@@ -40,10 +40,11 @@ Using Pip::
 
     sudo pip install nose
 
-Then you can either build pyspotify and run ``nosetests``, or do it all in one
-step::
+Then you can build pyspotify and run ``nosetests``::
 
-    python setup.py test
+    rm -rf build/
+    python setup.py build
+    PYTHONPATH=$(echo build/lib.linux-*/) nosetests
 
 
 Continuous integration server

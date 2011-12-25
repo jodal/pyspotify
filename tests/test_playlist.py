@@ -4,7 +4,7 @@ import unittest
 from nose.tools import raises
 
 from spotify import _mockspotify
-from spotify._mockspotify import mock_album, mock_artist, mock_track
+from spotify._mockspotify import mock_album, mock_artist, mock_track, mock_playlist
 from spotify import Album
 
 class TestPlaylistContainer(unittest.TestCase):
@@ -29,6 +29,23 @@ class TestPlaylistContainer(unittest.TestCase):
         def _():
             return pc[2]
         self.assertRaises(IndexError, _)
+
+    def test_add_new_playlist(self):
+        pc = _mockspotify.mock_playlistcontainer([])
+        pc.add_new_playlist('foo');
+        pc.add_new_playlist(u'bȧr');
+        self.assertRaises(ValueError, pc.add_new_playlist, 'foo' * 100)
+
+    def test_playlistfolder(self):
+        p1 = _mockspotify.mock_playlistfolder("folder_start", "foo")
+        p2 = _mockspotify.mock_playlistfolder("folder_end", "")
+        pc = _mockspotify.mock_playlistcontainer([p1, p2])
+        f1,f2  = pc[0],pc[1]
+        self.assertEqual(f1.name(), u'foo')
+        self.assertEqual(f1.type(), 'folder_start')
+        self.assertEqual(f2.type(), 'folder_end')
+        self.assertEqual(f1.id(), 42)
+        self.assertTrue(f1.is_loaded())
 
 class TestPlaylist(unittest.TestCase):
 
@@ -72,3 +89,35 @@ class TestPlaylist(unittest.TestCase):
         pc = _mockspotify.mock_playlist("foobar", [p1, p2])
         self.assertEqual(pc[0].name(), "foo")
         self.assertEqual(pc[1].name(), "bar")
+
+    def test_num_subscribers(self):
+        pl = _mockspotify.mock_playlist('foo', [])
+        self.assertEqual(pl.num_subscribers(), 42)
+
+    def test_subscribers(self):
+        pl = _mockspotify.mock_playlist('foo', [])
+        self.assertEqual(pl.subscribers(), [u'foo', u'bar', u'baz'])
+
+    def test_add_tracks_ok(self):
+        p1 = self._mock_track("foo")
+        p2 = self._mock_track("bar")
+        pl = mock_playlist("foobar", [p1])
+        pl.add_tracks(0, [p2])
+
+    @raises(IndexError)
+    def test_add_tracks_wrong_position(self):
+        p1 = self._mock_track("foo")
+        p2 = self._mock_track("bar")
+        pl = mock_playlist("foobar", [p1])
+        pl.add_tracks(99, [p2])
+
+    def test_add_tracks_wrong_types(self):
+        p1 = self._mock_track("foo")
+        pl = mock_playlist("foobar", [p1])
+        self.assertRaises(TypeError, pl.add_tracks, 0, True)
+        self.assertRaises(TypeError, pl.add_tracks, [False])
+
+    def test_track_create_time(self):
+        p1 = self._mock_track("foo")
+        pl = mock_playlist("foobar", [p1])
+        self.assertEqual(pl.track_create_time(0), 1320961109)

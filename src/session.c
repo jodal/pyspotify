@@ -16,6 +16,7 @@
 #include "playlistcontainer.h"
 #include "search.h"
 #include "image.h"
+#include "user.h"
 
 static int session_constructed = 0;
 sp_session *g_session;
@@ -121,17 +122,6 @@ handle_error(int err)
     }
 }
 
-PyObject *
-error_message(int err)
-{
-    if (err != 0) {
-        return PyUnicode_FromString(sp_error_message(err));
-    }
-    else {
-        Py_RETURN_NONE;
-    }
-}
-
 static PyObject *
 Session_playlist_container(Session * self)
 {
@@ -184,30 +174,6 @@ Session_seek(Session * self, PyObject *args)
 }
 
 static PyObject *
-Track_is_available(Session * self, PyObject *args)
-{
-    Track *track;
-
-    if (!PyArg_ParseTuple(args, "O!", &TrackType, &track)) {
-        return NULL;
-    }
-    return Py_BuildValue("i",
-                         sp_track_is_available(self->_session, track->_track));
-}
-
-static PyObject *
-Track_is_local(Session * self, PyObject *args)
-{
-    Track *track;
-
-    if (!PyArg_ParseTuple(args, "O!", &TrackType, &track)) {
-        return NULL;
-    }
-    return Py_BuildValue("i",
-                         sp_track_is_local(self->_session, track->_track));
-}
-
-static PyObject *
 Session_play(Session * self, PyObject *args)
 {
     int play;
@@ -241,7 +207,7 @@ Session_process_events(Session * self)
 void
 search_complete(sp_search * search, Callback * st)
 {
-    PyObject *results, *res;
+    PyObject *res, *results;
     PyGILState_STATE gstate;
 
     gstate = PyGILState_Ensure();
@@ -334,7 +300,6 @@ Session_image_create(Session * self, PyObject *args)
     byte *image_id;
     size_t len;
     sp_image *image;
-    PyObject *i;
 
     if (!PyArg_ParseTuple(args, "s#", &image_id, &len))
         return NULL;
@@ -343,12 +308,7 @@ Session_image_create(Session * self, PyObject *args)
         return NULL;
     }
     image = sp_image_create(self->_session, image_id);
-    if (sp_image_error(image)) {
-        PyErr_SetString(SpotifyError, "error occured during image creation");
-        return NULL;
-    }
-    i = Image_FromSpotify(image);
-    return i;
+    return Image_FromSpotify(image);
 }
 
 static PyObject *
@@ -396,10 +356,6 @@ static PyMethodDef Session_methods[] = {
      "Play or pause the currently loaded track"},
     {"unload", (PyCFunction)Session_unload, METH_NOARGS,
      "Stop the currently playing track"},
-    {"is_available", (PyCFunction)Track_is_available, METH_VARARGS,
-     "Return true if the track is available for playback."},
-    {"is_local", (PyCFunction)Track_is_local, METH_VARARGS,
-     "Return true if the track is a local file."},
     {"playlist_container", (PyCFunction)Session_playlist_container,
      METH_NOARGS,
      "Return the playlist container for the currently logged in user"},
@@ -423,7 +379,7 @@ static PyMethodDef Session_methods[] = {
 
 PyTypeObject SessionType = {
     PyObject_HEAD_INIT(NULL) 0, /*ob_size */
-    "_spotify.Session", /*tp_name */
+    "spotify.Session", /*tp_name */
     sizeof(Session),    /*tp_basicsize */
     0,                  /*tp_itemsize */
     0,                  /*tp_dealloc */
@@ -574,7 +530,7 @@ static void
 message_to_user(sp_session * session, const char *message)
 {
     PyGILState_STATE gstate;
-    PyObject *res, *method;
+    PyObject *res, *method, *msg;
 
 #ifdef DEBUG
         fprintf(stderr, "[DEBUG]-session- >> message to user: %s\n", message);
@@ -585,9 +541,10 @@ message_to_user(sp_session * session, const char *message)
     psession->_session = session;
     PyObject *client = (PyObject *)sp_session_userdata(session);
 
+    msg = PyUnicode_FromString(message);
     method = PyObject_GetAttrString(client, "message_to_user");
     res =
-        PyObject_CallFunctionObjArgs(method, psession, message, NULL);
+        PyObject_CallFunctionObjArgs(method, psession, msg, NULL);
     if (!res)
         PyErr_WriteUnraisable(method);
     Py_DECREF(psession);
@@ -662,12 +619,15 @@ music_delivery(sp_session * session, const sp_audioformat * format,
     int consumed = num_frames;  // assume all consumed
     if (!res)
         PyErr_WriteUnraisable(method);
-    if (!PyInt_Check(res)) {
+    if (PyInt_Check(res))
+        consumed = (int)PyInt_AsLong(res);
+    else if (PyLong_Check(res))
+        consumed = (int)PyLong_AsLong(res);
+    else {
         PyErr_SetString(PyExc_TypeError,
                         "music_delivery must return an integer");
         PyErr_WriteUnraisable(method);
     }
-    consumed = (int)PyInt_AsLong(res);
     Py_DECREF(pyframes);
     Py_DECREF(psession);
     Py_XDECREF(res);
@@ -761,15 +721,20 @@ session_init(PyObject *m)
 }
 
 char *
-PySpotify_GetConfigString(PyObject *client, const char *attr)
+PySpotify_GetConfigString(PyObject *client, const char *attr, bool optional)
 {
     PyObject *py_value, *py_uvalue;
     char *value;
 
     py_value = PyObject_GetAttrString(client, attr);
-    if (!py_value) {
-        PyErr_Format(SpotifyError, "%s not set", attr);
-        return NULL;
+    if (!py_value || py_value == Py_None) {
+        if (optional) {
+            return (char *)-1;
+        }
+        else {
+            PyErr_Format(SpotifyError, "%s not set", attr);
+            return NULL;
+        }
     }
     if (PyUnicode_Check(py_value)) {
         py_uvalue = py_value;
@@ -810,6 +775,7 @@ session_connect(PyObject *self, PyObject *args)
     sp_error error;
     char *username, *password;
     char *cache_location, *settings_location, *user_agent;
+    bool relogin = 0, remember_me;
 
     if (!PyArg_ParseTuple(args, "O", &client))
         return NULL;
@@ -820,7 +786,7 @@ session_connect(PyObject *self, PyObject *args)
     config.userdata = (void *)client;
     config.callbacks = &g_callbacks;
 
-    cache_location = PySpotify_GetConfigString(client, "cache_location");
+    cache_location = PySpotify_GetConfigString(client, "cache_location", 0);
     if (!cache_location)
         return NULL;
     config.cache_location = cache_location;
@@ -829,7 +795,8 @@ session_connect(PyObject *self, PyObject *args)
             cache_location);
 #endif
 
-    settings_location = PySpotify_GetConfigString(client, "settings_location");
+    settings_location = PySpotify_GetConfigString(client,
+                                                  "settings_location", 0);
     config.settings_location = settings_location;
 #ifdef DEBUG
     fprintf(stderr, "[DEBUG]-session- Settings location is '%s'\n",
@@ -856,44 +823,60 @@ session_connect(PyObject *self, PyObject *args)
     config.application_key = PyMem_Malloc(l_appkey);
     memcpy((char *)config.application_key, s_appkey, l_appkey);
 
-    user_agent = PySpotify_GetConfigString(client, "user_agent");
+    user_agent = PySpotify_GetConfigString(client, "user_agent", 0);
     if (!user_agent)
         return NULL;
     if (strlen(user_agent) > 255) {
         PyErr_SetString(SpotifyError, "user agent must be 255 characters max");
+        return NULL;
     }
     config.user_agent = user_agent;
 #ifdef DEBUG
         fprintf(stderr, "[DEBUG]-session- User agent set to '%s'\n",
                             user_agent);
 #endif
-    username = PySpotify_GetConfigString(client, "username");
+    username = PySpotify_GetConfigString(client, "username", 1);
     if (!username)
         return NULL;
 
-    password = PySpotify_GetConfigString(client, "password");
+    password = PySpotify_GetConfigString(client, "password", 1);
     if (!password)
         return NULL;
 
-    Py_BEGIN_ALLOW_THREADS;
+    if ((long) username < 0 || (long) password < 0)
+        relogin = 1;
+
+    PyObject *remember = PyObject_GetAttr(client, PyBytes_FromString("remember_me"));
+    remember_me = (remember == Py_True);
+    PyErr_Clear();
+    Py_XDECREF(remember);
+
 #ifdef DEBUG
     fprintf(stderr, "[DEBUG]-session- creating session...\n");
 #endif
     error = sp_session_create(&config, &session);
-    Py_END_ALLOW_THREADS;
     if (error != SP_ERROR_OK) {
         PyErr_SetString(SpotifyError, sp_error_message(error));
         return NULL;
     }
     session_constructed = 1;
 
+    if (relogin) {
+#ifdef DEBUG
+    fprintf(stderr, "[DEBUG]-session- relogin in progress...\n");
+#endif
+        error = sp_session_relogin(session);
+        if (error != SP_ERROR_OK) {
+            PyErr_SetString(SpotifyError, sp_error_message(error));
+            return NULL;
+        }
+    } else {
 #ifdef DEBUG
     fprintf(stderr, "[DEBUG]-session- login as %s in progress...\n",
             username);
 #endif
-    Py_BEGIN_ALLOW_THREADS;
-    sp_session_login(session, username, password);
-    Py_END_ALLOW_THREADS;
+        sp_session_login(session, username, password, remember_me);
+    }
     g_session = session;
     Session *psession =
         (Session *) PyObject_CallObject((PyObject *)&SessionType, NULL);

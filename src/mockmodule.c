@@ -19,10 +19,12 @@
 #include "link.h"
 #include "playlist.h"
 #include "playlistcontainer.h"
+#include "playlistfolder.h"
 #include "search.h"
 #include "session.h"
 #include "track.h"
 #include "user.h"
+#include "toplistbrowser.h"
 
 /***************************** FORWARD DEFINES *****************************/
 void mock_playlist_event(int event, sp_playlist * p);
@@ -37,8 +39,7 @@ sp_playlistcontainer *_mock_playlistcontainer(void);
 sp_playlist *_mock_playlist(char *name);
 sp_albumbrowse *_mock_albumbrowse(sp_album * album, bool loaded);
 sp_artistbrowse *_mock_artistbrowse(sp_artist * artist, bool loaded);
-sp_user *_mock_user(char *canonical_name, char *display_name, char *full_name,
-                    char *picture, sp_relation_type relation, bool loaded);
+sp_user *_mock_user(char *canonical_name, char *display_name, bool loaded);
 
 /****************************** GLOBALS ************************************/
 
@@ -93,6 +94,7 @@ struct sp_playlist {
     int num_tracks;
     sp_playlist_callbacks *callbacks;
     void *userdata;
+    sp_playlist_type type;
 };
 
 struct sp_playlistcontainer {
@@ -138,9 +140,15 @@ struct sp_user {
     bool loaded;
     char *canonical_name;
     char *display_name;
-    char *full_name;
-    char *picture;
-    sp_relation_type relation;
+};
+
+struct sp_toplistbrowse {
+    bool                loaded;
+    sp_toplisttype      type;
+    sp_toplistregion    region;
+    sp_album            *albums[3];
+    sp_artist           *artists[3];
+    sp_track            *tracks[3];
 };
 
 /***************************** MOCK EVENT GENERATION ***************************/
@@ -200,12 +208,21 @@ event_trigger(PyObject *self, PyObject *args)
 /***************************** MOCK SESSION FUNCTIONS **************************/
 
 void
-sp_session_login(sp_session * session, const char *username,
-                 const char *password)
+sp_session_login(sp_session *session, const char *username,
+                 const char *password, bool remember_me)
 {
     strcpy(g_data.username, username);
     strcpy(g_data.password, password);
     eventq[events++] = MOCK_LOGGED_IN;
+}
+
+sp_error
+sp_session_relogin(sp_session *session)
+{
+    if (!g_data.username || !g_data.password)
+        return SP_ERROR_NO_CREDENTIALS;
+    eventq[events++] = MOCK_LOGGED_IN;
+    return SP_ERROR_OK;
 }
 
 void
@@ -227,7 +244,7 @@ sp_error_message(sp_error error)
 sp_user *
 sp_session_user(sp_session * session)
 {
-    return _mock_user(g_data.username, "", NULL, "", 0, 1);
+    return _mock_user(g_data.username, "", 1);
 }
 
 sp_playlistcontainer *
@@ -316,8 +333,8 @@ sp_session_player_unload(sp_session * session)
 {
 }
 
-bool
-sp_track_is_available(sp_session * session, sp_track * t)
+sp_track_availability
+sp_track_get_availability(sp_session *session, sp_track *t)
 {
     return 1;
 }
@@ -472,24 +489,6 @@ const char *
 sp_user_display_name(sp_user *user)
 {
     return user->display_name;
-}
-
-const char *
-sp_user_full_name(sp_user *user)
-{
-    return user->loaded ? user->full_name : NULL;
-}
-
-const char *
-sp_user_picture(sp_user *user)
-{
-    return user->loaded ? user->picture : NULL;
-}
-
-sp_relation_type
-sp_user_relation_type(sp_session *session, sp_user *user)
-{
-    return user->relation;
 }
 
 /********************************* MOCK LINK FUNCTIONS ***********************************/
@@ -688,7 +687,7 @@ sp_track_is_starred(sp_session * s, sp_track * t)
 }
 
 void
-sp_track_set_starred(sp_session * s, const sp_track ** ts, int n, bool starred)
+sp_track_set_starred(sp_session *session, sp_track *const *ts, int n, bool starred)
 {
     int i;
 
@@ -773,6 +772,12 @@ sp_playlist_track(sp_playlist * p, int index)
 }
 
 int
+sp_playlist_track_create_time(sp_playlist * p, int index)
+{
+    return 1320961109;
+}
+
+int
 sp_playlist_num_tracks(sp_playlist * p)
 {
     return p->num_tracks;
@@ -800,10 +805,51 @@ sp_playlist_is_collaborative(sp_playlist * p)
 }
 
 sp_error
+sp_playlist_add_tracks(sp_playlist *p, sp_track *const *tracks, int num_tracks,
+                       int position, sp_session *session) {
+    if (position > p->num_tracks - 1)
+        return SP_ERROR_INVALID_INDATA;
+    return SP_ERROR_OK;
+};
+
+sp_error
 sp_playlist_remove_tracks(sp_playlist * p, const int *tracks, int num_tracks)
 {
     // TODO
     return SP_ERROR_OK;
+}
+
+unsigned int
+sp_playlist_num_subscribers(sp_playlist *p)
+{
+    return 42;
+}
+
+sp_subscribers *
+sp_playlist_subscribers(sp_playlist *p)
+{
+    typedef struct {
+        unsigned int count;
+        char *names[3];
+    } sub_t;
+
+    sub_t *s = PyMem_Malloc(sizeof(sub_t));
+    s->names[0] = "foo";
+    s->names[1] = "bar";
+    s->names[2] = "baz";
+    s->count = 3;
+    return (sp_subscribers *)s;
+}
+
+void
+sp_playlist_update_subscribers(sp_session *s, sp_playlist *p)
+{
+}
+
+void
+sp_playlist_subscribers_free(sp_subscribers *sub)
+{
+    PyMem_Free(sub);
 }
 
 void
@@ -812,7 +858,7 @@ mock_playlist_event(int event, sp_playlist * p)
     sp_artist *artist = _mock_artist("foo_", 1);
     sp_album *album = _mock_album("bar_", artist, 2011,
                                   (byte *) "01234567890123456789", 0, 1, 1);
-    sp_user *user = _mock_user("foo", "", "", "", 0, 0);
+    sp_user *user = _mock_user("foo", "", 0);
     sp_track *tracks[3] = {
         _mock_track("foo", 1, &artist, album, 0, 0, 0, 0, 0, 1),
         _mock_track("bar", 1, &artist, album, 0, 0, 0, 0, 0, 1),
@@ -902,16 +948,59 @@ sp_playlistcontainer_release(sp_playlistcontainer * p)
 {
 }
 
+bool
+sp_playlistcontainer_is_loaded(sp_playlistcontainer *p)
+{
+    return 1;
+}
+
 sp_playlist *
 sp_playlistcontainer_playlist(sp_playlistcontainer * pc, int index)
 {
     return pc->playlist[index];
 }
 
+sp_playlist_type
+sp_playlistcontainer_playlist_type(sp_playlistcontainer *pc, int index)
+{
+    return pc->playlist[index]->type;
+}
+
+sp_error
+sp_playlistcontainer_playlist_folder_name(sp_playlistcontainer *pc, int index,
+                                          char *buffer, int size)
+{
+    if (pc->playlist[index]->type == SP_PLAYLIST_TYPE_START_FOLDER)
+        strncpy(buffer, pc->playlist[index]->name, size);
+    else
+        buffer[0] = 0;
+    return SP_ERROR_OK;
+}
+
+sp_uint64
+sp_playlistcontainer_playlist_folder_id(sp_playlistcontainer *pc, int index)
+{
+    return 42;
+}
+
 int
 sp_playlistcontainer_num_playlists(sp_playlistcontainer * pc)
 {
     return pc->num_playlists;
+}
+
+sp_playlist *
+sp_playlistcontainer_add_playlist(sp_playlistcontainer *pc, sp_link *link)
+{
+    // TODO
+    return NULL;
+}
+
+sp_playlist *
+sp_playlistcontainer_add_new_playlist(sp_playlistcontainer *pc,
+                                      const char *name)
+{
+    return _mock_playlist((char *)name);
 }
 
 void
@@ -1133,7 +1222,9 @@ sp_artistbrowse_release(sp_artistbrowse * ab)
 
 sp_artistbrowse *
 sp_artistbrowse_create(sp_session * s, sp_artist * a,
-                       artistbrowse_complete_cb cb, void *userdata)
+                       sp_artistbrowse_type type,
+                       artistbrowse_complete_cb cb,
+                       void *userdata)
 {
     sp_artistbrowse *ab;
 
@@ -1214,20 +1305,108 @@ sp_artistbrowse_is_loaded(sp_artistbrowse * ab)
     return ab->loaded;
 }
 
+
+/**************** MOCK TOPLIST BROWSING ****************/
+void
+sp_toplistbrowse_add_ref(sp_toplistbrowse *tb)
+{
+}
+
+void
+sp_toplistbrowse_release(sp_toplistbrowse *tb)
+{
+}
+
+bool
+sp_toplistbrowse_is_loaded(sp_toplistbrowse *tb)
+{
+    return tb->loaded;
+}
+
+sp_error
+sp_toplistbrowse_error(sp_toplistbrowse *tb)
+{
+    return SP_ERROR_OK;
+}
+
+int
+sp_toplistbrowse_num_albums(sp_toplistbrowse *tb)
+{
+    return tb->type == SP_TOPLIST_TYPE_ALBUMS ? 3 : 0;
+}
+
+int
+sp_toplistbrowse_num_artists(sp_toplistbrowse *tb)
+{
+    return tb->type == SP_TOPLIST_TYPE_ARTISTS ? 3 : 0;
+}
+
+int
+sp_toplistbrowse_num_tracks(sp_toplistbrowse *tb)
+{
+    return tb->type == SP_TOPLIST_TYPE_TRACKS ? 3 : 0;
+}
+
+sp_album *
+sp_toplistbrowse_album(sp_toplistbrowse *tb, int index)
+{
+    return tb->albums[index];
+}
+
+sp_artist *
+sp_toplistbrowse_artist(sp_toplistbrowse *tb, int index)
+{
+    return tb->artists[index];
+}
+
+sp_track *
+sp_toplistbrowse_track(sp_toplistbrowse *tb, int index)
+{
+    return tb->tracks[index];
+}
+
+sp_toplistbrowse *
+sp_toplistbrowse_create(sp_session *session,
+                        sp_toplisttype type, sp_toplistregion region,
+                        const char* username,
+                        toplistbrowse_complete_cb *cb, void *userdata)
+{
+    sp_toplistbrowse *tb;
+
+    tb = (sp_toplistbrowse *)PyMem_Malloc(sizeof(struct sp_toplistbrowse));
+    tb->albums[0] = _mock_album("foo", NULL, 2001,
+                                    (byte *) "01234567890123456789", 1, 1, 1);
+    tb->albums[1] = _mock_album("bar", NULL, 2001,
+                                    (byte *) "01234567890123456789", 1, 1, 1);
+    tb->albums[2] = _mock_album("baz", NULL, 2001,
+                                    (byte *) "01234567890123456789", 1, 1, 1);
+    tb->artists[0] = _mock_artist("foo", 1);
+    tb->artists[1] = _mock_artist("bar", 1);
+    tb->artists[2] = _mock_artist("baz", 1);
+    tb->tracks[0] = _mock_track("foo", 1, NULL, NULL, 5, 0, 1, 1,
+                                                                SP_ERROR_OK, 1);
+    tb->tracks[1] = _mock_track("bar", 1, NULL, NULL, 5, 0, 1, 1,
+                                                                SP_ERROR_OK, 1);
+    tb->tracks[2] = _mock_track("baz", 1, NULL, NULL, 5, 0, 1, 1,
+                                                                SP_ERROR_OK, 1);
+    tb->type = type;
+    tb->region = region;
+    tb->loaded = 1;
+    cb(tb, userdata);
+    return tb;
+}
+
+
 /**************** MOCKING NEW OBJECTS *******************/
 
 /// Generate a mock sp_user structure
-sp_user *_mock_user(char *canonical_name, char *display_name, char *full_name,
-                    char *picture, sp_relation_type relation, bool loaded)
+sp_user *_mock_user(char *canonical_name, char *display_name, bool loaded)
 {
     sp_user *user;
 
     user = malloc(sizeof(sp_user));
     user->canonical_name = canonical_name;
     user->display_name = display_name;
-    user->full_name = full_name;
-    user->picture = picture;
-    user->relation = relation;
     user->loaded = loaded;
 
     return user;
@@ -1237,18 +1416,15 @@ sp_user *_mock_user(char *canonical_name, char *display_name, char *full_name,
 PyObject *
 mock_user(PyObject *self, PyObject *args)
 {
-    char *canonical_name, *display_name, *full_name, *picture;
-    int relation;
+    char *canonical_name, *display_name;
     int loaded;
     sp_user *user;
 
-    if (!PyArg_ParseTuple(args, "esesesesii", ENCODING, &canonical_name,
-                          ENCODING, &display_name, ENCODING, &full_name,
-                          ENCODING, &picture, &relation, &loaded))
+    if (!PyArg_ParseTuple(args, "esesi", ENCODING, &canonical_name,
+                          ENCODING, &display_name, &loaded))
         return NULL;
 
-    user = _mock_user(canonical_name, display_name, full_name, picture,
-                      relation, loaded);
+    user = _mock_user(canonical_name, display_name, loaded);
     return User_FromSpotify(user);
 }
 
@@ -1292,7 +1468,6 @@ mock_albumbrowse(PyObject *self, PyObject *args, PyObject *kwds)
     ab = (AlbumBrowser *) PyObject_Call((PyObject *)&AlbumBrowserType,
                                         new_args, NULL);
     ab->_browser->loaded = loaded;
-    Py_INCREF(ab);
     return (PyObject *)ab;
 }
 
@@ -1336,7 +1511,6 @@ mock_artistbrowse(PyObject *self, PyObject *args, PyObject *kwds)
     ab = (ArtistBrowser *) PyObject_Call((PyObject *)&ArtistBrowserType,
                                          new_args, NULL);
     ab->_browser->loaded = loaded;
-    Py_INCREF(ab);
     return (PyObject *)ab;
 }
 
@@ -1467,6 +1641,7 @@ _mock_playlist(char *name)
     p = malloc(sizeof(sp_playlist));
     memset(p, 0, sizeof(sp_playlist));
     strcpy(p->name, name);
+    p->type = SP_PLAYLIST_TYPE_PLAYLIST;
     return p;
 }
 
@@ -1508,7 +1683,8 @@ _mock_playlistcontainer(void)
 PyObject *
 mock_playlistcontainer(PyObject *self, PyObject *args)
 {
-    PyObject *seq;
+    PyObject *seq, *item;
+    sp_playlist *p;
 
     if (!PyArg_ParseTuple(args, "O", &seq))
         return NULL;
@@ -1516,20 +1692,65 @@ mock_playlistcontainer(PyObject *self, PyObject *args)
         (PlaylistContainer *) PyObject_CallObject((PyObject *)
                                                   &PlaylistContainerType,
                                                   NULL);
-
     pc->_playlistcontainer = _mock_playlistcontainer();
     int len = PySequence_Length(seq);
     int i;
 
     for (i = 0; i < len; ++i) {
-        Playlist *item = (Playlist *) PySequence_GetItem(seq, i);
-
-        Py_INCREF(item);
-        pc->_playlistcontainer->playlist[pc->
-                                         _playlistcontainer->num_playlists++] =
-            item->_playlist;
+        item = PySequence_GetItem(seq, i);
+        PyObject *ptype = PyObject_CallMethod(item, "type", NULL);
+        if (ptype) {
+            if (strcmp(PyBytes_AS_STRING(ptype), "playlist") == 0) {
+                p = ((Playlist *)item)->_playlist;
+            }
+            else if (strcmp(PyBytes_AS_STRING(ptype), "folder_start") == 0) {
+                p = _mock_playlist(((PlaylistFolder *)item)->_name);
+                p->type = SP_PLAYLIST_TYPE_START_FOLDER;
+            }
+            else if (strcmp(PyBytes_AS_STRING(ptype), "folder_end") == 0) {
+                p = _mock_playlist("");
+                p->type = SP_PLAYLIST_TYPE_END_FOLDER;
+            }
+            else {
+                p = _mock_playlist("");
+                p->type = SP_PLAYLIST_TYPE_PLACEHOLDER;
+            }
+        }
+        else return NULL;
+        pc->_playlistcontainer->playlist[
+            pc->_playlistcontainer->num_playlists++] = p;
     }
     return (PyObject *)pc;
+}
+
+PyObject *
+mock_playlistfolder(PyObject *self, PyObject *args)
+{
+    PlaylistFolder *pf;
+    char *type, *name = NULL;
+
+    if (!PyArg_ParseTuple(args, "s|s", &type, &name))
+            return NULL;
+    pf = (PlaylistFolder *)PyObject_CallObject((PyObject *)&PlaylistFolderType,
+                                               NULL);
+    if (strcmp(type, "folder_start") == 0) {
+        if (name) {
+            pf->_type = SP_PLAYLIST_TYPE_START_FOLDER;
+            pf->_name = PyMem_New(char, 256);
+            strncpy(pf->_name, name, 256);
+        }
+        else {
+            PyErr_SetString(PyExc_ValueError, "must provide name");
+            return NULL;
+        }
+    }
+    else if (strcmp(type, "folder_end") == 0) {
+        pf->_type = SP_PLAYLIST_TYPE_END_FOLDER;
+    }
+    else {
+        pf->_type = SP_PLAYLIST_TYPE_PLACEHOLDER;
+    }
+    return (PyObject *)pf;
 }
 
 PyObject *
@@ -1570,6 +1791,8 @@ static PyMethodDef module_methods[] = {
     {"mock_playlist", mock_playlist, METH_VARARGS, "Create a mock playlist"},
     {"mock_playlistcontainer", mock_playlistcontainer, METH_VARARGS,
      "Create a mock playlist container"},
+    {"mock_playlistfolder", mock_playlistfolder, METH_VARARGS,
+        "Create a mock playlist folder"},
     {"mock_search", mock_search, METH_VARARGS, "Create mock search results"},
     {"mock_session", mock_session, METH_VARARGS, "Create a mock session"},
     {"mock_event_trigger", event_trigger, METH_VARARGS, "Triggers an event"},
@@ -1598,11 +1821,15 @@ init_mockspotify(void)
         return;
     if (PyType_Ready(&PlaylistContainerType) < 0)
         return;
+    if (PyType_Ready(&PlaylistFolderType) < 0)
+        return;
     if (PyType_Ready(&ResultsType) < 0)
         return;
     if (PyType_Ready(&TrackType) < 0)
         return;
     if (PyType_Ready(&UserType) < 0)
+        return;
+    if (PyType_Ready(&ToplistBrowserType) < 0)
         return;
 
     m = Py_InitModule("_mockspotify", module_methods);
@@ -1626,8 +1853,10 @@ init_mockspotify(void)
     link_init(m);
     playlist_init(m);
     playlistcontainer_init(m);
+    playlistfolder_init(m);
     session_init(m);
     search_init(m);
     track_init(m);
     user_init(m);
+    toplistbrowser_init(m);
 }

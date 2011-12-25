@@ -1,7 +1,7 @@
 import pyaudio
 import traceback
 
-class portAudioController(object):
+class PortAudioController(object):
     def __init__(self, mode=None):
         self.out = pyaudio.PyAudio()
         self.__rate = None

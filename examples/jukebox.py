@@ -16,7 +16,7 @@ from spotify import Link, SpotifyError, ToplistBrowser
 AUDIO_CONTROLLERS = (
     ('spotify.alsahelper', 'AlsaController'),
     ('spotify.osshelper', 'OssController'),
-    ('spotify.portaudiohelper', 'portAudioController')
+    ('spotify.portaudiohelper', 'PortAudioController')
 )
 
 def import_audio_controller():

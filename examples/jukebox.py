@@ -14,28 +14,28 @@ from spotify.manager import SpotifySessionManager, SpotifyPlaylistManager, \
 from spotify import Link, SpotifyError, ToplistBrowser
 from spotify import AlbumBrowser, ArtistBrowser
 
-AUDIO_CONTROLLERS = (
-    ('spotify.audiosink.alsa', 'AlsaController'),
-    ('spotify.audiosink.oss', 'OssController'),
-    ('spotify.audiosink.portaudio', 'PortAudioController')
+AUDIO_SINKS = (
+    ('spotify.audiosink.alsa', 'AlsaSink'),
+    ('spotify.audiosink.oss', 'OssSink'),
+    ('spotify.audiosink.portaudio', 'PortAudioSink'),
 )
 
-def import_audio_controller():
+def import_audio_sink():
     error_messages = []
-    for module, cls in AUDIO_CONTROLLERS:
+    for module, cls in AUDIO_SINKS:
         try:
             module = __import__(module, fromlist=[cls])
             cls = getattr(module, cls)
             return cls
         except:
             error_messages.append(
-                "Tried to use %s.%s as audio controller, but failed:"
+                "Tried to use %s.%s as audio sink, but failed:"
                 % (module, cls))
             error_messages.append(traceback.format_exc())
-    error_messages.append("Was not able to import any of the audio helpers")
+    error_messages.append("Was not able to import any of the audio sinks")
     raise ImportError, error_messages.join("\n")
 
-AudioController = import_audio_controller()
+AudioSink = import_audio_sink()
 
 class JukeboxUI(cmd.Cmd, threading.Thread):
 
@@ -278,7 +278,7 @@ class Jukebox(SpotifySessionManager):
 
     def __init__(self, *a, **kw):
         SpotifySessionManager.__init__(self, *a, **kw)
-        self.audio = AudioController()
+        self.audio = AudioSink()
         self.ui = JukeboxUI(self)
         self.ctr = None
         self.playing = False

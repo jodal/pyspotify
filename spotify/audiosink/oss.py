@@ -1,6 +1,6 @@
 import ossaudiodev
 
-class OssController(object):
+class OssSink(object):
 
     """ Wrapper around alsa to make it simpler to control. Using this in a
     spotify client is very simple, just create one and then call

@@ -1,7 +1,55 @@
+"""
+The :mod:`spotify.audiosink` module provides audio sink wrappers for different
+audio sinks like ALSA, OSS, and PortAudio.
+"""
+
+import traceback
+
+
+AUDIO_SINKS = (
+    ('spotify.audiosink.alsa', 'AlsaSink'),
+    ('spotify.audiosink.oss', 'OssSink'),
+    ('spotify.audiosink.portaudio', 'PortAudioSink'),
+)
+
+
+def import_audio_sink(audio_sinks=None):
+    """
+    Try to import each audio sink until one is successfully imported.
+
+    The `audio_sinks` parameter specificies what audio sinks to import, in the
+    given order. If `audio_sinks` is not provided, the list
+    :attr:`spotify.audiosink.AUDIO_SINKS` will be used.
+
+    :param audio_sinks: audio sinks to try to import
+    :type audio_sinks: list of two-tuples of (modulename, classname)
+    :return: the first audio sink that was successfully imported
+    :rtype: class
+    :raise: :exc:`ImportError` if no audio sinks can be imported
+    """
+    if audio_sinks is None:
+        audio_sinks = AUDIO_SINKS
+    error_messages = []
+    for module, cls in audio_sinks:
+        try:
+            module = __import__(module, fromlist=[cls])
+            cls = getattr(module, cls)
+            return cls
+        except ImportError:
+            error_messages.append(
+                "Tried to use %s.%s as audio sink, but failed:"
+                % (module, cls))
+            error_messages.append(traceback.format_exc())
+    error_messages.append("Was not able to import any of the audio sinks")
+    raise ImportError, "\n".join(error_messages)
+
+
 class BaseAudioSink(object):
     """
-    :class:`BaseAudioSink` is an audio sink wrapper for different audio sinks
-    like ALSA, OSS, and PortAudio. The wrapper is a perfect match for the
+    :class:`BaseAudioSink` provides the interface which is implemented by all
+    audio sink wrappers in the :mod:`spotify.audiosink` module.
+
+    The interface is a perfect match for the
     :meth:`spotify.manager.SpotifySessionManager.music_delivery` method, making
     it easy to play audio data received from Spotify.
 

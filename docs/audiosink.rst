@@ -1,8 +1,6 @@
 Audio sinks
 ***********
 
-.. currentmodule:: spotify.audiosink
-
-.. autoclass:: BaseAudioSink
+.. automodule:: spotify.audiosink
     :members:
     :member-order: bysource

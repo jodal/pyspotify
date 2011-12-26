@@ -9,31 +9,11 @@ import threading
 import os
 
 import spotify
-from spotify.manager import SpotifySessionManager, SpotifyPlaylistManager, \
-    SpotifyContainerManager
 from spotify import Link, SpotifyError, ToplistBrowser
 from spotify import AlbumBrowser, ArtistBrowser
-
-AUDIO_SINKS = (
-    ('spotify.audiosink.alsa', 'AlsaSink'),
-    ('spotify.audiosink.oss', 'OssSink'),
-    ('spotify.audiosink.portaudio', 'PortAudioSink'),
-)
-
-def import_audio_sink():
-    error_messages = []
-    for module, cls in AUDIO_SINKS:
-        try:
-            module = __import__(module, fromlist=[cls])
-            cls = getattr(module, cls)
-            return cls
-        except:
-            error_messages.append(
-                "Tried to use %s.%s as audio sink, but failed:"
-                % (module, cls))
-            error_messages.append(traceback.format_exc())
-    error_messages.append("Was not able to import any of the audio sinks")
-    raise ImportError, error_messages.join("\n")
+from spotify.audiosink import import_audio_sink
+from spotify.manager import (SpotifySessionManager, SpotifyPlaylistManager,
+        SpotifyContainerManager)
 
 AudioSink = import_audio_sink()
 

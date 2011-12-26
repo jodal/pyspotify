@@ -1,7 +1,14 @@
 import pyaudio
 import traceback
 
-class PortAudioSink(object):
+from spotify.audiosink import BaseAudioSink
+
+class PortAudioSink(BaseAudioSink):
+    """
+    Audio sink wrapper for systems with PortAudio installed, which may
+    include Linux, Mac OS X, and Windows systems
+    """
+
     def __init__(self, mode=None):
         self.out = pyaudio.PyAudio()
         self.__rate = None
@@ -23,11 +30,8 @@ class PortAudioSink(object):
             frames_per_buffer=self.periodsize, channels=self.channels,
             rate=self.rate, output=True)
 
-    def music_delivery(self, session, frames, frame_size, num_frames, sample_type, sample_rate, channels):
-        """
-        Interface specifically provided to make it easy to play music from
-        Spotify. See the examples.
-        """
+    def music_delivery(self, session, frames, frame_size, num_frames,
+            sample_type, sample_rate, channels):
         try:
             self.channels = channels
             self.periodsize = num_frames

@@ -1,10 +1,9 @@
 import ossaudiodev
 
-class OssSink(object):
+from spotify.audiosink import BaseAudioSink
 
-    """ Wrapper around alsa to make it simpler to control. Using this in a
-    spotify client is very simple, just create one and then call
-    music_delivery every time you get packets from spotify. """
+class OssSink(BaseAudioSink):
+    """Audio sink wrapper for systems with OSS, e.g. older Linux systems"""
 
     def __init__(self):
         self.out = None
@@ -12,9 +11,8 @@ class OssSink(object):
         self.__periodsize = 2048 # unused for OSS
         self.__channels = None
 
-    def music_delivery(self, session, frames, frame_size, num_frames, sample_type, sample_rate, channels):
-        """ Interface specifically provided to make it easy to play music from
-        spotify. See the examples. """
+    def music_delivery(self, session, frames, frame_size, num_frames,
+            sample_type, sample_rate, channels):
         try:
             if num_frames == 0:
                 if self.out is not None:

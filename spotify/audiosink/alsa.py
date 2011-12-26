@@ -1,10 +1,9 @@
 import alsaaudio
 
-class AlsaSink(object):
+from spotify.audiosink import BaseAudioSink
 
-    """ Wrapper around alsa to make it simpler to control. Using this in a
-    spotify client is very simple, just create one and then call
-    music_delivery every time you get packets from spotify. """
+class AlsaSink(BaseAudioSink):
+    """Audio sink wrapper for systems with ALSA, e.g. most Linux systems"""
 
     def __init__(self, mode=alsaaudio.PCM_NORMAL):
         self.out = alsaaudio.PCM(alsaaudio.PCM_PLAYBACK, mode=mode)
@@ -16,9 +15,8 @@ class AlsaSink(object):
         self.channels = 2
         self.rate = 44100
 
-    def music_delivery(self, session, frames, frame_size, num_frames, sample_type, sample_rate, channels):
-        """ Interface specifically provided to make it easy to play music from
-        spotify. See the examples. """
+    def music_delivery(self, session, frames, frame_size, num_frames,
+            sample_type, sample_rate, channels):
         try:
             self.channels = channels
             self.periodsize = num_frames

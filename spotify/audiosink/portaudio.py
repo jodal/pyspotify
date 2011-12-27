@@ -1,5 +1,4 @@
 import pyaudio
-import traceback
 
 from spotify.audiosink import BaseAudioSink
 
@@ -32,14 +31,10 @@ class PortAudioSink(BaseAudioSink):
 
     def music_delivery(self, session, frames, frame_size, num_frames,
             sample_type, sample_rate, channels):
-        try:
-            self.channels = channels
-            self.periodsize = num_frames
-            self.rate = sample_rate
-            written = self.playsamples(frames)
-            return written
-        except:
-            traceback.print_exc()
+        self.channels = channels
+        self.periodsize = num_frames
+        self.rate = sample_rate
+        return self.playsamples(frames)
 
     def playsamples(self, samples):
         self.stream.write(samples, num_frames= self.__periodsize)

@@ -13,21 +13,17 @@ class OssSink(BaseAudioSink):
 
     def music_delivery(self, session, frames, frame_size, num_frames,
             sample_type, sample_rate, channels):
-        try:
-            if num_frames == 0:
-                if self.out is not None:
-                    self.out.close()
-                    self.out = None
-                return 0
-            if self.out is None:
-                self.out = ossaudiodev.open("w")
-                self.out.setfmt(ossaudiodev.AFMT_S16_LE) # actually native endian
-                self.__channels = self.out.channels(channels)
-                self.out.speed(sample_rate)
-
-            return self.playsamples(frames)
-        except:
-            traceback.print_exc()
+        if num_frames == 0:
+            if self.out is not None:
+                self.out.close()
+                self.out = None
+            return 0
+        if self.out is None:
+            self.out = ossaudiodev.open("w")
+            self.out.setfmt(ossaudiodev.AFMT_S16_LE) # actually native endian
+            self.__channels = self.out.channels(channels)
+            self.out.speed(sample_rate)
+        return self.playsamples(frames)
 
     def playsamples(self, samples):
         written = self.out.write(samples)

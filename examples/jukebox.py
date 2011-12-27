@@ -9,33 +9,13 @@ import threading
 import os
 
 import spotify
-from spotify.manager import SpotifySessionManager, SpotifyPlaylistManager, \
-    SpotifyContainerManager
 from spotify import Link, SpotifyError, ToplistBrowser
 from spotify import AlbumBrowser, ArtistBrowser
+from spotify.audiosink import import_audio_sink
+from spotify.manager import (SpotifySessionManager, SpotifyPlaylistManager,
+        SpotifyContainerManager)
 
-AUDIO_CONTROLLERS = (
-    ('spotify.alsahelper', 'AlsaController'),
-    ('spotify.osshelper', 'OssController'),
-    ('spotify.portaudiohelper', 'PortAudioController')
-)
-
-def import_audio_controller():
-    error_messages = []
-    for module, cls in AUDIO_CONTROLLERS:
-        try:
-            module = __import__(module, fromlist=[cls])
-            cls = getattr(module, cls)
-            return cls
-        except:
-            error_messages.append(
-                "Tried to use %s.%s as audio controller, but failed:"
-                % (module, cls))
-            error_messages.append(traceback.format_exc())
-    error_messages.append("Was not able to import any of the audio helpers")
-    raise ImportError, error_messages.join("\n")
-
-AudioController = import_audio_controller()
+AudioSink = import_audio_sink()
 
 class JukeboxUI(cmd.Cmd, threading.Thread):
 
@@ -278,7 +258,7 @@ class Jukebox(SpotifySessionManager):
 
     def __init__(self, *a, **kw):
         SpotifySessionManager.__init__(self, *a, **kw)
-        self.audio = AudioController()
+        self.audio = AudioSink()
         self.ui = JukeboxUI(self)
         self.ctr = None
         self.playing = False

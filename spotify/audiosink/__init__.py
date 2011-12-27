@@ -87,3 +87,15 @@ class BaseAudioSink(object):
         :rtype: :class:`int`
         """
         raise NotImplementedError
+
+    def _call_if_needed(self, func, *args, **kwargs):
+        """
+        Calls the given function with the given arguments if the arguments have
+        changed since the previous call to the function.
+        """
+        if not hasattr(self, '_call_cache'):
+            self._call_cache = {}
+        if (func not in self._call_cache
+                or self._call_cache[func] != (args, kwargs)):
+            self._call_cache[func] = (args, kwargs)
+            func(*args, **kwargs)

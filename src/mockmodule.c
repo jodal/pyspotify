@@ -13,6 +13,7 @@
 #include "albumbrowser.h"
 #include "artist.h"
 #include "artistbrowser.h"
+#include "image.h"
 #include "link.h"
 #include "playlist.h"
 #include "playlistcontainer.h"
@@ -94,7 +95,7 @@ mock_albumbrowse(PyObject *self, PyObject *args, PyObject *kwds)
           "copyrights", "review", NULL };
 
     if (!PyArg_ParseTupleAndKeywords(args, kwds,
-                "O!O!|O!iiO!esOO", kwlist, &AlbumType, &album, &PyList_Type,
+                "O!O!|O!iiO!es", kwlist, &AlbumType, &album, &PyList_Type,
                 &py_tracks, &ArtistType, &artist, &error, &request_duration,
                 &PyList_Type, &py_copyrights, ENCODING, &review))
         return NULL;
@@ -520,7 +521,51 @@ mock_session(PyObject *self)
     return (PyObject *)session;
 }
 
-/**************************** MODULE INITIALISATION ********************************/
+/************************* REGISTRY MANIPULATION ****************************/
+
+PyObject *
+mock_registry_add(PyObject *self, PyObject *args, PyObject *kwds)
+{
+    PyObject *sp_object;
+    const char* uri;
+
+    static char *kwlist[] =
+        { "uri", "sp_object", NULL };
+
+    if (!PyArg_ParseTupleAndKeywords(args, kwds, "sO", kwlist,
+                                     &uri, &sp_object))
+        return NULL;
+
+#define REGISTRY_ADD_SP_STRUCT_IF(uri, obj, type, attr) \
+    if (obj->ob_type == &type##Type) {                  \
+        registry_add(uri, ((type *)obj)->_##attr);      \
+        Py_RETURN_NONE;                                 \
+    }
+
+    REGISTRY_ADD_SP_STRUCT_IF(uri, sp_object, Album, album)
+    REGISTRY_ADD_SP_STRUCT_IF(uri, sp_object, AlbumBrowser, browser)
+    REGISTRY_ADD_SP_STRUCT_IF(uri, sp_object, Artist, artist)
+    REGISTRY_ADD_SP_STRUCT_IF(uri, sp_object, ArtistBrowser, browser)
+    REGISTRY_ADD_SP_STRUCT_IF(uri, sp_object, Image, image)
+    REGISTRY_ADD_SP_STRUCT_IF(uri, sp_object, Playlist, playlist)
+    REGISTRY_ADD_SP_STRUCT_IF(uri, sp_object,
+                              PlaylistContainer, playlistcontainer)
+    REGISTRY_ADD_SP_STRUCT_IF(uri, sp_object, Results, search)
+    REGISTRY_ADD_SP_STRUCT_IF(uri, sp_object, ToplistBrowser, toplistbrowse)
+    REGISTRY_ADD_SP_STRUCT_IF(uri, sp_object, Track, track)
+    REGISTRY_ADD_SP_STRUCT_IF(uri, sp_object, User, user)
+
+    Py_RETURN_NONE;
+}
+
+PyObject *
+mock_registry_clean(PyObject *self)
+{
+    registry_clean();
+    Py_RETURN_NONE;
+}
+
+/************************* MODULE INITIALISATION ****************************/
 
 static PyMethodDef module_methods[] = {
     {"connect", session_connect, METH_VARARGS,
@@ -550,6 +595,10 @@ static PyMethodDef module_methods[] = {
         METH_VARARGS, "Triggers an event"},
     {"mock_user", (PyCFunction)mock_user,
         METH_VARARGS | METH_KEYWORDS, "Create a mock user."},
+    {"registry_add", (PyCFunction)mock_registry_add,
+        METH_VARARGS | METH_KEYWORDS, "Add an object to the mock registry."},
+    {"registry_clean", (PyCFunction)mock_registry_clean,
+        METH_NOARGS, "Delete all the objects from the mock registry."},
     {NULL, NULL, 0, NULL}
 };
 

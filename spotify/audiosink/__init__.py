@@ -52,12 +52,6 @@ class BaseAudioSink(object):
     The interface is a perfect match for the
     :meth:`spotify.manager.SpotifySessionManager.music_delivery` method, making
     it easy to play audio data received from Spotify.
-
-    Implementations of this interface include:
-
-    - :class:`spotify.audiosink.alsa.AlsaController`
-    - :class:`spotify.audiosink.oss.OssController`
-    - :class:`spotify.audiosink.portaudio.PortAudioController`
     """
 
     def __init__(self):

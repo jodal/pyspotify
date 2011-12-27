@@ -1,16 +1,12 @@
 #!/usr/bin/env python
 
 import cmd
-import readline
-import sys
 import traceback
 import time
 import threading
 import os
 
-import spotify
-from spotify import Link, SpotifyError, ToplistBrowser
-from spotify import AlbumBrowser, ArtistBrowser
+from spotify import ArtistBrowser, Link, ToplistBrowser
 from spotify.audiosink import import_audio_sink
 from spotify.manager import (SpotifySessionManager, SpotifyPlaylistManager,
         SpotifyContainerManager)

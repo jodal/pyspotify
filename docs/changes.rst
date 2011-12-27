@@ -15,12 +15,23 @@ v1.7 (in development)
   work but have been deprecated. Also, callbacks are optional for the two
   browsers.
 
+- The audio sink wrappers have been cleaned up and moved to a new
+  :mod:`spotify.audiosink` module. The interface is the same, but you'll need
+  to update your imports if you previously used either
+  :class:`spotify.alsahelper.AlsaController` (renamed to
+  :class:`spotify.audiosink.alsa.AlsaSink`) or
+  :class:`spotify.osshelper.OssController` (renamed to
+  :class:`spotify.audiosink.oss.OssSink`).
+
 **New features**
 
-- The bundled jukebox example now supports `PortAudio
-  <http://www.portaudio.com/>`_ in addition to OSS and ALSA audio output. In
-  other words, the jukebox can now easily be used on Mac OS X. Contributed by
-  Tommaso Barbugli.
+- A audio sink wrapper for `PortAudio
+  <http://www.portaudio.com/>`_ have been contributed by Tommaso Barbugli.
+  PortAudio is available on both Linux, Mac OS X, and Windows.
+
+- The audio sink selector code originally written by Tommaso Barbugli for the
+  ``jukebox.py`` example app have been generalized and made available for other
+  applications as :func:`spotify.audiosink.import_audio_sink`.
 
 
 v1.6 (2011-11-29)

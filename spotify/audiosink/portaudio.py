@@ -9,64 +9,21 @@ class PortAudioSink(BaseAudioSink):
     """
 
     def __init__(self, mode=None):
-        self.out = pyaudio.PyAudio()
-        self.__rate = None
-        self.__periodsize = None
-        self.__channels = None
-        self.periodsize = 2048
-        self.channels = 2
-        self.rate = 44100
-        self.stream = self.out.open(format=pyaudio.paInt16,
-            frames_per_buffer=self.periodsize, channels=self.channels,
-            rate=self.rate, output=True)
+        self._device = pyaudio.PyAudio()
+        self._stream = None
 
-    def _reconfigure_stream(self):
+    def _setup_stream(self, sample_rate, channels):
         """
         Reopen the stream with new channel, rate settings
         """
-        self.stream.close()
-        self.stream = self.out.open(format=pyaudio.paInt16,
-            frames_per_buffer=self.periodsize, channels=self.channels,
-            rate=self.rate, output=True)
+        if self._stream is not None:
+            self._stream.close()
+            self._stream = None
+        self._stream = self._device.open(rate=sample_rate, channels=channels,
+                format=pyaudio.paInt16, output=True)
 
     def music_delivery(self, session, frames, frame_size, num_frames,
             sample_type, sample_rate, channels):
-        self.channels = channels
-        self.periodsize = num_frames
-        self.rate = sample_rate
-        return self.playsamples(frames)
-
-    def playsamples(self, samples):
-        self.stream.write(samples, num_frames= self.__periodsize)
-        return self.__periodsize
-
-    def getperiodsize(self):
-        return self.__periodsize
-
-    def setperiodsize(self, siz):
-        if self.__periodsize != siz:
-            self.__periodsize = siz
-
-    periodsize = property(getperiodsize, setperiodsize)
-
-    def getrate(self):
-        return self.__rate
-
-    def setrate(self, rate):
-        if self.__rate != rate:
-            self.__rate = rate
-            if hasattr(self, 'stream'):
-                self._reconfigure_stream
-
-    rate = property(getrate, setrate)
-
-    def getchannels(self):
-        return self.__channels
-
-    def setchannels(self, channels):
-        if self.__channels != channels:
-            self.__channels = channels
-            if hasattr(self, 'stream'):
-                self._reconfigure_stream
-
-    channels = property(getchannels, setchannels)
+        self._call_if_needed(self._setup_stream, sample_rate, channels)
+        self._stream.write(frames, num_frames=num_frames)
+        return num_frames

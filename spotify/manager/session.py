@@ -151,21 +151,23 @@ class SpotifySessionManager(object):
 
         Music data from `libspotify`.
 
-        :param session: the current session.
+        :param session: the current session
         :type session: :class:`spotify.Session`
-        :param frames: the audio data.
-        :type frames: buffer
-        :param frame_size: bytes per frame.
-        :type frame_size: int
-        :param num_frames: number of frames in this delivery.
-        :type num_frames: int
-        :param sample_type: currently this is always 0 which means 16-bit signed
-            native endian integer samples.
-        :type sample_type: int
-        :param sample_rate: audio sample rate, in samples per second.
-        :type sample_rate: int
-        :param channels: number of audio channels. Currently 1 or 2.
-        :type channels: int
+        :param frames: the audio data
+        :type frames: :class:`buffer`
+        :param frame_size: bytes per frame
+        :type frame_size: :class:`int`
+        :param num_frames: number of frames in this delivery
+        :type num_frames: :class:`int`
+        :param sample_type: currently this is always 0 which means 16-bit
+            signed native endian integer samples
+        :type sample_type: :class:`int`
+        :param sample_rate: audio sample rate, in samples per second
+        :type sample_rate: :class:`int`
+        :param channels: number of audio channels. Currently 1 or 2
+        :type channels: :class:`int`
+        :return: number of frames consumed
+        :rtype: :class:`int`
         """
         return 0
 

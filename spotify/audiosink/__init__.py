@@ -60,6 +60,9 @@ class BaseAudioSink(object):
     - :class:`spotify.audiosink.portaudio.PortAudioController`
     """
 
+    def __init__(self):
+        self._call_cache = {}
+
     def music_delivery(self, session, frames, frame_size, num_frames,
             sample_type, sample_rate, channels):
         """
@@ -93,8 +96,6 @@ class BaseAudioSink(object):
         Calls the given function with the given arguments if the arguments have
         changed since the previous call to the function.
         """
-        if not hasattr(self, '_call_cache'):
-            self._call_cache = {}
         if (func not in self._call_cache
                 or self._call_cache[func] != (args, kwargs)):
             self._call_cache[func] = (args, kwargs)

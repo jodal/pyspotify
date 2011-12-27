@@ -9,6 +9,7 @@ class PortAudioSink(BaseAudioSink):
     """
 
     def __init__(self, mode=None):
+        super(PortAudioSink, self).__init__()
         self._device = pyaudio.PyAudio()
         self._stream = None
 

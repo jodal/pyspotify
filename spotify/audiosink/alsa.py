@@ -7,6 +7,7 @@ class AlsaSink(BaseAudioSink):
     """Audio sink wrapper for systems with ALSA, e.g. most Linux systems"""
 
     def __init__(self, mode=alsaaudio.PCM_NORMAL):
+        super(AlsaSink, self).__init__()
         self._device = None
         self._mode = mode
         if sys.byteorder == 'little':

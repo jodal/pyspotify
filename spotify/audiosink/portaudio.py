@@ -14,9 +14,6 @@ class PortAudioSink(BaseAudioSink):
         self._stream = None
 
     def _setup_stream(self, sample_rate, channels):
-        """
-        Reopen the stream with new channel, rate settings
-        """
         if self._stream is not None:
             self._stream.close()
             self._stream = None

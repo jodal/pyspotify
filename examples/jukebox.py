@@ -1,16 +1,12 @@
 #!/usr/bin/env python
 
 import cmd
-import readline
-import sys
 import traceback
 import time
 import threading
 import os
 
-import spotify
-from spotify import Link, SpotifyError, ToplistBrowser
-from spotify import AlbumBrowser, ArtistBrowser
+from spotify import ArtistBrowser, Link, ToplistBrowser
 from spotify.audiosink import import_audio_sink
 from spotify.manager import (SpotifySessionManager, SpotifyPlaylistManager,
         SpotifyContainerManager)
@@ -118,7 +114,8 @@ class JukeboxUI(cmd.Cmd, threading.Thread):
                 print "Tracks:"
                 for a in self.results.tracks():
                     print "    ", Link.from_track(a, 0), a.name()
-                print self.results.total_tracks() - len(self.results.tracks()), "Tracks not shown"
+                print self.results.total_tracks() - \
+                        len(self.results.tracks()), "Tracks not shown"
         else:
             line = line.decode('utf-8')
             self.results = None
@@ -151,7 +148,8 @@ class JukeboxUI(cmd.Cmd, threading.Thread):
     def do_watch(self, line):
         if not line:
             print """Usage: watch [playlist]
-You will be notified when tracks are added, moved or removed from the playlist."""
+You will be notified when tracks are added, moved or removed from the
+playlist."""
         else:
             try:
                 p = int(line)
@@ -178,7 +176,7 @@ You will be notified when tracks are added, moved or removed from the playlist."
             self.jukebox.watch(self.jukebox.ctr[p], True)
 
     def do_toplist(self, line):
-        usage = "Usage: toplist (albums|artists|tracks) (GB|FR|..|NO|all|current)"
+        usage = "Usage: toplist (albums|artists|tracks) (GB|FR|..|all|current)"
         if not line:
             print usage
         else:
@@ -195,7 +193,8 @@ You will be notified when tracks are added, moved or removed from the playlist."
         if not line:
             print "Usage: add_new_playlist <name>"
         else:
-          new_playlist = self.jukebox.ctr.add_new_playlist(line.decode('utf-8'))
+            new_playlist = self.jukebox.ctr.add_new_playlist(
+                line.decode('utf-8'))
 
     def do_add_to_playlist(self, line):
         usage = "Usage: add_to_playlist <playlist_index> <insert_point>" + \
@@ -216,9 +215,12 @@ You will be notified when tracks are added, moved or removed from the playlist."
                 tracks = self.results.tracks()
                 for i in args:
                     for a in tracks[int(i)].artists():
-                        print u'{}. {} - {} '.format(i,a.name(),tracks[int(i)].name())
-                print u'adding them to {} '.format(self.jukebox.ctr[index].name())
-                self.jukebox.ctr[index].add_tracks(insert,[tracks[int(i)] for i in args])
+                        print u'{}. {} - {} '.format(
+                            i, a.name(), tracks[int(i)].name())
+                print u'adding them to {} '.format(
+                    self.jukebox.ctr[index].name())
+                self.jukebox.ctr[index].add_tracks(
+                    insert, [tracks[int(i)] for i in args])
 
     do_ls = do_list
     do_EOF = do_quit
@@ -353,7 +355,7 @@ class Jukebox(SpotifySessionManager):
     def watch(self, p, unwatch=False):
         if not unwatch:
             print "Watching playlist: %s" % p.name()
-            self.playlist_manager.watch(p);
+            self.playlist_manager.watch(p)
         else:
             print "Unatching playlist: %s" % p.name()
             self.playlist_manager.unwatch(p)

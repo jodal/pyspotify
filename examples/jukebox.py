@@ -215,9 +215,9 @@ playlist."""
                 tracks = self.results.tracks()
                 for i in args:
                     for a in tracks[int(i)].artists():
-                        print u'{}. {} - {} '.format(
+                        print u'{0}. {1} - {2} '.format(
                             i, a.name(), tracks[int(i)].name())
-                print u'adding them to {} '.format(
+                print u'adding them to {0} '.format(
                     self.jukebox.ctr[index].name())
                 self.jukebox.ctr[index].add_tracks(
                     insert, [tracks[int(i)] for i in args])

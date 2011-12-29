@@ -852,6 +852,13 @@ sp_playlist_subscribers_free(sp_subscribers *sub)
     PyMem_Free(sub);
 }
 
+sp_user *
+sp_playlist_owner(sp_playlist *p)
+{
+    /* STUB */
+    return NULL;
+}
+
 void
 mock_playlist_event(int event, sp_playlist * p)
 {

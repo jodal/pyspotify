@@ -16,3 +16,4 @@ Contributors to pyspotify in the order of appearance:
 - Benjamin Chapus <xben@free.fr>
 - Tommaso Barbugli <tbarbugli@gmail.com>
 - Bjørn Schjerve <bischjer@gmail.com>
+- David Buchmann <david.buchmann@gmail.com>

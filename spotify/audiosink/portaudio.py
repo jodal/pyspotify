@@ -5,7 +5,7 @@ from spotify.audiosink import BaseAudioSink
 class PortAudioSink(BaseAudioSink):
     """
     Audio sink wrapper for systems with PortAudio installed, which may
-    include Linux, Mac OS X, and Windows systems
+    include Linux, Mac OS X, and Windows systems.
     """
 
     def __init__(self):

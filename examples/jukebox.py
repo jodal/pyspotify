@@ -330,6 +330,7 @@ class Jukebox(SpotifySessionManager):
             self.play()
 
     def play(self):
+        self.audio.start()
         self.session.play(1)
         print "Playing"
         self.playing = True
@@ -338,6 +339,7 @@ class Jukebox(SpotifySessionManager):
         self.session.play(0)
         print "Stopping"
         self.playing = False
+        self.audio.stop()
 
     def music_delivery(self, *a, **kw):
         return self.audio.music_delivery(*a, **kw)

@@ -150,6 +150,11 @@ objects.
         :rtype:     :class:`int`
         :returns:   The number of subscribers of this playlist
 
+    .. method:: owner
+
+        :rtype:     :class:`spotify.User`
+        :returns:   the owner of the playlist
+
     .. method:: rename(name)
 
         :param name:    the new name

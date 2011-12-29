@@ -10,6 +10,7 @@ AUDIO_SINKS = (
     ('spotify.audiosink.alsa', 'AlsaSink'),
     ('spotify.audiosink.oss', 'OssSink'),
     ('spotify.audiosink.portaudio', 'PortAudioSink'),
+    ('spotify.audiosink.gstreamer', 'GstreamerSink'),
 )
 
 
@@ -84,6 +85,32 @@ class BaseAudioSink(object):
         :rtype: :class:`int`
         """
         raise NotImplementedError
+
+    def start(self):
+        """
+        Should be called when audio output starts.
+
+        This is a hook for the audio sink to do work just before the audio
+        starts.
+        """
+        pass
+
+    def stop(self):
+        """
+        Should be called when audio output stops.
+
+        This is a hook for the audio sink to do work just after the audio
+        stops.
+        """
+        pass
+
+    def pause(self):
+        """
+        Should be called when audio output is paused.
+
+        This is a hook for the audio sink to do work when the audio is paused.
+        """
+        pass
 
     def _call_if_needed(self, func, *args, **kwargs):
         """

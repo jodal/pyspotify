@@ -330,18 +330,16 @@ class Jukebox(SpotifySessionManager):
             self.play()
 
     def play(self):
+        self.audio.start()
         self.session.play(1)
         print "Playing"
         self.playing = True
-        if hasattr(self.audio, 'start'):
-            self.audio.start()
 
     def stop(self):
         self.session.play(0)
         print "Stopping"
         self.playing = False
-        if hasattr(self.audio, 'stop'):
-            self.audio.stop()
+        self.audio.stop()
 
     def music_delivery(self, *a, **kw):
         return self.audio.music_delivery(*a, **kw)

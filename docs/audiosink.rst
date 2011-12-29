@@ -26,3 +26,10 @@ Implementations of the :class:`BaseAudioSink` interface include:
   installed and the Python binding `pyaudio
   <http://people.csail.mit.edu/hubert/pyaudio/>`_. The PortAudio library is
   available for both Linux, Mac OS X, and Windows.
+
+- :class:`spotify.audiosink.gstreamer.GstreamerSink`
+
+  Requires a system with `Gstreamer <http://gstreamer.freedesktop.org/>`_
+  installed and the Python bindings gst-python. The Gstreamer library is
+  available for both Linux, Mac OS X, and Windows. Though, it isn't always
+  trivial to install Gstreamer.

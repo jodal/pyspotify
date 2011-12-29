@@ -839,7 +839,9 @@ session_connect(PyObject *self, PyObject *args)
     fprintf(stderr, "[DEBUG]-session- login as %s in progress...\n",
             username);
 #endif
+        Py_BEGIN_ALLOW_THREADS;
         sp_session_login(session, username, password, remember_me);
+        Py_END_ALLOW_THREADS;
     }
     g_session = session;
     Session *psession =

@@ -80,10 +80,15 @@ class JukeboxUI(cmd.Cmd, threading.Thread):
         else:
             try:
                 playlist, track = map(int, line.split(' ', 1))
+                self.jukebox.load(playlist, track)
             except ValueError:
-                print "Usage: play [track_link] | [playlist] [track]"
-                return
-            self.jukebox.load(playlist, track)
+                try:
+                    playlist = int(line)
+                    self.jukebox.load_playlist(playlist)
+                except ValueError:
+                    print("Usage: play [track_link] | "
+                          "[playlist] [track] | [playlist]")
+                    return
         self.jukebox.play()
 
     def do_browse(self, line):
@@ -302,6 +307,21 @@ class Jukebox(SpotifySessionManager):
         self.session.load(pl[track])
         print "Loading %s from %s" % (pl[track].name(), pl.name())
 
+    def load_playlist(self, playlist):
+        if self.playing:
+            self.stop()
+        if 0 <= playlist < len(self.ctr):
+            pl = self.ctr[playlist]
+        elif playlist == len(self.ctr):
+            pl = self.starred
+        print repr(pl)
+        if len(pl):
+            self.session.load(pl[0])
+        for i, track in enumerate(pl):
+            if i == 0:
+                continue
+            self._queue.append((playlist, i))
+
     def queue(self, playlist, track):
         if self.playing:
             self._queue.append((playlist, track))
@@ -325,7 +345,7 @@ class Jukebox(SpotifySessionManager):
     def next(self):
         self.stop()
         if self._queue:
-            t = self._queue.pop()
+            t = self._queue.pop(0)
             self.load(*t)
             self.play()
         else:

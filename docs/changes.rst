@@ -26,12 +26,14 @@ v1.7 (in development)
 **New features**
 
 - A audio sink wrapper for `PortAudio
-  <http://www.portaudio.com/>`_ have been contributed by Tommaso Barbugli.
-  PortAudio is available on both Linux, Mac OS X, and Windows.
+  <http://www.portaudio.com/>`_,
+  :class:`spotify.audiosink.portaudio.PortAudioSink`, have been contributed by
+  Tommaso Barbugli.  PortAudio is available on both Linux, Mac OS X, and
+  Windows.
 
-- A audio sink wrapper for `Gstreamer <http://gstreamer.freedesktop.org/>`_
-  have been contributed by David Buchmann. Gstreamer is available on both
-  Linux, Mac OS X, and Windows.
+- A audio sink wrapper for `Gstreamer <http://gstreamer.freedesktop.org/>`_,
+  :class:`spotify.audiosink.gstreamer.GstreamerSink`, have been contributed by
+  David Buchmann. Gstreamer is available on both Linux, Mac OS X, and Windows.
 
 - The audio sink selector code originally written by Tommaso Barbugli for the
   ``jukebox.py`` example app have been generalized and made available for other

@@ -36,6 +36,7 @@ v1.7 (in development)
 - The ``jukebox.py`` example application got support for playing entire
   playlists. Thanks to Bjørn Schjerve.
 
+- Added method :meth:`spotify.Playlist.owner`.
 
 v1.6.1 (2011-12-29)
 ===================

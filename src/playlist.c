@@ -92,9 +92,11 @@ Playlist_remove_tracks(Playlist * self, PyObject *args)
         }
         Py_DECREF(item);
     }
+
     Py_BEGIN_ALLOW_THREADS;
     err = sp_playlist_remove_tracks(self->_playlist, tracks, num_tracks);
     Py_END_ALLOW_THREADS;
+
     return handle_error(err);
 }
 

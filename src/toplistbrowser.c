@@ -93,6 +93,7 @@ ToplistBrowser_new(PyTypeObject *potype, PyObject *args, PyObject *kwds)
         tl_region = SP_TOPLIST_REGION_USER;
         username = (char *) sp_user_canonical_name(((User *)region)->_user);
     }
+
     Py_BEGIN_ALLOW_THREADS
     browser = sp_toplistbrowse_create(g_session,
                                       tl_type, tl_region, username,
@@ -100,6 +101,7 @@ ToplistBrowser_new(PyTypeObject *potype, PyObject *args, PyObject *kwds)
                                       ToplistBrowser_browse_complete,
                                       tramp);
     Py_END_ALLOW_THREADS
+
     Py_DECREF(region);
     self = potype->tp_alloc(potype, 0);
     ((ToplistBrowser *)self)->_toplistbrowse = browser;

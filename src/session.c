@@ -109,8 +109,8 @@ Session_playlist_container(Session * self)
 
     Py_BEGIN_ALLOW_THREADS;
     pc = sp_session_playlistcontainer(self->_session);
-
     Py_END_ALLOW_THREADS;
+
     PlaylistContainer *ppc =
         (PlaylistContainer *) PyObject_CallObject((PyObject *)
                                                   &PlaylistContainerType,
@@ -134,9 +134,11 @@ Session_load(Session * self, PyObject *args)
     }
     t = track->_track;
     s = self->_session;
+
     Py_BEGIN_ALLOW_THREADS;
     err = sp_session_player_load(s, t);
     Py_END_ALLOW_THREADS;
+
     return handle_error(err);
 }
 
@@ -147,9 +149,11 @@ Session_seek(Session * self, PyObject *args)
 
     if (!PyArg_ParseTuple(args, "i", &seek))
         return NULL;
+
     Py_BEGIN_ALLOW_THREADS;
     sp_session_player_seek(self->_session, seek);
     Py_END_ALLOW_THREADS;
+
     Py_RETURN_NONE;
 }
 
@@ -160,9 +164,11 @@ Session_play(Session * self, PyObject *args)
 
     if (!PyArg_ParseTuple(args, "i", &play))
         return NULL;
+
     Py_BEGIN_ALLOW_THREADS;
     sp_session_player_play(self->_session, play);
     Py_END_ALLOW_THREADS;
+
     Py_RETURN_NONE;
 }
 
@@ -181,6 +187,7 @@ Session_process_events(Session * self)
     Py_BEGIN_ALLOW_THREADS;
     sp_session_process_events(self->_session, &timeout);
     Py_END_ALLOW_THREADS;
+
     return Py_BuildValue("i", timeout);
 }
 
@@ -228,6 +235,7 @@ Session_search(Session * self, PyObject *args, PyObject *kwds)
     if (!userdata)
         userdata = Py_None;
     st = create_trampoline(callback, NULL, userdata);
+
     Py_BEGIN_ALLOW_THREADS;
     search = sp_search_create(self->_session, query,
                               track_offset, track_count,
@@ -236,6 +244,7 @@ Session_search(Session * self, PyObject *args, PyObject *kwds)
                               (search_complete_cb *) search_complete,
                               (void *)st);
     Py_END_ALLOW_THREADS;
+
     results = Results_FromSpotify(search);
     return results;
 }
@@ -282,9 +291,11 @@ Session_set_preferred_bitrate(Session * self, PyObject *args)
 
     if (!PyArg_ParseTuple(args, "i", &bitrate))
         return NULL;
+
     Py_BEGIN_ALLOW_THREADS;
     sp_session_preferred_bitrate(self->_session, bitrate);
     Py_END_ALLOW_THREADS;
+
     Py_RETURN_NONE;
 }
 
@@ -296,6 +307,7 @@ Session_starred(Session * self)
     Py_BEGIN_ALLOW_THREADS;
     spl = sp_session_starred_create(self->_session);
     Py_END_ALLOW_THREADS;
+
     PyObject *pl = Playlist_FromSpotify(spl);
 
     return pl;

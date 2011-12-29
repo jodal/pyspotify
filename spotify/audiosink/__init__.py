@@ -10,6 +10,7 @@ AUDIO_SINKS = (
     ('spotify.audiosink.alsa', 'AlsaSink'),
     ('spotify.audiosink.oss', 'OssSink'),
     ('spotify.audiosink.portaudio', 'PortAudioSink'),
+    ('spotify.audiosink.gstreamer', 'GstreamerSink'),
 )
 
 

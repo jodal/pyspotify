@@ -314,7 +314,7 @@ class Jukebox(SpotifySessionManager):
             pl = self.ctr[playlist]
         elif playlist == len(self.ctr):
             pl = self.starred
-        print repr(pl)
+        print "Loading playlist %s" % pl.name()
         if len(pl):
             self.session.load(pl[0])
         for i, track in enumerate(pl):

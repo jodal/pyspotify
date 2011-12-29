@@ -774,8 +774,7 @@ Playlist_rename(Playlist * self, PyObject *args)
 static PyObject *
 Playlist_owner(Playlist * self)
 {
-    PyErr_SetString(PyExc_NotImplementedError, "");
-    return NULL;
+    return User_FromSpotify(sp_playlist_owner(self->_playlist));
 }
 
 static PyObject *

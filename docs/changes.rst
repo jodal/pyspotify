@@ -33,6 +33,9 @@ v1.7 (in development)
   ``jukebox.py`` example app have been generalized and made available for other
   applications as :func:`spotify.audiosink.import_audio_sink`.
 
+- The ``jukebox.py`` example application got support for playing entire
+  playlists. Thanks to Bjørn Schjerve.
+
 
 v1.6.1 (2011-12-29)
 ===================

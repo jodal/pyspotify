@@ -136,8 +136,14 @@ class SpotifySessionManager(object):
         """
         Callback.
 
-        You should call :meth:`session.process_events()
-        <spotify.Session.process_events>` at this point.
+        When this method is called, you should make sure that
+        :meth:`session.process_events() <spotify.Session.process_events>` is
+        called.
+
+        .. warning::
+            This method is called from an internal thread in libspotify. You
+            should make sure _not_ to use the Spotify API from within it, as
+            libspotify isn't thread safe.
 
         :param session: the current session.
         :type session: :class:`spotify.Session`
@@ -149,7 +155,12 @@ class SpotifySessionManager(object):
         """
         Callback.
 
-        Music data from `libspotify`.
+        Called whenever new music data arrives from Spotify.
+
+        .. warning::
+            This method is called from an internal thread in libspotify. You
+            should make sure _not_ to use the Spotify API from within it, as
+            libspotify isn't thread safe.
 
         :param session: the current session
         :type session: :class:`spotify.Session`
@@ -201,6 +212,11 @@ class SpotifySessionManager(object):
         Callback.
 
         Playback has reached the end of the current track.
+
+        .. warning::
+            This method is called from an internal thread in libspotify. You
+            should make sure _not_ to use the Spotify API from within it, as
+            libspotify isn't thread safe.
 
         :param session: the current session.
         :type session: :class:`spotify.Session`

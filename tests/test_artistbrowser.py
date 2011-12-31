@@ -1,5 +1,7 @@
 import unittest
-from spotify._mockspotify import mock_artistbrowse, mock_artist
+from spotify._mockspotify import ArtistBrowser
+from spotify._mockspotify import mock_artistbrowse, mock_artist, mock_album
+from spotify._mockspotify import registry_add, registry_clean
 from tests import SkipTest
 
 callback_called = False
@@ -7,7 +9,13 @@ callback_userdata = None
 
 class TestArtistbrowser(unittest.TestCase):
 
-    artist = mock_artist("foo0", 1)
+    artist = mock_artist("foo")
+    albums = [
+        mock_album("album1", artist),
+        mock_album("album2", artist),
+        mock_album("album3", artist),
+    ]
+    browser = mock_artistbrowse(artist, [], albums, [], 0)
 
     def callback(self, browser, userdata):
         global callback_called
@@ -15,25 +23,30 @@ class TestArtistbrowser(unittest.TestCase):
         callback_called = True
         callback_userdata = userdata
 
-    def test_is_loaded(self):
-        browser = mock_artistbrowse(self.artist, 1)
-        assert browser.is_loaded()
+    def setUp(self):
+        registry_add('spotify:artist:foo', self.artist)
+        registry_add('spotify:artistbrowse:foo', self.browser)
 
-    def test_is_not_loaded(self):
-        browser = mock_artistbrowse(self.artist, 0)
-        assert not browser.is_loaded()
+    def tearDown(self):
+        registry_clean()
+
+    def test_is_loaded(self):
+        self.assertTrue(self.browser.is_loaded())
 
     def test_sequence(self):
-        browser = mock_artistbrowse(self.artist, 1)
-        assert len(browser) == 3
-        assert browser[0].name() == 'foo'
-        assert browser[1].name() == 'bar'
-        assert browser[2].name() == 'baz'
+        self.assertEqual(len(self.browser), 3)
+        self.assertEqual(self.browser[0].name(), 'album1')
+        self.assertEqual(self.browser[1].name(), 'album2')
+        self.assertEqual(self.browser[2].name(), 'album3')
 
-    def test_callback(self):
+    def test_browser(self):
+        browser = ArtistBrowser(self.artist)
+
+    def test_browser_with_callback(self):
         global callback_called
         global callback_userdata
         callback_called = False
-        browser = mock_artistbrowse(self.artist, 0, self.callback, self)
+
+        browser = ArtistBrowser(self.artist, self.callback, self)
         self.assertTrue(callback_called)
         self.assertEqual(callback_userdata, self)

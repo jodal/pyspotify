@@ -19,3 +19,17 @@ from spotify._spotify import ToplistBrowser
 
 from spotify._spotify import api_version
 from spotify._spotify import connect
+
+# pylint: disable = W0404
+def _add_null_handler_for_logging():
+    import logging
+    try:
+        NullHandler = logging.NullHandler  # Python 2.7 and upwards
+    except AttributeError:
+        class NullHandler(logging.Handler):
+            def emit(self, record):
+                pass
+    logging.getLogger('pyspotify').addHandler(NullHandler())
+
+_add_null_handler_for_logging()
+# pylint: enable = W0404

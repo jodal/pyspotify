@@ -1,5 +1,6 @@
+import Queue
+
 import spotify
-import threading
 
 class SpotifySessionManager(object):
     """
@@ -18,14 +19,12 @@ class SpotifySessionManager(object):
     user_agent = 'pyspotify-example'
 
     def __init__(self, username=None, password=None, remember_me=False):
+        self._cmdqueue = Queue.Queue()
         self.username = username
         self.password = password
         self.remember_me = remember_me
         if self.application_key is None:
             self.application_key = open(self.appkey_file).read()
-        self.awoken = threading.Event() # used to block until awoken
-        self.timer = None
-        self.finished = False
 
     def connect(self):
         """
@@ -37,35 +36,45 @@ class SpotifySessionManager(object):
 
     def loop(self, session):
         """
-        The main loop.
-
-        This processes events and then either waits for an event. The event is
-        either triggered by a timer expiring, or by a notification from within
-        the Spotify subsystem (which calls :meth:`wake`).
+        The main loop. Processes events from ``libspotify`` and turns some of
+        them into callback calls.
         """
-        while not self.finished:
-            self.awoken.clear()
-            timeout = session.process_events()
-            self.timer = threading.Timer(timeout/1000.0, self.awoken.set)
-            self.timer.start()
-            self.awoken.wait()
+        # TODO Introduce logging and convert all print statements
+        running = True
+        timeout = 0
+        while running:
+            try:
+                print 'waiting for message for %.3f seconds' % timeout
+                message = self._cmdqueue.get(timeout=timeout)
+                print 'got message: %s' % message.get('command')
+                if message.get('command') == 'process_events':
+                    print 'processing events'
+                    timeout = session.process_events() / 1000.0
+                elif message.get('command') == 'music_delivery':
+                    print 'music_delivery'
+                    self.music_delivery_safe(session, *message['args'])
+                elif message.get('command') == 'end_of_track':
+                    print 'end_of_track'
+                    self.end_of_track_safe(session)
+                elif message.get('command') == 'terminate':
+                    print 'terminate'
+                    # FIXME Call session.logout() ?
+                    running = False
+            except Queue.Empty:
+                print 'no message received; processing events'
+                timeout = session.process_events() / 1000.0
 
     def terminate(self):
         """
         Terminate the current Spotify session.
         """
-        self.finished = True
-        self.wake()
+        self._cmdqueue.put({'command': 'terminate'})
 
     disconnect = terminate
 
     def wake(self, session=None):
-        """
-        This is called by the Spotify subsystem to wake up the main loop.
-        """
-        if self.timer is not None:
-            self.timer.cancel()
-        self.awoken.set()
+        # XXX This method should probably be renamed to notify_main_thread
+        self._cmdqueue.put({'command': 'process_events'})
 
     def logged_in(self, session, error):
         """
@@ -148,7 +157,8 @@ class SpotifySessionManager(object):
         :param session: the current session.
         :type session: :class:`spotify.Session`
         """
-        pass
+        # XXX Is this method called at all by the C code?
+        self._cmdqueue.put({'command': 'process_events'})
 
     def music_delivery(self, session, frames, frame_size, num_frames,
             sample_type, sample_rate, channels):
@@ -156,6 +166,8 @@ class SpotifySessionManager(object):
         Callback.
 
         Called whenever new music data arrives from Spotify.
+
+        You should override this method *or* :meth:`music_delivery_safe`, not both.
 
         .. warning::
             This method is called from an internal thread in libspotify. You
@@ -179,6 +191,22 @@ class SpotifySessionManager(object):
         :type channels: :class:`int`
         :return: number of frames consumed
         :rtype: :class:`int`
+        """
+        self._cmdqueue.put({
+            'command': 'music_delivery',
+            'args': (frames, frame_size, num_frames, sample_type, sample_rate,
+                channels),
+        })
+        return 0
+
+    def music_delivery_safe(self, session, frames, frame_size, num_frames,
+            sample_type, sample_rate, channels):
+        """
+        This method does the same as :meth:`music_delivery`, except that it's
+        called from the :class:`SpotifySessionManager` loop. You can safely use
+        Spotify APIs from within this method.
+
+        You should override this method *or* :meth:`music_delivery`, not both.
         """
         return 0
 
@@ -213,6 +241,8 @@ class SpotifySessionManager(object):
 
         Playback has reached the end of the current track.
 
+        You should override this method *or* :meth:`end_of_track_safe`, not both.
+
         .. warning::
             This method is called from an internal thread in libspotify. You
             should make sure _not_ to use the Spotify API from within it, as
@@ -220,5 +250,15 @@ class SpotifySessionManager(object):
 
         :param session: the current session.
         :type session: :class:`spotify.Session`
+        """
+        self._cmdqueue.put({'command': 'end_of_track'})
+
+    def end_of_track_safe(self, session):
+        """
+        This method does the same as :meth:`end_of_track`, except that it's
+        called from the :class:`SpotifySessionManager` loop. You can safely use
+        Spotify APIs from within this method.
+
+        You should override this method *or* :meth:`end_of_track`, not both.
         """
         pass

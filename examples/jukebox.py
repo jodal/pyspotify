@@ -353,7 +353,7 @@ class Jukebox(SpotifySessionManager):
         else:
             self.stop()
 
-    def end_of_track(self, sess):
+    def end_of_track_safe(self, sess):
         print "track ends."
         self.next()
 

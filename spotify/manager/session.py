@@ -66,6 +66,8 @@ class SpotifySessionManager(object):
                     logger.debug('Disconnecting')
                     session.logout()
                     running = False
+                else:
+                    raise ValueError('Unknown message type')
             except Queue.Empty:
                 logger.debug(
                     'No message received before timeout. Processing events')

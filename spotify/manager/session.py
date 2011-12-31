@@ -197,7 +197,7 @@ class SpotifySessionManager(object):
             'args': (frames, frame_size, num_frames, sample_type, sample_rate,
                 channels),
         })
-        return 0
+        return num_frames
 
     def music_delivery_safe(self, session, frames, frame_size, num_frames,
             sample_type, sample_rate, channels):

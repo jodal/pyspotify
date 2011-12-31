@@ -50,20 +50,18 @@ class SpotifySessionManager(object):
         timeout = 0
         while running:
             try:
-                logger.debug('Waiting for message for %.3f seconds', timeout)
                 message = self._cmdqueue.get(timeout=timeout)
-                logger.debug('Got message: %s', message.get('command'))
-                if message.get('command') == 'process_events':
-                    logger.debug('Processing events')
-                    timeout = session.process_events() / 1000.0
-                elif message.get('command') == 'music_delivery':
-                    logger.debug('Delivering music')
+                if message.get('command') == 'music_delivery':
                     self.music_delivery_safe(session, *message['args'])
+                elif message.get('command') == 'process_events':
+                    logger.debug('Got message; processing events')
+                    timeout = session.process_events() / 1000.0
+                    logger.debug('Will wait %.3fs for next message', timeout)
                 elif message.get('command') == 'end_of_track':
-                    logger.debug('Signalling end of track')
+                    logger.debug('Got message; signalling end of track')
                     self.end_of_track_safe(session)
                 elif message.get('command') == 'disconnect':
-                    logger.debug('Disconnecting')
+                    logger.debug('Got message; disconnecting')
                     session.logout()
                     running = False
                 else:
@@ -72,6 +70,7 @@ class SpotifySessionManager(object):
                 logger.debug(
                     'No message received before timeout. Processing events')
                 timeout = session.process_events() / 1000.0
+                logger.debug('Will wait %.3fs for next message', timeout)
 
     def disconnect(self):
         """

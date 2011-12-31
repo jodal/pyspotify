@@ -52,7 +52,9 @@ class SpotifySessionManager(object):
             try:
                 message = self._cmdqueue.get(timeout=timeout)
                 if message.get('command') == 'music_delivery':
-                    self.music_delivery_safe(session, *message['args'])
+                    num_frames = self.music_delivery_safe(
+                        session, *message['args'])
+                    message['reply_to'].put(num_frames)
                 elif message.get('command') == 'process_events':
                     logger.debug('Got message; processing events')
                     timeout = session.process_events() / 1000.0
@@ -197,12 +199,14 @@ class SpotifySessionManager(object):
         :return: number of frames consumed
         :rtype: :class:`int`
         """
+        future = Queue.Queue()
         self._cmdqueue.put({
             'command': 'music_delivery',
             'args': (frames, frame_size, num_frames, sample_type, sample_rate,
                 channels),
+            'reply_to': future,
         })
-        return num_frames
+        return future.get()
 
     def music_delivery_safe(self, session, frames, frame_size, num_frames,
             sample_type, sample_rate, channels):

@@ -29,7 +29,11 @@ class SpotifySessionManager(object):
     def connect(self):
         """
         Connect to the Spotify API using the given username and password.
+
         This method calls the :func:`spotify.connect` function.
+
+        This method does not return before we disconnect from the Spotify
+        service.
         """
         session = spotify.connect(self)
         self.loop(session) # returns on disconnect
@@ -56,21 +60,19 @@ class SpotifySessionManager(object):
                 elif message.get('command') == 'end_of_track':
                     print 'end_of_track'
                     self.end_of_track_safe(session)
-                elif message.get('command') == 'terminate':
-                    print 'terminate'
+                elif message.get('command') == 'disconnect':
+                    print 'disconnect'
                     session.logout()
                     running = False
             except Queue.Empty:
                 print 'no message received; processing events'
                 timeout = session.process_events() / 1000.0
 
-    def terminate(self):
+    def disconnect(self):
         """
         Terminate the current Spotify session.
         """
-        self._cmdqueue.put({'command': 'terminate'})
-
-    disconnect = terminate
+        self._cmdqueue.put({'command': 'disconnect'})
 
     def logged_in(self, session, error):
         """

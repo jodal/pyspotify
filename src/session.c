@@ -556,7 +556,7 @@ notify_main_thread(sp_session * session)
     PyObject *client = (PyObject *)sp_session_userdata(session);
 
     if (client != NULL) {
-        method = PyObject_GetAttrString(client, "wake");
+        method = PyObject_GetAttrString(client, "notify_main_thread");
         res = PyObject_CallFunctionObjArgs(method, psession, NULL);
         if (!res)
             PyErr_WriteUnraisable(method);

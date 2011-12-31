@@ -199,7 +199,7 @@ mock_artist(PyObject *self, PyObject *args, PyObject *kwds)
     sp_artist *artist;
 
     static char *kwlist[] =
-        { "name", "portrait", "loaded", NULL };
+        { "name", "portrait", "is_loaded", NULL };
 
     if (!PyArg_ParseTupleAndKeywords(args, kwds, "es|sb", kwlist,
                                      ENCODING, &name, &portrait, &is_loaded))

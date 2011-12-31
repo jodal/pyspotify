@@ -1,6 +1,9 @@
+import logging
 import Queue
 
 import spotify
+
+logger = logging.getLogger('pyspotify.manager.session')
 
 class SpotifySessionManager(object):
     """
@@ -43,29 +46,29 @@ class SpotifySessionManager(object):
         The main loop. Processes events from ``libspotify`` and turns some of
         them into callback calls.
         """
-        # TODO Introduce logging and convert all print statements
         running = True
         timeout = 0
         while running:
             try:
-                print 'waiting for message for %.3f seconds' % timeout
+                logger.debug('Waiting for message for %.3f seconds', timeout)
                 message = self._cmdqueue.get(timeout=timeout)
-                print 'got message: %s' % message.get('command')
+                logger.debug('Got message: %s', message.get('command'))
                 if message.get('command') == 'process_events':
-                    print 'processing events'
+                    logger.debug('Processing events')
                     timeout = session.process_events() / 1000.0
                 elif message.get('command') == 'music_delivery':
-                    print 'music_delivery'
+                    logger.debug('Delivering music')
                     self.music_delivery_safe(session, *message['args'])
                 elif message.get('command') == 'end_of_track':
-                    print 'end_of_track'
+                    logger.debug('Signalling end of track')
                     self.end_of_track_safe(session)
                 elif message.get('command') == 'disconnect':
-                    print 'disconnect'
+                    logger.debug('Disconnecting')
                     session.logout()
                     running = False
             except Queue.Empty:
-                print 'no message received; processing events'
+                logger.debug(
+                    'No message received before timeout. Processing events')
                 timeout = session.process_events() / 1000.0
 
     def disconnect(self):

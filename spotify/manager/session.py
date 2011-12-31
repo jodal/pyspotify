@@ -142,7 +142,7 @@ class SpotifySessionManager(object):
 
         .. warning::
             This method is called from an internal thread in libspotify. You
-            should make sure _not_ to use the Spotify API from within it, as
+            should make sure *not* to use the Spotify API from within it, as
             libspotify isn't thread safe.
 
         :param session: the current session.
@@ -159,7 +159,7 @@ class SpotifySessionManager(object):
 
         .. warning::
             This method is called from an internal thread in libspotify. You
-            should make sure _not_ to use the Spotify API from within it, as
+            should make sure *not* to use the Spotify API from within it, as
             libspotify isn't thread safe.
 
         :param session: the current session
@@ -215,7 +215,7 @@ class SpotifySessionManager(object):
 
         .. warning::
             This method is called from an internal thread in libspotify. You
-            should make sure _not_ to use the Spotify API from within it, as
+            should make sure *not* to use the Spotify API from within it, as
             libspotify isn't thread safe.
 
         :param session: the current session.

@@ -341,8 +341,8 @@ class Jukebox(SpotifySessionManager):
         self.playing = False
         self.audio.stop()
 
-    def music_delivery(self, *a, **kw):
-        return self.audio.music_delivery(*a, **kw)
+    def music_delivery_safe(self, *args, **kwargs):
+        return self.audio.music_delivery(*args, **kwargs)
 
     def next(self):
         self.stop()

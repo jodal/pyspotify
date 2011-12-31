@@ -58,7 +58,7 @@ class SpotifySessionManager(object):
                     self.end_of_track_safe(session)
                 elif message.get('command') == 'terminate':
                     print 'terminate'
-                    # FIXME Call session.logout() ?
+                    session.logout()
                     running = False
             except Queue.Empty:
                 print 'no message received; processing events'

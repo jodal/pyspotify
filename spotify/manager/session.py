@@ -72,10 +72,6 @@ class SpotifySessionManager(object):
 
     disconnect = terminate
 
-    def wake(self, session=None):
-        # XXX This method should probably be renamed to notify_main_thread
-        self._cmdqueue.put({'command': 'process_events'})
-
     def logged_in(self, session, error):
         """
         Callback.
@@ -145,9 +141,13 @@ class SpotifySessionManager(object):
         """
         Callback.
 
-        When this method is called, you should make sure that
-        :meth:`session.process_events() <spotify.Session.process_events>` is
-        called.
+        When this method is called by ``libspotify``, one should call
+        :meth:`session.process_events() <spotify.Session.process_events>`.
+
+        If you use the :class:`SessionManager`'s default loop, the default
+        implementation of this method does the job. Though, if you implement
+        your own loop for handling Spotify events, you'll need to override this
+        method.
 
         .. warning::
             This method is called from an internal thread in libspotify. You
@@ -157,7 +157,6 @@ class SpotifySessionManager(object):
         :param session: the current session.
         :type session: :class:`spotify.Session`
         """
-        # XXX Is this method called at all by the C code?
         self._cmdqueue.put({'command': 'process_events'})
 
     def music_delivery(self, session, frames, frame_size, num_frames,

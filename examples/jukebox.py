@@ -1,9 +1,11 @@
 #!/usr/bin/env python
+
+import cmd
+import logging
 import os
 import sys
-import cmd
-import time
 import threading
+import time
 
 from spotify import ArtistBrowser, Link, ToplistBrowser
 from spotify.audiosink import import_audio_sink
@@ -432,8 +434,12 @@ class Jukebox(SpotifySessionManager):
 if __name__ == '__main__':
     import optparse
     op = optparse.OptionParser(version="%prog 0.1")
-    op.add_option("-u", "--username", help="spotify username")
-    op.add_option("-p", "--password", help="spotify password")
+    op.add_option("-u", "--username", help="Spotify username")
+    op.add_option("-p", "--password", help="Spotify password")
+    op.add_option("-v", "--verbose", help="Show debug information",
+        dest="verbose", action="store_true")
     (options, args) = op.parse_args()
+    if options.verbose:
+        logging.basicConfig(level=logging.DEBUG)
     session_m = Jukebox(options.username, options.password, True)
     session_m.connect()

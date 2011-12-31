@@ -33,6 +33,10 @@ v1.7 (in development)
   :meth:`spotify.managers.SpotifySessionManager.notify_main_thread` does the
   same job.
 
+- Remove undocumented/internal method
+  :meth:`spotify.managers.SpotifySessionManager.terminate`. Use
+  :meth:`spotify.managers.SpotifySessionManager.disconnect` instead.
+
 **New features**
 
 - Added method :meth:`spotify.Playlist.owner`.

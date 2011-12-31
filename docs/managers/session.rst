@@ -5,5 +5,5 @@ Session manager
 
 .. autoclass:: SpotifySessionManager
     :members:
-    :exclude-members: terminate,loop
+    :exclude-members: loop
     :member-order: bysource

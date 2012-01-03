@@ -415,11 +415,13 @@ mock_playlistfolder(PyObject *self, PyObject *args, PyObject *kwds)
 {
     PlaylistFolder *pf;
     char *type, *name = NULL;
+    sp_uint64 folder_id = 0;
 
     static char *kwlist[] =
-        { "type", "name", NULL };
+        { "type", "name", "folder_id", NULL };
 
-    if (!PyArg_ParseTupleAndKeywords(args, kwds, "s|s", kwlist, &type, &name))
+    if (!PyArg_ParseTupleAndKeywords(args, kwds, "s|sK", kwlist,
+                                     &type, &name, &folder_id))
             return NULL;
     pf = (PlaylistFolder *)PyObject_CallObject((PyObject *)&PlaylistFolderType,
                                                NULL);
@@ -440,6 +442,7 @@ mock_playlistfolder(PyObject *self, PyObject *args, PyObject *kwds)
     else {
         pf->_type = SP_PLAYLIST_TYPE_PLACEHOLDER;
     }
+    pf->_id = folder_id;
     return (PyObject *)pf;
 }
 

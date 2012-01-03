@@ -513,12 +513,38 @@ mock_search(PyObject *self, PyObject *args, PyObject *kwds)
 
 /// Generate a mock spotify.Session python object
 PyObject *
-mock_session(PyObject *self)
+mock_session(PyObject *self, PyObject *args, PyObject *kwds)
 {
-    Session *session =
-        (Session *) PyObject_CallObject((PyObject *)&SessionType, NULL);
-    Py_INCREF(session);
-    return (PyObject *)session;
+    sp_session *session;
+    sp_session_config config;
+    char *username = "";
+
+    sp_connectionstate connectionstate = SP_CONNECTION_STATE_LOGGED_IN;
+    sp_offline_sync_status sync_status;
+    int offline_time_left=0, offline_num_playlists=0, offline_tracks_to_sync=0;
+    sp_playlist *inbox = NULL;
+
+    static char *kwlist[] = { "username", "inbox", NULL};
+
+    if (!PyArg_ParseTupleAndKeywords(args, kwds, "|esO!", kwlist,
+                                     ENCODING, &username,
+                                     &PlaylistType, &inbox))
+        return NULL;
+
+    /* Config */
+    memset(&config, 0, sizeof(sp_session_config));
+    config.api_version = SPOTIFY_API_VERSION;
+    config.application_key = "appkey_good";
+
+    /* Sync status */
+    memset(&sync_status, 0, sizeof(sp_offline_sync_status));
+
+    session = mocksp_session_create(&config, connectionstate,
+                                    offline_time_left, &sync_status,
+                                    offline_num_playlists,
+                                    offline_tracks_to_sync, inbox);
+    session->username = username;
+    return Session_FromSpotify(session);
 }
 
 /************************* REGISTRY MANIPULATION ****************************/
@@ -565,6 +591,27 @@ mock_registry_clean(PyObject *self)
     Py_RETURN_NONE;
 }
 
+/************************* CURRENT SESSION **********************************/
+
+PyObject *
+mock_set_current_session(PyObject *self, PyObject *args, PyObject *kwds)
+{
+    PyObject *session;
+
+    static char *kwlist[] = { "session", NULL };
+
+    if (!PyArg_ParseTupleAndKeywords(args, kwds, "O", kwlist,
+                                     &session))
+        return NULL;
+
+    if (session == Py_None) {
+        g_session = NULL;
+    } else {
+        g_session = ((Session *)session)->_session;
+    }
+    Py_RETURN_NONE;
+}
+
 /************************* MODULE INITIALISATION ****************************/
 
 static PyMethodDef module_methods[] = {
@@ -590,7 +637,9 @@ static PyMethodDef module_methods[] = {
     {"mock_search", (PyCFunction)mock_search,
         METH_VARARGS | METH_KEYWORDS, "Create mock search results"},
     {"mock_session", (PyCFunction)mock_session,
-        METH_NOARGS, "Create a mock session"},
+        METH_VARARGS | METH_KEYWORDS, "Create a mock session"},
+    {"mock_set_current_session", (PyCFunction)mock_set_current_session,
+        METH_VARARGS | METH_KEYWORDS, "Set the current session."},
     {"mock_event_trigger", event_trigger,
         METH_VARARGS, "Triggers an event"},
     {"mock_user", (PyCFunction)mock_user,

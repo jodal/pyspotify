@@ -199,14 +199,17 @@ class SpotifySessionManager(object):
         :return: number of frames consumed
         :rtype: :class:`int`
         """
-        future = Queue.Queue()
-        self._cmdqueue.put({
-            'command': 'music_delivery',
-            'args': (frames, frame_size, num_frames, sample_type, sample_rate,
-                channels),
-            'reply_to': future,
-        })
-        return future.get()
+        try:
+            future = Queue.Queue()
+            self._cmdqueue.put({
+                'command': 'music_delivery',
+                'args': (frames, frame_size, num_frames, sample_type, sample_rate,
+                    channels),
+                'reply_to': future,
+            }, block=False)
+            return future.get()
+        except Queue.Full:
+            return 0
 
     def music_delivery_safe(self, session, frames, frame_size, num_frames,
             sample_type, sample_rate, channels):

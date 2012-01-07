@@ -772,6 +772,12 @@ sp_playlist_track(sp_playlist * p, int index)
 }
 
 int
+sp_playlist_track_create_time(sp_playlist * p, int index)
+{
+    return 1320961109;
+}
+
+int
 sp_playlist_num_tracks(sp_playlist * p)
 {
     return p->num_tracks;
@@ -844,6 +850,13 @@ void
 sp_playlist_subscribers_free(sp_subscribers *sub)
 {
     PyMem_Free(sub);
+}
+
+sp_user *
+sp_playlist_owner(sp_playlist *p)
+{
+    /* STUB */
+    return NULL;
 }
 
 void
@@ -1440,27 +1453,17 @@ mock_albumbrowse(PyObject *self, PyObject *args, PyObject *kwds)
 {
     AlbumBrowser *ab;
     int loaded;
-    PyObject *session, *album, *callback, *userdata = NULL;
-    PyObject *new_args;
+    PyObject *album, *callback = NULL, *userdata = NULL;
     static char *kwlist[] =
-        { "session", "album", "loaded", "callback", "userdata", NULL };
+        { "album", "loaded", "callback", "userdata", NULL };
 
-    if (!PyArg_ParseTupleAndKeywords(args, kwds, "O!O!iO|O", kwlist,
-                                     &SessionType, &session,
+    if (!PyArg_ParseTupleAndKeywords(args, kwds, "O!i|OO", kwlist,
                                      &AlbumType, &album, &loaded,
                                      &callback, &userdata))
         return NULL;
-    if (!userdata) {
-        userdata = Py_None;
-        Py_INCREF(Py_None);
-    }
-    new_args = PyTuple_New(4);
-    PyTuple_SetItem(new_args, 0, session);
-    PyTuple_SetItem(new_args, 1, album);
-    PyTuple_SetItem(new_args, 2, callback);
-    PyTuple_SetItem(new_args, 3, userdata);
-    ab = (AlbumBrowser *) PyObject_Call((PyObject *)&AlbumBrowserType,
-                                        new_args, NULL);
+    ab = (AlbumBrowser *) PyObject_CallFunctionObjArgs((PyObject *)&AlbumBrowserType,
+                                                album, callback,
+                                                userdata, NULL);
     ab->_browser->loaded = loaded;
     return (PyObject *)ab;
 }
@@ -1483,27 +1486,17 @@ mock_artistbrowse(PyObject *self, PyObject *args, PyObject *kwds)
 {
     ArtistBrowser *ab;
     int loaded;
-    PyObject *session, *artist, *callback, *userdata = NULL;
-    PyObject *new_args;
+    PyObject *artist, *callback = NULL, *userdata = NULL;
     static char *kwlist[] =
-        { "session", "artist", "loaded", "callback", "userdata", NULL };
+        { "artist", "loaded", "callback", "userdata", NULL };
 
-    if (!PyArg_ParseTupleAndKeywords(args, kwds, "O!O!iO|O", kwlist,
-                                     &SessionType, &session,
+    if (!PyArg_ParseTupleAndKeywords(args, kwds, "O!i|OO", kwlist,
                                      &ArtistType, &artist, &loaded,
                                      &callback, &userdata))
         return NULL;
-    if (!userdata) {
-        userdata = Py_None;
-        Py_INCREF(Py_None);
-    }
-    new_args = PyTuple_New(4);
-    PyTuple_SetItem(new_args, 0, session);
-    PyTuple_SetItem(new_args, 1, artist);
-    PyTuple_SetItem(new_args, 2, callback);
-    PyTuple_SetItem(new_args, 3, userdata);
-    ab = (ArtistBrowser *) PyObject_Call((PyObject *)&ArtistBrowserType,
-                                         new_args, NULL);
+    ab = (ArtistBrowser *) PyObject_CallFunctionObjArgs((PyObject *)&ArtistBrowserType,
+                                                artist, callback,
+                                                userdata, NULL);
     ab->_browser->loaded = loaded;
     return (PyObject *)ab;
 }

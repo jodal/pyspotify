@@ -4,9 +4,9 @@ Session handling
 .. currentmodule:: spotify
 
 The session handling is usually done by inheriting the
-:class:`spotify.managers.SpotifySessionManager` class from the :mod:`manager`
-module.  Then the manager's :meth:`connect` method calls the
-:func:`spotify.connect` function.
+:class:`spotify.manager.SpotifySessionManager` class from the
+:mod:`spotify.manager` module.  Then the manager's :meth:`connect` method calls
+the :func:`spotify.connect` function.
 
 .. function:: connect(session_manager)
 
@@ -31,11 +31,15 @@ The :class:`Session` class
         Browse an album, calling the callback when the browser's metadata is
         loaded.
 
-        :param album: A spotify album (does not have to be loaded)
+        :param album: a Spotify album (does not have to be loaded)
         :type album: :class:`Album`
-        :param callback: signature : ``(AlbumBrowser browser, Object userdata)``
+        :param callback: a function with signature :
+            ``(AlbumBrowser browser, Object userdata)``
         :param userdata: any object
         :returns: An :class:`AlbumBrowser` object containing the results
+
+        .. deprecated:: 1.7
+            Use :class:`AlbumBrowser` instead.
 
 
     .. method:: browse_artist(artist, callback[, userdata])
@@ -43,11 +47,15 @@ The :class:`Session` class
         Browse an artist, calling the callback when the browser's metadata is
         loaded.
 
-        :param artist: A spotify artist (does not have to be loaded)
+        :param artist: a Spotify artist (does not have to be loaded)
         :type artist: :class:`Artist`
-        :param callback: signature : ``(ArtistBrowser browser, Object userdata)``
+        :param callback: a function with signature :
+            ``(ArtistBrowser browser, Object userdata)``
         :param userdata: any object
         :returns: An :class:`ArtistBrowser` object containing the results.
+
+        .. deprecated:: 1.7
+            Use :class:`ArtistBrowser` instead.
 
 
     .. method:: display_name()

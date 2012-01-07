@@ -92,9 +92,11 @@ Playlist_remove_tracks(Playlist * self, PyObject *args)
         }
         Py_DECREF(item);
     }
+
     Py_BEGIN_ALLOW_THREADS;
     err = sp_playlist_remove_tracks(self->_playlist, tracks, num_tracks);
     Py_END_ALLOW_THREADS;
+
     return handle_error(err);
 }
 
@@ -727,6 +729,17 @@ Playlist_remove_callback(Playlist * self, PyObject *args)
 }
 
 static PyObject *
+Playlist_track_create_time(Playlist * self, PyObject *args)
+{
+	int num_track;
+	if (!PyArg_ParseTuple(args, "i", &num_track))
+        return NULL;
+
+	int when = sp_playlist_track_create_time(self->_playlist, num_track);
+	return Py_BuildValue("i", when);
+}
+
+static PyObject *
 Playlist_name(Playlist * self)
 {
     const char *name = sp_playlist_name(self->_playlist);
@@ -761,8 +774,7 @@ Playlist_rename(Playlist * self, PyObject *args)
 static PyObject *
 Playlist_owner(Playlist * self)
 {
-    PyErr_SetString(PyExc_NotImplementedError, "");
-    return NULL;
+    return User_FromSpotify(sp_playlist_owner(self->_playlist));
 }
 
 static PyObject *
@@ -962,6 +974,10 @@ static PyMethodDef Playlist_methods[] = {
      (PyCFunction)Playlist_remove_callback,
      METH_VARARGS,
      ""},
+ 	{"track_create_time",
+     (PyCFunction)Playlist_track_create_time,
+     METH_VARARGS,
+     "Return when the given index was added to the playlist"},
     {"name",
      (PyCFunction)Playlist_name,
      METH_NOARGS,

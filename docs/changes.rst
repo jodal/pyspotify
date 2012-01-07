@@ -2,8 +2,61 @@
 Changes
 =======
 
-v1.6 (in development)
+.. currentmodule:: spotify
+
+v1.7 (in development)
 =====================
+
+**API changes**
+
+- Artist and album browsers are now created directly from the
+  :class:`ArtistBrowser` and :class:`AlbumBrowser` class constructors. The
+  :meth:`Session.browse_artist` and :meth:`Session.browse_album` methods still
+  work but have been deprecated. Also, callbacks are optional for the two
+  browsers.
+
+- The audio sink wrappers have been cleaned up and moved to a new
+  :mod:`spotify.audiosink` module. The interface is the same, but you'll need
+  to update your imports if you previously used either
+  :class:`spotify.alsahelper.AlsaController` (renamed to
+  :class:`spotify.audiosink.alsa.AlsaSink`) or
+  :class:`spotify.osshelper.OssController` (renamed to
+  :class:`spotify.audiosink.oss.OssSink`).
+
+**New features**
+
+- A audio sink wrapper for `PortAudio
+  <http://www.portaudio.com/>`_,
+  :class:`spotify.audiosink.portaudio.PortAudioSink`, have been contributed by
+  Tommaso Barbugli.  PortAudio is available on both Linux, Mac OS X, and
+  Windows.
+
+- A audio sink wrapper for `Gstreamer <http://gstreamer.freedesktop.org/>`_,
+  :class:`spotify.audiosink.gstreamer.GstreamerSink`, have been contributed by
+  David Buchmann. Gstreamer is available on both Linux, Mac OS X, and Windows.
+
+- The audio sink selector code originally written by Tommaso Barbugli for the
+  ``jukebox.py`` example app have been generalized and made available for other
+  applications as :func:`spotify.audiosink.import_audio_sink`.
+
+- The ``jukebox.py`` example application got support for playing entire
+  playlists. Thanks to Bjørn Schjerve.
+
+- Added method :meth:`spotify.Playlist.owner`.
+
+v1.6.1 (2011-12-29)
+===================
+
+Maintenance release to fix a segfault for some users of playlist folders.
+
+**Bug fixes**
+
+- Calling :meth:`spotify.PlaylistFolder.is_loaded()` would cause a double
+  ``free()``, and thus a segfault.
+
+
+v1.6 (2011-11-29)
+=================
 
 Updated to work with libspotify 10.1.16.
 
@@ -15,8 +68,14 @@ Updated to work with libspotify 10.1.16.
 - ``Session.is_local(track)`` is now
   :meth:`spotify.Track.is_local()`, and returns a boolean.
 - Removed methods: ``Session.get_friends``, ``User.full_name``,
-  ``User.picture``, and``User.relation``, as they was removed from the
+  ``User.picture``, and ``User.relation``, as they was removed from the
   libspotify API.
+
+**New features**
+
+- Add new method: :meth:`spotify.Playlist.track_create_time`. Contributed by
+  Benjamin Chapus.
+
 
 v1.5 (2011-10-30)
 =================
@@ -60,9 +119,12 @@ with libspotify v0.0.8.
 - Add user handling: :class:`spotify.User`
 - Add toplist browsing: :class:`spotify.ToplistBrowser`
 - Add new method: :meth:`spotify.Playlist.rename`
-- Add new method: :meth:`spotify.Session.get_friends`
-- Add new method: :meth:`spotify.Playlist.add_tracks`
-- Add new method: :meth:`spotify.PlaylistContainer.add_new_playlist`
+- Add new method: :meth:`spotify.Session.get_friends`. Contributed by Francisco
+  Jordano.
+- Add new method: :meth:`spotify.Playlist.add_tracks`. Contributed by Andreas
+  Franzén.
+- Add new method: :meth:`spotify.PlaylistContainer.add_new_playlist`.
+  Contributed by Andreas Franzén.
 
 **Bug fixes**
 
@@ -71,10 +133,10 @@ with libspotify v0.0.8.
 - :meth:`spotify.manager.SpotifySessionManager.message_to_user` callback used
   ``str`` in place of ``unicode``
 - Argument errors were unchecked in :meth:`spotify.Session.search`
-- Fix crash on valid error at image creation (jkp)
-- Keep compatibility with Python 2.5 (jkp)
-- Callbacks given at artist/album browser creation are now called by pyspotify
-  (jkp)
+- Fix crash on valid error at image creation. Fixed by Jamie Kirkpatrick.
+- Keep compatibility with Python 2.5. Contributed by Jamie Kirkpatrick.
+- Callbacks given at artist/album browser creation are now called by pyspotify.
+  Fixed by Jamie Kirkpatrick.
 - Fix exception when a ``long`` was returned from
   :meth:`spotify.manager.SpotifySessionManager.music_delivery`
 
@@ -112,8 +174,8 @@ thanks to him!
 - Upgraded to libspotify 0.0.8
 - New managers: *SpotifyPlaylistManager* and *SpotifyContainerManager* \
   giving access to all the Playlist{,Container} callbacks
-- Artist and Album browsing available
-- Added a method to stop the playback
+- Artist and Album browsing available. Contributed by Jamie Kirkpatrick.
+- Added a method to stop the playback. Contributed by Jamie Kirkpatrick.
 - Better error messages when not logged in and accessing user information
 - Added support for a playlist of all starred tracks
 - Get/Set starred status for a track
@@ -125,8 +187,10 @@ v1.1+mopidy20110405 (2011-04-05)
 
 Unofficial release by the Mopidy developers.
 
-- Exposed the track_is_local() check function
-- Fixed incorrect calls to determine track availability/locality
+- Exposed the track_is_local() check function. Contributed by Jamie
+  Kirkpatrick.
+- Fixed incorrect calls to determine track availability/locality. Contributed
+  by Jamie Kirkpatrick.
 
 
 v1.1+mopidy20110331 (2011-03-31)
@@ -134,9 +198,12 @@ v1.1+mopidy20110331 (2011-03-31)
 
 Unofficial release by the Mopidy developers.
 
-- Pass error messages instead of error codes to session callbacks
-- Fixed an issue where all playlists would appar blank when starting up
-- Make new config flags default to 0
+- Pass error messages instead of error codes to session callbacks. Contributed
+  by Antoine Pierlot-Garcin.
+- Fixed an issue where all playlists would appar blank when starting up.
+  Contributed by Jamie Kirkpatrick.
+- Make new config flags default to 0. Thanks to Jamie Kirkpatrick and Antoine
+  Pierlot-Garcin.
 
 
 v1.1+mopidy20110330 (2011-03-30)
@@ -144,7 +211,8 @@ v1.1+mopidy20110330 (2011-03-30)
 
 Unofficial release by the Mopidy developers.
 
-- Further updates for libspotify 0.0.7 support
+- Further updates for libspotify 0.0.7 support. Contributed by Antoine
+  Pierlot-Garcin.
 
 
 v1.1+mopidy20110223 (2011-02-23)
@@ -152,7 +220,7 @@ v1.1+mopidy20110223 (2011-02-23)
 
 Unofficial release by the Mopidy developers.
 
-- Upgraded to libspotify 0.0.7
+- Upgraded to libspotify 0.0.7. Contributed by Antoine Pierlot-Garcin.
 
 
 v1.1+mopidy20110106 (2011-01-06)
@@ -168,13 +236,21 @@ Unofficial release by the Mopidy developers.
 - Add remove_tracks to playlists
 - Add seek support by mapping sp_session_player_seek
 - Add support to set preferred bitrate
-- Fix a segfault (Thanks to Valentin David)
+- Fix a segfault. Thanks to Valentin David.
 
 
 v1.1 (2010-04-25)
 =================
 
-Last release by Doug Winter. See the git history for changes up to v1.1.
+Last release by Doug Winter.
 
 - Upgraded to libspotify 0.0.4
-- ...
+- See the git history for changes up to v1.1.
+
+Contributors to pyspotify up until v1.1 includes:
+
+- Doug Winter
+- Stein Magnus Jodal
+- Thomas Jost
+- Ben Firshman
+- Johannes Knutsen

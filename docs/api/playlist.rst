@@ -150,6 +150,11 @@ objects.
         :rtype:     :class:`int`
         :returns:   The number of subscribers of this playlist
 
+    .. method:: owner
+
+        :rtype:     :class:`spotify.User`
+        :returns:   the owner of the playlist
+
     .. method:: rename(name)
 
         :param name:    the new name
@@ -173,6 +178,14 @@ objects.
             returned by :meth:`num_subscribers`. Spotify does not track each
             user subscribed to a playlist for playlist with many (>500)
             subscribers.
+
+    .. method:: track_create_time(index)
+
+        :param index:   index of the track in the playlist
+        :type index:    :class:`int`
+        :rtype:         :class:`int`
+        :returns:       number of seconds after Unix epoch the track was
+                        added to the playlist
 
     .. method:: type
 

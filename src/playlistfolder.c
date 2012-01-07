@@ -86,6 +86,7 @@ PlaylistFolder_type(PlaylistFolder *self)
 static PyObject *
 PlaylistFolder_is_loaded(PlaylistFolder *self)
 {
+    Py_INCREF(Py_True);
     return Py_True;
 }
 

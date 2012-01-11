@@ -57,6 +57,7 @@ class BaseAudioSink(object):
 
     def __init__(self):
         self._call_cache = {}
+        self.async = False
 
     def music_delivery(self, session, frames, frame_size, num_frames,
             sample_type, sample_rate, channels):

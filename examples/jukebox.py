@@ -1,10 +1,10 @@
 #!/usr/bin/env python
-
-import cmd
-import traceback
-import time
-import threading
 import os
+import sys
+import cmd
+import time
+import traceback
+import threading
 
 from spotify import ArtistBrowser, Link, ToplistBrowser
 from spotify.audiosink import import_audio_sink
@@ -12,6 +12,7 @@ from spotify.manager import (SpotifySessionManager, SpotifyPlaylistManager,
         SpotifyContainerManager)
 
 AudioSink = import_audio_sink()
+container_loaded = threading.Event()
 
 class JukeboxUI(cmd.Cmd, threading.Thread):
 
@@ -26,6 +27,7 @@ class JukeboxUI(cmd.Cmd, threading.Thread):
         self.results = False
 
     def run(self):
+        container_loaded.wait()
         try:
             self.cmdloop()
         except Exception, e:
@@ -264,7 +266,8 @@ class JukeboxPlaylistManager(SpotifyPlaylistManager):
 ## container calllbacks ##
 class JukeboxContainerManager(SpotifyContainerManager):
     def container_loaded(self, c, u):
-        print 'Container loaded !'
+        container_loaded.set()
+        container_loaded.clear()
 
     def playlist_added(self, c, p, i, u):
         print 'Container: playlist "%s" added.' % p.name()
@@ -285,14 +288,20 @@ class Jukebox(SpotifySessionManager):
     def __init__(self, *a, **kw):
         SpotifySessionManager.__init__(self, *a, **kw)
         self.audio = AudioSink()
+        if self.audio.async:
+            self.audio.backend = self
+            self.audio.setup()
         self.ui = JukeboxUI(self)
         self.ctr = None
         self.playing = False
         self._queue = []
         self.playlist_manager = JukeboxPlaylistManager()
         self.container_manager = JukeboxContainerManager()
+        self.track_playing = None
         print "Logging in, please wait..."
 
+    def new_track_playing(self, track):
+        self.track_playing = track
 
     def logged_in(self, session, error):
         if error:
@@ -313,6 +322,7 @@ class Jukebox(SpotifySessionManager):
     def load_track(self, track):
         if self.playing:
             self.stop()
+        self.new_track_playing(track)
         self.session.load(track)
         print "Loading %s" % track.name()
 
@@ -323,8 +333,10 @@ class Jukebox(SpotifySessionManager):
             pl = self.ctr[playlist]
         elif playlist == len(self.ctr):
             pl = self.starred
-        self.session.load(pl[track])
-        print "Loading %s from %s" % (pl[track].name(), pl.name())
+        spot_track = pl[track]
+        self.new_track_playing(spot_track)
+        self.session.load(spot_track)
+        print "Loading %s from %s" % (spot_track.name(), pl.name())
 
     def load_playlist(self, playlist):
         if self.playing:
@@ -335,6 +347,8 @@ class Jukebox(SpotifySessionManager):
             pl = self.starred
         print "Loading playlist %s" % pl.name()
         if len(pl):
+            print "Loading %s from %s" % (pl[0].name(), pl.name())
+            self.new_track_playing(pl[0])
             self.session.load(pl[0])
         for i, track in enumerate(pl):
             if i == 0:
@@ -345,6 +359,7 @@ class Jukebox(SpotifySessionManager):
         if self.playing:
             self._queue.append((playlist, track))
         else:
+            print 'Loading %s', track.name()
             self.load(playlist, track)
             self.play()
 
@@ -373,6 +388,9 @@ class Jukebox(SpotifySessionManager):
             self.stop()
 
     def end_of_track(self, sess):
+        if self.audio.async:
+            self.audio.emit_EOS()
+            return
         print "track ends."
         self.next()
 

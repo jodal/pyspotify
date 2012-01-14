@@ -13,18 +13,10 @@
 
 import sys, os, re
 
-import distutils.command.build
-from distutils.dist import Distribution
-
-b = distutils.command.build.build(Distribution())
-b.initialize_options()
-b.finalize_options()
-
 # If extensions (or modules to document with autodoc) are in another directory,
 # add these directories to sys.path here. If the directory is relative to the
 # documentation root, use os.path.abspath to make it absolute, like shown here.
-pyspotify_path = '../' + b.build_platlib
-sys.path.insert(0, os.path.abspath(pyspotify_path))
+sys.path.insert(0, os.path.abspath('..'))
 
 def get_version():
     init_py = open('../spotify/__init__.py').read()
@@ -227,3 +219,24 @@ man_pages = [
     ('index', 'pyspotify', u'pyspotify Documentation',
      [u'Doug Winter and contributors'], 1)
 ]
+
+
+class Mock(object):
+    def __init__(self, *args, **kwargs):
+        pass
+
+    def __call__(self, *args, **kwargs):
+        return Mock()
+
+    @classmethod
+    def __getattr__(self, name):
+        if name in ('__file__', '__path__'):
+            return '/dev/null'
+        elif name[0] == name[0].upper():
+            return type(name, (), {})
+        else:
+            return Mock()
+
+MOCK_MODULES = ['spotify._spotify']
+for mod_name in MOCK_MODULES:
+    sys.modules[mod_name] = Mock()

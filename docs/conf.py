@@ -46,7 +46,7 @@ master_doc = 'index'
 
 # General information about the project.
 project = u'pyspotify'
-copyright = u'2009-2011, Doug Winter and contributors'
+copyright = u'2009-2012, Doug Winter and contributors'
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the

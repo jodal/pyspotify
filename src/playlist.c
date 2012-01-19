@@ -670,7 +670,13 @@ playlist_image_changed_callback(sp_playlist * playlist, const byte * image,
     tramp = (Callback *) userdata;
     PyObject *p = Playlist_FromSpotify(playlist);
 
-    pimage = PyBytes_FromStringAndSize((const char *)image, 20);        //TODO: return Image
+    if (image) {
+        pimage = PyBytes_FromStringAndSize((const char *)image, 20);        //TODO: return Image
+    }
+    else {
+        Py_INCREF(Py_None);
+        pimage = Py_None;
+    }
     res = PyObject_CallFunctionObjArgs(tramp->callback,
                                        p, pimage, tramp->userdata, NULL);
     if (!res)

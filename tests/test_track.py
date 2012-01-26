@@ -5,14 +5,16 @@ from spotify._mockspotify import mock_track, mock_album, mock_artist, mock_sessi
 
 class TestTrack(unittest.TestCase):
 
-    track = mock_track(u'æâ€êþÿ', 3, mock_album("bar", mock_artist("baz", 1), 0, "",
-                                            0, 1, 1), 10, 20, 30, 40, 0, 1)
+    artists = [mock_artist('artist1'), mock_artist('artist2')]
+    album = mock_album('album1', artists[0])
+    track = mock_track(u'æâ€êþÿ', artists, album, 10, 20, 30, 40)
 
     def test_artists(self):
-        self.assertEqual([x.name() for x in self.track.artists()], ["a1", "a2", "a3"])
+        self.assertEqual([x.name() for x in self.track.artists()], ['artist1',
+                                                                    'artist2'])
 
     def test_album(self):
-        self.assertEqual(self.track.album().name(), "bar")
+        self.assertEqual(self.track.album().name(), "album1")
 
     def test_name(self):
         self.assertEqual(self.track.name(), u'æâ€êþÿ')

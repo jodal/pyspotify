@@ -8,3 +8,6 @@ typedef struct {
 extern PyTypeObject ArtistBrowserType;
 
 extern void artistbrowser_init(PyObject *m);
+
+PyObject *
+ArtistBrowser_FromSpotify(sp_artistbrowse * browse);

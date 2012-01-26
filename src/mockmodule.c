@@ -550,6 +550,51 @@ mock_session(PyObject *self, PyObject *args, PyObject *kwds)
     return Session_FromSpotify(session);
 }
 
+
+/// Generate a mock spotify.Toplistbrowse object
+PyObject *
+mock_toplistbrowse(PyObject *self, PyObject *args, PyObject *kwds)
+{
+    int i, error=0, request_duration=0, num_tracks=0, num_albums=0, num_artists=0;
+    PyObject *py_tracks, *py_albums, *py_artists;
+    sp_album  **albums;
+    sp_artist **artists;
+    sp_track  **tracks;
+    sp_toplistbrowse *tb;
+
+    static char *kwlist[] =
+        { "albums", "artists", "tracks", "error", "request_duration", NULL };
+
+    if (!PyArg_ParseTupleAndKeywords(args, kwds,
+                "O!O!O!|ii", kwlist, &PyList_Type, &py_albums,
+                &PyList_Type, &py_artists, &PyList_Type, &py_tracks,
+                &error, &request_duration))
+        return NULL;
+
+    num_tracks = PyList_GET_SIZE(py_tracks);
+    tracks = malloc(num_tracks * sizeof(sp_track *));
+    for (i = 0; i < num_tracks; i++) {
+        tracks[i] = ((Track *)PyList_GET_ITEM(py_tracks, i))->_track;
+    }
+
+    num_albums = PyList_GET_SIZE(py_albums);
+    albums = malloc(num_albums * sizeof(sp_album *));
+    for (i = 0; i < num_albums; i++) {
+        albums[i] = ((Album *)PyList_GET_ITEM(py_albums, i))->_album;
+    }
+
+    num_artists = PyList_GET_SIZE(py_artists);
+    artists = malloc(num_artists * sizeof(sp_artist *));
+    for (i = 0; i < num_artists; i++) {
+        artists[i] = ((Artist *)PyList_GET_ITEM(py_artists, i))->_artist;
+    }
+
+    tb = mocksp_toplistbrowse_create(error, request_duration, num_artists,
+                                    artists, num_albums, albums, num_tracks,
+                                    tracks, NULL, NULL);
+    return ToplistBrowser_FromSpotify(tb);
+}
+
 /************************* REGISTRY MANIPULATION ****************************/
 
 PyObject *
@@ -641,6 +686,8 @@ static PyMethodDef module_methods[] = {
         METH_VARARGS | METH_KEYWORDS, "Create mock search results"},
     {"mock_session", (PyCFunction)mock_session,
         METH_VARARGS | METH_KEYWORDS, "Create a mock session"},
+    {"mock_toplistbrowse", (PyCFunction)mock_toplistbrowse,
+        METH_VARARGS | METH_KEYWORDS, "Create a mock toplist browser"},
     {"mock_set_current_session", (PyCFunction)mock_set_current_session,
         METH_VARARGS | METH_KEYWORDS, "Set the current session."},
     {"mock_event_trigger", event_trigger,

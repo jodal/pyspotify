@@ -2,7 +2,7 @@
 
 import unittest
 
-from spotify._mockspotify import User, mock_user, mock_session
+from spotify._mockspotify import User, mock_user
 
 class TestUser(unittest.TestCase):
 

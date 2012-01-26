@@ -471,7 +471,7 @@ mock_search(PyObject *self, PyObject *args, PyObject *kwds)
                 "esO!O!O!|iiiesi", kwlist, ENCODING, &query,
                 &PyList_Type, &py_tracks, &PyList_Type, &py_albums,
                 &PyList_Type, &py_artists, &total_tracks, &total_albums,
-                &total_artists, &did_you_mean, &error))
+                &total_artists, ENCODING, &did_you_mean, &error))
         return NULL;
 
     num_tracks = PyList_GET_SIZE(py_tracks);

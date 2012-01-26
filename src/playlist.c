@@ -92,9 +92,11 @@ Playlist_remove_tracks(Playlist * self, PyObject *args)
         }
         Py_DECREF(item);
     }
+
     Py_BEGIN_ALLOW_THREADS;
     err = sp_playlist_remove_tracks(self->_playlist, tracks, num_tracks);
     Py_END_ALLOW_THREADS;
+
     return handle_error(err);
 }
 
@@ -778,8 +780,7 @@ Playlist_rename(Playlist * self, PyObject *args)
 static PyObject *
 Playlist_owner(Playlist * self)
 {
-    PyErr_SetString(PyExc_NotImplementedError, "");
-    return NULL;
+    return User_FromSpotify(sp_playlist_owner(self->_playlist));
 }
 
 static PyObject *

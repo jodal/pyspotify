@@ -15,12 +15,44 @@ v1.7 (in development)
   work but have been deprecated. Also, callbacks are optional for the two
   browsers.
 
+- The audio sink wrappers have been cleaned up and moved to a new
+  :mod:`spotify.audiosink` module. The interface is the same, but you'll need
+  to update your imports if you previously used either
+  :class:`spotify.alsahelper.AlsaController` (renamed to
+  :class:`spotify.audiosink.alsa.AlsaSink`) or
+  :class:`spotify.osshelper.OssController` (renamed to
+  :class:`spotify.audiosink.oss.OssSink`).
+
 **New features**
 
-- The bundled jukebox example now supports `PortAudio
-  <http://www.portaudio.com/>`_ in addition to OSS and ALSA audio output. In
-  other words, the jukebox can now easily be used on Mac OS X. Contributed by
-  Tommaso Barbugli.
+- A audio sink wrapper for `PortAudio
+  <http://www.portaudio.com/>`_,
+  :class:`spotify.audiosink.portaudio.PortAudioSink`, have been contributed by
+  Tommaso Barbugli.  PortAudio is available on both Linux, Mac OS X, and
+  Windows.
+
+- A audio sink wrapper for `Gstreamer <http://gstreamer.freedesktop.org/>`_,
+  :class:`spotify.audiosink.gstreamer.GstreamerSink`, have been contributed by
+  David Buchmann. Gstreamer is available on both Linux, Mac OS X, and Windows.
+
+- The audio sink selector code originally written by Tommaso Barbugli for the
+  ``jukebox.py`` example app have been generalized and made available for other
+  applications as :func:`spotify.audiosink.import_audio_sink`.
+
+- The ``jukebox.py`` example application got support for playing entire
+  playlists. Thanks to Bjørn Schjerve.
+
+- Added method :meth:`spotify.Playlist.owner`.
+
+v1.6.1 (2011-12-29)
+===================
+
+Maintenance release to fix a segfault for some users of playlist folders.
+
+**Bug fixes**
+
+- Calling :meth:`spotify.PlaylistFolder.is_loaded()` would cause a double
+  ``free()``, and thus a segfault.
 
 **Other changes**
 

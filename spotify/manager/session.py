@@ -136,8 +136,14 @@ class SpotifySessionManager(object):
         """
         Callback.
 
-        You should call :meth:`session.process_events()
-        <spotify.Session.process_events>` at this point.
+        When this method is called, you should make sure that
+        :meth:`session.process_events() <spotify.Session.process_events>` is
+        called.
+
+        .. warning::
+            This method is called from an internal thread in libspotify. You
+            should make sure *not* to use the Spotify API from within it, as
+            libspotify isn't thread safe.
 
         :param session: the current session.
         :type session: :class:`spotify.Session`
@@ -149,23 +155,30 @@ class SpotifySessionManager(object):
         """
         Callback.
 
-        Music data from `libspotify`.
+        Called whenever new music data arrives from Spotify.
 
-        :param session: the current session.
+        .. warning::
+            This method is called from an internal thread in libspotify. You
+            should make sure *not* to use the Spotify API from within it, as
+            libspotify isn't thread safe.
+
+        :param session: the current session
         :type session: :class:`spotify.Session`
-        :param frames: the audio data.
-        :type frames: buffer
-        :param frame_size: bytes per frame.
-        :type frame_size: int
-        :param num_frames: number of frames in this delivery.
-        :type num_frames: int
-        :param sample_type: currently this is always 0 which means 16-bit signed
-            native endian integer samples.
-        :type sample_type: int
-        :param sample_rate: audio sample rate, in samples per second.
-        :type sample_rate: int
-        :param channels: number of audio channels. Currently 1 or 2.
-        :type channels: int
+        :param frames: the audio data
+        :type frames: :class:`buffer`
+        :param frame_size: bytes per frame
+        :type frame_size: :class:`int`
+        :param num_frames: number of frames in this delivery
+        :type num_frames: :class:`int`
+        :param sample_type: currently this is always 0 which means 16-bit
+            signed native endian integer samples
+        :type sample_type: :class:`int`
+        :param sample_rate: audio sample rate, in samples per second
+        :type sample_rate: :class:`int`
+        :param channels: number of audio channels. Currently 1 or 2
+        :type channels: :class:`int`
+        :return: number of frames consumed
+        :rtype: :class:`int`
         """
         return 0
 
@@ -199,6 +212,11 @@ class SpotifySessionManager(object):
         Callback.
 
         Playback has reached the end of the current track.
+
+        .. warning::
+            This method is called from an internal thread in libspotify. You
+            should make sure *not* to use the Spotify API from within it, as
+            libspotify isn't thread safe.
 
         :param session: the current session.
         :type session: :class:`spotify.Session`

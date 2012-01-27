@@ -134,18 +134,18 @@ ArtistBrowser_tracks(ArtistBrowser * self)
 Py_ssize_t
 ArtistBrowser_sq_length(ArtistBrowser * self)
 {
-    return sp_artistbrowse_num_albums(self->_browser);
+    return sp_artistbrowse_num_tracks(self->_browser);
 }
 
 PyObject *
 ArtistBrowser_sq_item(ArtistBrowser * self, Py_ssize_t index)
 {
-    if (index >= sp_artistbrowse_num_albums(self->_browser)) {
+    if (index >= sp_artistbrowse_num_tracks(self->_browser)) {
         PyErr_SetString(PyExc_IndexError, "");
         return NULL;
     }
-    sp_album *album = sp_artistbrowse_album(self->_browser, (int)index);
-    PyObject *wrapper = Album_FromSpotify(album);
+    sp_track *track = sp_artistbrowse_track(self->_browser, (int)index);
+    PyObject *wrapper = Track_FromSpotify(track);
 
     return wrapper;
 }

@@ -6,6 +6,7 @@
 #include "artistbrowser.h"
 #include "album.h"
 #include "session.h"
+#include "track.h"
 
 static PyObject *
 ArtistBrowser_FromSpotify(sp_artistbrowse * browse)
@@ -81,6 +82,55 @@ ArtistBrowser_is_loaded(ArtistBrowser * self)
     return Py_BuildValue("i", sp_artistbrowse_is_loaded(self->_browser));
 }
 
+static PyObject *
+ArtistBrowser_albums(ArtistBrowser * self)
+{
+    sp_album *album;
+    int count = sp_artistbrowse_num_albums(self->_browser);
+    PyObject *l = PyList_New(count);
+    int i;
+
+    for (i = 0; i < count; ++i) {
+        album = sp_artistbrowse_album(self->_browser, i);
+        PyObject *a = Album_FromSpotify(album);
+
+        PyList_SetItem(l, i, a);
+    }
+    return l;
+}
+
+static PyObject *
+ArtistBrowser_similar_artists(ArtistBrowser * self)
+{
+    sp_artist *artist;
+    int count = sp_artistbrowse_num_similar_artists(self->_browser);
+    PyObject *l = PyList_New(count);
+    int i;
+
+    for (i = 0; i < count; ++i) {
+        artist = sp_artistbrowse_similar_artist(self->_browser, i);
+        PyObject *a = Artist_FromSpotify(artist);
+
+        PyList_SetItem(l, i, a);
+    }
+    return l;
+}
+
+static PyObject *
+ArtistBrowser_tracks(ArtistBrowser * self)
+{
+    int count = sp_artistbrowse_num_tracks(self->_browser);
+    PyObject *l = PyList_New(count);
+    int i;
+
+    for (i = 0; i < count; ++i) {
+        PyObject *a = Track_FromSpotify(sp_artistbrowse_track(self->_browser, i));
+
+        PyList_SetItem(l, i, a);
+    }
+    return l;
+}
+
 Py_ssize_t
 ArtistBrowser_sq_length(ArtistBrowser * self)
 {
@@ -116,6 +166,18 @@ static PyMethodDef ArtistBrowser_methods[] = {
      (PyCFunction)ArtistBrowser_is_loaded,
      METH_NOARGS,
      "True if this artist browser has finished loading"},
+    {"albums",
+     (PyCFunction)ArtistBrowser_albums,
+     METH_NOARGS,
+     "Return a list of all the albums found while browsing."},
+    {"similar_artists",
+     (PyCFunction)ArtistBrowser_similar_artists,
+     METH_NOARGS,
+     "Return a list of all the artists found while browsing."},
+    {"tracks",
+     (PyCFunction)ArtistBrowser_tracks,
+     METH_NOARGS,
+     "Return a list of all the tracks found while browsing."},
     {NULL}
 };
 

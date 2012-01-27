@@ -23,3 +23,17 @@ The :class:`ArtistBrowser` class
         :rtype:     :class:`int`
         :returns:   wether this artist browser has finished loading metadata.
 
+    .. method:: albums
+
+        :rtype:     list of :class:`Album`
+        :returns:   the list of albums found while browsing
+
+    .. method:: similar_artists
+
+        :rtype:     list of :class:`Artist`
+        :returns:   the list of similar artists found while browsing
+
+    .. method:: tracks
+
+        :rtype:     list of :class:`Track`
+        :returns:   the list of tracks found while browsing

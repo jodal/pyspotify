@@ -44,6 +44,9 @@ v1.7 (in development)
 
 - Added method :meth:`spotify.Playlist.owner`.
 
+- Added methods :meth:`spotify.Results.total_albums` and
+  :meth:`spotify.Results.total_artists`.
+
 v1.6.1 (2011-12-29)
 ===================
 

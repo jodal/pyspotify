@@ -107,6 +107,18 @@ Results_tracks(Results * self)
 }
 
 static PyObject *
+Results_total_albums(Results * self)
+{
+    return Py_BuildValue("i", sp_search_total_albums(self->_search));
+}
+
+static PyObject *
+Results_total_artists(Results * self)
+{
+    return Py_BuildValue("i", sp_search_total_artists(self->_search));
+}
+
+static PyObject *
 Results_total_tracks(Results * self)
 {
     return Py_BuildValue("i", sp_search_total_tracks(self->_search));
@@ -149,6 +161,14 @@ static PyMethodDef Results_methods[] = {
      (PyCFunction)Results_tracks,
      METH_NOARGS,
      "Return a list of all the tracks found by the search"},
+    {"total_albums",
+     (PyCFunction)Results_total_albums,
+     METH_NOARGS,
+     "Return the total number of albums available from this search - if this is more than the number in 'albums' then more are available that were not requested"},
+    {"total_artists",
+     (PyCFunction)Results_total_artists,
+     METH_NOARGS,
+     "Return the total number of artists available from this search - if this is more than the number in 'artists' then more are available that were not requested"},
     {"total_tracks",
      (PyCFunction)Results_total_tracks,
      METH_NOARGS,

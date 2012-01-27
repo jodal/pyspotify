@@ -51,6 +51,8 @@ v1.7 (in development)
   :meth:`spotify.ArtistBrowser.similar_artists` and
   :meth:`spotify.ArtistBrowser.tracks`
 
+- Added optional argurment ``type`` for :class:`spotify.ArtistBrowser`.
+
 v1.6.1 (2011-12-29)
 ===================
 

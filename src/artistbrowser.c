@@ -43,15 +43,30 @@ static PyObject *
 ArtistBrowser_new(PyTypeObject * type, PyObject *args, PyObject *kwds)
 {
     PyObject *artist, *callback = NULL, *userdata = NULL;
+    char *str_type = NULL;
+    sp_artistbrowse_type abtype = SP_ARTISTBROWSE_FULL;
     Callback *cb = NULL;
     ArtistBrowser *self;
     static char *kwlist[] =
-        { "artist", "callback", "userdata", NULL };
+        { "artist", "type", "callback", "userdata", NULL };
 
     if (!PyArg_ParseTupleAndKeywords
-        (args, kwds, "O!|OO", kwlist, &ArtistType, &artist, &callback,
-            &userdata))
+        (args, kwds, "O!|sOO", kwlist, &ArtistType, &artist, &str_type,
+         &callback, &userdata))
         return NULL;
+    if (str_type) {
+        if (strcmp(str_type, "full") == 0) {} // default
+        else if (strcmp(str_type, "no_tracks") == 0) {
+            abtype = SP_ARTISTBROWSE_NO_TRACKS;
+        }
+        else if (strcmp(str_type, "no_albums") == 0) {
+            abtype = SP_ARTISTBROWSE_NO_ALBUMS;
+        }
+        else {
+            PyErr_SetString(PyExc_ValueError, "Unknown artist browser type.");
+            return NULL;
+        }
+    }
     self = (ArtistBrowser *) type->tp_alloc(type, 0);
     if (callback) {
         if (!userdata)
@@ -61,7 +76,7 @@ ArtistBrowser_new(PyTypeObject * type, PyObject *args, PyObject *kwds)
     self->_browser =
         sp_artistbrowse_create(g_session,
                                ((Artist *) artist)->_artist,
-                               SP_ARTISTBROWSE_FULL,
+                               abtype,
                                (artistbrowse_complete_cb *)
                                ArtistBrowser_browse_complete,
                                cb);

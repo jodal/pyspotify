@@ -47,6 +47,10 @@ v1.7 (in development)
 - Added methods :meth:`spotify.Results.total_albums` and
   :meth:`spotify.Results.total_artists`.
 
+- Added methods :meth:`spotify.ArtistBrowser.albums`,
+  :meth:`spotify.ArtistBrowser.similar_artists` and
+  :meth:`spotify.ArtistBrowser.tracks`
+
 v1.6.1 (2011-12-29)
 ===================
 

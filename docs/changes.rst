@@ -44,6 +44,13 @@ v1.7 (in development)
 
 - Added method :meth:`spotify.Playlist.owner`.
 
+**Other changes**
+
+- For developers: *pyspotify* now uses `libmockspotify
+  <https://github.com/mopidy/libmockspotify>`_ for its mocking needs. The
+  mock module only contains Python bindings to the *libmockspotify* API.
+
+
 v1.6.1 (2011-12-29)
 ===================
 
@@ -54,11 +61,6 @@ Maintenance release to fix a segfault for some users of playlist folders.
 - Calling :meth:`spotify.PlaylistFolder.is_loaded()` would cause a double
   ``free()``, and thus a segfault.
 
-**Other changes**
-
-- For developers: *pyspotify* now uses `libmockspotify
-  <https://github.com/mopidy/libmockspotify>`_ for its mocking needs. The
-  mock module only contains Python bindings to the *libmockspotify* API.
 
 v1.6 (2011-11-29)
 =================

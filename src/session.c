@@ -31,6 +31,15 @@ Session_new(PyTypeObject * type, PyObject *args, PyObject *kwds)
     return (PyObject *)self;
 }
 
+PyObject *
+Session_FromSpotify(sp_session * session)
+{
+    PyObject *s = PyObject_CallObject((PyObject *)&SessionType, NULL);
+
+    ((Session *) s)->_session = session;
+    return s;
+}
+
 static PyMemberDef Session_members[] = {
     {NULL}
 };

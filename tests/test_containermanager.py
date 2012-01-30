@@ -1,5 +1,5 @@
 import unittest
-from spotify._mockspotify import mock_playlist, mock_event_trigger
+from spotify._mockspotify import mock_playlist, mock_event_trigger, mock_user
 from spotify._mockspotify import mock_playlistcontainer
 from spotify.manager import SpotifyContainerManager
 import spotify
@@ -29,8 +29,7 @@ class TestPlaylistManager(unittest.TestCase):
 
     def setUp(self):
         self.manager = MyContainerManager()
-        self.playlist = mock_playlist('foo_', [])
-        self.container = mock_playlistcontainer([])
+        self.container = mock_playlistcontainer(mock_user('user'), [])
 
     def test_container_loaded(self):
         global callback_called
@@ -43,7 +42,7 @@ class TestPlaylistManager(unittest.TestCase):
         self.assertEqual(name, "container_loaded")
         self.assertEqual(len(args), 3)
         self.assertEqual(args[0], self.manager)
-        self.assertEqual(type(args[1]), type(self.container))
+        self.assertEqual(type(args[1]), spotify._mockspotify.PlaylistContainer)
 
     def test_playlist_added(self):
         global callback_called
@@ -56,9 +55,9 @@ class TestPlaylistManager(unittest.TestCase):
         self.assertEqual(name, "playlist_added")
         self.assertEqual(len(args), 5)
         self.assertEqual(args[0], self.manager)
-        self.assertEqual(type(args[1]), type(self.container))
-        self.assertEqual(type(args[2]), type(self.playlist))
-        self.assertEqual(args[2].name(), 'foo')
+        self.assertEqual(type(args[1]), spotify._mockspotify.PlaylistContainer)
+        self.assertEqual(type(args[2]), spotify._mockspotify.Playlist)
+        self.assertEqual(args[2].name(), 'P')
         self.assertEqual(type(args[3]), int)
 
     def test_playlist_moved(self):
@@ -72,9 +71,9 @@ class TestPlaylistManager(unittest.TestCase):
         self.assertEqual(name, "playlist_moved")
         self.assertEqual(len(args), 6)
         self.assertEqual(args[0], self.manager)
-        self.assertEqual(type(args[1]), type(self.container))
-        self.assertEqual(type(args[2]), type(self.playlist))
-        self.assertEqual(args[2].name(), 'foo')
+        self.assertEqual(type(args[1]), spotify._mockspotify.PlaylistContainer)
+        self.assertEqual(type(args[2]), spotify._mockspotify.Playlist)
+        self.assertEqual(args[2].name(), 'P')
         self.assertEqual(type(args[3]), int)
         self.assertEqual(type(args[4]), int)
 
@@ -89,7 +88,7 @@ class TestPlaylistManager(unittest.TestCase):
         self.assertEqual(name, "playlist_removed")
         self.assertEqual(len(args), 5)
         self.assertEqual(args[0], self.manager)
-        self.assertEqual(type(args[1]), type(self.container))
-        self.assertEqual(type(args[2]), type(self.playlist))
-        self.assertEqual(args[2].name(), 'foo')
+        self.assertEqual(type(args[1]), spotify._mockspotify.PlaylistContainer)
+        self.assertEqual(type(args[2]), spotify._mockspotify.Playlist)
+        self.assertEqual(args[2].name(), 'P')
         self.assertEqual(type(args[3]), int)

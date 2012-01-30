@@ -1,14 +1,22 @@
 import unittest
-from spotify._mockspotify import mock_albumbrowse, mock_album, mock_artist
-from spotify import Album
+from spotify._mockspotify import mock_albumbrowse, mock_album, mock_artist, \
+                                 mock_track
+from spotify._mockspotify import Album, AlbumBrowser
+from spotify._mockspotify import registry_add, registry_clean
 
 callback_called = False
 callback_userdata = None
 
 class TestAlbumbrowser(unittest.TestCase):
 
-    album = mock_album("foo0", mock_artist("bar0", 1), 2006,
-                               "01234567890123456789", Album.ALBUM, 1, 1)
+    artist = mock_artist("foo")
+    album = mock_album("bar", artist)
+    tracks = [
+        mock_track("baz1", [artist], album),
+        mock_track("baz2", [artist], album),
+        mock_track("baz3", [artist], album),
+    ]
+    browser = mock_albumbrowse(album, tracks, artist=artist, error=0)
 
     def callback(self, browser, userdata):
         global callback_called
@@ -16,25 +24,30 @@ class TestAlbumbrowser(unittest.TestCase):
         callback_called = True
         callback_userdata = userdata
 
-    def test_is_loaded(self):
-        browser = mock_albumbrowse(self.album, 1)
-        assert browser.is_loaded()
+    def setUp(self):
+        registry_add('spotify:album:1234', self.album)
+        registry_add('spotify:albumbrowse:1234', self.browser)
 
-    def test_is_not_loaded(self):
-        browser = mock_albumbrowse(self.album, 0)
-        assert not browser.is_loaded()
+    def tearDown(self):
+        registry_clean()
+
+    def test_is_loaded(self):
+        assert self.browser.is_loaded()
 
     def test_sequence(self):
-        browser = mock_albumbrowse(self.album, 1)
-        assert len(browser) == 3
-        assert browser[0].name() == 'foo'
-        assert browser[1].name() == 'bar'
-        assert browser[2].name() == 'baz'
+        assert len(self.browser) == 3
+        assert self.browser[0].name() == 'baz1'
+        assert self.browser[1].name() == 'baz2'
+        assert self.browser[2].name() == 'baz3'
 
-    def test_callback(self):
+    def test_browser(self):
+        browser = AlbumBrowser(self.album)
+
+    def test_browser_with_callback(self):
         global callback_called
         global callback_userdata
         callback_called = False
-        browser = mock_albumbrowse(self.album, 0, self.callback, self)
+
+        browser = AlbumBrowser(self.album, self.callback, self)
         self.assertTrue(callback_called)
         self.assertEqual(callback_userdata, self)

@@ -53,6 +53,12 @@ v1.7 (in development)
 
 - Added optional argurment ``type`` for :class:`spotify.ArtistBrowser`.
 
+**Other changes**
+
+- For developers: *pyspotify* now uses `libmockspotify
+  <https://github.com/mopidy/libmockspotify>`_ for its mocking needs. The
+  mock module only contains Python bindings to the *libmockspotify* API.
+
 v1.6.1 (2011-12-29)
 ===================
 

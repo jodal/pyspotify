@@ -85,6 +85,7 @@ mockspotify_ext = Extension('spotify._mockspotify',
         'src/toplistbrowser.c',
     ],
     include_dirs=['src'],
+    libraries=['mockspotify'],
 )
 
 setup(

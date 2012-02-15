@@ -89,7 +89,6 @@ class GstreamerSink(BaseAudioSink):
         self._pipeline.set_state(gst.STATE_PLAYING)
 
     def stop(self):
-        self._pipeline.set_state(gst.STATE_READY)
         self._pipeline.set_state(gst.STATE_NULL)
 
     def pause(self):

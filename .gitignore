@@ -4,6 +4,9 @@
 *.swp
 *.wpr
 *.wpu
+*~
+\#*
+.\#*
 .coverage
 .pc
 MANIFEST

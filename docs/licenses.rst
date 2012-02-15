@@ -9,7 +9,7 @@ contributed what, please refer to our git repository.
 Source code license
 ===================
 
-Copyright 2009-2011 Doug Winter and contributors
+Copyright 2009-2012 Doug Winter and contributors
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -27,7 +27,7 @@ limitations under the License.
 Documentation license
 =====================
 
-Copyright 2009-2011 Doug Winter and contributors
+Copyright 2009-2012 Doug Winter and contributors
 
 This work is licensed under the Creative Commons Attribution-ShareAlike 3.0
 Unported License. To view a copy of this license, visit

@@ -7,7 +7,7 @@
 #include "album.h"
 #include "session.h"
 
-static PyObject *
+PyObject *
 ArtistBrowser_FromSpotify(sp_artistbrowse * browse)
 {
     ArtistBrowser *b = (ArtistBrowser *)ArtistBrowserType.tp_alloc(&ArtistBrowserType, 0);

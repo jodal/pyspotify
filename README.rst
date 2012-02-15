@@ -14,10 +14,7 @@ apply for, and receive an API key from Spotify.
 Project resources
 =================
 
-- `Documentation for the latest release
-  <http://pyspotify.mopidy.com/docs/master/>`_
-- `Documentation for the development version
-  <http://pyspotify.mopidy.com/docs/develop/>`_
+- `Documentation <http://pyspotify.mopidy.com/>`_
 - `Source code <http://github.com/mopidy/pyspotify>`_
 - `Issue tracker <http://github.com/mopidy/pyspotify/issues>`_
 - IRC: ``#mopidy`` at `irc.freenode.net <http://freenode.net/>`_

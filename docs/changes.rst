@@ -44,6 +44,13 @@ v1.7 (in development)
 
 - Added method :meth:`spotify.Playlist.owner`.
 
+**Other changes**
+
+- For developers: *pyspotify* now uses `libmockspotify
+  <https://github.com/mopidy/libmockspotify>`_ for its mocking needs. The
+  mock module only contains Python bindings to the *libmockspotify* API.
+
+
 v1.6.1 (2011-12-29)
 ===================
 

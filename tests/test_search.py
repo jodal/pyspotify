@@ -1,91 +1,54 @@
 import unittest
-from spotify._mockspotify import mock_session
-import pdb,time
-
-session = mock_session()
+from spotify._mockspotify import mock_artist, mock_album, mock_search, mock_track
 
 class TestSearch(unittest.TestCase):
     
+    artist1 = mock_artist('artist1')
+    album1  = mock_album('album1', artist1)
+    tracks1 = [
+        mock_track('track11', [artist1], album1),
+        mock_track('track12', [artist1], album1),
+        mock_track('track13', [artist1], album1),
+    ]
+    artist2 = mock_artist('artist2')
+    album2  = mock_album('album2', artist2)
+    tracks2 = [
+        mock_track('track21', [artist2], album2),
+        mock_track('track22', [artist2], album2),
+        mock_track('track23', [artist2], album2),
+    ]
+    albums = [album1, album2]
+    artists = [artist1, artist2]
+    tracks = tracks1 + tracks2
+    search = mock_search('query', tracks, albums, artists, 6, 2, 2, 'query2', 0)
+
     def test_search_is_loaded(self):
-        global is_loaded
-        is_loaded = None
-        def _(results,  userdata=None):
-            global is_loaded
-            is_loaded = results.is_loaded()
-        session.search("!loaded", _)
-        self.assertEqual(is_loaded, False)
-        session.search("loaded", _)
-        self.assertEqual(is_loaded, True)
+        self.assertEqual(self.search.is_loaded(), True)
         
     def test_artists(self):
-        global result
-        artists = None
-        def _(results, userdata=None):
-            global result
-            result = results.artists()
-        session.search("", _)
-        self.assertNotEqual(result, None)
-        self.assertEqual(result[0].name(), "foo")
-        self.assertEqual(result[1].name(), "bar")
+        self.assertEqual([a.name() for a in self.search.artists()],
+                        ['artist1', 'artist2'])
         
     def test_albums(self):
-        global result
-        result = None
-        def _(search, userdata=None):
-            global result
-            result = search.albums()
-        session.search("", _)
-        self.assertNotEqual(result, None)
-        self.assertEqual(result[0].name(), "baz")
-        self.assertEqual(result[1].name(), "qux")
-        self.assertEqual(result[2].name(), "quux")
+        self.assertEqual([a.name() for a in self.search.albums()],
+                        ['album1', 'album2'])
 
     def test_tracks(self):
-        global result
-        result = None
-        def _(search, userdata=None):
-            global result
-            result = search.tracks()
-        session.search("", _)
-        self.assertNotEqual(result, None)
-        self.assertEqual(result[0].name(), "corge")
-        self.assertEqual(result[1].name(), "grault")
-        self.assertEqual(result[2].name(), "garply")
-        self.assertEqual(result[3].name(), "waldo")
+        self.assertEqual([t.name() for t in self.search.tracks()],
+                        ['track11', 'track12', 'track13',
+                         'track21', 'track22', 'track23'])
 
     def test_query(self):
-        global result
-        result = None
-        def _(search, userdata=None):
-            global result
-            result = search.query()
-        session.search("foo", _)
-        self.assertEqual(result, "foo")
+        self.assertEqual(self.search.query(), "query")
        
     def test_error(self):
-        global result
-        result = None
-        def _(search, userdata=None):
-            global result
-            result = search.error()
-        session.search("foo", _)
-        self.assertEqual(result, 3)
+        self.assertEqual(self.search.error(), 0)
 
     def test_did_you_mean(self):
-        global result
-        result = None
-        def _(search, userdata=None):
-            global result
-            result = search.did_you_mean()
-        session.search("foo", _)
-        self.assertEqual(result, "did_you_mean")
+        self.assertEqual(self.search.did_you_mean(), "query2")
 
-    def test_total_tracks(self):
-        global result
-        result = None
-        def _(search, userdata=None):
-            global result
-            result = search.total_tracks()
-        session.search("foo", _)
-        self.assertEqual(result, 24)
+    def test_totals(self):
+        #self.assertEqual(self.search.total_albums(), 2)
+        #self.assertEqual(self.search.total_artists(), 2)
+        self.assertEqual(self.search.total_tracks(), 6)
         

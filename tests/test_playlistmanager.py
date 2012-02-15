@@ -1,7 +1,8 @@
 import unittest
 from spotify._mockspotify import mock_playlist, mock_event_trigger
+from spotify._mockspotify import mock_album, mock_artist, mock_user, mock_track
 from spotify.manager import SpotifyPlaylistManager
-import spotify
+from spotify._mockspotify import User, Playlist
 
 callback_called = None
 
@@ -61,10 +62,24 @@ class MyPlaylistManager(SpotifyPlaylistManager):
 
 class TestPlaylistManager(unittest.TestCase):
 
+    artist = mock_artist('artist')
+    album = mock_album('album', artist)
+    owner = mock_user('owner')
+    tracks = [
+        (mock_track('track1', [artist], album), owner, 1320961109),
+        (mock_track('track2', [artist], album), owner, 1320961109),
+        (mock_track('track3', [artist], album), owner, 1320961109),
+    ]
+    pure_tracks = [t[0] for t in tracks]
+    description = 'description'
+    num_subscribers = 42
+    subscribers = ['sub1', 'sub2', 'sub3']
+    image = '01234567890123456789'
+    playlist = mock_playlist('foo_', [], owner, subscribers, num_subscribers,
+                             description, image)
     def setUp(self):
         global callback_called
         self.manager = MyPlaylistManager()
-        self.playlist = mock_playlist('foo_', [])
         callback_called = None
 
     def test_tracks_added(self):
@@ -78,7 +93,7 @@ class TestPlaylistManager(unittest.TestCase):
         self.assertEqual(name,"tracks_added")
         self.assertEqual(len(args), 5)
         self.assertEqual(args[0], self.manager)
-        self.assertEqual(type(args[1]), type(self.playlist))
+        self.assertEqual(type(args[1]), Playlist)
         self.assertEqual(args[1].name(), self.playlist.name())
         self.assertEqual(type(args[2]), list)
         self.assertEqual(len(args[2]), 3)
@@ -96,7 +111,7 @@ class TestPlaylistManager(unittest.TestCase):
         self.assertEqual(name, "tracks_moved")
         self.assertEqual(len(args), 5)
         self.assertEqual(args[0], self.manager)
-        self.assertEqual(type(args[1]), type(self.playlist))
+        self.assertEqual(type(args[1]), Playlist)
         self.assertEqual(args[1].name(), self.playlist.name())
         self.assertEqual(type(args[2]), list)
         self.assertEqual(len(args[2]), 3)
@@ -114,7 +129,7 @@ class TestPlaylistManager(unittest.TestCase):
         self.assertEqual(name, "tracks_removed")
         self.assertEqual(len(args), 4)
         self.assertEqual(args[0], self.manager)
-        self.assertEqual(type(args[1]), type(self.playlist))
+        self.assertEqual(type(args[1]), Playlist)
         self.assertEqual(args[1].name(), self.playlist.name())
         self.assertEqual(type(args[2]), list)
         self.assertEqual(len(args[2]), 3)
@@ -131,7 +146,7 @@ class TestPlaylistManager(unittest.TestCase):
         self.assertEqual(name, "playlist_renamed")
         self.assertEqual(len(args), 3)
         self.assertEqual(args[0], self.manager)
-        self.assertEqual(type(args[1]), type(self.playlist))
+        self.assertEqual(type(args[1]), Playlist)
         self.assertEqual(args[1].name(), self.playlist.name())
 
     def test_playlist_state_changed(self):
@@ -145,7 +160,7 @@ class TestPlaylistManager(unittest.TestCase):
         self.assertEqual(name, "playlist_state_changed")
         self.assertEqual(len(args), 3)
         self.assertEqual(args[0], self.manager)
-        self.assertEqual(type(args[1]), type(self.playlist))
+        self.assertEqual(type(args[1]), Playlist)
         self.assertEqual(args[1].name(), self.playlist.name())
 
     def test_playlist_update_in_progress(self):
@@ -159,7 +174,7 @@ class TestPlaylistManager(unittest.TestCase):
         self.assertEqual(name, "playlist_update_in_progress")
         self.assertEqual(len(args), 4)
         self.assertEqual(args[0], self.manager)
-        self.assertEqual(type(args[1]), type(self.playlist))
+        self.assertEqual(type(args[1]), Playlist)
         self.assertEqual(args[1].name(), self.playlist.name())
         self.assertEqual(type(args[2]), bool)
         self.assertEqual(args[2], True)
@@ -175,7 +190,7 @@ class TestPlaylistManager(unittest.TestCase):
         self.assertEqual(name, "playlist_metadata_updated")
         self.assertEqual(len(args), 3)
         self.assertEqual(args[0], self.manager)
-        self.assertEqual(type(args[1]), type(self.playlist))
+        self.assertEqual(type(args[1]), Playlist)
         self.assertEqual(args[1].name(), self.playlist.name())
 
     def test_track_created_changed(self):
@@ -189,14 +204,11 @@ class TestPlaylistManager(unittest.TestCase):
         self.assertEqual(name, "track_created_changed")
         self.assertEqual(len(args), 6)
         self.assertEqual(args[0], self.manager)
-        self.assertEqual(type(args[1]), type(self.playlist))
+        self.assertEqual(type(args[1]), Playlist)
         self.assertEqual(args[1].name(), self.playlist.name())
         self.assertEqual(type(args[2]), int)
         self.assertEqual(args[2], 1)
-        self.assertEqual(str(type(args[3])),str(spotify.User)) # dirty hack
-                                                       # until I
-                                                       # figure why the
-                                                       # comparison fails
+        self.assertEqual(type(args[3]), User)
         self.assertEqual(args[3].canonical_name(), u'foo')
         self.assertEqual(type(args[4]), int)
         self.assertEqual(args[4], 123)
@@ -212,7 +224,7 @@ class TestPlaylistManager(unittest.TestCase):
         self.assertEqual(name, "track_message_changed")
         self.assertEqual(len(args), 5)
         self.assertEqual(args[0], self.manager)
-        self.assertEqual(type(args[1]), type(self.playlist))
+        self.assertEqual(type(args[1]), Playlist)
         self.assertEqual(args[1].name(), self.playlist.name())
         self.assertEqual(type(args[2]), int)
         self.assertEqual(args[2], 1)
@@ -230,7 +242,7 @@ class TestPlaylistManager(unittest.TestCase):
         self.assertEqual(name, "track_seen_changed")
         self.assertEqual(len(args), 5)
         self.assertEqual(args[0], self.manager)
-        self.assertEqual(type(args[1]), type(self.playlist))
+        self.assertEqual(type(args[1]), Playlist)
         self.assertEqual(args[1].name(), self.playlist.name())
         self.assertEqual(type(args[2]), int)
         self.assertEqual(args[2], 1)
@@ -248,7 +260,7 @@ class TestPlaylistManager(unittest.TestCase):
         self.assertEqual(name, "description_changed")
         self.assertEqual(len(args), 4)
         self.assertEqual(args[0], self.manager)
-        self.assertEqual(type(args[1]), type(self.playlist))
+        self.assertEqual(type(args[1]), Playlist)
         self.assertEqual(args[1].name(), self.playlist.name())
         self.assertEqual(type(args[2]), unicode)
         self.assertEqual(args[2], u'foo')
@@ -264,7 +276,7 @@ class TestPlaylistManager(unittest.TestCase):
         self.assertEqual(name, "subscribers_changed")
         self.assertEqual(len(args), 3)
         self.assertEqual(args[0], self.manager)
-        self.assertEqual(type(args[1]), type(self.playlist))
+        self.assertEqual(type(args[1]), Playlist)
         self.assertEqual(args[1].name(), self.playlist.name())
 
     def test_image_changed(self):
@@ -278,7 +290,7 @@ class TestPlaylistManager(unittest.TestCase):
         self.assertEqual(name, "image_changed")
         self.assertEqual(len(args), 4)
         self.assertEqual(args[0], self.manager)
-        self.assertEqual(type(args[1]), type(self.playlist))
+        self.assertEqual(type(args[1]), Playlist)
         self.assertEqual(args[1].name(), self.playlist.name())
         self.assertEqual(type(args[2]), bytes)
         self.assertEqual(args[2], '01234567890123456789')

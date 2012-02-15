@@ -1,10 +1,12 @@
 import threading
+import logging
 import gobject
 import gst
 import sys
 
 from spotify.audiosink import BaseAudioSink
 
+log = logging.getLogger(__name__)
 gobject.threads_init()
 
 CAPS_TEMPLATE = """
@@ -23,8 +25,8 @@ class GstreamerSink(BaseAudioSink):
     Linux, Mac OS X, and Windows systems.
     """
 
-    def __init__(self):
-        super(GstreamerSink, self).__init__()
+    def __init__(self, **kwargs):
+        super(GstreamerSink, self).__init__(**kwargs)
         if sys.byteorder == 'little':
             self._endianness = '1234'
         elif sys.byteorder == 'big':
@@ -42,21 +44,16 @@ class GstreamerSink(BaseAudioSink):
         ]))
         self._source = self._pipeline.get_by_name('application_src')
         self._source.set_property('caps', caps)
-        self.async = True
-        self.backend = None
         self.mainloop = None
         self.mainloop_thread = threading.Thread(target=self.start_glib)
         self.mainloop_thread.setDaemon(True)
         self.mainloop_thread.start()
-
+        self._setup_message_processor()
 
     def start_glib(self):
         self.mainloop = gobject.MainLoop()
         self.mainloop.run()
-        print 'Mainloop running'
-
-    def setup(self):
-        self._setup_message_processor()
+        log.info('Mainloop running')
 
     def _setup_message_processor(self):
         bus = self._pipeline.get_bus()
@@ -65,11 +62,11 @@ class GstreamerSink(BaseAudioSink):
 
     def _on_message(self, bus, message):
         if message.type == gst.MESSAGE_EOS:
-            print 'track ended'
+            log.info('track ended')
             self._pipeline.set_state(gst.STATE_NULL)
-            self.backend.next()
+            self.end_of_track_data()
 
-    def emit_EOS(self):
+    def end_of_track(self):
         self._source.emit('end-of-stream')
 
     def music_delivery(self, session, frames, frame_size, num_frames,

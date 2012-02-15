@@ -6,8 +6,8 @@ from spotify.audiosink import BaseAudioSink
 class OssSink(BaseAudioSink):
     """Audio sink wrapper for systems with OSS, e.g. older Linux systems"""
 
-    def __init__(self):
-        super(OssSink, self).__init__()
+    def __init__(self, **kwargs):
+        super(OssSink, self).__init__(**kwargs)
         self._device = None
         if sys.byteorder == 'little':
             self._format = ossaudiodev.AFMT_S16_LE

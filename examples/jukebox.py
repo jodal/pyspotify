@@ -28,6 +28,7 @@ class JukeboxUI(cmd.Cmd, threading.Thread):
 
     def run(self):
         container_loaded.wait()
+        container_loaded.clear()
         try:
             self.cmdloop()
         except Exception, e:
@@ -267,7 +268,6 @@ class JukeboxPlaylistManager(SpotifyPlaylistManager):
 class JukeboxContainerManager(SpotifyContainerManager):
     def container_loaded(self, c, u):
         container_loaded.set()
-        container_loaded.clear()
 
     def playlist_added(self, c, p, i, u):
         print 'Container: playlist "%s" added.' % p.name()
@@ -287,10 +287,7 @@ class Jukebox(SpotifySessionManager):
 
     def __init__(self, *a, **kw):
         SpotifySessionManager.__init__(self, *a, **kw)
-        self.audio = AudioSink()
-        if self.audio.async:
-            self.audio.backend = self
-            self.audio.setup()
+        self.audio = AudioSink(backend=self)
         self.ui = JukeboxUI(self)
         self.ctr = None
         self.playing = False
@@ -388,11 +385,7 @@ class Jukebox(SpotifySessionManager):
             self.stop()
 
     def end_of_track(self, sess):
-        if self.audio.async:
-            self.audio.emit_EOS()
-            return
-        print "track ends."
-        self.next()
+        self.audio.end_of_track()
 
     def search(self, *args, **kwargs):
         self.session.search(*args, **kwargs)

@@ -43,7 +43,7 @@ Using Pip::
 Then you can build pyspotify and run ``nosetests``::
 
     rm -rf build/
-    python setup.py build
+    python setup.py build --with-mock
     PYTHONPATH=$(echo build/lib.linux-*/) nosetests
 
 

@@ -3,13 +3,12 @@ import os
 import sys
 import cmd
 import time
-import traceback
 import threading
 
 from spotify import ArtistBrowser, Link, ToplistBrowser
 from spotify.audiosink import import_audio_sink
 from spotify.manager import (SpotifySessionManager, SpotifyPlaylistManager,
-        SpotifyContainerManager)
+    SpotifyContainerManager)
 
 AudioSink = import_audio_sink()
 container_loaded = threading.Event()
@@ -31,10 +30,8 @@ class JukeboxUI(cmd.Cmd, threading.Thread):
         container_loaded.clear()
         try:
             self.cmdloop()
-        except Exception, e:
-            import traceback
-            traceback.print_exc(e)
-        self.do_quit(None)
+        finally:
+            self.do_quit(None)
 
     def do_logout(self, line):
         self.jukebox.session.logout()
@@ -314,13 +311,10 @@ class Jukebox(SpotifySessionManager):
             print error
             return
         self.session = session
-        try:
-            self.ctr = session.playlist_container()
-            self.container_manager.watch(self.ctr)
-            self.starred = session.starred()
-            self.ui.start()
-        except:
-            traceback.print_exc()
+        self.ctr = session.playlist_container()
+        self.container_manager.watch(self.ctr)
+        self.starred = session.starred()
+        self.ui.start()
 
     def logged_out(self, session):
         self.ui.cmdqueue.append("quit")

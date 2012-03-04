@@ -26,6 +26,8 @@ v1.7 (in development)
 - An :class:`ArtistBrowser` object is now a list of :class:`Track`, as it was
   written in the API documentation.
 
+- ``offset`` is now optional in :meth:`Link.from_track`.
+
 **New features**
 
 - A audio sink wrapper for `PortAudio
@@ -54,7 +56,7 @@ v1.7 (in development)
   :meth:`spotify.ArtistBrowser.similar_artists` and
   :meth:`spotify.ArtistBrowser.tracks`
 
-- Added optional argurment ``type`` for :class:`spotify.ArtistBrowser`.
+- Added optional argument ``type`` for :class:`spotify.ArtistBrowser`.
 
 **Other changes**
 

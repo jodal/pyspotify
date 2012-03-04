@@ -30,23 +30,6 @@ v1.7 (in development)
 
 **New features**
 
-- A audio sink wrapper for `PortAudio
-  <http://www.portaudio.com/>`_,
-  :class:`spotify.audiosink.portaudio.PortAudioSink`, have been contributed by
-  Tommaso Barbugli.  PortAudio is available on both Linux, Mac OS X, and
-  Windows.
-
-- A audio sink wrapper for `Gstreamer <http://gstreamer.freedesktop.org/>`_,
-  :class:`spotify.audiosink.gstreamer.GstreamerSink`, have been contributed by
-  David Buchmann. Gstreamer is available on both Linux, Mac OS X, and Windows.
-
-- The audio sink selector code originally written by Tommaso Barbugli for the
-  ``jukebox.py`` example app have been generalized and made available for other
-  applications as :func:`spotify.audiosink.import_audio_sink`.
-
-- The ``jukebox.py`` example application got support for playing entire
-  playlists. Thanks to Bjørn Schjerve.
-
 - Added method :meth:`spotify.Playlist.owner`.
 
 - Added methods :meth:`spotify.Results.total_albums` and
@@ -58,8 +41,30 @@ v1.7 (in development)
 
 - Added optional argument ``type`` for :class:`spotify.ArtistBrowser`.
 
-- The ``jukebox.py`` example application now formats duration in minutes and
-  seconds. Thanks to David Buchmann.
+- Bundled audio sink support:
+
+  - A audio sink wrapper for `PortAudio
+    <http://www.portaudio.com/>`_,
+    :class:`spotify.audiosink.portaudio.PortAudioSink`, have been contributed
+    by Tommaso Barbugli.  PortAudio is available on both Linux, Mac OS X, and
+    Windows.
+
+  - A audio sink wrapper for `Gstreamer <http://gstreamer.freedesktop.org/>`_,
+    :class:`spotify.audiosink.gstreamer.GstreamerSink`, have been contributed
+    by David Buchmann. Gstreamer is available on both Linux, Mac OS X, and
+    Windows.
+
+  - The audio sink selector code originally written by Tommaso Barbugli for the
+    ``jukebox.py`` example app have been generalized and made available for
+    other applications as :func:`spotify.audiosink.import_audio_sink`.
+
+- Jukebox example:
+
+  - The jukebox got support for playing entire playlists. Thanks to Bjørn
+    Schjerve.
+
+  - The jukebox now formats duration in minutes and seconds. Thanks to David
+    Buchmann.
 
 **Other changes**
 
@@ -68,6 +73,7 @@ v1.7 (in development)
   mock module only contains Python bindings to the *libmockspotify* API. To be
   able to run the tests, you need to pass `--with-mock` to your `python
   setup.py ...` command to build pyspotify with mock support.
+
 
 v1.6.1 (2011-12-29)
 ===================

@@ -57,7 +57,9 @@ v1.7 (in development)
 
 - For developers: *pyspotify* now uses `libmockspotify
   <https://github.com/mopidy/libmockspotify>`_ for its mocking needs. The
-  mock module only contains Python bindings to the *libmockspotify* API.
+  mock module only contains Python bindings to the *libmockspotify* API. To be
+  able to run the tests, you need to pass `--with-mock` to your `python
+  setup.py ...` command to build pyspotify with mock support.
 
 v1.6.1 (2011-12-29)
 ===================

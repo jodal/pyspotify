@@ -64,7 +64,7 @@ class GstreamerSink(BaseAudioSink):
         if message.type == gst.MESSAGE_EOS:
             logger.debug('Track ended')
             self._pipeline.set_state(gst.STATE_NULL)
-            self.end_of_track_data()
+            self.backend.next()
 
     def end_of_track(self):
         self._source.emit('end-of-stream')

@@ -41,6 +41,15 @@ v1.7 (in development)
 
 - Added optional argument ``type`` for :class:`spotify.ArtistBrowser`.
 
+- pyspotify now registers a "null handler" for logging to the ``spotify``
+  logger. This means that any pyspotify code is free to log debug log to any
+  logger matching ``spotify.*``.
+
+  By default the log statements will be swallowed by the null handler. An
+  application developer using pyspotify may add an additional log handler which
+  listens for log messages to the ``spotify`` logger, and thus get debug
+  information from pyspotify.
+
 - Bundled audio sink support:
 
   - A audio sink wrapper for `PortAudio

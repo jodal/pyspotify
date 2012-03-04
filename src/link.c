@@ -65,10 +65,10 @@ static PyObject *
 Link_from_track(Link * self, PyObject *args)
 {
     Track *track;
-    int offset;
+    int offset = 0;
     PyObject *plink;
 
-    if (!PyArg_ParseTuple(args, "O!i", &TrackType, &track, &offset)) {
+    if (!PyArg_ParseTuple(args, "O!|i", &TrackType, &track, &offset)) {
         return NULL;
     }
     sp_link *link = sp_link_create_from_track(track->_track, offset);

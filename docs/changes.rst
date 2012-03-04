@@ -58,6 +58,9 @@ v1.7 (in development)
 
 - Added optional argument ``type`` for :class:`spotify.ArtistBrowser`.
 
+- The ``jukebox.py`` example application now formats duration in minutes and
+  seconds. Thanks to David Buchmann.
+
 **Other changes**
 
 - For developers: *pyspotify* now uses `libmockspotify

@@ -1,18 +1,18 @@
 #!/usr/bin/env python
-
+import os
+import sys
 import cmd
 import logging
-import os
 import threading
 import time
-import traceback
 
 from spotify import ArtistBrowser, Link, ToplistBrowser
 from spotify.audiosink import import_audio_sink
 from spotify.manager import (SpotifySessionManager, SpotifyPlaylistManager,
-        SpotifyContainerManager)
+    SpotifyContainerManager)
 
 AudioSink = import_audio_sink()
+container_loaded = threading.Event()
 
 class JukeboxUI(cmd.Cmd, threading.Thread):
 
@@ -27,7 +27,12 @@ class JukeboxUI(cmd.Cmd, threading.Thread):
         self.results = False
 
     def run(self):
-        self.cmdloop()
+        container_loaded.wait()
+        container_loaded.clear()
+        try:
+            self.cmdloop()
+        finally:
+            self.do_quit(None)
 
     def do_logout(self, line):
         self.jukebox.session.logout()
@@ -63,9 +68,18 @@ class JukeboxUI(cmd.Cmd, threading.Thread):
                 playlist = self.jukebox.starred
             for i, t in enumerate(playlist):
                 if t.is_loaded():
-                    print "%3d %s - %s" % (i, t.artists()[0].name(), t.name())
+                    print "%3d %s - %s [%s]" % (
+                        i, t.artists()[0].name(), t.name(),
+                        self.pretty_duration(t.duration()))
                 else:
                     print "%3d %s" % (i, "loading...")
+
+    def pretty_duration(self, milliseconds):
+        seconds = milliseconds // 1000
+        minutes = seconds // 60
+        seconds = seconds % 60
+        duration = '%02d:%02d' % (minutes, seconds)
+        return duration
 
     def do_play(self, line):
         if not line:
@@ -104,6 +118,19 @@ class JukeboxUI(cmd.Cmd, threading.Thread):
             print "Browse finished, %s" % (userdata)
         self.jukebox.browse(l, browse_finished)
 
+    def print_search_results(self):
+        print "Artists:"
+        for a in self.results.artists():
+            print "    ", Link.from_artist(a), a.name()
+        print "Albums:"
+        for a in self.results.albums():
+            print "    ", Link.from_album(a), a.name()
+        print "Tracks:"
+        for a in self.results.tracks():
+            print "    ", Link.from_track(a, 0), a.name()
+        print self.results.total_tracks() - len(self.results.tracks()), \
+            "Tracks not shown"
+
     def do_search(self, line):
         if not line:
             if self.results is False:
@@ -128,6 +155,7 @@ class JukeboxUI(cmd.Cmd, threading.Thread):
             def search_finished(results, userdata):
                 print "\nSearch results received"
                 self.results = results
+                self.print_search_results()
             self.jukebox.search(line, search_finished)
 
     def do_queue(self, line):
@@ -246,7 +274,7 @@ class JukeboxPlaylistManager(SpotifyPlaylistManager):
 ## container calllbacks ##
 class JukeboxContainerManager(SpotifyContainerManager):
     def container_loaded(self, c, u):
-        print 'Container loaded !'
+        container_loaded.set()
 
     def playlist_added(self, c, p, i, u):
         print 'Container: playlist "%s" added.' % p.name()
@@ -266,28 +294,28 @@ class Jukebox(SpotifySessionManager):
 
     def __init__(self, *a, **kw):
         SpotifySessionManager.__init__(self, *a, **kw)
-        self.audio = AudioSink()
+        self.audio = AudioSink(backend=self)
         self.ui = JukeboxUI(self)
         self.ctr = None
         self.playing = False
         self._queue = []
         self.playlist_manager = JukeboxPlaylistManager()
         self.container_manager = JukeboxContainerManager()
+        self.track_playing = None
         print "Logging in, please wait..."
 
+    def new_track_playing(self, track):
+        self.track_playing = track
 
     def logged_in(self, session, error):
         if error:
             print error
             return
         self.session = session
-        try:
-            self.ctr = session.playlist_container()
-            self.container_manager.watch(self.ctr)
-            self.starred = session.starred()
-            self.ui.start()
-        except:
-            traceback.print_exc()
+        self.ctr = session.playlist_container()
+        self.container_manager.watch(self.ctr)
+        self.starred = session.starred()
+        self.ui.start()
 
     def logged_out(self, session):
         self.ui.cmdqueue.append("quit")
@@ -295,6 +323,7 @@ class Jukebox(SpotifySessionManager):
     def load_track(self, track):
         if self.playing:
             self.stop()
+        self.new_track_playing(track)
         self.session.load(track)
         print "Loading %s" % track.name()
 
@@ -305,8 +334,10 @@ class Jukebox(SpotifySessionManager):
             pl = self.ctr[playlist]
         elif playlist == len(self.ctr):
             pl = self.starred
-        self.session.load(pl[track])
-        print "Loading %s from %s" % (pl[track].name(), pl.name())
+        spot_track = pl[track]
+        self.new_track_playing(spot_track)
+        self.session.load(spot_track)
+        print "Loading %s from %s" % (spot_track.name(), pl.name())
 
     def load_playlist(self, playlist):
         if self.playing:
@@ -317,6 +348,8 @@ class Jukebox(SpotifySessionManager):
             pl = self.starred
         print "Loading playlist %s" % pl.name()
         if len(pl):
+            print "Loading %s from %s" % (pl[0].name(), pl.name())
+            self.new_track_playing(pl[0])
             self.session.load(pl[0])
         for i, track in enumerate(pl):
             if i == 0:
@@ -327,6 +360,7 @@ class Jukebox(SpotifySessionManager):
         if self.playing:
             self._queue.append((playlist, track))
         else:
+            print 'Loading %s', track.name()
             self.load(playlist, track)
             self.play()
 
@@ -355,8 +389,7 @@ class Jukebox(SpotifySessionManager):
             self.stop()
 
     def end_of_track_safe(self, sess):
-        print "track ends."
-        self.next()
+        self.audio.end_of_track()
 
     def search(self, *args, **kwargs):
         self.session.search(*args, **kwargs)

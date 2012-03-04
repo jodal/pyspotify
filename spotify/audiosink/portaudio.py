@@ -8,8 +8,8 @@ class PortAudioSink(BaseAudioSink):
     include Linux, Mac OS X, and Windows systems.
     """
 
-    def __init__(self):
-        super(PortAudioSink, self).__init__()
+    def __init__(self, **kwargs):
+        super(PortAudioSink, self).__init__(**kwargs)
         self._device = pyaudio.PyAudio()
         self._stream = None
 

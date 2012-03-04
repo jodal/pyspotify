@@ -3,7 +3,7 @@ import Queue
 
 import spotify
 
-logger = logging.getLogger('pyspotify.manager.session')
+logger = logging.getLogger('spotify.manager.session')
 
 class SpotifySessionManager(object):
     """

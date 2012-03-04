@@ -5,7 +5,7 @@ from spotify._mockspotify import mock_album, mock_artist, Album
 
 class TestAlbum(unittest.TestCase):
 
-    album = mock_album(u'æâ€êþÿ', mock_artist("bar", 1), 2006,
+    album = mock_album(u'æâ€êþÿ', mock_artist("bar"), 2006,
                        "01234567890123456789", Album.ALBUM, 1, 1)
 
     def test_is_loaded(self):

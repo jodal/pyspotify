@@ -6,10 +6,10 @@ from spotify.audiosink import BaseAudioSink
 class AlsaSink(BaseAudioSink):
     """Audio sink wrapper for systems with ALSA, e.g. most Linux systems"""
 
-    def __init__(self, mode=alsaaudio.PCM_NORMAL):
-        super(AlsaSink, self).__init__()
+    def __init__(self, **kwargs):
+        self._mode = kwargs.popitem('mode', alsaaudio.PCM_NORMAL)
+        super(AlsaSink, self).__init__(**kwargs)
         self._device = None
-        self._mode = mode
         if sys.byteorder == 'little':
             self._format = alsaaudio.PCM_FORMAT_S16_LE
         elif sys.byteorder == 'big':

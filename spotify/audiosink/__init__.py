@@ -55,8 +55,9 @@ class BaseAudioSink(object):
     it easy to play audio data received from Spotify.
     """
 
-    def __init__(self):
+    def __init__(self, backend=None):
         self._call_cache = {}
+        self.backend = backend
 
     def music_delivery(self, session, frames, frame_size, num_frames,
             sample_type, sample_rate, channels):
@@ -85,6 +86,12 @@ class BaseAudioSink(object):
         :rtype: :class:`int`
         """
         raise NotImplementedError
+
+    def end_of_track(self, session):
+        self.end_of_track_data(session)
+
+    def end_of_track_data(self):
+        self.backend.next()
 
     def start(self):
         """

@@ -87,10 +87,7 @@ class BaseAudioSink(object):
         """
         raise NotImplementedError
 
-    def end_of_track(self, session):
-        self.end_of_track_data(session)
-
-    def end_of_track_data(self):
+    def end_of_track(self):
         self.backend.next()
 
     def start(self):

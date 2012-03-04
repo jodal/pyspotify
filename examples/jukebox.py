@@ -62,17 +62,16 @@ class JukeboxUI(cmd.Cmd, threading.Thread):
                 playlist = self.jukebox.starred
             for i, t in enumerate(playlist):
                 if t.is_loaded():
-                    print "%3d %s - %s [%s]" % (i,
-                                                t.artists()[0].name(),
-                                                t.name(),
-                                                self.pretty_duration(t.duration()))
+                    print "%3d %s - %s [%s]" % (
+                        i, t.artists()[0].name(), t.name(),
+                        self.pretty_duration(t.duration()))
                 else:
                     print "%3d %s" % (i, "loading...")
 
     def pretty_duration(self, milliseconds):
         seconds = milliseconds // 1000
-        minutes = int(seconds) / 60
-        seconds = int(seconds) % 60
+        minutes = seconds // 60
+        seconds = seconds % 60
         duration = '%02d:%02d' % (minutes, seconds)
         return duration
 

@@ -6,7 +6,7 @@ import sys
 
 from spotify.audiosink import BaseAudioSink
 
-log = logging.getLogger(__name__)
+logger = logging.getLogger('spotify.audiosink.gstreamer')
 gobject.threads_init()
 
 CAPS_TEMPLATE = """
@@ -53,7 +53,7 @@ class GstreamerSink(BaseAudioSink):
     def start_glib(self):
         self.mainloop = gobject.MainLoop()
         self.mainloop.run()
-        log.info('Mainloop running')
+        logger.debug('Mainloop running')
 
     def _setup_message_processor(self):
         bus = self._pipeline.get_bus()
@@ -62,7 +62,7 @@ class GstreamerSink(BaseAudioSink):
 
     def _on_message(self, bus, message):
         if message.type == gst.MESSAGE_EOS:
-            log.info('track ended')
+            logger.debug('Track ended')
             self._pipeline.set_state(gst.STATE_NULL)
             self.end_of_track_data()
 

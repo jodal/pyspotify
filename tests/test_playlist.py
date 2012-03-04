@@ -123,3 +123,8 @@ class TestPlaylist(unittest.TestCase):
     def test_track_create_time(self):
         playlist = mock_playlist('foo', self.tracks, self.owner)
         self.assertEqual(playlist.track_create_time(0), 1320961109)
+
+    def test_owner(self):
+        playlist = mock_playlist('foo', [], self.owner)
+        self.assertEqual(playlist.owner().canonical_name(),
+                         self.owner.canonical_name())

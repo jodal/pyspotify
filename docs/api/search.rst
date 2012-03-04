@@ -39,6 +39,24 @@ The :class:`Results` class
         :rtype:     string
         :returns:   the query expression that generated these results.
 
+    .. method:: total_albums
+
+        :rtype:     :class:`int`
+        :returns:   the total number of albums available for this search query.
+
+        .. note:: If this value is larger than the interval specified at
+            creation of the search object, more search results are available.
+            To fetch these, create a new search object with a new interval.
+
+    .. method:: total_artists
+
+        :rtype:     :class:`int`
+        :returns:   the total number of artists available for this search query.
+
+        .. note:: If this value is larger than the interval specified at
+            creation of the search object, more search results are available.
+            To fetch these, create a new search object with a new interval.
+
     .. method:: total_tracks
 
         :rtype:     :class:`int`

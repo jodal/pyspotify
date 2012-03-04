@@ -23,6 +23,11 @@ v1.7 (in development)
   :class:`spotify.osshelper.OssController` (renamed to
   :class:`spotify.audiosink.oss.OssSink`).
 
+- An :class:`ArtistBrowser` object is now a list of :class:`Track`, as it was
+  written in the API documentation.
+
+- ``offset`` is now optional in :meth:`Link.from_track`.
+
 **New features**
 
 - A audio sink wrapper for `PortAudio
@@ -44,6 +49,15 @@ v1.7 (in development)
 
 - Added method :meth:`spotify.Playlist.owner`.
 
+- Added methods :meth:`spotify.Results.total_albums` and
+  :meth:`spotify.Results.total_artists`.
+
+- Added methods :meth:`spotify.ArtistBrowser.albums`,
+  :meth:`spotify.ArtistBrowser.similar_artists` and
+  :meth:`spotify.ArtistBrowser.tracks`
+
+- Added optional argument ``type`` for :class:`spotify.ArtistBrowser`.
+
 - The ``jukebox.py`` example application now formats duration in minutes and
   seconds. Thanks to David Buchmann.
 
@@ -54,7 +68,6 @@ v1.7 (in development)
   mock module only contains Python bindings to the *libmockspotify* API. To be
   able to run the tests, you need to pass `--with-mock` to your `python
   setup.py ...` command to build pyspotify with mock support.
-
 
 v1.6.1 (2011-12-29)
 ===================

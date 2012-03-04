@@ -23,6 +23,9 @@ v1.7 (in development)
   :class:`spotify.osshelper.OssController` (renamed to
   :class:`spotify.audiosink.oss.OssSink`).
 
+- An :class:`ArtistBrowser` object is now a list of :class:`Track`, as it was
+  written in the API documentation.
+
 **New features**
 
 - A audio sink wrapper for `PortAudio

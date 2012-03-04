@@ -5,7 +5,7 @@ Artist browsing
 The :class:`ArtistBrowser` class
 ================================
 
-.. class:: ArtistBrowser(artist[, callback[, userdata]])
+.. class:: ArtistBrowser(artist[, type[, callback[, userdata]]])
 
     .. note:: A sequence of :class:`Track` objects.
 
@@ -14,6 +14,12 @@ The :class:`ArtistBrowser` class
 
     :param artist: a Spotify artist (does not have to be loaded)
     :type artist: :class:`Artist`
+    :param type:    this browser's type. One of:
+
+        * ``'full'`` (default):     all data will be fetched
+        * ``'no_tracks'``:          no information about tracks
+        * ``'no_albums'``:          no information about albums (implies ``'no_tracks'``)
+
     :param callback: a function with signature :
         ``(ArtistBrowser browser, Object userdata)``
     :param userdata: any object
@@ -23,3 +29,17 @@ The :class:`ArtistBrowser` class
         :rtype:     :class:`int`
         :returns:   wether this artist browser has finished loading metadata.
 
+    .. method:: albums
+
+        :rtype:     list of :class:`Album`
+        :returns:   the list of albums found while browsing
+
+    .. method:: similar_artists
+
+        :rtype:     list of :class:`Artist`
+        :returns:   the list of similar artists found while browsing
+
+    .. method:: tracks
+
+        :rtype:     list of :class:`Track`
+        :returns:   the list of tracks found while browsing

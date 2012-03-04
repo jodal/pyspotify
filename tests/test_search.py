@@ -2,7 +2,7 @@ import unittest
 from spotify._mockspotify import mock_artist, mock_album, mock_search, mock_track
 
 class TestSearch(unittest.TestCase):
-    
+
     artist1 = mock_artist('artist1')
     album1  = mock_album('album1', artist1)
     tracks1 = [
@@ -24,11 +24,11 @@ class TestSearch(unittest.TestCase):
 
     def test_search_is_loaded(self):
         self.assertEqual(self.search.is_loaded(), True)
-        
+
     def test_artists(self):
         self.assertEqual([a.name() for a in self.search.artists()],
                         ['artist1', 'artist2'])
-        
+
     def test_albums(self):
         self.assertEqual([a.name() for a in self.search.albums()],
                         ['album1', 'album2'])
@@ -40,7 +40,7 @@ class TestSearch(unittest.TestCase):
 
     def test_query(self):
         self.assertEqual(self.search.query(), "query")
-       
+
     def test_error(self):
         self.assertEqual(self.search.error(), 0)
 
@@ -48,7 +48,7 @@ class TestSearch(unittest.TestCase):
         self.assertEqual(self.search.did_you_mean(), "query2")
 
     def test_totals(self):
-        #self.assertEqual(self.search.total_albums(), 2)
-        #self.assertEqual(self.search.total_artists(), 2)
+        self.assertEqual(self.search.total_albums(), 2)
+        self.assertEqual(self.search.total_artists(), 2)
         self.assertEqual(self.search.total_tracks(), 6)
-        
+

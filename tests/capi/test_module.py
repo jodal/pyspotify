@@ -6,3 +6,7 @@ class CAPIModuleTest(unittest.TestCase):
             import spotify.capi
         except ImportError:
             self.fail('Could not import spotify.capi module')
+
+    def test_has_api_version(self):
+        from spotify import capi
+        self.assertEqual(capi.SPOTIFY_API_VERSION, 10)

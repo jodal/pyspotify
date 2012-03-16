@@ -1,6 +1,8 @@
 import ctypes as _ctypes
 
-_libspotify = _ctypes.CDLL('libspotify.so.10')
+SPOTIFY_API_VERSION = 10
+
+_libspotify = _ctypes.CDLL('libspotify.so.%s' % SPOTIFY_API_VERSION)
 
 
 ### Spotify types & structs

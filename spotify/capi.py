@@ -2,6 +2,59 @@ import ctypes as _ctypes
 
 _libspotify = _ctypes.CDLL('libspotify.so.10')
 
+
+### Spotify types & structs
+
+sp_uint64 = _ctypes.c_uint64
+sp_bool = _ctypes.c_ubyte
+
+class sp_session(_ctypes.Structure):
+    pass
+
+class sp_track(_ctypes.Structure):
+    pass
+
+class sp_album(_ctypes.Structure):
+    pass
+
+class sp_artist(_ctypes.Structure):
+    pass
+
+class sp_artistbrowse(_ctypes.Structure):
+    pass
+
+class sp_albumbrowse(_ctypes.Structure):
+    pass
+
+class sp_toplistbrowse(_ctypes.Structure):
+    pass
+
+class sp_search(_ctypes.Structure):
+    pass
+
+class sp_link(_ctypes.Structure):
+    pass
+
+class sp_image(_ctypes.Structure):
+    pass
+
+class sp_user(_ctypes.Structure):
+    pass
+
+class sp_playlist(_ctypes.Structure):
+    pass
+
+class sp_playlistcontainer(_ctypes.Structure):
+    pass
+
+class sp_inbox(_ctypes.Structure):
+    pass
+
+
+### Error handling
+
+sp_error = _ctypes.c_uint
+
 SP_ERROR_OK = 0
 SP_ERROR_BAD_API_VERSION = 1
 SP_ERROR_API_INITIALIZATION_FAILED = 2
@@ -34,10 +87,10 @@ SP_ERROR_OFFLINE_DISK_CACHE = 32
 SP_ERROR_OFFLINE_EXPIRED = 33
 SP_ERROR_OFFLINE_NOT_ALLOWED = 34
 SP_ERROR_OFFLINE_LICENSE_LOST = 35
-SP_ERROR_OFFLINE_LICENSE_ERROR = 36 
+SP_ERROR_OFFLINE_LICENSE_ERROR = 36
 
 _sp_error_message = _libspotify.sp_error_message
-_sp_error_message.argtypes = [_ctypes.c_int]
+_sp_error_message.argtypes = [sp_error]
 _sp_error_message.restype = _ctypes.c_char_p
 
 def sp_error_message(error):

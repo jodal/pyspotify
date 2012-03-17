@@ -41,12 +41,12 @@ class CAPIErrorTest(unittest.TestCase):
 
     def test_sp_error_message_returns_error_message_as_unicode(self):
         msg = capi.sp_error_message(capi.SP_ERROR_OK)
-        self.assertEqual(msg, u'No error')
+        self.assertEqual(msg, u'sp_error: 0')
         self.assertIsInstance(msg, unicode)
 
     def test_sp_error_message_returns_error_message_for_unknown_error_no(self):
         msg = capi.sp_error_message(999)
-        self.assertEqual(msg, u'invalid error code')
+        self.assertEqual(msg, u'sp_error: 999')
 
     def test_sp_error_message_raises_exc_on_wrong_arg_type(self):
         self.assertRaises(ctypes.ArgumentError, capi.sp_error_message, 'a string')

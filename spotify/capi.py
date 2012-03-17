@@ -1,9 +1,12 @@
+import os
 import ctypes as _ctypes
 
 SPOTIFY_API_VERSION = 10
 
-_libspotify = _ctypes.CDLL('libspotify.so.%s' % SPOTIFY_API_VERSION)
-
+if os.environ.get('USE_LIBMOCKSPOTIFY') == '1':
+    _libspotify = _ctypes.CDLL('libmockspotify.so.0')
+else:
+    _libspotify = _ctypes.CDLL('libspotify.so.%s' % SPOTIFY_API_VERSION)
 
 ### Spotify types & structs
 

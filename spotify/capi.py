@@ -266,7 +266,7 @@ class sp_session_config(_ctypes.Structure):
         ('api_version', _ctypes.c_int),
         ('cache_location', _ctypes.c_char_p),
         ('settings_location', _ctypes.c_char_p),
-        ('application_key', _ctypes.c_void_p),
+        ('application_key', _ctypes.c_char_p),
         ('application_key_size', _ctypes.c_size_t),
         ('user_agent', _ctypes.c_char_p),
         ('callbacks', _ctypes.POINTER(sp_session_callbacks)),

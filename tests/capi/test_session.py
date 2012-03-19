@@ -334,7 +334,7 @@ class CAPISessionConfigTest(unittest.TestCase):
         self.assertRaises(TypeError, capi.sp_session_config,
             settings_location=1.0)
         self.assertRaises(TypeError, capi.sp_session_config,
-            application_key='not a void pointer')
+            application_key=1.0)
         self.assertRaises(TypeError, capi.sp_session_config,
             application_key_size='not an integer')
         self.assertRaises(TypeError, capi.sp_session_config,

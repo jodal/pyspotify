@@ -12,7 +12,7 @@ class CAPISessionEnumAndStructTest(unittest.TestCase):
         self.assertEqual(capi.SP_CONNECTION_STATE_OFFLINE, 4)
 
     def test_sp_sampletype_is_ctypes_c_uint(self):
-        self.assertEqual(capi.sp_sampletype, ctypes.c_uint)
+        self.assertEqual(capi.sp_sampletype, ctypes.c_int)
 
     def test_sp_sampletype_enum_has_correct_enumeration(self):
         self.assertEqual(capi.SP_SAMPLETYPE_INT16_NATIVE_ENDIAN, 0)

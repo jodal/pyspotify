@@ -59,7 +59,7 @@ class sp_inbox(_ctypes.Structure):
 
 ### Error handling
 
-sp_error = _ctypes.c_uint
+sp_error = _ctypes.c_int
 
 SP_ERROR_OK = 0
 SP_ERROR_BAD_API_VERSION = 1
@@ -111,7 +111,7 @@ SP_CONNECTION_STATE_DISCONNECTED = 2
 SP_CONNECTION_STATE_UNDEFINED = 3
 SP_CONNECTION_STATE_OFFLINE = 4
 
-sp_sampletype = _ctypes.c_uint
+sp_sampletype = _ctypes.c_int
 
 SP_SAMPLETYPE_INT16_NATIVE_ENDIAN = 0
 
@@ -198,7 +198,7 @@ SP_SESSION_METADATA_UPDATED_FUNC = _ctypes.CFUNCTYPE(None,
     _ctypes.POINTER(sp_session))
 
 SP_SESSION_CONNECTION_ERROR_FUNC = _ctypes.CFUNCTYPE(None,
-    _ctypes.POINTER(sp_session), _ctypes.c_uint)
+    _ctypes.POINTER(sp_session), sp_error)
 
 SP_SESSION_MESSAGE_TO_USER_FUNC = _ctypes.CFUNCTYPE(None,
     _ctypes.POINTER(sp_session), _ctypes.c_char_p)

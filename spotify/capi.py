@@ -281,3 +281,17 @@ class sp_session_config(_ctypes.Structure):
         ('device_id', _ctypes.c_char_p),
         ('tracefile', _ctypes.c_char_p),
     ]
+
+_sp_session_create = _libspotify.sp_session_create
+_sp_session_create.argtypes = [_ctypes.POINTER(sp_session_config),
+     _ctypes.POINTER(_ctypes.POINTER(sp_session))]
+_sp_session_create.restype = sp_error
+
+def sp_session_create(config):
+    session = sp_session()
+    error = _sp_session_create(_ctypes.pointer(config),
+        _ctypes.pointer(session))
+    if error == SP_ERROR_OK:
+        return session
+    else:
+        raise SpError(error)

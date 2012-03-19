@@ -50,3 +50,7 @@ class CAPIErrorTest(unittest.TestCase):
 
     def test_sp_error_message_raises_exc_on_wrong_arg_type(self):
         self.assertRaises(ctypes.ArgumentError, capi.sp_error_message, 'a string')
+
+    def test_SpError_exc_looks_up_error_message_given_error_code(self):
+        exc = capi.SpError(5)
+        self.assertEqual(exc.message, 'sp_error: 5 (error 5)')

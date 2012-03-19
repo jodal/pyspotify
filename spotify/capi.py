@@ -102,6 +102,11 @@ _sp_error_message.restype = _ctypes.c_char_p
 def sp_error_message(error):
     return _sp_error_message(error).decode('utf-8')
 
+class SpError(Exception):
+    def __init__(self, sp_error):
+        super(SpError, self).__init__('%s (error %d)' % (
+            sp_error_message(sp_error), sp_error))
+
 
 ### Session handling
 

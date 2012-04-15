@@ -864,6 +864,10 @@ session_connect(PyObject *self, PyObject *args)
             return NULL;
         }
         blob = PyString_AS_STRING(py_blob);
+        /* if blob is the empty string (= default value), we pass NULL to
+         * sp_session_login */
+        if (blob[0] == '\0')
+            blob = NULL;
     } else {
         PyErr_Clear();
     }

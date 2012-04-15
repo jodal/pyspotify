@@ -28,29 +28,14 @@ v1.7 (in development)
 
 - ``offset`` is now optional in :meth:`Link.from_track`.
 
-- :class:`spotify.managers.SpotifySessionManager` improvements:
+- Remove undocumented/internal method
+  :meth:`spotify.manager.SpotifySessionManager.wake`.
+  :meth:`spotify.manager.SpotifySessionManager.notify_main_thread` does the
+  same job.
 
-  - Remove undocumented/internal method :meth:`terminate`. Use
-    :meth:`disconnect` instead.
-
-  - Remove undocumented/internal method :meth:`wake`.
-    :meth:`notify_main_thread` does the same job.
-
-  - Actually call :meth:`notify_main_thread` when libspotify triggers that
-    callback. New default implementation of :meth:`notify_main_thread` should
-    work for everybody without change.
-
-  - Add warnings to the documentation of :meth:`notify_main_thread`,
-    :meth:`music_delivery`, and :meth:`end_of_track` callbacks that they are
-    called from an internal libspotify thread, and thus should not use the
-    Spotify API, as that will cause segfaults.
-
-  - Add new :meth:`music_delivery_safe` and :meth:`end_of_track_safe` callbacks
-    that can safely use the Spotify API without segfaulting. A little overhead
-    is caused by serializing and passing data to the main thread, so if you are
-    not going to use the Spotify API from your callbacks, or you're doing your
-    own synchronization, you can continue to use the non-safe methods with a
-    bit less overhead.
+- Remove undocumented/internal method
+  :meth:`spotify.manager.SpotifySessionManager.terminate`. Use
+  :meth:`spotify.manager.SpotifySessionManager.disconnect` instead.
 
 **New features**
 
@@ -64,6 +49,14 @@ v1.7 (in development)
   :meth:`spotify.ArtistBrowser.tracks`
 
 - Added optional argument ``type`` for :class:`spotify.ArtistBrowser`.
+
+- Added new :meth:`spotify.manager.SpotifySessionManager.music_delivery_safe`
+  and :meth:`spotify.manager.SpotifySessionManager.end_of_track_safe` callbacks
+  that can safely use the Spotify API without segfaulting. A little overhead is
+  caused by serializing and passing data to the main thread, so if you are not
+  going to use the Spotify API from your callbacks, or you're doing your own
+  synchronization, you can continue to use the non-safe methods with a bit less
+  overhead.
 
 - pyspotify now registers a "null handler" for logging to the ``spotify``
   logger. This means that any pyspotify code is free to log debug log to any

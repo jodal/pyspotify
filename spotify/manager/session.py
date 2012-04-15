@@ -12,6 +12,16 @@ class SpotifySessionManager(object):
 
     Exceptions raised in your callback handlers will be displayed on the
     standard error output (stderr).
+
+    When logging in a user, the application can pass one of:
+        - `username` + `password`: standard login using a plaintext password
+        - nothing: logs in the last user which credentials have been stored
+          using `remember_me`.
+        - `username` + `login_blob`: the blob is encrypted data from
+          *libspotify*, for when a multi-user application wants to use
+          the re-login feature. The blob is obtained from the
+          :meth:`credentials_blob_updated` callback after a successful
+          login to the Spotify AP.
     """
 
     api_version = spotify.api_version
@@ -21,11 +31,13 @@ class SpotifySessionManager(object):
     appkey_file = 'spotify_appkey.key'
     user_agent = 'pyspotify-example'
 
-    def __init__(self, username=None, password=None, remember_me=False):
+    def __init__(self, username=None, password=None, remember_me=False,
+            login_blob=''):
         self._cmdqueue = Queue.Queue()
         self.username = username
         self.password = password
         self.remember_me = remember_me
+        self.login_blob = login_blob
         if self.application_key is None:
             self.application_key = open(self.appkey_file).read()
 
@@ -253,7 +265,17 @@ class SpotifySessionManager(object):
 
         Playback has reached the end of the current track.
 
-        You should override this method *or* :meth:`end_of_track_safe`, not both.
+        :param session: the current session.
+        :type session: :class:`spotify.Session`
+        """
+        pass
+
+    def credentials_blob_updated(self, session, blob):
+        """
+        Callback.
+
+        Called when storable credentials have been updated, usually called when
+        we have connected to the AP.
 
         .. warning::
             This method is called from an internal thread in libspotify. You
@@ -262,15 +284,7 @@ class SpotifySessionManager(object):
 
         :param session: the current session.
         :type session: :class:`spotify.Session`
-        """
-        self._cmdqueue.put({'command': 'end_of_track'})
-
-    def end_of_track_safe(self, session):
-        """
-        This method does the same as :meth:`end_of_track`, except that it's
-        called from the :class:`SpotifySessionManager` loop. You can safely use
-        Spotify APIs from within this method.
-
-        You should override this method *or* :meth:`end_of_track`, not both.
+        :param blob: a string which contains an encrypted token that can be
+            stored safely on disk instead of storing plaintext passwords.
         """
         pass

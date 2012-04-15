@@ -185,6 +185,7 @@ mock_artistbrowse(PyObject *self, PyObject *args, PyObject *kwds)
                                     num_portraits, (const byte **)portraits,
                                     num_tracks, tracks, num_albums, albums,
                                     num_similar_artists, similar_artists,
+                                    0, NULL,
                                     (const char *)biography, type, NULL, NULL);
     return ArtistBrowser_FromSpotify(ab);
 }
@@ -246,7 +247,8 @@ mock_track(PyObject *self, PyObject *args, PyObject *kwds)
     track = mocksp_track_create(name, num_artists, artists, album->_album,
                                 duration, popularity, disc, index, error,
                                 is_loaded, availability, status, is_local,
-                                is_autolinked, is_starred, is_placeholder);
+                                is_autolinked, NULL, is_starred,
+                                is_placeholder);
     return Track_FromSpotify(track);
 }
 
@@ -507,6 +509,7 @@ mock_search(PyObject *self, PyObject *args, PyObject *kwds)
                                   (const sp_album **)albums,
                                   total_artists, num_artists,
                                   (const sp_artist **)artists,
+                                  0, 0, NULL,
                                   NULL, NULL);
     free(tracks);
     free(albums);

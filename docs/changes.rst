@@ -29,13 +29,13 @@ v1.7 (in development)
 - ``offset`` is now optional in :meth:`Link.from_track`.
 
 - Remove undocumented/internal method
-  :meth:`spotify.managers.SpotifySessionManager.wake`.
-  :meth:`spotify.managers.SpotifySessionManager.notify_main_thread` does the
+  :meth:`spotify.manager.SpotifySessionManager.wake`.
+  :meth:`spotify.manager.SpotifySessionManager.notify_main_thread` does the
   same job.
 
 - Remove undocumented/internal method
-  :meth:`spotify.managers.SpotifySessionManager.terminate`. Use
-  :meth:`spotify.managers.SpotifySessionManager.disconnect` instead.
+  :meth:`spotify.manager.SpotifySessionManager.terminate`. Use
+  :meth:`spotify.manager.SpotifySessionManager.disconnect` instead.
 
 **New features**
 

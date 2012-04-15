@@ -65,6 +65,13 @@ The :class:`Session` class
 
         Raises :exc:`SpotifyError` if not logged in.
 
+    .. method:: flush_caches
+
+        This will make libspotify write all data that is meant to be stored
+        on disk to the disk immediately. libspotify does this periodically
+        by itself and also on logout. So under normal conditions this
+        should never need to be used.
+
     .. method:: image_create(id)
 
         :param string id:   the id of the image to be fetched.
@@ -160,4 +167,3 @@ The :class:`Session` class
         user.
 
         If the user is not logged in, this method raises a :exc:`SpotifyError`.
-

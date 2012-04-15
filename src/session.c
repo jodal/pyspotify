@@ -340,6 +340,16 @@ Session_starred(Session * self)
     return pl;
 }
 
+static PyObject *
+Session_flush_caches(Session * self)
+{
+    Py_BEGIN_ALLOW_THREADS;
+    sp_session_flush_caches(self->_session);
+    Py_END_ALLOW_THREADS;
+
+    Py_RETURN_NONE;
+}
+
 static PyMethodDef Session_methods[] = {
     {"username", (PyCFunction)Session_username, METH_NOARGS,
      "Return the canonical username for the logged in user"},
@@ -377,6 +387,8 @@ static PyMethodDef Session_methods[] = {
      "Set the preferred bitrate of the audio stream. 0 = 160k, 1 = 320k"},
     {"starred", (PyCFunction)Session_starred, METH_NOARGS,
      "Get the starred playlist for the logged in user"},
+    {"flush_caches", (PyCFunction)Session_flush_caches, METH_NOARGS,
+     "Flush the libspotify caches"},
     {NULL}
 };
 

@@ -109,7 +109,7 @@ The :class:`Session` class
         <spotify.manager.SpotifySessionManager.notify_main_thread>` session
         callback.
 
-    .. method:: search(query, callback[ ,track_offset=0, track_count=32, album_offset=0, album_count=32, artist_offset=0, artist_count=32, userdata=None])
+    .. method:: search(query, callback[ ,track_offset=0, track_count=32, album_offset=0, album_count=32, artist_offset=0, artist_count=32, playlist_offset=0, playlist_count=32, search_type='standard', userdata=None])
 
         :param query:           Query search string
         :param callback:        signature ``(Results results, Object userdata)``
@@ -119,6 +119,9 @@ The :class:`Session` class
         :param album_count:     The number of albums to ask for
         :param artist_offset:   The offset among the artists of the result
         :param artist_count:    The number of artists to ask for
+        :param playlist_offset: The offset among the playlists of the result
+        :param playlist_count:  The number of playlists to ask for
+        :param search_type:     'standard' or 'suggest'
 
         :returns:               The search results
         :rtype:                 :class:`Results`

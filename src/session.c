@@ -225,22 +225,38 @@ Session_search(Session * self, PyObject *args, PyObject *kwds)
     PyObject *callback, *userdata = NULL;
     int track_offset = 0, track_count = 32,
         album_offset = 0, album_count = 32, artist_offset = 0, artist_count =
-        32;
+        32, playlist_offset = 0, playlist_count = 32;
     Callback *st;
     PyObject *results;
+    sp_search_type search_type = SP_SEARCH_STANDARD;
+    char *str_search_type = NULL;
 
     static char *kwlist[] = { "query", "callback",
         "track_offset", "track_count",
         "album_offset", "album_count",
         "artist_offset", "artist_count",
-        "userdata", NULL
+        "playlist_offset", "playlist_count",
+        "search_type", "userdata", NULL
     };
-    if (!PyArg_ParseTupleAndKeywords(args, kwds, "esO|iiiiiiO", kwlist,
+    if (!PyArg_ParseTupleAndKeywords(args, kwds, "esO|iiiiiiiisO", kwlist,
                                      ENCODING, &query, &callback,
                                      &track_offset, &track_count,
                                      &album_offset, &album_count,
-                                     &artist_offset, &artist_count, &userdata))
+                                     &artist_offset, &artist_count,
+                                     &playlist_offset, &playlist_count,
+                                     &str_search_type, &userdata))
         return NULL;
+    /* Determine search type */
+    if (str_search_type) {
+        if (strcmp(str_search_type, "standard") == 0) {} // default
+        else if (strcmp(str_search_type, "suggest") == 0) {
+            search_type = SP_SEARCH_SUGGEST;
+        }
+        else {
+            PyErr_Format(SpotifyError, "Unknown search type: %s", str_search_type);
+            return NULL;
+        }
+    }
     if (!userdata)
         userdata = Py_None;
     st = create_trampoline(callback, NULL, userdata);
@@ -250,6 +266,8 @@ Session_search(Session * self, PyObject *args, PyObject *kwds)
                               track_offset, track_count,
                               album_offset, album_count,
                               artist_offset, artist_count,
+                              playlist_offset, playlist_count,
+                              search_type,
                               (search_complete_cb *) search_complete,
                               (void *)st);
     Py_END_ALLOW_THREADS;

@@ -16,9 +16,13 @@ The :class:`ArtistBrowser` class
     :type artist: :class:`Artist`
     :param type:    this browser's type. One of:
 
-        * ``'full'`` (default):     all data will be fetched
+        * ``'full'`` (default):     all data will be fetched (deprecated in
+          pyspotify 1.7 / libspotify 11)
         * ``'no_tracks'``:          no information about tracks
         * ``'no_albums'``:          no information about albums (implies ``'no_tracks'``)
+
+        The ``'no_tracks'`` and ``'no_albums'`` browser types also include a
+        list of top tracks for this artist.
 
     :param callback: a function with signature :
         ``(ArtistBrowser browser, Object userdata)``

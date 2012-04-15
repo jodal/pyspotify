@@ -146,6 +146,21 @@ ArtistBrowser_tracks(ArtistBrowser * self)
     return l;
 }
 
+static PyObject *
+ArtistBrowser_tophit_tracks(ArtistBrowser * self)
+{
+    int count = sp_artistbrowse_num_tophit_tracks(self->_browser);
+    PyObject *l = PyList_New(count);
+    int i;
+
+    for (i = 0; i < count; ++i) {
+        PyObject *a = Track_FromSpotify(sp_artistbrowse_tophit_track(self->_browser, i));
+
+        PyList_SetItem(l, i, a);
+    }
+    return l;
+}
+
 Py_ssize_t
 ArtistBrowser_sq_length(ArtistBrowser * self)
 {
@@ -193,6 +208,10 @@ static PyMethodDef ArtistBrowser_methods[] = {
      (PyCFunction)ArtistBrowser_tracks,
      METH_NOARGS,
      "Return a list of all the tracks found while browsing."},
+    {"tophit_tracks",
+     (PyCFunction)ArtistBrowser_tophit_tracks,
+     METH_NOARGS,
+     "Return a list of all the top tracks found while browsing."},
     {NULL}
 };
 

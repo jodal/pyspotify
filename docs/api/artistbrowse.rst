@@ -47,3 +47,8 @@ The :class:`ArtistBrowser` class
 
         :rtype:     list of :class:`Track`
         :returns:   the list of tracks found while browsing
+
+    .. method:: tophit_tracks
+
+        :rtype:     list of :class:`Track`
+        :returns:   the list of top tracks for this artist found while browsing

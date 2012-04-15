@@ -225,11 +225,6 @@ class SpotifySessionManager(object):
 
         Playback has reached the end of the current track.
 
-        .. warning::
-            This method is called from an internal thread in libspotify. You
-            should make sure *not* to use the Spotify API from within it, as
-            libspotify isn't thread safe.
-
         :param session: the current session.
         :type session: :class:`spotify.Session`
         """

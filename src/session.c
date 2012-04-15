@@ -728,6 +728,31 @@ end_of_track(sp_session * session)
     PyGILState_Release(gstate);
 }
 
+static void
+credentials_blob_updated(sp_session *session, const char *blob)
+{
+    PyGILState_STATE gstate;
+    PyObject *res, *method, *client, *py_session, *py_blob;
+
+#ifdef DEBUG
+        fprintf(stderr, "[DEBUG]-session- >> credentials_blob_updated called\n");
+#endif
+    gstate = PyGILState_Ensure();
+    client = (PyObject *)sp_session_userdata(session);
+    py_session = Session_FromSpotify(session);
+    py_blob = PyBytes_FromString(blob);
+
+    method = PyObject_GetAttrString(client, "credentials_blob_updated");
+    res = PyObject_CallFunctionObjArgs(method, py_session, py_blob, NULL);
+    if (!res)
+        PyErr_WriteUnraisable(method);
+    Py_DECREF(py_session);
+    Py_DECREF(py_blob);
+    Py_XDECREF(res);
+    Py_DECREF(method);
+    PyGILState_Release(gstate);
+}
+
 void
 session_init(PyObject *m)
 {
@@ -778,7 +803,15 @@ static sp_session_callbacks g_callbacks = {
     &music_delivery,
     &play_token_lost,
     &log_message,
-    &end_of_track
+    &end_of_track,
+    NULL, /* streaming_error */
+    NULL, /* userinfo_updated */
+    NULL, /* start_playback */
+    NULL, /* stop_playback */
+    NULL, /* get_audio_buffer_stats */
+    NULL, /* offline_status_updated */
+    NULL, /* offline_error */
+    &credentials_blob_updated,
 };
 
 PyObject *

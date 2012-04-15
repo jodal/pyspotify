@@ -229,3 +229,22 @@ class SpotifySessionManager(object):
         :type session: :class:`spotify.Session`
         """
         pass
+
+    def credentials_blob_updated(self, session, blob):
+        """
+        Callback.
+
+        Called when storable credentials have been updated, usually called when
+        we have connected to the AP.
+
+        .. warning::
+            This method is called from an internal thread in libspotify. You
+            should make sure *not* to use the Spotify API from within it, as
+            libspotify isn't thread safe.
+
+        :param session: the current session.
+        :type session: :class:`spotify.Session`
+        :param blob: a string which contains an encrypted token that can be
+            stored safely on disk instead of storing plaintext passwords.
+        """
+        pass

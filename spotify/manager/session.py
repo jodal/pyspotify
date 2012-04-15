@@ -42,7 +42,11 @@ class SpotifySessionManager(object):
     def connect(self):
         """
         Connect to the Spotify API using the given username and password.
+
         This method calls the :func:`spotify.connect` function.
+
+        This method does not return before we disconnect from the Spotify
+        service.
         """
         session = spotify.connect(self)
         self.loop(session) # returns on disconnect
@@ -62,22 +66,12 @@ class SpotifySessionManager(object):
             self.timer.start()
             self.awoken.wait()
 
-    def terminate(self):
+    def disconnect(self):
         """
         Terminate the current Spotify session.
         """
         self.finished = True
         self.wake()
-
-    disconnect = terminate
-
-    def wake(self, session=None):
-        """
-        This is called by the Spotify subsystem to wake up the main loop.
-        """
-        if self.timer is not None:
-            self.timer.cancel()
-        self.awoken.set()
 
     def logged_in(self, session, error):
         """
@@ -148,9 +142,13 @@ class SpotifySessionManager(object):
         """
         Callback.
 
-        When this method is called, you should make sure that
-        :meth:`session.process_events() <spotify.Session.process_events>` is
-        called.
+        When this method is called by ``libspotify``, one should call
+        :meth:`session.process_events() <spotify.Session.process_events>`.
+
+        If you use the :class:`SessionManager`'s default loop, the default
+        implementation of this method does the job. Though, if you implement
+        your own loop for handling Spotify events, you'll need to override this
+        method.
 
         .. warning::
             This method is called from an internal thread in libspotify. You
@@ -160,7 +158,9 @@ class SpotifySessionManager(object):
         :param session: the current session.
         :type session: :class:`spotify.Session`
         """
-        pass
+        if self.timer is not None:
+            self.timer.cancel()
+        self.awoken.set()
 
     def music_delivery(self, session, frames, frame_size, num_frames,
             sample_type, sample_rate, channels):

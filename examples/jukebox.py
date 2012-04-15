@@ -38,7 +38,7 @@ class JukeboxUI(cmd.Cmd, threading.Thread):
 
     def do_quit(self, line):
         print "Goodbye!"
-        self.jukebox.terminate()
+        self.jukebox.disconnect()
         return True
 
     def do_list(self, line):

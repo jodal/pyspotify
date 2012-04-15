@@ -761,6 +761,7 @@ session_connect(PyObject *self, PyObject *args)
     char *username, *password;
     char *cache_location, *settings_location, *user_agent;
     bool relogin = 0, remember_me;
+    char *blob = NULL;
 
     if (!PyArg_ParseTuple(args, "O", &client))
         return NULL;
@@ -836,12 +837,26 @@ session_connect(PyObject *self, PyObject *args)
     PyErr_Clear();
     Py_XDECREF(remember);
 
+    /* Binary blob to use in place of a password */
+    PyObject *py_blob = PyObject_GetAttr(client, PyBytes_FromString("login_blob"));
+    if (py_blob != NULL) {
+        if (!(PyBytes_Check(py_blob))) {
+            PyErr_SetString(SpotifyError, "login_blob must be a string of bytes.");
+            Py_XDECREF(py_blob);
+            return NULL;
+        }
+        blob = PyString_AS_STRING(py_blob);
+    } else {
+        PyErr_Clear();
+    }
+
 #ifdef DEBUG
     fprintf(stderr, "[DEBUG]-session- creating session...\n");
 #endif
     error = sp_session_create(&config, &session);
     if (error != SP_ERROR_OK) {
         PyErr_SetString(SpotifyError, sp_error_message(error));
+        Py_XDECREF(py_blob);
         return NULL;
     }
     session_constructed = 1;
@@ -853,6 +868,7 @@ session_connect(PyObject *self, PyObject *args)
         error = sp_session_relogin(session);
         if (error != SP_ERROR_OK) {
             PyErr_SetString(SpotifyError, sp_error_message(error));
+            Py_XDECREF(py_blob);
             return NULL;
         }
     } else {
@@ -861,9 +877,10 @@ session_connect(PyObject *self, PyObject *args)
             username);
 #endif
         Py_BEGIN_ALLOW_THREADS;
-        sp_session_login(session, username, password, remember_me);
+        sp_session_login(session, username, password, remember_me, blob);
         Py_END_ALLOW_THREADS;
     }
+    Py_XDECREF(py_blob);
     g_session = session;
     Session *psession =
         (Session *) PyObject_CallObject((PyObject *)&SessionType, NULL);

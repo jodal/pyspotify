@@ -27,9 +27,9 @@ The :class:`Link` class
 
     .. method:: __str__()
 
-        Return the link as a string in the spotify format.
+        Return the link as a string in the Spotify format.
 
-        Example: spotify:track:5st5644IlBmKiiRE73UsoZ.
+        Example: spotify:track:5st5644IlBmKiiRE73UsoZ
 
     .. method:: type()
 

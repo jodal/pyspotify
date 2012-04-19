@@ -25,6 +25,12 @@ The :class:`Link` class
 
     .. data:: LINK_PLAYLIST
 
+    .. method:: __str__()
+
+        Return the link as a string in the Spotify format.
+
+        Example: ``spotify:track:5st5644IlBmKiiRE73UsoZ``
+
     .. method:: type()
 
         Return the type of the link as an :class:`int`. Check value

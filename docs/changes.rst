@@ -9,6 +9,8 @@ v1.7 (in development)
 
 **API changes**
 
+- This version corresponds to *libspotify* version 11.
+
 - Artist and album browsers are now created directly from the
   :class:`ArtistBrowser` and :class:`AlbumBrowser` class constructors. The
   :meth:`Session.browse_artist` and :meth:`Session.browse_album` methods still
@@ -45,8 +47,9 @@ v1.7 (in development)
   :meth:`spotify.Results.total_artists`.
 
 - Added methods :meth:`spotify.ArtistBrowser.albums`,
-  :meth:`spotify.ArtistBrowser.similar_artists` and
-  :meth:`spotify.ArtistBrowser.tracks`
+  :meth:`spotify.ArtistBrowser.similar_artists`,
+  :meth:`spotify.ArtistBrowser.tracks` and
+  :meth:`spotify.ArtistBrowser.tophit_tracks`.
 
 - Added optional argument ``type`` for :class:`spotify.ArtistBrowser`.
 
@@ -58,6 +61,14 @@ v1.7 (in development)
   application developer using pyspotify may add an additional log handler which
   listens for log messages to the ``spotify`` logger, and thus get debug
   information from pyspotify.
+
+- Multi-user credential retainment using ``login_blob`` from the
+  :class:`spotify.manager.SpotifySessionManager` and the
+  :meth:`spotify.manager.SpotifySessionManager.credentials_blob_updated` method.
+
+- Added a ``search_type`` argument for searches.
+
+- Added new method :meth:`spotify.Session.flush_caches`.
 
 - Bundled audio sink support:
 

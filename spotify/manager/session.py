@@ -57,7 +57,7 @@ class SpotifySessionManager(object):
 
         This processes events and then either waits for an event. The event is
         either triggered by a timer expiring, or by a notification from within
-        the Spotify subsystem (which calls :meth:`wake`).
+        the Spotify subsystem (which calls :meth:`notify_main_thread`).
         """
         while not self.finished:
             self.awoken.clear()
@@ -71,7 +71,7 @@ class SpotifySessionManager(object):
         Terminate the current Spotify session.
         """
         self.finished = True
-        self.wake()
+        self.notify_main_thread()
 
     def logged_in(self, session, error):
         """
@@ -138,7 +138,7 @@ class SpotifySessionManager(object):
         """
         pass
 
-    def notify_main_thread(self, session):
+    def notify_main_thread(self, session=None):
         """
         Callback.
 

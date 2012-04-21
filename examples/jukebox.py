@@ -39,8 +39,9 @@ class JukeboxUI(cmd.Cmd, threading.Thread):
         self.jukebox.session.logout()
 
     def do_quit(self, line):
-        print "Goodbye!"
+        self.jukebox.stop()
         self.jukebox.disconnect()
+        print "Goodbye!"
         return True
 
     def do_list(self, line):
@@ -377,8 +378,8 @@ class Jukebox(SpotifySessionManager):
         self.playing = False
         self.audio.stop()
 
-    def music_delivery(self, *a, **kw):
-        return self.audio.music_delivery(*a, **kw)
+    def music_delivery_safe(self, *args, **kwargs):
+        return self.audio.music_delivery(*args, **kwargs)
 
     def next(self):
         self.stop()

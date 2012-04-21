@@ -70,6 +70,13 @@ v1.7 (in development)
 
 - Added new method :meth:`spotify.Session.flush_caches`.
 
+- Add new :meth:`spotify.manager.SpotifySessionManager.music_delivery_safe`
+  callback that can safely use the Spotify API without segfaulting. A little
+  overhead is caused by serializing and passing data to the main thread, so if
+  you are not going to use the Spotify API from your callbacks, or you're doing
+  your own synchronization, you can continue to use the non-safe methods with a
+  bit less overhead.
+
 - Bundled audio sink support:
 
   - A audio sink wrapper for `PortAudio

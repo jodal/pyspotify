@@ -8,6 +8,7 @@ Table of contents
 
     introduction
     managers/index
+    audiosink
     api/index
     changes
     development

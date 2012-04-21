@@ -2,6 +2,117 @@
 Changes
 =======
 
+.. currentmodule:: spotify
+
+v1.7 (2012-04-22)
+=================
+
+**API changes**
+
+- This version works with *libspotify* version 11.
+
+- Artist and album browsers are now created directly from the
+  :class:`ArtistBrowser` and :class:`AlbumBrowser` class constructors. The
+  :meth:`Session.browse_artist` and :meth:`Session.browse_album` methods still
+  work but have been deprecated. Also, callbacks are optional for the two
+  browsers.
+
+- The audio sink wrappers have been cleaned up and moved to a new
+  :mod:`spotify.audiosink` module. The interface is the same, but you'll need
+  to update your imports if you previously used either
+  :class:`spotify.alsahelper.AlsaController` (renamed to
+  :class:`spotify.audiosink.alsa.AlsaSink`) or
+  :class:`spotify.osshelper.OssController` (renamed to
+  :class:`spotify.audiosink.oss.OssSink`).
+
+- An :class:`ArtistBrowser` object is now a list of :class:`Track`, as it was
+  written in the API documentation.
+
+- ``offset`` is now optional in :meth:`Link.from_track`.
+
+- Remove undocumented/internal method
+  :meth:`spotify.manager.SpotifySessionManager.wake`.
+  :meth:`spotify.manager.SpotifySessionManager.notify_main_thread` does the
+  same job. Make sure you haven't accidentally overrided :meth:`notify_main_thread`
+  in your :class:`SpotifySessionManager` subclass.
+
+- Remove undocumented/internal method
+  :meth:`spotify.manager.SpotifySessionManager.terminate`. Use
+  :meth:`spotify.manager.SpotifySessionManager.disconnect` instead.
+
+**New features**
+
+- Added method :meth:`spotify.Playlist.owner`.
+
+- Added methods :meth:`spotify.Results.total_albums` and
+  :meth:`spotify.Results.total_artists`.
+
+- Added methods :meth:`spotify.ArtistBrowser.albums`,
+  :meth:`spotify.ArtistBrowser.similar_artists`,
+  :meth:`spotify.ArtistBrowser.tracks` and
+  :meth:`spotify.ArtistBrowser.tophit_tracks`.
+
+- Added optional argument ``type`` for :class:`spotify.ArtistBrowser`.
+
+- pyspotify now registers a "null handler" for logging to the ``spotify``
+  logger. This means that any pyspotify code is free to log debug log to any
+  logger matching ``spotify.*``.
+
+  By default the log statements will be swallowed by the null handler. An
+  application developer using pyspotify may add an additional log handler which
+  listens for log messages to the ``spotify`` logger, and thus get debug
+  information from pyspotify.
+
+- Multi-user credential retainment using ``login_blob`` from the
+  :class:`spotify.manager.SpotifySessionManager` and the
+  :meth:`spotify.manager.SpotifySessionManager.credentials_blob_updated` method.
+
+- Added a ``search_type`` argument for searches.
+
+- Added new method :meth:`spotify.Session.flush_caches`.
+
+- Add new :meth:`spotify.manager.SpotifySessionManager.music_delivery_safe`
+  callback that can safely use the Spotify API without segfaulting. A little
+  overhead is caused by serializing and passing data to the main thread, so if
+  you are not going to use the Spotify API from your callbacks, or you're doing
+  your own synchronization, you can continue to use the non-safe methods with a
+  bit less overhead.
+
+- Bundled audio sink support:
+
+  - A audio sink wrapper for `PortAudio
+    <http://www.portaudio.com/>`_,
+    :class:`spotify.audiosink.portaudio.PortAudioSink`, have been contributed
+    by Tommaso Barbugli.  PortAudio is available on both Linux, Mac OS X, and
+    Windows.
+
+  - A audio sink wrapper for `Gstreamer <http://gstreamer.freedesktop.org/>`_,
+    :class:`spotify.audiosink.gstreamer.GstreamerSink`, have been contributed
+    by David Buchmann. Gstreamer is available on both Linux, Mac OS X, and
+    Windows.
+
+  - The audio sink selector code originally written by Tommaso Barbugli for the
+    ``jukebox.py`` example app have been generalized and made available for
+    other applications as :func:`spotify.audiosink.import_audio_sink`.
+
+- Jukebox example:
+
+  - The jukebox got support for playing entire playlists. Thanks to Bjørn
+    Schjerve.
+
+  - The jukebox now formats duration in minutes and seconds. Thanks to David
+    Buchmann.
+
+**Other changes**
+
+- For developers: *pyspotify* now uses `libmockspotify
+  <https://github.com/mopidy/libmockspotify>`_ for its mocking needs. The
+  mock module only contains Python bindings to the *libmockspotify* API. To be
+  able to run the tests, you need to pass ``--with-mock`` to your ``python
+  setup.py ...`` command to build pyspotify with mock support. Alternatively,
+  you can use ``make test`` to run the tests.
+
+
 v1.6.1 (2011-12-29)
 ===================
 
@@ -79,9 +190,10 @@ with libspotify v0.0.8.
 - Add new method: :meth:`spotify.Playlist.rename`
 - Add new method: :meth:`spotify.Session.get_friends`. Contributed by Francisco
   Jordano.
-- Add new method: :meth:`spotify.Playlist.add_tracks`. Contributed by triptec.
+- Add new method: :meth:`spotify.Playlist.add_tracks`. Contributed by Andreas
+  Franzén.
 - Add new method: :meth:`spotify.PlaylistContainer.add_new_playlist`.
-  Contributed by triptec.
+  Contributed by Andreas Franzén.
 
 **Bug fixes**
 
@@ -92,8 +204,8 @@ with libspotify v0.0.8.
 - Argument errors were unchecked in :meth:`spotify.Session.search`
 - Fix crash on valid error at image creation. Fixed by Jamie Kirkpatrick.
 - Keep compatibility with Python 2.5. Contributed by Jamie Kirkpatrick.
-- Callbacks given at artist/album browser creation are now called by pyspotify
-  (jkp)
+- Callbacks given at artist/album browser creation are now called by pyspotify.
+  Fixed by Jamie Kirkpatrick.
 - Fix exception when a ``long`` was returned from
   :meth:`spotify.manager.SpotifySessionManager.music_delivery`
 

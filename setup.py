@@ -3,6 +3,7 @@
 from distutils.core import setup, Extension
 import os
 import re
+import sys
 
 def get_version():
     init_py = open('spotify/__init__.py').read()
@@ -22,6 +23,16 @@ def fullsplit(path, result=None):
     if head == path:
         return result
     return fullsplit(head, [tail] + result)
+
+def with_mock():
+    """
+    Checks wether the user wants to build the mockmodule (off by default).
+    """
+    try:
+        sys.argv.remove('--with-mock')
+        return True
+    except ValueError:
+        return False
 
 # Compile the list of packages available, because distutils doesn't have
 # an easy way to do this.
@@ -85,7 +96,12 @@ mockspotify_ext = Extension('spotify._mockspotify',
         'src/toplistbrowser.c',
     ],
     include_dirs=['src'],
+    libraries=['mockspotify'],
 )
+
+modules = [spotify_ext]
+if with_mock():
+    modules.append(mockspotify_ext)
 
 setup(
     name='pyspotify',
@@ -97,5 +113,5 @@ setup(
     url='http://pyspotify.mopidy.com/',
     packages=packages,
     data_files=data_files,
-    ext_modules=[spotify_ext, mockspotify_ext],
+    ext_modules=modules,
 )

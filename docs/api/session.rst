@@ -4,9 +4,9 @@ Session handling
 .. currentmodule:: spotify
 
 The session handling is usually done by inheriting the
-:class:`spotify.managers.SpotifySessionManager` class from the :mod:`manager`
-module.  Then the manager's :meth:`connect` method calls the
-:func:`spotify.connect` function.
+:class:`spotify.manager.SpotifySessionManager` class from the
+:mod:`spotify.manager` module.  Then the manager's :meth:`connect` method calls
+the :func:`spotify.connect` function.
 
 .. function:: connect(session_manager)
 
@@ -31,11 +31,15 @@ The :class:`Session` class
         Browse an album, calling the callback when the browser's metadata is
         loaded.
 
-        :param album: A spotify album (does not have to be loaded)
+        :param album: a Spotify album (does not have to be loaded)
         :type album: :class:`Album`
-        :param callback: signature : ``(AlbumBrowser browser, Object userdata)``
+        :param callback: a function with signature :
+            ``(AlbumBrowser browser, Object userdata)``
         :param userdata: any object
         :returns: An :class:`AlbumBrowser` object containing the results
+
+        .. deprecated:: 1.7
+            Use :class:`AlbumBrowser` instead.
 
 
     .. method:: browse_artist(artist, callback[, userdata])
@@ -43,11 +47,15 @@ The :class:`Session` class
         Browse an artist, calling the callback when the browser's metadata is
         loaded.
 
-        :param artist: A spotify artist (does not have to be loaded)
+        :param artist: a Spotify artist (does not have to be loaded)
         :type artist: :class:`Artist`
-        :param callback: signature : ``(ArtistBrowser browser, Object userdata)``
+        :param callback: a function with signature :
+            ``(ArtistBrowser browser, Object userdata)``
         :param userdata: any object
         :returns: An :class:`ArtistBrowser` object containing the results.
+
+        .. deprecated:: 1.7
+            Use :class:`ArtistBrowser` instead.
 
 
     .. method:: display_name()
@@ -56,6 +64,13 @@ The :class:`Session` class
         :returns:   the full name for the logged in user.
 
         Raises :exc:`SpotifyError` if not logged in.
+
+    .. method:: flush_caches
+
+        This will make libspotify write all data that is meant to be stored
+        on disk to the disk immediately. libspotify does this periodically
+        by itself and also on logout. So under normal conditions this
+        should never need to be used.
 
     .. method:: image_create(id)
 
@@ -101,7 +116,7 @@ The :class:`Session` class
         <spotify.manager.SpotifySessionManager.notify_main_thread>` session
         callback.
 
-    .. method:: search(query, callback[ ,track_offset=0, track_count=32, album_offset=0, album_count=32, artist_offset=0, artist_count=32, userdata=None])
+    .. method:: search(query, callback[ ,track_offset=0, track_count=32, album_offset=0, album_count=32, artist_offset=0, artist_count=32, playlist_offset=0, playlist_count=32, search_type='standard', userdata=None])
 
         :param query:           Query search string
         :param callback:        signature ``(Results results, Object userdata)``
@@ -111,6 +126,9 @@ The :class:`Session` class
         :param album_count:     The number of albums to ask for
         :param artist_offset:   The offset among the artists of the result
         :param artist_count:    The number of artists to ask for
+        :param playlist_offset: The offset among the playlists of the result
+        :param playlist_count:  The number of playlists to ask for
+        :param search_type:     'standard' or 'suggest'
 
         :returns:               The search results
         :rtype:                 :class:`Results`
@@ -149,4 +167,3 @@ The :class:`Session` class
         user.
 
         If the user is not logged in, this method raises a :exc:`SpotifyError`.
-

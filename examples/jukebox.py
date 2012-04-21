@@ -2,8 +2,9 @@
 import os
 import sys
 import cmd
-import time
+import logging
 import threading
+import time
 
 from spotify import ArtistBrowser, Link, ToplistBrowser
 from spotify.audiosink import import_audio_sink
@@ -375,8 +376,8 @@ class Jukebox(SpotifySessionManager):
         self.playing = False
         self.audio.stop()
 
-    def music_delivery(self, *a, **kw):
-        return self.audio.music_delivery(*a, **kw)
+    def music_delivery_safe(self, *args, **kwargs):
+        return self.audio.music_delivery(*args, **kwargs)
 
     def next(self):
         self.stop()
@@ -387,7 +388,7 @@ class Jukebox(SpotifySessionManager):
         else:
             self.stop()
 
-    def end_of_track(self, sess):
+    def end_of_track_safe(self, sess):
         self.audio.end_of_track()
 
     def search(self, *args, **kwargs):
@@ -432,8 +433,12 @@ class Jukebox(SpotifySessionManager):
 if __name__ == '__main__':
     import optparse
     op = optparse.OptionParser(version="%prog 0.1")
-    op.add_option("-u", "--username", help="spotify username")
-    op.add_option("-p", "--password", help="spotify password")
+    op.add_option("-u", "--username", help="Spotify username")
+    op.add_option("-p", "--password", help="Spotify password")
+    op.add_option("-v", "--verbose", help="Show debug information",
+        dest="verbose", action="store_true")
     (options, args) = op.parse_args()
+    if options.verbose:
+        logging.basicConfig(level=logging.DEBUG)
     session_m = Jukebox(options.username, options.password, True)
     session_m.connect()

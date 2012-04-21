@@ -53,6 +53,13 @@ v1.7 (in development)
 
 - Added optional argument ``type`` for :class:`spotify.ArtistBrowser`.
 
+- Added new :meth:`spotify.manager.SpotifySessionManager.music_delivery_safe`
+  callback that can safely use the Spotify API without segfaulting. A little
+  overhead is caused by serializing and passing data to the main thread, so if
+  you are not going to use the Spotify API from your callbacks, or you're doing
+  your own synchronization, you can continue to use the non-safe methods with a
+  bit less overhead.
+
 - pyspotify now registers a "null handler" for logging to the ``spotify``
   logger. This means that any pyspotify code is free to log debug log to any
   logger matching ``spotify.*``.

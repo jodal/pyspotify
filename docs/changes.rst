@@ -9,7 +9,7 @@ v1.7 (in development)
 
 **API changes**
 
-- This version corresponds to *libspotify* version 11.
+- This version works with *libspotify* version 11.
 
 - Artist and album browsers are now created directly from the
   :class:`ArtistBrowser` and :class:`AlbumBrowser` class constructors. The
@@ -33,7 +33,8 @@ v1.7 (in development)
 - Remove undocumented/internal method
   :meth:`spotify.manager.SpotifySessionManager.wake`.
   :meth:`spotify.manager.SpotifySessionManager.notify_main_thread` does the
-  same job.
+  same job. Make sure you haven't accidentally overrided :meth:`notify_main_thread`
+  in your :class:`SpotifySessionManager` subclass.
 
 - Remove undocumented/internal method
   :meth:`spotify.manager.SpotifySessionManager.terminate`. Use
@@ -107,8 +108,9 @@ v1.7 (in development)
 - For developers: *pyspotify* now uses `libmockspotify
   <https://github.com/mopidy/libmockspotify>`_ for its mocking needs. The
   mock module only contains Python bindings to the *libmockspotify* API. To be
-  able to run the tests, you need to pass `--with-mock` to your `python
-  setup.py ...` command to build pyspotify with mock support.
+  able to run the tests, you need to pass ``--with-mock`` to your ``python
+  setup.py ...`` command to build pyspotify with mock support. Alternatively,
+  you can use ``make test`` to run the tests.
 
 
 v1.6.1 (2011-12-29)

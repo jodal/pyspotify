@@ -4,8 +4,8 @@ Changes
 
 .. currentmodule:: spotify
 
-v1.7 (in development)
-=====================
+v1.7 (2012-04-22)
+=================
 
 **API changes**
 

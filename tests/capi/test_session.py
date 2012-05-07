@@ -1,4 +1,5 @@
 import ctypes
+import threading
 import unittest
 
 from spotify import capi
@@ -377,3 +378,23 @@ class CAPISessionCreationTest(unittest.TestCase):
 
     def test_sp_session_create_fails_with_invalid_arg_type(self):
         self.assertRaises(TypeError, capi.sp_session_create, 1.0, None)
+
+
+class CAPISessionLoginTest(unittest.TestCase):
+    def test_sp_session_login(self):
+        self.logged_in_called = threading.Event()
+        application_key = b'appkey_good'
+        config = capi.sp_session_config(
+            application_key=application_key,
+            application_key_size=len(application_key))
+        callbacks = capi.sp_session_callbacks(
+            logged_in=capi.SP_SESSION_LOGGED_IN_FUNC(
+                lambda *a: self.logged_in_called.set())
+        )
+        session = capi.sp_session_create(config, callbacks)
+
+        capi.sp_session_login(session,
+            username='alice', password='secret', remember_me=False, blob=None)
+
+        self.logged_in_called.wait(1)
+        self.assert_(self.logged_in_called.is_set())

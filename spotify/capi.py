@@ -296,3 +296,11 @@ def sp_session_create(config, callbacks):
         return session
     else:
         raise SpError(error)
+
+_sp_session_login = _libspotify.sp_session_login
+_sp_session_login.argtypes = [_ctypes.POINTER(sp_session),
+    _ctypes.c_char_p, _ctypes.c_char_p, sp_bool, _ctypes.c_char_p]
+
+def sp_session_login(session, username, password,
+        remember_me=False, blob=None):
+    _sp_session_login(session, username, password, remember_me, blob)

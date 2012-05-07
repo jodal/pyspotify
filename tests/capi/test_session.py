@@ -398,3 +398,20 @@ class CAPISessionLoginTest(unittest.TestCase):
 
         self.logged_in_called.wait(1)
         self.assert_(self.logged_in_called.is_set())
+
+
+class CAPISessionProcessEventsTest(unittest.TestCase):
+    def test_sp_session_process_events(self):
+        application_key = b'appkey_good'
+        config = capi.sp_session_config(
+            application_key=application_key,
+            application_key_size=len(application_key))
+        callbacks = capi.sp_session_callbacks(
+            logged_in=capi.SP_SESSION_LOGGED_IN_FUNC(
+                lambda *a: self.logged_in_called.set())
+        )
+        session = capi.sp_session_create(config, callbacks)
+
+        next_timeout = capi.sp_session_process_events(session)
+
+        self.assertEquals(next_timeout, 1)

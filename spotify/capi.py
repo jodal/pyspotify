@@ -304,3 +304,12 @@ _sp_session_login.argtypes = [_ctypes.POINTER(sp_session),
 def sp_session_login(session, username, password,
         remember_me=False, blob=None):
     _sp_session_login(session, username, password, remember_me, blob)
+
+_sp_session_process_events = _libspotify.sp_session_process_events
+_sp_session_process_events.argtypes = [_ctypes.POINTER(sp_session),
+    _ctypes.POINTER(_ctypes.c_int)]
+
+def sp_session_process_events(session):
+    next_timeout = _ctypes.c_int(0)
+    _sp_session_process_events(session, _ctypes.byref(next_timeout))
+    return next_timeout.value

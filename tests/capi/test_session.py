@@ -359,18 +359,21 @@ class CAPISessionCreationTest(unittest.TestCase):
         config = capi.sp_session_config(
             application_key=application_key,
             application_key_size=len(application_key))
-        session = capi.sp_session_create(config)
-        self.assertEqual(type(session), capi.sp_session)
+        callbacks = capi.sp_session_callbacks()
+        session = capi.sp_session_create(config, callbacks)
+        self.assertEqual(type(session), ctypes.POINTER(capi.sp_session))
 
     def test_sp_session_create_fails_with_invalid_app_key(self):
         application_key = b'appkey_bad'
         config = capi.sp_session_config(
             application_key=application_key,
             application_key_size=len(application_key))
-        self.assertRaises(capi.SpError, capi.sp_session_create, config)
+        callbacks = capi.sp_session_callbacks()
+        self.assertRaises(capi.SpError,
+            capi.sp_session_create, config, callbacks)
 
     def test_sp_session_create_fails_with_invalid_arg_count(self):
         self.assertRaises(TypeError, capi.sp_session_create)
 
     def test_sp_session_create_fails_with_invalid_arg_type(self):
-        self.assertRaises(TypeError, capi.sp_session_create, 1.0)
+        self.assertRaises(TypeError, capi.sp_session_create, 1.0, None)

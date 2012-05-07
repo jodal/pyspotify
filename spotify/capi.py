@@ -288,10 +288,10 @@ _sp_session_create.argtypes = [_ctypes.POINTER(sp_session_config),
      _ctypes.POINTER(_ctypes.POINTER(sp_session))]
 _sp_session_create.restype = sp_error
 
-def sp_session_create(config):
-    session = sp_session()
-    error = _sp_session_create(_ctypes.pointer(config),
-        _ctypes.pointer(session))
+def sp_session_create(config, callbacks):
+    config.callbacks = _ctypes.pointer(callbacks)
+    session = _ctypes.pointer(sp_session())
+    error = _sp_session_create(_ctypes.byref(config), _ctypes.byref(session))
     if error == SP_ERROR_OK:
         return session
     else:

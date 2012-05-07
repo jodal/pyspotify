@@ -3,17 +3,20 @@
 import logging
 import os
 import time
-import Queue
+try:
+    import Queue as queue
+except ImportError:
+    import queue
 
 from spotify import capi
 
 logger = logging.getLogger('capitest')
 
 def main(options):
-    cmd_queue = Queue.Queue()
+    cmd_queue = queue.Queue()
 
     appkey_file = os.path.join(os.path.dirname(__file__), 'spotify_appkey.key')
-    appkey = open(appkey_file).read()
+    appkey = open(appkey_file, mode='rb').read()
 
     callbacks = capi.sp_session_callbacks(
         logged_in=capi.SP_SESSION_LOGGED_IN_FUNC(
@@ -48,7 +51,7 @@ def main(options):
                 logger.debug('Got message; processing events')
                 timeout = capi.sp_session_process_events(session) / 1000.0
                 logger.debug('Will wait %.3fs for next message', timeout)
-        except Queue.Empty:
+        except queue.Empty:
             logger.debug(
                 'No message received before timeout. Processing events')
             timeout = capi.sp_session_process_events(session) / 1000.0

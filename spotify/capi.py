@@ -275,6 +275,7 @@ class sp_session_config(_ctypes.Structure):
         ('application_key_size', _ctypes.c_size_t),
         ('user_agent', _ctypes.c_char_p),
         ('callbacks', _ctypes.POINTER(sp_session_callbacks)),
+        ('userdata', _ctypes.c_void_p),
         ('compress_playlists', sp_bool),
         ('dont_save_metadata_for_playlists', sp_bool),
         ('initially_unload_playlists', sp_bool),

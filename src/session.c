@@ -225,22 +225,38 @@ Session_search(Session * self, PyObject *args, PyObject *kwds)
     PyObject *callback, *userdata = NULL;
     int track_offset = 0, track_count = 32,
         album_offset = 0, album_count = 32, artist_offset = 0, artist_count =
-        32;
+        32, playlist_offset = 0, playlist_count = 32;
     Callback *st;
     PyObject *results;
+    sp_search_type search_type = SP_SEARCH_STANDARD;
+    char *str_search_type = NULL;
 
     static char *kwlist[] = { "query", "callback",
         "track_offset", "track_count",
         "album_offset", "album_count",
         "artist_offset", "artist_count",
-        "userdata", NULL
+        "playlist_offset", "playlist_count",
+        "search_type", "userdata", NULL
     };
-    if (!PyArg_ParseTupleAndKeywords(args, kwds, "esO|iiiiiiO", kwlist,
+    if (!PyArg_ParseTupleAndKeywords(args, kwds, "esO|iiiiiiiisO", kwlist,
                                      ENCODING, &query, &callback,
                                      &track_offset, &track_count,
                                      &album_offset, &album_count,
-                                     &artist_offset, &artist_count, &userdata))
+                                     &artist_offset, &artist_count,
+                                     &playlist_offset, &playlist_count,
+                                     &str_search_type, &userdata))
         return NULL;
+    /* Determine search type */
+    if (str_search_type) {
+        if (strcmp(str_search_type, "standard") == 0) {} // default
+        else if (strcmp(str_search_type, "suggest") == 0) {
+            search_type = SP_SEARCH_SUGGEST;
+        }
+        else {
+            PyErr_Format(SpotifyError, "Unknown search type: %s", str_search_type);
+            return NULL;
+        }
+    }
     if (!userdata)
         userdata = Py_None;
     st = create_trampoline(callback, NULL, userdata);
@@ -250,6 +266,8 @@ Session_search(Session * self, PyObject *args, PyObject *kwds)
                               track_offset, track_count,
                               album_offset, album_count,
                               artist_offset, artist_count,
+                              playlist_offset, playlist_count,
+                              search_type,
                               (search_complete_cb *) search_complete,
                               (void *)st);
     Py_END_ALLOW_THREADS;
@@ -322,6 +340,16 @@ Session_starred(Session * self)
     return pl;
 }
 
+static PyObject *
+Session_flush_caches(Session * self)
+{
+    Py_BEGIN_ALLOW_THREADS;
+    sp_session_flush_caches(self->_session);
+    Py_END_ALLOW_THREADS;
+
+    Py_RETURN_NONE;
+}
+
 static PyMethodDef Session_methods[] = {
     {"username", (PyCFunction)Session_username, METH_NOARGS,
      "Return the canonical username for the logged in user"},
@@ -359,6 +387,8 @@ static PyMethodDef Session_methods[] = {
      "Set the preferred bitrate of the audio stream. 0 = 160k, 1 = 320k"},
     {"starred", (PyCFunction)Session_starred, METH_NOARGS,
      "Get the starred playlist for the logged in user"},
+    {"flush_caches", (PyCFunction)Session_flush_caches, METH_NOARGS,
+     "Flush the libspotify caches"},
     {NULL}
 };
 
@@ -556,7 +586,7 @@ notify_main_thread(sp_session * session)
     PyObject *client = (PyObject *)sp_session_userdata(session);
 
     if (client != NULL) {
-        method = PyObject_GetAttrString(client, "wake");
+        method = PyObject_GetAttrString(client, "notify_main_thread");
         res = PyObject_CallFunctionObjArgs(method, psession, NULL);
         if (!res)
             PyErr_WriteUnraisable(method);
@@ -698,6 +728,31 @@ end_of_track(sp_session * session)
     PyGILState_Release(gstate);
 }
 
+static void
+credentials_blob_updated(sp_session *session, const char *blob)
+{
+    PyGILState_STATE gstate;
+    PyObject *res, *method, *client, *py_session, *py_blob;
+
+#ifdef DEBUG
+        fprintf(stderr, "[DEBUG]-session- >> credentials_blob_updated called\n");
+#endif
+    gstate = PyGILState_Ensure();
+    client = (PyObject *)sp_session_userdata(session);
+    py_session = Session_FromSpotify(session);
+    py_blob = PyBytes_FromString(blob);
+
+    method = PyObject_GetAttrString(client, "credentials_blob_updated");
+    res = PyObject_CallFunctionObjArgs(method, py_session, py_blob, NULL);
+    if (!res)
+        PyErr_WriteUnraisable(method);
+    Py_DECREF(py_session);
+    Py_DECREF(py_blob);
+    Py_XDECREF(res);
+    Py_DECREF(method);
+    PyGILState_Release(gstate);
+}
+
 void
 session_init(PyObject *m)
 {
@@ -748,7 +803,15 @@ static sp_session_callbacks g_callbacks = {
     &music_delivery,
     &play_token_lost,
     &log_message,
-    &end_of_track
+    &end_of_track,
+    NULL, /* streaming_error */
+    NULL, /* userinfo_updated */
+    NULL, /* start_playback */
+    NULL, /* stop_playback */
+    NULL, /* get_audio_buffer_stats */
+    NULL, /* offline_status_updated */
+    NULL, /* offline_error */
+    &credentials_blob_updated,
 };
 
 PyObject *
@@ -761,6 +824,7 @@ session_connect(PyObject *self, PyObject *args)
     char *username, *password;
     char *cache_location, *settings_location, *user_agent;
     bool relogin = 0, remember_me;
+    char *blob = NULL;
 
     if (!PyArg_ParseTuple(args, "O", &client))
         return NULL;
@@ -836,12 +900,30 @@ session_connect(PyObject *self, PyObject *args)
     PyErr_Clear();
     Py_XDECREF(remember);
 
+    /* Binary blob to use in place of a password */
+    PyObject *py_blob = PyObject_GetAttr(client, PyBytes_FromString("login_blob"));
+    if (py_blob != NULL) {
+        if (!(PyBytes_Check(py_blob))) {
+            PyErr_SetString(SpotifyError, "login_blob must be a string of bytes.");
+            Py_XDECREF(py_blob);
+            return NULL;
+        }
+        blob = PyString_AS_STRING(py_blob);
+        /* if blob is the empty string (= default value), we pass NULL to
+         * sp_session_login */
+        if (blob[0] == '\0')
+            blob = NULL;
+    } else {
+        PyErr_Clear();
+    }
+
 #ifdef DEBUG
     fprintf(stderr, "[DEBUG]-session- creating session...\n");
 #endif
     error = sp_session_create(&config, &session);
     if (error != SP_ERROR_OK) {
         PyErr_SetString(SpotifyError, sp_error_message(error));
+        Py_XDECREF(py_blob);
         return NULL;
     }
     session_constructed = 1;
@@ -853,6 +935,7 @@ session_connect(PyObject *self, PyObject *args)
         error = sp_session_relogin(session);
         if (error != SP_ERROR_OK) {
             PyErr_SetString(SpotifyError, sp_error_message(error));
+            Py_XDECREF(py_blob);
             return NULL;
         }
     } else {
@@ -861,9 +944,10 @@ session_connect(PyObject *self, PyObject *args)
             username);
 #endif
         Py_BEGIN_ALLOW_THREADS;
-        sp_session_login(session, username, password, remember_me);
+        sp_session_login(session, username, password, remember_me, blob);
         Py_END_ALLOW_THREADS;
     }
+    Py_XDECREF(py_blob);
     g_session = session;
     Session *psession =
         (Session *) PyObject_CallObject((PyObject *)&SessionType, NULL);

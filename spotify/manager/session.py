@@ -1,5 +1,9 @@
+import logging
+import Queue
+
 import spotify
-import threading
+
+logger = logging.getLogger('pyspotify.manager.session')
 
 class SpotifySessionManager(object):
     """
@@ -8,6 +12,16 @@ class SpotifySessionManager(object):
 
     Exceptions raised in your callback handlers will be displayed on the
     standard error output (stderr).
+
+    When logging in a user, the application can pass one of:
+        - `username` + `password`: standard login using a plaintext password
+        - nothing: logs in the last user which credentials have been stored
+          using `remember_me`.
+        - `username` + `login_blob`: the blob is encrypted data from
+          *libspotify*, for when a multi-user application wants to use
+          the re-login feature. The blob is obtained from the
+          :meth:`credentials_blob_updated` callback after a successful
+          login to the Spotify AP.
     """
 
     api_version = spotify.api_version
@@ -17,20 +31,24 @@ class SpotifySessionManager(object):
     appkey_file = 'spotify_appkey.key'
     user_agent = 'pyspotify-example'
 
-    def __init__(self, username=None, password=None, remember_me=False):
+    def __init__(self, username=None, password=None, remember_me=False,
+                 login_blob=''):
+        self._cmdqueue = Queue.Queue()
         self.username = username
         self.password = password
         self.remember_me = remember_me
+        self.login_blob = login_blob
         if self.application_key is None:
             self.application_key = open(self.appkey_file).read()
-        self.awoken = threading.Event() # used to block until awoken
-        self.timer = None
-        self.finished = False
 
     def connect(self):
         """
         Connect to the Spotify API using the given username and password.
+
         This method calls the :func:`spotify.connect` function.
+
+        This method does not return before we disconnect from the Spotify
+        service.
         """
         session = spotify.connect(self)
         self.loop(session) # returns on disconnect
@@ -39,33 +57,39 @@ class SpotifySessionManager(object):
         """
         The main loop.
 
-        This processes events and then either waits for an event. The event is
-        either triggered by a timer expiring, or by a notification from within
-        the Spotify subsystem (which calls :meth:`wake`).
+        Processes events from ``libspotify`` and turns some of them into
+        callback calls.
         """
-        while not self.finished:
-            self.awoken.clear()
-            timeout = session.process_events()
-            self.timer = threading.Timer(timeout/1000.0, self.awoken.set)
-            self.timer.start()
-            self.awoken.wait()
+        running = True
+        timeout = 0
+        while running:
+            try:
+                message = self._cmdqueue.get(timeout=timeout)
+                if message.get('command') == 'music_delivery':
+                    num_frames = self.music_delivery_safe(
+                        session, *message['args'])
+                    message['reply_to'].put(num_frames)
+                elif message.get('command') == 'process_events':
+                    logger.debug('Got message; processing events')
+                    timeout = session.process_events() / 1000.0
+                    logger.debug('Will wait %.3fs for next message', timeout)
+                elif message.get('command') == 'disconnect':
+                    logger.debug('Got message; disconnecting')
+                    session.logout()
+                    running = False
+                else:
+                    raise ValueError('Unknown message type')
+            except Queue.Empty:
+                logger.debug(
+                    'No message received before timeout. Processing events')
+                timeout = session.process_events() / 1000.0
+                logger.debug('Will wait %.3fs for next message', timeout)
 
-    def terminate(self):
+    def disconnect(self):
         """
         Terminate the current Spotify session.
         """
-        self.finished = True
-        self.wake()
-
-    disconnect = terminate
-
-    def wake(self, session=None):
-        """
-        This is called by the Spotify subsystem to wake up the main loop.
-        """
-        if self.timer is not None:
-            self.timer.cancel()
-        self.awoken.set()
+        self._cmdqueue.put({'command': 'disconnect'})
 
     def logged_in(self, session, error):
         """
@@ -132,13 +156,17 @@ class SpotifySessionManager(object):
         """
         pass
 
-    def notify_main_thread(self, session):
+    def notify_main_thread(self, session=None):
         """
         Callback.
 
-        When this method is called, you should make sure that
-        :meth:`session.process_events() <spotify.Session.process_events>` is
-        called.
+        When this method is called by ``libspotify``, one should call
+        :meth:`session.process_events() <spotify.Session.process_events>`.
+
+        If you use the :class:`SessionManager`'s default loop, the default
+        implementation of this method does the job. Though, if you implement
+        your own loop for handling Spotify events, you'll need to override this
+        method.
 
         .. warning::
             This method is called from an internal thread in libspotify. You
@@ -148,7 +176,7 @@ class SpotifySessionManager(object):
         :param session: the current session.
         :type session: :class:`spotify.Session`
         """
-        pass
+        self._cmdqueue.put({'command': 'process_events'})
 
     def music_delivery(self, session, frames, frame_size, num_frames,
             sample_type, sample_rate, channels):
@@ -156,6 +184,8 @@ class SpotifySessionManager(object):
         Callback.
 
         Called whenever new music data arrives from Spotify.
+
+        You should override this method *or* :meth:`music_delivery_safe`, not both.
 
         .. warning::
             This method is called from an internal thread in libspotify. You
@@ -179,6 +209,27 @@ class SpotifySessionManager(object):
         :type channels: :class:`int`
         :return: number of frames consumed
         :rtype: :class:`int`
+        """
+        try:
+            future = Queue.Queue()
+            self._cmdqueue.put({
+                'command': 'music_delivery',
+                'args': (frames, frame_size, num_frames, sample_type, sample_rate,
+                    channels),
+                'reply_to': future,
+            }, block=False)
+            return future.get()
+        except Queue.Full:
+            return 0
+
+    def music_delivery_safe(self, session, frames, frame_size, num_frames,
+            sample_type, sample_rate, channels):
+        """
+        This method does the same as :meth:`music_delivery`, except that it's
+        called from the :class:`SpotifySessionManager` loop. You can safely use
+        Spotify APIs from within this method.
+
+        You should override this method *or* :meth:`music_delivery`, not both.
         """
         return 0
 
@@ -213,6 +264,18 @@ class SpotifySessionManager(object):
 
         Playback has reached the end of the current track.
 
+        :param session: the current session.
+        :type session: :class:`spotify.Session`
+        """
+        pass
+
+    def credentials_blob_updated(self, session, blob):
+        """
+        Callback.
+
+        Called when storable credentials have been updated, usually called when
+        we have connected to the AP.
+
         .. warning::
             This method is called from an internal thread in libspotify. You
             should make sure *not* to use the Spotify API from within it, as
@@ -220,5 +283,7 @@ class SpotifySessionManager(object):
 
         :param session: the current session.
         :type session: :class:`spotify.Session`
+        :param blob: a string which contains an encrypted token that can be
+            stored safely on disk instead of storing plaintext passwords.
         """
         pass

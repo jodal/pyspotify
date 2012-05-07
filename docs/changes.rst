@@ -4,10 +4,12 @@ Changes
 
 .. currentmodule:: spotify
 
-v1.7 (in development)
-=====================
+v1.7 (2012-04-22)
+=================
 
 **API changes**
+
+- This version works with *libspotify* version 11.
 
 - Artist and album browsers are now created directly from the
   :class:`ArtistBrowser` and :class:`AlbumBrowser` class constructors. The
@@ -28,6 +30,16 @@ v1.7 (in development)
 
 - ``offset`` is now optional in :meth:`Link.from_track`.
 
+- Remove undocumented/internal method
+  :meth:`spotify.manager.SpotifySessionManager.wake`.
+  :meth:`spotify.manager.SpotifySessionManager.notify_main_thread` does the
+  same job. Make sure you haven't accidentally overrided :meth:`notify_main_thread`
+  in your :class:`SpotifySessionManager` subclass.
+
+- Remove undocumented/internal method
+  :meth:`spotify.manager.SpotifySessionManager.terminate`. Use
+  :meth:`spotify.manager.SpotifySessionManager.disconnect` instead.
+
 **New features**
 
 - Added method :meth:`spotify.Playlist.owner`.
@@ -36,8 +48,9 @@ v1.7 (in development)
   :meth:`spotify.Results.total_artists`.
 
 - Added methods :meth:`spotify.ArtistBrowser.albums`,
-  :meth:`spotify.ArtistBrowser.similar_artists` and
-  :meth:`spotify.ArtistBrowser.tracks`
+  :meth:`spotify.ArtistBrowser.similar_artists`,
+  :meth:`spotify.ArtistBrowser.tracks` and
+  :meth:`spotify.ArtistBrowser.tophit_tracks`.
 
 - Added optional argument ``type`` for :class:`spotify.ArtistBrowser`.
 
@@ -49,6 +62,21 @@ v1.7 (in development)
   application developer using pyspotify may add an additional log handler which
   listens for log messages to the ``spotify`` logger, and thus get debug
   information from pyspotify.
+
+- Multi-user credential retainment using ``login_blob`` from the
+  :class:`spotify.manager.SpotifySessionManager` and the
+  :meth:`spotify.manager.SpotifySessionManager.credentials_blob_updated` method.
+
+- Added a ``search_type`` argument for searches.
+
+- Added new method :meth:`spotify.Session.flush_caches`.
+
+- Add new :meth:`spotify.manager.SpotifySessionManager.music_delivery_safe`
+  callback that can safely use the Spotify API without segfaulting. A little
+  overhead is caused by serializing and passing data to the main thread, so if
+  you are not going to use the Spotify API from your callbacks, or you're doing
+  your own synchronization, you can continue to use the non-safe methods with a
+  bit less overhead.
 
 - Bundled audio sink support:
 
@@ -80,8 +108,9 @@ v1.7 (in development)
 - For developers: *pyspotify* now uses `libmockspotify
   <https://github.com/mopidy/libmockspotify>`_ for its mocking needs. The
   mock module only contains Python bindings to the *libmockspotify* API. To be
-  able to run the tests, you need to pass `--with-mock` to your `python
-  setup.py ...` command to build pyspotify with mock support.
+  able to run the tests, you need to pass ``--with-mock`` to your ``python
+  setup.py ...`` command to build pyspotify with mock support. Alternatively,
+  you can use ``make test`` to run the tests.
 
 
 v1.6.1 (2011-12-29)

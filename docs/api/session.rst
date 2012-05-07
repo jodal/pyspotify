@@ -65,6 +65,13 @@ The :class:`Session` class
 
         Raises :exc:`SpotifyError` if not logged in.
 
+    .. method:: flush_caches
+
+        This will make libspotify write all data that is meant to be stored
+        on disk to the disk immediately. libspotify does this periodically
+        by itself and also on logout. So under normal conditions this
+        should never need to be used.
+
     .. method:: image_create(id)
 
         :param string id:   the id of the image to be fetched.
@@ -109,7 +116,7 @@ The :class:`Session` class
         <spotify.manager.SpotifySessionManager.notify_main_thread>` session
         callback.
 
-    .. method:: search(query, callback[ ,track_offset=0, track_count=32, album_offset=0, album_count=32, artist_offset=0, artist_count=32, userdata=None])
+    .. method:: search(query, callback[ ,track_offset=0, track_count=32, album_offset=0, album_count=32, artist_offset=0, artist_count=32, playlist_offset=0, playlist_count=32, search_type='standard', userdata=None])
 
         :param query:           Query search string
         :param callback:        signature ``(Results results, Object userdata)``
@@ -119,6 +126,9 @@ The :class:`Session` class
         :param album_count:     The number of albums to ask for
         :param artist_offset:   The offset among the artists of the result
         :param artist_count:    The number of artists to ask for
+        :param playlist_offset: The offset among the playlists of the result
+        :param playlist_count:  The number of playlists to ask for
+        :param search_type:     'standard' or 'suggest'
 
         :returns:               The search results
         :rtype:                 :class:`Results`
@@ -157,4 +167,3 @@ The :class:`Session` class
         user.
 
         If the user is not logged in, this method raises a :exc:`SpotifyError`.
-

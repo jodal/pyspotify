@@ -9,4 +9,4 @@ class CAPIModuleTest(unittest.TestCase):
 
     def test_has_api_version(self):
         from spotify import capi
-        self.assertEqual(capi.SPOTIFY_API_VERSION, 10)
+        self.assertEqual(capi.SPOTIFY_API_VERSION, 11)

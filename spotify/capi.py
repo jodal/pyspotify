@@ -1,7 +1,7 @@
 import os as _os
 import ctypes as _ctypes
 
-SPOTIFY_API_VERSION = 10
+SPOTIFY_API_VERSION = 11
 
 if _os.environ.get('USE_LIBMOCKSPOTIFY'):
     _libspotify = _ctypes.CDLL('libmockspotify.so.0')

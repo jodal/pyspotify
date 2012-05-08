@@ -69,4 +69,7 @@ if __name__ == '__main__':
     (options, args) = op.parse_args()
     if options.verbose:
         logging.basicConfig(level=logging.DEBUG)
-    main(options)
+    try:
+        main(options)
+    except KeyboardInterrupt:
+        pass

@@ -31,17 +31,18 @@ def main(options):
 
     config = capi.sp_session_config(
         api_version=capi.SPOTIFY_API_VERSION,
-        cache_location='/tmp/libspotify-cache',
-        settings_location='/tmp/libspotify-cache',
+        cache_location='/tmp/libspotify-cache'.encode('utf-8'),
+        settings_location='/tmp/libspotify-cache'.encode('utf-8'),
         application_key=appkey,
         application_key_size=len(appkey),
-        user_agent='pyspotify.capi test',
-        device_id='pyspotify.capi test',
-        tracefile='/tmp/libspotify-cache/trace.log',
+        user_agent='pyspotify.capi test'.encode('utf-8'),
+        device_id='pyspotify.capi test'.encode('utf-8'),
+        tracefile='/tmp/libspotify-cache/trace.log'.encode('utf-8'),
     )
 
     session = capi.sp_session_create(config, callbacks)
-    capi.sp_session_login(session, options.username, options.password)
+    capi.sp_session_login(session, options.username.encode('utf-8'),
+                                   options.password.encode('utf-8'))
 
     timeout = 0
     while True:

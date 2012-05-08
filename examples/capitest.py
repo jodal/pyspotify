@@ -37,7 +37,7 @@ def main(options):
         application_key_size=len(appkey),
         user_agent='pyspotify.capi test'.encode('utf-8'),
         device_id='pyspotify.capi test'.encode('utf-8'),
-        tracefile='/tmp/libspotify-cache/trace.log'.encode('utf-8'),
+        tracefile='/tmp/libspotify-trace.log'.encode('utf-8'),
     )
 
     session = capi.sp_session_create(config, callbacks)

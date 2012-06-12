@@ -65,7 +65,11 @@ Album_artist(Album * self)
 static PyObject *
 Album_cover(Album * self)
 {
+#if SPOTIFY_API_VERSION > 11
+    const byte *cover = sp_album_cover(self->_album, SP_IMAGE_SIZE_NORMAL);
+#else
     const byte *cover = sp_album_cover(self->_album);
+#endif
     if (!cover)
         Py_RETURN_NONE;
     return Py_BuildValue("s#", cover, 20);

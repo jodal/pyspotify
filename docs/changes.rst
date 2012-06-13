@@ -4,6 +4,15 @@ Changes
 
 .. currentmodule:: spotify
 
+v1.7.1 (in development)
+=======================
+
+Updates to work with *libspotify* version 12:
+
+- ``sp_album_cover`` requires a preferred image size. For now, it's hard coded
+  to ``SP_IMAGE_SIZE_NORMAL``. Thanks to olle. (Fixes: :issue:`66`)
+
+
 v1.7 (2012-04-22)
 =================
 

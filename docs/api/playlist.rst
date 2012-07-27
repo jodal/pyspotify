@@ -166,8 +166,8 @@ objects.
 
     .. method:: remove_tracks(tracks)
 
-        :param tracks:  A list of tracks to be removed from the playlist.
-        :type tracks:   list of :class:`Track`
+        :param tracks:  A list of track positions to be removed from the playlist.
+        :type tracks:   list of :class:`int`
 
     .. method:: subscribers
 

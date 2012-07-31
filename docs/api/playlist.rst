@@ -169,6 +169,15 @@ objects.
         :param tracks:  A list of track positions to be removed from the playlist.
         :type tracks:   list of :class:`int`
 
+    .. method:: reorder_tracks(position, tracks)
+        :param position:    where to move the tracks in the playlist
+        :type position:     :class:`int`
+        :param tracks:      A list of track positions to be moved from the playlist.
+        :type tracks:       list of :class:`int`
+
+        .. note:: The tracks array must be in ascending order of indices, without repeats.
+                  It may not be possible to reorder an entire playlist with one call.
+
     .. method:: subscribers
 
         :rtype:     list of :class:`unicode`

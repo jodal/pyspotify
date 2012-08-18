@@ -3,7 +3,6 @@
 #include <libgen.h>
 #include <unistd.h>
 #include <stdint.h>
-#include <pthread.h>
 #include "libspotify/api.h"
 #include "pyspotify.h"
 #include "album.h"

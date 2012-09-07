@@ -30,7 +30,7 @@ def get_version():
 
 # Add any Sphinx extension module names here, as strings. They can be extensions
 # coming with Sphinx (named 'sphinx.ext.*') or your custom ones.
-extensions = ['sphinx.ext.autodoc']
+extensions = ['sphinx.ext.autodoc', 'sphinx.ext.extlinks']
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']
@@ -219,6 +219,9 @@ man_pages = [
     ('index', 'pyspotify', u'pyspotify Documentation',
      [u'Doug Winter and contributors'], 1)
 ]
+
+
+extlinks = {'issue': ('https://github.com/mopidy/pyspotify/issues/%s', '#')}
 
 
 class Mock(object):

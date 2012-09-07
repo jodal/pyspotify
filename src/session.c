@@ -3,7 +3,6 @@
 #include <libgen.h>
 #include <unistd.h>
 #include <stdint.h>
-#include <pthread.h>
 #include "libspotify/api.h"
 #include "pyspotify.h"
 #include "album.h"
@@ -892,7 +891,7 @@ session_connect(PyObject *self, PyObject *args)
     if (!password)
         return NULL;
 
-    if ((long) username < 0 || (long) password < 0)
+    if ((long) username == (-1) || (long) password == (-1))
         relogin = 1;
 
     PyObject *remember = PyObject_GetAttr(client, PyBytes_FromString("remember_me"));

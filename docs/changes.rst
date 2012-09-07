@@ -4,6 +4,24 @@ Changes
 
 .. currentmodule:: spotify
 
+
+v1.7.1 (2012-09-07)
+===================
+
+Maintenance release to fix a login issue experienced by some users.
+
+This version, like 1.7, is compatible with *libspotify* version 11.
+
+**Bug fixes**
+
+- Fix bogus comparision of pointers. This caused ``SpotifyError: No credentials
+  stored`` for some users. (Fixes: :issue:`65`)
+
+- Fix wrong return type in the :meth:`Playlist.remove_tracks` docs.
+
+- Remove unused include of ``pthread.h``, which caused warnings from lintian.
+
+
 v1.7 (2012-04-22)
 =================
 

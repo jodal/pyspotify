@@ -2,6 +2,8 @@
 pyspotify
 =========
 
+.. image:: https://secure.travis-ci.org/mopidy/pyspotify.png?branch=develop
+
 pyspotify provides a Python interface to `Spotify's <http://www.spotify.com/>`_
 online music streaming service.
 

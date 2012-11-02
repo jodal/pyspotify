@@ -100,7 +100,7 @@ mock_albumbrowse(PyObject *self, PyObject *args, PyObject *kwds)
                 &PyList_Type, &py_copyrights, ENCODING, &review))
         return NULL;
 
-    num_tracks = PyList_GET_SIZE(py_tracks);
+    num_tracks = (int)PyList_GET_SIZE(py_tracks);
     tracks = malloc(num_tracks * sizeof(sp_track *));
     for (i = 0; i < num_tracks; i++) {
         tracks[i] = ((Track *)PyList_GET_ITEM(py_tracks, i))->_track;
@@ -112,7 +112,7 @@ mock_albumbrowse(PyObject *self, PyObject *args, PyObject *kwds)
         artist = py_artist->_artist;
 
     if (py_copyrights) {
-        num_copyrights = PyList_GET_SIZE(py_copyrights);
+        num_copyrights = (int)PyList_GET_SIZE(py_copyrights);
         copyrights = malloc(num_copyrights * sizeof(char *));
         for (i = 0; i < num_copyrights; i++) {
             copyrights[i] = PyBytes_AsString(PyList_GET_ITEM(py_copyrights, i));
@@ -153,19 +153,19 @@ mock_artistbrowse(PyObject *self, PyObject *args, PyObject *kwds)
                 &PyList_Type, &py_portraits, ENCODING, &biography, &type))
         return NULL;
 
-    num_tracks = PyList_GET_SIZE(py_tracks);
+    num_tracks = (int)PyList_GET_SIZE(py_tracks);
     tracks = malloc(num_tracks * sizeof(sp_track *));
     for (i = 0; i < num_tracks; i++) {
         tracks[i] = ((Track *)PyList_GET_ITEM(py_tracks, i))->_track;
     }
 
-    num_albums = PyList_GET_SIZE(py_albums);
+    num_albums = (int)PyList_GET_SIZE(py_albums);
     albums = malloc(num_albums * sizeof(sp_album *));
     for (i = 0; i < num_albums; i++) {
         albums[i] = ((Album *)PyList_GET_ITEM(py_albums, i))->_album;
     }
 
-    num_similar_artists = PyList_GET_SIZE(py_similar_artists);
+    num_similar_artists = (int)PyList_GET_SIZE(py_similar_artists);
     similar_artists = malloc(num_similar_artists * sizeof(sp_artist *));
     for (i = 0; i < num_similar_artists; i++) {
         similar_artists[i] =
@@ -173,7 +173,7 @@ mock_artistbrowse(PyObject *self, PyObject *args, PyObject *kwds)
     }
 
     if (py_portraits) {
-        num_portraits = PyList_GET_SIZE(py_portraits);
+        num_portraits = (int)PyList_GET_SIZE(py_portraits);
         portraits = malloc(num_portraits * sizeof(byte *));
         for (i = 0; i < num_portraits; i++) {
             portraits[i] = (byte *)PyBytes_AsString(
@@ -238,7 +238,7 @@ mock_track(PyObject *self, PyObject *args, PyObject *kwds)
             &is_placeholder))
         return NULL;
 
-    num_artists = PyList_GET_SIZE(py_artists);
+    num_artists = (int)PyList_GET_SIZE(py_artists);
     artists = malloc(num_artists * sizeof(sp_artist *));
     for (i = 0; i < num_artists; i++) {
         artists[i] = ((Artist *)PyList_GET_ITEM(py_artists, i))->_artist;
@@ -316,7 +316,7 @@ mock_playlist(PyObject *self, PyObject *args, PyObject *kwds)
                 &offline_download_completed))
         return NULL;
 
-    num_tracks = PyList_GET_SIZE(py_tracks);
+    num_tracks = (int)PyList_GET_SIZE(py_tracks);
     tracks = malloc(num_tracks * sizeof(sp_playlist_track_t));
     for (i = 0; i < num_tracks; i++) {
         create_time = 0;
@@ -334,7 +334,7 @@ mock_playlist(PyObject *self, PyObject *args, PyObject *kwds)
     }
 
     if (py_subscribers) {
-        count = PyList_GET_SIZE(py_subscribers);
+        count = (int)PyList_GET_SIZE(py_subscribers);
         names = (char **)malloc(count * sizeof(char *));
         for (i = 0; i < count; i++) {
             names[i] = PyBytes_AsString(PyList_GET_ITEM(py_subscribers, i));
@@ -381,7 +381,7 @@ mock_playlistcontainer(PyObject *self, PyObject *args, PyObject *kwds)
                                      &py_playlists, &is_loaded))
         return NULL;
 
-    num_playlists = PyList_GET_SIZE(py_playlists);
+    num_playlists = (int)PyList_GET_SIZE(py_playlists);
     playlists = malloc(num_playlists * sizeof(sp_playlistcontainer_playlist_t));
     for (i = 0; i < num_playlists; i++) {
         p = NULL;
@@ -476,19 +476,19 @@ mock_search(PyObject *self, PyObject *args, PyObject *kwds)
                 &total_artists, ENCODING, &did_you_mean, &error))
         return NULL;
 
-    num_tracks = PyList_GET_SIZE(py_tracks);
+    num_tracks = (int)PyList_GET_SIZE(py_tracks);
     tracks = malloc(num_tracks * sizeof(sp_track *));
     for (i = 0; i < num_tracks; i++) {
         tracks[i] = ((Track *)PyList_GET_ITEM(py_tracks, i))->_track;
     }
 
-    num_albums = PyList_GET_SIZE(py_albums);
+    num_albums = (int)PyList_GET_SIZE(py_albums);
     albums = malloc(num_albums * sizeof(sp_album *));
     for (i = 0; i < num_albums; i++) {
         albums[i] = ((Album *)PyList_GET_ITEM(py_albums, i))->_album;
     }
 
-    num_artists = PyList_GET_SIZE(py_artists);
+    num_artists = (int)PyList_GET_SIZE(py_artists);
     artists = malloc(num_artists * sizeof(sp_artist *));
     for (i = 0; i < num_artists; i++) {
         artists[i] =
@@ -574,19 +574,19 @@ mock_toplistbrowse(PyObject *self, PyObject *args, PyObject *kwds)
                 &error, &request_duration))
         return NULL;
 
-    num_tracks = PyList_GET_SIZE(py_tracks);
+    num_tracks = (int)PyList_GET_SIZE(py_tracks);
     tracks = malloc(num_tracks * sizeof(sp_track *));
     for (i = 0; i < num_tracks; i++) {
         tracks[i] = ((Track *)PyList_GET_ITEM(py_tracks, i))->_track;
     }
 
-    num_albums = PyList_GET_SIZE(py_albums);
+    num_albums = (int)PyList_GET_SIZE(py_albums);
     albums = malloc(num_albums * sizeof(sp_album *));
     for (i = 0; i < num_albums; i++) {
         albums[i] = ((Album *)PyList_GET_ITEM(py_albums, i))->_album;
     }
 
-    num_artists = PyList_GET_SIZE(py_artists);
+    num_artists = (int)PyList_GET_SIZE(py_artists);
     artists = malloc(num_artists * sizeof(sp_artist *));
     for (i = 0; i < num_artists; i++) {
         artists[i] = ((Artist *)PyList_GET_ITEM(py_artists, i))->_artist;

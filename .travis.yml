@@ -6,6 +6,7 @@ install:
   - "sudo apt-get update"
   - "sudo apt-get install $(apt-cache depends python-spotify | awk '$2 !~ /spotify/ {print $2}')"
   - "sudo apt-get install python-all-dev libmockspotify-dev libspotify-dev"
+  - "sudo python setup.py install"
 
 before_script:
   - "rm $VIRTUAL_ENV/lib/python$TRAVIS_PYTHON_VERSION/no-global-site-packages.txt"

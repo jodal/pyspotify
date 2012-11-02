@@ -5,7 +5,7 @@ install:
   - "sudo wget -q -O /etc/apt/sources.list.d/mopidy.list http://apt.mopidy.com/mopidy.list"
   - "sudo apt-get update"
   - "sudo apt-get install $(apt-cache depends python-spotify | awk '$2 !~ /spotify/ {print $2}')"
-  - "sudo apt-get install python-all-dev libmockspotify-dev libspotify-dev
+  - "sudo apt-get install python-all-dev libmockspotify-dev libspotify-dev"
 
 before_script:
   - "rm $VIRTUAL_ENV/lib/python$TRAVIS_PYTHON_VERSION/no-global-site-packages.txt"

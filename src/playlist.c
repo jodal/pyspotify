@@ -74,7 +74,7 @@ Playlist_remove_tracks(Playlist * self, PyObject *args)
         PyErr_SetString(PyExc_TypeError, "expected sequence");
         return NULL;
     }
-    num_tracks = PySequence_Size(py_tracks);
+    num_tracks = (int)PySequence_Size(py_tracks);
     tracks = (int *)malloc(sizeof(tracks) * num_tracks);
     playlist_length = sp_playlist_num_tracks(self->_playlist);
     for (i = 0; i < num_tracks; i++) {
@@ -837,7 +837,7 @@ Playlist_add_tracks(Playlist *self, PyObject *args)
     }
     if (!PyArg_ParseTuple(args, "iO!", &position, &PyList_Type, &tracks))
         return NULL;
-    num_tracks = PyList_GET_SIZE(tracks);
+    num_tracks = (int)PyList_GET_SIZE(tracks);
     if (num_tracks <= 0)
         Py_RETURN_NONE;
 

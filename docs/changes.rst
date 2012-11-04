@@ -4,6 +4,17 @@ Changes
 
 .. currentmodule:: spotify
 
+
+v1.8.1 (2012-11-04)
+===================
+
+Minor fix to ease Debian package building:
+
+- Replace ``Makefile`` used as a development convenience with Fabric and
+  ``fabfile.py``, so that debhelper doesn't think the project is built using
+  make.
+
+
 v1.8 (2012-11-04)
 =================
 

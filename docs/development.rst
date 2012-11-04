@@ -50,14 +50,25 @@ Then you can build pyspotify and run ``nosetests``::
 Continuous integration server
 =============================
 
-We run a continuous integration (CI) server at http://ci.mopidy.com/ that runs
-all test on multiple platforms (Ubuntu, OS X, etc.) for every commit we push to
-GitHub.
+pyspotify uses the free service `Travis CI
+<http://travis-ci.org/mopidy/pyspotify>`_ for automatically running the test
+suite when code is pushed to GitHub. This works both for the main pyspotify
+repo, but also for any forks. This way, any contributions to pyspotify through
+GitHub will automatically be tested by Travis CI, and the build status will be
+visible in the GitHub pull request interface, making it easier to evaluate the
+quality of pull requests.
 
-In addition to running tests, the CI server also gathers coverage statistics
-and uses pylint to check for errors and possible improvements in our code. So,
-if you're out of work, the code coverage and pylint data at the CI server
-should give you a place to start.
+In addition, we run a Jenkins CI server at http://ci.mopidy.com/ that runs all
+test on multiple platforms (Ubuntu, OS X, x86, arm) for every commit we push to
+the ``develop`` branch in the main pyspotify repo on GitHub. Thus, new code
+isn't tested by Jenkins before it is merged into the ``develop`` branch, which
+is a bit late, but good enough to get broad testing before new code is
+released.
+
+In addition to running tests, the Jenkins CI server also gathers coverage
+statistics and uses pylint to check for errors and possible improvements in our
+code. So, if you're out of work, the code coverage and pylint data at the CI
+server should give you a place to start.
 
 
 Writing documentation

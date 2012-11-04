@@ -2,6 +2,8 @@
 pyspotify
 =========
 
+.. image:: https://secure.travis-ci.org/mopidy/pyspotify.png?branch=develop
+
 pyspotify provides a Python interface to `Spotify's <http://www.spotify.com/>`_
 online music streaming service.
 
@@ -17,5 +19,6 @@ Project resources
 - `Documentation <http://pyspotify.mopidy.com/>`_
 - `Source code <http://github.com/mopidy/pyspotify>`_
 - `Issue tracker <http://github.com/mopidy/pyspotify/issues>`_
+- `CI server <http://travis-ci.org/mopidy/pyspotify>`_
 - IRC: ``#mopidy`` at `irc.freenode.net <http://freenode.net/>`_
 - `Download development snapshot <http://github.com/mopidy/pyspotify/tarball/develop#egg=pyspotify-dev>`_

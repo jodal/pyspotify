@@ -55,7 +55,7 @@ PlaylistFolder_dealloc(PlaylistFolder * self)
 static PyObject *
 PlaylistFolder_id(PlaylistFolder *self)
 {
-    return PyLong_FromLong(self->_id);
+    return PyLong_FromUnsignedLongLong(self->_id);
 }
 
 static PyObject *

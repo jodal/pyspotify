@@ -4,6 +4,17 @@ Changes
 
 .. currentmodule:: spotify
 
+v1.8 (2012-11-04)
+=================
+
+Updated to work with *libspotify* version 12:
+
+- ``sp_album_cover`` requires a preferred image size. For now, it's hard coded
+  to ``SP_IMAGE_SIZE_NORMAL``. Thanks to olle. (Fixes: :issue:`66`)
+
+Since the above API change to libspotify isn't reflected in the pyspotify API
+yet, there are no API changes between v1.7.1 and 1.8.
+
 
 v1.7.1 (2012-09-07)
 ===================

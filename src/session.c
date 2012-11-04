@@ -822,6 +822,7 @@ session_connect(PyObject *self, PyObject *args)
     sp_error error;
     char *username, *password;
     char *cache_location, *settings_location, *user_agent;
+    char *proxy, *proxy_username, *proxy_password;
     bool relogin = 0, remember_me;
     char *blob = NULL;
 
@@ -883,6 +884,39 @@ session_connect(PyObject *self, PyObject *args)
         fprintf(stderr, "[DEBUG]-session- User agent set to '%s'\n",
                             user_agent);
 #endif
+
+    proxy = PySpotify_GetConfigString(client, "proxy", 1);
+    if (!proxy)
+        return NULL;
+    if ((long) proxy != -1) {
+    config.proxy = proxy;
+#ifdef DEBUG
+    fprintf(stderr, "[DEBUG]-session- Proxy set to '%s'\n", proxy);
+#endif
+    }
+
+    proxy_username = PySpotify_GetConfigString(client, "proxy_username", 1);
+    if (!proxy_username)
+       return NULL;
+    if ((long) proxy_username != (-1)) {
+        config.proxy_username = proxy_username;
+#ifdef DEBUG
+        fprintf(stderr, "[DEBUG]-session- Proxy username set to '%s'\n",
+            proxy_username);
+#endif
+    }
+
+    proxy_password = PySpotify_GetConfigString(client, "proxy_password", 1);
+    if (!proxy_password)
+       return NULL;
+    if ((long) proxy_password != (-1)) {
+        config.proxy_password = proxy_password;
+#ifdef DEBUG
+        fprintf(stderr, "[DEBUG]-session- Proxy password set to '%s'\n",
+            proxy_password);
+#endif
+    }
+
     username = PySpotify_GetConfigString(client, "username", 1);
     if (!username)
         return NULL;

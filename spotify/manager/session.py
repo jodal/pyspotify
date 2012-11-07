@@ -40,6 +40,7 @@ class SpotifySessionManager(object):
         self.login_blob = login_blob
         if self.application_key is None:
             self.application_key = open(self.appkey_file).read()
+        self.session = Session.create(self)
 
     def connect(self):
         """
@@ -50,8 +51,7 @@ class SpotifySessionManager(object):
         This method does not return before we disconnect from the Spotify
         service.
         """
-        session = spotify.connect(self)
-        self.loop(session) # returns on disconnect
+        self.loop(self.session) # returns on disconnect
 
     def loop(self, session):
         """

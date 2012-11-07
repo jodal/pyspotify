@@ -6,7 +6,7 @@ Session handling
 The session handling is usually done by inheriting the
 :class:`spotify.manager.SpotifySessionManager` class from the
 :mod:`spotify.manager` module.  Then the manager's :meth:`connect` method calls
-the :func:`spotify.connect` function.
+the :meth:`Session.create` and :meth:`Session.connect` functions.
 
 .. function:: connect(session_manager)
 
@@ -25,6 +25,41 @@ The :class:`Session` class
 .. class:: Session
 
     A Spotify session object.
+
+    .. classmethod:: create(settings)
+
+        Creates a new Spotify session. Call once per process.
+
+        :param settings: an object that has the sessions settings as attributes
+        :returns: a :class:`Session` object embedding the newly created
+                  Spotify session
+
+
+    .. method:: connect(username[, password, remember_me, blob])
+
+        Connects the specified user to the Spotify service.
+
+        The application must not store any user password in plain text. If
+        password storage is needed, the application must store the encrypted
+        binary blob corresponding to the user and obtained via the
+        :meth:`manager.SpotifySessionManager.credentials_blob_updated` session
+        callback. One of ``password`` or ``blob`` must be specified.
+
+        :param username:    the user's login to Spotify Premium
+        :type username:     string
+        :param password:    the user's password to Spotify Premium
+        :type password:     string
+        :param remember_me: set this flag if you want libspotify to remember
+                            this user
+        :type remember_me:  ``bool``
+        :param blob:        binary login blob
+        :type blob:         ``str``
+
+    .. method:: reconnect()
+
+        Use this method if you want to re-login the last user who set the
+        ``remember_me`` flag in :meth:`Session.connect`
+
 
     .. method:: browse_album(album, callback[ ,userdata])
 

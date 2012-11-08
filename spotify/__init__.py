@@ -32,6 +32,3 @@ from spotify._spotify import User
 from spotify._spotify import ToplistBrowser
 
 from spotify._spotify import api_version
-from spotify._spotify import connect
-
-

@@ -426,7 +426,7 @@ Session_reconnect(Session *self)
 }
 
 static PyMethodDef Session_methods[] = {
-    {"create",   (PyCFunction)Session_create, METH_CLASS,
+    {"create",   (PyCFunction)Session_create, METH_VARARGS | METH_CLASS,
      "Returns a Session object embedding a newly created Spotify session"},
     {"username", (PyCFunction)Session_username, METH_NOARGS,
      "Return the canonical username for the logged in user"},

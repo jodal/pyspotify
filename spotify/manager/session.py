@@ -51,6 +51,7 @@ class SpotifySessionManager(object):
         This method does not return before we disconnect from the Spotify
         service.
         """
+        self.session.connect(self.username, self.password)
         self.loop(self.session) # returns on disconnect
 
     def loop(self, session):

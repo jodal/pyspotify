@@ -375,17 +375,16 @@ Session_flush_caches(Session * self)
 static PyObject *
 Session_connect(Session *self, PyObject *args, PyObject *kwds)
 {
-    char *username, *password;
+    char *username, *password = NULL;
     int remember_me = 1;
     char *blob = NULL;
-    int blob_len;
     sp_error error;
     static char *kwlist[] = { "username", "password", "remember_me",
                               "blob", NULL };
 
-    if (!PyArg_ParseTupleAndKeywords(args, kwds, "es|eziz#", kwlist,
+    if (!PyArg_ParseTupleAndKeywords(args, kwds, "es|esiz", kwlist,
                                      ENCODING, &username, ENCODING, &password,
-                                     &remember_me, &blob, &blob_len));
+                                     &remember_me, &blob))
         return NULL;
 
     if ((!password) && (!blob)) {

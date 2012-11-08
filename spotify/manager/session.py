@@ -40,7 +40,7 @@ class SpotifySessionManager(object):
         self.login_blob = login_blob
         if self.application_key is None:
             self.application_key = open(self.appkey_file).read()
-        self.session = Session.create(self)
+        self.session = spotify.Session.create(self)
 
     def connect(self):
         """

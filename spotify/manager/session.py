@@ -45,13 +45,17 @@ class SpotifySessionManager(object):
     def connect(self):
         """
         Connect to the Spotify API using the given username and password.
-
-        This method calls the :func:`spotify.connect` function.
+        If ``username`` is ``None``, reconnection of the last user will
+        be attempted.
 
         This method does not return before we disconnect from the Spotify
         service.
         """
-        self.session.connect(self.username, self.password)
+        if self.username is None:
+            self.session.reconnect()
+        else:
+            self.session.connect(self.username, self.password,
+                                 self.remember_me)
         self.loop(self.session) # returns on disconnect
 
     def loop(self, session):

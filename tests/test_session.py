@@ -9,7 +9,7 @@ import spotify.manager.session
 spotify.manager.session.spotify = spotify._mockspotify
 
 from spotify.manager import SpotifySessionManager
-from spotify._mockspotify import mock_track, mock_album
+from spotify._mockspotify import mock_track, mock_album, Session
 
 
 class BaseMockClient(SpotifySessionManager):
@@ -35,6 +35,10 @@ class BaseMockUnicodeClient(SpotifySessionManager):
         self.awoken = threading.Event() # used to block until awoken
 
 class TestSession(unittest.TestCase):
+
+    def test_create(self):
+        c = BaseMockClient()
+        session = Session.create(c)
 
     def test_initialisation(self):
         class MockClient(BaseMockClient):

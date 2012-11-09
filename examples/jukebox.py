@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+# -*- coding: utf8 -*-
 
 import cmd
 import logging
@@ -7,7 +8,7 @@ import sys
 import threading
 import time
 
-from spotify import ArtistBrowser, Link, ToplistBrowser
+from spotify import ArtistBrowser, Link, ToplistBrowser, SpotifyError
 from spotify.audiosink import import_audio_sink
 from spotify.manager import (SpotifySessionManager, SpotifyPlaylistManager,
     SpotifyContainerManager)
@@ -87,25 +88,29 @@ class JukeboxUI(cmd.Cmd, threading.Thread):
         if not line:
             self.jukebox.play()
             return
-        if line.startswith("spotify:"):
-            # spotify url
-            l = Link.from_string(line)
-            if not l.type() == Link.LINK_TRACK:
-                print "You can only play tracks!"
-                return
-            self.jukebox.load_track(l.as_track())
-        else:
-            try:
-                playlist, track = map(int, line.split(' ', 1))
-                self.jukebox.load(playlist, track)
-            except ValueError:
-                try:
-                    playlist = int(line)
-                    self.jukebox.load_playlist(playlist)
-                except ValueError:
-                    print("Usage: play [track_link] | "
-                          "[playlist] [track] | [playlist]")
+        try:
+            if line.startswith("spotify:"):
+                # spotify url
+                l = Link.from_string(line)
+                if not l.type() == Link.LINK_TRACK:
+                    print "You can only play tracks!"
                     return
+                self.jukebox.load_track(l.as_track())
+            else:
+                try:
+                    playlist, track = map(int, line.split(' ', 1))
+                    self.jukebox.load(playlist, track)
+                except ValueError:
+                    try:
+                        playlist = int(line)
+                        self.jukebox.load_playlist(playlist)
+                    except ValueError:
+                        print("Usage: play [track_link] | "
+                              "[playlist] [track] | [playlist]")
+                        return
+        except SpotifyError as e:
+            print "Unable to load track:", e
+            return
         self.jukebox.play()
 
     def do_browse(self, line):
@@ -323,11 +328,19 @@ class Jukebox(SpotifySessionManager):
         self.ui.cmdqueue.append("quit")
 
     def load_track(self, track):
+        print u"Loading track…"
+        while not track.is_loaded():
+            time.sleep(0.1)
+        if track.is_autolinked(): # if linked, load the target track instead
+            print "Autolinked track, loading the linked-to track"
+            return self.load_track(track.playable())
+        if track.availability() != 1:
+            print "Track not available (%s)" % track.availability()
         if self.playing:
             self.stop()
         self.new_track_playing(track)
         self.session.load(track)
-        print "Loading %s" % track.name()
+        print "Loaded track: %s" % track.name()
 
     def load(self, playlist, track):
         if self.playing:

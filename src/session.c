@@ -21,7 +21,7 @@ static int session_constructed = 0;
 sp_session *g_session;
 
 static int
-create_session(Session *self, PyObject *client);
+create_session(Session *self, PyObject *client, PyObject *settings);
 
 static PyObject *
 Session_new(PyTypeObject *type, PyObject *args, PyObject *kwds)
@@ -51,15 +51,16 @@ Session_create(PyTypeObject *type, PyObject *args)
 {
     Session *self;
     PyObject *client;
+    PyObject *settings;
 
-    if (!PyArg_ParseTuple(args, "O", &client))
+    if (!PyArg_ParseTuple(args, "OO", &client, &settings))
         return NULL;
 
     self = (Session *) PyObject_Call((PyObject *)type, args, NULL);
 
     PyEval_InitThreads();
 
-    if (create_session(self, client) != 0) {
+    if (create_session(self, client, settings) != 0) {
         Py_XDECREF(self);
         return NULL;
     }
@@ -895,7 +896,7 @@ static sp_session_callbacks g_callbacks = {
 };
 
 static int
-create_session(Session *self, PyObject *client)
+create_session(Session *self, PyObject *client, PyObject *settings)
 {
     sp_session_config config;
     sp_session *session;
@@ -907,7 +908,7 @@ create_session(Session *self, PyObject *client)
     config.userdata = (void *)client;
     config.callbacks = &g_callbacks;
 
-    cache_location = PySpotify_GetConfigString(client, "cache_location", 0);
+    cache_location = PySpotify_GetConfigString(settings, "cache_location", 0);
     if (!cache_location)
         return -1;
     config.cache_location = cache_location;
@@ -916,7 +917,7 @@ create_session(Session *self, PyObject *client)
             cache_location);
 #endif
 
-    settings_location = PySpotify_GetConfigString(client,
+    settings_location = PySpotify_GetConfigString(settings,
                                                   "settings_location", 0);
     config.settings_location = settings_location;
 #ifdef DEBUG
@@ -925,7 +926,7 @@ create_session(Session *self, PyObject *client)
 #endif
 
     PyObject *application_key =
-        PyObject_GetAttr(client, PyBytes_FromString("application_key"));
+        PyObject_GetAttr(settings, PyBytes_FromString("application_key"));
     if (!application_key) {
         PyErr_SetString(SpotifyError,
                         "application_key not set");
@@ -944,7 +945,7 @@ create_session(Session *self, PyObject *client)
     config.application_key = PyMem_Malloc(l_appkey);
     memcpy((char *)config.application_key, s_appkey, l_appkey);
 
-    user_agent = PySpotify_GetConfigString(client, "user_agent", 0);
+    user_agent = PySpotify_GetConfigString(settings, "user_agent", 0);
     if (!user_agent)
         return -1;
     if (strlen(user_agent) > 255) {

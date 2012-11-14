@@ -2,6 +2,7 @@ import logging
 import Queue
 
 import spotify
+from spotify import Settings
 
 logger = logging.getLogger('pyspotify.manager.session')
 
@@ -24,7 +25,6 @@ class SpotifySessionManager(object):
           login to the Spotify AP.
     """
 
-    api_version = spotify.api_version
     cache_location = 'tmp'
     settings_location = 'tmp'
     application_key = None
@@ -34,13 +34,24 @@ class SpotifySessionManager(object):
     def __init__(self, username=None, password=None, remember_me=False,
                  login_blob=''):
         self._cmdqueue = Queue.Queue()
+
+        # Session settings
+        self.settings = Settings()
+        if self.application_key is None:
+            self.application_key = open(self.appkey_file).read()
+        self.settings.application_key   = self.application_key
+        self.settings.cache_location    = self.cache_location
+        self.settings.settings_location = self.settings_location
+        self.settings.user_agent        = self.user_agent
+
+        # Connection settings
         self.username = username
         self.password = password
         self.remember_me = remember_me
         self.login_blob = login_blob
-        if self.application_key is None:
-            self.application_key = open(self.appkey_file).read()
-        self.session = spotify.Session.create(self)
+
+        # Create session
+        self.session = spotify.Session.create(self, self.settings)
 
     def connect(self):
         """

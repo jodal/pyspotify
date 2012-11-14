@@ -17,6 +17,8 @@ def _add_null_handler_for_logging():
 _add_null_handler_for_logging()
 # pylint: enable = W0404
 
+from settings import Settings
+
 from spotify._spotify import Session
 from spotify._spotify import Track
 from spotify._spotify import Artist

@@ -8,16 +8,6 @@ The session handling is usually done by inheriting the
 :mod:`spotify.manager` module.  Then the manager's :meth:`connect` method calls
 the :meth:`Session.create` and :meth:`Session.connect` functions.
 
-.. function:: connect(session_manager)
-
-    Connect to the Spotify API using a session manager. The callbacks must
-    have been defined in that class. See
-    :class:`SpotifySessionManager <spotify.manager.SpotifySessionManager>`
-    for reference.
-
-    Returns the newly created session as a :class:`spotify.Session` object.
-
-
 The :class:`Session` class
 ==========================
 .. currentmodule:: spotify
@@ -26,11 +16,12 @@ The :class:`Session` class
 
     A Spotify session object.
 
-    .. classmethod:: create(settings)
+    .. classmethod:: create(manager, settings)
 
         Creates a new Spotify session. Call once per process.
 
-        :param settings: an object that has the sessions settings as attributes
+        :param manager: an object that has the session callbacks as methods
+        :param settings: an :class:`Settings` object
         :returns: a :class:`Session` object embedding the newly created
                   Spotify session
 

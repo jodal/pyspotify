@@ -313,14 +313,15 @@ class Jukebox(SpotifySessionManager):
         if error:
             print error
             return
-        self.session = session
+        print "Logged in!"
         self.ctr = session.playlist_container()
         self.container_manager.watch(self.ctr)
         self.starred = session.starred()
-        self.ui.start()
+        if not self.ui.is_alive():
+            self.ui.start()
 
     def logged_out(self, session):
-        self.ui.cmdqueue.append("quit")
+        print "Logged out!"
 
     def load_track(self, track):
         if self.playing:

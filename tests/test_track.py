@@ -50,3 +50,6 @@ class TestTrack(unittest.TestCase):
 
     def test_is_local(self):
         self.assertFalse(self.track.is_local())
+
+    def test_is_autolinked(self):
+        self.assertFalse(self.track.is_autolinked())

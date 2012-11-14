@@ -56,6 +56,14 @@ The :class:`Track` class
         .. note:: This function returns valid data only for tracks appearing in
             a browse artist or browse album result (otherwise returns 0).
 
+    .. method:: is_autolinked()
+
+        :rtype:     :class:`int`
+        :returns:   wether this track is linked to another track
+
+        If the application wants to play this track, it has to call
+        :meth:`playable()` on the track to obtain the linked track.
+
     .. method:: is_loaded()
 
         :rtype:     :class:`int`
@@ -76,6 +84,13 @@ The :class:`Track` class
 
         :rtype:     :class:`String`
         :returns:   The name of this track.
+
+    .. method:: playable()
+
+        :rtype:     :class:`Track`
+        :returns:   the playable track for this track
+
+        When calling this method on a linked track, returns the linked track.
 
     .. method:: popularity()
 

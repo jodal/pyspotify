@@ -9,7 +9,7 @@ Users
     .. method:: is_loaded
 
         :rtype:     :class:`bool`
-        :returns:   wether the user is loaded.
+        :returns:   whether the user is loaded.
 
     .. method:: canonical_name
 

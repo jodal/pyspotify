@@ -59,7 +59,7 @@ The :class:`Track` class
     .. method:: is_autolinked()
 
         :rtype:     :class:`int`
-        :returns:   wether this track is linked to another track
+        :returns:   whether this track is linked to another track
 
         If the application wants to play this track, it has to call
         :meth:`playable()` on the track to obtain the linked track.
@@ -104,5 +104,5 @@ The :class:`Track` class
         :param set:     If given, set the starred status of the track.
         :type set:      :class:`bool`
         :rtype:         :class:`bool`
-        :returns:       Wether the track is starred or not.
+        :returns:       Whether the track is starred or not.
 

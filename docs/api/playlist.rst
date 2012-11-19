@@ -138,7 +138,7 @@ objects.
     .. method:: is_loaded
 
         :rtype:     :class:`int`
-        :returns:   wether this playlist has been loaded by the client
+        :returns:   whether this playlist has been loaded by the client
 
     .. method:: name
 

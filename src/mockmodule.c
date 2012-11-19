@@ -219,7 +219,7 @@ mock_track(PyObject *self, PyObject *args, PyObject *kwds)
     sp_artist **artists;
     PyObject *py_artists;
     Album *album;
-    Track *playable;
+    Track *playable = NULL;
     sp_track *sp_playable = NULL;
     int duration=0, popularity=0, disc=0, index=0;
     sp_error error = SP_ERROR_OK;

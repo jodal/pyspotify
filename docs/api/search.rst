@@ -32,7 +32,7 @@ The :class:`Results` class
     .. method:: is_loaded
 
         :rtype:     :class:`int`
-        :returns:   Wether the results metadata are loaded.
+        :returns:   Whether the results metadata are loaded.
 
     .. method:: query
 

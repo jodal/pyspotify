@@ -84,7 +84,7 @@ The :class:`Session` class
         :param track:   a track
         :type track:    :class:`Track`
         :rtype:         :class:`int`
-        :returns:       Wether the track is available for playback.
+        :returns:       Whether the track is available for playback.
 
     .. method:: load(track)
 

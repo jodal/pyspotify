@@ -26,7 +26,7 @@ def fullsplit(path, result=None):
 
 def with_mock():
     """
-    Checks wether the user wants to build the mockmodule (off by default).
+    Checks whether the user wants to build the mockmodule (off by default).
     """
     try:
         sys.argv.remove('--with-mock')

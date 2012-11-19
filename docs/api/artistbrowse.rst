@@ -31,7 +31,7 @@ The :class:`ArtistBrowser` class
     .. method:: is_loaded
 
         :rtype:     :class:`int`
-        :returns:   wether this artist browser has finished loading metadata.
+        :returns:   whether this artist browser has finished loading metadata.
 
     .. method:: albums
 

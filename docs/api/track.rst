@@ -91,6 +91,7 @@ The :class:`Track` class
         :returns:   the playable track for this track
 
         When calling this method on a linked track, returns the linked track.
+        On a non-linked track, returns the track itself.
 
     .. method:: popularity()
 

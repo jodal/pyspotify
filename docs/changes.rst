@@ -8,6 +8,12 @@ Changes
 v1.8.1 (2012-11-04)
 ===================
 
+***New Features***
+
+- Added optional parameters ``proxy``, ``proxy_username``, ``proxy_password``
+  to the ``connect`` function and the session manager, to allow libspotify to
+  connect to the Spotify service through an authenticated proxy. Thans to Dvad.
+
 Minor fix to ease Debian package building:
 
 - Replace ``Makefile`` used as a development convenience with Fabric and

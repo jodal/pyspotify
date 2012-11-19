@@ -22,6 +22,13 @@ class SpotifySessionManager(object):
           the re-login feature. The blob is obtained from the
           :meth:`credentials_blob_updated` callback after a successful
           login to the Spotify AP.
+
+    When behind a proxy, the application can specify:
+        - `proxy`: url to the proxy server that should be used. The format
+            is ``protocol://<host>:port`` (where protocol is
+            ``http/https/socks4/socks5``)
+        - `proxy_username`: username to authenticate with the proxy server.
+        - `proxy_password`: password to authenticate with the proxy server.
     """
 
     api_version = spotify.api_version

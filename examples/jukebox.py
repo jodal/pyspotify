@@ -328,7 +328,7 @@ class Jukebox(SpotifySessionManager):
         self.ui.cmdqueue.append("quit")
 
     def load_track(self, track):
-        print u"Loading track…"
+        print u"Loading track..."
         while not track.is_loaded():
             time.sleep(0.1)
         if track.is_autolinked(): # if linked, load the target track instead

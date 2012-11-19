@@ -219,6 +219,8 @@ mock_track(PyObject *self, PyObject *args, PyObject *kwds)
     sp_artist **artists;
     PyObject *py_artists;
     Album *album;
+    Track *playable;
+    sp_track *sp_playable = NULL;
     int duration=0, popularity=0, disc=0, index=0;
     sp_error error = SP_ERROR_OK;
     bool is_loaded=1, is_local=0, is_autolinked=0, is_starred=0, is_placeholder=0;
@@ -229,13 +231,14 @@ mock_track(PyObject *self, PyObject *args, PyObject *kwds)
     static char *kwlist[] =
         { "name", "artists", "album", "duration", "popularity", "disc",
           "index", "error", "is_loaded", "availability", "status", "is_local",
-          "is_autolinked", "is_starred", "is_placeholder", NULL };
+          "is_autolinked", "is_starred", "is_placeholder", "playable", NULL };
 
-    if (!PyArg_ParseTupleAndKeywords(args, kwds, "esO!O!|iiiiibiibbbb", kwlist,
+    if (!PyArg_ParseTupleAndKeywords(args, kwds, "esO!O!|iiiiibiibbbbO!",
+            kwlist,
             ENCODING, &name, &PyList_Type, &py_artists, &AlbumType, &album,
             &duration, &popularity, &disc, &index, &error, &is_loaded,
             &availability, &status, &is_local, &is_autolinked, &is_starred,
-            &is_placeholder))
+            &is_placeholder, &TrackType, &playable))
         return NULL;
 
     num_artists = (int)PyList_GET_SIZE(py_artists);
@@ -243,11 +246,13 @@ mock_track(PyObject *self, PyObject *args, PyObject *kwds)
     for (i = 0; i < num_artists; i++) {
         artists[i] = ((Artist *)PyList_GET_ITEM(py_artists, i))->_artist;
     }
+    if (playable)
+        sp_playable = playable->_track;
 
     track = mocksp_track_create(name, num_artists, artists, album->_album,
                                 duration, popularity, disc, index, error,
                                 is_loaded, availability, status, is_local,
-                                is_autolinked, NULL, is_starred,
+                                is_autolinked, sp_playable, is_starred,
                                 is_placeholder);
     return Track_FromSpotify(track);
 }

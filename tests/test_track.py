@@ -8,6 +8,8 @@ class TestTrack(unittest.TestCase):
     artists = [mock_artist('artist1'), mock_artist('artist2')]
     album = mock_album('album1', artists[0])
     track = mock_track(u'æâ€êþÿ', artists, album, 10, 20, 30, 40)
+    track_linked = mock_track(u'linked', artists, album, 10, 20, 30, 40,
+                              is_autolinked=1, playable=track)
 
     def test_artists(self):
         self.assertEqual([x.name() for x in self.track.artists()], ['artist1',
@@ -50,3 +52,11 @@ class TestTrack(unittest.TestCase):
 
     def test_is_local(self):
         self.assertFalse(self.track.is_local())
+
+    def test_is_autolinked(self):
+        self.assertFalse(self.track.is_autolinked())
+        self.assertTrue(self.track_linked.is_autolinked())
+
+    def test_playable(self):
+        self.assertEqual(self.track_linked.playable().name(),
+                         self.track.name())

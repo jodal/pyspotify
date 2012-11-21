@@ -157,6 +157,18 @@ Track_is_local(Track *self)
     return PyBool_FromLong(sp_track_is_local(g_session, self->_track));
 }
 
+static PyObject *
+Track_is_autolinked(Track *self)
+{
+    return PyBool_FromLong(sp_track_is_autolinked(g_session, self->_track));
+}
+
+static PyObject *
+Track_get_playable(Track *self)
+{
+    return Track_FromSpotify(sp_track_get_playable(g_session, self->_track));
+}
+
 static PyMethodDef Track_methods[] = {
     {"availability",
      (PyCFunction)Track_availability,
@@ -169,7 +181,7 @@ static PyMethodDef Track_methods[] = {
     {"is_local",
      (PyCFunction)Track_is_local,
      METH_NOARGS,
-     "Returns wether this track is local, ie. created with the API."},
+     "Returns whether this track is local, ie. created with the API."},
     {"artists",
      (PyCFunction)Track_artists,
      METH_VARARGS,
@@ -206,6 +218,14 @@ static PyMethodDef Track_methods[] = {
      (PyCFunction)Track_starred,
      METH_VARARGS | METH_KEYWORDS,
      "Get/set the starred property of the track"},
+    {"is_autolinked",
+     (PyCFunction)Track_is_autolinked,
+     METH_NOARGS,
+     "Returns whether this track is a link to another track"},
+    {"playable",
+     (PyCFunction)Track_get_playable,
+     METH_NOARGS,
+     "Return the actual track that will be played if this track is played"},
     {NULL}
 };
 

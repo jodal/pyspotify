@@ -5,6 +5,23 @@ Changes
 .. currentmodule:: spotify
 
 
+v1.9 (2012-11-20)
+=================
+
+This version, like 1.8, is compatible with *libspotify* version 12.
+
+**New features**
+
+- Added optional parameters ``proxy``, ``proxy_username``, ``proxy_password``
+  to :class:`spotify.manager.SpotifySessionManager`, to allow libspotify to
+  connect to the Spotify service through an authenticated proxy. Thanks to
+  Dvad.
+
+- Added methods :meth:`spotify.Track.is_autolinked` and
+  :meth:`spotify.Track.playable` to support autolinked tracks. (Fixes:
+  :issue:`74`)
+
+
 v1.8.1 (2012-11-04)
 ===================
 

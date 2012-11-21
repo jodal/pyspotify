@@ -21,5 +21,5 @@ The :class:`AlbumBrowser` class
     .. method:: is_loaded
 
         :rtype:     :class:`int`
-        :returns:   wether this album browser has finished loading metadata.
+        :returns:   whether this album browser has finished loading metadata.
 

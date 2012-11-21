@@ -19,6 +19,22 @@ class Settings:
     cache.
     """
 
+    proxy = None
+    """
+    Url to the proxy server that should be used. The format is
+    ``protocol://<host>:port`` (where protocol is http/https/socks4/socks5).
+    """
+
+    proxy_password = None
+    """
+    Password to authenticate with the proxy server.
+    """
+
+    proxy_username = None
+    """
+    Username to authenticate with proxy server.
+    """
+
     settings_location = 'tmp'
     """
     The location where Spotify will write setting files and per-user cache

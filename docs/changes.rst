@@ -5,6 +5,12 @@ Changes
 .. currentmodule:: spotify
 
 
+v1.9.1 (in development)
+=======================
+
+- Fixed memory leak caused by the ``from_*`` methods on :class:`spotify.Link`.
+
+
 v1.9 (2012-11-20)
 =================
 

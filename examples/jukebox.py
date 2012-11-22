@@ -48,6 +48,7 @@ class JukeboxUI(cmd.Cmd, threading.Thread):
     def do_list(self, line):
         """ List the playlists, or the contents of a playlist """
         if not line:
+            i = -1
             for i, p in enumerate(self.jukebox.ctr):
                 if p.is_loaded():
                     print "%3d %s" % (i, p.name())

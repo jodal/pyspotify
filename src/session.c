@@ -305,9 +305,7 @@ Session_set_preferred_bitrate(Session * self, PyObject *args)
     if (!PyArg_ParseTuple(args, "i", &bitrate))
         return NULL;
 
-    Py_BEGIN_ALLOW_THREADS;
     sp_session_preferred_bitrate(self->_session, bitrate);
-    Py_END_ALLOW_THREADS;
 
     Py_RETURN_NONE;
 }

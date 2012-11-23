@@ -5,10 +5,16 @@ Changes
 .. currentmodule:: spotify
 
 
-v1.9.1 (in development)
-=======================
+v1.9.1 (2012-11-23)
+===================
+
+This version, like 1.9, is compatible with *libspotify* version 12.
+
+**Bug fixes**
 
 - Fixed memory leak caused by the ``from_*`` methods on :class:`spotify.Link`.
+  The memory leak was introduced in v1.2 in June 2011, so all users should
+  really update to this version.
 
 
 v1.9 (2012-11-20)

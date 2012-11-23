@@ -119,14 +119,7 @@ Session_playlist_container(Session * self)
     pc = sp_session_playlistcontainer(self->_session);
     Py_END_ALLOW_THREADS;
 
-    PlaylistContainer *ppc =
-        (PlaylistContainer *) PyObject_CallObject((PyObject *)
-                                                  &PlaylistContainerType,
-                                                  NULL);
-
-    ppc->_playlistcontainer = pc;
-    sp_playlistcontainer_add_ref(pc);
-    return (PyObject *)ppc;
+    return PlaylistContainer_FromSpotify(pc);
 }
 
 static PyObject *
@@ -226,7 +219,6 @@ Session_search(Session * self, PyObject *args, PyObject *kwds)
         album_offset = 0, album_count = 32, artist_offset = 0, artist_count =
         32, playlist_offset = 0, playlist_count = 32;
     Callback *st;
-    PyObject *results;
     sp_search_type search_type = SP_SEARCH_STANDARD;
     char *str_search_type = NULL;
 
@@ -271,26 +263,21 @@ Session_search(Session * self, PyObject *args, PyObject *kwds)
                               (void *)st);
     Py_END_ALLOW_THREADS;
 
-    results = Results_FromSpotify(search);
-    return results;
+    return Results_FromSpotify(search);
 }
 
 static PyObject *
 Session_browse_album(Session * self, PyObject *args, PyObject *kwds)
 {
     /* Deprecated, calls the AlbumBrowserType object */
-    PyObject *result =
-        PyObject_Call((PyObject *)&AlbumBrowserType, args, kwds);
-    return result;
+    return PyObject_Call((PyObject *)&AlbumBrowserType, args, kwds);
 }
 
 static PyObject *
 Session_browse_artist(Session * self, PyObject *args, PyObject *kwds)
 {
     /* Deprecated, calls the ArtistBrowserType object */
-    PyObject *result =
-        PyObject_Call((PyObject *)&ArtistBrowserType, args, kwds);
-    return result;
+    return PyObject_Call((PyObject *)&ArtistBrowserType, args, kwds);
 }
 
 static PyObject *
@@ -318,9 +305,7 @@ Session_set_preferred_bitrate(Session * self, PyObject *args)
     if (!PyArg_ParseTuple(args, "i", &bitrate))
         return NULL;
 
-    Py_BEGIN_ALLOW_THREADS;
     sp_session_preferred_bitrate(self->_session, bitrate);
-    Py_END_ALLOW_THREADS;
 
     Py_RETURN_NONE;
 }

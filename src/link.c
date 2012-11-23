@@ -29,7 +29,6 @@ Link_FromSpotify(sp_link * link)
     PyObject *l = PyObject_CallObject((PyObject *)&LinkType, NULL);
 
     ((Link *) l)->_link = link;
-    sp_link_add_ref(link);
     return l;
 }
 

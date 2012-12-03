@@ -8,3 +8,6 @@ except ImportError:
     except ImportError: # Failsafe
         class SkipTest(Exception):
             pass
+
+import os
+os.environ['USE_LIBMOCKSPOTIFY'] = '1'

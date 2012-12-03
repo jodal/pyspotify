@@ -143,8 +143,16 @@ The :class:`Session` class
 
     .. method:: set_preferred_bitrate(bitrate)
 
-        Set the preferred bitrate for the audio stream. ``0`` = 160kbps,
-        ``1`` = 320kbps.
+        Set the preferred bitrate for the audio stream.
+
+        ``0``:
+            160 kbps
+
+        ``1``:
+            320 kbps
+
+        ``2``:
+            96 kbps
 
     .. method:: starred()
 

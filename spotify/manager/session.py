@@ -103,6 +103,8 @@ class SpotifySessionManager(object):
                 elif message.get('command') == 'disconnect':
                     logger.debug('Got message; disconnecting')
                     session.logout()
+                elif message.get('command') == 'stop':
+                    logger.debug('Got message; stopping main loop')
                     running = False
                 else:
                     raise ValueError('Unknown message type')
@@ -133,6 +135,21 @@ class SpotifySessionManager(object):
         :type error: string or :class:`None`
         """
         pass
+
+    def _manager_logged_out(self, session):
+        """
+        Callback.
+
+        The user has or has been logged out from Spotify.
+        This is a wrapper method around `logged_out` that
+        also stops the manager's main loop. Don't override
+        this method.
+
+        :param session: the current session.
+        :type session: :class:`spotify.Session`
+        """
+        self._cmdqueue.put({'command': 'stop'})
+        self.logged_out(session)
 
     def logged_out(self, session):
         """

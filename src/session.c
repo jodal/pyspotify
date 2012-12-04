@@ -560,7 +560,7 @@ logged_out(sp_session * session)
     psession->_session = session;
     PyObject *client = (PyObject *)sp_session_userdata(session);
 
-    method = PyObject_GetAttrString(client, "logged_out");
+    method = PyObject_GetAttrString(client, "_manager_logged_out");
     res = PyObject_CallFunctionObjArgs(method, psession, NULL);
     if (!res)
         PyErr_WriteUnraisable(method);

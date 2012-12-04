@@ -1,0 +1,5 @@
+usr/share/doc/python-spotify-doc/html usr/share/doc/python-spotify/html
+usr/share/doc/python-spotify-doc/rst usr/share/doc/python-spotify/rst
+usr/share/doc/python-spotify-doc/html/_sources usr/share/doc/python-spotify-doc/rst
+usr/share/javascript/jquery/jquery.min.js usr/share/doc/python-spotify-doc/html/_static/jquery.js
+usr/share/javascript/underscore/underscore.min.js usr/share/doc/python-spotify-doc/html/_static/underscore.js

@@ -1,0 +1,187 @@
+python-spotify (1.9.1-1) unstable; urgency=low
+
+  * New upstream releease.
+
+ -- Stein Magnus Jodal <stein.magnus@jodal.no>  Fri, 23 Nov 2012 01:09:56 +0100
+
+python-spotify (1.9-1) unstable; urgency=low
+
+  * New upstream release.
+
+ -- Stein Magnus Jodal <stein.magnus@jodal.no>  Tue, 20 Nov 2012 13:46:29 +0100
+
+python-spotify (1.8.1-1) unstable; urgency=low
+
+  * New upstream release.
+
+ -- Stein Magnus Jodal <stein.magnus@jodal.no>  Sun, 04 Nov 2012 11:42:13 +0100
+
+python-spotify (1.8-1) unstable; urgency=low
+
+  * New upstream release.
+
+ -- Stein Magnus Jodal <stein.magnus@jodal.no>  Sun, 04 Nov 2012 10:55:03 +0100
+
+python-spotify (1.7.1-1) unstable; urgency=low
+
+  * New upstream release.
+
+ -- Stein Magnus Jodal <stein.magnus@jodal.no>  Fri, 07 Sep 2012 19:29:58 +0000
+
+python-spotify (1.7-8) unstable; urgency=low
+
+  * Bump version number for rebuild.
+
+ -- Stein Magnus Jodal <stein.magnus@jodal.no>  Wed, 22 Aug 2012 20:42:39 +0000
+
+python-spotify (1.7-7) unstable; urgency=low
+
+  * Move docs building to build-indep target.
+
+ -- Stein Magnus Jodal <stein.magnus@jodal.no>  Sun, 19 Aug 2012 12:35:34 +0200
+
+python-spotify (1.7-6) unstable; urgency=low
+
+  * Move python-sphinx to Build-Depends-Indep, so it isn't required for
+    building the binary packages.
+
+ -- Stein Magnus Jodal <stein.magnus@jodal.no>  Sun, 19 Aug 2012 12:01:03 +0200
+
+python-spotify (1.7-5) unstable; urgency=low
+
+  * Revert to python-support to make package work on Debian Squeeze.
+
+ -- Stein Magnus Jodal <stein.magnus@jodal.no>  Sun, 19 Aug 2012 10:25:25 +0200
+
+python-spotify (1.7-4) unstable; urgency=low
+
+  * Split documentation out to its own package, python-spotify-doc.
+  * Add debug extension, python-spotify-dbg.
+  * Don't bundle jQuery and Underscore.js.
+  * Register docs with doc-base.
+  * Install examples the dh_ way.
+
+ -- Stein Magnus Jodal <stein.magnus@jodal.no>  Sun, 19 Aug 2012 00:22:34 +0200
+
+python-spotify (1.7-3) unstable; urgency=low
+
+  * Build for all available Python versions.
+
+ -- Stein Magnus Jodal <stein.magnus@jodal.no>  Fri, 11 May 2012 00:49:58 +0200
+
+python-spotify (1.7-2oneiric1) oneiric; urgency=low
+
+  * Rebuild for oneiric, to get Python 2.6 support.
+
+ -- Stein Magnus Jodal <stein.magnus@jodal.no>  Mon, 07 May 2012 23:58:30 +0200
+
+python-spotify (1.7-2) unstable; urgency=low
+
+  * Remove Build-Depends on quilt.
+
+ -- Stein Magnus Jodal <stein.magnus@jodal.no>  Sun, 06 May 2012 22:59:03 +0200
+
+python-spotify (1.7-1) unstable; urgency=low
+
+  * New upstream release.
+
+ -- Stein Magnus Jodal <stein.magnus@jodal.no>  Sun, 22 Apr 2012 01:43:58 +0200
+
+python-spotify (1.6.1-2) unstable; urgency=low
+
+  * Replace deprecated python-support with dh_python2.
+  * Update year ranges in debian/copyright.
+  * Increase Standards-Version to 3.9.3.
+
+ -- Stein Magnus Jodal <stein.magnus@jodal.no>  Sat, 14 Apr 2012 21:37:40 +0200
+
+python-spotify (1.6.1-1) unstable; urgency=low
+
+  * New upstream maintenance release, fixing a segfault bug.
+  * Increase standards-version to 3.9.2.
+  * Update debian/copyright to dep5 format.
+
+ -- Stein Magnus Jodal <stein.magnus@jodal.no>  Thu, 29 Dec 2011 00:44:04 +0100
+
+python-spotify (1.6-1) unstable; urgency=low
+
+  * New upstream release, compatible with libspotify 10.
+
+ -- Stein Magnus Jodal <stein.magnus@jodal.no>  Tue, 29 Nov 2011 00:43:55 +0100
+
+python-spotify (1.5-1) unstable; urgency=low
+
+  * New upstream release, compatible with libspotify 9.
+
+ -- Stein Magnus Jodal <stein.magnus@jodal.no>  Sun, 30 Oct 2011 16:44:12 +0100
+
+python-spotify (1.4-1) unstable; urgency=low
+
+  * New upstream release.
+
+ -- Stein Magnus Jodal <stein.magnus@jodal.no>  Sat, 24 Sep 2011 17:01:21 +0200
+
+python-spotify (1.3-1) unstable; urgency=low
+
+  * New upstream release.
+
+ -- Stein Magnus Jodal <stein.magnus@jodal.no>  Sun, 12 Jun 2011 01:56:10 +0200
+
+python-spotify (1.2-1) unstable; urgency=low
+
+  * New upstream release.
+  * Remove Build-Depends on python-setuptools.
+  * Change Depends from libspotify7 to libspotify8.
+  * Docs have moved from doc/ to docs/.
+  * LICENSE is no longer in docs/, so it does not need to be excluded.
+  * No egg needs to be cleaned, as we no longer use setuptools.
+  * Build HTML version of docs.
+  * Install docs/changes.rst as changelog.
+  * Watch PyPI instead of GitHub for new releases.
+  * Update copyright of upstream package.
+
+ -- Stein Magnus Jodal <stein.magnus@jodal.no>  Tue, 07 Jun 2011 13:53:57 +0200
+
+python-spotify (1.1+mopidy20110405-1) unstable; urgency=low
+
+  * New upstream release.
+
+ -- Stein Magnus Jodal <stein.magnus@jodal.no>  Tue, 05 Apr 2011 21:20:14 +0200
+
+python-spotify (1.1+mopidy20110331-2) unstable; urgency=low
+
+  * New upstream release.
+
+ -- Stein Magnus Jodal <stein.magnus@jodal.no>  Wed, 30 Mar 2011 22:25:43 +0200
+
+python-spotify (1.1+mopidy20110330-1) unstable; urgency=low
+
+  * New upstream release.
+
+ -- Stein Magnus Jodal <stein.magnus@jodal.no>  Wed, 30 Mar 2011 00:26:34 +0200
+
+python-spotify (1.1+mopidy20110223-2) unstable; urgency=low
+
+  * Rebuild with Python 2.7 support.
+
+ -- Stein Magnus Jodal <stein.magnus@jodal.no>  Fri, 25 Mar 2011 22:55:47 +0100
+
+python-spotify (1.1+mopidy20110223-1) unstable; urgency=low
+
+  * New release which use libspotify 0.0.7 instead of 0.0.6.
+
+ -- Stein Magnus Jodal <stein.magnus@jodal.no>  Wed, 23 Feb 2011 23:02:12 +0100
+
+python-spotify (1.1+mopidy20110106-2) unstable; urgency=low
+
+  * Set debian/pyversions to "2.5-".
+  * Build-Depends on quilt and python-all-dev.
+  * Remove pyspotify.egg-info on clean.
+
+ -- Stein Magnus Jodal <stein.magnus@jodal.no>  Fri, 07 Jan 2011 14:34:40 +0100
+
+python-spotify (1.1+mopidy20110106-1) unstable; urgency=low
+
+  * Initial release
+
+ -- Stein Magnus Jodal <stein.magnus@jodal.no>  Thu, 06 Jan 2011 16:13:02 +0100

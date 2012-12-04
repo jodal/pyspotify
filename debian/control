@@ -1,0 +1,62 @@
+Source: python-spotify
+Section: python
+Priority: optional
+Maintainer: Stein Magnus Jodal <stein.magnus@jodal.no>
+Build-Depends:
+    debhelper (>= 7.0.50~),
+    libspotify-dev (>= 12), libspotify-dev (<< 13),
+    python-support,
+    python-all-dev (>= 2.5),
+    python-all-dbg (>= 2.5)
+Build-Depends-Indep: python-sphinx (>= 1.0)
+Standards-Version: 3.9.3
+Homepage: http://github.com/mopidy/pyspotify
+Vcs-Git: git://github.com/mopidy/pyspotify-deb.git
+Vcs-Browser: http://github.com/mopidy/pyspotify-deb
+XS-Python-Version: >= 2.5
+X-Python-Version: >= 2.5
+X-Python3-Version: << 3
+
+Package: python-spotify
+Architecture: any
+Depends:
+    ${python:Depends},
+    ${misc:Depends},
+    ${shlibs:Depends},
+    libspotify12
+Suggests:
+    python-spotify-dbg,
+    python-spotify-doc
+Description: Python bindings for libspotify
+ The Python bindings for libspotify allows third party developers to write
+ applications that utilize the Spotify music streaming service in Python.
+
+Package: python-spotify-dbg
+Section: debug
+Priority: extra
+Architecture: any
+Depends:
+    ${python:Depends},
+    ${misc:Depends},
+    ${shlibs:Depends},
+    python-spotify (= ${binary:Version})
+Description: Python bindings for libspotify - debug extension
+ The Python bindings for libspotify allows third party developers to write
+ applications that utilize the Spotify music streaming service in Python.
+ .
+ This package contains the extension built for the Python debug interpreter.
+
+Package: python-spotify-doc
+Section: doc
+Architecture: all
+Depends:
+    ${misc:Depends},
+    libjs-jquery,
+    libjs-underscore
+Recommends: python-spotify
+Replaces: python-spotify (<< 1.7-2)
+Description: Python bindings for libspotify - documentation
+ The Python bindings for libspotify allows third party developers to write
+ applications that utilize the Spotify music streaming service in Python.
+ .
+ This package contains documentation for pyspotify.

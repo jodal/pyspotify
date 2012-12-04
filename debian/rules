@@ -1,0 +1,23 @@
+#!/usr/bin/make -f
+
+# Uncomment this to turn on verbose mode.
+#export DH_VERBOSE=1
+
+%:
+	dh $@
+
+override_dh_install:
+	dh_install -X "*_d.so" "debian/tmp/*" -p python-spotify
+	dh_install "debian/tmp/usr/lib/python*/*-packages/spotify/*_d.so" -p python-spotify-dbg
+	dh_install
+
+override_dh_installchangelogs:
+	dh_installchangelogs docs/changes.rst
+
+override_dh_installdocs-indep:
+	make -C docs/ clean html
+	dh_installdocs
+
+override_dh_clean-indep:
+	make -C docs/ clean
+	dh_clean

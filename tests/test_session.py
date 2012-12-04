@@ -22,7 +22,6 @@ class BaseMockClient(SpotifySessionManager):
 
     def __init__(self):
         SpotifySessionManager.__init__(self, "username_good", "password_good")
-        self.awoken = threading.Event() # used to block until awoken
 
 class BaseMockUnicodeClient(SpotifySessionManager):
 
@@ -33,7 +32,6 @@ class BaseMockUnicodeClient(SpotifySessionManager):
 
     def __init__(self):
         SpotifySessionManager.__init__(self, "username_good", "password_good")
-        self.awoken = threading.Event() # used to block until awoken
 
 class TestSession(unittest.TestCase):
 
@@ -48,7 +46,6 @@ class TestSession(unittest.TestCase):
             def logged_in(self, session, error):
                 username = session.username()
                 self.found_username = username
-                session.logout()
                 self.disconnect()
 
         c = MockClient()
@@ -60,7 +57,6 @@ class TestSession(unittest.TestCase):
             def logged_in(self, session, error):
                 username = session.username()
                 self.found_username = username
-                session.logout()
                 self.disconnect()
 
         c = MockClient()
@@ -74,7 +70,6 @@ class TestSession(unittest.TestCase):
                 session.load(track)
                 session.seek(40000)
                 session.play(True)
-                session.logout()
                 self.disconnect()
 
             def music_delivery(self, sess, mformat, frames):

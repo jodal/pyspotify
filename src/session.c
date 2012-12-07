@@ -561,6 +561,9 @@ logged_out(sp_session * session)
     PyObject *client = (PyObject *)sp_session_userdata(session);
 
     method = PyObject_GetAttrString(client, "_manager_logged_out");
+    if (!method) { // Stay compatible
+        method = PyObject_GetAttrString(client, "logged_out");
+    }
     res = PyObject_CallFunctionObjArgs(method, psession, NULL);
     if (!res)
         PyErr_WriteUnraisable(method);

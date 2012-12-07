@@ -74,11 +74,11 @@ class SpotifySessionManager(object):
         service.
         """
         if self.username is None:
-            self.session.reconnect()
+            self.session.relogin()
         else:
-            self.session.connect(self.username, self.password,
-                                 self.remember_me)
-        self.loop(self.session) # returns on disconnect
+            self.session.login(self.username, self.password,
+                               self.remember_me)
+        self.loop(self.session) # returns on logged out
 
     def loop(self, session):
         """

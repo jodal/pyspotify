@@ -374,7 +374,7 @@ Session_flush_caches(Session * self)
 }
 
 static PyObject *
-Session_connect(Session *self, PyObject *args, PyObject *kwds)
+Session_login(Session *self, PyObject *args, PyObject *kwds)
 {
     char *username, *password = NULL;
     int remember_me = 1;
@@ -410,7 +410,7 @@ Session_connect(Session *self, PyObject *args, PyObject *kwds)
 }
 
 static PyObject *
-Session_reconnect(Session *self)
+Session_relogin(Session *self)
 {
     sp_error error;
 
@@ -435,7 +435,7 @@ static PyMethodDef Session_methods[] = {
     {"user_is_loaded", (PyCFunction)Session_user_is_loaded, METH_NOARGS,
      "Return whether the user is loaded or not"},
     {"logout", (PyCFunction)Session_logout, METH_NOARGS,
-     "Logout from the session and terminate the main loop"},
+     "Logs out the user from the Spotify service"},
     {"process_events", (PyCFunction)Session_process_events, METH_NOARGS,
      "Process any outstanding events"},
     {"load", (PyCFunction)Session_load, METH_VARARGS,
@@ -466,10 +466,10 @@ static PyMethodDef Session_methods[] = {
      "Get the starred playlist for the logged in user"},
     {"flush_caches", (PyCFunction)Session_flush_caches, METH_NOARGS,
      "Flush the libspotify caches"},
-    {"connect", (PyCFunction)Session_connect, METH_VARARGS | METH_KEYWORDS,
-     "Connects the specified user to the Spotify service"},
-    {"reconnect", (PyCFunction)Session_reconnect, METH_NOARGS,
-     "Reconnects the last user that logged in with the remember_me flag set"},
+    {"login", (PyCFunction)Session_login, METH_VARARGS | METH_KEYWORDS,
+     "Logs in the specified user to the Spotify service"},
+    {"relogin", (PyCFunction)Session_relogin, METH_NOARGS,
+     "Logs in the last user that logged in with the remember_me flag set"},
     {NULL}
 };
 

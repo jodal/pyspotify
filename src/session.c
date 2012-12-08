@@ -20,8 +20,11 @@
 static int session_constructed = 0;
 sp_session *g_session;
 
+static int
+create_session(Session *self, PyObject *client, PyObject *settings);
+
 static PyObject *
-Session_new(PyTypeObject * type, PyObject *args, PyObject *kwds)
+Session_new(PyTypeObject *type, PyObject *args, PyObject *kwds)
 {
     Session *self;
 
@@ -42,6 +45,27 @@ Session_FromSpotify(sp_session * session)
 static PyMemberDef Session_members[] = {
     {NULL}
 };
+
+static PyObject *
+Session_create(PyTypeObject *type, PyObject *args)
+{
+    Session *self;
+    PyObject *client;
+    PyObject *settings;
+
+    if (!PyArg_ParseTuple(args, "OO", &client, &settings))
+        return NULL;
+
+    self = (Session *) PyObject_Call((PyObject *)type, args, NULL);
+
+    PyEval_InitThreads();
+
+    if (create_session(self, client, settings) != 0) {
+        Py_XDECREF(self);
+        return NULL;
+    }
+    return (PyObject *)self;
+}
 
 static PyObject *
 Session_username(Session * self)
@@ -334,7 +358,61 @@ Session_flush_caches(Session * self)
     Py_RETURN_NONE;
 }
 
+static PyObject *
+Session_login(Session *self, PyObject *args, PyObject *kwds)
+{
+    char *username, *password = NULL;
+    int remember_me = 1;
+    char *blob = NULL;
+    sp_error error;
+    static char *kwlist[] = { "username", "password", "remember_me",
+                              "blob", NULL };
+
+    if (!PyArg_ParseTupleAndKeywords(args, kwds, "es|esiz", kwlist,
+                                     ENCODING, &username, ENCODING, &password,
+                                     &remember_me, &blob))
+        return NULL;
+
+    if ((!password) && (!blob)) {
+        PyErr_SetString(SpotifyError, "one of the password or login blob "
+                        "is required to login");
+        return NULL;
+    }
+
+#ifdef DEBUG
+    fprintf(stderr, "[DEBUG]-session- login as %s in progress...\n",
+            username);
+#endif
+    Py_BEGIN_ALLOW_THREADS;
+    error = sp_session_login(self->_session, username, password,
+                             remember_me, blob);
+    Py_END_ALLOW_THREADS;
+    if (error != SP_ERROR_OK) {
+        PyErr_SetString(SpotifyError, sp_error_message(error));
+        return NULL;
+    }
+    Py_RETURN_NONE;
+}
+
+static PyObject *
+Session_relogin(Session *self)
+{
+    sp_error error;
+
+#ifdef DEBUG
+    fprintf(stderr, "[DEBUG]-session- relogin in progress...\n");
+#endif
+    error = sp_session_relogin(self->_session);
+    if (error != SP_ERROR_OK) {
+        PyErr_SetString(SpotifyError, sp_error_message(error));
+        return NULL;
+    }
+    Py_RETURN_NONE;
+}
+
 static PyMethodDef Session_methods[] = {
+    {"create",   (PyCFunction)Session_create, METH_VARARGS | METH_CLASS,
+     "Returns a Session object embedding a newly created Spotify session"},
     {"username", (PyCFunction)Session_username, METH_NOARGS,
      "Return the canonical username for the logged in user"},
     {"display_name", (PyCFunction)Session_display_name, METH_NOARGS,
@@ -342,7 +420,7 @@ static PyMethodDef Session_methods[] = {
     {"user_is_loaded", (PyCFunction)Session_user_is_loaded, METH_NOARGS,
      "Return whether the user is loaded or not"},
     {"logout", (PyCFunction)Session_logout, METH_NOARGS,
-     "Logout from the session and terminate the main loop"},
+     "Logs out the user from the Spotify service"},
     {"process_events", (PyCFunction)Session_process_events, METH_NOARGS,
      "Process any outstanding events"},
     {"load", (PyCFunction)Session_load, METH_VARARGS,
@@ -373,6 +451,10 @@ static PyMethodDef Session_methods[] = {
      "Get the starred playlist for the logged in user"},
     {"flush_caches", (PyCFunction)Session_flush_caches, METH_NOARGS,
      "Flush the libspotify caches"},
+    {"login", (PyCFunction)Session_login, METH_VARARGS | METH_KEYWORDS,
+     "Logs in the specified user to the Spotify service"},
+    {"relogin", (PyCFunction)Session_relogin, METH_NOARGS,
+     "Logs in the last user that logged in with the remember_me flag set"},
     {NULL}
 };
 
@@ -463,7 +545,10 @@ logged_out(sp_session * session)
     psession->_session = session;
     PyObject *client = (PyObject *)sp_session_userdata(session);
 
-    method = PyObject_GetAttrString(client, "logged_out");
+    method = PyObject_GetAttrString(client, "_manager_logged_out");
+    if (!method) { // Stay compatible
+        method = PyObject_GetAttrString(client, "logged_out");
+    }
     res = PyObject_CallFunctionObjArgs(method, psession, NULL);
     if (!res)
         PyErr_WriteUnraisable(method);
@@ -798,38 +883,30 @@ static sp_session_callbacks g_callbacks = {
     &credentials_blob_updated,
 };
 
-PyObject *
-session_connect(PyObject *self, PyObject *args)
+static int
+create_session(Session *self, PyObject *client, PyObject *settings)
 {
     sp_session_config config;
-    PyObject *client;
     sp_session *session;
     sp_error error;
-    char *username, *password;
     char *cache_location, *settings_location, *user_agent;
     char *proxy, *proxy_username, *proxy_password;
-    bool relogin = 0, remember_me;
-    char *blob = NULL;
-
-    if (!PyArg_ParseTuple(args, "O", &client))
-        return NULL;
-    PyEval_InitThreads();
 
     memset(&config, 0, sizeof(config));
     config.api_version = SPOTIFY_API_VERSION;
     config.userdata = (void *)client;
     config.callbacks = &g_callbacks;
 
-    cache_location = PySpotify_GetConfigString(client, "cache_location", 0);
+    cache_location = PySpotify_GetConfigString(settings, "cache_location", 0);
     if (!cache_location)
-        return NULL;
+        return -1;
     config.cache_location = cache_location;
 #ifdef DEBUG
     fprintf(stderr, "[DEBUG]-session- Cache location is '%s'\n",
             cache_location);
 #endif
 
-    settings_location = PySpotify_GetConfigString(client,
+    settings_location = PySpotify_GetConfigString(settings,
                                                   "settings_location", 0);
     config.settings_location = settings_location;
 #ifdef DEBUG
@@ -838,16 +915,16 @@ session_connect(PyObject *self, PyObject *args)
 #endif
 
     PyObject *application_key =
-        PyObject_GetAttr(client, PyBytes_FromString("application_key"));
+        PyObject_GetAttr(settings, PyBytes_FromString("application_key"));
     if (!application_key) {
         PyErr_SetString(SpotifyError,
                         "application_key not set");
-        return NULL;
+        return -1;
     }
     else if (!PyBytes_Check(application_key)) {
         PyErr_SetString(SpotifyError,
                         "application_key must be a byte string");
-        return NULL;
+        return -1;
     }
     char *s_appkey;
     Py_ssize_t l_appkey;
@@ -857,22 +934,22 @@ session_connect(PyObject *self, PyObject *args)
     config.application_key = PyMem_Malloc(l_appkey);
     memcpy((char *)config.application_key, s_appkey, l_appkey);
 
-    user_agent = PySpotify_GetConfigString(client, "user_agent", 0);
+    user_agent = PySpotify_GetConfigString(settings, "user_agent", 0);
     if (!user_agent)
-        return NULL;
+        return -1;
     if (strlen(user_agent) > 255) {
         PyErr_SetString(SpotifyError, "user agent must be 255 characters max");
-        return NULL;
+        return -1;
     }
     config.user_agent = user_agent;
 #ifdef DEBUG
-        fprintf(stderr, "[DEBUG]-session- User agent set to '%s'\n",
-                            user_agent);
+    fprintf(stderr, "[DEBUG]-session- User agent set to '%s'\n",
+                        user_agent);
 #endif
 
     proxy = PySpotify_GetConfigString(client, "proxy", 1);
     if (!proxy)
-        return NULL;
+        return -1;
     if ((long) proxy != (-1)) {
     config.proxy = proxy;
 #ifdef DEBUG
@@ -882,7 +959,7 @@ session_connect(PyObject *self, PyObject *args)
 
     proxy_username = PySpotify_GetConfigString(client, "proxy_username", 1);
     if (!proxy_username)
-       return NULL;
+       return -1;
     if ((long) proxy_username != (-1)) {
         config.proxy_username = proxy_username;
 #ifdef DEBUG
@@ -893,7 +970,7 @@ session_connect(PyObject *self, PyObject *args)
 
     proxy_password = PySpotify_GetConfigString(client, "proxy_password", 1);
     if (!proxy_password)
-       return NULL;
+       return -1;
     if ((long) proxy_password != (-1)) {
         config.proxy_password = proxy_password;
 #ifdef DEBUG
@@ -902,73 +979,16 @@ session_connect(PyObject *self, PyObject *args)
 #endif
     }
 
-    username = PySpotify_GetConfigString(client, "username", 1);
-    if (!username)
-        return NULL;
-
-    password = PySpotify_GetConfigString(client, "password", 1);
-    if (!password)
-        return NULL;
-
-    if ((long) username == (-1) || (long) password == (-1))
-        relogin = 1;
-
-    PyObject *remember = PyObject_GetAttr(client, PyBytes_FromString("remember_me"));
-    remember_me = (remember == Py_True);
-    PyErr_Clear();
-    Py_XDECREF(remember);
-
-    /* Binary blob to use in place of a password */
-    PyObject *py_blob = PyObject_GetAttr(client, PyBytes_FromString("login_blob"));
-    if (py_blob != NULL) {
-        if (!(PyBytes_Check(py_blob))) {
-            PyErr_SetString(SpotifyError, "login_blob must be a string of bytes.");
-            Py_XDECREF(py_blob);
-            return NULL;
-        }
-        blob = PyString_AS_STRING(py_blob);
-        /* if blob is the empty string (= default value), we pass NULL to
-         * sp_session_login */
-        if (blob[0] == '\0')
-            blob = NULL;
-    } else {
-        PyErr_Clear();
-    }
-
 #ifdef DEBUG
     fprintf(stderr, "[DEBUG]-session- creating session...\n");
 #endif
     error = sp_session_create(&config, &session);
     if (error != SP_ERROR_OK) {
         PyErr_SetString(SpotifyError, sp_error_message(error));
-        Py_XDECREF(py_blob);
-        return NULL;
+        return -1;
     }
     session_constructed = 1;
-
-    if (relogin) {
-#ifdef DEBUG
-    fprintf(stderr, "[DEBUG]-session- relogin in progress...\n");
-#endif
-        error = sp_session_relogin(session);
-        if (error != SP_ERROR_OK) {
-            PyErr_SetString(SpotifyError, sp_error_message(error));
-            Py_XDECREF(py_blob);
-            return NULL;
-        }
-    } else {
-#ifdef DEBUG
-    fprintf(stderr, "[DEBUG]-session- login as %s in progress...\n",
-            username);
-#endif
-        Py_BEGIN_ALLOW_THREADS;
-        sp_session_login(session, username, password, remember_me, blob);
-        Py_END_ALLOW_THREADS;
-    }
-    Py_XDECREF(py_blob);
     g_session = session;
-    Session *psession =
-        (Session *) PyObject_CallObject((PyObject *)&SessionType, NULL);
-    psession->_session = session;
-    return (PyObject *)psession;
+    self->_session = session;
+    return 0;
 }

@@ -671,9 +671,6 @@ mock_set_current_session(PyObject *self, PyObject *args, PyObject *kwds)
 /************************* MODULE INITIALISATION ****************************/
 
 static PyMethodDef module_methods[] = {
-    {"connect", session_connect, METH_VARARGS,
-        "Run the Spotify subsystem. This will return on error,"
-        " or after Spotify is logged out."},
     {"mock_track", (PyCFunction)mock_track,
         METH_VARARGS | METH_KEYWORDS, "Create a mock track"},
     {"mock_album", (PyCFunction)mock_album,

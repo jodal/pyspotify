@@ -21,8 +21,6 @@ PyObject *SpotifyError;
 PyObject *SpotifyApiVersion;
 
 static PyMethodDef module_methods[] = {
-    {"connect", session_connect, METH_VARARGS,
-     "Run the spotify subsystem.  this will return on error, or after spotify is logged out."},
     {NULL, NULL, 0, NULL}
 };
 

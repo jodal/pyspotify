@@ -2,6 +2,7 @@ import logging
 import Queue
 
 import spotify
+from spotify import Settings
 
 logger = logging.getLogger('pyspotify.manager.session')
 
@@ -31,7 +32,6 @@ class SpotifySessionManager(object):
         - `proxy_password`: password to authenticate with the proxy server.
     """
 
-    api_version = spotify.api_version
     cache_location = 'tmp'
     settings_location = 'tmp'
     application_key = None
@@ -42,6 +42,17 @@ class SpotifySessionManager(object):
                  login_blob='', proxy=None, proxy_username=None,
                  proxy_password=None):
         self._cmdqueue = Queue.Queue()
+
+        # Session settings
+        self.settings = Settings()
+        if self.application_key is None:
+            self.application_key = open(self.appkey_file).read()
+        self.settings.application_key   = self.application_key
+        self.settings.cache_location    = self.cache_location
+        self.settings.settings_location = self.settings_location
+        self.settings.user_agent        = self.user_agent
+
+        # Connection settings
         self.username = username
         self.password = password
         self.remember_me = remember_me
@@ -49,20 +60,25 @@ class SpotifySessionManager(object):
         self.proxy_username = proxy_username
         self.proxy_password = proxy_password
         self.login_blob = login_blob
-        if self.application_key is None:
-            self.application_key = open(self.appkey_file).read()
+
+        # Create session
+        self.session = spotify.Session.create(self, self.settings)
 
     def connect(self):
         """
         Connect to the Spotify API using the given username and password.
-
-        This method calls the :func:`spotify.connect` function.
+        If ``username`` is ``None``, reconnection of the last user will
+        be attempted.
 
         This method does not return before we disconnect from the Spotify
         service.
         """
-        session = spotify.connect(self)
-        self.loop(session) # returns on disconnect
+        if self.username is None:
+            self.session.relogin()
+        else:
+            self.session.login(self.username, self.password,
+                               self.remember_me)
+        self.loop(self.session) # returns on logged out
 
     def loop(self, session):
         """
@@ -87,6 +103,8 @@ class SpotifySessionManager(object):
                 elif message.get('command') == 'disconnect':
                     logger.debug('Got message; disconnecting')
                     session.logout()
+                elif message.get('command') == 'stop':
+                    logger.debug('Got message; stopping main loop')
                     running = False
                 else:
                     raise ValueError('Unknown message type')
@@ -117,6 +135,21 @@ class SpotifySessionManager(object):
         :type error: string or :class:`None`
         """
         pass
+
+    def _manager_logged_out(self, session):
+        """
+        Callback.
+
+        The user has or has been logged out from Spotify.
+        This is a wrapper method around `logged_out` that
+        also stops the manager's main loop. Don't override
+        this method.
+
+        :param session: the current session.
+        :type session: :class:`spotify.Session`
+        """
+        self._cmdqueue.put({'command': 'stop'})
+        self.logged_out(session)
 
     def logged_out(self, session):
         """

@@ -17,6 +17,8 @@ def _add_null_handler_for_logging():
 _add_null_handler_for_logging()
 # pylint: enable = W0404
 
+from settings import Settings
+
 from spotify._spotify import Session
 from spotify._spotify import Track
 from spotify._spotify import Artist
@@ -32,6 +34,3 @@ from spotify._spotify import User
 from spotify._spotify import ToplistBrowser
 
 from spotify._spotify import api_version
-from spotify._spotify import connect
-
-

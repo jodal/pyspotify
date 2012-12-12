@@ -13,6 +13,7 @@ parent module.
 .. toctree::
 
     error
+    settings
     session
     link
     track

@@ -48,6 +48,7 @@ class JukeboxUI(cmd.Cmd, threading.Thread):
     def do_list(self, line):
         """ List the playlists, or the contents of a playlist """
         if not line:
+            i = -1
             for i, p in enumerate(self.jukebox.ctr):
                 if p.is_loaded():
                     print "%3d %s" % (i, p.name())
@@ -318,14 +319,15 @@ class Jukebox(SpotifySessionManager):
         if error:
             print error
             return
-        self.session = session
+        print "Logged in!"
         self.ctr = session.playlist_container()
         self.container_manager.watch(self.ctr)
         self.starred = session.starred()
-        self.ui.start()
+        if not self.ui.is_alive():
+            self.ui.start()
 
     def logged_out(self, session):
-        self.ui.cmdqueue.append("quit")
+        print "Logged out!"
 
     def load_track(self, track):
         print u"Loading track..."

@@ -46,6 +46,11 @@ The :class:`Link` class
         :return: the link as an :class:`Artist` object.
         :rtype: :class:`Artist`
 
+    .. method:: as_playlist()
+
+        :return: the link as a :class:`Playlist` object.
+        :rtype: :class:`Playlist`
+
     .. method:: as_track()
 
         :return: the link as a :class:`Track` object.

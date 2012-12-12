@@ -8,6 +8,7 @@
 #include "album.h"
 #include "playlist.h"
 #include "search.h"
+#include "session.h"
 
 static PyMemberDef Link_members[] = {
     {NULL}
@@ -203,6 +204,23 @@ Link_as_artist(Link * self)
 }
 
 static PyObject *
+Link_as_playlist(Link * self)
+{
+    if (!g_session) {
+        PyErr_SetString(SpotifyError, "Not logged in");
+        return NULL;
+    }
+
+    sp_playlist *p = sp_playlist_create(g_session, self->_link);
+
+    if (!p) {
+        PyErr_SetString(SpotifyError, "Not a playlist link");
+        return NULL;
+    }
+    return Playlist_FromSpotify(p);
+}
+
+static PyObject *
 Link_str(PyObject *oself)
 {
     Link *self = (Link *) oself;
@@ -247,6 +265,10 @@ static PyMethodDef Link_methods[] = {
      (PyCFunction)Link_type,
      METH_NOARGS,
      "Return the type of the link"},
+    {"as_playlist",
+     (PyCFunction)Link_as_playlist,
+     METH_NOARGS,
+     "Return this link as a Playlist object"},
     {"as_track",
      (PyCFunction)Link_as_track,
      METH_NOARGS,

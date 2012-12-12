@@ -4,6 +4,32 @@ Changes
 
 .. currentmodule:: spotify
 
+v1.10 (2012-12-12)
+==================
+
+This version is compatible with *libspotify* version 12.
+
+**API changes**
+
+- Session method `connect` has been renamed to :meth:`Session.login` for
+  consistency.
+
+- Add :meth:`spotify.Link.as_playlist`. (Fixes: :issue:`82`)
+
+**New features**
+
+- Split session creation and user login. The session must be created only once
+  per process. After that, the application can connect and disconnect a user
+  at will. (Fixes: :issue:`73`)
+
+  New methods: :meth:`Session.create`, :meth:`Session.relogin`,
+  :meth:`Session.logout`.
+
+  The :class:`Session` object now calls
+  :meth:`manager.SpotifySessionManager._manager_logged_out` when getting a
+  `logged_out` event from *libspotify*, or
+  `manager.SpotifySessionManager.logged_out` if the former is not defined.
+
 
 v1.9.1 (2012-11-23)
 ===================

@@ -1,3 +1,9 @@
+python-spotify (1.10-0mopidy1) unstable; urgency=low
+
+  * New upstream release.
+
+ -- Stein Magnus Jodal <stein.magnus@jodal.no>  Wed, 12 Dec 2012 21:17:30 +0100
+
 python-spotify (1.9.1-1) unstable; urgency=low
 
   * New upstream releease.

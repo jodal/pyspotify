@@ -14,6 +14,8 @@ This version is compatible with *libspotify* version 12.
 - Session method `connect` has been renamed to :meth:`Session.login()`
   for consistency.
 
+- Add :meth:`spotify.Link.as_playlist`. (Fixes: :issue:`82`)
+
 **New features**
 
 - Split session creation and user login. The session must be created only once

@@ -17,6 +17,11 @@ class AlsaSink(BaseAudioSink):
         elif sys.byteorder == 'big':
             self._format = alsaaudio.PCM_FORMAT_S16_BE
 
+    def _close_device(self):
+        if self._device:
+            self._device.close()
+            self._device = None
+
     def music_delivery(
             self, session, frames, frame_size, num_frames,
             sample_type, sample_rate, channels):
@@ -25,7 +30,13 @@ class AlsaSink(BaseAudioSink):
             self._device.setperiodsize(self._period_size)
             self._device.setformat(self._format)
         if num_frames == 0:
+            # flush audio buffers on seek
+            self._close_device()
             return 0
         self._call_if_needed(self._device.setrate, sample_rate)
         self._call_if_needed(self._device.setchannels, channels)
         return self._device.write(frames)
+
+    def stop(self):
+        if self._device:
+            self._close_device()

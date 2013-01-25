@@ -16,6 +16,7 @@ class AlsaSink(BaseAudioSink):
             self._format = alsaaudio.PCM_FORMAT_S16_LE
         elif sys.byteorder == 'big':
             self._format = alsaaudio.PCM_FORMAT_S16_BE
+        self._paused = False
 
     def _close_device(self):
         if self._device:
@@ -37,6 +38,19 @@ class AlsaSink(BaseAudioSink):
         self._call_if_needed(self._device.setchannels, channels)
         return self._device.write(frames)
 
+    def start(self):
+        if self._device and self._paused:
+            self._device.pause(0)
+            self._paused = False
+
     def stop(self):
         if self._device:
             self._close_device()
+            self._paused = False
+
+    def pause(self):
+        # We have to check if the device is paused, because Alsa raises
+        # an error if it's paused again.
+        if self._device and not self._paused:
+            self._device.pause(1)
+            self._paused = True

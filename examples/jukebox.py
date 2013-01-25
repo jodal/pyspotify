@@ -181,6 +181,9 @@ class JukeboxUI(cmd.Cmd, threading.Thread):
     def do_stop(self, line):
         self.jukebox.stop()
 
+    def do_pause(self, line):
+        self.jukebox.pause()
+
     def do_next(self, line):
         self.jukebox.next()
 
@@ -386,6 +389,12 @@ class Jukebox(SpotifySessionManager):
         self.session.play(1)
         print "Playing"
         self.playing = True
+
+    def pause(self):
+        self.session.play(0)
+        print "Pausing"
+        self.playing = False
+        self.audio.pause()
 
     def stop(self):
         self.session.play(0)

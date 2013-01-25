@@ -8,7 +8,7 @@ class AlsaSink(BaseAudioSink):
 
     def __init__(self, **kwargs):
         super(AlsaSink, self).__init__(**kwargs)
-        self._mode = alsaaudio.PCM_NONBLOCK
+        self._mode = kwargs.get('mode', alsaaudio.PCM_NONBLOCK)
         self._device = None
         self._periodesize = 8192
         if sys.byteorder == 'little':

@@ -22,6 +22,9 @@ class AlsaSink(BaseAudioSink):
         if self._device:
             self._device.close()
             self._device = None
+        # clear _call_cache to avoid memory leaks, because references to
+        # bound methods of old Alsa devices would be stored there
+        self._call_cache = {}
 
     def music_delivery(
             self, session, frames, frame_size, num_frames,

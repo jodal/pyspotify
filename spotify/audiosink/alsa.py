@@ -10,7 +10,7 @@ class AlsaSink(BaseAudioSink):
         super(AlsaSink, self).__init__(**kwargs)
         self._mode = kwargs.get('mode', alsaaudio.PCM_NONBLOCK)
         self._device = None
-        self._periodesize = 8192
+        self._periodsize = kwargs.get('periodsize', 8192)
         if sys.byteorder == 'little':
             self._format = alsaaudio.PCM_FORMAT_S16_LE
         elif sys.byteorder == 'big':
@@ -20,7 +20,7 @@ class AlsaSink(BaseAudioSink):
             sample_type, sample_rate, channels):
         if self._device is None:
             self._device = alsaaudio.PCM(mode=self._mode)
-            self._device.setperiodsize(self._periodesize)
+            self._device.setperiodsize(self._periodsize)
             self._device.setformat(self._format)
         if num_frames == 0:
             return 0

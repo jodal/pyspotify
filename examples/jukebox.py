@@ -242,7 +242,7 @@ playlist."""
         if not line:
             print "Usage: remove_playlist <index> [<count>]"
         else:
-            c = None
+            c = 1
             try:
                 args = line.split(' ')
                 p = int(args[0])
@@ -251,12 +251,7 @@ playlist."""
             except ValueError:
                 print "that's not a number!"
                 return
-            if p < 0 or p > len(self.jukebox.ctr):
-                print "That's out of range!"
-                return
-            if not c:
-                return
-            if p + c > len(self.jukebox.ctr):
+	    if p < 0 or p + c > len(self.jukebox.ctr):
                 print "That's out of range!"
                 return
             while c > 0:

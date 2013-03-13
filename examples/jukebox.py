@@ -238,6 +238,33 @@ playlist."""
             new_playlist = self.jukebox.ctr.add_new_playlist(
                 line.decode('utf-8'))
 
+    def do_remove_playlist(self, line):
+        if not line:
+            print "Usage: remove_playlist <index> [<count>]"
+        else:
+            c = None
+            try:
+                args = line.split(' ')
+                p = int(args[0])
+                if len(args)>1:
+                    c = int(args[1])
+            except ValueError:
+                print "that's not a number!"
+                return
+            if p < 0 or p > len(self.jukebox.ctr):
+                print "That's out of range!"
+                return
+            if not c:
+                return
+            if p + c > len(self.jukebox.ctr):
+                print "That's out of range!"
+                return
+            while c > 0:
+                if self.jukebox.ctr[p+c].is_loaded():
+                    print "Removing playlist #%d" % (p+c)
+                    self.jukebox.ctr.remove_playlist(p+c)
+                c=c-1
+                
     def do_add_to_playlist(self, line):
         usage = "Usage: add_to_playlist <playlist_index> <insert_point>" + \
                 " <search_result_indecies>"

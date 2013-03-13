@@ -279,6 +279,20 @@ PlaylistContainer_sq_length(PyObject *o)
 }
 
 static PyObject *
+PlaylistContainer_remove_playlist(PlaylistContainer *pc, PyObject *args)
+{
+    int index;
+    if (!sp_playlistcontainer_is_loaded(pc->_playlistcontainer)) {
+        PyErr_SetString(SpotifyError, "PlaylistContainer not loaded");
+        return NULL;
+    }
+    if (!PyArg_ParseTuple(args, "i", &index)){
+        return NULL;
+    }
+    return Py_BuildValue("i",sp_playlistcontainer_remove_playlist(pc->_playlistcontainer,index));
+}
+
+static PyObject *
 PlaylistContainer_add_new_playlist(PlaylistContainer *pc, PyObject *args)
 {
     char *name = NULL;
@@ -369,6 +383,10 @@ static PyMethodDef PlaylistContainer_methods[] = {
      (PyCFunction)PlaylistContainer_add_playlist_removed_callback,
      METH_VARARGS,
      ""},
+    {"remove_playlist",
+     (PyCFunction)PlaylistContainer_remove_playlist,
+     METH_VARARGS,
+     "Remove a playlist from the playlistcontainer"},     
     {"add_new_playlist",
      (PyCFunction)PlaylistContainer_add_new_playlist,
      METH_VARARGS,

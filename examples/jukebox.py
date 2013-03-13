@@ -246,7 +246,7 @@ playlist."""
             try:
                 args = line.split(' ')
                 p = int(args[0])
-                if len(args)>1:
+                if len(args) > 1:
                     c = int(args[1])
             except ValueError:
                 print "that's not a number!"

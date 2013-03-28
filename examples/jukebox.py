@@ -254,10 +254,11 @@ playlist."""
 	    if p < 0 or p + c > len(self.jukebox.ctr):
                 print "That's out of range!"
                 return
-            while c > 0:
-                if self.jukebox.ctr[p+c].is_loaded():
-                    print "Removing playlist #%d" % (p+c)
-                    self.jukebox.ctr.remove_playlist(p+c)
+            for i in range(p + c - 1, p - 1, -1):
+                if self.jukebox.ctr[i].is_loaded():
+                    print "Removing playlist #%d" % (i)
+                    self.jukebox.ctr.remove_playlist(i)
+                    time.sleep(0.5)
                 c=c-1
                 
     def do_add_to_playlist(self, line):

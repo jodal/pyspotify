@@ -4,6 +4,20 @@ Changes
 
 .. currentmodule:: spotify
 
+
+v1.11 (UNRELEASED)
+==================
+
+**API changes**
+
+- :class:`spotify.audiosink.alsa.AlsaSink` now defaults to using
+  ``PCM_NONBLOCK``, which seems to help on audio underruns on Raspberry Pi.
+  Thanks to Stefan Hoffmann.
+
+- :class:`spotify.audiosink.alsa.AlsaSink` now accepts a ``period_size`` kwarg,
+  which defaults to 8192. Thanks to Stefan Hoffmann.
+
+
 v1.10 (2012-12-12)
 ==================
 

@@ -22,6 +22,7 @@ class AlsaSink(BaseAudioSink):
         if self._device:
             self._device.close()
             self._device = None
+            self._paused = False
         # clear _call_cache to avoid memory leaks, because references to
         # bound methods of old Alsa devices would be stored there
         self._call_cache = {}
@@ -49,7 +50,6 @@ class AlsaSink(BaseAudioSink):
     def stop(self):
         if self._device:
             self._close_device()
-            self._paused = False
 
     def pause(self):
         # We have to check if the device is paused, because Alsa raises

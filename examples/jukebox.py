@@ -392,7 +392,7 @@ class Jukebox(SpotifySessionManager):
 
     def pause(self):
         self.session.play(0)
-        print "Pauseing"
+        print "Pausing"
         self.playing = False
         self.audio.pause()
 

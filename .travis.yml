@@ -7,7 +7,7 @@ install:
   - "sudo apt-get install $(apt-cache depends python-spotify | awk '$2 !~ /spotify/ {print $2}')"
   - "sudo apt-get install python-all-dev libmockspotify-dev libspotify-dev python-alsaaudio pulseaudio"
   - "pulseaudio --start"
-  - "sudo chmod 1777 /dev/shm"
+  - "sudo rm -rf /dev/shm && sudo ln -s /run/shm /dev/shm"
   - "sudo python setup.py install --with-mock"
 
 before_script:

@@ -2,7 +2,13 @@
 
 import unittest
 
-from spotify.audiosink.alsa import AlsaSink
+try:
+    import alsaaudio
+except ImportError:
+    alsaaudio = False
+
+if alsaaudio:
+    from spotify.audiosink.alsa import AlsaSink
 
 
 class TestAlsaSink(unittest.TestCase):
@@ -36,3 +42,11 @@ class TestAlsaSink(unittest.TestCase):
         self.fake_play(audio, 2, 8192)
         audio.pause()
         self.fake_play(audio, 2, 8192)
+
+
+if not alsaaudio:
+    class TestMissingDependency(unittest.TestCase):
+        @unittest.skip('could not import optional dependency pyalsaaudio')
+        def test_missing_dependency():
+            pass
+    del TestAlsaSink

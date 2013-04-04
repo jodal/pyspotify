@@ -2,9 +2,16 @@
 
 import unittest
 
-from spotify.audiosink.alsa import AlsaSink
+try:
+    import alsaaudio
+except ImportError:
+    alsaaudio = False
+
+if alsaaudio:
+    from spotify.audiosink.alsa import AlsaSink
 
 
+@unittest.skipUnless(alsaaudio, 'requires alsaaudio')
 class TestAlsaSink(unittest.TestCase):
 
     def fake_music_delivery(self, audio, num_frames):

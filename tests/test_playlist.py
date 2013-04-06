@@ -45,6 +45,16 @@ class TestPlaylistContainer(unittest.TestCase):
         self.assertEqual(f1.id(), 42)
         self.assertTrue(f1.is_loaded())
 
+    def test_remove_playlist(self):
+        pc = mock_playlistcontainer(self.owner, [self.p1, self.p2])
+        pc.remove_playlist(1)
+        self.assertEqual(len(pc), 1)
+
+    def test_remove_playlist_out_of_range(self):
+        pc = mock_playlistcontainer(self.owner, [])        
+        self.assertRaises(IndexError, pc.remove_playlist, 0)
+
+
 class TestPlaylist(unittest.TestCase):
 
     artist = mock_artist('artist')

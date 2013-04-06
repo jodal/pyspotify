@@ -55,3 +55,10 @@ It is a list of :class:`Playlist` and :class:`PlaylistFolder` objects.
 
         The callback will be called when a playlist is removed from the
         container.
+
+    .. method:: remove_playlist(index)
+
+        :param index:       index of the playlist to remove
+        :type index:        :class:`int`
+
+        Removes a playlist from the container.

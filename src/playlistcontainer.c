@@ -289,6 +289,10 @@ PlaylistContainer_remove_playlist(PlaylistContainer *pc, PyObject *args)
     if (!PyArg_ParseTuple(args, "i", &index)){
         return NULL;
     }
+    if (index >= sp_playlistcontainer_num_playlists(pc->_playlistcontainer)) {
+        PyErr_SetString(PyExc_IndexError, "");
+        return NULL;
+    }
     return Py_BuildValue("i",sp_playlistcontainer_remove_playlist(pc->_playlistcontainer,index));
 }
 

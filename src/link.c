@@ -342,5 +342,11 @@ link_init(PyObject *m)
                             Py_BuildValue("i", SP_LINKTYPE_SEARCH));
     PyMapping_SetItemString(LinkType.tp_dict, "LINK_PLAYLIST",
                             Py_BuildValue("i", SP_LINKTYPE_PLAYLIST));
+    PyMapping_SetItemString(LinkType.tp_dict, "LINK_STARRED",
+                            Py_BuildValue("i", SP_LINKTYPE_STARRED));
+    PyMapping_SetItemString(LinkType.tp_dict, "LINK_PROFILE",
+                            Py_BuildValue("i", SP_LINKTYPE_PROFILE));
+    PyMapping_SetItemString(LinkType.tp_dict, "LINK_IMAGE",
+                            Py_BuildValue("i", SP_LINKTYPE_IMAGE));
 
 }

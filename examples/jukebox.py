@@ -51,7 +51,11 @@ class JukeboxUI(cmd.Cmd, threading.Thread):
             i = -1
             for i, p in enumerate(self.jukebox.ctr):
                 if p.is_loaded():
-                    print "%3d %s" % (i, p.name())
+                    if Link.from_playlist(p).type() == Link.LINK_STARRED:
+                        name = "Starred by %s" % p.owner()
+                    else:
+                        name = p.name()
+                    print "%3d %s" % (i, name)
                 else:
                     print "%3d %s" % (i, "loading...")
             print "%3d Starred tracks" % (i + 1,)

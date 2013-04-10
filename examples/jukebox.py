@@ -279,6 +279,9 @@ class JukeboxPlaylistManager(SpotifyPlaylistManager):
     def tracks_removed(self, p, t, u):
         print 'Tracks removed from playlist %s' % p.name()
 
+    def playlist_renamed(self, p, u):
+        print 'Playlist renamed to %s' % p.name()
+
 ## container calllbacks ##
 class JukeboxContainerManager(SpotifyContainerManager):
     def container_loaded(self, c, u):

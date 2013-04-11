@@ -348,5 +348,7 @@ link_init(PyObject *m)
                             Py_BuildValue("i", SP_LINKTYPE_PROFILE));
     PyMapping_SetItemString(LinkType.tp_dict, "LINK_IMAGE",
                             Py_BuildValue("i", SP_LINKTYPE_IMAGE));
+    PyMapping_SetItemString(LinkType.tp_dict, "LINK_LOCALTRACK",
+                            Py_BuildValue("i", SP_LINKTYPE_LOCALTRACK));
 
 }

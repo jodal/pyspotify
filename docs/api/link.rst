@@ -25,6 +25,14 @@ The :class:`Link` class
 
     .. data:: LINK_PLAYLIST
 
+    .. data:: LINK_PROFILE
+
+    .. data:: LINK_STARRED
+
+    .. data:: LINK_LOCALTRACK
+
+    .. data:: LINK_IMAGE
+
     .. method:: __str__()
 
         Return the link as a string in the Spotify format.

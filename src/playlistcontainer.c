@@ -293,7 +293,7 @@ PlaylistContainer_remove_playlist(PlaylistContainer *pc, PyObject *args)
         PyErr_SetString(PyExc_IndexError, "");
         return NULL;
     }
-    return Py_BuildValue("i",sp_playlistcontainer_remove_playlist(pc->_playlistcontainer,index));
+    return Py_BuildValue("i", sp_playlistcontainer_remove_playlist(pc->_playlistcontainer, index));
 }
 
 static PyObject *
@@ -390,7 +390,7 @@ static PyMethodDef PlaylistContainer_methods[] = {
     {"remove_playlist",
      (PyCFunction)PlaylistContainer_remove_playlist,
      METH_VARARGS,
-     "Remove a playlist from the playlistcontainer"},     
+     "Remove a playlist from the playlistcontainer"},
     {"add_new_playlist",
      (PyCFunction)PlaylistContainer_add_new_playlist,
      METH_VARARGS,

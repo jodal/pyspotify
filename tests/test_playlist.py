@@ -51,7 +51,7 @@ class TestPlaylistContainer(unittest.TestCase):
         self.assertEqual(len(pc), 1)
 
     def test_remove_playlist_out_of_range(self):
-        pc = mock_playlistcontainer(self.owner, [])        
+        pc = mock_playlistcontainer(self.owner, [])
         self.assertRaises(IndexError, pc.remove_playlist, 0)
 
 

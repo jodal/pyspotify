@@ -17,6 +17,15 @@ v1.11 (UNRELEASED)
 - :class:`spotify.audiosink.alsa.AlsaSink` now accepts a ``period_size`` kwarg,
   which defaults to 8192. Thanks to Stefan Hoffmann.
 
+**New features**
+
+- Add missing link types:
+
+  - :data:`spotify.Link.LINK_PROFILE`
+  - :data:`spotify.Link.LINK_STARRED`
+  - :data:`spotify.Link.LINK_LOCALTRACK`
+  - :data:`spotify.Link.LINK_IMAGE`
+
 
 v1.10 (2012-12-12)
 ==================

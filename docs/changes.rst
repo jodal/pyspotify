@@ -17,6 +17,9 @@ v1.11 (UNRELEASED)
 - :class:`spotify.audiosink.alsa.AlsaSink` now accepts a ``period_size`` kwarg,
   which defaults to 8192. Thanks to Stefan Hoffmann.
 
+- :meth:`spotify.manager.SpotifyPlaylistManager.watch` now listen to 10
+  additional types of playlist modification events, in total 13 types.
+
 **New features**
 
 - Add missing link types:

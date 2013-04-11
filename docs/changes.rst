@@ -26,6 +26,8 @@ v1.11 (UNRELEASED)
   - :data:`spotify.Link.LINK_LOCALTRACK`
   - :data:`spotify.Link.LINK_IMAGE`
 
+- Add :meth:`spotify.PlaylistContainer.remove_playlist`.
+
 
 v1.10 (2012-12-12)
 ==================

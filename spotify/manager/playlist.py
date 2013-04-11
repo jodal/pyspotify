@@ -17,6 +17,16 @@ class SpotifyPlaylistManager:
         playlist.add_tracks_added_callback(self.tracks_added, userdata)
         playlist.add_tracks_moved_callback(self.tracks_moved, userdata)
         playlist.add_tracks_removed_callback(self.tracks_removed, userdata)
+        playlist.add_playlist_renamed_callback(self.playlist_renamed, userdata)
+        playlist.add_playlist_state_changed_callback(self.playlist_state_changed, userdata)
+        playlist.add_playlist_update_in_progress_callback(self.playlist_update_in_progress, userdata)
+        playlist.add_playlist_metadata_updated_callback(self.playlist_metadata_updated, userdata)
+        playlist.add_track_created_changed_callback(self.track_created_changed, userdata)
+        playlist.add_track_message_changed_callback(self.track_message_changed, userdata)
+        playlist.add_track_seen_changed_callback(self.track_seen_changed, userdata)
+        playlist.add_description_changed_callback(self.description_changed, userdata)
+        playlist.add_subscribers_changed_callback(self.subscribers_changed, userdata)
+        playlist.add_image_changed_callback(self.image_changed, userdata)
 
     def unwatch(self, playlist, userdata=None):
         """

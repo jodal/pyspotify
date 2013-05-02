@@ -1,0 +1,9 @@
+include *.rst
+include LICENSE
+include MANIFEST.in
+include spotify/api.h
+
+recursive-include docs *
+prune docs/_build
+
+recursive-include tests *.py

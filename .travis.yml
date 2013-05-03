@@ -11,7 +11,7 @@ install:
   - "sudo wget -q -O /etc/apt/sources.list.d/mopidy.list http://apt.mopidy.com/mopidy.list"
   - "sudo apt-get update -qq"
   - "sudo apt-get install -qq python-all-dev libffi-dev libspotify-dev"
-  - "pip install tox"
+  - "pip install cffi tox"
 
 script:
   - "tox -e $TOX_ENV"

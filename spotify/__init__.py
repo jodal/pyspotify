@@ -29,14 +29,8 @@ def _add_enum(obj, prefix):
 
 class Error(Exception):
     def __init__(self, error_code):
-        super(Error, self).__init__(error_code)
         self.error_code = error_code
-        self.message = _to_text(lib.sp_error_message(error_code))
-
-    def __repr__(self):
-        return '%s (error code %s)' % (self.message, self.error_code)
-
-    def __str__(self):
-        return self.message
+        message = _to_text(lib.sp_error_message(error_code))
+        super(Error, self).__init__(message)
 
 _add_enum(Error, 'SP_ERROR_')

@@ -24,11 +24,11 @@ class ErrorTest(unittest.TestCase):
 
     def test_error_has_useful_repr(self):
         error = spotify.Error(0)
-        self.assertEqual(repr(error), 'No error (error code 0)')
+        self.assertEqual(repr(error), b"Error(u'No error',)")
 
     def test_error_has_useful_str(self):
         error = spotify.Error(0)
-        self.assertEqual(str(error), error.message)
+        self.assertEqual(str(error), 'No error')
 
     def test_error_has_error_constants(self):
         self.assertEqual(spotify.Error.OK, 0)

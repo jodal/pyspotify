@@ -17,7 +17,7 @@ ffi.cdef(header)
 lib = ffi.verify('#include "libspotify/api.h"', libraries=[str('spotify')])
 
 
-def _to_text(chars):
+def _to_unicode(chars):
     return ffi.string(chars).decode('utf-8')
 
 
@@ -34,5 +34,5 @@ def enum(prefix):
 class Error(Exception):
     def __init__(self, error_code):
         self.error_code = error_code
-        message = _to_text(lib.sp_error_message(error_code))
+        message = _to_unicode(lib.sp_error_message(error_code))
         super(Error, self).__init__(message)

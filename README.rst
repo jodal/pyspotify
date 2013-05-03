@@ -19,7 +19,10 @@ Development setup
    - CPython 3.3
    - PyPy 2
 
-2. Install libspotify with development files.
+2. Install Python, libffi, and libspotify development files. On Ubuntu with
+   apt.mopidy.com in your APT sources::
+
+       sudo apt-get install python-all-dev libffi-dev libspotify-dev
 
 3. Create and activate a virtualenv::
 

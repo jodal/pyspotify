@@ -2,6 +2,7 @@ include *.rst
 include LICENSE
 include MANIFEST.in
 include spotify/api.h
+include spotify/api.processed.h
 
 recursive-include docs *
 prune docs/_build

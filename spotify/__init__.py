@@ -10,6 +10,8 @@ __version__ = '2.0.0a1'
 
 header_file = os.path.join(os.path.dirname(__file__), 'api.processed.h')
 header = open(header_file).read()
+header += '#define SPOTIFY_API_VERSION ...\n'
+
 ffi = FFI()
 ffi.cdef(header)
 lib = ffi.verify('#include "libspotify/api.h"', libraries=[str('spotify')])

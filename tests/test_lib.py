@@ -10,3 +10,6 @@ class LibTest(unittest.TestCase):
         self.assertEqual(
             spotify.ffi.string(spotify.lib.sp_error_message(0)),
             b'No error')
+
+    def test_SPOTIFY_API_VERSION_macro(self):
+        self.assertEqual(spotify.lib.SPOTIFY_API_VERSION, 12)

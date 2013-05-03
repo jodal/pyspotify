@@ -1,0 +1,27 @@
+language: python
+
+env:
+  - TOX_ENV=py27
+  - TOX_ENV=py33
+  # TODO Activate when Travis has PyPy 2.x
+  #- TOX_ENV=pypy
+
+install:
+  - "wget -q -O - http://apt.mopidy.com/mopidy.gpg | sudo apt-key add -"
+  - "sudo wget -q -O /etc/apt/sources.list.d/mopidy.list http://apt.mopidy.com/mopidy.list"
+  - "sudo apt-get update -qq"
+  - "sudo apt-get install -qq python-all-dev libffi-dev libspotify-dev"
+  - "pip install tox"
+
+script:
+  - "tox -e $TOX_ENV"
+
+# TODO Activate when pyspotify2 is released
+#notifications:
+#  irc:
+#    channels:
+#      - "irc.freenode.org#mopidy"
+#    on_success: change
+#    on_failure: change
+#    use_notice: true
+#    skip_join: true

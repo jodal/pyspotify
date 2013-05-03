@@ -45,6 +45,8 @@ Development setup
 Development status
 ==================
 
+.. image:: https://secure.travis-ci.org/jodal/pyspotify.png?branch=pyspotify2
+
 - 2013-05-03: The Python object ``spotify.lib`` is a working CFFI wrapper
   around the entire libspotify 12 API. This will be the foundation for more
   pythonic APIs. The library currently works on CPython 2.7, 3.3 and PyPy 2.

@@ -15,3 +15,28 @@ header += '#define SPOTIFY_API_VERSION ...\n'
 ffi = FFI()
 ffi.cdef(header)
 lib = ffi.verify('#include "libspotify/api.h"', libraries=[str('spotify')])
+
+
+def _to_text(chars):
+    return ffi.string(chars).decode('utf-8')
+
+
+def _add_enum(obj, prefix):
+    for attr in dir(lib):
+        if attr.startswith(prefix):
+            setattr(obj, attr.replace(prefix, ''), getattr(lib, attr))
+
+
+class Error(Exception):
+    def __init__(self, error_code):
+        super(Error, self).__init__(error_code)
+        self.error_code = error_code
+        self.message = _to_text(lib.sp_error_message(error_code))
+
+    def __repr__(self):
+        return '%s (error code %s)' % (self.message, self.error_code)
+
+    def __str__(self):
+        return self.message
+
+_add_enum(Error, 'SP_ERROR_')

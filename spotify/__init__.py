@@ -1,6 +1,7 @@
 from __future__ import unicode_literals
 
 import os
+import weakref
 
 import cffi
 
@@ -15,6 +16,14 @@ ffi = cffi.FFI()
 ffi.cdef(_header)
 lib = ffi.verify('#include "libspotify/api.h"', libraries=[str('spotify')])
 
+
+# Mapping between keys and objects that should be kept alive as long as the key
+# is alive. May be used to keep objects alive when there isn't a more
+# convenient place to keep a reference to it. The keys are weakrefs, so entries
+# disappear from the dict when the key is garbage collected, potentially
+# causing objects associated to the key to be garbage collected as well. For
+# further details, refer to the CFFI docs.
+global_weakrefs = weakref.WeakKeyDictionary()
 
 
 from spotify.error import *  # noqa

@@ -1,5 +1,6 @@
 from __future__ import unicode_literals
 
+import logging
 import os
 import weakref
 
@@ -7,6 +8,11 @@ import cffi
 
 
 __version__ = '2.0.0a1'
+
+
+# Log to nowhere by default. For details, see:
+# http://docs.python.org/2/howto/logging.html#library-config
+logging.getLogger('spotify').addHandler(logging.NullHandler())
 
 
 _header_file = os.path.join(os.path.dirname(__file__), 'api.processed.h')

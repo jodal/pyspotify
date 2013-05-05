@@ -13,3 +13,9 @@ class Error(Exception):
         self.error_code = error_code
         message = to_unicode(lib.sp_error_message(error_code))
         super(Error, self).__init__(message)
+
+    def __eq__(self, other):
+        return self.error_code == other.error_code
+
+    def __ne__(self, other):
+        return not self.__eq__(other)

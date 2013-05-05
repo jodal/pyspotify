@@ -33,3 +33,4 @@ global_weakrefs = weakref.WeakKeyDictionary()
 
 
 from spotify.error import *  # noqa
+from spotify.session import *  # noqa

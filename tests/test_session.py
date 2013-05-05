@@ -143,6 +143,8 @@ class SessionConfigTest(unittest.TestCase):
         mock.assert_called_once_with()
 
     def test_make_sp_session_config_returns_a_c_object(self):
+        self.config.application_key = b''
+
         self.assertIsInstance(
             self.config.make_sp_session_config(), spotify.ffi.CData)
 
@@ -154,6 +156,8 @@ class SessionConfigTest(unittest.TestCase):
         self.assertEqual(sp_session_config.application_key_size, 3)
 
     def test_global_weakrefs_keeps_struct_parts_alive(self):
+        self.config.application_key = b''
+
         sp_session_config = self.config.make_sp_session_config()
 
         self.assertIn(sp_session_config, spotify.global_weakrefs)

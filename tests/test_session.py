@@ -1,6 +1,7 @@
 from __future__ import unicode_literals
 
 import mock
+import tempfile
 import unittest
 
 import spotify
@@ -77,3 +78,83 @@ class SessionCallbacksTest(unittest.TestCase):
 
         self.callbacks.credentials_blob_updated.assert_called_once_with(
             spotify.Session(self.sp_session), b'a credentials blob')
+
+
+class SessionConfigTest(unittest.TestCase):
+    def setUp(self):
+        self.config = spotify.SessionConfig()
+
+    def test_api_version_defaults_to_current_lib_version(self):
+        self.assertEqual(
+            self.config.api_version, spotify.lib.SPOTIFY_API_VERSION)
+
+    def test_cache_location_defaults_to_tmp_in_cwd(self):
+        self.assertEqual(self.config.cache_location, b'tmp')
+
+    def test_settings_location_defaults_to_tmp_in_cwd(self):
+        self.assertEqual(self.config.settings_location, b'tmp')
+
+    def test_application_key_is_unknown(self):
+        self.assertIsNone(self.config.application_key)
+
+    def test_application_key_filename_defaults_to_a_file_in_cwd(self):
+        self.assertEqual(
+            self.config.application_key_filename, b'spotify_appkey.key')
+
+    def test_user_agent_defaults_to_pyspotify(self):
+        self.assertEqual(self.config.user_agent, b'pyspotify')
+
+    def test_callbacks_defaults_to_none(self):
+        self.assertIsNone(self.config.callbacks)
+
+    def test_get_application_key_prefers_the_key_attr(self):
+        self.config.application_key = b'secret key from attr'
+
+        self.assertEqual(
+            self.config.get_application_key(), b'secret key from attr')
+
+    def test_get_application_key_can_load_key_from_file(self):
+        self.config.application_key = None
+        self.config.application_key_filename = tempfile.mkstemp()[1]
+
+        with open(self.config.application_key_filename, 'wb') as f:
+            f.write(b'secret key from file')
+
+        self.assertEqual(
+            self.config.get_application_key(), b'secret key from file')
+
+    def test_get_application_key_fails_if_no_key_found(self):
+        self.config.application_key_filename = '/nonexistant'
+
+        self.assertRaises(EnvironmentError, self.config.get_application_key)
+
+    def test_get_callbacks_prefers_the_key_attr(self):
+        self.config.callbacks = mock.sentinel.my_callbacks
+
+        self.assertEqual(
+            self.config.get_callbacks(), mock.sentinel.my_callbacks)
+
+    @mock.patch.object(spotify.session, 'SessionCallbacks')
+    def test_get_callbacks_creates_new_callbacks_object_if_needed(self, mock):
+        self.config.callbacks = None
+
+        self.config.get_callbacks()
+
+        mock.assert_called_once_with()
+
+    def test_make_sp_session_config_returns_a_c_object(self):
+        self.assertIsInstance(
+            self.config.make_sp_session_config(), spotify.ffi.CData)
+
+    def test_application_key_size_is_calculated_correctly(self):
+        self.config.application_key = b'123'
+
+        sp_session_config = self.config.make_sp_session_config()
+
+        self.assertEqual(sp_session_config.application_key_size, 3)
+
+    def test_global_weakrefs_keeps_struct_parts_alive(self):
+        sp_session_config = self.config.make_sp_session_config()
+
+        self.assertIn(sp_session_config, spotify.global_weakrefs)
+        self.assertEqual(len(spotify.global_weakrefs[sp_session_config]), 5)

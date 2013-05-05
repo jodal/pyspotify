@@ -8,6 +8,7 @@ from spotify.utils import to_unicode
 
 __all__ = [
     'SessionCallbacks',
+    'SessionConfig',
     'Session',
 ]
 
@@ -106,6 +107,57 @@ class SessionCallbacks(object):
             'offline_status_updated': self._offline_status_updated,
             'credentials_blob_updated': self._credentials_blob_updated,
         })
+
+
+class SessionConfig(object):
+    api_version = lib.SPOTIFY_API_VERSION
+    cache_location = b'tmp'
+    settings_location = b'tmp'
+    application_key = None
+    application_key_filename = 'spotify_appkey.key'
+    user_agent = b'pyspotify'
+    callbacks = None
+
+    def get_application_key(self):
+        if self.application_key is None:
+            return open(self.application_key_filename).read()
+        else:
+            return self.application_key
+
+    def get_callbacks(self):
+        if self.callbacks is None:
+            return SessionCallbacks()
+        else:
+            return self.callbacks
+
+    def make_sp_session_config(self):
+        cache_location = ffi.new('char[]', self.cache_location)
+        settings_location = ffi.new('char[]', self.settings_location)
+        application_key_bytes = self.get_application_key()
+        application_key = ffi.new('char[]', application_key_bytes)
+        user_agent = ffi.new('char[]', self.user_agent)
+        callbacks = self.get_callbacks()
+
+        # TODO Add remaining config values
+        sp_session_config = ffi.new('sp_session_config *', {
+            'api_version': self.api_version,
+            'cache_location': cache_location,
+            'settings_location': settings_location,
+            'application_key': ffi.cast('void *', application_key),
+            'application_key_size': len(application_key_bytes),
+            'user_agent': user_agent,
+            'callbacks': callbacks.make_sp_session_callbacks(),
+        })
+
+        global_weakrefs[sp_session_config] = [
+            cache_location,
+            settings_location,
+            application_key,
+            user_agent,
+            callbacks,
+        ]
+
+        return sp_session_config
 
 
 class Session(object):

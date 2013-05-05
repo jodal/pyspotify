@@ -20,3 +20,10 @@ def autotest():
         local(
             'inotifywait -q -e create -e modify -e delete '
             '--exclude ".*\.(pyc|sw.)" -r spotify/ tests/')
+
+
+@task
+def update_authors():
+    # Keep authors in the order of appearance and use awk to filter out dupes
+    local(
+        "git log --format='- %aN <%aE>' --reverse | awk '!x[$0]++' > AUTHORS")

@@ -114,13 +114,13 @@ class SessionConfig(object):
     cache_location = b'tmp'
     settings_location = b'tmp'
     application_key = None
-    application_key_filename = 'spotify_appkey.key'
+    application_key_filename = b'spotify_appkey.key'
     user_agent = b'pyspotify'
     callbacks = None
 
     def get_application_key(self):
         if self.application_key is None:
-            return open(self.application_key_filename).read()
+            return open(self.application_key_filename, 'rb').read()
         else:
             return self.application_key
 

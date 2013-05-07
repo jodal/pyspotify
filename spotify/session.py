@@ -3,7 +3,7 @@ from __future__ import unicode_literals
 import logging
 
 from spotify import Error, ffi, global_weakrefs, lib
-from spotify.utils import to_unicode
+from spotify.utils import to_bytes, to_unicode
 
 
 __all__ = [
@@ -185,3 +185,29 @@ class Session(object):
 
     def __ne__(self, other):
         return not self.__eq__(other)
+
+    def login(self, username, password=None, remember_me=False, blob=None):
+        username = ffi.new('char[]', to_bytes(username))
+
+        if password is not None:
+            password = ffi.new('char[]', to_bytes(password)) or ffi.NULL
+            blob = ffi.NULL
+        elif blob is not None:
+            password = ffi.NULL
+            blob = ffi.new('char[]', to_bytes(blob))
+        else:
+            raise AttributeError('password or blob is required to login')
+
+        err = lib.sp_session_login(
+            self.sp_session, username, password, bool(remember_me), blob)
+        if err != Error.OK:
+            raise Error(err)
+
+    def process_events(self):
+        next_timeout = ffi.new('int *')
+
+        err = lib.sp_session_process_events(self.sp_session, next_timeout)
+        if err != Error.OK:
+            raise Error(err)
+
+        return next_timeout[0]

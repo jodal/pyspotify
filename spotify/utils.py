@@ -12,5 +12,12 @@ def enum(prefix):
     return wrapper
 
 
+def to_bytes(text):
+    if isinstance(text, unicode):
+        return text.encode('utf-8')
+    else:
+        return text
+
+
 def to_unicode(chars):
     return ffi.string(chars).decode('utf-8')

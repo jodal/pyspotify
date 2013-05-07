@@ -222,10 +222,10 @@ class SessionTest(unittest.TestCase):
             False, spotify.ffi.NULL)
         self.assertEqual(
             spotify.ffi.string(lib_mock.sp_session_login.call_args[0][1]),
-            'alice')
+            b'alice')
         self.assertEqual(
             spotify.ffi.string(lib_mock.sp_session_login.call_args[0][2]),
-            'secret')
+            b'secret')
 
     def test_login_with_blob(self, lib_mock):
         lib_mock.sp_session_login.return_value = spotify.Error.OK
@@ -238,10 +238,10 @@ class SessionTest(unittest.TestCase):
             False, mock.ANY)
         self.assertEqual(
             spotify.ffi.string(lib_mock.sp_session_login.call_args[0][1]),
-            'alice')
+            b'alice')
         self.assertEqual(
             spotify.ffi.string(lib_mock.sp_session_login.call_args[0][4]),
-            'secret blob')
+            b'secret blob')
 
     def test_login_with_remember_me_flag(self, lib_mock):
         lib_mock.sp_session_login.return_value = spotify.Error.OK

@@ -1,6 +1,18 @@
 from __future__ import unicode_literals
 
+import sys
+
 from spotify import ffi, lib
+
+
+PY3 = sys.version_info[0] == 3
+
+if PY3:
+    text_type = str
+    binary_type = bytes
+else:
+    text_type = unicode
+    binary_type = str
 
 
 def enum(prefix):
@@ -12,11 +24,13 @@ def enum(prefix):
     return wrapper
 
 
-def to_bytes(text):
-    if isinstance(text, unicode):
-        return text.encode('utf-8')
+def to_bytes(value):
+    if isinstance(value, text_type):
+        return value.encode('utf-8')
+    elif isinstance(value, binary_type):
+        return value
     else:
-        return text
+        raise ValueError('Value must be a string')
 
 
 def to_unicode(chars):

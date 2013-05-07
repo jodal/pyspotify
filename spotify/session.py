@@ -203,6 +203,11 @@ class Session(object):
         if err != Error.OK:
             raise Error(err)
 
+    def logout(self):
+        err = lib.sp_session_logout(self.sp_session)
+        if err != Error.OK:
+            raise Error(err)
+
     def process_events(self):
         next_timeout = ffi.new('int *')
 

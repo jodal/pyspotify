@@ -259,6 +259,21 @@ class SessionTest(unittest.TestCase):
 
         self.assertRaises(spotify.Error, session.login, 'alice', 'secret')
 
+    def test_logout(self, lib_mock):
+        lib_mock.sp_session_logout.return_value = spotify.Error.OK
+        session = spotify.Session(mock.sentinel.sp_session)
+
+        session.logout()
+
+        lib_mock.sp_session_logout.assert_called_once_with(
+            mock.sentinel.sp_session)
+
+    def test_logout_fail_raises_error(self, lib_mock):
+        lib_mock.sp_session_login.return_value = spotify.Error.BAD_API_VERSION
+        session = spotify.Session(mock.sentinel.sp_session)
+
+        self.assertRaises(spotify.Error, session.logout)
+
     def test_process_events_returns_next_timeout(self, lib_mock):
         def set_next_timeout(sp_session, int_ptr):
             int_ptr[0] = 500

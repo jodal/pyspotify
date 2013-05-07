@@ -162,3 +162,46 @@ class SessionConfigTest(unittest.TestCase):
 
         self.assertIn(sp_session_config, spotify.global_weakrefs)
         self.assertEqual(len(spotify.global_weakrefs[sp_session_config]), 5)
+
+
+class SessionTest(unittest.TestCase):
+    @mock.patch.object(spotify.session, 'SessionConfig')
+    @mock.patch('spotify.session.lib')
+    def test_creates_config_if_none_provided(self, mock, config_cls_mock):
+        mock.sp_session_create.return_value = spotify.Error.OK
+
+        spotify.Session()
+
+        config_cls_mock.assert_called_once_with()
+        config_obj_mock = config_cls_mock.return_value
+        config_obj_mock.make_sp_session_config.assert_called_once_with()
+
+    @mock.patch('spotify.session.lib')
+    def test_raises_error_if_not_ok(self, mock):
+        mock.sp_session_create.return_value = spotify.Error.BAD_API_VERSION
+        config = spotify.SessionConfig()
+        config.application_key = b'secret'
+
+        self.assertRaises(spotify.Error, spotify.Session, config=config)
+
+    @mock.patch('spotify.session.lib')
+    def test_global_weakrefs_keeps_config_alive(self, mock):
+        mock.sp_session_create.return_value = spotify.Error.OK
+        config = spotify.SessionConfig()
+        config.application_key = b'secret'
+
+        session = spotify.Session(config=config)
+
+        self.assertIn(session.sp_session, spotify.global_weakrefs)
+        self.assertEqual(len(spotify.global_weakrefs[session.sp_session]), 1)
+
+        # Removing the only reference to the session will GC it
+        num_weakrefs = len(spotify.global_weakrefs)
+        session = None
+        self.assertEqual(len(spotify.global_weakrefs), num_weakrefs - 1)
+
+    def test_is_equal_if_same_sp_session(self):
+        sp_session = spotify.ffi.new('sp_session **')[0]
+
+        self.assertEqual(
+            spotify.Session(sp_session), spotify.Session(sp_session))

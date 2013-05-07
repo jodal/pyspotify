@@ -161,8 +161,24 @@ class SessionConfig(object):
 
 
 class Session(object):
-    def __init__(self, sp_session):
-        self.sp_session = sp_session
+    def __init__(self, sp_session=None, config=None):
+        if sp_session is not None:
+            self.sp_session = sp_session
+            return
+
+        if config is None:
+            config = SessionConfig()
+
+        sp_session_config = config.make_sp_session_config()
+        sp_session_ptr = ffi.new('sp_session **')
+
+        err = lib.sp_session_create(sp_session_config, sp_session_ptr)
+        if err != Error.OK:
+            raise Error(err)
+
+        self.sp_session = ffi.gc(sp_session_ptr[0], lib.sp_session_release)
+
+        global_weakrefs[self.sp_session] = [sp_session_config]
 
     def __eq__(self, other):
         return self.sp_session == other.sp_session

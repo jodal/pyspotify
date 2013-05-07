@@ -203,6 +203,11 @@ class Session(object):
         if err != Error.OK:
             raise Error(err)
 
+    def relogin(self):
+        err = lib.sp_session_relogin(self.sp_session)
+        if err != Error.OK:
+            raise Error(err)
+
     def logout(self):
         err = lib.sp_session_logout(self.sp_session)
         if err != Error.OK:

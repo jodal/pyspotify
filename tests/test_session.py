@@ -259,6 +259,21 @@ class SessionTest(unittest.TestCase):
 
         self.assertRaises(spotify.Error, session.login, 'alice', 'secret')
 
+    def test_relogin(self, lib_mock):
+        lib_mock.sp_session_relogin.return_value = spotify.Error.OK
+        session = spotify.Session(mock.sentinel.sp_session)
+
+        session.relogin()
+
+        lib_mock.sp_session_relogin.assert_called_once_with(
+            mock.sentinel.sp_session)
+
+    def test_relogin_fail_raises_error(self, lib_mock):
+        lib_mock.sp_session_relogin.return_value = spotify.Error.NO_CREDENTIALS
+        session = spotify.Session(mock.sentinel.sp_session)
+
+        self.assertRaises(spotify.Error, session.relogin)
+
     def test_logout(self, lib_mock):
         lib_mock.sp_session_logout.return_value = spotify.Error.OK
         session = spotify.Session(mock.sentinel.sp_session)

@@ -194,11 +194,6 @@ class SessionTest(unittest.TestCase):
         self.assertIn(session.sp_session, spotify.global_weakrefs)
         self.assertEqual(len(spotify.global_weakrefs[session.sp_session]), 1)
 
-        # Removing the only reference to the session will GC it
-        num_weakrefs = len(spotify.global_weakrefs)
-        session = None
-        self.assertEqual(len(spotify.global_weakrefs), num_weakrefs - 1)
-
     def test_is_equal_if_same_sp_session(self, lib_mock):
         sp_session = mock.sentinel.sp_session
 

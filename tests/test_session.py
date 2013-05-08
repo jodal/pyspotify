@@ -341,6 +341,26 @@ class SessionTest(unittest.TestCase):
 
         self.assertRaises(spotify.Error, session.forget_me)
 
+    @mock.patch('spotify.user.lib')
+    def test_user(self, user_lib_mock, lib_mock):
+        lib_mock.sp_session_user.return_value = (
+            spotify.ffi.new('sp_user **'))
+        session = spotify.Session(mock.sentinel.sp_session)
+
+        result = session.user
+
+        lib_mock.sp_session_user.assert_called_with(mock.sentinel.sp_session)
+        self.assertIsInstance(result, spotify.User)
+
+    def test_user_if_not_logged_in(self, lib_mock):
+        lib_mock.sp_session_user.return_value = spotify.ffi.NULL
+        session = spotify.Session(mock.sentinel.sp_session)
+
+        result = session.user
+
+        lib_mock.sp_session_user.assert_called_with(mock.sentinel.sp_session)
+        self.assertIsNone(result)
+
     def test_logout(self, lib_mock):
         lib_mock.sp_session_logout.return_value = spotify.Error.OK
         session = spotify.Session(mock.sentinel.sp_session)

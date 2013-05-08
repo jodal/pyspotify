@@ -2,7 +2,7 @@ from __future__ import unicode_literals
 
 import logging
 
-from spotify import Error, ffi, global_weakrefs, lib
+from spotify import Error, ffi, global_weakrefs, lib, User
 from spotify.utils import to_bytes, to_unicode
 
 
@@ -229,6 +229,13 @@ class Session(object):
         err = lib.sp_session_forget_me(self.sp_session)
         if err != Error.OK:
             raise Error(err)
+
+    @property
+    def user(self):
+        sp_user = lib.sp_session_user(self.sp_session)
+        if sp_user == ffi.NULL:
+            return None
+        return User(sp_user)
 
     def logout(self):
         err = lib.sp_session_logout(self.sp_session)

@@ -48,6 +48,8 @@ Development status
 .. image:: https://secure.travis-ci.org/jodal/pyspotify.png?branch=pyspotify2
     :target: https://travis-ci.org/jodal/pyspotify
 
+- 2013-05-09: User subsystem complete.
+
 - 2013-05-08: Session configuration and creation, with login and logout works.
 
 - 2013-05-03: The Python object ``spotify.lib`` is a working CFFI wrapper

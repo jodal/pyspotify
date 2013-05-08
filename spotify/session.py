@@ -208,6 +208,18 @@ class Session(object):
         if err != Error.OK:
             raise Error(err)
 
+    def remembered_user(self):
+        buffer_length = 10
+        actual_length = buffer_length
+        while actual_length >= buffer_length:
+            buffer_length *= 2
+            username = ffi.new('char[%d]' % buffer_length)
+            actual_length = lib.sp_session_remembered_user(
+                self.sp_session, username, buffer_length)
+        if actual_length == -1:
+            return None
+        return to_unicode(username)
+
     def logout(self):
         err = lib.sp_session_logout(self.sp_session)
         if err != Error.OK:

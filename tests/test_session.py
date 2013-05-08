@@ -269,6 +269,32 @@ class SessionTest(unittest.TestCase):
 
         self.assertRaises(spotify.Error, session.relogin)
 
+    def test_remembered_user_grows_buffer_to_fit_username(self, lib_mock):
+        username = b'alice' * 100
+
+        def func(sp_session, buffer_, buffer_size):
+            length = min(len(username), buffer_size - 1)
+            buffer_[0:length] = username[:length]
+            return len(username)
+        lib_mock.sp_session_remembered_user.side_effect = func
+        session = spotify.Session(mock.sentinel.sp_session)
+
+        result = session.remembered_user()
+
+        lib_mock.sp_session_remembered_user.assert_called_with(
+            mock.sentinel.sp_session, mock.ANY, mock.ANY)
+        self.assertEqual(result, username)
+
+    def test_remembered_user_is_none_if_not_remembered(self, lib_mock):
+        lib_mock.sp_session_remembered_user.return_value = -1
+        session = spotify.Session(mock.sentinel.sp_session)
+
+        result = session.remembered_user()
+
+        lib_mock.sp_session_remembered_user.assert_called_with(
+            mock.sentinel.sp_session, mock.ANY, mock.ANY)
+        self.assertIsNone(result)
+
     def test_logout(self, lib_mock):
         lib_mock.sp_session_logout.return_value = spotify.Error.OK
         session = spotify.Session(mock.sentinel.sp_session)
@@ -285,10 +311,10 @@ class SessionTest(unittest.TestCase):
         self.assertRaises(spotify.Error, session.logout)
 
     def test_process_events_returns_next_timeout(self, lib_mock):
-        def set_next_timeout(sp_session, int_ptr):
+        def func(sp_session, int_ptr):
             int_ptr[0] = 500
             return spotify.Error.OK
-        lib_mock.sp_session_process_events.side_effect = set_next_timeout
+        lib_mock.sp_session_process_events.side_effect = func
         session = spotify.Session(mock.sentinel.sp_session)
 
         timeout = session.process_events()

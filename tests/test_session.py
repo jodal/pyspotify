@@ -295,6 +295,17 @@ class SessionTest(unittest.TestCase):
             mock.sentinel.sp_session, mock.ANY, mock.ANY)
         self.assertIsNone(result)
 
+    def test_user_name(self, lib_mock):
+        lib_mock.sp_session_user_name.return_value = spotify.ffi.new(
+            'char[]', b'alice')
+        session = spotify.Session(mock.sentinel.sp_session)
+
+        result = session.user_name()
+
+        lib_mock.sp_session_user_name.assert_called_with(
+            mock.sentinel.sp_session)
+        self.assertEqual(result, 'alice')
+
     def test_logout(self, lib_mock):
         lib_mock.sp_session_logout.return_value = spotify.Error.OK
         session = spotify.Session(mock.sentinel.sp_session)

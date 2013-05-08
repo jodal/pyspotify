@@ -220,6 +220,9 @@ class Session(object):
             return None
         return to_unicode(username)
 
+    def user_name(self):
+        return to_unicode(lib.sp_session_user_name(self.sp_session))
+
     def logout(self):
         err = lib.sp_session_logout(self.sp_session)
         if err != Error.OK:

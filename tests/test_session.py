@@ -306,6 +306,22 @@ class SessionTest(unittest.TestCase):
             mock.sentinel.sp_session)
         self.assertEqual(result, 'alice')
 
+    def test_forget_me(self, lib_mock):
+        lib_mock.sp_session_forget_me.return_value = spotify.Error.OK
+        session = spotify.Session(mock.sentinel.sp_session)
+
+        session.forget_me()
+
+        lib_mock.sp_session_forget_me.assert_called_with(
+            mock.sentinel.sp_session)
+
+    def test_forget_me_fail_raises_error(self, lib_mock):
+        lib_mock.sp_session_forget_me.return_value = (
+            spotify.Error.BAD_API_VERSION)
+        session = spotify.Session(mock.sentinel.sp_session)
+
+        self.assertRaises(spotify.Error, session.forget_me)
+
     def test_logout(self, lib_mock):
         lib_mock.sp_session_logout.return_value = spotify.Error.OK
         session = spotify.Session(mock.sentinel.sp_session)

@@ -208,6 +208,7 @@ class Session(object):
         if err != Error.OK:
             raise Error(err)
 
+    @property
     def remembered_user(self):
         buffer_length = 10
         actual_length = buffer_length
@@ -220,6 +221,7 @@ class Session(object):
             return None
         return to_unicode(username)
 
+    @property
     def user_name(self):
         return to_unicode(lib.sp_session_user_name(self.sp_session))
 

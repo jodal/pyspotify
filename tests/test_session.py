@@ -279,7 +279,7 @@ class SessionTest(unittest.TestCase):
         lib_mock.sp_session_remembered_user.side_effect = func
         session = spotify.Session(mock.sentinel.sp_session)
 
-        result = session.remembered_user()
+        result = session.remembered_user
 
         lib_mock.sp_session_remembered_user.assert_called_with(
             mock.sentinel.sp_session, mock.ANY, mock.ANY)
@@ -289,7 +289,7 @@ class SessionTest(unittest.TestCase):
         lib_mock.sp_session_remembered_user.return_value = -1
         session = spotify.Session(mock.sentinel.sp_session)
 
-        result = session.remembered_user()
+        result = session.remembered_user
 
         lib_mock.sp_session_remembered_user.assert_called_with(
             mock.sentinel.sp_session, mock.ANY, mock.ANY)
@@ -300,7 +300,7 @@ class SessionTest(unittest.TestCase):
             'char[]', b'alice')
         session = spotify.Session(mock.sentinel.sp_session)
 
-        result = session.user_name()
+        result = session.user_name
 
         lib_mock.sp_session_user_name.assert_called_with(
             mock.sentinel.sp_session)

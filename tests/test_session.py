@@ -1,5 +1,6 @@
 from __future__ import unicode_literals
 
+import gc
 import mock
 import tempfile
 import unittest
@@ -10,7 +11,7 @@ import spotify
 class SessionCallbacksTest(unittest.TestCase):
     def setUp(self):
         self.callbacks = spotify.SessionCallbacks()
-        self.sp_session = spotify.ffi.new('sp_session **')[0]
+        self.sp_session = spotify.ffi.NULL
         self.sp_error = 1
 
     def test_logged_in_callback(self):
@@ -184,6 +185,23 @@ class SessionTest(unittest.TestCase):
 
         self.assertRaises(spotify.Error, spotify.Session, config=config)
 
+    def test_releases_sp_session_when_session_dies(self, lib_mock):
+        sp_session = spotify.ffi.NULL
+
+        def func(sp_session_config, sp_session_ptr):
+            sp_session_ptr[0] = sp_session
+            return spotify.Error.OK
+
+        lib_mock.sp_session_create.side_effect = func
+        config = spotify.SessionConfig()
+        config.application_key = b'secret'
+
+        session = spotify.Session(config=config)
+        session = None  # noqa
+        gc.collect()  # Needed for PyPy
+
+        lib_mock.sp_session_release.assert_called_with(sp_session)
+
     def test_global_weakrefs_keeps_config_alive(self, lib_mock):
         lib_mock.sp_session_create.return_value = spotify.Error.OK
         config = spotify.SessionConfig()
@@ -276,6 +294,7 @@ class SessionTest(unittest.TestCase):
             length = min(len(username), buffer_size - 1)
             buffer_[0:length] = username[:length]
             return len(username)
+
         lib_mock.sp_session_remembered_user.side_effect = func
         session = spotify.Session(mock.sentinel.sp_session)
 
@@ -341,6 +360,7 @@ class SessionTest(unittest.TestCase):
         def func(sp_session, int_ptr):
             int_ptr[0] = 500
             return spotify.Error.OK
+
         lib_mock.sp_session_process_events.side_effect = func
         session = spotify.Session(mock.sentinel.sp_session)
 

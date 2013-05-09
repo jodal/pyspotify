@@ -288,11 +288,15 @@ class SessionTest(unittest.TestCase):
         self.assertRaises(spotify.Error, session.relogin)
 
     def test_remembered_user_grows_buffer_to_fit_username(self, lib_mock):
-        username = b'alice' * 100
+        username = 'alice' * 100
 
         def func(sp_session, buffer_, buffer_size):
+            # -1 to keep a char free for \0 terminating the string
             length = min(len(username), buffer_size - 1)
-            buffer_[0:length] = username[:length]
+            # Due to Python 3 treating bytes as an array of ints, we have to
+            # encode and copy chars one by one.
+            for i in range(length):
+                buffer_[i] = username[i].encode('utf-8')
             return len(username)
 
         lib_mock.sp_session_remembered_user.side_effect = func

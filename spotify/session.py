@@ -3,7 +3,7 @@ from __future__ import unicode_literals
 import logging
 
 import spotify
-from spotify import Error, ffi, global_weakrefs, lib, User
+from spotify import Error, ffi, lib, User
 from spotify.utils import to_bytes, to_unicode
 
 
@@ -166,7 +166,7 @@ class SessionConfig(object):
             'callbacks': callbacks.make_sp_session_callbacks(),
         })
 
-        global_weakrefs[sp_session_config] = [
+        spotify.weak_key_dict[sp_session_config] = [
             cache_location,
             settings_location,
             application_key,
@@ -194,7 +194,7 @@ class Session(object):
 
         self.sp_session = ffi.gc(sp_session_ptr[0], lib.sp_session_release)
 
-        global_weakrefs[self.sp_session] = [sp_session_config]
+        spotify.weak_key_dict[self.sp_session] = [sp_session_config]
 
         spotify.session_instance = self
 

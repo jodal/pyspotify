@@ -29,7 +29,7 @@ lib = ffi.verify('#include "libspotify/api.h"', libraries=[str('spotify')])
 # disappear from the dict when the key is garbage collected, potentially
 # causing objects associated to the key to be garbage collected as well. For
 # further details, refer to the CFFI docs.
-global_weakrefs = weakref.WeakKeyDictionary()
+weak_key_dict = weakref.WeakKeyDictionary()
 
 
 # Reference to the spotify.Session instance. Used to enforce that one and only

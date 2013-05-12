@@ -168,13 +168,13 @@ class SessionConfigTest(unittest.TestCase):
 
         self.assertEqual(sp_session_config.application_key_size, 3)
 
-    def test_global_weakrefs_keeps_struct_parts_alive(self):
+    def test_weak_key_dict_keeps_struct_parts_alive(self):
         self.config.application_key = b''
 
         sp_session_config = self.config.make_sp_session_config()
 
-        self.assertIn(sp_session_config, spotify.global_weakrefs)
-        self.assertEqual(len(spotify.global_weakrefs[sp_session_config]), 5)
+        self.assertIn(sp_session_config, spotify.weak_key_dict)
+        self.assertEqual(len(spotify.weak_key_dict[sp_session_config]), 5)
 
 
 @mock.patch('spotify.session.lib')
@@ -229,11 +229,11 @@ class SessionTest(unittest.TestCase):
 
         lib_mock.sp_session_release.assert_called_with(sp_session)
 
-    def test_global_weakrefs_keeps_config_alive(self, lib_mock):
+    def test_weak_key_dict_keeps_config_alive(self, lib_mock):
         session = self.create_session(lib_mock)
 
-        self.assertIn(session.sp_session, spotify.global_weakrefs)
-        self.assertEqual(len(spotify.global_weakrefs[session.sp_session]), 1)
+        self.assertIn(session.sp_session, spotify.weak_key_dict)
+        self.assertEqual(len(spotify.weak_key_dict[session.sp_session]), 1)
 
     def test_login_raises_error_if_no_password_and_no_blob(self, lib_mock):
         lib_mock.sp_session_login.return_value = spotify.Error.OK

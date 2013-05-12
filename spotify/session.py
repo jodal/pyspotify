@@ -4,7 +4,7 @@ import logging
 
 import spotify
 from spotify import Error, ffi, lib, User
-from spotify.utils import to_bytes, to_unicode
+from spotify.utils import get_with_growing_buffer, to_bytes, to_unicode
 
 
 __all__ = [
@@ -222,16 +222,8 @@ class Session(object):
 
     @property
     def remembered_user(self):
-        actual_length = 10
-        buffer_length = actual_length
-        while actual_length >= buffer_length:
-            buffer_length = actual_length + 1
-            username = ffi.new('char[%d]' % buffer_length)
-            actual_length = lib.sp_session_remembered_user(
-                self.sp_session, username, buffer_length)
-        if actual_length == -1:
-            return None
-        return to_unicode(username)
+        return get_with_growing_buffer(
+            lib.sp_session_remembered_user, self.sp_session)
 
     @property
     def user_name(self):

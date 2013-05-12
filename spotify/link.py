@@ -2,7 +2,7 @@ from __future__ import unicode_literals
 
 import spotify
 from spotify import ffi, lib
-from spotify.utils import to_bytes, to_unicode
+from spotify.utils import get_with_growing_buffer, to_bytes
 
 
 __all__ = [
@@ -24,13 +24,4 @@ class Link(object):
         self.sp_link = ffi.gc(sp_link, lib.sp_link_release)
 
     def __str__(self):
-        actual_length = 10
-        buffer_length = actual_length
-        while actual_length >= buffer_length:
-            buffer_length = actual_length + 1
-            link = ffi.new('char[%d]' % buffer_length)
-            actual_length = lib.sp_link_as_string(
-                self.sp_link, link, buffer_length)
-        if actual_length == -1:
-            return None
-        return to_unicode(link)
+        return get_with_growing_buffer(lib.sp_link_as_string, self.sp_link)

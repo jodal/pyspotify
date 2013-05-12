@@ -210,10 +210,10 @@ class Session(object):
 
     @property
     def remembered_user(self):
-        buffer_length = 10
-        actual_length = buffer_length
+        actual_length = 10
+        buffer_length = actual_length
         while actual_length >= buffer_length:
-            buffer_length *= 2
+            buffer_length = actual_length + 1
             username = ffi.new('char[%d]' % buffer_length)
             actual_length = lib.sp_session_remembered_user(
                 self.sp_session, username, buffer_length)

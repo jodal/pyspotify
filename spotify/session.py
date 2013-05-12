@@ -2,6 +2,7 @@ from __future__ import unicode_literals
 
 import logging
 
+import spotify
 from spotify import Error, ffi, global_weakrefs, lib, User
 from spotify.utils import to_bytes, to_unicode
 
@@ -49,50 +50,66 @@ class SessionCallbacks(object):
             'void(sp_session *, const char *)', self._credentials_blob_updated)
 
     def _logged_in(self, sp_session, sp_error):
+        if not spotify.session_instance:
+            return
         if sp_error == Error.OK:
             logger.info('Logged in')
         else:
             logger.error('Login error: %s', Error(sp_error))
         if self.logged_in is not None:
-            self.logged_in(Session(sp_session), Error(sp_error))
+            self.logged_in(spotify.session_instance, Error(sp_error))
 
     def _logged_out(self, sp_session):
+        if not spotify.session_instance:
+            return
         logger.info('Logged out')
         if self.logged_out is not None:
-            self.logged_out(Session(sp_session))
+            self.logged_out(spotify.session_instance)
 
     def _metadata_updated(self, sp_session):
+        if not spotify.session_instance:
+            return
         logger.debug('Metadata updated')
         if self.metadata_updated is not None:
-            self.metadata_updated(Session(sp_session))
+            self.metadata_updated(spotify.session_instance)
 
     def _connection_error(self, sp_session, sp_error):
+        if not spotify.session_instance:
+            return
         error = Error(sp_error)
         logger.error('Connection error: %s', error)
         if self.connection_error is not None:
-            self.connection_error(Session(sp_session), error)
+            self.connection_error(spotify.session_instance, error)
 
     def _notify_main_thread(self, sp_session):
+        if not spotify.session_instance:
+            return
         logger.debug('Notify main thread')
         if self.notify_main_thread is not None:
-            self.notify_main_thread(Session(sp_session))
+            self.notify_main_thread(spotify.session_instance)
 
     def _log_message(self, sp_session, data):
+        if not spotify.session_instance:
+            return
         data = to_unicode(data).strip()
         logger.debug('Log message from Spotify: %s', data)
         if self.log_message is not None:
-            self.log_message(Session(sp_session), data)
+            self.log_message(spotify.session_instance, data)
 
     def _offline_status_updated(self, sp_session):
+        if not spotify.session_instance:
+            return
         logger.debug('Offline status updated')
         if self.offline_status_updated is not None:
-            self.offline_status_updated(Session(sp_session))
+            self.offline_status_updated(spotify.session_instance)
 
     def _credentials_blob_updated(self, sp_session, data):
+        if not spotify.session_instance:
+            return
         data = ffi.string(data)
         logger.debug('Credentials blob updated: %r', data)
         if self.credentials_blob_updated is not None:
-            self.credentials_blob_updated(Session(sp_session), data)
+            self.credentials_blob_updated(spotify.session_instance, data)
 
     def make_sp_session_callbacks(self):
         # TODO Add remaining callbacks
@@ -162,9 +179,8 @@ class SessionConfig(object):
 
 class Session(object):
     def __init__(self, sp_session=None, config=None):
-        if sp_session is not None:
-            self.sp_session = sp_session
-            return
+        if spotify.session_instance is not None:
+            raise RuntimeError('Session has already been initialized')
 
         if config is None:
             config = SessionConfig()
@@ -180,11 +196,7 @@ class Session(object):
 
         global_weakrefs[self.sp_session] = [sp_session_config]
 
-    def __eq__(self, other):
-        return self.sp_session == other.sp_session
-
-    def __ne__(self, other):
-        return not self.__eq__(other)
+        spotify.session_instance = self
 
     def login(self, username, password=None, remember_me=False, blob=None):
         username = ffi.new('char[]', to_bytes(username))

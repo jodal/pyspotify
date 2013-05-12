@@ -32,6 +32,11 @@ lib = ffi.verify('#include "libspotify/api.h"', libraries=[str('spotify')])
 global_weakrefs = weakref.WeakKeyDictionary()
 
 
+# Reference to the spotify.Session instance. Used to enforce that one and only
+# one session exists in each process.
+session_instance = None
+
+
 from spotify.error import *  # noqa
 from spotify.user import *  # noqa
 from spotify.session import *  # noqa

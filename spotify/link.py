@@ -20,6 +20,8 @@ class Link(object):
             if offset is None:
                 offset = 0
             sp_link = lib.sp_link_create_from_track(value.sp_track, offset)
+        elif isinstance(value, spotify.Playlist):
+            sp_link = lib.sp_link_create_from_playlist(value.sp_playlist)
         elif isinstance(value, spotify.User):
             sp_link = lib.sp_link_create_from_user(value.sp_user)
         else:

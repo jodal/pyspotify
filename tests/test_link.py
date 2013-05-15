@@ -29,6 +29,32 @@ class LinkTest(unittest.TestCase):
                 lib_mock.sp_link_create_from_string.call_args[0][0]),
             b'spotify:track:foo')
 
+    @mock.patch('spotify.track.lib')
+    def test_create_from_track(self, track_lib_mock, lib_mock):
+        sp_link = spotify.ffi.new('int *')
+        lib_mock.sp_link_create_from_track.return_value = sp_link
+        sp_track = spotify.ffi.new('int *')
+        track = spotify.Track(sp_track)
+
+        link = spotify.Link(track)
+
+        self.assertEqual(link.sp_link, sp_link)
+        lib_mock.sp_link_create_from_track.assert_called_once_with(
+            sp_track, 0)
+
+    @mock.patch('spotify.track.lib')
+    def test_create_from_track_and_offset(self, track_lib_mock, lib_mock):
+        sp_link = spotify.ffi.new('int *')
+        lib_mock.sp_link_create_from_track.return_value = sp_link
+        sp_track = spotify.ffi.new('int *')
+        track = spotify.Track(sp_track)
+
+        link = spotify.Link(track, offset=90)
+
+        self.assertEqual(link.sp_link, sp_link)
+        lib_mock.sp_link_create_from_track.assert_called_once_with(
+            sp_track, 90)
+
     def test_raises_error_if_session_doesnt_exist(self, lib_mock):
         spotify.session_instance = None
 
@@ -85,3 +111,41 @@ class LinkTest(unittest.TestCase):
         self.assertEqual(spotify.Link.TYPE_TRACK, link.type)
 
         lib_mock.sp_link_type.assert_called_once_with(sp_link)
+
+    @mock.patch('spotify.track.lib')
+    def test_as_track(self, track_lib_mock, lib_mock):
+        sp_link = spotify.ffi.new('int *')
+        lib_mock.sp_link_create_from_string.return_value = sp_link
+        sp_track = spotify.ffi.new('int *')
+        lib_mock.sp_link_as_track.return_value = sp_track
+
+        link = spotify.Link('spotify:track:foo')
+        self.assertEqual(link.as_track().sp_track, sp_track)
+
+        lib_mock.sp_link_as_track.assert_called_once_with(sp_link)
+
+    @mock.patch('spotify.track.lib')
+    def test_as_track_if_not_a_track(self, track_lib_mock, lib_mock):
+        sp_link = spotify.ffi.new('int *')
+        lib_mock.sp_link_create_from_string.return_value = sp_link
+        lib_mock.sp_link_as_track.return_value = spotify.ffi.NULL
+
+        link = spotify.Link('spotify:track:foo')
+        self.assertIsNone(link.as_track())
+
+        lib_mock.sp_link_as_track.assert_called_once_with(sp_link)
+
+    @mock.patch('spotify.track.lib')
+    def test_as_track_with_offset(self, track_lib_mock, lib_mock):
+        sp_link = spotify.ffi.new('int *')
+        lib_mock.sp_link_create_from_string.return_value = sp_link
+        sp_track = spotify.ffi.new('int *')
+        lib_mock.sp_link_as_track_and_offset.return_value = sp_track
+
+        link = spotify.Link('spotify:track:foo')
+        track = link.as_track(offset=90)
+
+        self.assertEqual(track.sp_track, sp_track)
+
+        lib_mock.sp_link_as_track_and_offset.assert_called_once_with(
+            sp_link, 90)

@@ -12,15 +12,20 @@ __all__ = [
 
 @enum('SP_LINK')
 class Link(object):
-    def __init__(self, value):
+    def __init__(self, value, offset=None):
         if spotify.session_instance is None:
             raise RuntimeError('Session must be initialized to create links')
 
-        sp_link = lib.sp_link_create_from_string(
-            ffi.new('char[]', to_bytes(value)))
-
-        if sp_link == ffi.NULL:
-            raise ValueError('Failed to get link from Spotify URI: %s' % value)
+        if isinstance(value, spotify.Track):
+            if offset is None:
+                offset = 0
+            sp_link = lib.sp_link_create_from_track(value.sp_track, offset)
+        else:
+            sp_link = lib.sp_link_create_from_string(
+                ffi.new('char[]', to_bytes(value)))
+            if sp_link == ffi.NULL:
+                raise ValueError(
+                    'Failed to get link from Spotify URI: %s' % value)
 
         self.sp_link = ffi.gc(sp_link, lib.sp_link_release)
 
@@ -30,3 +35,11 @@ class Link(object):
     @property
     def type(self):
         return lib.sp_link_type(self.sp_link)
+
+    def as_track(self, offset=None):
+        if offset is not None:
+            sp_track = lib.sp_link_as_track_and_offset(self.sp_link, offset)
+        else:
+            sp_track = lib.sp_link_as_track(self.sp_link)
+        if sp_track:
+            return spotify.Track(sp_track)

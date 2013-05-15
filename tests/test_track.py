@@ -25,3 +25,14 @@ class TrackTest(unittest.TestCase):
         gc.collect()  # Needed for PyPy
 
         lib_mock.sp_track_release.assert_called_with(sp_track)
+
+    @mock.patch('spotify.link.Link')
+    def test_link_creates_link_to_track(self, link_mock, lib_mock):
+        link_mock.return_value = mock.sentinel.link
+        sp_track = spotify.ffi.new('int *')
+        track = spotify.Track(sp_track)
+
+        result = track.link
+
+        link_mock.assert_called_once_with(track)
+        self.assertEqual(result, mock.sentinel.link)

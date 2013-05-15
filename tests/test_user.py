@@ -57,3 +57,14 @@ class UserTest(unittest.TestCase):
 
         lib_mock.sp_user_is_loaded.assert_called_once_with(sp_user)
         self.assertTrue(result)
+
+    @mock.patch('spotify.link.Link')
+    def test_link_creates_link_to_user(self, link_mock, lib_mock):
+        link_mock.return_value = mock.sentinel.link
+        sp_user = spotify.ffi.new('int *')
+        user = spotify.User(sp_user)
+
+        result = user.link
+
+        link_mock.assert_called_once_with(user)
+        self.assertEqual(result, mock.sentinel.link)

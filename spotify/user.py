@@ -25,3 +25,8 @@ class User(object):
     @property
     def is_loaded(self):
         return bool(lib.sp_user_is_loaded(self.sp_user))
+
+    @property
+    def link(self):
+        from spotify.link import Link
+        return Link(self)

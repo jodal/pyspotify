@@ -55,6 +55,18 @@ class LinkTest(unittest.TestCase):
         lib_mock.sp_link_create_from_track.assert_called_once_with(
             sp_track, 90)
 
+    @mock.patch('spotify.user.lib')
+    def test_create_from_user(self, user_lib_mock, lib_mock):
+        sp_link = spotify.ffi.new('int *')
+        lib_mock.sp_link_create_from_user.return_value = sp_link
+        sp_user = spotify.ffi.new('int *')
+        user = spotify.User(sp_user)
+
+        link = spotify.Link(user)
+
+        self.assertEqual(link.sp_link, sp_link)
+        lib_mock.sp_link_create_from_user.assert_called_once_with(sp_user)
+
     def test_raises_error_if_session_doesnt_exist(self, lib_mock):
         spotify.session_instance = None
 
@@ -149,3 +161,26 @@ class LinkTest(unittest.TestCase):
 
         lib_mock.sp_link_as_track_and_offset.assert_called_once_with(
             sp_link, 90)
+
+    @mock.patch('spotify.user.lib')
+    def test_as_user(self, user_lib_mock, lib_mock):
+        sp_link = spotify.ffi.new('int *')
+        lib_mock.sp_link_create_from_string.return_value = sp_link
+        sp_user = spotify.ffi.new('int *')
+        lib_mock.sp_link_as_user.return_value = sp_user
+
+        link = spotify.Link('spotify:user:foo')
+        self.assertEqual(link.as_user().sp_user, sp_user)
+
+        lib_mock.sp_link_as_user.assert_called_once_with(sp_link)
+
+    @mock.patch('spotify.user.lib')
+    def test_as_user_if_not_a_user(self, user_lib_mock, lib_mock):
+        sp_link = spotify.ffi.new('int *')
+        lib_mock.sp_link_create_from_string.return_value = sp_link
+        lib_mock.sp_link_as_user.return_value = spotify.ffi.NULL
+
+        link = spotify.Link('spotify:user:foo')
+        self.assertIsNone(link.as_user())
+
+        lib_mock.sp_link_as_user.assert_called_once_with(sp_link)

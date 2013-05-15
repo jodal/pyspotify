@@ -20,6 +20,8 @@ class Link(object):
             if offset is None:
                 offset = 0
             sp_link = lib.sp_link_create_from_track(value.sp_track, offset)
+        elif isinstance(value, spotify.User):
+            sp_link = lib.sp_link_create_from_user(value.sp_user)
         else:
             sp_link = lib.sp_link_create_from_string(
                 ffi.new('char[]', to_bytes(value)))
@@ -43,3 +45,10 @@ class Link(object):
             sp_track = lib.sp_link_as_track(self.sp_link)
         if sp_track:
             return spotify.Track(sp_track)
+
+    def as_user(self):
+        sp_user = lib.sp_link_as_user(self.sp_link)
+        if sp_user:
+            return spotify.User(sp_user)
+
+    # TODO Add all sp_link_* methods

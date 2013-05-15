@@ -22,22 +22,22 @@ Development setup
 2. Install Python, libffi, and libspotify development files. On Ubuntu with
    apt.mopidy.com in your APT sources::
 
-       sudo apt-get install python-all-dev libffi-dev libspotify-dev
+       sudo apt-get install python-all-dev python3-all-dev libffi-dev libspotify-dev
 
 3. Create and activate a virtualenv::
 
        virtualenv ve
        source ve/bin/activate
 
-4. Install cffi and tox::
+4. Install development dependencies::
 
-       pip install cffi tox
+       pip install cffi mock nose six tox
 
-5. Optionally, install pyspotify into your virtualenv::
+5. Quick test suite run, using the virtualenv's Python version::
 
-       python setup.py develop
+       nosetests
 
-6. Run tests on all the Python implementations::
+6. Slower test suite run, using all the Python implementations::
 
        tox
 

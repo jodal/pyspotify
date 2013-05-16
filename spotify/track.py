@@ -1,7 +1,7 @@
 from __future__ import unicode_literals
 
 from spotify import ffi, lib
-from spotify.utils import to_bytes
+from spotify.utils import to_bytes, to_unicode
 
 
 __all__ = [
@@ -23,6 +23,10 @@ class Track(object):
     @property
     def error(self):
         return lib.sp_track_error(self.sp_track)
+
+    @property
+    def name(self):
+        return to_unicode(lib.sp_track_name(self.sp_track))
 
     def as_link(self, offset=0):
         from spotify.link import Link

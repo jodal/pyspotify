@@ -12,13 +12,11 @@ __all__ = [
 
 @enum('SP_LINK')
 class Link(object):
-    def __init__(self, value, offset=None):
+    def __init__(self, value, offset=0):
         if spotify.session_instance is None:
             raise RuntimeError('Session must be initialized to create links')
 
         if isinstance(value, spotify.Track):
-            if offset is None:
-                offset = 0
             sp_link = lib.sp_link_create_from_track(value.sp_track, offset)
         elif isinstance(value, spotify.Album):
             sp_link = lib.sp_link_create_from_album(value.sp_album)

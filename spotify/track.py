@@ -16,6 +16,10 @@ class Track(object):
             lib.sp_track_add_ref(sp_track)
         self.sp_track = ffi.gc(sp_track, lib.sp_track_release)
 
+    @property
+    def is_loaded(self):
+        return bool(lib.sp_track_is_loaded(self.sp_track))
+
     def as_link(self, offset=0):
         from spotify.link import Link
         return Link(self, offset=offset)

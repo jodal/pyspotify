@@ -40,6 +40,7 @@ session_instance = None
 from spotify.error import *  # noqa
 from spotify.user import *  # noqa
 from spotify.session import *  # noqa
+from spotify.album import *  # noqa
 from spotify.playlist import *  # noqa
 from spotify.track import *  # noqa
 from spotify.link import *  # noqa

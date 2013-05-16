@@ -201,17 +201,13 @@ class LinkTest(unittest.TestCase):
             sp_link, mock.ANY, mock.ANY)
         self.assertEqual(result, string)
 
-    def test_has_type_constants(self, lib_mock):
-        self.assertEqual(spotify.Link.TYPE_TRACK, 1)
-        self.assertEqual(spotify.Link.TYPE_ALBUM, 2)
-
     def test_type(self, lib_mock):
         sp_link = spotify.ffi.new('int *')
         lib_mock.sp_link_create_from_string.return_value = sp_link
         lib_mock.sp_link_type.return_value = 1
 
         link = spotify.Link('spotify:track:foo')
-        self.assertEqual(spotify.Link.TYPE_TRACK, link.type)
+        self.assertEqual(spotify.LinkType.TRACK, link.type)
 
         lib_mock.sp_link_type.assert_called_once_with(sp_link)
 
@@ -321,3 +317,11 @@ class LinkTest(unittest.TestCase):
         self.assertIsNone(link.as_user())
 
         lib_mock.sp_link_as_user.assert_called_once_with(sp_link)
+
+
+class LinkTypeTest(unittest.TestCase):
+
+    def test_has_link_type_constants(self):
+        self.assertEqual(spotify.LinkType.INVALID, 0)
+        self.assertEqual(spotify.LinkType.TRACK, 1)
+        self.assertEqual(spotify.LinkType.ALBUM, 2)

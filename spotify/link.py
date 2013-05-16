@@ -7,10 +7,10 @@ from spotify.utils import enum, get_with_growing_buffer, to_bytes
 
 __all__ = [
     'Link',
+    'LinkType',
 ]
 
 
-@enum('SP_LINK')
 class Link(object):
     def __init__(self, value, offset=0, image_size=None):
         if spotify.session_instance is None:
@@ -78,3 +78,8 @@ class Link(object):
         sp_user = lib.sp_link_as_user(self.sp_link)
         if sp_user:
             return spotify.User(sp_user)
+
+
+@enum('SP_LINKTYPE_')
+class LinkType(object):
+    pass

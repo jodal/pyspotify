@@ -67,6 +67,18 @@ class LinkTest(unittest.TestCase):
         self.assertEqual(link.sp_link, sp_link)
         lib_mock.sp_link_create_from_album.assert_called_once_with(sp_album)
 
+    @mock.patch('spotify.artist.lib')
+    def test_create_from_artist(self, artist_lib_mock, lib_mock):
+        sp_link = spotify.ffi.new('int *')
+        lib_mock.sp_link_create_from_artist.return_value = sp_link
+        sp_artist = spotify.ffi.new('int *')
+        artist = spotify.Artist(sp_artist)
+
+        link = spotify.Link(artist)
+
+        self.assertEqual(link.sp_link, sp_link)
+        lib_mock.sp_link_create_from_artist.assert_called_once_with(sp_artist)
+
     @mock.patch('spotify.playlist.lib')
     def test_create_from_playlist(self, playlist_lib_mock, lib_mock):
         sp_link = spotify.ffi.new('int *')
@@ -209,6 +221,29 @@ class LinkTest(unittest.TestCase):
         self.assertIsNone(link.as_album())
 
         lib_mock.sp_link_as_album.assert_called_once_with(sp_link)
+
+    @mock.patch('spotify.artist.lib')
+    def test_as_artist(self, artist_lib_mock, lib_mock):
+        sp_link = spotify.ffi.new('int *')
+        lib_mock.sp_link_create_from_string.return_value = sp_link
+        sp_artist = spotify.ffi.new('int *')
+        lib_mock.sp_link_as_artist.return_value = sp_artist
+
+        link = spotify.Link('spotify:artist:foo')
+        self.assertEqual(link.as_artist().sp_artist, sp_artist)
+
+        lib_mock.sp_link_as_artist.assert_called_once_with(sp_link)
+
+    @mock.patch('spotify.artist.lib')
+    def test_as_artist_if_not_an_artist(self, artist_lib_mock, lib_mock):
+        sp_link = spotify.ffi.new('int *')
+        lib_mock.sp_link_create_from_string.return_value = sp_link
+        lib_mock.sp_link_as_artist.return_value = spotify.ffi.NULL
+
+        link = spotify.Link('spotify:artist:foo')
+        self.assertIsNone(link.as_artist())
+
+        lib_mock.sp_link_as_artist.assert_called_once_with(sp_link)
 
     @mock.patch('spotify.user.lib')
     def test_as_user(self, user_lib_mock, lib_mock):

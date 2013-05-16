@@ -36,6 +36,16 @@ class TrackTest(unittest.TestCase):
         lib_mock.sp_track_is_loaded.assert_called_once_with(sp_track)
         self.assertTrue(result)
 
+    def test_error(self, lib_mock):
+        lib_mock.sp_track_error.return_value = spotify.Error.IS_LOADING
+        sp_track = spotify.ffi.new('int *')
+        track = spotify.Track(sp_track)
+
+        result = track.error
+
+        lib_mock.sp_track_error.assert_called_once_with(sp_track)
+        self.assertEqual(result, spotify.Error.IS_LOADING)
+
     @mock.patch('spotify.link.Link', spec=spotify.Link)
     def test_as_link_creates_link_to_track(self, link_mock, lib_mock):
         link_mock.return_value = mock.sentinel.link

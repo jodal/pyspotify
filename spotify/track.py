@@ -20,6 +20,10 @@ class Track(object):
     def is_loaded(self):
         return bool(lib.sp_track_is_loaded(self.sp_track))
 
+    @property
+    def error(self):
+        return lib.sp_track_error(self.sp_track)
+
     def as_link(self, offset=0):
         from spotify.link import Link
         return Link(self, offset=offset)

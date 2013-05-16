@@ -24,6 +24,8 @@ class Link(object):
             sp_link = lib.sp_link_create_from_album(value.sp_album)
         elif isinstance(value, spotify.Artist):
             sp_link = lib.sp_link_create_from_artist(value.sp_artist)
+        elif isinstance(value, spotify.Search):
+            sp_link = lib.sp_link_create_from_search(value.sp_search)
         elif isinstance(value, spotify.Playlist):
             sp_link = lib.sp_link_create_from_playlist(value.sp_playlist)
         elif isinstance(value, spotify.User):

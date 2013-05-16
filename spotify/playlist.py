@@ -14,8 +14,7 @@ class Playlist(object):
         lib.sp_playlist_add_ref(sp_playlist)
         self.sp_playlist = ffi.gc(sp_playlist, lib.sp_playlist_release)
 
-    @property
-    def link(self):
+    def as_link(self):
         from spotify.link import Link
         return Link(self)
 

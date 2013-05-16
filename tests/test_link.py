@@ -116,6 +116,18 @@ class LinkTest(unittest.TestCase):
         self.assertEqual(link.sp_link, sp_link)
         lib_mock.sp_link_create_from_user.assert_called_once_with(sp_user)
 
+    @mock.patch('spotify.image.lib', spec=spotify.lib)
+    def test_create_from_image(self, image_lib_mock, lib_mock):
+        sp_link = spotify.ffi.new('int *')
+        lib_mock.sp_link_create_from_image.return_value = sp_link
+        sp_image = spotify.ffi.new('int *')
+        image = spotify.Image(sp_image)
+
+        link = spotify.Link(image)
+
+        self.assertEqual(link.sp_link, sp_link)
+        lib_mock.sp_link_create_from_image.assert_called_once_with(sp_image)
+
     def test_raises_error_if_session_doesnt_exist(self, lib_mock):
         spotify.session_instance = None
 

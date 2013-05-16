@@ -28,6 +28,8 @@ class Link(object):
             sp_link = lib.sp_link_create_from_playlist(value.sp_playlist)
         elif isinstance(value, spotify.User):
             sp_link = lib.sp_link_create_from_user(value.sp_user)
+        elif isinstance(value, spotify.Image):
+            sp_link = lib.sp_link_create_from_image(value.sp_image)
         else:
             sp_link = lib.sp_link_create_from_string(
                 ffi.new('char[]', to_bytes(value)))

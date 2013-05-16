@@ -1,10 +1,12 @@
 from __future__ import unicode_literals
 
 from spotify import ffi, lib
+from spotify.utils import enum
 
 
 __all__ = [
     'Image',
+    'ImageSize',
 ]
 
 
@@ -18,3 +20,8 @@ class Image(object):
         return Link(self)
 
     # TODO Add sp_image_* methods
+
+
+@enum('SP_IMAGE_SIZE_')
+class ImageSize(object):
+    pass

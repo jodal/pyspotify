@@ -36,3 +36,11 @@ class ImageTest(unittest.TestCase):
 
         link_mock.assert_called_once_with(image)
         self.assertEqual(result, mock.sentinel.link)
+
+
+class ImageSizeTest(unittest.TestCase):
+
+    def test_has_size_constants(self):
+        self.assertEqual(spotify.ImageSize.NORMAL, 0)
+        self.assertEqual(spotify.ImageSize.SMALL, 1)
+        self.assertEqual(spotify.ImageSize.LARGE, 2)

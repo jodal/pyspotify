@@ -7,7 +7,7 @@ import unittest
 import spotify
 
 
-@mock.patch('spotify.link.lib')
+@mock.patch('spotify.link.lib', spec=spotify.lib)
 class LinkTest(unittest.TestCase):
 
     def setUp(self):
@@ -29,7 +29,7 @@ class LinkTest(unittest.TestCase):
                 lib_mock.sp_link_create_from_string.call_args[0][0]),
             b'spotify:track:foo')
 
-    @mock.patch('spotify.track.lib')
+    @mock.patch('spotify.track.lib', spec=spotify.lib)
     def test_create_from_track(self, track_lib_mock, lib_mock):
         sp_link = spotify.ffi.new('int *')
         lib_mock.sp_link_create_from_track.return_value = sp_link
@@ -42,7 +42,7 @@ class LinkTest(unittest.TestCase):
         lib_mock.sp_link_create_from_track.assert_called_once_with(
             sp_track, 0)
 
-    @mock.patch('spotify.track.lib')
+    @mock.patch('spotify.track.lib', spec=spotify.lib)
     def test_create_from_track_and_offset(self, track_lib_mock, lib_mock):
         sp_link = spotify.ffi.new('int *')
         lib_mock.sp_link_create_from_track.return_value = sp_link
@@ -55,7 +55,7 @@ class LinkTest(unittest.TestCase):
         lib_mock.sp_link_create_from_track.assert_called_once_with(
             sp_track, 90)
 
-    @mock.patch('spotify.album.lib')
+    @mock.patch('spotify.album.lib', spec=spotify.lib)
     def test_create_from_album(self, album_lib_mock, lib_mock):
         sp_link = spotify.ffi.new('int *')
         lib_mock.sp_link_create_from_album.return_value = sp_link
@@ -67,7 +67,7 @@ class LinkTest(unittest.TestCase):
         self.assertEqual(link.sp_link, sp_link)
         lib_mock.sp_link_create_from_album.assert_called_once_with(sp_album)
 
-    @mock.patch('spotify.artist.lib')
+    @mock.patch('spotify.artist.lib', spec=spotify.lib)
     def test_create_from_artist(self, artist_lib_mock, lib_mock):
         sp_link = spotify.ffi.new('int *')
         lib_mock.sp_link_create_from_artist.return_value = sp_link
@@ -79,7 +79,7 @@ class LinkTest(unittest.TestCase):
         self.assertEqual(link.sp_link, sp_link)
         lib_mock.sp_link_create_from_artist.assert_called_once_with(sp_artist)
 
-    @mock.patch('spotify.playlist.lib')
+    @mock.patch('spotify.playlist.lib', spec=spotify.lib)
     def test_create_from_playlist(self, playlist_lib_mock, lib_mock):
         sp_link = spotify.ffi.new('int *')
         lib_mock.sp_link_create_from_playlist.return_value = sp_link
@@ -92,7 +92,7 @@ class LinkTest(unittest.TestCase):
         lib_mock.sp_link_create_from_playlist.assert_called_once_with(
             sp_playlist)
 
-    @mock.patch('spotify.user.lib')
+    @mock.patch('spotify.user.lib', spec=spotify.lib)
     def test_create_from_user(self, user_lib_mock, lib_mock):
         sp_link = spotify.ffi.new('int *')
         lib_mock.sp_link_create_from_user.return_value = sp_link
@@ -161,7 +161,7 @@ class LinkTest(unittest.TestCase):
 
         lib_mock.sp_link_type.assert_called_once_with(sp_link)
 
-    @mock.patch('spotify.track.lib')
+    @mock.patch('spotify.track.lib', spec=spotify.lib)
     def test_as_track(self, track_lib_mock, lib_mock):
         sp_link = spotify.ffi.new('int *')
         lib_mock.sp_link_create_from_string.return_value = sp_link
@@ -173,7 +173,7 @@ class LinkTest(unittest.TestCase):
 
         lib_mock.sp_link_as_track.assert_called_once_with(sp_link)
 
-    @mock.patch('spotify.track.lib')
+    @mock.patch('spotify.track.lib', spec=spotify.lib)
     def test_as_track_if_not_a_track(self, track_lib_mock, lib_mock):
         sp_link = spotify.ffi.new('int *')
         lib_mock.sp_link_create_from_string.return_value = sp_link
@@ -184,7 +184,7 @@ class LinkTest(unittest.TestCase):
 
         lib_mock.sp_link_as_track.assert_called_once_with(sp_link)
 
-    @mock.patch('spotify.track.lib')
+    @mock.patch('spotify.track.lib', spec=spotify.lib)
     def test_as_track_with_offset(self, track_lib_mock, lib_mock):
         sp_link = spotify.ffi.new('int *')
         lib_mock.sp_link_create_from_string.return_value = sp_link
@@ -199,7 +199,7 @@ class LinkTest(unittest.TestCase):
         lib_mock.sp_link_as_track_and_offset.assert_called_once_with(
             sp_link, 90)
 
-    @mock.patch('spotify.album.lib')
+    @mock.patch('spotify.album.lib', spec=spotify.lib)
     def test_as_album(self, album_lib_mock, lib_mock):
         sp_link = spotify.ffi.new('int *')
         lib_mock.sp_link_create_from_string.return_value = sp_link
@@ -211,7 +211,7 @@ class LinkTest(unittest.TestCase):
 
         lib_mock.sp_link_as_album.assert_called_once_with(sp_link)
 
-    @mock.patch('spotify.album.lib')
+    @mock.patch('spotify.album.lib', spec=spotify.lib)
     def test_as_album_if_not_an_album(self, album_lib_mock, lib_mock):
         sp_link = spotify.ffi.new('int *')
         lib_mock.sp_link_create_from_string.return_value = sp_link
@@ -222,7 +222,7 @@ class LinkTest(unittest.TestCase):
 
         lib_mock.sp_link_as_album.assert_called_once_with(sp_link)
 
-    @mock.patch('spotify.artist.lib')
+    @mock.patch('spotify.artist.lib', spec=spotify.lib)
     def test_as_artist(self, artist_lib_mock, lib_mock):
         sp_link = spotify.ffi.new('int *')
         lib_mock.sp_link_create_from_string.return_value = sp_link
@@ -234,7 +234,7 @@ class LinkTest(unittest.TestCase):
 
         lib_mock.sp_link_as_artist.assert_called_once_with(sp_link)
 
-    @mock.patch('spotify.artist.lib')
+    @mock.patch('spotify.artist.lib', spec=spotify.lib)
     def test_as_artist_if_not_an_artist(self, artist_lib_mock, lib_mock):
         sp_link = spotify.ffi.new('int *')
         lib_mock.sp_link_create_from_string.return_value = sp_link
@@ -245,7 +245,7 @@ class LinkTest(unittest.TestCase):
 
         lib_mock.sp_link_as_artist.assert_called_once_with(sp_link)
 
-    @mock.patch('spotify.user.lib')
+    @mock.patch('spotify.user.lib', spec=spotify.lib)
     def test_as_user(self, user_lib_mock, lib_mock):
         sp_link = spotify.ffi.new('int *')
         lib_mock.sp_link_create_from_string.return_value = sp_link
@@ -257,7 +257,7 @@ class LinkTest(unittest.TestCase):
 
         lib_mock.sp_link_as_user.assert_called_once_with(sp_link)
 
-    @mock.patch('spotify.user.lib')
+    @mock.patch('spotify.user.lib', spec=spotify.lib)
     def test_as_user_if_not_a_user(self, user_lib_mock, lib_mock):
         sp_link = spotify.ffi.new('int *')
         lib_mock.sp_link_create_from_string.return_value = sp_link

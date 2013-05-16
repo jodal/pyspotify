@@ -147,7 +147,8 @@ class SessionConfigTest(unittest.TestCase):
         self.assertEqual(
             self.config.get_callbacks(), mock.sentinel.my_callbacks)
 
-    @mock.patch.object(spotify.session, 'SessionCallbacks')
+    @mock.patch(
+        'spotify.session.SessionCallbacks', spec=spotify.SessionCallbacks)
     def test_get_callbacks_creates_new_callbacks_object_if_needed(self, mock):
         self.config.callbacks = None
 
@@ -177,7 +178,7 @@ class SessionConfigTest(unittest.TestCase):
         self.assertEqual(len(spotify.weak_key_dict[sp_session_config]), 5)
 
 
-@mock.patch('spotify.session.lib')
+@mock.patch('spotify.session.lib', spec=spotify.lib)
 class SessionTest(unittest.TestCase):
 
     def create_session(self, lib_mock):
@@ -194,7 +195,7 @@ class SessionTest(unittest.TestCase):
 
         self.assertRaises(RuntimeError, self.create_session, lib_mock)
 
-    @mock.patch.object(spotify.session, 'SessionConfig')
+    @mock.patch('spotify.session.SessionConfig', spec=spotify.SessionConfig)
     def test_creates_config_if_none_provided(self, config_cls_mock, lib_mock):
         lib_mock.sp_session_create.return_value = spotify.Error.OK
 
@@ -359,7 +360,7 @@ class SessionTest(unittest.TestCase):
 
         self.assertRaises(spotify.Error, session.forget_me)
 
-    @mock.patch('spotify.user.lib')
+    @mock.patch('spotify.user.lib', spec=spotify.lib)
     def test_user(self, user_lib_mock, lib_mock):
         lib_mock.sp_session_user.return_value = (
             spotify.ffi.new('sp_user **'))

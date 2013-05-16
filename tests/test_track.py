@@ -7,7 +7,7 @@ import unittest
 import spotify
 
 
-@mock.patch('spotify.track.lib')
+@mock.patch('spotify.track.lib', spec=spotify.lib)
 class TrackTest(unittest.TestCase):
 
     def test_adds_ref_to_sp_track_when_created(self, lib_mock):
@@ -26,7 +26,7 @@ class TrackTest(unittest.TestCase):
 
         lib_mock.sp_track_release.assert_called_with(sp_track)
 
-    @mock.patch('spotify.link.Link')
+    @mock.patch('spotify.link.Link', spec=spotify.Link)
     def test_as_link_creates_link_to_track(self, link_mock, lib_mock):
         link_mock.return_value = mock.sentinel.link
         sp_track = spotify.ffi.new('int *')
@@ -37,7 +37,7 @@ class TrackTest(unittest.TestCase):
         link_mock.assert_called_once_with(track, offset=0)
         self.assertEqual(result, mock.sentinel.link)
 
-    @mock.patch('spotify.link.Link')
+    @mock.patch('spotify.link.Link', spec=spotify.Link)
     def test_as_link_with_offset(self, link_mock, lib_mock):
         link_mock.return_value = mock.sentinel.link
         sp_track = spotify.ffi.new('int *')

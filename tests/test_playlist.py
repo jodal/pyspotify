@@ -7,7 +7,7 @@ import unittest
 import spotify
 
 
-@mock.patch('spotify.playlist.lib')
+@mock.patch('spotify.playlist.lib', spec=spotify.lib)
 class PlaylistTest(unittest.TestCase):
 
     def test_adds_ref_to_sp_playlist_when_created(self, lib_mock):
@@ -26,7 +26,7 @@ class PlaylistTest(unittest.TestCase):
 
         lib_mock.sp_playlist_release.assert_called_with(sp_playlist)
 
-    @mock.patch('spotify.link.Link')
+    @mock.patch('spotify.link.Link', spec=spotify.Link)
     def test_as_link_creates_link_to_playlist(self, link_mock, lib_mock):
         link_mock.return_value = mock.sentinel.link
         sp_playlist = spotify.ffi.new('int *')
@@ -38,6 +38,6 @@ class PlaylistTest(unittest.TestCase):
         self.assertEqual(result, mock.sentinel.link)
 
 
-@mock.patch('spotify.playlist.lib')
+@mock.patch('spotify.playlist.lib', spec=spotify.lib)
 class PlaylistContainerTest(unittest.TestCase):
     pass

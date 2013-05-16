@@ -7,7 +7,7 @@ import unittest
 import spotify
 
 
-@mock.patch('spotify.artist.lib')
+@mock.patch('spotify.artist.lib', spec=spotify.lib)
 class ArtistTest(unittest.TestCase):
 
     def test_adds_ref_to_sp_artist_when_created(self, lib_mock):
@@ -26,7 +26,7 @@ class ArtistTest(unittest.TestCase):
 
         lib_mock.sp_artist_release.assert_called_with(sp_artist)
 
-    @mock.patch('spotify.link.Link')
+    @mock.patch('spotify.link.Link', spec=spotify.Link)
     def test_as_link_creates_link_to_artist(self, link_mock, lib_mock):
         link_mock.return_value = mock.sentinel.link
         sp_artist = spotify.ffi.new('int *')

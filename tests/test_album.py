@@ -7,7 +7,7 @@ import unittest
 import spotify
 
 
-@mock.patch('spotify.album.lib')
+@mock.patch('spotify.album.lib', spec=spotify.lib)
 class AlbumTest(unittest.TestCase):
 
     def test_adds_ref_to_sp_album_when_created(self, lib_mock):
@@ -26,7 +26,7 @@ class AlbumTest(unittest.TestCase):
 
         lib_mock.sp_album_release.assert_called_with(sp_album)
 
-    @mock.patch('spotify.link.Link')
+    @mock.patch('spotify.link.Link', spec=spotify.Link)
     def test_as_link_creates_link_to_album(self, link_mock, lib_mock):
         link_mock.return_value = mock.sentinel.link
         sp_album = spotify.ffi.new('int *')

@@ -7,7 +7,7 @@ import unittest
 import spotify
 
 
-@mock.patch('spotify.user.lib')
+@mock.patch('spotify.user.lib', spec=spotify.lib)
 class UserTest(unittest.TestCase):
 
     def test_adds_ref_to_sp_user_when_created(self, lib_mock):
@@ -58,7 +58,7 @@ class UserTest(unittest.TestCase):
         lib_mock.sp_user_is_loaded.assert_called_once_with(sp_user)
         self.assertTrue(result)
 
-    @mock.patch('spotify.link.Link')
+    @mock.patch('spotify.link.Link', spec=spotify.Link)
     def test_as_link_creates_link_to_user(self, link_mock, lib_mock):
         link_mock.return_value = mock.sentinel.link
         sp_user = spotify.ffi.new('int *')

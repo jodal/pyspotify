@@ -12,16 +12,26 @@ __all__ = [
 
 @enum('SP_LINK')
 class Link(object):
-    def __init__(self, value, offset=0):
+    def __init__(self, value, offset=0, image_size=None):
         if spotify.session_instance is None:
             raise RuntimeError('Session must be initialized to create links')
+
+        # TODO Add support for creating link from a sp_artistbrowse instance
 
         if isinstance(value, spotify.Track):
             sp_link = lib.sp_link_create_from_track(value.sp_track, offset)
         elif isinstance(value, spotify.Album):
-            sp_link = lib.sp_link_create_from_album(value.sp_album)
+            if image_size is not None:
+                sp_link = lib.sp_link_create_from_album_cover(
+                    value.sp_album, image_size)
+            else:
+                sp_link = lib.sp_link_create_from_album(value.sp_album)
         elif isinstance(value, spotify.Artist):
-            sp_link = lib.sp_link_create_from_artist(value.sp_artist)
+            if image_size is not None:
+                sp_link = lib.sp_link_create_from_artist_portrait(
+                    value.sp_artist, image_size)
+            else:
+                sp_link = lib.sp_link_create_from_artist(value.sp_artist)
         elif isinstance(value, spotify.Search):
             sp_link = lib.sp_link_create_from_search(value.sp_search)
         elif isinstance(value, spotify.Playlist):
@@ -68,5 +78,3 @@ class Link(object):
         sp_user = lib.sp_link_as_user(self.sp_link)
         if sp_user:
             return spotify.User(sp_user)
-
-    # TODO Add all sp_link_* methods

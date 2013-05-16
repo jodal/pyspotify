@@ -16,6 +16,11 @@ class LinkTest(unittest.TestCase):
     def tearDown(self):
         spotify.session_instance = None
 
+    def test_raises_error_if_session_doesnt_exist(self, lib_mock):
+        spotify.session_instance = None
+
+        self.assertRaises(RuntimeError, spotify.Link, 'spotify:track:foo')
+
     def test_create_from_string(self, lib_mock):
         sp_link = spotify.ffi.new('int *')
         lib_mock.sp_link_create_from_string.return_value = sp_link
@@ -28,6 +33,11 @@ class LinkTest(unittest.TestCase):
             spotify.ffi.string(
                 lib_mock.sp_link_create_from_string.call_args[0][0]),
             b'spotify:track:foo')
+
+    def test_raises_error_if_string_isnt_parseable(self, lib_mock):
+        lib_mock.sp_link_create_from_string.return_value = spotify.ffi.NULL
+
+        self.assertRaises(ValueError, spotify.Link, 'invalid link string')
 
     @mock.patch('spotify.track.lib', spec=spotify.lib)
     def test_create_from_track(self, track_lib_mock, lib_mock):
@@ -67,6 +77,19 @@ class LinkTest(unittest.TestCase):
         self.assertEqual(link.sp_link, sp_link)
         lib_mock.sp_link_create_from_album.assert_called_once_with(sp_album)
 
+    @mock.patch('spotify.album.lib', spec=spotify.lib)
+    def test_create_from_album_cover(self, album_lib_mock, lib_mock):
+        sp_link = spotify.ffi.new('int *')
+        lib_mock.sp_link_create_from_album_cover.return_value = sp_link
+        sp_album = spotify.ffi.new('int *')
+        album = spotify.Album(sp_album)
+
+        link = spotify.Link(album, image_size=spotify.ImageSize.NORMAL)
+
+        self.assertEqual(link.sp_link, sp_link)
+        lib_mock.sp_link_create_from_album_cover.assert_called_once_with(
+            sp_album, spotify.ImageSize.NORMAL)
+
     @mock.patch('spotify.artist.lib', spec=spotify.lib)
     def test_create_from_artist(self, artist_lib_mock, lib_mock):
         sp_link = spotify.ffi.new('int *')
@@ -78,6 +101,23 @@ class LinkTest(unittest.TestCase):
 
         self.assertEqual(link.sp_link, sp_link)
         lib_mock.sp_link_create_from_artist.assert_called_once_with(sp_artist)
+
+    @mock.patch('spotify.artist.lib', spec=spotify.lib)
+    def test_create_from_artist_portrait(self, artist_lib_mock, lib_mock):
+        sp_link = spotify.ffi.new('int *')
+        lib_mock.sp_link_create_from_artist_portrait.return_value = sp_link
+        sp_artist = spotify.ffi.new('int *')
+        artist = spotify.Artist(sp_artist)
+
+        link = spotify.Link(artist, image_size=spotify.ImageSize.NORMAL)
+
+        self.assertEqual(link.sp_link, sp_link)
+        lib_mock.sp_link_create_from_artist_portrait.assert_called_once_with(
+            sp_artist, spotify.ImageSize.NORMAL)
+
+    @unittest.SkipTest
+    def test_create_from_artistbrowse_portrait(self):
+        pass  # TODO Implement functionality
 
     @mock.patch('spotify.search.lib', spec=spotify.lib)
     def test_create_from_search(self, search_lib_mock, lib_mock):
@@ -127,16 +167,6 @@ class LinkTest(unittest.TestCase):
 
         self.assertEqual(link.sp_link, sp_link)
         lib_mock.sp_link_create_from_image.assert_called_once_with(sp_image)
-
-    def test_raises_error_if_session_doesnt_exist(self, lib_mock):
-        spotify.session_instance = None
-
-        self.assertRaises(RuntimeError, spotify.Link, 'spotify:track:foo')
-
-    def test_raises_error_if_string_isnt_parseable(self, lib_mock):
-        lib_mock.sp_link_create_from_string.return_value = spotify.ffi.NULL
-
-        self.assertRaises(ValueError, spotify.Link, 'invalid link string')
 
     def test_releases_sp_link_when_link_dies(self, lib_mock):
         sp_link = spotify.ffi.new('int *')

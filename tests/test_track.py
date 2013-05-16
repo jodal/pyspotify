@@ -47,3 +47,34 @@ class TrackTest(unittest.TestCase):
 
         link_mock.assert_called_once_with(track, offset=90)
         self.assertEqual(result, mock.sentinel.link)
+
+
+@mock.patch('spotify.track.lib', spec=spotify.lib)
+class LocalTrackTest(unittest.TestCase):
+
+    def test_create(self, lib_mock):
+        sp_track = spotify.ffi.new('int *')
+        lib_mock.sp_localtrack_create.return_value = sp_track
+
+        track = spotify.LocalTrack(
+            artist='foo', title='bar', album='baz', length=210)
+
+        self.assertEqual(track.sp_track, sp_track)
+        lib_mock.sp_localtrack_create.assert_called_once_with(
+            mock.ANY, mock.ANY, mock.ANY, 210)
+        self.assertEqual(
+            spotify.ffi.string(lib_mock.sp_localtrack_create.call_args[0][0]),
+            b'foo')
+        self.assertEqual(
+            spotify.ffi.string(lib_mock.sp_localtrack_create.call_args[0][1]),
+            b'bar')
+        self.assertEqual(
+            spotify.ffi.string(lib_mock.sp_localtrack_create.call_args[0][2]),
+            b'baz')
+        self.assertEqual(
+            lib_mock.sp_localtrack_create.call_args[0][3], 210)
+
+        # Since we *created* the sp_track, we already have a refcount of 1 and
+        # shouldn't increase the refcount when wrapping this sp_track in a
+        # Track object
+        self.assertEqual(lib_mock.sp_track_add_ref.call_count, 0)

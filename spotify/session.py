@@ -253,6 +253,6 @@ class Session(object):
         if err != Error.OK:
             raise Error(err)
 
-        return next_timeout[0]
+        return next_timeout[0] / 1000.0
 
     # TODO Add all sp_session_* methods

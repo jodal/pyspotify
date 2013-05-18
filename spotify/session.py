@@ -26,6 +26,7 @@ class SessionCallbacks(object):
     music_delivery = None
     log_message = None
     end_of_track = None
+    streaming_error = None
     offline_status_updated = None
     credentials_blob_updated = None
 
@@ -54,6 +55,8 @@ class SessionCallbacks(object):
             'void(sp_session *, const char *)', self._log_message)
         self._end_of_track = ffi.callback(
             'void(sp_session *)', self._end_of_track)
+        self._streaming_error = ffi.callback(
+            'void(sp_session *, sp_error)', self._streaming_error)
         self._offline_status_updated = ffi.callback(
             'void(sp_session *)', self._offline_status_updated)
         self._credentials_blob_updated = ffi.callback(
@@ -137,6 +140,14 @@ class SessionCallbacks(object):
         if self.end_of_track is not None:
             self.end_of_track(spotify.session_instance)
 
+    def _streaming_error(self, sp_session, sp_error):
+        if not spotify.session_instance:
+            return
+        error = Error(sp_error)
+        logger.error('Streaming error: %s', error)
+        if self.streaming_error is not None:
+            self.streaming_error(spotify.session_instance, error)
+
     def _offline_status_updated(self, sp_session):
         if not spotify.session_instance:
             return
@@ -165,6 +176,7 @@ class SessionCallbacks(object):
             'music_delivery': self._music_delivery,
             'log_message': self._log_message,
             'end_of_track': self._end_of_track,
+            'streaming_error': self._streaming_error,
             'offline_status_updated': self._offline_status_updated,
             'credentials_blob_updated': self._credentials_blob_updated,
         })

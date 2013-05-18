@@ -119,6 +119,14 @@ class SessionCallbacksTest(unittest.TestCase):
         self.callbacks.end_of_track.assert_called_once_with(
             spotify.session_instance)
 
+    def test_streaming_error_callback(self):
+        self.callbacks.streaming_error = mock.Mock()
+
+        self.callbacks._streaming_error(self.sp_session, self.sp_error)
+
+        self.callbacks.streaming_error.assert_called_once_with(
+            spotify.session_instance, spotify.Error(self.sp_error))
+
     def test_offline_status_updated_callback(self):
         self.callbacks.offline_status_updated = mock.Mock()
 

@@ -21,6 +21,7 @@ class SessionCallbacks(object):
     logged_out = None
     metadata_updated = None
     connection_error = None
+    message_to_user = None
     notify_main_thread = None
     music_delivery = None
     log_message = None
@@ -41,6 +42,8 @@ class SessionCallbacks(object):
             'void(sp_session *)', self._metadata_updated)
         self._connection_error = ffi.callback(
             'void(sp_session *, sp_error)', self._connection_error)
+        self._message_to_user = ffi.callback(
+            'void(sp_session *, const char *)', self._message_to_user)
         self._notify_main_thread = ffi.callback(
             'void(sp_session *)', self._notify_main_thread)
         self._music_delivery = ffi.callback(
@@ -84,6 +87,14 @@ class SessionCallbacks(object):
         logger.error('Connection error: %s', error)
         if self.connection_error is not None:
             self.connection_error(spotify.session_instance, error)
+
+    def _message_to_user(self, sp_session, data):
+        if not spotify.session_instance:
+            return
+        data = to_unicode(data).strip()
+        logger.debug('Message to user: %s', data)
+        if self.message_to_user is not None:
+            self.message_to_user(spotify.session_instance, data)
 
     def _notify_main_thread(self, sp_session):
         if not spotify.session_instance:
@@ -139,6 +150,7 @@ class SessionCallbacks(object):
             'logged_out': self._logged_out,
             'metadata_updated': self._metadata_updated,
             'connection_error': self._connection_error,
+            'message_to_user': self._message_to_user,
             'notify_main_thread': self._notify_main_thread,
             'music_delivery': self._music_delivery,
             'log_message': self._log_message,

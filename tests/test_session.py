@@ -58,6 +58,15 @@ class SessionCallbacksTest(unittest.TestCase):
         self.callbacks.connection_error.assert_called_once_with(
             spotify.session_instance, spotify.Error(self.sp_error))
 
+    def test_message_to_user_callback(self):
+        self.callbacks.message_to_user = mock.Mock()
+        data = spotify.ffi.new('char[]', b'a log message\n')
+
+        self.callbacks._message_to_user(self.sp_session, data)
+
+        self.callbacks.message_to_user.assert_called_once_with(
+            spotify.session_instance, u'a log message')
+
     def test_notify_main_thread_callback(self):
         self.callbacks.notify_main_thread = mock.Mock()
 

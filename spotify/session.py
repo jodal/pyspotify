@@ -311,4 +311,14 @@ class Session(object):
 
         return next_timeout[0] / 1000.0
 
+    def player_load(self, track):
+        err = lib.sp_session_player_load(self.sp_session, track.sp_track)
+        if err != Error.OK:
+            raise Error(err)
+
+    def player_play(self, play=True):
+        err = lib.sp_session_player_play(self.sp_session, play)
+        if err != Error.OK:
+            raise Error(err)
+
     # TODO Add all sp_session_* methods

@@ -97,15 +97,15 @@ class SessionCallbacksTest(unittest.TestCase):
         self.assertEqual(
             self.callbacks.music_delivery.call_args[0][1].sp_audioformat,
             sp_audioformat)
-        self.assertSequenceEqual(
+        self.assertEqual(
             self.callbacks.music_delivery.call_args[0][2][0], b'a')
-        self.assertSequenceEqual(
+        self.assertEqual(
             self.callbacks.music_delivery.call_args[0][2][1], b'b')
-        self.assertSequenceEqual(
+        self.assertEqual(
             self.callbacks.music_delivery.call_args[0][2][2], b'c')
-        self.assertSequenceEqual(
+        self.assertEqual(
             self.callbacks.music_delivery.call_args[0][2][3], b'\x00')
-        self.assertSequenceEqual(
+        self.assertEqual(
             self.callbacks.music_delivery.call_args[0][2][4], b'\x00')
         self.assertEqual(result, num_frames)
 

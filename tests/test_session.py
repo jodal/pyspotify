@@ -111,6 +111,14 @@ class SessionCallbacksTest(unittest.TestCase):
         self.callbacks.log_message.assert_called_once_with(
             spotify.session_instance, u'a log message')
 
+    def test_end_of_track_callback(self):
+        self.callbacks.end_of_track = mock.Mock()
+
+        self.callbacks._end_of_track(self.sp_session)
+
+        self.callbacks.end_of_track.assert_called_once_with(
+            spotify.session_instance)
+
     def test_offline_status_updated_callback(self):
         self.callbacks.offline_status_updated = mock.Mock()
 

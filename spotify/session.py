@@ -25,6 +25,7 @@ class SessionCallbacks(object):
     notify_main_thread = None
     music_delivery = None
     log_message = None
+    end_of_track = None
     offline_status_updated = None
     credentials_blob_updated = None
 
@@ -51,6 +52,8 @@ class SessionCallbacks(object):
             self._music_delivery)
         self._log_message = ffi.callback(
             'void(sp_session *, const char *)', self._log_message)
+        self._end_of_track = ffi.callback(
+            'void(sp_session *)', self._end_of_track)
         self._offline_status_updated = ffi.callback(
             'void(sp_session *)', self._offline_status_updated)
         self._credentials_blob_updated = ffi.callback(
@@ -127,6 +130,13 @@ class SessionCallbacks(object):
         if self.log_message is not None:
             self.log_message(spotify.session_instance, data)
 
+    def _end_of_track(self, sp_session):
+        if not spotify.session_instance:
+            return
+        logger.debug('End of track')
+        if self.end_of_track is not None:
+            self.end_of_track(spotify.session_instance)
+
     def _offline_status_updated(self, sp_session):
         if not spotify.session_instance:
             return
@@ -154,6 +164,7 @@ class SessionCallbacks(object):
             'notify_main_thread': self._notify_main_thread,
             'music_delivery': self._music_delivery,
             'log_message': self._log_message,
+            'end_of_track': self._end_of_track,
             'offline_status_updated': self._offline_status_updated,
             'credentials_blob_updated': self._credentials_blob_updated,
         })

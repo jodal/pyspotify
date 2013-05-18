@@ -66,6 +66,33 @@ class SessionCallbacksTest(unittest.TestCase):
         self.callbacks.notify_main_thread.assert_called_once_with(
             spotify.session_instance)
 
+    def test_music_delivery_callback(self):
+        sp_audioformat = spotify.ffi.new('sp_audioformat *')
+        sp_audioformat.channels = 2
+        audio_format = spotify.AudioFormat(sp_audioformat)
+
+        num_frames = 10
+        frames_size = audio_format.frame_size() * num_frames
+        frames = spotify.ffi.new('char[]', frames_size)
+        frames[0:3] = [b'a', b'b', b'c']
+        frames_void_ptr = spotify.ffi.cast('void *', frames)
+
+        self.callbacks.music_delivery = mock.Mock()
+        self.callbacks.music_delivery.return_value = num_frames
+
+        result = self.callbacks._music_delivery(
+            self.sp_session, sp_audioformat, frames_void_ptr, num_frames)
+
+        self.callbacks.music_delivery.assert_called_once_with(
+            spotify.session_instance, mock.ANY, mock.ANY, num_frames)
+        self.assertEqual(
+            self.callbacks.music_delivery.call_args[0][1].sp_audioformat,
+            sp_audioformat)
+        self.assertSequenceEqual(
+            self.callbacks.music_delivery.call_args[0][2][0:5],
+            [b'a', b'b', b'c', b'\x00', b'\x00'])
+        self.assertEqual(result, num_frames)
+
     def test_log_message_callback(self):
         self.callbacks.log_message = mock.Mock()
         data = spotify.ffi.new('char[]', b'a log message\n')

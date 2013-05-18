@@ -22,6 +22,7 @@ class SessionCallbacks(object):
     metadata_updated = None
     connection_error = None
     notify_main_thread = None
+    music_delivery = None
     log_message = None
     offline_status_updated = None
     credentials_blob_updated = None
@@ -42,6 +43,9 @@ class SessionCallbacks(object):
             'void(sp_session *, sp_error)', self._connection_error)
         self._notify_main_thread = ffi.callback(
             'void(sp_session *)', self._notify_main_thread)
+        self._music_delivery = ffi.callback(
+            'int(sp_session *, const sp_audioformat *, const void *, int)',
+            self._music_delivery)
         self._log_message = ffi.callback(
             'void(sp_session *, const char *)', self._log_message)
         self._offline_status_updated = ffi.callback(
@@ -88,6 +92,22 @@ class SessionCallbacks(object):
         if self.notify_main_thread is not None:
             self.notify_main_thread(spotify.session_instance)
 
+    def _music_delivery(self, sp_session, sp_audioformat, frames, num_frames):
+        if not spotify.session_instance:
+            return 0
+        logger.debug('Music delivery')
+        if self.music_delivery is not None:
+            audio_format = spotify.AudioFormat(sp_audioformat)
+            buffer_ = spotify.ffi.buffer(
+                frames, audio_format.frame_size() * num_frames)
+            # TODO Decide if we should make a copy of the buffer out of
+            # libspotify's memory and into Python land, by:
+            #    our_bytes = buffer_[:]
+            return self.music_delivery(
+                spotify.session_instance, audio_format, buffer_, num_frames)
+        else:
+            return 0
+
     def _log_message(self, sp_session, data):
         if not spotify.session_instance:
             return
@@ -120,6 +140,7 @@ class SessionCallbacks(object):
             'metadata_updated': self._metadata_updated,
             'connection_error': self._connection_error,
             'notify_main_thread': self._notify_main_thread,
+            'music_delivery': self._music_delivery,
             'log_message': self._log_message,
             'offline_status_updated': self._offline_status_updated,
             'credentials_blob_updated': self._credentials_blob_updated,

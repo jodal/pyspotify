@@ -37,8 +37,7 @@ class LoadableTest(unittest.TestCase):
         is_loaded_mock.side_effect = [False, False, True]
 
         foo = Foo()
-        foo.error = mock.Mock(return_value=spotify.Error(
-            spotify.ErrorType.OTHER_PERMANENT))
+        foo.error = mock.Mock(return_value=spotify.Error.OTHER_PERMANENT)
         self.assertRaises(spotify.Error, foo.load)
 
         self.assertEqual(session_mock.process_events.call_count, 1)
@@ -49,8 +48,7 @@ class LoadableTest(unittest.TestCase):
         is_loaded_mock.side_effect = [False, False, True]
 
         foo = Foo()
-        foo.error = mock.Mock(return_value=spotify.Error(
-            spotify.ErrorType.IS_LOADING))
+        foo.error = mock.Mock(return_value=spotify.Error.IS_LOADING)
         foo.load()
 
         self.assertEqual(session_mock.process_events.call_count, 2)

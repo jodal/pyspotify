@@ -309,7 +309,7 @@ class Session(object):
         if err != Error.OK:
             raise Error(err)
 
-        return next_timeout[0] / 1000.0
+        return next_timeout[0]
 
     def player_load(self, track):
         err = lib.sp_session_player_load(self.sp_session, track.sp_track)

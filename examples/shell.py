@@ -129,7 +129,7 @@ class SpotifyLoop(threading.Thread):
                 stop = action(*args)
             except queue.Empty:
                 self.logger.debug('Timeout reached; processing events')
-                timeout = self.session.process_events()
+                timeout = self.session.process_events() / 1000.0
                 self.logger.debug('Waiting %.3fs for next message', timeout)
         self.logger.debug('Spotify event loop stopped')
 

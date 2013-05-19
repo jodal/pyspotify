@@ -453,7 +453,7 @@ class SessionTest(unittest.TestCase):
 
         self.assertRaises(spotify.Error, session.logout)
 
-    def test_process_events_returns_seconds_to_next_timeout(self, lib_mock):
+    def test_process_events_returns_ms_to_next_timeout(self, lib_mock):
         def func(sp_session, int_ptr):
             int_ptr[0] = 5500
             return spotify.Error.OK
@@ -464,7 +464,7 @@ class SessionTest(unittest.TestCase):
 
         timeout = session.process_events()
 
-        self.assertEqual(timeout, 5.5)
+        self.assertEqual(timeout, 5500)
 
     def test_process_events_fail_raises_error(self, lib_mock):
         lib_mock.sp_session_process_events.return_value = (

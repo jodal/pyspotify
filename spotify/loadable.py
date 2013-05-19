@@ -18,6 +18,5 @@ class Loadable(object):
             spotify.session_instance.process_events()
             if hasattr(self, 'error'):
                 spotify.Error.maybe_raise(
-                    self.error().error_type,
-                    ignores=[spotify.ErrorType.IS_LOADING])
+                    self.error, ignores=[spotify.ErrorType.IS_LOADING])
             time.sleep(0.001)

@@ -117,11 +117,10 @@ class SessionCallbacks(object):
             audio_format = spotify.AudioFormat(sp_audioformat)
             buffer_ = spotify.ffi.buffer(
                 frames, audio_format.frame_size() * num_frames)
-            # TODO Decide if we should make a copy of the buffer out of
-            # libspotify's memory and into Python land, by:
-            #    our_bytes = buffer_[:]
+            frames_bytes = buffer_[:]
             return self.music_delivery(
-                spotify.session_instance, audio_format, buffer_, num_frames)
+                spotify.session_instance, audio_format,
+                frames_bytes, num_frames)
         else:
             return 0
 

@@ -40,6 +40,19 @@ class ErrorTest(unittest.TestCase):
             spotify.Error.BAD_API_VERSION,
             spotify.Error(spotify.ErrorType.BAD_API_VERSION))
 
+    def test_maybe_raise(self):
+        self.assertRaises(
+            spotify.Error,
+            spotify.Error.maybe_raise, spotify.ErrorType.BAD_API_VERSION)
+
+    def test_maybe_raise_does_not_raise_if_ok(self):
+        spotify.Error.maybe_raise(spotify.ErrorType.OK)
+
+    def test_maybe_raise_does_not_raise_if_error_is_ignored(self):
+        spotify.Error.maybe_raise(
+            spotify.ErrorType.BAD_API_VERSION,
+            ignores=[spotify.ErrorType.BAD_API_VERSION])
+
 
 class ErrorTypeTest(unittest.TestCase):
 

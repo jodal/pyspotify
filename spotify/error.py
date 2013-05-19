@@ -27,6 +27,14 @@ class Error(Exception):
     def __ne__(self, other):
         return not self.__eq__(other)
 
+    @classmethod
+    def maybe_raise(cls, error_type, ignores=None):
+        if ignores is None:
+            ignores = []
+        ignores.append(ErrorType.OK)
+        if error_type not in ignores:
+            raise Error(error_type)
+
 
 for attr in dir(lib):
     if attr.startswith('SP_ERROR_'):

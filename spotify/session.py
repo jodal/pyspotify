@@ -244,9 +244,8 @@ class Session(object):
         sp_session_config = config.make_sp_session_config()
         sp_session_ptr = ffi.new('sp_session **')
 
-        err = lib.sp_session_create(sp_session_config, sp_session_ptr)
-        if err != ErrorType.OK:
-            raise Error(err)
+        Error.maybe_raise(lib.sp_session_create(
+            sp_session_config, sp_session_ptr))
 
         self.sp_session = ffi.gc(sp_session_ptr[0], lib.sp_session_release)
 
@@ -266,15 +265,11 @@ class Session(object):
         else:
             raise AttributeError('password or blob is required to login')
 
-        err = lib.sp_session_login(
-            self.sp_session, username, password, bool(remember_me), blob)
-        if err != ErrorType.OK:
-            raise Error(err)
+        Error.maybe_raise(lib.sp_session_login(
+            self.sp_session, username, password, bool(remember_me), blob))
 
     def relogin(self):
-        err = lib.sp_session_relogin(self.sp_session)
-        if err != ErrorType.OK:
-            raise Error(err)
+        Error.maybe_raise(lib.sp_session_relogin(self.sp_session))
 
     @property
     def remembered_user(self):
@@ -286,9 +281,7 @@ class Session(object):
         return to_unicode(lib.sp_session_user_name(self.sp_session))
 
     def forget_me(self):
-        err = lib.sp_session_forget_me(self.sp_session)
-        if err != ErrorType.OK:
-            raise Error(err)
+        Error.maybe_raise(lib.sp_session_forget_me(self.sp_session))
 
     @property
     def user(self):
@@ -298,27 +291,22 @@ class Session(object):
         return User(sp_user)
 
     def logout(self):
-        err = lib.sp_session_logout(self.sp_session)
-        if err != ErrorType.OK:
-            raise Error(err)
+        Error.maybe_raise(lib.sp_session_logout(self.sp_session))
 
     def process_events(self):
         next_timeout = ffi.new('int *')
 
-        err = lib.sp_session_process_events(self.sp_session, next_timeout)
-        if err != ErrorType.OK:
-            raise Error(err)
+        Error.maybe_raise(lib.sp_session_process_events(
+            self.sp_session, next_timeout))
 
         return next_timeout[0]
 
     def player_load(self, track):
-        err = lib.sp_session_player_load(self.sp_session, track.sp_track)
-        if err != ErrorType.OK:
-            raise Error(err)
+        Error.maybe_raise(lib.sp_session_player_load(
+            self.sp_session, track.sp_track))
 
     def player_play(self, play=True):
-        err = lib.sp_session_player_play(self.sp_session, play)
-        if err != ErrorType.OK:
-            raise Error(err)
+        Error.maybe_raise(lib.sp_session_player_play(
+            self.sp_session, play))
 
     # TODO Add all sp_session_* methods

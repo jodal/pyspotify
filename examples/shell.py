@@ -58,7 +58,7 @@ class Commander(cmd.Cmd):
             self.spotify_queue.put(('logout',))
             spotify_logged_out.wait()
         print('Exiting...')
-        self.spotify_queue.put(('stop',))
+        self.spotify_queue.put(('exit',))
         return True
 
     def do_login(self, line):
@@ -157,7 +157,7 @@ class SpotifyLoop(threading.Thread):
     def do_logout(self):
         self.session.logout()
 
-    def do_stop(self):
+    def do_exit(self):
         return True
 
     def do_whoami(self):

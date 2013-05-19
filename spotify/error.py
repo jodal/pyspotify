@@ -4,18 +4,31 @@ from spotify import lib
 from spotify.utils import enum, to_unicode
 
 
-__all__ = ['Error']
+__all__ = [
+    'Error',
+    'ErrorType',
+]
 
 
 @enum('SP_ERROR_')
+class ErrorType(object):
+    pass
+
+
 class Error(Exception):
-    def __init__(self, error_code):
-        self.error_code = error_code
-        message = to_unicode(lib.sp_error_message(error_code))
+    def __init__(self, error_type):
+        self.error_type = error_type
+        message = to_unicode(lib.sp_error_message(error_type))
         super(Error, self).__init__(message)
 
     def __eq__(self, other):
-        return self.error_code == other.error_code
+        return self.error_type == other.error_type
 
     def __ne__(self, other):
         return not self.__eq__(other)
+
+
+for attr in dir(lib):
+    if attr.startswith('SP_ERROR_'):
+        setattr(
+            Error, attr.replace('SP_ERROR_', ''), Error(getattr(lib, attr)))

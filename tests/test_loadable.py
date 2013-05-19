@@ -38,7 +38,7 @@ class LoadableTest(unittest.TestCase):
 
         foo = Foo()
         foo.error = mock.Mock(return_value=spotify.Error(
-            spotify.Error.OTHER_PERMANENT))
+            spotify.ErrorType.OTHER_PERMANENT))
         self.assertRaises(spotify.Error, foo.load)
 
         self.assertEqual(session_mock.process_events.call_count, 1)
@@ -50,7 +50,7 @@ class LoadableTest(unittest.TestCase):
 
         foo = Foo()
         foo.error = mock.Mock(return_value=spotify.Error(
-            spotify.Error.IS_LOADING))
+            spotify.ErrorType.IS_LOADING))
         foo.load()
 
         self.assertEqual(session_mock.process_events.call_count, 2)

@@ -3,7 +3,7 @@ from __future__ import unicode_literals
 import logging
 
 import spotify
-from spotify import Error, ffi, lib, User
+from spotify import Error, ErrorType, ffi, lib, User
 from spotify.utils import get_with_growing_buffer, to_bytes, to_unicode
 
 
@@ -65,7 +65,7 @@ class SessionCallbacks(object):
     def _logged_in(self, sp_session, sp_error):
         if not spotify.session_instance:
             return
-        if sp_error == Error.OK:
+        if sp_error == ErrorType.OK:
             logger.info('Logged in')
         else:
             logger.error('Login error: %s', Error(sp_error))
@@ -245,7 +245,7 @@ class Session(object):
         sp_session_ptr = ffi.new('sp_session **')
 
         err = lib.sp_session_create(sp_session_config, sp_session_ptr)
-        if err != Error.OK:
+        if err != ErrorType.OK:
             raise Error(err)
 
         self.sp_session = ffi.gc(sp_session_ptr[0], lib.sp_session_release)
@@ -268,12 +268,12 @@ class Session(object):
 
         err = lib.sp_session_login(
             self.sp_session, username, password, bool(remember_me), blob)
-        if err != Error.OK:
+        if err != ErrorType.OK:
             raise Error(err)
 
     def relogin(self):
         err = lib.sp_session_relogin(self.sp_session)
-        if err != Error.OK:
+        if err != ErrorType.OK:
             raise Error(err)
 
     @property
@@ -287,7 +287,7 @@ class Session(object):
 
     def forget_me(self):
         err = lib.sp_session_forget_me(self.sp_session)
-        if err != Error.OK:
+        if err != ErrorType.OK:
             raise Error(err)
 
     @property
@@ -299,26 +299,26 @@ class Session(object):
 
     def logout(self):
         err = lib.sp_session_logout(self.sp_session)
-        if err != Error.OK:
+        if err != ErrorType.OK:
             raise Error(err)
 
     def process_events(self):
         next_timeout = ffi.new('int *')
 
         err = lib.sp_session_process_events(self.sp_session, next_timeout)
-        if err != Error.OK:
+        if err != ErrorType.OK:
             raise Error(err)
 
         return next_timeout[0]
 
     def player_load(self, track):
         err = lib.sp_session_player_load(self.sp_session, track.sp_track)
-        if err != Error.OK:
+        if err != ErrorType.OK:
             raise Error(err)
 
     def player_play(self, play=True):
         err = lib.sp_session_player_play(self.sp_session, play)
-        if err != Error.OK:
+        if err != ErrorType.OK:
             raise Error(err)
 
     # TODO Add all sp_session_* methods

@@ -17,7 +17,7 @@ class Loadable(object):
         while not self.is_loaded:
             spotify.session_instance.process_events()
             if hasattr(self, 'error'):
-                if self.error().error_code not in (
+                if self.error() not in (
                         spotify.Error.OK, spotify.Error.IS_LOADING):
                     raise self.error()
             time.sleep(0.001)

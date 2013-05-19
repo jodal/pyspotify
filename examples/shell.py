@@ -85,6 +85,10 @@ class Commander(cmd.Cmd):
         "whoami"
         self.spotify_queue.put(('whoami',))
 
+    def do_play_uri(self, line):
+        "play <spotify track uri>"
+        self.spotify_queue.put(('play_uri', line))
+
 
 def logged_in(session, error):
     # TODO Handle error situations
@@ -153,6 +157,9 @@ class SpotifyLoop(threading.Thread):
     def do_logout(self):
         self.session.logout()
 
+    def do_stop(self):
+        return True
+
     def do_whoami(self):
         if spotify_logged_in.is_set():
             self.logger.info(
@@ -165,8 +172,20 @@ class SpotifyLoop(threading.Thread):
                 'I am not logged in, but I may be %s',
                 self.session.remembered_user)
 
-    def do_stop(self):
-        return True
+    def do_play_uri(self, uri):
+        if not spotify_logged_in.is_set():
+            self.logger.warning('You must be logged in to play')
+            return
+        try:
+            track = spotify.Link(uri).as_track()
+            track.load()
+        except (ValueError, spotify.Error) as e:
+            self.logger.warning(e)
+            return
+        self.logger.info('Loading track into player')
+        self.session.player_load(track)
+        self.logger.info('Playing track')
+        self.session.player_play()
 
 
 if __name__ == '__main__':

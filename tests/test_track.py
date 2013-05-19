@@ -46,6 +46,12 @@ class TrackTest(unittest.TestCase):
         lib_mock.sp_track_error.assert_called_once_with(sp_track)
         self.assertEqual(result, spotify.Error.IS_LOADING)
 
+    def test_is_loadable(self, lib_mock):
+        sp_track = spotify.ffi.new('int *')
+        track = spotify.Track(sp_track)
+
+        self.assertIsInstance(track, spotify.Loadable)
+
     def test_name(self, lib_mock):
         lib_mock.sp_track_name.return_value = spotify.ffi.new(
             'char[]', b'Foo Bar Baz')

@@ -1,6 +1,6 @@
 from __future__ import unicode_literals
 
-from spotify import ffi, lib
+from spotify import ffi, lib, Loadable
 from spotify.utils import to_bytes, to_unicode
 
 
@@ -10,7 +10,7 @@ __all__ = [
 ]
 
 
-class Track(object):
+class Track(Loadable):
     def __init__(self, sp_track, add_ref=True):
         if add_ref:
             lib.sp_track_add_ref(sp_track)

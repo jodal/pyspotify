@@ -1,6 +1,6 @@
 from __future__ import unicode_literals
 
-from spotify import ffi, lib
+from spotify import ffi, lib, Loadable
 from spotify.utils import to_unicode
 
 
@@ -9,7 +9,7 @@ __all__ = [
 ]
 
 
-class User(object):
+class User(Loadable):
     def __init__(self, sp_user):
         lib.sp_user_add_ref(sp_user)
         self.sp_user = ffi.gc(sp_user, lib.sp_user_release)

@@ -233,7 +233,7 @@ class SessionConfig(object):
 
 
 class Session(object):
-    def __init__(self, sp_session=None, config=None):
+    def __init__(self, config=None):
         if spotify.session_instance is not None:
             raise RuntimeError('Session has already been initialized')
 

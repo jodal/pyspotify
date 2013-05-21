@@ -4,6 +4,7 @@
 *.sw[po]
 .tox/
 __pycache__/
+_build/
 build/
 dist/
 spotify_appkey.key

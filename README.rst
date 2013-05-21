@@ -5,8 +5,8 @@ pyspotify
 Python wrapper for libspotify, second edition
 
 This is a new Python wrapper for `libspotify
-<https://developer.spotify.com/technologies/libspotify/>`_ based on `CFFI
-<http://cffi.readthedocs.org/>`_ instead of a CPython C extension like
+<https://developer.spotify.com/technologies/libspotify/>`__ based on `CFFI
+<http://cffi.readthedocs.org/>`__ instead of a CPython C extension like
 pyspotify 1.x was. This makes pyspotify work on CPython 3 as well as PyPy 2.
 
 

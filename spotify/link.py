@@ -56,13 +56,16 @@ class Link(object):
     def type(self):
         return lib.sp_link_type(self.sp_link)
 
-    def as_track(self, offset=None):
-        if offset is not None:
-            sp_track = lib.sp_link_as_track_and_offset(self.sp_link, offset)
-        else:
-            sp_track = lib.sp_link_as_track(self.sp_link)
+    def as_track(self):
+        sp_track = lib.sp_link_as_track(self.sp_link)
         if sp_track:
             return spotify.Track(sp_track)
+
+    def as_track_offset(self):
+        offset = ffi.new('int *')
+        sp_track = lib.sp_link_as_track_and_offset(self.sp_link, offset)
+        if sp_track:
+            return offset[0]
 
     def as_album(self):
         sp_album = lib.sp_link_as_album(self.sp_link)

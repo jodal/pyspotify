@@ -239,15 +239,33 @@ class LinkTest(unittest.TestCase):
         sp_link = spotify.ffi.new('int *')
         lib_mock.sp_link_create_from_string.return_value = sp_link
         sp_track = spotify.ffi.new('int *')
-        lib_mock.sp_link_as_track_and_offset.return_value = sp_track
+
+        def func(sp_link, offset_ptr):
+            offset_ptr[0] = 90
+            return sp_track
+
+        lib_mock.sp_link_as_track_and_offset.side_effect = func
 
         link = spotify.Link('spotify:track:foo')
-        track = link.as_track(offset=90)
+        offset = link.as_track_offset()
 
-        self.assertEqual(track.sp_track, sp_track)
-
+        self.assertEqual(offset, 90)
         lib_mock.sp_link_as_track_and_offset.assert_called_once_with(
-            sp_link, 90)
+            sp_link, mock.ANY)
+
+    @mock.patch('spotify.track.lib', spec=spotify.lib)
+    def test_as_track_with_offset_if_not_a_track(
+            self, track_lib_mock, lib_mock):
+        sp_link = spotify.ffi.new('int *')
+        lib_mock.sp_link_create_from_string.return_value = sp_link
+        lib_mock.sp_link_as_track_and_offset.return_value = spotify.ffi.NULL
+
+        link = spotify.Link('spotify:track:foo')
+        offset = link.as_track_offset()
+
+        self.assertIsNone(offset)
+        lib_mock.sp_link_as_track_and_offset.assert_called_once_with(
+            sp_link, mock.ANY)
 
     @mock.patch('spotify.album.lib', spec=spotify.lib)
     def test_as_album(self, album_lib_mock, lib_mock):

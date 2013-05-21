@@ -13,6 +13,7 @@ class Loadable(object):
     """
 
     def load(self):
+        """Block until the object's data is loaded."""
         # TODO Timeout if this takes too long
         while not self.is_loaded:
             spotify.session_instance.process_events()

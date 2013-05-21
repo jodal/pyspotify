@@ -10,12 +10,9 @@ __all__ = [
 ]
 
 
-@enum('SP_ERROR_')
-class ErrorType(object):
-    pass
-
-
 class Error(Exception):
+    """A Spotify error."""
+
     def __init__(self, error_type):
         self.error_type = error_type
         message = to_unicode(lib.sp_error_message(error_type))
@@ -29,6 +26,12 @@ class Error(Exception):
 
     @classmethod
     def maybe_raise(cls, error_type, ignores=None):
+        """Raise an :exc:`Error` unless the ``error_type`` is
+        :attr:`ErrorType.OK` or in the ``ignores`` list of error types.
+
+        Internal method.
+        """
+
         if ignores is None:
             ignores = []
         ignores.append(ErrorType.OK)
@@ -40,3 +43,8 @@ for attr in dir(lib):
     if attr.startswith('SP_ERROR_'):
         setattr(
             Error, attr.replace('SP_ERROR_', ''), Error(getattr(lib, attr)))
+
+
+@enum('SP_ERROR_')
+class ErrorType(object):
+    pass

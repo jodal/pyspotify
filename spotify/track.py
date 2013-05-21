@@ -11,6 +11,8 @@ __all__ = [
 
 
 class Track(Loadable):
+    """A Spotify track."""
+
     def __init__(self, sp_track, add_ref=True):
         if add_ref:
             lib.sp_track_add_ref(sp_track)
@@ -18,17 +20,28 @@ class Track(Loadable):
 
     @property
     def is_loaded(self):
+        """Whether the track's data is loaded yet."""
         return bool(lib.sp_track_is_loaded(self.sp_track))
 
     @property
     def error(self):
+        """An :class:`ErrorType` associated with the track.
+
+        Check to see if there was problems loading the track.
+        """
         return lib.sp_track_error(self.sp_track)
 
     @property
     def name(self):
+        """The track's name. Empty if the track is not loaded yet."""
         return to_unicode(lib.sp_track_name(self.sp_track))
 
     def as_link(self, offset=0):
+        """Make a :class:`Link` to the track.
+
+        ``offset`` is the number of milliseconds into the track the link should
+        point.
+        """
         from spotify.link import Link
         return Link(self, offset=offset)
 
@@ -36,6 +49,12 @@ class Track(Loadable):
 
 
 class LocalTrack(Track):
+    """A Spotify local track.
+
+    TODO: Explain what a local track is. libspotify docs doesn't say much, but
+    there are more details in Hallon's docs.
+    """
+
     def __init__(self, artist=None, title=None, album=None, length=None):
         if artist is not None:
             artist = ffi.new('char[]', to_bytes(artist))

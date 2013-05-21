@@ -17,6 +17,17 @@ logger = logging.getLogger(__name__)
 
 
 class SessionCallbacks(object):
+    """Session callbacks.
+
+    If needed, callback functions and :class:`None` can be assigned to
+    :class:`SessionCallbacks` instance's attributes while a session exists and
+    is in use.
+
+    All callbacks will cause debug log statements to be emitted, even if the
+    callback attributes are set to :class:`None`. Thus, there is no need to
+    define callback functions just to log that they're called.
+    """
+
     logged_in = None
     logged_out = None
     metadata_updated = None
@@ -163,6 +174,8 @@ class SessionCallbacks(object):
             self.credentials_blob_updated(spotify.session_instance, data)
 
     def make_sp_session_callbacks(self):
+        """Internal method."""
+
         # TODO Add remaining callbacks
 
         return ffi.new('sp_session_callbacks *', {
@@ -182,27 +195,82 @@ class SessionCallbacks(object):
 
 
 class SessionConfig(object):
+    """The session config.
+
+    Create an instance and assign to its attributes to configure. Then use the
+    config object to create a session::
+
+        >>> import spotify
+        >>> config = spotify.SessionConfig()
+        >>> config.user_agent = 'My Spotify client'
+        >>> # Etc ...
+        >>> session = spotify.Session(config)
+    """
+
     api_version = lib.SPOTIFY_API_VERSION
+    """The API version of the libspotify we're using.
+
+    You should not need to change this. It is read from
+    :attr:`lib.SPOTIFY_API_VERSION`.
+    """
+
     cache_location = b'tmp'
+    """A location for libspotify to cache files.
+
+    Must be a bytestring. Cannot be shared with other Spotify apps. Can only be
+    used by one session at the time. Optimally, you should use a lock file or
+    similar to ensure this.
+    """
+
     settings_location = b'tmp'
+    """A location for libspotify to save settings.
+
+    Must be a bytestring. Cannot be shared with other Spotify apps. Can only be
+    used by one session at the time. Optimally, you should use a lock file or
+    similar to ensure this.
+    """
+
     application_key = None
+    """Your libspotify application key.
+
+    Must be a bytestring. Alternatively, you can set
+    :attr:`application_key_filename`, and pyspotify will read the file and use
+    it instead of :attr:`application_key`.
+    """
+
     application_key_filename = b'spotify_appkey.key'
+    """Path to your libspotify application key file.
+
+    This is an alternative to :attr:`application_key`. The file must be a
+    binary key file, not the C code key file that can be compiled into an
+    application.
+    """
+
     user_agent = 'pyspotify'
+    """A string with the name of your client."""
+
     callbacks = None
+    """A :class:`SessionCallbacks` instance.
+
+    If not set, a :class:`SessionCallbacks` instance will be created for you.
+    """
 
     def get_application_key(self):
+        """Internal method."""
         if self.application_key is None:
             return open(self.application_key_filename, 'rb').read()
         else:
             return self.application_key
 
     def get_callbacks(self):
+        """Internal method."""
         if self.callbacks is None:
             return SessionCallbacks()
         else:
             return self.callbacks
 
     def make_sp_session_config(self):
+        """Internal method."""
         cache_location = ffi.new('char[]', self.cache_location)
         settings_location = ffi.new('char[]', self.settings_location)
         application_key_bytes = self.get_application_key()
@@ -233,6 +301,14 @@ class SessionConfig(object):
 
 
 class Session(object):
+    """The Spotify session.
+
+    You can only have one session instance per process.
+
+    ``config`` is a :class:`SessionConfig` instance. If no config instance is
+    provided, the default config is used.
+    """
+
     def __init__(self, config=None):
         if spotify.session_instance is not None:
             raise RuntimeError('Session has already been initialized')
@@ -253,6 +329,22 @@ class Session(object):
         spotify.session_instance = self
 
     def login(self, username, password=None, remember_me=False, blob=None):
+        """Authenticate to Spotify's servers.
+
+        You can login with one of two combinations:
+
+        - ``username`` and ``password``
+        - ``username`` and ``blob``
+
+        To get the ``blob`` string, you must once log in with ``username`` and
+        ``password``. You'll then get the ``blob`` string passed to the
+        :attr:`~SessionCallbacks.credentials_blob_updated` callback.
+
+        If you set ``remember_me`` to :class:`True`, you can later login to the
+        same account without providing any ``username`` or credentials by
+        calling :meth:`relogin`.
+        """
+
         username = ffi.new('char[]', to_bytes(username))
 
         if password is not None:
@@ -268,31 +360,60 @@ class Session(object):
             self.sp_session, username, password, bool(remember_me), blob))
 
     def relogin(self):
+        """Relogin as the remembered user.
+
+        To be able do this, you must previously have logged in with
+        :meth:`login` with the ``remember_me`` argument set to :class:`True`.
+
+        To check what user you'll be logged in as if you call this method, see
+        :attr:`remembered_user`.
+        """
         Error.maybe_raise(lib.sp_session_relogin(self.sp_session))
 
     @property
     def remembered_user(self):
+        """The username of the remembered user from a previous :meth:`login`
+        call."""
         return get_with_growing_buffer(
             lib.sp_session_remembered_user, self.sp_session)
 
     @property
     def user_name(self):
+        """The username of the logged in user."""
         return to_unicode(lib.sp_session_user_name(self.sp_session))
 
     def forget_me(self):
+        """Forget the remembered user from a previous :meth:`login` call."""
         Error.maybe_raise(lib.sp_session_forget_me(self.sp_session))
 
     @property
     def user(self):
+        """The logged in :class:`User`."""
         sp_user = lib.sp_session_user(self.sp_session)
         if sp_user == ffi.NULL:
             return None
         return User(sp_user)
 
     def logout(self):
+        """Log out the current user.
+
+        If you logged in with the ``remember_me`` argument set to
+        :class:`True`, you will also need to call :meth:`forget_me` to
+        completely remove all credentials of the user that was logged in.
+        """
         Error.maybe_raise(lib.sp_session_logout(self.sp_session))
 
     def process_events(self):
+        """Process pending events in libspotify.
+
+        This method must be called for most callbacks to be called. Without
+        calling this method, you'll only get the callbacks that are called from
+        internal libspotify threads. When the
+        :attr:`~SessionCallbacks.notify_main_thread` callback is called (from
+        an internal libspotify thread), it's your job to make sure this method
+        is called (from the thread you use for accessing Spotify), so that
+        further callbacks can be triggered (from the same thread).
+        """
         next_timeout = ffi.new('int *')
 
         Error.maybe_raise(lib.sp_session_process_events(
@@ -301,10 +422,16 @@ class Session(object):
         return next_timeout[0]
 
     def player_load(self, track):
+        """Load :class:`Track` for playback."""
         Error.maybe_raise(lib.sp_session_player_load(
             self.sp_session, track.sp_track))
 
     def player_play(self, play=True):
+        """Play the currently loaded track.
+
+        This will cause audio data to be passed to the
+        :attr:`~SessionCallbacks.music_delivery` callback.
+        """
         Error.maybe_raise(lib.sp_session_player_play(
             self.sp_session, play))
 

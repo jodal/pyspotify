@@ -166,7 +166,7 @@ class SessionConfigTest(unittest.TestCase):
             self.config.application_key_filename, b'spotify_appkey.key')
 
     def test_user_agent_defaults_to_pyspotify(self):
-        self.assertEqual(self.config.user_agent, b'pyspotify')
+        self.assertEqual(self.config.user_agent, 'pyspotify')
 
     def test_callbacks_defaults_to_none(self):
         self.assertIsNone(self.config.callbacks)

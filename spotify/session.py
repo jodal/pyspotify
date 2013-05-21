@@ -187,7 +187,7 @@ class SessionConfig(object):
     settings_location = b'tmp'
     application_key = None
     application_key_filename = b'spotify_appkey.key'
-    user_agent = b'pyspotify'
+    user_agent = 'pyspotify'
     callbacks = None
 
     def get_application_key(self):
@@ -207,7 +207,7 @@ class SessionConfig(object):
         settings_location = ffi.new('char[]', self.settings_location)
         application_key_bytes = self.get_application_key()
         application_key = ffi.new('char[]', application_key_bytes)
-        user_agent = ffi.new('char[]', self.user_agent)
+        user_agent = ffi.new('char[]', to_bytes(self.user_agent))
         callbacks = self.get_callbacks()
 
         # TODO Add remaining config values

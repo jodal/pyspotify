@@ -20,7 +20,10 @@ _header = open(_header_file).read()
 _header += '#define SPOTIFY_API_VERSION ...\n'
 ffi = cffi.FFI()
 ffi.cdef(_header)
-lib = ffi.verify('#include "libspotify/api.h"', libraries=[str('spotify')])
+lib = ffi.verify(
+    '#include "libspotify/api.h"',
+    libraries=[str('spotify')],
+    ext_package='spotify')
 
 
 # Mapping between keys and objects that should be kept alive as long as the key

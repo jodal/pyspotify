@@ -4,7 +4,14 @@ import re
 
 from setuptools import setup, find_packages
 
-import spotify
+try:
+    import spotify
+except ImportError:
+    # We're installing, so cffi isn't available yet
+    ext_modules = []
+else:
+    # We're building bdist, so cffi is available
+    ext_modules = [spotify.ffi.verifier.get_extension()]
 
 
 def get_version(filename):
@@ -26,7 +33,7 @@ setup(
     zip_safe=False,
     include_package_data=True,
     ext_package='spotify',
-    ext_modules=[spotify.ffi.verifier.get_extension()],
+    ext_modules=ext_modules,
     install_requires=[
         'setuptools',
         'cffi >= 0.6',

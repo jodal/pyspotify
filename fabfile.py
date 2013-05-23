@@ -33,7 +33,7 @@ def auto(task):
             execute(task)
         local(
             'inotifywait -q -e create -e modify -e delete '
-            '--exclude ".*\.(pyc|sw.)" -r spotify/ tests/')
+            '--exclude ".*\.(pyc|sw.)" -r docs/ spotify/ tests/')
 
 
 @task

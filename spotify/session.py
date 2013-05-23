@@ -29,17 +29,141 @@ class SessionCallbacks(object):
     """
 
     logged_in = None
+    """Called when login has completed.
+
+    :param session: the current session
+    :type session: :class:`Session`
+    :param error: the login error
+    :type error: :class:`Error`
+    """
+
     logged_out = None
+    """Called when logout has completed or there is a permanent connection
+    error.
+
+    :param session: the current session
+    :type session: :class:`Session`
+    """
+
     metadata_updated = None
+    """Called when some metadata has been updated.
+
+    There is no way to know what metadata was updated, so you'll have to
+    refresh all you metadata caches.
+
+    :param session: the current session
+    :type session: :class:`Session`
+    """
+
     connection_error = None
+    """Called when there is a connection error and libspotify has problems
+    reconnecting to the Spotify service.
+
+    May be called repeatedly as long as the problem persists. Will be called
+    with an :attr:`Error.OK` error when the problem is resolved.
+
+    :param session: the current session
+    :type session: :class:`Session`
+    :param error: the connection error
+    :type error: :class:`Error`
+    """
+
     message_to_user = None
+    """Called when libspotify wants to show a message to the end user.
+
+    :param session: the current session
+    :type session: :class:`Session`
+    :param data: the message
+    :type data: text
+    """
+
     notify_main_thread = None
+    """Called when processing on the main thread is needed.
+
+    When this is called, you should call :meth:`~Session.process_events` from
+    your main thread. Failure to do so may cause request timeouts, or a lost
+    connection.
+
+    .. warning::
+
+        This function is called from an internal libspotify thread. You need
+        proper synchronization.
+
+    :param session: the current session
+    :type session: :class:`Session`
+    """
+
     music_delivery = None
+    """Called when there is decompressed audio data available.
+
+    If the function returns a lower number of frames consumed than
+    ``num_frames``, libspotify will retry delivery of the unconsumed frames in
+    about 100ms. This can be used for rate limiting if libspotify is giving you
+    audio data too fast.
+
+    .. warning::
+
+        This function is called from an internal libspotify thread. You need
+        proper synchronization.
+
+    :param session: the current session
+    :type session: :class:`Session`
+    :param audio_format: the audio format
+    :type audio_format: :class:`AudioFormat`
+    :param frames: the audio frames
+    :type frames: bytestring
+    :param num_frames: the number of frames
+    :type num_frames: int
+    :returns: the number of frames consumed
+    """
+
     log_message = None
+    """Called when libspotify have something to log.
+
+    Note that pyspotify logs this for you, so you'll probably never need to
+    define this callback.
+
+    :param session: the current session
+    :type session: :class:`Session`
+    :param data: the message
+    :type data: text
+    """
+
     end_of_track = None
+    """Called when all audio data for the current track has been delivered.
+
+    :param session: the current session
+    :type session: :class:`Session`
+    """
+
     streaming_error = None
+    """Called when audio streaming cannot start or continue.
+
+    :param session: the current session
+    :type session: :class:`Session`
+    :param error: the streaming error
+    :type error: :class:`Error`
+    """
+
     offline_status_updated = None
+    """Called when offline sync status is updated.
+
+    :param session: the current session
+    :type session: :class:`Session`
+    """
+
     credentials_blob_updated = None
+    """Called when storable credentials have been updated, typically right
+    after login.
+
+    The ``blob`` argument can be stored and later passed to
+    :meth:`~Session.login` to login without storing the user's password.
+
+    :param session: the current session
+    :type session: :class:`Session`
+    :param blob: the authentication blob
+    :type blob: bytestring
+    """
 
     def __init__(self):
         # If we use @ffi.callback as a decorator on the methods they'll expect

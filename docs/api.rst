@@ -149,6 +149,14 @@ TODO
 .. autoclass:: Session
 
 
+Audio
+=====
+
+.. autoclass:: SampleType
+
+.. autoclass:: AudioFormat
+
+
 Links
 =====
 

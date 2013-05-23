@@ -7,16 +7,30 @@ def preprocess_header():
 
 
 @task
+def docs():
+    local('make -C docs/ html')
+
+
+@task
+def autodocs():
+    auto(docs)
+
+
+@task
 def test():
     local('nosetests')
 
 
 @task
 def autotest():
+    auto(test)
+
+
+def auto(task):
     while True:
         local('clear')
         with settings(warn_only=True):
-            execute(test)
+            execute(task)
         local(
             'inotifywait -q -e create -e modify -e delete '
             '--exclude ".*\.(pyc|sw.)" -r spotify/ tests/')

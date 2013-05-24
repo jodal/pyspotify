@@ -429,16 +429,24 @@ class Session(object):
 
     You can only have one session instance per process.
 
-    ``config`` is a :class:`SessionConfig` instance. If no config instance is
-    provided, the default config is used.
+    If no ``config`` is provided, the default config is used. If no
+    ``callbacks`` is provided, no callbacks are hooked up initially.
+
+    :param config: the session config
+    :type config: :class:`SessionConfig` or :class:`None`
+    :param callbacks: the session callbacks
+    :type callbacks: :class:`SessionCallbacks` or :class:`None`
     """
 
-    def __init__(self, config=None):
+    def __init__(self, config=None, callbacks=None):
         if spotify.session_instance is not None:
             raise RuntimeError('Session has already been initialized')
 
         if config is None:
             config = SessionConfig()
+
+        if callbacks is not None:
+            config.callbacks = callbacks
 
         sp_session_config = config.make_sp_session_config()
         sp_session_ptr = ffi.new('sp_session **')

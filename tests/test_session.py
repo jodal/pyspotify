@@ -256,6 +256,18 @@ class SessionTest(unittest.TestCase):
         config_obj_mock = config_cls_mock.return_value
         config_obj_mock.make_sp_session_config.assert_called_once_with()
 
+    def test_adds_callbacks_to_config_if_provided(self, lib_mock):
+        lib_mock.sp_session_create.return_value = spotify.ErrorType.OK
+        config = spotify.SessionConfig()
+        config.application_key = b'secret'
+        callbacks = spotify.SessionCallbacks()
+
+        self.assertIsNone(config.callbacks)
+
+        spotify.Session(config=config, callbacks=callbacks)
+
+        self.assertEqual(config.callbacks, callbacks)
+
     def test_raises_error_if_not_ok(self, lib_mock):
         lib_mock.sp_session_create.return_value = (
             spotify.ErrorType.BAD_API_VERSION)

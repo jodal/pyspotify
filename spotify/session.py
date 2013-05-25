@@ -482,7 +482,6 @@ class SessionConfig(object):
         else:
             tracefile = ffi.new('char[]', to_bytes(self.tracefile))
 
-        # TODO Add remaining config values
         sp_session_config = ffi.new('sp_session_config *', {
             'api_version': self.api_version,
             'cache_location': cache_location,

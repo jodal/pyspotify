@@ -171,6 +171,33 @@ class SessionConfigTest(unittest.TestCase):
     def test_callbacks_defaults_to_none(self):
         self.assertIsNone(self.config.callbacks)
 
+    def test_compress_playlists_defaults_to_false(self):
+        self.assertFalse(self.config.compress_playlists)
+
+    def test_dont_save_metadata_for_playlists_defaults_to_false(self):
+        self.assertFalse(self.config.dont_save_metadata_for_playlists)
+
+    def test_initially_unload_playlists_defaults_to_false(self):
+        self.assertFalse(self.config.initially_unload_playlists)
+
+    def test_device_id_defaults_to_none(self):
+        self.assertIsNone(self.config.device_id)
+
+    def test_proxy_defaults_to_none(self):
+        self.assertIsNone(self.config.proxy)
+
+    def test_proxy_username_defaults_to_none(self):
+        self.assertIsNone(self.config.proxy_username)
+
+    def test_proxy_password_defaults_to_none(self):
+        self.assertIsNone(self.config.proxy_password)
+
+    def test_ca_certs_filename_defaults_none(self):
+        self.assertIsNone(self.config.ca_certs_filename)
+
+    def test_tracefile_defaults_to_none(self):
+        self.assertIsNone(self.config.tracefile)
+
     def test_get_application_key_prefers_the_key_attr(self):
         self.config.application_key = b'secret key from attr'
 
@@ -226,7 +253,7 @@ class SessionConfigTest(unittest.TestCase):
         sp_session_config = self.config.make_sp_session_config()
 
         self.assertIn(sp_session_config, spotify.weak_key_dict)
-        self.assertEqual(len(spotify.weak_key_dict[sp_session_config]), 5)
+        self.assertEqual(len(spotify.weak_key_dict[sp_session_config]), 11)
 
 
 @mock.patch('spotify.session.lib', spec=spotify.lib)

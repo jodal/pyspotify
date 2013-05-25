@@ -335,7 +335,7 @@ class SessionConfig(object):
     """The API version of the libspotify we're using.
 
     You should not need to change this. It is read from
-    :attr:`lib.SPOTIFY_API_VERSION`.
+    :attr:`spotify.lib.SPOTIFY_API_VERSION`.
     """
 
     cache_location = b'tmp'
@@ -379,6 +379,61 @@ class SessionConfig(object):
     If not set, a :class:`SessionCallbacks` instance will be created for you.
     """
 
+    compress_playlists = False
+    """Compress local copy of playlists, reduces disk space usage."""
+
+    dont_save_metadata_for_playlists = False
+    """Don't save metadata for local copies of playlists.
+
+    Reduces disk space usage at the expense of needing to request metadata from
+    Spotify backend when loading list."""
+
+    initially_unload_playlists = False
+    """Avoid loading playlists into RAM on startup.
+
+    See :meth:`Playlist.is_in_ram` for more details.
+    """
+
+    device_id = None
+    """Device ID for offline synchronization and logging purposes.
+
+    The Device ID must be unique to the particular device instance, i.e. no two
+    units must supply the same Device ID. The Device ID must not change between
+    sessions or power cycles. Good examples is the device's MAC address or
+    unique serial number.
+    """
+
+    proxy = None
+    """URL to the proxy server that should be used.
+
+    The format is protocol://host:port where protocol is
+    http/https/socks4/socks5.
+    """
+
+    proxy_username = None
+    """Username to authenticate with proxy server."""
+
+    proxy_password = None
+    """Password to authenticate with proxy server."""
+
+    ca_certs_filename = None
+    """Path to a file containing the root CA certificates that the peer should
+    be verified with.
+
+    The file must be a concatenation of all certificates in PEM format.
+    Provided with libspotify is a sample PEM file in the ``examples/`` dir. It
+    is recommended that the application export a similar file from the local
+    certificate store.
+
+    Must be a bytestring.
+    """
+
+    tracefile = None
+    """Path to API trace file.
+
+    Must be a bytestring.
+    """
+
     def get_application_key(self):
         """Internal method."""
         if self.application_key is None:
@@ -395,12 +450,37 @@ class SessionConfig(object):
 
     def make_sp_session_config(self):
         """Internal method."""
-        cache_location = ffi.new('char[]', self.cache_location)
-        settings_location = ffi.new('char[]', self.settings_location)
+        cache_location = ffi.new('char[]', to_bytes(self.cache_location))
+        settings_location = ffi.new('char[]', to_bytes(self.settings_location))
         application_key_bytes = self.get_application_key()
         application_key = ffi.new('char[]', application_key_bytes)
         user_agent = ffi.new('char[]', to_bytes(self.user_agent))
         callbacks = self.get_callbacks()
+        if self.device_id is None:
+            device_id = ffi.NULL
+        else:
+            device_id = ffi.new('char[]', to_bytes(self.device_id))
+        if self.proxy is None:
+            proxy = ffi.NULL
+        else:
+            proxy = ffi.new('char[]', to_bytes(self.proxy))
+        if self.proxy_username is None:
+            proxy_username = ffi.NULL
+        else:
+            proxy_username = ffi.new('char[]', to_bytes(self.proxy_username))
+        if self.proxy_password is None:
+            proxy_password = ffi.NULL
+        else:
+            proxy_password = ffi.new('char[]', to_bytes(self.proxy_password))
+        if self.ca_certs_filename is None:
+            ca_certs_filename = ffi.NULL
+        else:
+            ca_certs_filename = ffi.new(
+                'char[]', to_bytes(self.ca_certs_filename))
+        if self.tracefile is None:
+            tracefile = ffi.NULL
+        else:
+            tracefile = ffi.new('char[]', to_bytes(self.tracefile))
 
         # TODO Add remaining config values
         sp_session_config = ffi.new('sp_session_config *', {
@@ -411,6 +491,17 @@ class SessionConfig(object):
             'application_key_size': len(application_key_bytes),
             'user_agent': user_agent,
             'callbacks': callbacks.make_sp_session_callbacks(),
+            'compress_playlists': bool(self.compress_playlists),
+            'dont_save_metadata_for_playlists': bool(
+                self.dont_save_metadata_for_playlists),
+            'initially_unload_playlists': bool(
+                self.initially_unload_playlists),
+            'device_id': device_id,
+            'proxy': proxy,
+            'proxy_username': proxy_username,
+            'proxy_password': proxy_password,
+            'ca_certs_filename': ca_certs_filename,
+            'tracefile': tracefile,
         })
 
         spotify.weak_key_dict[sp_session_config] = [
@@ -419,6 +510,12 @@ class SessionConfig(object):
             application_key,
             user_agent,
             callbacks,
+            device_id,
+            proxy,
+            proxy_username,
+            proxy_password,
+            ca_certs_filename,
+            tracefile,
         ]
 
         return sp_session_config

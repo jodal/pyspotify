@@ -5,14 +5,14 @@ import sys
 from spotify import ffi, lib
 
 
-PY3 = sys.version_info[0] == 3
+PY2 = sys.version_info[0] == 2
 
-if PY3:
-    text_type = str
-    binary_type = bytes
-else:
+if PY2:
     text_type = unicode
     binary_type = str
+else:
+    text_type = str
+    binary_type = bytes
 
 
 def enum(prefix):

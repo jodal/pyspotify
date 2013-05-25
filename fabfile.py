@@ -26,6 +26,16 @@ def autotest():
     auto(test)
 
 
+@task
+def coverage():
+    local('nosetests --with-coverage --cover-package=spotify')
+
+
+@task
+def autocoverage():
+    auto(coverage)
+
+
 def auto(task):
     while True:
         local('clear')

@@ -369,31 +369,33 @@ class SessionConfigTest(unittest.TestCase):
 
     def test_make_sp_session_config_encodes_unicode_as_utf8(self):
         self.config.application_key = b''
-        self.config.device_id = 'æøå device_id'
-        self.config.proxy = 'æøå proxy'
-        self.config.proxy_username = 'æøå proxy_username'
-        self.config.proxy_password = 'æøå proxy_password'
-        self.config.ca_certs_filename = 'æøå ca_certs_filename'
-        self.config.tracefile = 'æøå tracefile'
+        self.config.device_id = 'æ device_id'
+        self.config.proxy = 'æ proxy'
+        self.config.proxy_username = 'æ proxy_username'
+        self.config.proxy_password = 'æ proxy_password'
+        self.config.ca_certs_filename = 'æ ca_certs_filename'
+        self.config.tracefile = 'æ tracefile'
 
         sp_session_config = self.config.make_sp_session_config()
 
         self.assertEqual(
-            spotify.ffi.string(sp_session_config.device_id), b'æøå device_id')
+            spotify.ffi.string(sp_session_config.device_id),
+            b'\xc3\xa6 device_id')
         self.assertEqual(
-            spotify.ffi.string(sp_session_config.proxy), b'æøå proxy')
+            spotify.ffi.string(sp_session_config.proxy),
+            b'\xc3\xa6 proxy')
         self.assertEqual(
             spotify.ffi.string(sp_session_config.proxy_username),
-            b'æøå proxy_username')
+            b'\xc3\xa6 proxy_username')
         self.assertEqual(
             spotify.ffi.string(sp_session_config.proxy_password),
-            b'æøå proxy_password')
+            b'\xc3\xa6 proxy_password')
         self.assertEqual(
             spotify.ffi.string(sp_session_config.ca_certs_filename),
-            b'æøå ca_certs_filename')
+            b'\xc3\xa6 ca_certs_filename')
         self.assertEqual(
             spotify.ffi.string(sp_session_config.tracefile),
-            b'æøå tracefile')
+            b'\xc3\xa6 tracefile')
 
     def test_weak_key_dict_keeps_struct_parts_alive(self):
         self.config.application_key = b''

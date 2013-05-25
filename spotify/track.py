@@ -71,8 +71,8 @@ class LocalTrack(Track):
         else:
             album = ffi.NULL
 
-        if album is None:
-            album = -1
+        if length is None:
+            length = -1
 
         sp_track = lib.sp_localtrack_create(artist, title, album, length)
 

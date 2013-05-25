@@ -115,3 +115,21 @@ class LocalTrackTest(unittest.TestCase):
         # shouldn't increase the refcount when wrapping this sp_track in a
         # Track object
         self.assertEqual(lib_mock.sp_track_add_ref.call_count, 0)
+
+    def test_create_with_defaults(self, lib_mock):
+        sp_track = spotify.ffi.new('int *')
+        lib_mock.sp_localtrack_create.return_value = sp_track
+
+        track = spotify.LocalTrack()
+
+        self.assertEqual(track.sp_track, sp_track)
+        lib_mock.sp_localtrack_create.assert_called_once_with(
+            mock.ANY, mock.ANY, mock.ANY, -1)
+        self.assertEqual(
+            lib_mock.sp_localtrack_create.call_args[0][0], spotify.ffi.NULL)
+        self.assertEqual(
+            lib_mock.sp_localtrack_create.call_args[0][1], spotify.ffi.NULL)
+        self.assertEqual(
+            lib_mock.sp_localtrack_create.call_args[0][2], spotify.ffi.NULL)
+        self.assertEqual(
+            lib_mock.sp_localtrack_create.call_args[0][3], -1)

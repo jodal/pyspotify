@@ -53,3 +53,12 @@ class LoadableTest(unittest.TestCase):
 
         self.assertEqual(session_mock.process_events.call_count, 2)
         self.assertEqual(time_mock.sleep.call_count, 2)
+
+    def test_load_returns_self(
+            self, is_loaded_mock, session_mock, time_mock):
+        is_loaded_mock.return_value = True
+
+        foo = Foo()
+        result = foo.load()
+
+        self.assertEqual(result, foo)

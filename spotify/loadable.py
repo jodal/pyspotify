@@ -17,6 +17,7 @@ class Loadable(object):
 
         :param timeout: seconds before giving up and raising an exception
         :type timeout: float
+        :returns: self
         """
         # TODO Timeout if this takes too long
         while not self.is_loaded:
@@ -25,3 +26,4 @@ class Loadable(object):
                 spotify.Error.maybe_raise(
                     self.error, ignores=[spotify.ErrorType.IS_LOADING])
             time.sleep(0.001)
+        return self

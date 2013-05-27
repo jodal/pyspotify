@@ -450,37 +450,22 @@ class SessionConfig(object):
 
     def make_sp_session_config(self):
         """Internal method."""
+
+        convert = lambda value: ffi.NULL if value is None else ffi.new(
+            'char[]', to_bytes(value))
+
         cache_location = ffi.new('char[]', to_bytes(self.cache_location))
         settings_location = ffi.new('char[]', to_bytes(self.settings_location))
         application_key_bytes = self.get_application_key()
         application_key = ffi.new('char[]', application_key_bytes)
         user_agent = ffi.new('char[]', to_bytes(self.user_agent))
         callbacks = self.get_callbacks()
-        if self.device_id is None:
-            device_id = ffi.NULL
-        else:
-            device_id = ffi.new('char[]', to_bytes(self.device_id))
-        if self.proxy is None:
-            proxy = ffi.NULL
-        else:
-            proxy = ffi.new('char[]', to_bytes(self.proxy))
-        if self.proxy_username is None:
-            proxy_username = ffi.NULL
-        else:
-            proxy_username = ffi.new('char[]', to_bytes(self.proxy_username))
-        if self.proxy_password is None:
-            proxy_password = ffi.NULL
-        else:
-            proxy_password = ffi.new('char[]', to_bytes(self.proxy_password))
-        if self.ca_certs_filename is None:
-            ca_certs_filename = ffi.NULL
-        else:
-            ca_certs_filename = ffi.new(
-                'char[]', to_bytes(self.ca_certs_filename))
-        if self.tracefile is None:
-            tracefile = ffi.NULL
-        else:
-            tracefile = ffi.new('char[]', to_bytes(self.tracefile))
+        device_id = convert(self.device_id)
+        proxy = convert(self.proxy)
+        proxy_username = convert(self.proxy_username)
+        proxy_password = convert(self.proxy_password)
+        ca_certs_filename = convert(self.ca_certs_filename)
+        tracefile = convert(self.tracefile)
 
         sp_session_config = ffi.new('sp_session_config *', {
             'api_version': self.api_version,

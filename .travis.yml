@@ -3,7 +3,8 @@ language: python
 env:
   - TOX_ENV=py27
   - TOX_ENV=py33
-  - TOX_ENV=pypy
+  # TODO Activate when Travis has PyPy 2.x
+  #- TOX_ENV=pypy
 
 install:
   - "wget -q -O - http://apt.mopidy.com/mopidy.gpg | sudo apt-key add -"

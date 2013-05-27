@@ -12,8 +12,12 @@ class Loadable(object):
     have the :meth:`error` method.
     """
 
-    def load(self):
-        """Block until the object's data is loaded."""
+    def load(self, timeout=None):
+        """Block until the object's data is loaded.
+
+        :param timeout: seconds before giving up and raising an exception
+        :type timeout: float
+        """
         # TODO Timeout if this takes too long
         while not self.is_loaded:
             spotify.session_instance.process_events()

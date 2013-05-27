@@ -53,6 +53,11 @@ class ErrorTest(unittest.TestCase):
             spotify.ErrorType.BAD_API_VERSION,
             ignores=[spotify.ErrorType.BAD_API_VERSION])
 
+    def test_maybe_raise_works_with_any_iterable(self):
+        spotify.Error.maybe_raise(
+            spotify.ErrorType.BAD_API_VERSION,
+            ignores=(spotify.ErrorType.BAD_API_VERSION,))
+
 
 class ErrorTypeTest(unittest.TestCase):
 

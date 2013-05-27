@@ -31,10 +31,8 @@ class Error(Exception):
 
         Internal method.
         """
-
-        if ignores is None:
-            ignores = []
-        ignores.append(ErrorType.OK)
+        ignores = set(ignores or [])
+        ignores.add(ErrorType.OK)
         if error_type not in ignores:
             raise Error(error_type)
 

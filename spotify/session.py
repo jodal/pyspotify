@@ -200,6 +200,15 @@ class SessionCallbacks(object):
     :type error: :class:`Error`
     """
 
+    private_session_mode_changed = None
+    """Called when there is a change in the private session mode.
+
+    :param session: the current session
+    :type session: :class:`Session`
+    :param is_private: whether the session is private
+    :type is_private: bool
+    """
+
     def __init__(self):
         # If we use @ffi.callback as a decorator on the methods they'll expect
         # to get passed self from the C library, so we have to defer the
@@ -239,6 +248,8 @@ class SessionCallbacks(object):
             'void(sp_session *)', self._connection_state_updated)
         self._scrobble_error = ffi.callback(
             'void(sp_session *, sp_error)', self._scrobble_error)
+        self._private_session_mode_changed = ffi.callback(
+            'void(sp_session *, bool)', self._private_session_mode_changed)
 
     def _logged_in(self, sp_session, sp_error):
         if not spotify.session_instance:
@@ -369,6 +380,16 @@ class SessionCallbacks(object):
         if self.scrobble_error is not None:
             self.scrobble_error(spotify.session_instance, error)
 
+    def _private_session_mode_changed(self, sp_session, is_private):
+        if not spotify.session_instance:
+            return
+        is_private = bool(is_private)
+        status = 'private' if is_private else 'public'
+        logger.error('Private session mode changed: %s', status)
+        if self.private_session_mode_changed is not None:
+            self.private_session_mode_changed(
+                spotify.session_instance, is_private)
+
     def make_sp_session_callbacks(self):
         """Internal method."""
 
@@ -392,7 +413,7 @@ class SessionCallbacks(object):
             'credentials_blob_updated': self._credentials_blob_updated,
             'connectionstate_updated': self._connection_state_updated,
             'scrobble_error': self._scrobble_error,
-            # TODO private_session_mode_changed(session, is_private)
+            'private_session_mode_changed': self._private_session_mode_changed,
         })
 
 

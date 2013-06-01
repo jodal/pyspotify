@@ -327,6 +327,25 @@ class SessionCallbacksTest(unittest.TestCase):
 
         self.assertEqual(self.callbacks.scrobble_error.call_count, 0)
 
+    def test_private_session_mode_changed_callback(self):
+        self.callbacks.private_session_mode_changed = mock.Mock()
+
+        self.callbacks._private_session_mode_changed(
+            self.sp_session, 1)
+
+        self.callbacks.private_session_mode_changed.assert_called_once_with(
+            spotify.session_instance, True)
+
+    def test_private_session_mode_changed_without_session(self):
+        spotify.session_instance = None
+        self.callbacks.private_session_mode_changed = mock.Mock()
+
+        self.callbacks._private_session_mode_changed(
+            self.sp_session, 1)
+
+        self.assertEqual(
+            self.callbacks.private_session_mode_changed.call_count, 0)
+
 
 class SessionConfigTest(unittest.TestCase):
     def setUp(self):

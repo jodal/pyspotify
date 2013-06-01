@@ -5,6 +5,19 @@ import unittest
 import spotify
 
 
+class AudioBufferStatsTest(unittest.TestCase):
+
+    def test_samples(self):
+        stats = spotify.AudioBufferStats(100, 5)
+
+        self.assertEqual(stats.samples, 100)
+
+    def test_stutter(self):
+        stats = spotify.AudioBufferStats(100, 5)
+
+        self.assertEqual(stats.stutter, 5)
+
+
 class AudioFormatTest(unittest.TestCase):
 
     def setUp(self):

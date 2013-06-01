@@ -1,6 +1,21 @@
 from __future__ import unicode_literals
 
+import collections
+
 from spotify.utils import enum
+
+
+__all__ = [
+    'AudioBufferStats',
+    'AudioFormat',
+    'SampleType',
+]
+
+
+class AudioBufferStats(collections.namedtuple(
+        'AudioBufferStats', ['samples', 'stutter'])):
+    """Stats about the application's audio buffers."""
+    pass
 
 
 @enum('SP_SAMPLETYPE_')

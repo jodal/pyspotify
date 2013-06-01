@@ -162,6 +162,21 @@ class SessionCallbacks(object):
     :type session: :class:`Session`
     """
 
+    start_playback = None
+    """Called when audio playback should start.
+
+    You need to implement :attr:`get_audio_buffer_stats` for this callback to
+    be useful.
+
+    .. warning::
+
+        This function is called from an internal libspotify thread. You need
+        proper synchronization.
+
+    :param session: the current session
+    :type session: :class:`Session`
+    """
+
     offline_status_updated = None
     """Called when offline sync status is updated.
 
@@ -240,6 +255,8 @@ class SessionCallbacks(object):
             'void(sp_session *, sp_error)', self._streaming_error)
         self._user_info_updated = ffi.callback(
             'void(sp_session *)', self._user_info_updated)
+        self._start_playback = ffi.callback(
+            'void(sp_session *)', self._start_playback)
         self._offline_status_updated = ffi.callback(
             'void(sp_session *)', self._offline_status_updated)
         self._credentials_blob_updated = ffi.callback(
@@ -350,6 +367,13 @@ class SessionCallbacks(object):
         if self.user_info_updated is not None:
             self.user_info_updated(spotify.session_instance)
 
+    def _start_playback(self, sp_session):
+        if not spotify.session_instance:
+            return
+        logger.debug('Start playback called')
+        if self.start_playback is not None:
+            self.start_playback(spotify.session_instance)
+
     def _offline_status_updated(self, sp_session):
         if not spotify.session_instance:
             return
@@ -406,7 +430,7 @@ class SessionCallbacks(object):
             'end_of_track': self._end_of_track,
             'streaming_error': self._streaming_error,
             'userinfo_updated': self._user_info_updated,
-            # TODO start_playback(session)
+            'start_playback': self._start_playback,
             # TODO stop_playback(session)
             # TODO get_audio_buffer_stats(session, stats)
             'offline_status_updated': self._offline_status_updated,

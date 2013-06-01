@@ -117,6 +117,16 @@ class SessionCallbacks(object):
     :returns: the number of frames consumed
     """
 
+    play_token_lost = None
+    """Music has been paused because an account only allows music to be played
+    from one location simultaneously.
+
+    When this callback is called, you should pause playback.
+
+    :param session: the current session
+    :type session: :class:`Session`
+    """
+
     log_message = None
     """Called when libspotify have something to log.
 
@@ -186,6 +196,8 @@ class SessionCallbacks(object):
         self._music_delivery = ffi.callback(
             'int(sp_session *, const sp_audioformat *, const void *, int)',
             self._music_delivery)
+        self._play_token_lost = ffi.callback(
+            'void(sp_session *)', self._play_token_lost)
         self._log_message = ffi.callback(
             'void(sp_session *, const char *)', self._log_message)
         self._end_of_track = ffi.callback(
@@ -259,6 +271,13 @@ class SessionCallbacks(object):
         else:
             return 0
 
+    def _play_token_lost(self, sp_session):
+        if not spotify.session_instance:
+            return
+        logger.debug('Play token lost')
+        if self.play_token_lost is not None:
+            self.play_token_lost(spotify.session_instance)
+
     def _log_message(self, sp_session, data):
         if not spotify.session_instance:
             return
@@ -300,8 +319,6 @@ class SessionCallbacks(object):
     def make_sp_session_callbacks(self):
         """Internal method."""
 
-        # TODO Add remaining callbacks
-
         return ffi.new('sp_session_callbacks *', {
             'logged_in': self._logged_in,
             'logged_out': self._logged_out,
@@ -310,11 +327,19 @@ class SessionCallbacks(object):
             'message_to_user': self._message_to_user,
             'notify_main_thread': self._notify_main_thread,
             'music_delivery': self._music_delivery,
+            'play_token_lost': self._play_token_lost,
             'log_message': self._log_message,
             'end_of_track': self._end_of_track,
             'streaming_error': self._streaming_error,
+            # TODO userinfo_updated(session)
+            # TODO start_playback(session)
+            # TODO stop_playback(session)
+            # TODO get_audio_buffer_stats(session, stats)
             'offline_status_updated': self._offline_status_updated,
             'credentials_blob_updated': self._credentials_blob_updated,
+            # TODO connectionstate_updated(session)
+            # TODO scrobble_error(session, error)
+            # TODO private_session_mode_changed(session, is_private)
         })
 
 

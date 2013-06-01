@@ -179,6 +179,22 @@ class SessionCallbacksTest(unittest.TestCase):
 
         self.assertEqual(result, 0)
 
+    def test_play_token_lost_callback(self):
+        self.callbacks.play_token_lost = mock.Mock()
+
+        self.callbacks._play_token_lost(self.sp_session)
+
+        self.callbacks.play_token_lost.assert_called_once_with(
+            spotify.session_instance)
+
+    def test_play_token_lost_without_session(self):
+        spotify.session_instance = None
+        self.callbacks.play_token_lost = mock.Mock()
+
+        self.callbacks._play_token_lost(self.sp_session)
+
+        self.assertEqual(self.callbacks.play_token_lost.call_count, 0)
+
     def test_log_message_callback(self):
         self.callbacks.log_message = mock.Mock()
         data = spotify.ffi.new('char[]', b'a log message\n')

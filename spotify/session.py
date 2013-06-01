@@ -191,6 +191,15 @@ class SessionCallbacks(object):
     :type session: :class:`Session`
     """
 
+    scrobble_error = None
+    """Called when there is a scrobble error event.
+
+    :param session: the current session
+    :type session: :class:`Session`
+    :param error: the scrobble error
+    :type error: :class:`Error`
+    """
+
     def __init__(self):
         # If we use @ffi.callback as a decorator on the methods they'll expect
         # to get passed self from the C library, so we have to defer the
@@ -228,6 +237,8 @@ class SessionCallbacks(object):
             'void(sp_session *, const char *)', self._credentials_blob_updated)
         self._connection_state_updated = ffi.callback(
             'void(sp_session *)', self._connection_state_updated)
+        self._scrobble_error = ffi.callback(
+            'void(sp_session *, sp_error)', self._scrobble_error)
 
     def _logged_in(self, sp_session, sp_error):
         if not spotify.session_instance:
@@ -350,6 +361,14 @@ class SessionCallbacks(object):
         if self.connection_state_updated is not None:
             self.connection_state_updated(spotify.session_instance)
 
+    def _scrobble_error(self, sp_session, sp_error):
+        if not spotify.session_instance:
+            return
+        error = Error(sp_error)
+        logger.error('Scrobble error: %s', error)
+        if self.scrobble_error is not None:
+            self.scrobble_error(spotify.session_instance, error)
+
     def make_sp_session_callbacks(self):
         """Internal method."""
 
@@ -372,7 +391,7 @@ class SessionCallbacks(object):
             'offline_status_updated': self._offline_status_updated,
             'credentials_blob_updated': self._credentials_blob_updated,
             'connectionstate_updated': self._connection_state_updated,
-            # TODO scrobble_error(session, error)
+            'scrobble_error': self._scrobble_error,
             # TODO private_session_mode_changed(session, is_private)
         })
 

@@ -311,6 +311,22 @@ class SessionCallbacksTest(unittest.TestCase):
 
         self.assertEqual(self.callbacks.connection_state_updated.call_count, 0)
 
+    def test_scrobble_error_callback(self):
+        self.callbacks.scrobble_error = mock.Mock()
+
+        self.callbacks._scrobble_error(self.sp_session, self.sp_error)
+
+        self.callbacks.scrobble_error.assert_called_once_with(
+            spotify.session_instance, spotify.Error(self.sp_error))
+
+    def test_scrobble_error_without_session(self):
+        spotify.session_instance = None
+        self.callbacks.scrobble_error = mock.Mock()
+
+        self.callbacks._scrobble_error(self.sp_session, self.sp_error)
+
+        self.assertEqual(self.callbacks.scrobble_error.call_count, 0)
+
 
 class SessionConfigTest(unittest.TestCase):
     def setUp(self):

@@ -277,6 +277,22 @@ class SessionCallbacksTest(unittest.TestCase):
 
         self.assertEqual(self.callbacks.start_playback.call_count, 0)
 
+    def test_stop_playback_callback(self):
+        self.callbacks.stop_playback = mock.Mock()
+
+        self.callbacks._stop_playback(self.sp_session)
+
+        self.callbacks.stop_playback.assert_called_once_with(
+            spotify.session_instance)
+
+    def test_stop_playback_without_session(self):
+        spotify.session_instance = None
+        self.callbacks.stop_playback = mock.Mock()
+
+        self.callbacks._stop_playback(self.sp_session)
+
+        self.assertEqual(self.callbacks.stop_playback.call_count, 0)
+
     def test_offline_status_updated_callback(self):
         self.callbacks.offline_status_updated = mock.Mock()
 

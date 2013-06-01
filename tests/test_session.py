@@ -293,6 +293,30 @@ class SessionCallbacksTest(unittest.TestCase):
 
         self.assertEqual(self.callbacks.stop_playback.call_count, 0)
 
+    def test_get_audio_buffer_stats_callback(self):
+        self.callbacks.get_audio_buffer_stats = mock.Mock()
+        self.callbacks.get_audio_buffer_stats.return_value = (
+            spotify.AudioBufferStats(100, 5))
+        sp_audio_buffer_stats = spotify.ffi.new('sp_audio_buffer_stats *')
+
+        self.callbacks._get_audio_buffer_stats(
+            self.sp_session, sp_audio_buffer_stats)
+
+        self.callbacks.get_audio_buffer_stats.assert_called_once_with(
+            spotify.session_instance)
+
+    def test_get_audio_buffer_stats_without_session(self):
+        spotify.session_instance = None
+        self.callbacks.get_audio_buffer_stats = mock.Mock()
+        self.callbacks.get_audio_buffer_stats.return_value = (
+            spotify.AudioBufferStats(100, 5))
+        sp_audio_buffer_stats = spotify.ffi.new('sp_audio_buffer_stats *')
+
+        self.callbacks._get_audio_buffer_stats(
+            self.sp_session, sp_audio_buffer_stats)
+
+        self.assertEqual(self.callbacks.get_audio_buffer_stats.call_count, 0)
+
     def test_offline_status_updated_callback(self):
         self.callbacks.offline_status_updated = mock.Mock()
 

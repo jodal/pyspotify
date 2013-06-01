@@ -192,6 +192,19 @@ class SessionCallbacks(object):
     :type session: :class:`Session`
     """
 
+    get_audio_buffer_stats = None
+    """Called to query the application about its audio buffer.
+
+    .. warning::
+
+        This function is called from an internal libspotify thread. You need
+        proper synchronization.
+
+    :param session: the current session
+    :type session: :class:`Session`
+    :returns: an :class:`AudioBufferStats` instance
+    """
+
     offline_status_updated = None
     """Called when offline sync status is updated.
 
@@ -274,6 +287,9 @@ class SessionCallbacks(object):
             'void(sp_session *)', self._start_playback)
         self._stop_playback = ffi.callback(
             'void(sp_session *)', self._stop_playback)
+        self._get_audio_buffer_stats = ffi.callback(
+            'void(sp_session *, sp_audio_buffer_stats *)',
+            self._get_audio_buffer_stats)
         self._offline_status_updated = ffi.callback(
             'void(sp_session *)', self._offline_status_updated)
         self._credentials_blob_updated = ffi.callback(
@@ -398,6 +414,15 @@ class SessionCallbacks(object):
         if self.stop_playback is not None:
             self.stop_playback(spotify.session_instance)
 
+    def _get_audio_buffer_stats(self, sp_session, sp_audio_buffer_stats):
+        if not spotify.session_instance:
+            return
+        logger.debug('Audio buffer stats requested')
+        if self.get_audio_buffer_stats is not None:
+            stats = self.get_audio_buffer_stats(spotify.session_instance)
+            sp_audio_buffer_stats.samples = stats.samples
+            sp_audio_buffer_stats.stutter = stats.stutter
+
     def _offline_status_updated(self, sp_session):
         if not spotify.session_instance:
             return
@@ -456,7 +481,7 @@ class SessionCallbacks(object):
             'userinfo_updated': self._user_info_updated,
             'start_playback': self._start_playback,
             'stop_playback': self._stop_playback,
-            # TODO get_audio_buffer_stats(session, stats)
+            'get_audio_buffer_stats': self._get_audio_buffer_stats,
             'offline_status_updated': self._offline_status_updated,
             'credentials_blob_updated': self._credentials_blob_updated,
             'connectionstate_updated': self._connection_state_updated,

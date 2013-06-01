@@ -48,6 +48,8 @@ Development status
 .. image:: https://secure.travis-ci.org/jodal/pyspotify.png?branch=pyspotify2
     :target: https://travis-ci.org/jodal/pyspotify
 
+- 2013-06-01: Session callbacks complete.
+
 - 2013-05-25: Session config complete.
 
 - 2013-05-16: Link subsystem complete.

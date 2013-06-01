@@ -155,6 +155,13 @@ class SessionCallbacks(object):
     :type error: :class:`Error`
     """
 
+    user_info_updated = None
+    """Called when anything related to :class:`User` objects is updated.
+
+    :param session: the current session
+    :type session: :class:`Session`
+    """
+
     offline_status_updated = None
     """Called when offline sync status is updated.
 
@@ -204,6 +211,8 @@ class SessionCallbacks(object):
             'void(sp_session *)', self._end_of_track)
         self._streaming_error = ffi.callback(
             'void(sp_session *, sp_error)', self._streaming_error)
+        self._user_info_updated = ffi.callback(
+            'void(sp_session *)', self._user_info_updated)
         self._offline_status_updated = ffi.callback(
             'void(sp_session *)', self._offline_status_updated)
         self._credentials_blob_updated = ffi.callback(
@@ -301,6 +310,13 @@ class SessionCallbacks(object):
         if self.streaming_error is not None:
             self.streaming_error(spotify.session_instance, error)
 
+    def _user_info_updated(self, sp_session):
+        if not spotify.session_instance:
+            return
+        logger.debug('User info updated')
+        if self.user_info_updated is not None:
+            self.user_info_updated(spotify.session_instance)
+
     def _offline_status_updated(self, sp_session):
         if not spotify.session_instance:
             return
@@ -331,7 +347,7 @@ class SessionCallbacks(object):
             'log_message': self._log_message,
             'end_of_track': self._end_of_track,
             'streaming_error': self._streaming_error,
-            # TODO userinfo_updated(session)
+            'userinfo_updated': self._user_info_updated,
             # TODO start_playback(session)
             # TODO stop_playback(session)
             # TODO get_audio_buffer_stats(session, stats)

@@ -295,6 +295,22 @@ class SessionCallbacksTest(unittest.TestCase):
 
         self.assertEqual(self.callbacks.credentials_blob_updated.call_count, 0)
 
+    def test_connection_state_updated_callback(self):
+        self.callbacks.connection_state_updated = mock.Mock()
+
+        self.callbacks._connection_state_updated(self.sp_session)
+
+        self.callbacks.connection_state_updated.assert_called_once_with(
+            spotify.session_instance)
+
+    def test_connection_state_updated_without_session(self):
+        spotify.session_instance = None
+        self.callbacks.connection_state_updated = mock.Mock()
+
+        self.callbacks._connection_state_updated(self.sp_session)
+
+        self.assertEqual(self.callbacks.connection_state_updated.call_count, 0)
+
 
 class SessionConfigTest(unittest.TestCase):
     def setUp(self):

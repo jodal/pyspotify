@@ -1133,3 +1133,31 @@ class SessionTest(unittest.TestCase):
         session = self.create_session(lib_mock)
 
         self.assertRaises(spotify.Error, session.preferred_offline_bitrate, 17)
+
+    def test_get_volume_normalization(self, lib_mock):
+        lib_mock.sp_session_get_volume_normalization.return_value = 0
+        session = self.create_session(lib_mock)
+
+        result = session.volume_normalization
+
+        lib_mock.sp_session_get_volume_normalization.assert_called_with(
+            session.sp_session)
+        self.assertFalse(result)
+
+    def test_set_volume_normalization(self, lib_mock):
+        lib_mock.sp_session_set_volume_normalization.return_value = (
+            spotify.ErrorType.OK)
+        session = self.create_session(lib_mock)
+
+        session.volume_normalization = True
+
+        lib_mock.sp_session_set_volume_normalization.assert_called_with(
+            session.sp_session, 1)
+
+    def test_set_volume_normalization_fail_raises_error(self, lib_mock):
+        lib_mock.sp_session_set_volume_normalization.return_value = (
+            spotify.ErrorType.BAD_API_VERSION)
+        session = self.create_session(lib_mock)
+
+        self.assertRaises(
+            spotify.Error, setattr, session, 'volume_normalization', True)

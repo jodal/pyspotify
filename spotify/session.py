@@ -929,4 +929,18 @@ class Session(object):
         Error.maybe_raise(lib.sp_session_preferred_offline_bitrate(
             self.sp_session, bitrate, allow_resync))
 
+    def get_volume_normalization(self):
+        return bool(lib.sp_session_get_volume_normalization(self.sp_session))
+
+    def set_volume_normalization(self, value):
+        Error.maybe_raise(lib.sp_session_set_volume_normalization(
+            self.sp_session, value))
+
+    volume_normalization = property(
+        get_volume_normalization, set_volume_normalization)
+    """Whether volume normalization is active or not.
+
+    Set to :class:`True` or :class:`False` to change.
+    """
+
     # TODO Add all sp_session_* methods

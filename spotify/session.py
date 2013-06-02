@@ -899,4 +899,21 @@ class Session(object):
             return None
         return Playlist(sp_playlist, add_ref=False)
 
+    def published_container_for_user(self, canonical_username=None):
+        """The :class:`PlaylistContainer` of published playlists for the user
+        with ``canonical_username``.
+
+        If ``canonical_username`` isn't specified, the published container for
+        the currently logged in user is returned."""
+        if canonical_username is None:
+            canonical_username = ffi.NULL
+        else:
+            canonical_username = to_bytes(canonical_username)
+        sp_playlistcontainer = (
+            lib.sp_session_publishedcontainer_for_user_create(
+                self.sp_session, canonical_username))
+        if sp_playlistcontainer == ffi.NULL:
+            return None
+        return PlaylistContainer(sp_playlistcontainer, add_ref=False)
+
     # TODO Add all sp_session_* methods

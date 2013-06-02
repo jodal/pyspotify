@@ -42,7 +42,7 @@ def to_bytes(value):
     elif isinstance(value, binary_type):
         return value
     else:
-        raise ValueError('Value must be a string')
+        raise ValueError('Value must be text or bytes')
 
 
 def to_unicode(chars):

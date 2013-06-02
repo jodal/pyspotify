@@ -8,34 +8,16 @@ import spotify
 from spotify import (
     Error, ErrorType, ffi, lib, Playlist, PlaylistContainer, User)
 from spotify.utils import (
-    enum, get_with_growing_buffer, to_bytes, to_unicode, to_country)
+    get_with_growing_buffer, to_bytes, to_unicode, to_country)
 
 
 __all__ = [
-    'ConnectionRule',
-    'ConnectionState',
-    'ConnectionType',
     'SessionCallbacks',
     'SessionConfig',
     'Session',
 ]
 
 logger = logging.getLogger(__name__)
-
-
-@enum('SP_CONNECTION_RULE_')
-class ConnectionRule(object):
-    pass
-
-
-@enum('SP_CONNECTION_STATE_')
-class ConnectionState(object):
-    pass
-
-
-@enum('SP_CONNECTION_TYPE_')
-class ConnectionType(object):
-    pass
 
 
 class SessionCallbacks(object):

@@ -28,7 +28,7 @@ def autotest():
 
 @task
 def coverage():
-    local('nosetests --with-coverage --cover-package=spotify')
+    local('nosetests --with-coverage --cover-package=spotify --cover-branches')
 
 
 @task

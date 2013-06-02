@@ -1040,7 +1040,7 @@ class Session(object):
 
     @property
     def offline_sync_status(self):
-        """The :class:`OfflineSyncStatus`.
+        """The :class:`OfflineSyncStatus` or :class:`None` if not syncing.
 
         The :attr:`~SessionCallbacks.offline_status_updated` callback is called
         when this is updated.

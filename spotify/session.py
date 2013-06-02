@@ -855,4 +855,13 @@ class Session(object):
         """Stops the currently playing track."""
         Error.maybe_raise(lib.sp_session_player_unload(self.sp_session))
 
+    def player_prefetch(self, track):
+        """Prefetch a :class:`Track` for playback.
+
+        This can be used to make libspotify download and cache a track before
+        playing it.
+        """
+        Error.maybe_raise(lib.sp_session_player_prefetch(
+            self.sp_session, track.sp_track))
+
     # TODO Add all sp_session_* methods

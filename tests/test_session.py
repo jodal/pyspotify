@@ -923,3 +923,25 @@ class SessionTest(unittest.TestCase):
         session = self.create_session(lib_mock)
 
         self.assertRaises(spotify.Error, session.player_unload)
+
+    @mock.patch('spotify.track.lib', spec=spotify.lib)
+    def test_player_prefetch(self, track_lib_mock, lib_mock):
+        lib_mock.sp_session_player_prefetch.return_value = spotify.ErrorType.OK
+        session = self.create_session(lib_mock)
+        sp_track = spotify.ffi.new('int *')
+        track = spotify.Track(sp_track)
+
+        session.player_prefetch(track)
+
+        lib_mock.sp_session_player_prefetch.assert_called_once_with(
+            session.sp_session, sp_track)
+
+    @mock.patch('spotify.track.lib', spec=spotify.lib)
+    def test_player_prefetch_fail_raises_error(self, track_lib_mock, lib_mock):
+        lib_mock.sp_session_player_prefetch.return_value = (
+            spotify.ErrorType.NO_CACHE)
+        session = self.create_session(lib_mock)
+        sp_track = spotify.ffi.new('int *')
+        track = spotify.Track(sp_track)
+
+        self.assertRaises(spotify.Error, session.player_prefetch, track)

@@ -1107,10 +1107,10 @@ class SessionTest(unittest.TestCase):
             spotify.ErrorType.OK)
         session = self.create_session(lib_mock)
 
-        session.preferred_bitrate(spotify.Bitrate._320k)
+        session.preferred_bitrate(spotify.Bitrate.BITRATE_320k)
 
         lib_mock.sp_session_preferred_bitrate.assert_called_with(
-            session.sp_session, spotify.Bitrate._320k)
+            session.sp_session, spotify.Bitrate.BITRATE_320k)
 
     def test_preferred_bitrate_fail_raises_error(self, lib_mock):
         lib_mock.sp_session_preferred_bitrate.return_value = (
@@ -1124,10 +1124,10 @@ class SessionTest(unittest.TestCase):
             spotify.ErrorType.OK)
         session = self.create_session(lib_mock)
 
-        session.preferred_offline_bitrate(spotify.Bitrate._320k)
+        session.preferred_offline_bitrate(spotify.Bitrate.BITRATE_320k)
 
         lib_mock.sp_session_preferred_offline_bitrate.assert_called_with(
-            session.sp_session, spotify.Bitrate._320k, 0)
+            session.sp_session, spotify.Bitrate.BITRATE_320k, 0)
 
     def test_preferred_offline_bitrate_with_allow_resync(self, lib_mock):
         lib_mock.sp_session_preferred_offline_bitrate.return_value = (
@@ -1135,10 +1135,10 @@ class SessionTest(unittest.TestCase):
         session = self.create_session(lib_mock)
 
         session.preferred_offline_bitrate(
-            spotify.Bitrate._320k, allow_resync=True)
+            spotify.Bitrate.BITRATE_320k, allow_resync=True)
 
         lib_mock.sp_session_preferred_offline_bitrate.assert_called_with(
-            session.sp_session, spotify.Bitrate._320k, 1)
+            session.sp_session, spotify.Bitrate.BITRATE_320k, 1)
 
     def test_preferred_offline_bitrate_fail_raises_error(self, lib_mock):
         lib_mock.sp_session_preferred_offline_bitrate.return_value = (

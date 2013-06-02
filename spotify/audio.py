@@ -19,7 +19,7 @@ class AudioBufferStats(collections.namedtuple(
     pass
 
 
-@enum('SP_BITRATE')
+@enum('SP_BITRATE_', 'BITRATE_')
 class Bitrate(object):
     pass
 

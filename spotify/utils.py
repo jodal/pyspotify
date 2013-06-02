@@ -15,11 +15,12 @@ else:
     binary_type = bytes
 
 
-def enum(prefix):
+def enum(lib_prefix, enum_prefix=''):
     def wrapper(obj):
         for attr in dir(lib):
-            if attr.startswith(prefix):
-                setattr(obj, attr.replace(prefix, ''), getattr(lib, attr))
+            if attr.startswith(lib_prefix):
+                name = attr.replace(lib_prefix, enum_prefix)
+                setattr(obj, name, getattr(lib, attr))
         return obj
     return wrapper
 

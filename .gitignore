@@ -7,6 +7,7 @@
 __pycache__/
 _build/
 build/
+cover/
 dist/
 spotify_appkey.key
 tmp/

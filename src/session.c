@@ -230,12 +230,15 @@ search_complete(sp_search * search, Callback * st)
 
     gstate = PyGILState_Ensure();
     results = Results_FromSpotify(search);
-    res = PyObject_CallFunctionObjArgs(st->callback, results, st->userdata, NULL);
-    if (!res)
-        PyErr_WriteUnraisable(st->callback);
+    if (results != NULL) {
+        res = PyObject_CallFunctionObjArgs(st->callback, results, st->userdata, NULL);
+        if (res == NULL)
+            PyErr_WriteUnraisable(st->callback);
+        else
+            Py_DECREF(res);
+        Py_XDECREF(results);
+    }
     delete_trampoline(st);
-    Py_XDECREF(res);
-    Py_DECREF(results);
     PyGILState_Release(gstate);
 }
 

@@ -39,6 +39,16 @@ class User(spotify.Loadable):
 
     @property
     def starred(self):
+        """The :class:`Playlist` of tracks starred by the user."""
         if spotify.session_instance is None:
             return None
         return spotify.session_instance.starred_for_user(self.canonical_name)
+
+    @property
+    def published_container(self):
+        """The :class:`PlaylistContainer` of playlists published by the
+        user."""
+        if spotify.session_instance is None:
+            return None
+        return spotify.session_instance.published_container_for_user(
+            self.canonical_name)

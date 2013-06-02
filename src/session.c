@@ -17,20 +17,11 @@
 #include "image.h"
 #include "user.h"
 
-// Adds gcc-python-plugin hints to avoid some false positives.
-#if defined(WITH_CPYCHECKER_SETS_EXCEPTION_ATTRIBUTE)
-    #define CPYCHECKER_SETS_EXCEPTION \
-        __attribute__((cpychecker_sets_exception))
-#else
-    #define CPYCHECKER_SETS_EXCEPTION
-#endif
-
 static int session_constructed = 0;
 sp_session *g_session;
 
 static int
-create_session(Session *self, PyObject *client, PyObject *settings)
-    CPYCHECKER_SETS_EXCEPTION;
+create_session(Session *self, PyObject *client, PyObject *settings);
 
 static PyObject *
 Session_new(PyTypeObject *type, PyObject *args, PyObject *kwds)
@@ -933,13 +924,16 @@ create_session(Session *self, PyObject *client, PyObject *settings)
             settings_location);
 #endif
 
+    // TODO: this looks like a bad copy of PySpotify_GetConfigString, we should
+    // probably refactor the helper to support this case as well
     PyObject *application_key =
-        PyObject_GetAttr(settings, PyBytes_FromString("application_key"));
+        PyObject_GetAttrString(settings, "application_key");
     if (!application_key) {
         PyErr_SetString(SpotifyError, "application_key not set");
         return -1;
     }
     else if (!PyBytes_Check(application_key)) {
+        Py_DECREF(application_key);
         PyErr_SetString(SpotifyError, "application_key must be a byte string");
         return -1;
     }
@@ -947,6 +941,8 @@ create_session(Session *self, PyObject *client, PyObject *settings)
     Py_ssize_t l_appkey;
 
     PyBytes_AsStringAndSize(application_key, &s_appkey, &l_appkey);
+    Py_DECREF(application_key);
+
     config.application_key_size = l_appkey;
     config.application_key = PyMem_Malloc(l_appkey);
     memcpy((char *)config.application_key, s_appkey, l_appkey);

@@ -156,6 +156,8 @@ Audio
 
 .. autoclass:: AudioFormat
 
+.. autoclass:: Bitrate
+
 .. autoclass:: SampleType
 
 

@@ -1088,3 +1088,20 @@ class SessionTest(unittest.TestCase):
 
         func_mock.assert_called_with(session.sp_session, b'alice')
         self.assertIsNone(result)
+
+    def test_preferred_bitrate(self, lib_mock):
+        lib_mock.sp_session_preferred_bitrate.return_value = (
+            spotify.ErrorType.OK)
+        session = self.create_session(lib_mock)
+
+        session.preferred_bitrate(spotify.Bitrate._320k)
+
+        lib_mock.sp_session_preferred_bitrate.assert_called_with(
+            session.sp_session, spotify.Bitrate._320k)
+
+    def test_preferred_bitrate_fail_raises_error(self, lib_mock):
+        lib_mock.sp_session_preferred_bitrate.return_value = (
+            spotify.ErrorType.INVALID_ARGUMENT)
+        session = self.create_session(lib_mock)
+
+        self.assertRaises(spotify.Error, session.preferred_bitrate, 17)

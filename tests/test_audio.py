@@ -56,6 +56,14 @@ class AudioFormatTest(unittest.TestCase):
         self.assertRaises(ValueError, self.audio_format.frame_size)
 
 
+class BitrateTest(unittest.TestCase):
+
+    def test_has_contants(self):
+        self.assertEqual(spotify.Bitrate._96k, 2)
+        self.assertEqual(spotify.Bitrate._160k, 0)
+        self.assertEqual(spotify.Bitrate._320k, 1)
+
+
 class SampleTypeTest(unittest.TestCase):
 
     def test_has_constants(self):

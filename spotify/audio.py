@@ -8,6 +8,7 @@ from spotify.utils import enum
 __all__ = [
     'AudioBufferStats',
     'AudioFormat',
+    'Bitrate',
     'SampleType',
 ]
 
@@ -15,6 +16,11 @@ __all__ = [
 class AudioBufferStats(collections.namedtuple(
         'AudioBufferStats', ['samples', 'stutter'])):
     """Stats about the application's audio buffers."""
+    pass
+
+
+@enum('SP_BITRATE')
+class Bitrate(object):
     pass
 
 

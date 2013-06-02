@@ -916,4 +916,9 @@ class Session(object):
             return None
         return PlaylistContainer(sp_playlistcontainer, add_ref=False)
 
+    def preferred_bitrate(self, bitrate):
+        """Set preferred :class:`Bitrate` for music streaming."""
+        Error.maybe_raise(lib.sp_session_preferred_bitrate(
+            self.sp_session, bitrate))
+
     # TODO Add all sp_session_* methods

@@ -74,3 +74,27 @@ class UserTest(unittest.TestCase):
 
         link_mock.assert_called_once_with(user)
         self.assertEqual(result, mock.sentinel.link)
+
+    @mock.patch('spotify.session_instance', spec=spotify.Session)
+    def test_starred(self, session_mock, lib_mock):
+        session_mock.starred_for_user.return_value = mock.sentinel.playlist
+        lib_mock.sp_user_canonical_name.return_value = spotify.ffi.new(
+            'char[]', b'alice')
+        sp_user = spotify.ffi.new('int *')
+        user = spotify.User(sp_user)
+
+        result = user.starred
+
+        session_mock.starred_for_user.assert_called_with('alice')
+        self.assertEqual(result, mock.sentinel.playlist)
+
+    def test_starred_if_no_session(self, lib_mock):
+        spotify.session_instance = None
+        lib_mock.sp_user_canonical_name.return_value = spotify.ffi.new(
+            'char[]', b'alice')
+        sp_user = spotify.ffi.new('int *')
+        user = spotify.User(sp_user)
+
+        result = user.starred
+
+        self.assertIsNone(result)

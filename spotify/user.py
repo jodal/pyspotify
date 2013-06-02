@@ -1,6 +1,7 @@
 from __future__ import unicode_literals
 
-from spotify import ffi, lib, Loadable
+import spotify
+from spotify import ffi, lib
 from spotify.utils import to_unicode
 
 
@@ -9,7 +10,7 @@ __all__ = [
 ]
 
 
-class User(Loadable):
+class User(spotify.Loadable):
     """A Spotify user."""
 
     def __init__(self, sp_user):
@@ -35,3 +36,9 @@ class User(Loadable):
         """Make a :class:`Link` to the user."""
         from spotify.link import Link
         return Link(self)
+
+    @property
+    def starred(self):
+        if spotify.session_instance is None:
+            return None
+        return spotify.session_instance.starred_for_user(self.canonical_name)

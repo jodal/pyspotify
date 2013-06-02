@@ -780,24 +780,34 @@ static void
 end_of_track(sp_session * session)
 {
     PyGILState_STATE gstate;
-    PyObject *res, *method;
+    Session *py_session;
+    PyObject *callback, *client, *result;
 
 #ifdef DEBUG
         fprintf(stderr, "[DEBUG]-session- >> end_of_track called\n");
 #endif
     gstate = PyGILState_Ensure();
-    Session *psession =
+    py_session =
         (Session *) PyObject_CallObject((PyObject *)&SessionType, NULL);
-    psession->_session = session;
-    PyObject *client = (PyObject *)sp_session_userdata(session);
 
-    method = PyObject_GetAttrString(client, "end_of_track");
-    res = PyObject_CallFunctionObjArgs(method, psession, NULL);
-    if (!res)
-        PyErr_WriteUnraisable(method);
-    Py_DECREF(psession);
-    Py_XDECREF(res);
-    Py_DECREF(method);
+    if (py_session != NULL) {
+        py_session->_session = session;
+
+        client = (PyObject *)sp_session_userdata(session);
+        callback = PyObject_GetAttrString(client, "end_of_track");
+
+        if (callback != NULL) {
+            result = PyObject_CallFunctionObjArgs(callback, py_session, NULL);
+
+            if (result == NULL)
+                PyErr_WriteUnraisable(callback);
+            else
+                Py_DECREF(result);
+
+            Py_XDECREF(callback);
+	}
+        Py_DECREF(py_session);
+    }
     PyGILState_Release(gstate);
 }
 

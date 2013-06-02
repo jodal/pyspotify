@@ -882,4 +882,12 @@ class Session(object):
             return None
         return Playlist(sp_playlist, add_ref=False)
 
+    @property
+    def starred(self):
+        """The starred :class:`Playlist` for the currently logged in user."""
+        sp_playlist = lib.sp_session_starred_create(self.sp_session)
+        if sp_playlist == ffi.NULL:
+            return None
+        return Playlist(sp_playlist, add_ref=False)
+
     # TODO Add all sp_session_* methods

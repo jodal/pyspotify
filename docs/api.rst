@@ -208,6 +208,14 @@ Search
 .. autoclass:: Search
 
 
+Social
+======
+
+.. autoclass:: ScrobblingState
+
+.. autoclass:: SocialProvider
+
+
 Playlists
 =========
 

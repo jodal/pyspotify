@@ -957,4 +957,37 @@ class Session(object):
     Set to :class:`True` or :class:`False` to change.
     """
 
+    def is_scrobbling(self, social_provider):
+        """Get the :class:`ScrobblingState` for the given
+        ``social_provider``."""
+        scrobbling_state = ffi.new('sp_scrobbling_state *')
+        Error.maybe_raise(lib.sp_session_is_scrobbling(
+            self.sp_session, social_provider, scrobbling_state))
+        return scrobbling_state[0]
+
+    def is_scrobbling_possible(self, social_provider):
+        """Check if the scrobbling settings should be shown to the user."""
+        out = ffi.new('bool *')
+        Error.maybe_raise(lib.sp_session_is_scrobbling_possible(
+            self.sp_session, social_provider, out))
+        return out[0]
+
+    def set_scrobbling(self, social_provider, scrobbling_state):
+        """Set the ``scrobbling_state`` for the given ``social_provider``."""
+        Error.maybe_raise(lib.sp_session_set_scrobbling(
+            self.sp_session, social_provider, scrobbling_state))
+
+    def set_social_credentials(self, social_provider, username, password):
+        """Set the user's credentials with a social provider.
+
+        Currently this is only relevant for Last.fm. Call
+        :meth:`set_scrobbling` to force an authentication attempt with the
+        provider. If authentication fails a
+        :attr:`~SessionCallbacks.scrobble_error` callback will be sent.
+        """
+        username = ffi.new('char[]', to_bytes(username))
+        password = ffi.new('char[]', to_bytes(password))
+        Error.maybe_raise(lib.sp_session_set_social_credentials(
+            self.sp_session, social_provider, username, password))
+
     # TODO Add all sp_session_* methods

@@ -1189,3 +1189,107 @@ class SessionTest(unittest.TestCase):
 
         self.assertRaises(
             spotify.Error, setattr, session, 'private_session', True)
+
+    def test_is_scrobbling(self, lib_mock):
+
+        def func(sp_session_ptr, sp_social_provider, sp_scrobbling_state_ptr):
+            sp_scrobbling_state_ptr[0] = (
+                spotify.ScrobblingState.USE_GLOBAL_SETTING)
+            return spotify.ErrorType.OK
+
+        lib_mock.sp_session_is_scrobbling.side_effect = func
+        session = self.create_session(lib_mock)
+
+        result = session.is_scrobbling(spotify.SocialProvider.SPOTIFY)
+
+        lib_mock.sp_session_is_scrobbling.assert_called_with(
+            session.sp_session, spotify.SocialProvider.SPOTIFY, mock.ANY)
+        self.assertEqual(result, spotify.ScrobblingState.USE_GLOBAL_SETTING)
+
+    def test_is_scrobbling_fail_raises_error(self, lib_mock):
+        lib_mock.sp_session_is_scrobbling.return_value = (
+            spotify.ErrorType.BAD_API_VERSION)
+        session = self.create_session(lib_mock)
+
+        self.assertRaises(
+            spotify.Error,
+            session.is_scrobbling, spotify.SocialProvider.SPOTIFY)
+
+    def test_set_scrobbling(self, lib_mock):
+        lib_mock.sp_session_set_scrobbling.return_value = spotify.ErrorType.OK
+        session = self.create_session(lib_mock)
+
+        session.set_scrobbling(
+            spotify.SocialProvider.SPOTIFY,
+            spotify.ScrobblingState.USE_GLOBAL_SETTING)
+
+        lib_mock.sp_session_set_scrobbling.assert_called_with(
+            session.sp_session,
+            spotify.SocialProvider.SPOTIFY,
+            spotify.ScrobblingState.USE_GLOBAL_SETTING)
+
+    def test_set_scrobbling_fail_raises_error(self, lib_mock):
+        lib_mock.sp_session_set_scrobbling.return_value = (
+            spotify.ErrorType.BAD_API_VERSION)
+        session = self.create_session(lib_mock)
+
+        self.assertRaises(
+            spotify.Error,
+            session.set_scrobbling,
+            spotify.SocialProvider.SPOTIFY,
+            spotify.ScrobblingState.USE_GLOBAL_SETTING)
+
+    def test_is_scrobbling_possible(self, lib_mock):
+
+        def func(sp_session_ptr, sp_social_provider, out_ptr):
+            out_ptr[0] = 1
+            return spotify.ErrorType.OK
+
+        lib_mock.sp_session_is_scrobbling_possible.side_effect = func
+        session = self.create_session(lib_mock)
+
+        result = session.is_scrobbling_possible(
+            spotify.SocialProvider.FACEBOOK)
+
+        lib_mock.sp_session_is_scrobbling_possible.assert_called_with(
+            session.sp_session, spotify.SocialProvider.FACEBOOK, mock.ANY)
+        self.assertTrue(result)
+
+    def test_is_scrobbling_possible_fail_raises_error(self, lib_mock):
+        lib_mock.sp_session_is_scrobbling_possible.return_value = (
+            spotify.ErrorType.BAD_API_VERSION)
+        session = self.create_session(lib_mock)
+
+        self.assertRaises(
+            spotify.Error,
+            session.is_scrobbling_possible, spotify.SocialProvider.FACEBOOK)
+
+    def test_set_social_credentials(self, lib_mock):
+        lib_mock.sp_session_set_social_credentials.return_value = (
+            spotify.ErrorType.OK)
+        session = self.create_session(lib_mock)
+
+        session.set_social_credentials(
+            spotify.SocialProvider.LASTFM, 'alice', 'secret')
+
+        lib_mock.sp_session_set_social_credentials.assert_called_once_with(
+            session.sp_session, spotify.SocialProvider.LASTFM,
+            mock.ANY, mock.ANY)
+        self.assertEqual(
+            spotify.ffi.string(
+                lib_mock.sp_session_set_social_credentials.call_args[0][2]),
+            b'alice')
+        self.assertEqual(
+            spotify.ffi.string(
+                lib_mock.sp_session_set_social_credentials.call_args[0][3]),
+            b'secret')
+
+    def test_set_social_credentials_fail_raises_error(self, lib_mock):
+        lib_mock.sp_session_login.return_value = (
+            spotify.ErrorType.BAD_API_VERSION)
+        session = self.create_session(lib_mock)
+
+        self.assertRaises(
+            spotify.Error,
+            session.set_social_credentials, spotify.SocialProvider.LASTFM,
+            'alice', 'secret')

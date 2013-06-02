@@ -49,6 +49,7 @@ from spotify.audio import *  # noqa
 from spotify.image import *  # noqa
 from spotify.playlist import *  # noqa
 from spotify.search import *  # noqa
+from spotify.social import *  # noqa
 from spotify.track import *  # noqa
 from spotify.user import *  # noqa
 

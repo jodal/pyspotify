@@ -1025,4 +1025,35 @@ class Session(object):
         Error.maybe_raise(lib.sp_session_set_connection_rules(
             self.sp_session, connection_rules))
 
+    @property
+    def offline_tracks_to_sync(self):
+        """Total number of tracks that needs download before everything from
+        all playlists that is marked for offline is fully synchronized.
+        """
+        return lib.sp_offline_tracks_to_sync(self.sp_session)
+
+    @property
+    def offline_num_playlists(self):
+        """Number of playlists that is marked for offline synchronization."""
+        return lib.sp_offline_num_playlists(self.sp_session)
+
+    @property
+    def offline_sync_status(self):
+        """The :class:`OfflineSyncStatus`.
+
+        The :attr:`~SessionCallbacks.offline_status_updated` callback is called
+        when this is updated.
+        """
+        sp_offline_sync_status_ptr = ffi.new('sp_offline_sync_status **')
+        syncing = lib.sp_offline_sync_get_status(
+            self.sp_session, sp_offline_sync_status_ptr)
+        if syncing:
+            return spotify.OfflineSyncStatus(sp_offline_sync_status_ptr[0])
+
+    @property
+    def offline_time_left(self):
+        """The number of seconds until the user has to get online and
+        relogin."""
+        return lib.sp_offline_time_left(self.sp_session)
+
     # TODO Add all sp_session_* methods

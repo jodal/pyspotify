@@ -153,6 +153,12 @@ Sessions
 .. autoclass:: Session
 
 
+Offline
+=======
+
+.. autoclass:: OfflineSyncStatus
+
+
 Audio
 =====
 

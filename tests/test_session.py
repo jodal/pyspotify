@@ -1358,3 +1358,60 @@ class SessionTest(unittest.TestCase):
         self.assertRaises(
             spotify.Error,
             session.set_connection_rules, spotify.ConnectionRule.NETWORK)
+
+    def test_offline_tracks_to_sync(self, lib_mock):
+        lib_mock.sp_offline_tracks_to_sync.return_value = 17
+        session = self.create_session(lib_mock)
+
+        result = session.offline_tracks_to_sync
+
+        lib_mock.sp_offline_tracks_to_sync.assert_called_with(
+            session.sp_session)
+        self.assertEqual(result, 17)
+
+    def test_offline_num_playlists(self, lib_mock):
+        lib_mock.sp_offline_num_playlists.return_value = 5
+        session = self.create_session(lib_mock)
+
+        result = session.offline_num_playlists
+
+        lib_mock.sp_offline_num_playlists.assert_called_with(
+            session.sp_session)
+        self.assertEqual(result, 5)
+
+    def test_offline_sync_status(self, lib_mock):
+        sp_offline_sync_status = spotify.ffi.new('sp_offline_sync_status *')
+        sp_offline_sync_status.queued_tracks = 3
+
+        def func(sp_session_ptr, sp_offline_sync_status_ptr):
+            sp_offline_sync_status_ptr[0] = sp_offline_sync_status
+            return 1
+
+        lib_mock.sp_offline_sync_get_status.side_effect = func
+        session = self.create_session(lib_mock)
+
+        result = session.offline_sync_status
+
+        lib_mock.sp_offline_sync_get_status.assert_called_with(
+            session.sp_session, mock.ANY)
+        self.assertIsInstance(result, spotify.OfflineSyncStatus)
+        self.assertEqual(result.queued_tracks, 3)
+
+    def test_offline_sync_status_when_not_syncing(self, lib_mock):
+        lib_mock.sp_offline_sync_get_status.return_value = 0
+        session = self.create_session(lib_mock)
+
+        result = session.offline_sync_status
+
+        lib_mock.sp_offline_sync_get_status.assert_called_with(
+            session.sp_session, mock.ANY)
+        self.assertIsNone(result)
+
+    def test_offline_time_left(self, lib_mock):
+        lib_mock.sp_offline_time_left.return_value = 3600
+        session = self.create_session(lib_mock)
+
+        result = session.offline_time_left
+
+        lib_mock.sp_offline_time_left.assert_called_with(session.sp_session)
+        self.assertEqual(result, 3600)

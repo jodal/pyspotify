@@ -3,7 +3,8 @@ from __future__ import unicode_literals
 import logging
 
 import spotify
-from spotify import Error, ErrorType, ffi, lib, PlaylistContainer, User
+from spotify import (
+    Error, ErrorType, ffi, lib, Playlist, PlaylistContainer, User)
 from spotify.utils import enum, get_with_growing_buffer, to_bytes, to_unicode
 
 
@@ -872,5 +873,13 @@ class Session(object):
         if sp_playlistcontainer == ffi.NULL:
             return None
         return PlaylistContainer(sp_playlistcontainer)
+
+    @property
+    def inbox(self):
+        """The inbox :class:`Playlist` for the currently logged in user."""
+        sp_playlist = lib.sp_session_inbox_create(self.sp_session)
+        if sp_playlist == ffi.NULL:
+            return None
+        return Playlist(sp_playlist, add_ref=False)
 
     # TODO Add all sp_session_* methods

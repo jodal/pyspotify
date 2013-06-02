@@ -12,8 +12,9 @@ __all__ = [
 class Playlist(object):
     """A Spotify playlist."""
 
-    def __init__(self, sp_playlist):
-        lib.sp_playlist_add_ref(sp_playlist)
+    def __init__(self, sp_playlist, add_ref=True):
+        if add_ref:
+            lib.sp_playlist_add_ref(sp_playlist)
         self.sp_playlist = ffi.gc(sp_playlist, lib.sp_playlist_release)
 
     def as_link(self):

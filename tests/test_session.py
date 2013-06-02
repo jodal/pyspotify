@@ -967,3 +967,30 @@ class SessionTest(unittest.TestCase):
         lib_mock.sp_session_playlistcontainer.assert_called_with(
             session.sp_session)
         self.assertIsNone(result)
+
+    @mock.patch('spotify.playlist.lib', spec=spotify.lib)
+    def test_inbox(self, playlist_lib_mock, lib_mock):
+        lib_mock.sp_session_inbox_create.return_value = (
+            spotify.ffi.new('sp_playlist **'))
+        session = self.create_session(lib_mock)
+
+        result = session.inbox
+
+        lib_mock.sp_session_inbox_create.assert_called_with(
+            session.sp_session)
+        self.assertIsInstance(result, spotify.Playlist)
+
+        # Since we *created* the sp_playlist, we already have a refcount of 1
+        # and shouldn't increase the refcount when wrapping this sp_playlist in
+        # a Playlist object
+        self.assertEqual(playlist_lib_mock.sp_playlist_add_ref.call_count, 0)
+
+    def test_inbox_if_not_logged_in(self, lib_mock):
+        lib_mock.sp_session_inbox_create.return_value = spotify.ffi.NULL
+        session = self.create_session(lib_mock)
+
+        result = session.inbox
+
+        lib_mock.sp_session_inbox_create.assert_called_with(
+            session.sp_session)
+        self.assertIsNone(result)

@@ -40,4 +40,21 @@ class PlaylistTest(unittest.TestCase):
 
 @mock.patch('spotify.playlist.lib', spec=spotify.lib)
 class PlaylistContainerTest(unittest.TestCase):
-    pass
+
+    def test_adds_ref_to_sp_playlistcontainer_when_created(self, lib_mock):
+        sp_playlistcontainer = spotify.ffi.new('int *')
+
+        spotify.PlaylistContainer(sp_playlistcontainer)
+
+        lib_mock.sp_playlistcontainer_add_ref.assert_called_with(
+            sp_playlistcontainer)
+
+    def test_releases_sp_playlistcontainer_when_container_dies(self, lib_mock):
+        sp_playlistcontainer = spotify.ffi.new('int *')
+
+        playlist_container = spotify.PlaylistContainer(sp_playlistcontainer)
+        playlist_container = None  # noqa
+        gc.collect()  # Needed for PyPy
+
+        lib_mock.sp_playlistcontainer_release.assert_called_with(
+            sp_playlistcontainer)

@@ -3,7 +3,7 @@ from __future__ import unicode_literals
 import logging
 
 import spotify
-from spotify import Error, ErrorType, ffi, lib, User
+from spotify import Error, ErrorType, ffi, lib, PlaylistContainer, User
 from spotify.utils import enum, get_with_growing_buffer, to_bytes, to_unicode
 
 
@@ -863,5 +863,14 @@ class Session(object):
         """
         Error.maybe_raise(lib.sp_session_player_prefetch(
             self.sp_session, track.sp_track))
+
+    @property
+    def playlist_container(self):
+        """The :class:`PlaylistContainer` for the currently logged in user."""
+        sp_playlistcontainer = lib.sp_session_playlistcontainer(
+            self.sp_session)
+        if sp_playlistcontainer == ffi.NULL:
+            return None
+        return PlaylistContainer(sp_playlistcontainer)
 
     # TODO Add all sp_session_* methods

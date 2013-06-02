@@ -945,3 +945,25 @@ class SessionTest(unittest.TestCase):
         track = spotify.Track(sp_track)
 
         self.assertRaises(spotify.Error, session.player_prefetch, track)
+
+    @mock.patch('spotify.playlist.lib', spec=spotify.lib)
+    def test_playlist_container(self, playlist_lib_mock, lib_mock):
+        lib_mock.sp_session_playlistcontainer.return_value = (
+            spotify.ffi.new('sp_playlistcontainer **'))
+        session = self.create_session(lib_mock)
+
+        result = session.playlist_container
+
+        lib_mock.sp_session_playlistcontainer.assert_called_with(
+            session.sp_session)
+        self.assertIsInstance(result, spotify.PlaylistContainer)
+
+    def test_playlist_container_if_not_logged_in(self, lib_mock):
+        lib_mock.sp_session_playlistcontainer.return_value = spotify.ffi.NULL
+        session = self.create_session(lib_mock)
+
+        result = session.playlist_container
+
+        lib_mock.sp_session_playlistcontainer.assert_called_with(
+            session.sp_session)
+        self.assertIsNone(result)

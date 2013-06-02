@@ -27,6 +27,9 @@ class Playlist(object):
 class PlaylistContainer(object):
     """A Spotify playlist container."""
 
-    pass
+    def __init__(self, sp_playlistcontainer):
+        lib.sp_playlistcontainer_add_ref(sp_playlistcontainer)
+        self.sp_playlistcontainer = ffi.gc(
+            sp_playlistcontainer, lib.sp_playlistcontainer_release)
 
     # TODO Add sp_playlistcontainer_* methods

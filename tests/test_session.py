@@ -685,7 +685,7 @@ class SessionTest(unittest.TestCase):
 
         self.assertRaises(spotify.Error, session.relogin)
 
-    def test_remembered_user_grows_buffer_to_fit_username(self, lib_mock):
+    def test_remembered_user_name_grows_buffer_to_fit_username(self, lib_mock):
         username = 'alice' * 100
 
         def func(sp_session, buffer_, buffer_size):
@@ -700,17 +700,17 @@ class SessionTest(unittest.TestCase):
         lib_mock.sp_session_remembered_user.side_effect = func
         session = self.create_session(lib_mock)
 
-        result = session.remembered_user
+        result = session.remembered_user_name
 
         lib_mock.sp_session_remembered_user.assert_called_with(
             session.sp_session, mock.ANY, mock.ANY)
         self.assertEqual(result, username)
 
-    def test_remembered_user_is_none_if_not_remembered(self, lib_mock):
+    def test_remembered_user_name_is_none_if_not_remembered(self, lib_mock):
         lib_mock.sp_session_remembered_user.return_value = -1
         session = self.create_session(lib_mock)
 
-        result = session.remembered_user
+        result = session.remembered_user_name
 
         lib_mock.sp_session_remembered_user.assert_called_with(
             session.sp_session, mock.ANY, mock.ANY)

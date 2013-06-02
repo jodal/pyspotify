@@ -751,12 +751,12 @@ class Session(object):
         :meth:`login` with the ``remember_me`` argument set to :class:`True`.
 
         To check what user you'll be logged in as if you call this method, see
-        :attr:`remembered_user`.
+        :attr:`remembered_user_name`.
         """
         Error.maybe_raise(lib.sp_session_relogin(self.sp_session))
 
     @property
-    def remembered_user(self):
+    def remembered_user_name(self):
         """The username of the remembered user from a previous :meth:`login`
         call."""
         return get_with_growing_buffer(

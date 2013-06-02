@@ -45,5 +45,12 @@ def to_bytes(value):
         raise ValueError('Value must be text or bytes')
 
 
-def to_unicode(chars):
-    return ffi.string(chars).decode('utf-8')
+def to_unicode(value):
+    if isinstance(value, ffi.CData):
+        return ffi.string(value).decode('utf-8')
+    elif isinstance(value, binary_type):
+        return value.decode('utf-8')
+    elif isinstance(value, text_type):
+        return value
+    else:
+        raise ValueError('Value must be text, bytes, or char[]')

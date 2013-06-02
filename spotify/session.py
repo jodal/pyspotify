@@ -7,7 +7,8 @@ import operator
 import spotify
 from spotify import (
     Error, ErrorType, ffi, lib, Playlist, PlaylistContainer, User)
-from spotify.utils import enum, get_with_growing_buffer, to_bytes, to_unicode
+from spotify.utils import (
+    enum, get_with_growing_buffer, to_bytes, to_unicode, to_country)
 
 
 __all__ = [
@@ -1056,4 +1057,11 @@ class Session(object):
         relogin."""
         return lib.sp_offline_time_left(self.sp_session)
 
-    # TODO Add all sp_session_* methods
+    @property
+    def user_country(self):
+        """The country of the currently logged in user.
+
+        The :attr:`~SessionCallbacks.offline_status_updated` callback is called
+        when this changes.
+        """
+        return to_country(lib.sp_session_user_country(self.sp_session))

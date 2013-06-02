@@ -1415,3 +1415,14 @@ class SessionTest(unittest.TestCase):
 
         lib_mock.sp_offline_time_left.assert_called_with(session.sp_session)
         self.assertEqual(result, 3600)
+
+    def test_user_country(self, lib_mock):
+        lib_mock.sp_session_user_country.return_value = (
+            ord('S') << 8 | ord('E'))
+        session = self.create_session(lib_mock)
+
+        result = session.user_country
+
+        lib_mock.sp_session_user_country.assert_called_with(
+            session.sp_session)
+        self.assertEqual(result, 'SE')

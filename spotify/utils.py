@@ -54,3 +54,18 @@ def to_unicode(value):
         return value
     else:
         raise ValueError('Value must be text, bytes, or char[]')
+
+
+def to_country(code):
+    return to_unicode(chr(code >> 8) + chr(code & 0xff))
+
+
+def to_country_code(country):
+    country = to_unicode(country)
+    if len(country) != 2:
+        raise ValueError('Must be exactly two chars')
+    first, second = (ord(char) for char in country)
+    if (not (ord('A') <= first <= ord('Z')) or
+            not (ord('A') <= second <= ord('Z'))):
+        raise ValueError('Chars must be in range A-Z')
+    return first << 8 | second

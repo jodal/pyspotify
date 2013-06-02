@@ -37,3 +37,27 @@ class ToUnicodeTest(unittest.TestCase):
     def test_anything_else_to_unicode_fails(self):
         self.assertRaises(ValueError, utils.to_unicode, [])
         self.assertRaises(ValueError, utils.to_unicode, 123)
+
+
+class ToCountryCode(unittest.TestCase):
+
+    def test_unicode_to_country_code(self):
+        self.assertEqual(utils.to_country_code('NO'), 20047)
+        self.assertEqual(utils.to_country_code('SE'), 21317)
+
+    def test_bytes_to_country_code(self):
+        self.assertEqual(utils.to_country_code(b'NO'), 20047)
+        self.assertEqual(utils.to_country_code(b'SE'), 21317)
+
+    def test_fails_if_not_exactly_two_chars(self):
+        self.assertRaises(ValueError, utils.to_country_code, 'NOR')
+
+    def test_fails_if_not_in_uppercase(self):
+        self.assertRaises(ValueError, utils.to_country_code, 'no')
+
+
+class ToCountry(unittest.TestCase):
+
+    def test_to_country(self):
+        self.assertEqual(utils.to_country(20047), 'NO')
+        self.assertEqual(utils.to_country(21317), 'SE')

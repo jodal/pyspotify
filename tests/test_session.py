@@ -809,6 +809,22 @@ class SessionTest(unittest.TestCase):
         lib_mock.sp_session_connectionstate.assert_called_once_with(
             session.sp_session)
 
+    def test_set_cache_size(self, lib_mock):
+        lib_mock.sp_session_set_cache_size.return_value = spotify.ErrorType.OK
+        session = self.create_session(lib_mock)
+
+        session.set_cache_size(100)
+
+        lib_mock.sp_session_set_cache_size.assert_called_once_with(
+            session.sp_session, 100)
+
+    def test_set_cache_size_fail_raises_error(self, lib_mock):
+        lib_mock.sp_session_set_cache_size.return_value = (
+            spotify.ErrorType.BAD_API_VERSION)
+        session = self.create_session(lib_mock)
+
+        self.assertRaises(spotify.Error, session.set_cache_size, 100)
+
     def test_process_events_returns_ms_to_next_timeout(self, lib_mock):
         def func(sp_session, int_ptr):
             int_ptr[0] = 5500

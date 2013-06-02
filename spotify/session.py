@@ -807,6 +807,14 @@ class Session(object):
         """The current :class:`ConnectionState`."""
         return lib.sp_session_connectionstate(self.sp_session)
 
+    def set_cache_size(self, size):
+        """Set maximum size in MB for libspotify's cache.
+
+        If set to 0 (the default), up to 10% of the free disk space will be
+        used."""
+        Error.maybe_raise(lib.sp_session_set_cache_size(
+            self.sp_session, size))
+
     def process_events(self):
         """Process pending events in libspotify.
 

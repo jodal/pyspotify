@@ -921,4 +921,12 @@ class Session(object):
         Error.maybe_raise(lib.sp_session_preferred_bitrate(
             self.sp_session, bitrate))
 
+    def preferred_offline_bitrate(self, bitrate, allow_resync=False):
+        """Set preferred :class:`Bitrate` for offline sync.
+
+        If ``allow_resync`` is :class:`True` libspotify may resynchronize
+        already synced tracks."""
+        Error.maybe_raise(lib.sp_session_preferred_offline_bitrate(
+            self.sp_session, bitrate, allow_resync))
+
     # TODO Add all sp_session_* methods

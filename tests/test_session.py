@@ -867,6 +867,22 @@ class SessionTest(unittest.TestCase):
 
         self.assertRaises(spotify.Error, session.player_load, track)
 
+    def test_player_seek(self, lib_mock):
+        lib_mock.sp_session_player_seek.return_value = spotify.ErrorType.OK
+        session = self.create_session(lib_mock)
+
+        session.player_seek(45000)
+
+        lib_mock.sp_session_player_seek.assert_called_once_with(
+            session.sp_session, 45000)
+
+    def test_player_seek_fail_raises_error(self, lib_mock):
+        lib_mock.sp_session_player_seek.return_value = (
+            spotify.ErrorType.BAD_API_VERSION)
+        session = self.create_session(lib_mock)
+
+        self.assertRaises(spotify.Error, session.player_seek, 45000)
+
     def test_player_play(self, lib_mock):
         lib_mock.sp_session_player_play.return_value = spotify.ErrorType.OK
         session = self.create_session(lib_mock)

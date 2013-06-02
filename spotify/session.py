@@ -838,6 +838,10 @@ class Session(object):
         Error.maybe_raise(lib.sp_session_player_load(
             self.sp_session, track.sp_track))
 
+    def player_seek(self, offset):
+        """Seek to the offset in ms in the currently loaded track."""
+        Error.maybe_raise(lib.sp_session_player_seek(self.sp_session, offset))
+
     def player_play(self, play=True):
         """Play the currently loaded track.
 

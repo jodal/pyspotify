@@ -45,7 +45,7 @@ Development setup
 Development status
 ==================
 
-.. image:: https://secure.travis-ci.org/jodal/pyspotify.png?branch=pyspotify2
+.. image:: https://travis-ci.org/jodal/pyspotify.png?branch=pyspotify2
     :target: https://travis-ci.org/jodal/pyspotify
 
 - 2013-06-01: Session callbacks complete.

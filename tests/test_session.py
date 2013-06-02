@@ -776,6 +776,22 @@ class SessionTest(unittest.TestCase):
 
         self.assertRaises(spotify.Error, session.logout)
 
+    def test_flush_caches(self, lib_mock):
+        lib_mock.sp_session_flush_caches.return_value = spotify.ErrorType.OK
+        session = self.create_session(lib_mock)
+
+        session.flush_caches()
+
+        lib_mock.sp_session_flush_caches.assert_called_once_with(
+            session.sp_session)
+
+    def test_flush_caches_fail_raises_error(self, lib_mock):
+        lib_mock.sp_session_flush_caches.return_value = (
+            spotify.ErrorType.BAD_API_VERSION)
+        session = self.create_session(lib_mock)
+
+        self.assertRaises(spotify.Error, session.flush_caches)
+
     def test_process_events_returns_ms_to_next_timeout(self, lib_mock):
         def func(sp_session, int_ptr):
             int_ptr[0] = 5500

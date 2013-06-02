@@ -788,6 +788,14 @@ class Session(object):
         """
         Error.maybe_raise(lib.sp_session_logout(self.sp_session))
 
+    def flush_caches(self):
+        """Write all cached data to disk.
+
+        libspotify does this regularly and on logout, so you should never need
+        to call this method yourself.
+        """
+        Error.maybe_raise(lib.sp_session_flush_caches(self.sp_session))
+
     def process_events(self):
         """Process pending events in libspotify.
 

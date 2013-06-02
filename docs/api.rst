@@ -140,7 +140,7 @@ when using pyspotify.
 Sessions
 ========
 
-TODO
+.. autoclass:: ConnectionState
 
 .. autoclass:: SessionCallbacks
 
@@ -152,9 +152,11 @@ TODO
 Audio
 =====
 
-.. autoclass:: SampleType
+.. autoclass:: AudioBufferStats
 
 .. autoclass:: AudioFormat
+
+.. autoclass:: SampleType
 
 
 Links

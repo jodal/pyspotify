@@ -24,7 +24,7 @@ static int
 create_session(Session *self, PyObject *client, PyObject *settings);
 
 static void
-session_callback(sp_session *session, const char* attr);
+session_callback(sp_session *session, const char* attr, PyObject *extra);
 
 static PyObject *
 Session_new(PyTypeObject *type, PyObject *args, PyObject *kwds)
@@ -512,9 +512,8 @@ PyTypeObject SessionType = {
 /*           CALLBACK SHIMS          */
 /*************************************/
 
-// TODO: expand with va_list support so we can support more complecated callbacks.
 static void
-session_callback(sp_session * session, const char *attr)
+session_callback(sp_session * session, const char *attr, PyObject *extra)
 {
     Session *py_session;
     PyObject *args, *callback, *client, *result;
@@ -529,7 +528,7 @@ session_callback(sp_session * session, const char *attr)
         callback = PyObject_GetAttrString(client, attr);
 
         if (callback != NULL) {
-            result = PyObject_CallFunctionObjArgs(callback, py_session, NULL);
+            result = PyObject_CallFunctionObjArgs(callback, py_session, extra, NULL);
 
             if (result == NULL)
                 PyErr_WriteUnraisable(callback);
@@ -605,7 +604,7 @@ metadata_updated(sp_session * session)
 #endif
     PyGILState_STATE gstate;
     gstate = PyGILState_Ensure();
-    session_callback(session, "metadata_updated");
+    session_callback(session, "metadata_updated", NULL);
     PyGILState_Release(gstate);
 }
 
@@ -676,7 +675,7 @@ notify_main_thread(sp_session * session)
 
     PyGILState_STATE gstate;
     gstate = PyGILState_Ensure();
-    session_callback(session, "notify_main_thread");
+    session_callback(session, "notify_main_thread", NULL);
     PyGILState_Release(gstate);
 }
 
@@ -742,7 +741,7 @@ play_token_lost(sp_session * session)
 #endif
     PyGILState_STATE gstate;
     gstate = PyGILState_Ensure();
-    session_callback(session, "play_token_lost");
+    session_callback(session, "play_token_lost", NULL);
     PyGILState_Release(gstate);
 }
 
@@ -781,7 +780,7 @@ end_of_track(sp_session * session)
 #endif
     PyGILState_STATE gstate;
     gstate = PyGILState_Ensure();
-    session_callback(session, "end_of_track");
+    session_callback(session, "end_of_track", NULL);
     PyGILState_Release(gstate);
 }
 

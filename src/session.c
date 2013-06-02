@@ -623,20 +623,21 @@ message_to_user(sp_session * session, const char *message)
         fprintf(stderr, "[DEBUG]-session- >> message to user: %s\n", message);
 #endif
     gstate = PyGILState_Ensure();
-    Session *psession =
+    Session *py_session =
         (Session *) PyObject_CallObject((PyObject *)&SessionType, NULL);
-    psession->_session = session;
+    py_session->_session = session;
     PyObject *client = (PyObject *)sp_session_userdata(session);
 
     msg = PyUnicode_FromString(message);
     method = PyObject_GetAttrString(client, "message_to_user");
     res =
-        PyObject_CallFunctionObjArgs(method, psession, msg, NULL);
+        PyObject_CallFunctionObjArgs(method, py_session, msg, NULL);
     if (!res)
         PyErr_WriteUnraisable(method);
-    Py_DECREF(psession);
+    Py_DECREF(py_session);
     Py_XDECREF(res);
     Py_DECREF(method);
+    Py_DECREF(msg);
     PyGILState_Release(gstate);
 }
 

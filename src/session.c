@@ -29,17 +29,20 @@ Session_new(PyTypeObject *type, PyObject *args, PyObject *kwds)
     Session *self;
 
     self = (Session *) type->tp_alloc(type, 0);
-    self->_session = NULL;
+    if (self != NULL) {
+        self->_session = NULL;
+    }
     return (PyObject *)self;
 }
 
 PyObject *
 Session_FromSpotify(sp_session * session)
 {
-    PyObject *s = PyObject_CallObject((PyObject *)&SessionType, NULL);
-
-    ((Session *) s)->_session = session;
-    return s;
+    PyObject *py_session = PyObject_CallObject((PyObject *)&SessionType, NULL);
+    if (py_session != NULL) {
+        ((Session *) py_session)->_session = session;
+    }
+    return py_session;
 }
 
 static PyMemberDef Session_members[] = {

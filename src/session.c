@@ -857,12 +857,17 @@ PySpotify_GetConfigString(PyObject *client, const char *attr, bool optional)
             return NULL;
         }
     }
+
     if (PyUnicode_Check(py_value)) {
         py_uvalue = py_value;
         py_value = PyUnicode_AsEncodedString(py_uvalue, ENCODING, "replace");
         Py_DECREF(py_uvalue);
+	if (py_value == NULL) {
+            return NULL;
+	}
     }
     else if (!PyBytes_Check(py_value)) {
+        Py_DECREF(py_value);
         PyErr_Format(SpotifyError,
                      "configuration value '%s' must be a string/unicode object",
                      attr);

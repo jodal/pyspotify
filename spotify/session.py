@@ -1,5 +1,6 @@
 from __future__ import unicode_literals
 
+import functools
 import logging
 import operator
 
@@ -1020,7 +1021,7 @@ class Session(object):
 
         To remove all rules, simply call this method without any arguments.
         """
-        connection_rules = reduce(operator.or_, connection_rules, 0)
+        connection_rules = functools.reduce(operator.or_, connection_rules, 0)
         Error.maybe_raise(lib.sp_session_set_connection_rules(
             self.sp_session, connection_rules))
 

@@ -760,25 +760,12 @@ music_delivery(sp_session * session, const sp_audioformat * format,
 static void
 play_token_lost(sp_session * session)
 {
-    PyGILState_STATE gstate;
-    PyObject *res, *method;
-
 #ifdef DEBUG
         fprintf(stderr, "[DEBUG]-session- >> play_token_lost called\n");
 #endif
+    PyGILState_STATE gstate;
     gstate = PyGILState_Ensure();
-    Session *psession =
-        (Session *) PyObject_CallObject((PyObject *)&SessionType, NULL);
-    psession->_session = session;
-    PyObject *client = (PyObject *)sp_session_userdata(session);
-
-    method = PyObject_GetAttrString(client, "play_token_lost");
-    res = PyObject_CallFunctionObjArgs(method, psession, NULL);
-    if (!res)
-        PyErr_WriteUnraisable(method);
-    Py_DECREF(psession);
-    Py_XDECREF(res);
-    Py_DECREF(method);
+    session_callback(session, "play_token_lost");
     PyGILState_Release(gstate);
 }
 

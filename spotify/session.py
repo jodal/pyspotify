@@ -943,4 +943,18 @@ class Session(object):
     Set to :class:`True` or :class:`False` to change.
     """
 
+    def is_private_session(self):
+        return bool(lib.sp_session_is_private_session(self.sp_session))
+
+    def set_private_session(self, value):
+        Error.maybe_raise(lib.sp_session_set_private_session(
+            self.sp_session, value))
+
+    private_session = property(
+        is_private_session, set_private_session)
+    """Whether the session is private.
+
+    Set to :class:`True` or :class:`False` to change.
+    """
+
     # TODO Add all sp_session_* methods

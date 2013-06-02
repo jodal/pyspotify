@@ -1161,3 +1161,31 @@ class SessionTest(unittest.TestCase):
 
         self.assertRaises(
             spotify.Error, setattr, session, 'volume_normalization', True)
+
+    def test_is_private_session(self, lib_mock):
+        lib_mock.sp_session_is_private_session.return_value = 0
+        session = self.create_session(lib_mock)
+
+        result = session.private_session
+
+        lib_mock.sp_session_is_private_session.assert_called_with(
+            session.sp_session)
+        self.assertFalse(result)
+
+    def test_set_private_session(self, lib_mock):
+        lib_mock.sp_session_set_private_session.return_value = (
+            spotify.ErrorType.OK)
+        session = self.create_session(lib_mock)
+
+        session.private_session = True
+
+        lib_mock.sp_session_set_private_session.assert_called_with(
+            session.sp_session, 1)
+
+    def test_set_private_session_fail_raises_error(self, lib_mock):
+        lib_mock.sp_session_set_private_session.return_value = (
+            spotify.ErrorType.BAD_API_VERSION)
+        session = self.create_session(lib_mock)
+
+        self.assertRaises(
+            spotify.Error, setattr, session, 'private_session', True)

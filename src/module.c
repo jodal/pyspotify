@@ -60,13 +60,16 @@ init_spotify(void)
 
     PyObject *spotify = PyImport_ImportModule("spotify");
     PyObject *d = PyModule_GetDict(spotify);
-    PyObject *s = PyUnicode_FromString("SpotifyError");
 
-    SpotifyError = PyDict_GetItem(d, s);
-    Py_INCREF(SpotifyError);
-
+    SpotifyError = PyDict_GetItemString(d, "SpotifyError");
     SpotifyApiVersion = Py_BuildValue("i", SPOTIFY_API_VERSION);
+
+    // TODO: figure out why we store these globaly. increfs are for that global
+    // ref, as the SpotifyError simply has a borrowed ref, and the
+    // SpotifyApiVersion one will be stolen by the module.
+    Py_INCREF(SpotifyError);
     Py_INCREF(SpotifyApiVersion);
+
     PyModule_AddObject(m, "api_version", SpotifyApiVersion);
     album_init(m);
     albumbrowser_init(m);

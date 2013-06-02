@@ -23,6 +23,9 @@ sp_session *g_session;
 static int
 create_session(Session *self, PyObject *client, PyObject *settings);
 
+static void
+session_callback(sp_session *session, const char* attr);
+
 static PyObject *
 Session_new(PyTypeObject *type, PyObject *args, PyObject *kwds)
 {
@@ -506,6 +509,36 @@ PyTypeObject SessionType = {
 /*           CALLBACK SHIMS          */
 /*************************************/
 
+// TODO: expand with va_list support so we can support more complecated callbacks.
+static void
+session_callback(sp_session * session, const char *attr)
+{
+    Session *py_session;
+    PyObject *args, *callback, *client, *result;
+
+    py_session =
+        (Session *) PyObject_CallObject((PyObject *)&SessionType, NULL);
+
+    if (py_session != NULL) {
+        py_session->_session = session;
+
+        client = (PyObject *)sp_session_userdata(session);
+        callback = PyObject_GetAttrString(client, attr);
+
+        if (callback != NULL) {
+            result = PyObject_CallFunctionObjArgs(callback, py_session, NULL);
+
+            if (result == NULL)
+                PyErr_WriteUnraisable(callback);
+            else
+                Py_DECREF(result);
+
+            Py_XDECREF(callback);
+        }
+        Py_DECREF(py_session);
+    }
+}
+
 static void
 logged_in(sp_session * session, sp_error error)
 {
@@ -779,35 +812,12 @@ log_message(sp_session * session, const char *data)
 static void
 end_of_track(sp_session * session)
 {
-    PyGILState_STATE gstate;
-    Session *py_session;
-    PyObject *callback, *client, *result;
-
 #ifdef DEBUG
         fprintf(stderr, "[DEBUG]-session- >> end_of_track called\n");
 #endif
+    PyGILState_STATE gstate;
     gstate = PyGILState_Ensure();
-    py_session =
-        (Session *) PyObject_CallObject((PyObject *)&SessionType, NULL);
-
-    if (py_session != NULL) {
-        py_session->_session = session;
-
-        client = (PyObject *)sp_session_userdata(session);
-        callback = PyObject_GetAttrString(client, "end_of_track");
-
-        if (callback != NULL) {
-            result = PyObject_CallFunctionObjArgs(callback, py_session, NULL);
-
-            if (result == NULL)
-                PyErr_WriteUnraisable(callback);
-            else
-                Py_DECREF(result);
-
-            Py_XDECREF(callback);
-	}
-        Py_DECREF(py_session);
-    }
+    session_callback(session, "end_of_track");
     PyGILState_Release(gstate);
 }
 

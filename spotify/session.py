@@ -4,16 +4,22 @@ import logging
 
 import spotify
 from spotify import Error, ErrorType, ffi, lib, User
-from spotify.utils import get_with_growing_buffer, to_bytes, to_unicode
+from spotify.utils import enum, get_with_growing_buffer, to_bytes, to_unicode
 
 
 __all__ = [
+    'ConnectionState',
     'SessionCallbacks',
     'SessionConfig',
     'Session',
 ]
 
 logger = logging.getLogger(__name__)
+
+
+@enum('SP_CONNECTION_STATE_')
+class ConnectionState(object):
+    pass
 
 
 class SessionCallbacks(object):
@@ -795,6 +801,11 @@ class Session(object):
         to call this method yourself.
         """
         Error.maybe_raise(lib.sp_session_flush_caches(self.sp_session))
+
+    @property
+    def connection_state(self):
+        """The current :class:`ConnectionState`."""
+        return lib.sp_session_connectionstate(self.sp_session)
 
     def process_events(self):
         """Process pending events in libspotify.

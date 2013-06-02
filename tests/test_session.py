@@ -10,6 +10,12 @@ import unittest
 import spotify
 
 
+class ConnectionStateTest(unittest.TestCase):
+
+    def test_has_constants(self):
+        self.assertEqual(spotify.ConnectionState.LOGGED_OUT, 0)
+
+
 class SessionCallbacksTest(unittest.TestCase):
     def setUp(self):
         self.callbacks = spotify.SessionCallbacks()
@@ -791,6 +797,17 @@ class SessionTest(unittest.TestCase):
         session = self.create_session(lib_mock)
 
         self.assertRaises(spotify.Error, session.flush_caches)
+
+    def test_connection_state(self, lib_mock):
+        lib_mock.sp_session_connectionstate.return_value = (
+            spotify.ConnectionState.LOGGED_OUT)
+        session = self.create_session(lib_mock)
+
+        self.assertEqual(
+            session.connection_state, spotify.ConnectionState.LOGGED_OUT)
+
+        lib_mock.sp_session_connectionstate.assert_called_once_with(
+            session.sp_session)
 
     def test_process_events_returns_ms_to_next_timeout(self, lib_mock):
         def func(sp_session, int_ptr):

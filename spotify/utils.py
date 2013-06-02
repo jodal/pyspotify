@@ -7,7 +7,7 @@ from spotify import ffi, lib
 
 PY2 = sys.version_info[0] == 2
 
-if PY2:
+if PY2:  # pragma: no branch
     text_type = unicode
     binary_type = str
 else:

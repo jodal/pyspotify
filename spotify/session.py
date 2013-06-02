@@ -851,4 +851,8 @@ class Session(object):
         Error.maybe_raise(lib.sp_session_player_play(
             self.sp_session, play))
 
+    def player_unload(self):
+        """Stops the currently playing track."""
+        Error.maybe_raise(lib.sp_session_player_unload(self.sp_session))
+
     # TODO Add all sp_session_* methods

@@ -17,11 +17,20 @@
 #include "image.h"
 #include "user.h"
 
+// Adds gcc-python-plugin hints to avoid some false positives.
+#if defined(WITH_CPYCHECKER_SETS_EXCEPTION_ATTRIBUTE)
+    #define CPYCHECKER_SETS_EXCEPTION \
+        __attribute__((cpychecker_sets_exception))
+#else
+    #define CPYCHECKER_SETS_EXCEPTION
+#endif
+
 static int session_constructed = 0;
 sp_session *g_session;
 
 static int
-create_session(Session *self, PyObject *client, PyObject *settings);
+create_session(Session *self, PyObject *client, PyObject *settings)
+    CPYCHECKER_SETS_EXCEPTION;
 
 static PyObject *
 Session_new(PyTypeObject *type, PyObject *args, PyObject *kwds)
@@ -901,8 +910,10 @@ create_session(Session *self, PyObject *client, PyObject *settings)
     config.callbacks = &g_callbacks;
 
     cache_location = PySpotify_GetConfigString(settings, "cache_location", 0);
-    if (!cache_location)
+    if (!cache_location) {
+        PyErr_SetString(SpotifyError, "cache_location not set");
         return -1;
+    }
     config.cache_location = cache_location;
 #ifdef DEBUG
     fprintf(stderr, "[DEBUG]-session- Cache location is '%s'\n",
@@ -920,13 +931,11 @@ create_session(Session *self, PyObject *client, PyObject *settings)
     PyObject *application_key =
         PyObject_GetAttr(settings, PyBytes_FromString("application_key"));
     if (!application_key) {
-        PyErr_SetString(SpotifyError,
-                        "application_key not set");
+        PyErr_SetString(SpotifyError, "application_key not set");
         return -1;
     }
     else if (!PyBytes_Check(application_key)) {
-        PyErr_SetString(SpotifyError,
-                        "application_key must be a byte string");
+        PyErr_SetString(SpotifyError, "application_key must be a byte string");
         return -1;
     }
     char *s_appkey;
@@ -938,9 +947,11 @@ create_session(Session *self, PyObject *client, PyObject *settings)
     memcpy((char *)config.application_key, s_appkey, l_appkey);
 
     user_agent = PySpotify_GetConfigString(settings, "user_agent", 0);
-    if (!user_agent)
+    if (!user_agent) {
+        PyErr_SetString(SpotifyError, "user_agent not set");
         return -1;
-    if (strlen(user_agent) > 255) {
+    }
+    else if (strlen(user_agent) > 255) {
         PyErr_SetString(SpotifyError, "user agent must be 255 characters max");
         return -1;
     }
@@ -951,18 +962,22 @@ create_session(Session *self, PyObject *client, PyObject *settings)
 #endif
 
     proxy = PySpotify_GetConfigString(client, "proxy", 1);
-    if (!proxy)
+    if (!proxy) {
+        PyErr_SetString(SpotifyError, "proxy attribute missing");
         return -1;
+    }
     if ((long) proxy != (-1)) {
-    config.proxy = proxy;
+        config.proxy = proxy;
 #ifdef DEBUG
-    fprintf(stderr, "[DEBUG]-session- Proxy set to '%s'\n", proxy);
+        fprintf(stderr, "[DEBUG]-session- Proxy set to '%s'\n", proxy);
 #endif
     }
 
     proxy_username = PySpotify_GetConfigString(client, "proxy_username", 1);
-    if (!proxy_username)
-       return -1;
+    if (!proxy_username) {
+        PyErr_SetString(SpotifyError, "proxy_username attribute missing");
+        return -1;
+    }
     if ((long) proxy_username != (-1)) {
         config.proxy_username = proxy_username;
 #ifdef DEBUG
@@ -972,8 +987,10 @@ create_session(Session *self, PyObject *client, PyObject *settings)
     }
 
     proxy_password = PySpotify_GetConfigString(client, "proxy_password", 1);
-    if (!proxy_password)
-       return -1;
+    if (!proxy_password) {
+        PyErr_SetString(SpotifyError, "proxy_password attribute missing");
+        return -1;
+    }
     if ((long) proxy_password != (-1)) {
         config.proxy_password = proxy_password;
 #ifdef DEBUG

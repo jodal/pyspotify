@@ -140,7 +140,11 @@ when using pyspotify.
 Sessions
 ========
 
+.. autoclass:: ConnectionRule
+
 .. autoclass:: ConnectionState
+
+.. autoclass:: ConnectionType
 
 .. autoclass:: SessionCallbacks
 

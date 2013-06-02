@@ -1,6 +1,7 @@
 from __future__ import unicode_literals
 
 import logging
+import operator
 
 import spotify
 from spotify import (
@@ -9,7 +10,9 @@ from spotify.utils import enum, get_with_growing_buffer, to_bytes, to_unicode
 
 
 __all__ = [
+    'ConnectionRule',
     'ConnectionState',
+    'ConnectionType',
     'SessionCallbacks',
     'SessionConfig',
     'Session',
@@ -18,8 +21,18 @@ __all__ = [
 logger = logging.getLogger(__name__)
 
 
+@enum('SP_CONNECTION_RULE_')
+class ConnectionRule(object):
+    pass
+
+
 @enum('SP_CONNECTION_STATE_')
 class ConnectionState(object):
+    pass
+
+
+@enum('SP_CONNECTION_TYPE_')
+class ConnectionType(object):
     pass
 
 
@@ -989,5 +1002,26 @@ class Session(object):
         password = ffi.new('char[]', to_bytes(password))
         Error.maybe_raise(lib.sp_session_set_social_credentials(
             self.sp_session, social_provider, username, password))
+
+    def set_connection_type(self, connection_type):
+        """Set the :class:`ConnectionType`.
+
+        This is used together with :meth:`set_connection_rules` to control
+        offline syncing and network usage.
+        """
+        Error.maybe_raise(lib.sp_session_set_connection_type(
+            self.sp_session, connection_type))
+
+    def set_connection_rules(self, *connection_rules):
+        """Set one or more :class:`connection rules <ConnectionRule>`.
+
+        This is used together with :meth:`set_connection_type` to control
+        offline syncing and network usage.
+
+        To remove all rules, simply call this method without any arguments.
+        """
+        connection_rules = reduce(operator.or_, connection_rules, 0)
+        Error.maybe_raise(lib.sp_session_set_connection_rules(
+            self.sp_session, connection_rules))
 
     # TODO Add all sp_session_* methods

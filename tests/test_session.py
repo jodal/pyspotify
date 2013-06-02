@@ -900,3 +900,10 @@ class SessionTest(unittest.TestCase):
 
         lib_mock.sp_session_player_play.assert_called_once_with(
             session.sp_session, 0)
+
+    def test_player_play_fail_raises_error(self, lib_mock):
+        lib_mock.sp_session_player_play.return_value = (
+            spotify.ErrorType.BAD_API_VERSION)
+        session = self.create_session(lib_mock)
+
+        self.assertRaises(spotify.Error, session.player_play, True)

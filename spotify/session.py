@@ -890,4 +890,13 @@ class Session(object):
             return None
         return Playlist(sp_playlist, add_ref=False)
 
+    def starred_for_user(self, canonical_username):
+        """The starred :class:`Playlist` for the user with
+        ``canonical_username``."""
+        sp_playlist = lib.sp_session_starred_for_user_create(
+            self.sp_session, to_bytes(canonical_username))
+        if sp_playlist == ffi.NULL:
+            return None
+        return Playlist(sp_playlist, add_ref=False)
+
     # TODO Add all sp_session_* methods

@@ -646,40 +646,44 @@ music_delivery(sp_session * session, const sp_audioformat * format,
     // Note that we do not try to shoe horn this into session_callback as it is
     // quite different in that this needs to handle return values and much more
     // complicated arguments.
-    PyGILState_STATE gstate;
-    PyObject *res, *method;
 
 #ifdef DEBUG
         fprintf(stderr, "[DEBUG]-session- >> music_delivery called\n");
 #endif
-    gstate = PyGILState_Ensure();
-    int siz = frame_size(format);
-    PyObject *pyframes = PyBuffer_FromMemory((void *)frames, num_frames * siz);
-    Session *psession =
-        (Session *) PyObject_CallObject((PyObject *)&SessionType, NULL);
-    psession->_session = session;
-    PyObject *client = (PyObject *)sp_session_userdata(session);
-    method = PyObject_GetAttrString(client, "music_delivery");
-    res =
-        PyObject_CallFunction(method, "OOiiiii", psession,
-                              pyframes, siz, num_frames, format->sample_type,
-                              format->sample_rate, format->channels);
     int consumed = num_frames;  // assume all consumed
-    if (!res)
-        PyErr_WriteUnraisable(method);
-    else if (PyInt_Check(res))
-        consumed = (int)PyInt_AsLong(res);
-    else if (PyLong_Check(res))
-        consumed = (int)PyLong_AsLong(res);
+    int size = frame_size(format);
+
+    PyGILState_STATE gstate;
+    PyObject *callback, *client, *py_frames, *py_session, *result;
+    gstate = PyGILState_Ensure();
+
+    // TODO: check if session creations succeeds.
+    py_frames = PyBuffer_FromMemory((void *)frames, num_frames * size);
+    py_session = Session_FromSpotify(session);
+
+    client = (PyObject *)sp_session_userdata(session);
+    callback = PyObject_GetAttrString(client, "music_delivery");
+
+    result = PyObject_CallFunction(callback, "OOiiiii", py_session, py_frames,
+            size, num_frames, format->sample_type, format->sample_rate,
+            format->channels);
+
+    Py_DECREF(callback);
+    Py_DECREF(py_frames);
+    Py_DECREF(py_session);
+
+    if (result == NULL)
+        PyErr_WriteUnraisable(callback);
+    else if (PyInt_Check(result))
+        consumed = (int)PyInt_AsLong(result);
+    else if (PyLong_Check(result))
+        consumed = (int)PyLong_AsLong(result);
     else {
         PyErr_SetString(PyExc_TypeError,
                         "music_delivery must return an integer");
-        PyErr_WriteUnraisable(method);
+        PyErr_WriteUnraisable(callback);
     }
-    Py_DECREF(pyframes);
-    Py_DECREF(psession);
-    Py_XDECREF(res);
-    Py_DECREF(method);
+    Py_XDECREF(result);
     PyGILState_Release(gstate);
     return consumed;
 }

@@ -517,14 +517,9 @@ PyTypeObject SessionType = {
 static void
 session_callback(sp_session * session, PyObject *extra, const char *attr)
 {
-    Session *py_session;
-    PyObject *callback, *client, *result;
-
-    py_session =
-        (Session *) PyObject_CallObject((PyObject *)&SessionType, NULL);
-
+    PyObject *callback, *client, *py_session, *result;
+    py_session = Session_FromSpotify(session);
     if (py_session != NULL) {
-        py_session->_session = session;
 
         client = (PyObject *)sp_session_userdata(session);
         callback = PyObject_GetAttrString(client, attr);

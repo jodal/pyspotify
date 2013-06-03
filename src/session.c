@@ -567,9 +567,8 @@ logged_out(sp_session * session)
 #endif
     PyGILState_STATE gstate;
     gstate = PyGILState_Ensure();
-    // FIXME: this should probably be calling internal logged out callback that
-    // queues stop etc.
-    session_callback(session, NULL, "logged_out");
+    // TODO: should this fallback to logged_out like old code did?
+    session_callback(session, NULL, "_manager_logged_out");
     PyGILState_Release(gstate);
 }
 

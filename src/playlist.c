@@ -216,11 +216,10 @@ Playlist_add_callback(Playlist * self, PyObject *args,
     to_add->callback = pl_callbacks;
     to_add->trampoline = tramp;
     pl_callbacks_table_add(self, to_add);
-#ifdef DEBUG
-    fprintf(stderr, "[DEBUG]-playlist- adding callback (%p,%p) py(%p,%p)\n",
-            pl_callbacks, tramp, tramp->callback,
-            tramp->userdata);
-#endif
+
+    debug_printf("adding callback (%p,%p) py(%p,%p)",
+            pl_callbacks, tramp, tramp->callback, tramp->userdata);
+
     sp_playlist_add_callbacks(self->_playlist, pl_callbacks, tramp);
     Py_RETURN_NONE;
 }
@@ -713,21 +712,18 @@ Playlist_remove_callback(Playlist * self, PyObject *args)
     }
     if (!(callback = as_function(callback)))
         return NULL;
-#ifdef DEBUG
-    fprintf(stderr, "[DEBUG]-playlist- looking for callback py(%p,%p)\n",
-            callback, userdata);
-#endif
+
+    debug_printf("looking for callback py(%p,%p)", callback, userdata);
     pl_callback = pl_callbacks_table_remove(self, callback, userdata);
     if (!pl_callback) {
         PyErr_SetString(SpotifyError, "This callback was not added");
         return NULL;
     }
-#ifdef DEBUG
-    fprintf(stderr, "[DEBUG]-playlist- removing callback (%p,%p)\n",
+
+    debug_printf("removing callback (%p,%p)",
             pl_callback->callback, pl_callback->trampoline);
-#endif
-    sp_playlist_remove_callbacks(self->_playlist, pl_callback->callback,
-                                 pl_callback->trampoline);
+    sp_playlist_remove_callbacks(
+            self->_playlist, pl_callback->callback, pl_callback->trampoline);
     delete_trampoline(pl_callback->trampoline);
     free(pl_callback->callback);
     free(pl_callback);

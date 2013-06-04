@@ -21,10 +21,11 @@ AlbumBrowser_FromSpotify(sp_albumbrowse * browse)
 static void
 AlbumBrowser_browse_complete(sp_albumbrowse * browse, Callback * st)
 {
-#ifdef DEBUG
-    fprintf(stderr, "[DEBUG]-albbrw- browse complete (%p, %p)\n", browse, st);
-#endif
-    if (!st) return;
+    debug_printf("browse complete (%p, %p)", browse, st);
+
+    if (!st)
+        return;
+
     PyGILState_STATE gstate = PyGILState_Ensure();
     PyObject *browser = AlbumBrowser_FromSpotify(browse);
 
@@ -32,6 +33,7 @@ AlbumBrowser_browse_complete(sp_albumbrowse * browse, Callback * st)
                                                  st->userdata, NULL);
     if (!res)
         PyErr_WriteUnraisable(st->callback);
+
     delete_trampoline(st);
     Py_DECREF(browser);
     Py_XDECREF(res);

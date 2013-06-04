@@ -22,9 +22,8 @@ ArtistBrowser_FromSpotify(sp_artistbrowse * browse)
 void
 ArtistBrowser_browse_complete(sp_artistbrowse *browse, Callback *st)
 {
-#ifdef DEBUG
-    fprintf(stderr, "[DEBUG]-artbrw- browse complete (%p, %p)\n", browse, st);
-#endif
+    debug_printf("browse complete (%p, %p)", browse, st);
+
     if (!st) return;
     PyGILState_STATE gstate = PyGILState_Ensure();
     PyObject *browser = ArtistBrowser_FromSpotify(browse);

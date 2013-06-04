@@ -388,10 +388,7 @@ Session_login(Session *self, PyObject *args, PyObject *kwds)
         return NULL;
     }
 
-#ifdef DEBUG
-    fprintf(stderr, "[DEBUG]-session- login as %s in progress...\n",
-            username);
-#endif
+    debug_printf("login as %s in progress...", username);
     Py_BEGIN_ALLOW_THREADS;
     error = sp_session_login(self->_session, username, password,
                              remember_me, blob);
@@ -408,9 +405,7 @@ Session_relogin(Session *self)
 {
     sp_error error;
 
-#ifdef DEBUG
-    fprintf(stderr, "[DEBUG]-session- relogin in progress...\n");
-#endif
+    debug_printf("relogin in progress...");
     error = sp_session_relogin(self->_session);
     if (error != SP_ERROR_OK) {
         PyErr_SetString(SpotifyError, sp_error_message(error));
@@ -541,9 +536,8 @@ session_callback(sp_session * session, PyObject *extra, const char *attr)
 static void
 logged_in(sp_session * session, sp_error error)
 {
-#ifdef DEBUG
-    fprintf(stderr, "[DEBUG]-session- >> logged_in called\n");
-#endif
+    debug_printf(">> logged_in called: %s", sp_error_message(error));
+
     PyGILState_STATE gstate;
     gstate = PyGILState_Ensure();
     PyObject *py_error = error_message(error);
@@ -557,9 +551,8 @@ logged_in(sp_session * session, sp_error error)
 static void
 logged_out(sp_session * session)
 {
-#ifdef DEBUG
-        fprintf(stderr, "[DEBUG]-session- >> logged_out called\n");
-#endif
+    debug_printf(">> logged_out called");
+
     PyGILState_STATE gstate;
     gstate = PyGILState_Ensure();
     // TODO: should this fallback to logged_out like old code did?
@@ -570,9 +563,8 @@ logged_out(sp_session * session)
 static void
 metadata_updated(sp_session * session)
 {
-#ifdef DEBUG
-        fprintf(stderr, "[DEBUG]-session- >> metadata_updated called\n");
-#endif
+    debug_printf(">> metadata_updated called");
+
     PyGILState_STATE gstate;
     gstate = PyGILState_Ensure();
     session_callback(session, NULL, "metadata_updated");
@@ -582,9 +574,8 @@ metadata_updated(sp_session * session)
 static void
 connection_error(sp_session * session, sp_error error)
 {
-#ifdef DEBUG
-        fprintf(stderr, "[DEBUG]-session- >> connection_error called\n");
-#endif
+    debug_printf(">> connection_error called: %s", sp_error_message(error));
+
     PyGILState_STATE gstate;
     gstate = PyGILState_Ensure();
     PyObject *py_error = error_message(error);
@@ -598,9 +589,8 @@ connection_error(sp_session * session, sp_error error)
 static void
 message_to_user(sp_session * session, const char *data)
 {
-#ifdef DEBUG
-        fprintf(stderr, "[DEBUG]-session- >> message to user: %s\n", data);
-#endif
+    debug_printf(">> message_to_user called: %s", data);
+
     PyGILState_STATE gstate;
     gstate = PyGILState_Ensure();
     PyObject *message = PyUnicode_FromString(data);
@@ -614,9 +604,7 @@ message_to_user(sp_session * session, const char *data)
 static void
 notify_main_thread(sp_session * session)
 {
-#ifdef DEBUG
-        fprintf(stderr, "[DEBUG]-session- >> notify_main_thread called\n");
-#endif
+    debug_printf(">> notify_main_thread called");
 
     if (!session_constructed)
         return;
@@ -647,9 +635,8 @@ music_delivery(sp_session * session, const sp_audioformat * format,
     // quite different in that this needs to handle return values and much more
     // complicated arguments.
 
-#ifdef DEBUG
-        fprintf(stderr, "[DEBUG]-session- >> music_delivery called\n");
-#endif
+    debug_printf(">> music_delivery called: frames %d", num_frames);
+
     int consumed = num_frames;  // assume all consumed
     int size = frame_size(format);
 
@@ -694,9 +681,8 @@ music_delivery(sp_session * session, const sp_audioformat * format,
 static void
 play_token_lost(sp_session * session)
 {
-#ifdef DEBUG
-        fprintf(stderr, "[DEBUG]-session- >> play_token_lost called\n");
-#endif
+    debug_printf(">> play_token_lost called");
+
     PyGILState_STATE gstate;
     gstate = PyGILState_Ensure();
     session_callback(session, NULL, "play_token_lost");
@@ -706,9 +692,8 @@ play_token_lost(sp_session * session)
 static void
 log_message(sp_session * session, const char *data)
 {
-#ifdef DEBUG
-        fprintf(stderr, "[DEBUG]-session- >> log message: %s\n", data);
-#endif
+    debug_printf(">> log_message called: %s", data);
+
     PyGILState_STATE gstate;
     gstate = PyGILState_Ensure();
     PyObject *message = PyUnicode_FromString(data);
@@ -722,9 +707,8 @@ log_message(sp_session * session, const char *data)
 static void
 end_of_track(sp_session * session)
 {
-#ifdef DEBUG
-        fprintf(stderr, "[DEBUG]-session- >> end_of_track called\n");
-#endif
+    debug_printf(">> end_of_track called");
+
     PyGILState_STATE gstate;
     gstate = PyGILState_Ensure();
     session_callback(session, NULL, "end_of_track");
@@ -734,9 +718,8 @@ end_of_track(sp_session * session)
 static void
 credentials_blob_updated(sp_session *session, const char *data)
 {
-#ifdef DEBUG
-        fprintf(stderr, "[DEBUG]-session- >> credentials_blob_updated called\n");
-#endif
+    debug_printf(">> credentials_blob_updated called");
+
     PyGILState_STATE gstate;
     gstate = PyGILState_Ensure();
     PyObject *blob = PyBytes_FromString(data);
@@ -833,18 +816,12 @@ create_session(Session *self, PyObject *client, PyObject *settings)
         return -1;
     }
     config.cache_location = cache_location;
-#ifdef DEBUG
-    fprintf(stderr, "[DEBUG]-session- Cache location is '%s'\n",
-            cache_location);
-#endif
+    debug_printf("cache_location = %s", config.cache_location);
 
     settings_location = PySpotify_GetConfigString(settings,
                                                   "settings_location", 0);
     config.settings_location = settings_location;
-#ifdef DEBUG
-    fprintf(stderr, "[DEBUG]-session- Settings location is '%s'\n",
-            settings_location);
-#endif
+    debug_printf("settings_location = %s", config.settings_location);
 
     // TODO: this looks like a bad copy of PySpotify_GetConfigString, we should
     // probably refactor the helper to support this case as well
@@ -879,10 +856,7 @@ create_session(Session *self, PyObject *client, PyObject *settings)
         return -1;
     }
     config.user_agent = user_agent;
-#ifdef DEBUG
-    fprintf(stderr, "[DEBUG]-session- User agent set to '%s'\n",
-                        user_agent);
-#endif
+    debug_printf("user_agent = %s", config.user_agent);
 
     proxy = PySpotify_GetConfigString(client, "proxy", 1);
     if (!proxy) {
@@ -891,9 +865,7 @@ create_session(Session *self, PyObject *client, PyObject *settings)
     }
     if ((long) proxy != (-1)) {
         config.proxy = proxy;
-#ifdef DEBUG
-        fprintf(stderr, "[DEBUG]-session- Proxy set to '%s'\n", proxy);
-#endif
+        debug_printf("proxy = %s", config.proxy);
     }
 
     proxy_username = PySpotify_GetConfigString(client, "proxy_username", 1);
@@ -903,10 +875,7 @@ create_session(Session *self, PyObject *client, PyObject *settings)
     }
     if ((long) proxy_username != (-1)) {
         config.proxy_username = proxy_username;
-#ifdef DEBUG
-        fprintf(stderr, "[DEBUG]-session- Proxy username set to '%s'\n",
-            proxy_username);
-#endif
+        debug_printf("proxy_username = %s", config.proxy_username);
     }
 
     proxy_password = PySpotify_GetConfigString(client, "proxy_password", 1);
@@ -916,15 +885,10 @@ create_session(Session *self, PyObject *client, PyObject *settings)
     }
     if ((long) proxy_password != (-1)) {
         config.proxy_password = proxy_password;
-#ifdef DEBUG
-        fprintf(stderr, "[DEBUG]-session- Proxy password set to '%s'\n",
-            proxy_password);
-#endif
+        debug_printf("proxy_password = %s", config.proxy_password);
     }
 
-#ifdef DEBUG
-    fprintf(stderr, "[DEBUG]-session- creating session...\n");
-#endif
+    debug_printf("createing session...");
     error = sp_session_create(&config, &session);
     if (error != SP_ERROR_OK) {
         PyErr_SetString(SpotifyError, sp_error_message(error));

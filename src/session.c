@@ -20,8 +20,8 @@
 static int session_constructed = 0;
 sp_session *g_session;
 
-static int
-create_session(Session *self, PyObject *client, PyObject *settings);
+static sp_session *
+create_session(PyObject *client, PyObject *settings);
 
 static void
 session_callback(sp_session *session, PyObject *extra, const char *attr);
@@ -55,22 +55,16 @@ static PyMemberDef Session_members[] = {
 static PyObject *
 Session_create(PyTypeObject *type, PyObject *args)
 {
-    Session *self;
-    PyObject *client;
-    PyObject *settings;
+    PyObject *client, *settings;
 
     if (!PyArg_ParseTuple(args, "OO", &client, &settings))
         return NULL;
 
-    self = (Session *) PyObject_Call((PyObject *)type, args, NULL);
-
     PyEval_InitThreads();
-
-    if (create_session(self, client, settings) != 0) {
-        Py_XDECREF(self);
+    sp_session *session = create_session(client, settings);
+    if (session == NULL)
         return NULL;
-    }
-    return (PyObject *)self;
+    return Session_FromSpotify(session);
 }
 
 static PyObject *
@@ -794,8 +788,8 @@ static sp_session_callbacks g_callbacks = {
     &credentials_blob_updated,
 };
 
-static int
-create_session(Session *self, PyObject *client, PyObject *settings)
+static sp_session *
+create_session(PyObject *client, PyObject *settings)
 {
     sp_session_config config;
     sp_session *session;
@@ -811,7 +805,7 @@ create_session(Session *self, PyObject *client, PyObject *settings)
     cache_location = PySpotify_GetConfigString(settings, "cache_location", 0);
     if (!cache_location) {
         PyErr_SetString(SpotifyError, "cache_location not set");
-        return -1;
+        return NULL;
     }
     config.cache_location = cache_location;
     debug_printf("cache_location = %s", config.cache_location);
@@ -827,12 +821,12 @@ create_session(Session *self, PyObject *client, PyObject *settings)
         PyObject_GetAttrString(settings, "application_key");
     if (!application_key) {
         PyErr_SetString(SpotifyError, "application_key not set");
-        return -1;
+        return NULL;
     }
     else if (!PyBytes_Check(application_key)) {
         Py_DECREF(application_key);
         PyErr_SetString(SpotifyError, "application_key must be a byte string");
-        return -1;
+        return NULL;
     }
     char *s_appkey;
     Py_ssize_t l_appkey;
@@ -847,11 +841,11 @@ create_session(Session *self, PyObject *client, PyObject *settings)
     user_agent = PySpotify_GetConfigString(settings, "user_agent", 0);
     if (!user_agent) {
         PyErr_SetString(SpotifyError, "user_agent not set");
-        return -1;
+        return NULL;
     }
     else if (strlen(user_agent) > 255) {
         PyErr_SetString(SpotifyError, "user agent must be 255 characters max");
-        return -1;
+        return NULL;
     }
     config.user_agent = user_agent;
     debug_printf("user_agent = %s", config.user_agent);
@@ -859,7 +853,7 @@ create_session(Session *self, PyObject *client, PyObject *settings)
     proxy = PySpotify_GetConfigString(client, "proxy", 1);
     if (!proxy) {
         PyErr_SetString(SpotifyError, "proxy attribute missing");
-        return -1;
+        return NULL;
     }
     if ((long) proxy != (-1)) {
         config.proxy = proxy;
@@ -869,7 +863,7 @@ create_session(Session *self, PyObject *client, PyObject *settings)
     proxy_username = PySpotify_GetConfigString(client, "proxy_username", 1);
     if (!proxy_username) {
         PyErr_SetString(SpotifyError, "proxy_username attribute missing");
-        return -1;
+        return NULL;
     }
     if ((long) proxy_username != (-1)) {
         config.proxy_username = proxy_username;
@@ -879,7 +873,7 @@ create_session(Session *self, PyObject *client, PyObject *settings)
     proxy_password = PySpotify_GetConfigString(client, "proxy_password", 1);
     if (!proxy_password) {
         PyErr_SetString(SpotifyError, "proxy_password attribute missing");
-        return -1;
+        return NULL;
     }
     if ((long) proxy_password != (-1)) {
         config.proxy_password = proxy_password;
@@ -890,10 +884,9 @@ create_session(Session *self, PyObject *client, PyObject *settings)
     error = sp_session_create(&config, &session);
     if (error != SP_ERROR_OK) {
         PyErr_SetString(SpotifyError, sp_error_message(error));
-        return -1;
+        return NULL;
     }
     session_constructed = 1;
     g_session = session;
-    self->_session = session;
-    return 0;
+    return session;
 }

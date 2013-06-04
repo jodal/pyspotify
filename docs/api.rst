@@ -135,6 +135,7 @@ when using pyspotify.
     :no-inherited-members:
 
 .. autoclass:: ErrorType
+    :no-inherited-members:
 
 
 Sessions
@@ -151,10 +152,13 @@ Connection
 ==========
 
 .. autoclass:: ConnectionRule
+    :no-inherited-members:
 
 .. autoclass:: ConnectionState
+    :no-inherited-members:
 
 .. autoclass:: ConnectionType
+    :no-inherited-members:
 
 
 Offline
@@ -167,12 +171,19 @@ Audio
 =====
 
 .. autoclass:: AudioBufferStats
+    :no-inherited-members:
+
+    .. autoattribute:: samples
+
+    .. autoattribute:: stutter
 
 .. autoclass:: AudioFormat
 
 .. autoclass:: Bitrate
+    :no-inherited-members:
 
 .. autoclass:: SampleType
+    :no-inherited-members:
 
 
 Links
@@ -181,6 +192,7 @@ Links
 .. autoclass:: Link
 
 .. autoclass:: LinkType
+    :no-inherited-members:
 
 
 Tracks
@@ -214,6 +226,7 @@ Images
 .. autoclass:: Image
 
 .. autoclass:: ImageSize
+    :no-inherited-members:
 
 
 Search
@@ -226,8 +239,10 @@ Social
 ======
 
 .. autoclass:: ScrobblingState
+    :no-inherited-members:
 
 .. autoclass:: SocialProvider
+    :no-inherited-members:
 
 
 Playlists

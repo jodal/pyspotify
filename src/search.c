@@ -131,9 +131,9 @@ Results_query(Results * self)
 }
 
 PyObject *
-Results_str(PyObject *self)
+Results_str(PyObject * self)
 {
-    return PyUnicode_FromString(sp_search_query(((Results *) self)->_search));
+    return Results_query((Results*)self);
 }
 
 static PyMethodDef Results_methods[] = {

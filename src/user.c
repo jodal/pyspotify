@@ -46,26 +46,21 @@ User_is_loaded(User * self)
 static PyObject *
 User_canonical_name(User * self)
 {
-    const char *s = sp_user_canonical_name(self->_user);
-
-    return PyUnicode_FromString(s);
+    const char *user_canonical_name = sp_user_canonical_name(self->_user);
+    return PyUnicode_FromString(user_canonical_name);
 }
 
 static PyObject *
 User_display_name(User * self)
 {
-    const char *s = sp_user_display_name(self->_user);
-
-    return PyUnicode_FromString(s);
+    const char *display_name = sp_user_display_name(self->_user);
+    return PyUnicode_FromString(display_name);
 }
 
 static PyObject *
-User_str(PyObject *self)
+User_str(PyObject * self)
 {
-    User *a = (User *) self;
-    const char *s = sp_user_canonical_name(a->_user);
-
-    return PyUnicode_FromString(s);
+    return User_canonical_name((User*)self);
 }
 
 static PyMethodDef User_methods[] = {

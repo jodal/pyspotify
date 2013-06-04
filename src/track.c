@@ -40,15 +40,6 @@ Track_dealloc(Track * self)
 }
 
 static PyObject *
-Track_str(PyObject *oself)
-{
-    Track *self = (Track *) oself;
-    const char *s = sp_track_name(self->_track);
-
-    return PyUnicode_FromString(s);
-}
-
-static PyObject *
 Track_is_loaded(Track * self)
 {
     return Py_BuildValue("i", sp_track_is_loaded(self->_track));
@@ -88,8 +79,13 @@ static PyObject *
 Track_name(Track * self)
 {
     const char *s = sp_track_name(self->_track);
-
     return PyUnicode_FromString(s);
+}
+
+static PyObject *
+Track_str(PyObject * self)
+{
+    return Track_name((Track*)self);
 }
 
 static PyObject *

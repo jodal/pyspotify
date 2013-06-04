@@ -55,12 +55,7 @@ Artist_name(Artist * self)
 static PyObject *
 Artist_str(PyObject *self)
 {
-    Artist *a = (Artist *) self;
-    const char *s = sp_artist_name(a->_artist);
-
-    if (!s)
-        Py_RETURN_NONE;
-    return PyUnicode_FromString(s);
+    return Artist_name((Artist*)self);
 }
 
 static PyMethodDef Artist_methods[] = {

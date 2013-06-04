@@ -10,6 +10,8 @@
 #include "search.h"
 #include "session.h"
 
+#define MAX_URI_LENGTH 100
+
 static PyMemberDef Link_members[] = {
     {NULL}
 };
@@ -221,13 +223,12 @@ Link_as_playlist(Link * self)
 }
 
 static PyObject *
-Link_str(PyObject *oself)
+Link_str(PyObject *self)
 {
-    Link *self = (Link *) oself;
-    char uri[1024];
+    char uri[MAX_URI_LENGTH];
     int len;
 
-    len = sp_link_as_string(self->_link, uri, sizeof(uri));
+    len = sp_link_as_string(((Link*)self)->_link, uri, sizeof(uri));
     if (len < 0) {
         PyErr_SetString(SpotifyError,
                         "failed to render Spotify URI from link");

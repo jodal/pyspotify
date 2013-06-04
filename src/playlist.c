@@ -745,7 +745,6 @@ static PyObject *
 Playlist_name(Playlist * self)
 {
     const char *name = sp_playlist_name(self->_playlist);
-
     return PyUnicode_FromString(name);
 }
 
@@ -897,10 +896,9 @@ Playlist_sq_item(PyObject *o, Py_ssize_t index)
 /////////////// ADDITIONAL METHODS
 
 static PyObject *
-Playlist_str(PyObject *o)
+Playlist_str(PyObject * self)
 {
-    PyErr_SetString(PyExc_NotImplementedError, "");
-    return NULL;
+    return Playlist_name((Playlist*)self);
 }
 
 static PyMethodDef Playlist_methods[] = {

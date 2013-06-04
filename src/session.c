@@ -236,7 +236,7 @@ search_complete(sp_search * search, Callback * st)
             PyErr_WriteUnraisable(st->callback);
         else
             Py_DECREF(res);
-        Py_XDECREF(results);
+        Py_DECREF(results);
     }
     delete_trampoline(st);
     PyGILState_Release(gstate);

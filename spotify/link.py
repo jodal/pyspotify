@@ -70,7 +70,7 @@ class Link(object):
                 ffi.new('char[]', to_bytes(value)))
             if sp_link == ffi.NULL:
                 raise ValueError(
-                    'Failed to get link from Spotify URI: %s' % value)
+                    'Failed to get link from Spotify URI: %r' % value)
 
         self.sp_link = ffi.gc(sp_link, lib.sp_link_release)
 

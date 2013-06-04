@@ -8,6 +8,32 @@ import spotify
 from spotify import utils
 
 
+class IntEnumTest(unittest.TestCase):
+
+    def setUp(self):
+        class Foo(utils.IntEnum):
+            pass
+
+        self.Foo = Foo
+
+        self.Foo.add('bar', 1)
+        self.Foo.add('baz', 2)
+
+    def test_has_pretty_repr(self):
+        self.assertEqual(repr(self.Foo.bar), '<Foo.bar: 1>')
+        self.assertEqual(repr(self.Foo.baz), '<Foo.baz: 2>')
+
+    def test_is_equal_to_the_int_value(self):
+        self.assertEqual(self.Foo.bar, 1)
+        self.assertEqual(self.Foo.baz, 2)
+
+    def test_two_instances_with_same_value_is_identical(self):
+        self.assertIs(self.Foo(1), self.Foo.bar)
+        self.assertIs(self.Foo(2), self.Foo.baz)
+        self.assertIsNot(self.Foo(2), self.Foo.bar)
+        self.assertIsNot(self.Foo(1), self.Foo.baz)
+
+
 class ToBytesTest(unittest.TestCase):
 
     def test_unicode_to_bytes_is_encoded_as_utf8(self):

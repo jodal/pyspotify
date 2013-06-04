@@ -2,7 +2,7 @@ from __future__ import unicode_literals
 
 import spotify
 from spotify import ffi, lib
-from spotify.utils import enum, get_with_growing_buffer, to_bytes
+from spotify.utils import get_with_growing_buffer, IntEnum, make_enum, to_bytes
 
 
 __all__ = [
@@ -114,6 +114,6 @@ class Link(object):
             return spotify.User(sp_user)
 
 
-@enum('SP_LINKTYPE_')
-class LinkType(object):
+@make_enum('SP_LINKTYPE_')
+class LinkType(IntEnum):
     pass

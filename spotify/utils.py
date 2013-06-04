@@ -15,13 +15,34 @@ else:
     binary_type = bytes
 
 
-def enum(lib_prefix, enum_prefix=''):
-    def wrapper(obj):
+class IntEnum(int):
+    def __new__(cls, value):
+        if not hasattr(cls, '_values'):
+            cls._values = {}
+        if value not in cls._values:
+            cls._values[value] = int.__new__(cls, value)
+        return cls._values[value]
+
+    def __repr__(self):
+        if hasattr(self, '_name'):
+            return '<%s.%s: %d>' % (self.__class__.__name__, self._name, self)
+        else:
+            return '<Unknown %s: %d>' % (self.__class__.__name__, self)
+
+    @classmethod
+    def add(cls, name, value):
+        attr = cls(value)
+        attr._name = name
+        setattr(cls, name, attr)
+
+
+def make_enum(lib_prefix, enum_prefix=''):
+    def wrapper(cls):
         for attr in dir(lib):
             if attr.startswith(lib_prefix):
                 name = attr.replace(lib_prefix, enum_prefix)
-                setattr(obj, name, getattr(lib, attr))
-        return obj
+                cls.add(name, getattr(lib, attr))
+        return cls
     return wrapper
 
 

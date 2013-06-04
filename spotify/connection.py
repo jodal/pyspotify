@@ -1,6 +1,6 @@
 from __future__ import unicode_literals
 
-from spotify.utils import enum
+from spotify.utils import IntEnum, make_enum
 
 
 __all__ = [
@@ -10,16 +10,16 @@ __all__ = [
 ]
 
 
-@enum('SP_CONNECTION_RULE_')
-class ConnectionRule(object):
+@make_enum('SP_CONNECTION_RULE_')
+class ConnectionRule(IntEnum):
     pass
 
 
-@enum('SP_CONNECTION_STATE_')
-class ConnectionState(object):
+@make_enum('SP_CONNECTION_STATE_')
+class ConnectionState(IntEnum):
     pass
 
 
-@enum('SP_CONNECTION_TYPE_')
-class ConnectionType(object):
+@make_enum('SP_CONNECTION_TYPE_')
+class ConnectionType(IntEnum):
     pass

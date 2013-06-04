@@ -1,7 +1,7 @@
 from __future__ import unicode_literals
 
 from spotify import lib
-from spotify.utils import enum, to_unicode
+from spotify.utils import IntEnum, make_enum, to_unicode
 
 
 __all__ = [
@@ -43,6 +43,6 @@ for attr in dir(lib):
             Error, attr.replace('SP_ERROR_', ''), Error(getattr(lib, attr)))
 
 
-@enum('SP_ERROR_')
-class ErrorType(object):
+@make_enum('SP_ERROR_')
+class ErrorType(IntEnum):
     pass

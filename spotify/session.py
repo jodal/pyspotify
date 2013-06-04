@@ -6,7 +6,8 @@ import operator
 
 import spotify
 from spotify import (
-    Error, ErrorType, ffi, lib, Playlist, PlaylistContainer, User)
+    ConnectionState, Error, ErrorType, ffi, lib, Playlist, PlaylistContainer,
+    ScrobblingState, User)
 from spotify.utils import (
     get_with_growing_buffer, to_bytes, to_unicode, to_country)
 
@@ -803,7 +804,7 @@ class Session(object):
     @property
     def connection_state(self):
         """The current :class:`ConnectionState`."""
-        return lib.sp_session_connectionstate(self.sp_session)
+        return ConnectionState(lib.sp_session_connectionstate(self.sp_session))
 
     def set_cache_size(self, size):
         """Set maximum size in MB for libspotify's cache.
@@ -960,7 +961,7 @@ class Session(object):
         scrobbling_state = ffi.new('sp_scrobbling_state *')
         Error.maybe_raise(lib.sp_session_is_scrobbling(
             self.sp_session, social_provider, scrobbling_state))
-        return scrobbling_state[0]
+        return ScrobblingState(scrobbling_state[0])
 
     def is_scrobbling_possible(self, social_provider):
         """Check if the scrobbling settings should be shown to the user."""

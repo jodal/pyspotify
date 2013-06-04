@@ -793,11 +793,11 @@ class SessionTest(unittest.TestCase):
         self.assertRaises(spotify.Error, session.flush_caches)
 
     def test_connection_state(self, lib_mock):
-        lib_mock.sp_session_connectionstate.return_value = (
+        lib_mock.sp_session_connectionstate.return_value = int(
             spotify.ConnectionState.LOGGED_OUT)
         session = self.create_session(lib_mock)
 
-        self.assertEqual(
+        self.assertIs(
             session.connection_state, spotify.ConnectionState.LOGGED_OUT)
 
         lib_mock.sp_session_connectionstate.assert_called_once_with(
@@ -1198,7 +1198,7 @@ class SessionTest(unittest.TestCase):
 
         lib_mock.sp_session_is_scrobbling.assert_called_with(
             session.sp_session, spotify.SocialProvider.SPOTIFY, mock.ANY)
-        self.assertEqual(result, spotify.ScrobblingState.USE_GLOBAL_SETTING)
+        self.assertIs(result, spotify.ScrobblingState.USE_GLOBAL_SETTING)
 
     def test_is_scrobbling_fail_raises_error(self, lib_mock):
         lib_mock.sp_session_is_scrobbling.return_value = (

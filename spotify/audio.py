@@ -39,7 +39,7 @@ class AudioFormat(object):
     def sample_type(self):
         """The :class:`SampleType`, currently always
         :attr:`SampleType.INT16_NATIVE_ENDIAN`."""
-        return self.sp_audioformat.sample_type
+        return SampleType(self.sp_audioformat.sample_type)
 
     @property
     def sample_rate(self):

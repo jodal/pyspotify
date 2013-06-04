@@ -29,7 +29,7 @@ class AudioFormatTest(unittest.TestCase):
         self.audio_format = spotify.AudioFormat(self.sp_audioformat)
 
     def test_sample_type(self):
-        self.assertEqual(
+        self.assertIs(
             self.audio_format.sample_type,
             spotify.SampleType.INT16_NATIVE_ENDIAN)
 

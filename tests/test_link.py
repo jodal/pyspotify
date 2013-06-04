@@ -205,9 +205,9 @@ class LinkTest(unittest.TestCase):
         sp_link = spotify.ffi.new('int *')
         lib_mock.sp_link_create_from_string.return_value = sp_link
         lib_mock.sp_link_type.return_value = 1
-
         link = spotify.Link('spotify:track:foo')
-        self.assertEqual(spotify.LinkType.TRACK, link.type)
+
+        self.assertIs(link.type, spotify.LinkType.TRACK)
 
         lib_mock.sp_link_type.assert_called_once_with(sp_link)
 

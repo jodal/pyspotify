@@ -80,7 +80,7 @@ class Link(object):
     @property
     def type(self):
         """The link's :class:`LinkType`."""
-        return lib.sp_link_type(self.sp_link)
+        return LinkType(lib.sp_link_type(self.sp_link))
 
     def as_track(self):
         """Make a :class:`Track` from the link."""

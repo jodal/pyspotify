@@ -54,7 +54,7 @@ Playlist_dealloc(Playlist * self)
 static PyObject *
 Playlist_is_loaded(Playlist * self)
 {
-    return Py_BuildValue("i", sp_playlist_is_loaded(self->_playlist));
+    return PyBool_FromLong(sp_playlist_is_loaded(self->_playlist));
 }
 
 static PyObject *

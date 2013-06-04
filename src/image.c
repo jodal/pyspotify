@@ -39,19 +39,23 @@ Image_dealloc(Image * self)
 static PyObject *
 Image_is_loaded(Image * self)
 {
-    return Py_BuildValue("i", sp_image_is_loaded(self->_image));
+    return PyBool_FromLong(sp_image_is_loaded(self->_image));
 }
 
 static PyObject *
 Image_error(Image * self)
 {
-    return Py_BuildValue("i", sp_image_error(self->_image));
+    // TODO: return enums that represent sp_error
+    sp_error error = sp_image_error(self->_image);
+    return Py_BuildValue("i", error);
 }
 
 static PyObject *
 Image_format(Image * self)
 {
-    return Py_BuildValue("i", sp_image_format(self->_image));
+    // TODO: return enums that represent sp_imageformat
+    sp_imageformat format = sp_image_format(self->_image);
+    return Py_BuildValue("i", format);
 }
 
 static PyObject *

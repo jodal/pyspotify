@@ -93,7 +93,7 @@ ArtistBrowser_dealloc(PyObject *arg)
 static PyObject *
 ArtistBrowser_is_loaded(ArtistBrowser * self)
 {
-    return Py_BuildValue("i", sp_artistbrowse_is_loaded(self->_browser));
+    return PyBool_FromLong(sp_artistbrowse_is_loaded(self->_browser));
 }
 
 static PyObject *

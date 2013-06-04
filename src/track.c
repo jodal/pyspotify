@@ -42,7 +42,7 @@ Track_dealloc(Track * self)
 static PyObject *
 Track_is_loaded(Track * self)
 {
-    return Py_BuildValue("i", sp_track_is_loaded(self->_track));
+    return PyBool_FromLong(sp_track_is_loaded(self->_track));
 }
 
 static PyObject *
@@ -115,7 +115,9 @@ Track_index(Track * self)
 static PyObject *
 Track_error(Track * self)
 {
-    return Py_BuildValue("i", sp_track_error(self->_track));
+    // TODO: return enums that represent sp_error
+    sp_error error = sp_track_error(self->_track);
+    return Py_BuildValue("i", error);
 }
 
 static PyObject *
@@ -135,16 +137,17 @@ Track_starred(Track * self, PyObject *args, PyObject *kwds)
         sp_track_set_starred(session->_session,
                              (sp_track * const*)&(self->_track), 1, set);
     }
-    return (PyObject *)PyBool_FromLong((long)
-                                       sp_track_is_starred(session->_session,
-                                                           self->_track));
+    return PyBool_FromLong(sp_track_is_starred(
+                session->_session, self->_track));
 }
 
 static PyObject *
 Track_availability(Track *self)
 {
-    return Py_BuildValue("i",
-                         sp_track_get_availability(g_session, self->_track));
+    // TODO: return enums that represent sp_availability
+    enum sp_availability availability = sp_track_get_availability(
+            g_session, self->_track);
+    return Py_BuildValue("i", availability);
 }
 
 static PyObject *

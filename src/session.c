@@ -113,9 +113,7 @@ Session_user_is_loaded(Session * self)
         PyErr_SetString(SpotifyError, "Not logged in");
         return NULL;
     }
-    bool loaded = sp_user_is_loaded(user);
-
-    return Py_BuildValue("i", loaded);
+    return PyBool_FromLong(sp_user_is_loaded(user));
 };
 
 static PyObject *

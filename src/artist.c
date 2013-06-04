@@ -39,7 +39,7 @@ Artist_dealloc(Artist * self)
 static PyObject *
 Artist_is_loaded(Artist * self)
 {
-    return Py_BuildValue("i", sp_artist_is_loaded(self->_artist));
+    return PyBool_FromLong(sp_artist_is_loaded(self->_artist));
 }
 
 static PyObject *

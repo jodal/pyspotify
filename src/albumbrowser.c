@@ -82,7 +82,7 @@ AlbumBrowser_dealloc(PyObject *arg)
 static PyObject *
 AlbumBrowser_is_loaded(AlbumBrowser * self)
 {
-    return Py_BuildValue("i", sp_albumbrowse_is_loaded(self->_browser));
+    return PyBool_FromLong(sp_albumbrowse_is_loaded(self->_browser));
 }
 
 Py_ssize_t

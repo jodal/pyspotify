@@ -160,7 +160,9 @@ Link_from_playlist(Link * self, PyObject *args)
 static PyObject *
 Link_type(Link * self)
 {
-    return Py_BuildValue("i", sp_link_type(self->_link));
+    // TODO: return enums that represent sp_linktype
+    sp_linktype link_type = sp_link_type(self->_link);
+    return Py_BuildValue("i", link_type);
 }
 
 static PyObject *

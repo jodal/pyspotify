@@ -42,7 +42,7 @@ Results_dealloc(Results * self)
 static PyObject *
 Results_is_loaded(Results * self)
 {
-    return Py_BuildValue("i", sp_search_is_loaded(self->_search));
+    return PyBool_FromLong(sp_search_is_loaded(self->_search));
 }
 
 static PyObject *
@@ -54,7 +54,9 @@ Results_did_you_mean(Results * self)
 static PyObject *
 Results_error(Results * self)
 {
-    return Py_BuildValue("i", sp_search_error(self->_search));
+    // TODO: return enums that represent sp_error
+    sp_error error = sp_search_error(self->_search);
+    return Py_BuildValue("i", error);
 }
 
 static PyObject *

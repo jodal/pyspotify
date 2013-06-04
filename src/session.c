@@ -661,6 +661,7 @@ music_delivery(sp_session * session, const sp_audioformat * format,
     py_frames = PyBuffer_FromMemory((void *)frames, num_frames * size);
     py_session = Session_FromSpotify(session);
 
+    // TODO: check if callback get succeeds.
     client = (PyObject *)sp_session_userdata(session);
     callback = PyObject_GetAttrString(client, "music_delivery");
 
@@ -668,22 +669,24 @@ music_delivery(sp_session * session, const sp_audioformat * format,
             size, num_frames, format->sample_type, format->sample_rate,
             format->channels);
 
-    Py_DECREF(callback);
     Py_DECREF(py_frames);
     Py_DECREF(py_session);
 
     if (result == NULL)
         PyErr_WriteUnraisable(callback);
-    else if (PyInt_Check(result))
-        consumed = (int)PyInt_AsLong(result);
-    else if (PyLong_Check(result))
-        consumed = (int)PyLong_AsLong(result);
     else {
-        PyErr_SetString(PyExc_TypeError,
-                        "music_delivery must return an integer");
-        PyErr_WriteUnraisable(callback);
+        if (PyInt_Check(result))
+            consumed = (int)PyInt_AsLong(result);
+        else if (PyLong_Check(result))
+            consumed = (int)PyLong_AsLong(result);
+        else {
+            PyErr_SetString(PyExc_TypeError,
+                    "music_delivery must return an integer");
+            PyErr_WriteUnraisable(callback);
+        }
+        Py_DECREF(result);
     }
-    Py_XDECREF(result);
+    Py_DECREF(callback);
     PyGILState_Release(gstate);
     return consumed;
 }

@@ -37,14 +37,15 @@ class TrackTest(unittest.TestCase):
         self.assertTrue(result)
 
     def test_error(self, lib_mock):
-        lib_mock.sp_track_error.return_value = spotify.Error.IS_LOADING
+        lib_mock.sp_track_error.return_value = int(
+            spotify.ErrorType.IS_LOADING)
         sp_track = spotify.ffi.new('int *')
         track = spotify.Track(sp_track)
 
         result = track.error
 
         lib_mock.sp_track_error.assert_called_once_with(sp_track)
-        self.assertEqual(result, spotify.Error.IS_LOADING)
+        self.assertIs(result, spotify.ErrorType.IS_LOADING)
 
     def test_is_loadable(self, lib_mock):
         sp_track = spotify.ffi.new('int *')

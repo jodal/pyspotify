@@ -1,6 +1,6 @@
 from __future__ import unicode_literals
 
-from spotify import ffi, lib, Loadable
+from spotify import ErrorType, ffi, lib, Loadable
 from spotify.utils import to_bytes, to_unicode
 
 
@@ -29,7 +29,7 @@ class Track(Loadable):
 
         Check to see if there was problems loading the track.
         """
-        return lib.sp_track_error(self.sp_track)
+        return ErrorType(lib.sp_track_error(self.sp_track))
 
     @property
     def name(self):

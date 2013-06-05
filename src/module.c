@@ -59,15 +59,18 @@ init_spotify(void)
         return;
 
     PyObject *spotify = PyImport_ImportModule("spotify");
-    PyObject *d = PyModule_GetDict(spotify);
-    PyObject *s = PyUnicode_FromString("SpotifyError");
+    PyObject *module_dict = PyModule_GetDict(spotify);
 
-    SpotifyError = PyDict_GetItem(d, s);
-    Py_INCREF(SpotifyError);
-
+    SpotifyError = PyDict_GetItemString(module_dict, "SpotifyError");
     SpotifyApiVersion = Py_BuildValue("i", SPOTIFY_API_VERSION);
-    Py_INCREF(SpotifyApiVersion);
+
+    // TODO: figure out why we store these globaly.
+    Py_XINCREF(SpotifyError);      // SpotifyError has a borrowed ref.
+    Py_XINCREF(SpotifyApiVersion); // PyModule_AddObject steals the ref.
+    Py_XDECREF(spotify);           // dict is borrowed, only cleanup module.
+
     PyModule_AddObject(m, "api_version", SpotifyApiVersion);
+
     album_init(m);
     albumbrowser_init(m);
     artist_init(m);

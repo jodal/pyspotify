@@ -669,8 +669,8 @@ music_delivery(sp_session * session, const sp_audioformat * format,
             size, num_frames, format->sample_type, format->sample_rate,
             format->channels);
 
-    Py_DECREF(py_frames);
-    Py_DECREF(py_session);
+    Py_XDECREF(py_frames);
+    Py_XDECREF(py_session);
 
     if (result == NULL)
         PyErr_WriteUnraisable(callback);
@@ -686,7 +686,7 @@ music_delivery(sp_session * session, const sp_audioformat * format,
         }
         Py_DECREF(result);
     }
-    Py_DECREF(callback);
+    Py_XDECREF(callback);
     PyGILState_Release(gstate);
     return consumed;
 }

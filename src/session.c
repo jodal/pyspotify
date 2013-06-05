@@ -765,8 +765,9 @@ config_string(PyObject *settings, const char *attr, const char **target) {
         PyErr_Format(SpotifyError, "%s not set", attr);
         return;
     }
-    if (value != Py_None && PyArg_Parse(value, "es", ENCODING, &tmp))
+    if (value != Py_None && PyArg_Parse(value, "es", ENCODING, &tmp)) {
         *target = tmp;
+    }
     Py_DECREF(value);
 }
 
@@ -797,14 +798,24 @@ create_session(PyObject *client, PyObject *settings)
     config.api_version = SPOTIFY_API_VERSION;
     config.userdata = (void*)client;
     config.callbacks = &g_callbacks;
+    config.cache_location = "";
+    config.user_agent = "pyspotify-fallback";
 
     config_data(settings, "application_key", &config.application_key, &config.application_key_size);
     config_string(settings, "cache_location", &config.cache_location);
     config_string(settings, "settings_location", &config.settings_location);
     config_string(settings, "user_agent", &config.user_agent);
-    config_string(settings, "proxy", &config.proxy);
-    config_string(settings, "proxy_username", &config.proxy_username);
-    config_string(settings, "proxy_password", &config.proxy_password);
+    config_string(client, "proxy", &config.proxy);
+    config_string(client, "proxy_username", &config.proxy_username);
+    config_string(client, "proxy_password", &config.proxy_password);
+
+    debug_printf("cache_location = %s", config.cache_location);
+    debug_printf("settings_location = %s", config.settings_location);
+    debug_printf("user_agent = %s", config.user_agent);
+    debug_printf("proxy = %s", config.proxy);
+    debug_printf("proxy_username = %s", config.proxy_username);
+    debug_printf("proxy_password = %s", config.proxy_password);
+    debug_printf("application_key_size = %zu", config.application_key_size);
 
     if (PyErr_Occurred() != NULL) {
         return NULL;
@@ -815,12 +826,10 @@ create_session(PyObject *client, PyObject *settings)
         return NULL;
     }
 
-    debug_printf("cache_location = %s", config.cache_location);
-    debug_printf("settings_location = %s", config.settings_location);
-    debug_printf("user_agent = %s", config.user_agent);
-    debug_printf("proxy = %s", config.proxy);
-    debug_printf("proxy_username = %s", config.proxy_username);
-    debug_printf("proxy_password = %s", config.proxy_password);
+    if (config.application_key_size == 0) {
+        PyErr_SetString(SpotifyError, "application_key must be provided.");
+        return NULL;
+    }
 
     debug_printf("creating session...");
     error = sp_session_create(&config, &session);

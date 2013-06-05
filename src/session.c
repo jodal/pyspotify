@@ -729,44 +729,6 @@ session_init(PyObject *m)
     PyModule_AddObject(m, "Session", (PyObject *)&SessionType);
 }
 
-char *
-PySpotify_GetConfigString(PyObject *client, const char *attr, bool optional)
-{
-    PyObject *py_value, *py_uvalue;
-    char *value;
-
-    py_value = PyObject_GetAttrString(client, attr);
-    if (!py_value || py_value == Py_None) {
-        if (optional) {
-            return (char *)-1;
-        }
-        else {
-            PyErr_Format(SpotifyError, "%s not set", attr);
-            return NULL;
-        }
-    }
-
-    if (PyUnicode_Check(py_value)) {
-        py_uvalue = py_value;
-        py_value = PyUnicode_AsEncodedString(py_uvalue, ENCODING, "replace");
-        Py_DECREF(py_uvalue);
-        if (py_value == NULL) {
-            return NULL;
-        }
-    }
-    else if (!PyBytes_Check(py_value)) {
-        Py_DECREF(py_value);
-        PyErr_Format(SpotifyError,
-                     "configuration value '%s' must be a string/unicode object",
-                     attr);
-        return NULL;
-    }
-    value = PyMem_Malloc(strlen(PyBytes_AS_STRING(py_value)) + 1);
-    strcpy(value, PyBytes_AS_STRING(py_value));
-    Py_DECREF(py_value);
-    return value;
-}
-
 static sp_session_callbacks g_callbacks = {
     &logged_in,
     &logged_out,
@@ -788,99 +750,79 @@ static sp_session_callbacks g_callbacks = {
     &credentials_blob_updated,
 };
 
+// populate_config_* functions are used as conveniance wrappers to get
+// data from the python attrs to the config objects. Setting the struct
+// members without tmp intermetide would not work due to const char.
+//
+// Attribute not existing is a fatal error, as not being able to convert
+// the attributes value. These cases _only_ set the python exception, so
+// callers must check PyErr_Occurred().
+static void
+config_string(PyObject *settings, const char *attr, const char **target) {
+    const char * tmp;
+    PyObject *value = PyObject_GetAttrString(settings, attr);
+    if (value == NULL) {
+        PyErr_Format(SpotifyError, "%s not set", attr);
+        return;
+    }
+    if (value != Py_None && PyArg_Parse(value, "es", ENCODING, &tmp))
+        *target = tmp;
+    Py_DECREF(value);
+}
+
+static void
+config_data(PyObject *settings, const char *attr, const char **target, int *target_length) {
+    int length;
+    const char * tmp;
+    PyObject *value = PyObject_GetAttrString(settings, attr);
+    if (value == NULL) {
+        PyErr_Format(SpotifyError, "%s not set", attr);
+        return;
+    }
+    if (value != Py_None && PyArg_Parse(value, "s#", &tmp, &length)) {
+        *target = tmp;
+        *target_length = length;
+    }
+    Py_DECREF(value);
+}
+
 static sp_session *
 create_session(PyObject *client, PyObject *settings)
 {
     sp_session_config config;
-    sp_session *session;
+    sp_session* session;
     sp_error error;
-    char *cache_location, *settings_location, *user_agent;
-    char *proxy, *proxy_username, *proxy_password;
 
     memset(&config, 0, sizeof(config));
     config.api_version = SPOTIFY_API_VERSION;
-    config.userdata = (void *)client;
+    config.userdata = (void*)client;
     config.callbacks = &g_callbacks;
 
-    cache_location = PySpotify_GetConfigString(settings, "cache_location", 0);
-    if (!cache_location) {
-        PyErr_SetString(SpotifyError, "cache_location not set");
+    config_data(settings, "application_key", &config.application_key, &config.application_key_size);
+    config_string(settings, "cache_location", &config.cache_location);
+    config_string(settings, "settings_location", &config.settings_location);
+    config_string(settings, "user_agent", &config.user_agent);
+    config_string(settings, "proxy", &config.proxy);
+    config_string(settings, "proxy_username", &config.proxy_username);
+    config_string(settings, "proxy_password", &config.proxy_password);
+
+    if (PyErr_Occurred() != NULL) {
         return NULL;
     }
-    config.cache_location = cache_location;
+
+    if (strlen(config.user_agent) > 255) {
+        PyErr_SetString(SpotifyError, "user_agent may not longer than 255.");
+        return NULL;
+    }
+
     debug_printf("cache_location = %s", config.cache_location);
-
-    settings_location = PySpotify_GetConfigString(settings,
-                                                  "settings_location", 0);
-    config.settings_location = settings_location;
     debug_printf("settings_location = %s", config.settings_location);
-
-    // TODO: this looks like a bad copy of PySpotify_GetConfigString, we should
-    // probably refactor the helper to support this case as well
-    PyObject *application_key =
-        PyObject_GetAttrString(settings, "application_key");
-    if (!application_key) {
-        PyErr_SetString(SpotifyError, "application_key not set");
-        return NULL;
-    }
-    else if (!PyBytes_Check(application_key)) {
-        Py_DECREF(application_key);
-        PyErr_SetString(SpotifyError, "application_key must be a byte string");
-        return NULL;
-    }
-    char *s_appkey;
-    Py_ssize_t l_appkey;
-
-    PyBytes_AsStringAndSize(application_key, &s_appkey, &l_appkey);
-    Py_DECREF(application_key);
-
-    config.application_key_size = l_appkey;
-    config.application_key = PyMem_Malloc(l_appkey);
-    memcpy((char *)config.application_key, s_appkey, l_appkey);
-
-    user_agent = PySpotify_GetConfigString(settings, "user_agent", 0);
-    if (!user_agent) {
-        PyErr_SetString(SpotifyError, "user_agent not set");
-        return NULL;
-    }
-    else if (strlen(user_agent) > 255) {
-        PyErr_SetString(SpotifyError, "user agent must be 255 characters max");
-        return NULL;
-    }
-    config.user_agent = user_agent;
     debug_printf("user_agent = %s", config.user_agent);
+    debug_printf("proxy = %s", config.proxy);
+    debug_printf("proxy_username = %s", config.proxy_username);
+    debug_printf("proxy_password = %s", config.proxy_password);
 
-    proxy = PySpotify_GetConfigString(client, "proxy", 1);
-    if (!proxy) {
-        PyErr_SetString(SpotifyError, "proxy attribute missing");
-        return NULL;
-    }
-    if ((long) proxy != (-1)) {
-        config.proxy = proxy;
-        debug_printf("proxy = %s", config.proxy);
-    }
-
-    proxy_username = PySpotify_GetConfigString(client, "proxy_username", 1);
-    if (!proxy_username) {
-        PyErr_SetString(SpotifyError, "proxy_username attribute missing");
-        return NULL;
-    }
-    if ((long) proxy_username != (-1)) {
-        config.proxy_username = proxy_username;
-        debug_printf("proxy_username = %s", config.proxy_username);
-    }
-
-    proxy_password = PySpotify_GetConfigString(client, "proxy_password", 1);
-    if (!proxy_password) {
-        PyErr_SetString(SpotifyError, "proxy_password attribute missing");
-        return NULL;
-    }
-    if ((long) proxy_password != (-1)) {
-        config.proxy_password = proxy_password;
-        debug_printf("proxy_password = %s", config.proxy_password);
-    }
-
-    debug_printf("createing session...");
+    debug_printf("creating session...");
     error = sp_session_create(&config, &session);
     if (error != SP_ERROR_OK) {
         PyErr_SetString(SpotifyError, sp_error_message(error));

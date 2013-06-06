@@ -255,6 +255,20 @@ class TrackTest(unittest.TestCase):
     def test_name_fails_if_error(self, lib_mock):
         self.assert_fails_if_error(lib_mock, lambda t: t.name)
 
+    def test_duration(self, lib_mock):
+        lib_mock.sp_track_error.return_value = spotify.ErrorType.OK
+        lib_mock.sp_track_duration.return_value = 60000
+        sp_track = spotify.ffi.new('int *')
+        track = spotify.Track(sp_track)
+
+        result = track.duration
+
+        lib_mock.sp_track_duration.assert_called_with(sp_track)
+        self.assertEqual(result, 60000)
+
+    def test_duration_fails_if_error(self, lib_mock):
+        self.assert_fails_if_error(lib_mock, lambda t: t.duration)
+
     @mock.patch('spotify.link.Link', spec=spotify.Link)
     def test_as_link_creates_link_to_track(self, link_mock, lib_mock):
         link_mock.return_value = mock.sentinel.link

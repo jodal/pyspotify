@@ -140,9 +140,21 @@ class Track(Loadable):
 
     @property
     def name(self):
-        """The track's name. Empty if the track is not loaded yet."""
+        """The track's name.
+
+        Will always return an empty string if the track isn't loaded yet.
+        """
         Error.maybe_raise(self.error)
         return to_unicode(lib.sp_track_name(self.sp_track))
+
+    @property
+    def duration(self):
+        """The track's duration in milliseconds.
+
+        Will always return 0 if the track isn't loaded yet.
+        """
+        Error.maybe_raise(self.error)
+        return lib.sp_track_duration(self.sp_track)
 
     def as_link(self, offset=0):
         """Make a :class:`Link` to the track.

@@ -1,5 +1,6 @@
 from __future__ import unicode_literals
 
+import spotify
 from spotify import Error, ErrorType, ffi, lib, Loadable
 from spotify.utils import IntEnum, make_enum, to_bytes, to_unicode
 
@@ -7,6 +8,7 @@ from spotify.utils import IntEnum, make_enum, to_bytes, to_unicode
 __all__ = [
     'LocalTrack',
     'Track',
+    'TrackAvailability',
     'TrackOfflineStatus',
 ]
 
@@ -42,6 +44,15 @@ class Track(Loadable):
         Error.maybe_raise(self.error)
         return TrackOfflineStatus(
             lib.sp_track_offline_get_status(self.sp_track))
+
+    @property
+    def availability(self):
+        """The :class:`TrackAvailability` of the track."""
+        if spotify.session_instance is None:
+            raise RuntimeError('Session must be initialized')
+        Error.maybe_raise(self.error)
+        return TrackAvailability(lib.sp_track_get_availability(
+            spotify.session_instance.sp_session, self.sp_track))
 
     @property
     def name(self):
@@ -80,6 +91,11 @@ class LocalTrack(Track):
         sp_track = lib.sp_localtrack_create(artist, title, album, length)
 
         super(LocalTrack, self).__init__(sp_track, add_ref=False)
+
+
+@make_enum('SP_TRACK_AVAILABILITY_')
+class TrackAvailability(IntEnum):
+    pass
 
 
 @make_enum('SP_TRACK_OFFLINE_')

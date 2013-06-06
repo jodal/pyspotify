@@ -10,6 +10,31 @@ import spotify
 @mock.patch('spotify.track.lib', spec=spotify.lib)
 class TrackTest(unittest.TestCase):
 
+    def create_session(self, lib_mock):
+        session = mock.sentinel.session
+        session.sp_session = mock.sentinel.sp_session
+        spotify.session_instance = session
+        return session
+
+    def tearDown(self):
+        spotify.session_instance = None
+
+    def assert_fails_if_no_session(self, lib_mock, func):
+        spotify.session_instance = None
+        sp_track = spotify.ffi.new('int *')
+        track = spotify.Track(sp_track)
+
+        self.assertRaises(RuntimeError, func, track)
+
+    def assert_fails_if_error(self, lib_mock, func):
+        self.create_session(lib_mock)
+        lib_mock.sp_track_error.return_value = (
+            spotify.ErrorType.BAD_API_VERSION)
+        sp_track = spotify.ffi.new('int *')
+        track = spotify.Track(sp_track)
+
+        self.assertRaises(spotify.Error, func, track)
+
     def test_adds_ref_to_sp_track_when_created(self, lib_mock):
         sp_track = spotify.ffi.new('int *')
 
@@ -72,6 +97,25 @@ class TrackTest(unittest.TestCase):
         track = spotify.Track(sp_track)
 
         self.assertRaises(spotify.Error, lambda: track.offline_status)
+
+    def test_availability(self, lib_mock):
+        session = self.create_session(lib_mock)
+        lib_mock.sp_track_error.return_value = spotify.ErrorType.OK
+        lib_mock.sp_track_get_availability.return_value = 1
+        sp_track = spotify.ffi.new('int *')
+        track = spotify.Track(sp_track)
+
+        result = track.availability
+
+        lib_mock.sp_track_get_availability.assert_called_with(
+            session.sp_session, sp_track)
+        self.assertIs(result, spotify.TrackAvailability.AVAILABLE)
+
+    def test_availability_fails_if_no_session(self, lib_mock):
+        self.assert_fails_if_no_session(lib_mock, lambda t: t.availability)
+
+    def test_availability_fails_if_error(self, lib_mock):
+        self.assert_fails_if_error(lib_mock, lambda t: t.availability)
 
     def test_name(self, lib_mock):
         lib_mock.sp_track_name.return_value = spotify.ffi.new(
@@ -154,6 +198,13 @@ class LocalTrackTest(unittest.TestCase):
             lib_mock.sp_localtrack_create.call_args[0][2], spotify.ffi.NULL)
         self.assertEqual(
             lib_mock.sp_localtrack_create.call_args[0][3], -1)
+
+
+class TrackAvailability(unittest.TestCase):
+
+    def test_has_constants(self):
+        self.assertEqual(spotify.TrackAvailability.UNAVAILABLE, 0)
+        self.assertEqual(spotify.TrackAvailability.AVAILABLE, 1)
 
 
 class TrackOfflineStatusTest(unittest.TestCase):

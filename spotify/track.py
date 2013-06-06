@@ -69,6 +69,9 @@ class Track(Loadable):
     @property
     def name(self):
         """The track's name. Empty if the track is not loaded yet."""
+        if spotify.session_instance is None:
+            raise RuntimeError('Session must be initialized')
+        Error.maybe_raise(self.error)
         return to_unicode(lib.sp_track_name(self.sp_track))
 
     def as_link(self, offset=0):

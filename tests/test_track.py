@@ -137,6 +137,8 @@ class TrackTest(unittest.TestCase):
         self.assert_fails_if_error(lib_mock, lambda t: t.is_local)
 
     def test_name(self, lib_mock):
+        self.create_session(lib_mock)
+        lib_mock.sp_track_error.return_value = spotify.ErrorType.OK
         lib_mock.sp_track_name.return_value = spotify.ffi.new(
             'char[]', b'Foo Bar Baz')
         sp_track = spotify.ffi.new('int *')
@@ -146,6 +148,12 @@ class TrackTest(unittest.TestCase):
 
         lib_mock.sp_track_name.assert_called_once_with(sp_track)
         self.assertEqual(result, 'Foo Bar Baz')
+
+    def test_name_fails_if_no_session(self, lib_mock):
+        self.assert_fails_if_no_session(lib_mock, lambda t: t.name)
+
+    def test_name_fails_if_error(self, lib_mock):
+        self.assert_fails_if_error(lib_mock, lambda t: t.name)
 
     @mock.patch('spotify.link.Link', spec=spotify.Link)
     def test_as_link_creates_link_to_track(self, link_mock, lib_mock):

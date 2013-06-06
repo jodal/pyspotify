@@ -155,6 +155,28 @@ class TrackTest(unittest.TestCase):
     def test_is_autolinked_fails_if_error(self, lib_mock):
         self.assert_fails_if_error(lib_mock, lambda t: t.is_autolinked)
 
+    def test_playable(self, lib_mock):
+        session = self.create_session(lib_mock)
+        lib_mock.sp_track_error.return_value = spotify.ErrorType.OK
+        sp_track_playable = spotify.ffi.new('int *')
+        lib_mock.sp_track_get_playable.return_value = sp_track_playable
+        sp_track = spotify.ffi.new('int *')
+        track = spotify.Track(sp_track)
+
+        result = track.playable
+
+        lib_mock.sp_track_get_playable.assert_called_with(
+            session.sp_session, sp_track)
+        lib_mock.sp_track_add_ref.assert_called_with(sp_track_playable)
+        self.assertIsInstance(result, spotify.Track)
+        self.assertEqual(result.sp_track, sp_track_playable)
+
+    def test_playable_fails_if_no_session(self, lib_mock):
+        self.assert_fails_if_no_session(lib_mock, lambda t: t.playable)
+
+    def test_playable_fails_if_error(self, lib_mock):
+        self.assert_fails_if_error(lib_mock, lambda t: t.playable)
+
     def test_name(self, lib_mock):
         self.create_session(lib_mock)
         lib_mock.sp_track_error.return_value = spotify.ErrorType.OK

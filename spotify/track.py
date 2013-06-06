@@ -71,11 +71,25 @@ class Track(Loadable):
         """Whether the track is a autolinked to another track.
 
         Will always return :class:`False` if the track isn't loaded.
+
+        See :meth:`playable`.
         """
         if spotify.session_instance is None:
             raise RuntimeError('Session must be initialized')
         Error.maybe_raise(self.error)
         return bool(lib.sp_track_is_autolinked(
+            spotify.session_instance.sp_session, self.sp_track))
+
+    @property
+    def playable(self):
+        """The actual track that will be played when this track is played.
+
+        See :meth:`is_autolinked`.
+        """
+        if spotify.session_instance is None:
+            raise RuntimeError('Session must be initialized')
+        Error.maybe_raise(self.error)
+        return Track(lib.sp_track_get_playable(
             spotify.session_instance.sp_session, self.sp_track))
 
     @property

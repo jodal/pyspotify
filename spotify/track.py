@@ -1,7 +1,7 @@
 from __future__ import unicode_literals
 
 import spotify
-from spotify import Error, ErrorType, ffi, lib, Loadable
+from spotify import Album, Error, ErrorType, ffi, lib, Loadable
 from spotify.utils import IntEnum, make_enum, to_bytes, to_unicode
 
 
@@ -120,6 +120,23 @@ class Track(Loadable):
         Error.maybe_raise(self.error)
         return bool(lib.sp_track_is_starred(
             spotify.session_instance.sp_session, self.sp_track))
+
+    # TODO Add track.set_starred(True) and Track.set_starred(tracks, True)
+
+    # TODO Add track.artists
+
+    @property
+    def album(self):
+        """The album of the track.
+
+        Will always return :class:`None` if the track isn't loaded.
+        """
+        Error.maybe_raise(self.error)
+        sp_album = lib.sp_track_album(self.sp_track)
+        if sp_album:
+            return Album(sp_album)
+        else:
+            return None
 
     @property
     def name(self):

@@ -210,6 +210,36 @@ class TrackTest(unittest.TestCase):
     def test_is_starred_fails_if_error(self, lib_mock):
         self.assert_fails_if_error(lib_mock, lambda t: t.is_starred)
 
+    @mock.patch('spotify.album.lib', spec=spotify.lib)
+    def test_album(self, album_lib_mock, lib_mock):
+        lib_mock.sp_track_error.return_value = spotify.ErrorType.OK
+        sp_album = spotify.ffi.new('int *')
+        lib_mock.sp_track_album.return_value = sp_album
+        sp_track = spotify.ffi.new('int *')
+        track = spotify.Track(sp_track)
+
+        result = track.album
+
+        lib_mock.sp_track_album.assert_called_with(sp_track)
+        self.assertEqual(album_lib_mock.sp_album_add_ref.call_count, 1)
+        self.assertIsInstance(result, spotify.Album)
+        self.assertEqual(result.sp_album, sp_album)
+
+    @mock.patch('spotify.album.lib', spec=spotify.lib)
+    def test_album_if_unloaded(self, album_lib_mock, lib_mock):
+        lib_mock.sp_track_error.return_value = spotify.ErrorType.OK
+        lib_mock.sp_track_album.return_value = 0
+        sp_track = spotify.ffi.new('int *')
+        track = spotify.Track(sp_track)
+
+        result = track.album
+
+        lib_mock.sp_track_album.assert_called_with(sp_track)
+        self.assertIsNone(result)
+
+    def test_album_fails_if_error(self, lib_mock):
+        self.assert_fails_if_error(lib_mock, lambda t: t.album)
+
     def test_name(self, lib_mock):
         lib_mock.sp_track_error.return_value = spotify.ErrorType.OK
         lib_mock.sp_track_name.return_value = spotify.ffi.new(

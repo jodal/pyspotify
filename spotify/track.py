@@ -55,6 +55,18 @@ class Track(Loadable):
             spotify.session_instance.sp_session, self.sp_track))
 
     @property
+    def is_local(self):
+        """Whether the track is a local track.
+
+        Will always return :class:`False` if the track isn't loaded.
+        """
+        if spotify.session_instance is None:
+            raise RuntimeError('Session must be initialized')
+        Error.maybe_raise(self.error)
+        return bool(lib.sp_track_is_local(
+            spotify.session_instance.sp_session, self.sp_track))
+
+    @property
     def name(self):
         """The track's name. Empty if the track is not loaded yet."""
         return to_unicode(lib.sp_track_name(self.sp_track))

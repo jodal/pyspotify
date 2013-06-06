@@ -117,6 +117,25 @@ class TrackTest(unittest.TestCase):
     def test_availability_fails_if_error(self, lib_mock):
         self.assert_fails_if_error(lib_mock, lambda t: t.availability)
 
+    def test_is_local(self, lib_mock):
+        session = self.create_session(lib_mock)
+        lib_mock.sp_track_error.return_value = spotify.ErrorType.OK
+        lib_mock.sp_track_is_local.return_value = 1
+        sp_track = spotify.ffi.new('int *')
+        track = spotify.Track(sp_track)
+
+        result = track.is_local
+
+        lib_mock.sp_track_is_local.assert_called_with(
+            session.sp_session, sp_track)
+        self.assertTrue(result)
+
+    def test_is_local_fails_if_no_session(self, lib_mock):
+        self.assert_fails_if_no_session(lib_mock, lambda t: t.is_local)
+
+    def test_is_local_fails_if_error(self, lib_mock):
+        self.assert_fails_if_error(lib_mock, lambda t: t.is_local)
+
     def test_name(self, lib_mock):
         lib_mock.sp_track_name.return_value = spotify.ffi.new(
             'char[]', b'Foo Bar Baz')

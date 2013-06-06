@@ -156,6 +156,15 @@ class Track(Loadable):
         Error.maybe_raise(self.error)
         return lib.sp_track_duration(self.sp_track)
 
+    @property
+    def popularity(self):
+        """The track's popularity in the range 0-100, 0 if undefined.
+
+        Will always return 0 if the track isn't loaded yet.
+        """
+        Error.maybe_raise(self.error)
+        return lib.sp_track_popularity(self.sp_track)
+
     def as_link(self, offset=0):
         """Make a :class:`Link` to the track.
 

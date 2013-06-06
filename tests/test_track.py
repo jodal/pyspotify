@@ -297,6 +297,20 @@ class TrackTest(unittest.TestCase):
     def test_disc_fails_if_error(self, lib_mock):
         self.assert_fails_if_error(lib_mock, lambda t: t.disc)
 
+    def test_index(self, lib_mock):
+        lib_mock.sp_track_error.return_value = spotify.ErrorType.OK
+        lib_mock.sp_track_index.return_value = 7
+        sp_track = spotify.ffi.new('int *')
+        track = spotify.Track(sp_track)
+
+        result = track.index
+
+        lib_mock.sp_track_index.assert_called_with(sp_track)
+        self.assertEqual(result, 7)
+
+    def test_index_fails_if_error(self, lib_mock):
+        self.assert_fails_if_error(lib_mock, lambda t: t.index)
+
     @mock.patch('spotify.link.Link', spec=spotify.Link)
     def test_as_link_creates_link_to_track(self, link_mock, lib_mock):
         link_mock.return_value = mock.sentinel.link

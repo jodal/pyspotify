@@ -175,6 +175,16 @@ class Track(Loadable):
         Error.maybe_raise(self.error)
         return lib.sp_track_disc(self.sp_track)
 
+    @property
+    def index(self):
+        """The track's index number. 1 or higher.
+
+        Will always return 0 if the track isn't part of an album or artist
+        browser.
+        """
+        Error.maybe_raise(self.error)
+        return lib.sp_track_index(self.sp_track)
+
     def as_link(self, offset=0):
         """Make a :class:`Link` to the track.
 
@@ -183,8 +193,6 @@ class Track(Loadable):
         """
         from spotify.link import Link
         return Link(self, offset=offset)
-
-    # TODO Add sp_track_* methods
 
 
 class LocalTrack(Track):

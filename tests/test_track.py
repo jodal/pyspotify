@@ -53,6 +53,26 @@ class TrackTest(unittest.TestCase):
 
         self.assertIsInstance(track, spotify.Loadable)
 
+    def test_offline_status(self, lib_mock):
+        lib_mock.sp_track_error.return_value = spotify.ErrorType.OK
+        lib_mock.sp_track_offline_get_status.return_value = 2
+        sp_track = spotify.ffi.new('int *')
+        track = spotify.Track(sp_track)
+
+        result = track.offline_status
+
+        lib_mock.sp_track_offline_get_status.assert_called_with(sp_track)
+        self.assertIs(result, spotify.TrackOfflineStatus.DOWNLOADING)
+
+    def test_offline_status_fails_if_error(self, lib_mock):
+        lib_mock.sp_track_error.return_value = (
+            spotify.ErrorType.BAD_API_VERSION)
+        lib_mock.sp_track_offline_get_status.return_value = 2
+        sp_track = spotify.ffi.new('int *')
+        track = spotify.Track(sp_track)
+
+        self.assertRaises(spotify.Error, lambda: track.offline_status)
+
     def test_name(self, lib_mock):
         lib_mock.sp_track_name.return_value = spotify.ffi.new(
             'char[]', b'Foo Bar Baz')
@@ -134,3 +154,10 @@ class LocalTrackTest(unittest.TestCase):
             lib_mock.sp_localtrack_create.call_args[0][2], spotify.ffi.NULL)
         self.assertEqual(
             lib_mock.sp_localtrack_create.call_args[0][3], -1)
+
+
+class TrackOfflineStatusTest(unittest.TestCase):
+
+    def test_has_constants(self):
+        self.assertEqual(spotify.TrackOfflineStatus.NO, 0)
+        self.assertEqual(spotify.TrackOfflineStatus.DOWNLOADING, 2)

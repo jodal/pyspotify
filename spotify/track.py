@@ -1,12 +1,13 @@
 from __future__ import unicode_literals
 
-from spotify import ErrorType, ffi, lib, Loadable
-from spotify.utils import to_bytes, to_unicode
+from spotify import Error, ErrorType, ffi, lib, Loadable
+from spotify.utils import IntEnum, make_enum, to_bytes, to_unicode
 
 
 __all__ = [
     'LocalTrack',
     'Track',
+    'TrackOfflineStatus',
 ]
 
 
@@ -30,6 +31,17 @@ class Track(Loadable):
         Check to see if there was problems loading the track.
         """
         return ErrorType(lib.sp_track_error(self.sp_track))
+
+    @property
+    def offline_status(self):
+        """The :class:`TrackOfflineStatus` of the track.
+
+        The :attr:`~SessionCallbacks.metadata_updated` callback is called when
+        the offline status changes.
+        """
+        Error.maybe_raise(self.error)
+        return TrackOfflineStatus(
+            lib.sp_track_offline_get_status(self.sp_track))
 
     @property
     def name(self):
@@ -68,3 +80,8 @@ class LocalTrack(Track):
         sp_track = lib.sp_localtrack_create(artist, title, album, length)
 
         super(LocalTrack, self).__init__(sp_track, add_ref=False)
+
+
+@make_enum('SP_TRACK_OFFLINE_')
+class TrackOfflineStatus(IntEnum):
+    pass

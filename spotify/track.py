@@ -165,6 +165,16 @@ class Track(Loadable):
         Error.maybe_raise(self.error)
         return lib.sp_track_popularity(self.sp_track)
 
+    @property
+    def disc(self):
+        """The track's disc number. 1 or higher.
+
+        Will always return 0 if the track isn't part of an album or artist
+        browser.
+        """
+        Error.maybe_raise(self.error)
+        return lib.sp_track_disc(self.sp_track)
+
     def as_link(self, offset=0):
         """Make a :class:`Link` to the track.
 

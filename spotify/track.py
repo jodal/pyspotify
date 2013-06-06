@@ -93,6 +93,23 @@ class Track(Loadable):
             spotify.session_instance.sp_session, self.sp_track))
 
     @property
+    def is_placeholder(self):
+        """Whether the track is a placeholder for a non-track object in the
+        playlist.
+
+        To convert to the real object::
+
+            >>> track.is_placeholder
+            True
+            >>> link = track.as_link()
+            >>> link.type
+            <LinkType.ARTIST: ...>
+            >>> artist = link.as_artist()
+        """
+        Error.maybe_raise(self.error)
+        return bool(lib.sp_track_is_placeholder(self.sp_track))
+
+    @property
     def name(self):
         """The track's name. Empty if the track is not loaded yet."""
         if spotify.session_instance is None:

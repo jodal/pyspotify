@@ -192,6 +192,25 @@ class TrackTest(unittest.TestCase):
     def test_is_placeholder_fails_if_error(self, lib_mock):
         self.assert_fails_if_error(lib_mock, lambda t: t.is_placeholder)
 
+    def test_is_starred(self, lib_mock):
+        session = self.create_session(lib_mock)
+        lib_mock.sp_track_error.return_value = spotify.ErrorType.OK
+        lib_mock.sp_track_is_starred.return_value = 1
+        sp_track = spotify.ffi.new('int *')
+        track = spotify.Track(sp_track)
+
+        result = track.is_starred
+
+        lib_mock.sp_track_is_starred.assert_called_with(
+            session.sp_session, sp_track)
+        self.assertTrue(result)
+
+    def test_is_starred_fails_if_no_session(self, lib_mock):
+        self.assert_fails_if_no_session(lib_mock, lambda t: t.is_starred)
+
+    def test_is_starred_fails_if_error(self, lib_mock):
+        self.assert_fails_if_error(lib_mock, lambda t: t.is_starred)
+
     def test_name(self, lib_mock):
         self.create_session(lib_mock)
         lib_mock.sp_track_error.return_value = spotify.ErrorType.OK

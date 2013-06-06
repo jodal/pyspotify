@@ -110,6 +110,18 @@ class Track(Loadable):
         return bool(lib.sp_track_is_placeholder(self.sp_track))
 
     @property
+    def is_starred(self):
+        """Whether the track is starred by the current user.
+
+        Will always return :class:`False` if the track isn't loaded.
+        """
+        if spotify.session_instance is None:
+            raise RuntimeError('Session must be initialized')
+        Error.maybe_raise(self.error)
+        return bool(lib.sp_track_is_starred(
+            spotify.session_instance.sp_session, self.sp_track))
+
+    @property
     def name(self):
         """The track's name. Empty if the track is not loaded yet."""
         if spotify.session_instance is None:

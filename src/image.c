@@ -45,7 +45,7 @@ Image_is_loaded(Image * self)
 static PyObject *
 Image_error(Image * self)
 {
-    // TODO: return enums that represent sp_error
+    /* TODO: return enums that represent sp_error */
     sp_error error = sp_image_error(self->_image);
     return Py_BuildValue("i", error);
 }
@@ -53,7 +53,7 @@ Image_error(Image * self)
 static PyObject *
 Image_format(Image * self)
 {
-    // TODO: return enums that represent sp_imageformat
+    /* TODO: return enums that represent sp_imageformat */
     sp_imageformat format = sp_image_format(self->_image);
     return Py_BuildValue("i", format);
 }
@@ -108,6 +108,7 @@ Image_add_load_callback(Image * self, PyObject *args)
         return NULL;
     Py_XINCREF(callback);
     Py_XINCREF(userdata);
+    /* TODO: switch to PyMem_Malloc and audit for coresponding free */
     tramp = malloc(sizeof(image_callback_trampoline));
     tramp->userdata = userdata;
     tramp->callback = callback;

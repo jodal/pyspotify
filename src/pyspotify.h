@@ -1,8 +1,9 @@
 #pragma once
 
-// See http://stackoverflow.com/a/1644898 for details of the hows and whys:
-// Note that ##__VA_ARGS__ is gcc-ism, we might need to create a debug_print
-// macro for the cases where there are no arguments to the printf.
+/* See http://stackoverflow.com/a/1644898 for details of the hows and whys:
+ * Note that ##__VA_ARGS__ is gcc-ism, we might need to create a debug_print
+ * macro for the cases where there are no arguments to the printf.
+ */
 #ifndef DEBUG
 #define DEBUG 0
 #endif
@@ -14,7 +15,7 @@
 
 #define ENCODING "utf-8"
 
-// TODO: remove this?
+/* TODO: remove this? */
 #if (PY_MAJOR_VERSION == 2 && PY_MINOR_VERSION < 6)
 #define PyBytes_AS_STRING            PyString_AS_STRING
 #define PyBytes_AsStringAndSize      PyString_AsStringAndSize

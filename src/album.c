@@ -86,7 +86,7 @@ Album_year(Album * self)
 static PyObject *
 Album_type(Album * self)
 {
-    // TODO: return enums that represent sp_albumtype
+    /* TODO: return enums that represent sp_albumtype */
     sp_albumtype album_type = sp_album_type(self->_album);
     return Py_BuildValue("i", album_type);
 }

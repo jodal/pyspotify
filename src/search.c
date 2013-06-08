@@ -54,7 +54,7 @@ Results_did_you_mean(Results * self)
 static PyObject *
 Results_error(Results * self)
 {
-    // TODO: return enums that represent sp_error
+    /* TODO: return enums that represent sp_error */
     sp_error error = sp_search_error(self->_search);
     return Py_BuildValue("i", error);
 }

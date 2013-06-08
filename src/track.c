@@ -115,7 +115,7 @@ Track_index(Track * self)
 static PyObject *
 Track_error(Track * self)
 {
-    // TODO: return enums that represent sp_error
+    /* TODO: return enums that represent sp_error */
     sp_error error = sp_track_error(self->_track);
     return Py_BuildValue("i", error);
 }
@@ -144,7 +144,7 @@ Track_starred(Track * self, PyObject *args, PyObject *kwds)
 static PyObject *
 Track_availability(Track *self)
 {
-    // TODO: return enums that represent sp_availability
+    /* TODO: return enums that represent sp_availability */
     enum sp_availability availability = sp_track_get_availability(
             g_session, self->_track);
     return Py_BuildValue("i", availability);

@@ -51,6 +51,7 @@ Link_from_string(Link * self, PyObject *args)
 
     if (!PyArg_ParseTuple(args, "s", &s))
         return NULL;
+    /* TODO: switch to PyMem_Malloc and audit for coresponding free */
     s2 = malloc(strlen(s) + 1);
     strcpy(s2, s);
     sp_link *link = sp_link_create_from_string(s2);
@@ -160,7 +161,7 @@ Link_from_playlist(Link * self, PyObject *args)
 static PyObject *
 Link_type(Link * self)
 {
-    // TODO: return enums that represent sp_linktype
+    /* TODO: return enums that represent sp_linktype */
     sp_linktype link_type = sp_link_type(self->_link);
     return Py_BuildValue("i", link_type);
 }
@@ -215,6 +216,7 @@ Link_as_playlist(Link * self)
         return NULL;
     }
 
+    /* TODO: audit that we cleanup with _release */
     sp_playlist *p = sp_playlist_create(g_session, self->_link);
 
     if (!p) {

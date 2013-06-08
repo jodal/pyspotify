@@ -59,6 +59,7 @@ AlbumBrowser_new(PyTypeObject *type, PyObject *args, PyObject *kwds)
             userdata = Py_None;
         cb = create_trampoline(callback, NULL, userdata);
     }
+    /* TODO: audit that we cleanup with _release */
     self->_browser =
         sp_albumbrowse_create(g_session,
                                ((Album *) album)->_album,

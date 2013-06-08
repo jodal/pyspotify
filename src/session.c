@@ -17,7 +17,10 @@
 #include "image.h"
 #include "user.h"
 
+/* TODO: is this safe as just an int, or should it be a condition variable? */
 static int session_constructed = 0;
+
+/* TODO: we probably should have a lock protecting access to this */
 sp_session *g_session;
 
 static sp_session *
@@ -278,6 +281,7 @@ Session_search(Session * self, PyObject *args, PyObject *kwds)
     st = create_trampoline(callback, NULL, userdata);
 
     Py_BEGIN_ALLOW_THREADS;
+    /* TODO: audit that we cleanup with _release */
     search = sp_search_create(self->_session, query,
                               track_offset, track_count,
                               album_offset, album_count,
@@ -318,6 +322,7 @@ Session_image_create(Session * self, PyObject *args)
         PyErr_SetString(SpotifyError, "Image id length != 20");
         return NULL;
     }
+    /* TODO: audit that we cleanup with _release */
     image = sp_image_create(self->_session, image_id);
     return Image_FromSpotify(image);
 }
@@ -341,6 +346,7 @@ Session_starred(Session * self)
     sp_playlist *spl;
 
     Py_BEGIN_ALLOW_THREADS;
+    /* TODO: audit that we cleanup with _release */
     spl = sp_session_starred_create(self->_session);
     Py_END_ALLOW_THREADS;
 
@@ -499,8 +505,17 @@ PyTypeObject SessionType = {
 /*           CALLBACK SHIMS          */
 /*************************************/
 
-// TODO: convert to Py_VaBuildValue based solution so we can support
-// music_delivery?
+/* TODO: convert to Py_VaBuildValue based solution so we can support
+ *   music_delivery?
+ * TODO: could we avoid having to pass session into the python callbacks, or
+ *   could we at least store a g_py_session to save us reconstructing it all
+ *   the time? Or would that break in unexpected ways if the session gets
+ *   modified? Measuring the affect of changing say music_delivery to not
+ *   waste time contructing the session would be a good place to start.
+ * TODO: could we avoid having to lookup the attr for the callback on every
+ *   single callback? Would that break cases where people change the config
+ *   later, does that matter?
+ */
 static void
 session_callback(sp_session * session, PyObject *extra, const char *attr)
 {
@@ -547,7 +562,7 @@ logged_out(sp_session * session)
 
     PyGILState_STATE gstate;
     gstate = PyGILState_Ensure();
-    // TODO: should this fallback to logged_out like old code did?
+    /* TODO: should this fallback to logged_out like old code did? */
     session_callback(session, NULL, "_manager_logged_out");
     PyGILState_Release(gstate);
 }
@@ -636,11 +651,11 @@ music_delivery(sp_session * session, const sp_audioformat * format,
     PyObject *callback, *client, *py_frames, *py_session, *result;
     gstate = PyGILState_Ensure();
 
-    // TODO: check if session creations succeeds.
+    /* TODO: check if session creations succeeds. */
     py_frames = PyBuffer_FromMemory((void *)frames, num_frames * size);
     py_session = Session_FromSpotify(session);
 
-    // TODO: check if callback get succeeds.
+    /* TODO: check if callback get succeeds. */
     client = (PyObject *)sp_session_userdata(session);
     callback = PyObject_GetAttrString(client, "music_delivery");
 
@@ -750,9 +765,9 @@ static sp_session_callbacks g_callbacks = {
     &credentials_blob_updated,
 };
 
-// populate_config_* functions are used as conveniance wrappers to get
+// populate_config_* functions are used as convenience wrappers to get
 // data from the python attrs to the config objects. Setting the struct
-// members without tmp intermetide would not work due to const char.
+// members without tmp intermediate would not work due to const char.
 //
 // Attribute not existing is a fatal error, as not being able to convert
 // the attributes value. These cases _only_ set the python exception, so
@@ -765,9 +780,8 @@ config_string(PyObject *settings, const char *attr, const char **target) {
         PyErr_Format(SpotifyError, "%s not set", attr);
         return;
     }
-    if (value != Py_None && PyArg_Parse(value, "es", ENCODING, &tmp)) {
+    if (value != Py_None && PyArg_Parse(value, "es", ENCODING, &tmp))
         *target = tmp;
-    }
     Py_DECREF(value);
 }
 
@@ -822,7 +836,7 @@ create_session(PyObject *client, PyObject *settings)
     }
 
     if (strlen(config.user_agent) > 255) {
-        PyErr_SetString(SpotifyError, "user_agent may not longer than 255.");
+        PyErr_SetString(SpotifyError, "user_agent may not be longer than 255.");
         return NULL;
     }
 
@@ -832,6 +846,7 @@ create_session(PyObject *client, PyObject *settings)
     }
 
     debug_printf("creating session...");
+    /* TODO: audit that we cleanup with _release */
     error = sp_session_create(&config, &session);
     if (error != SP_ERROR_OK) {
         PyErr_SetString(SpotifyError, sp_error_message(error));

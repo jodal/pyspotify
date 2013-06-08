@@ -18,6 +18,16 @@
  */
 static pl_cb_entry *playlist_callbacks_table = NULL;
 
+
+/* Mallocs and memsets a new sp_playlist_callbacks structure. */
+static sp_playlist_callbacks *
+create_and_initialize_callbacks() {
+    /* TODO: switch to PyMem_Malloc and audit for coresponding free */
+    sp_playlist_callbacks *callbacks = malloc(sizeof(sp_playlist_callbacks));
+    memset(callbacks, 0, sizeof(sp_playlist_callbacks));
+    return callbacks;
+}
+
 static PyMemberDef Playlist_members[] = {
     {NULL}
 };
@@ -262,13 +272,9 @@ playlist_tracks_added_callback(sp_playlist * playlist,
 static PyObject *
 Playlist_add_tracks_added_callback(Playlist * self, PyObject *args)
 {
-    sp_playlist_callbacks *spl_callbacks;
-
-    /* TODO: switch to PyMem_Malloc and audit for coresponding free */
-    spl_callbacks = malloc(sizeof(sp_playlist_callbacks));
-    memset(spl_callbacks, 0, sizeof(sp_playlist_callbacks));
-    spl_callbacks->tracks_added = &playlist_tracks_added_callback;
-    return Playlist_add_callback(self, args, spl_callbacks);
+    sp_playlist_callbacks *callbacks = create_and_initialize_callbacks();
+    callbacks->tracks_added = &playlist_tracks_added_callback;
+    return Playlist_add_callback(self, args, callbacks);
 }
 
 void
@@ -300,13 +306,9 @@ playlist_tracks_removed_callback(sp_playlist * playlist, const int *tracks,
 static PyObject *
 Playlist_add_tracks_removed_callback(Playlist * self, PyObject *args)
 {
-    sp_playlist_callbacks *spl_callbacks;
-
-    /* TODO: switch to PyMem_Malloc and audit for coresponding free */
-    spl_callbacks = malloc(sizeof(sp_playlist_callbacks));
-    memset(spl_callbacks, 0, sizeof(sp_playlist_callbacks));
-    spl_callbacks->tracks_removed = &playlist_tracks_removed_callback;
-    return Playlist_add_callback(self, args, spl_callbacks);
+    sp_playlist_callbacks *callbacks = create_and_initialize_callbacks();
+    callbacks->tracks_removed = &playlist_tracks_removed_callback;
+    return Playlist_add_callback(self, args, callbacks);
 }
 
 void
@@ -342,13 +344,9 @@ playlist_tracks_moved_callback(sp_playlist * playlist, const int *tracks,
 static PyObject *
 Playlist_add_tracks_moved_callback(Playlist * self, PyObject *args)
 {
-    sp_playlist_callbacks *spl_callbacks;
-
-    /* TODO: switch to PyMem_Malloc and audit for coresponding free */
-    spl_callbacks = malloc(sizeof(sp_playlist_callbacks));
-    memset(spl_callbacks, 0, sizeof(sp_playlist_callbacks));
-    spl_callbacks->tracks_moved = &playlist_tracks_moved_callback;
-    return Playlist_add_callback(self, args, spl_callbacks);
+    sp_playlist_callbacks *callbacks = create_and_initialize_callbacks();
+    callbacks->tracks_moved = &playlist_tracks_moved_callback;
+    return Playlist_add_callback(self, args, callbacks);
 }
 
 void
@@ -374,13 +372,9 @@ playlist_renamed_callback(sp_playlist * playlist, void *userdata)
 static PyObject *
 Playlist_add_playlist_renamed_callback(Playlist * self, PyObject *args)
 {
-    sp_playlist_callbacks *spl_callbacks;
-
-    /* TODO: switch to PyMem_Malloc and audit for coresponding free */
-    spl_callbacks = malloc(sizeof(sp_playlist_callbacks));
-    memset(spl_callbacks, 0, sizeof(sp_playlist_callbacks));
-    spl_callbacks->playlist_renamed = &playlist_renamed_callback;
-    return Playlist_add_callback(self, args, spl_callbacks);
+    sp_playlist_callbacks *callbacks = create_and_initialize_callbacks();
+    callbacks->playlist_renamed = &playlist_renamed_callback;
+    return Playlist_add_callback(self, args, callbacks);
 }
 
 void
@@ -406,13 +400,9 @@ playlist_state_changed_callback(sp_playlist * playlist, void *userdata)
 static PyObject *
 Playlist_add_playlist_state_changed_callback(Playlist * self, PyObject *args)
 {
-    sp_playlist_callbacks *spl_callbacks;
-
-    /* TODO: switch to PyMem_Malloc and audit for coresponding free */
-    spl_callbacks = malloc(sizeof(sp_playlist_callbacks));
-    memset(spl_callbacks, 0, sizeof(sp_playlist_callbacks));
-    spl_callbacks->playlist_state_changed = &playlist_state_changed_callback;
-    return Playlist_add_callback(self, args, spl_callbacks);
+    sp_playlist_callbacks *callbacks = create_and_initialize_callbacks();
+    callbacks->playlist_state_changed = &playlist_state_changed_callback;
+    return Playlist_add_callback(self, args, callbacks);
 }
 
 void
@@ -442,14 +432,9 @@ static PyObject *
 Playlist_add_playlist_update_in_progress_callback(Playlist * self,
                                                   PyObject *args)
 {
-    sp_playlist_callbacks *spl_callbacks;
-
-    /* TODO: switch to PyMem_Malloc and audit for coresponding free */
-    spl_callbacks = malloc(sizeof(sp_playlist_callbacks));
-    memset(spl_callbacks, 0, sizeof(sp_playlist_callbacks));
-    spl_callbacks->playlist_update_in_progress =
-        &playlist_update_in_progress_callback;
-    return Playlist_add_callback(self, args, spl_callbacks);
+    sp_playlist_callbacks *callbacks = create_and_initialize_callbacks();
+    callbacks->playlist_update_in_progress = &playlist_update_in_progress_callback;
+    return Playlist_add_callback(self, args, callbacks);
 }
 
 void
@@ -476,14 +461,9 @@ static PyObject *
 Playlist_add_playlist_metadata_updated_callback(Playlist * self,
                                                 PyObject *args)
 {
-    sp_playlist_callbacks *spl_callbacks;
-
-    /* TODO: switch to PyMem_Malloc and audit for coresponding free */
-    spl_callbacks = malloc(sizeof(sp_playlist_callbacks));
-    memset(spl_callbacks, 0, sizeof(sp_playlist_callbacks));
-    spl_callbacks->playlist_metadata_updated =
-        &playlist_metadata_updated_callback;
-    return Playlist_add_callback(self, args, spl_callbacks);
+    sp_playlist_callbacks *callbacks = create_and_initialize_callbacks();
+    callbacks->playlist_metadata_updated = &playlist_metadata_updated_callback;
+    return Playlist_add_callback(self, args, callbacks);
 }
 
 void
@@ -519,14 +499,9 @@ playlist_track_created_changed_callback(sp_playlist * playlist,
 static PyObject *
 Playlist_add_track_created_changed_callback(Playlist * self, PyObject *args)
 {
-    sp_playlist_callbacks *spl_callbacks;
-
-    /* TODO: switch to PyMem_Malloc and audit for coresponding free */
-    spl_callbacks = malloc(sizeof(sp_playlist_callbacks));
-    memset(spl_callbacks, 0, sizeof(sp_playlist_callbacks));
-    spl_callbacks->track_created_changed =
-        &playlist_track_created_changed_callback;
-    return Playlist_add_callback(self, args, spl_callbacks);
+    sp_playlist_callbacks *callbacks = create_and_initialize_callbacks();
+    callbacks->track_created_changed = &playlist_track_created_changed_callback;
+    return Playlist_add_callback(self, args, callbacks);
 }
 
 void
@@ -558,14 +533,9 @@ playlist_track_message_changed_callback(sp_playlist * playlist,
 static PyObject *
 Playlist_add_track_message_changed_callback(Playlist * self, PyObject *args)
 {
-    sp_playlist_callbacks *spl_callbacks;
-
-    /* TODO: switch to PyMem_Malloc and audit for coresponding free */
-    spl_callbacks = malloc(sizeof(sp_playlist_callbacks));
-    memset(spl_callbacks, 0, sizeof(sp_playlist_callbacks));
-    spl_callbacks->track_message_changed =
-        &playlist_track_message_changed_callback;
-    return Playlist_add_callback(self, args, spl_callbacks);
+    sp_playlist_callbacks *callbacks = create_and_initialize_callbacks();
+    callbacks->track_message_changed = &playlist_track_message_changed_callback;
+    return Playlist_add_callback(self, args, callbacks);
 }
 
 void
@@ -596,13 +566,9 @@ playlist_track_seen_changed_callback(sp_playlist * playlist,
 static PyObject *
 Playlist_add_track_seen_changed_callback(Playlist * self, PyObject *args)
 {
-    sp_playlist_callbacks *spl_callbacks;
-
-    /* TODO: switch to PyMem_Malloc and audit for coresponding free */
-    spl_callbacks = malloc(sizeof(sp_playlist_callbacks));
-    memset(spl_callbacks, 0, sizeof(sp_playlist_callbacks));
-    spl_callbacks->track_seen_changed = &playlist_track_seen_changed_callback;
-    return Playlist_add_callback(self, args, spl_callbacks);
+    sp_playlist_callbacks *callbacks = create_and_initialize_callbacks();
+    callbacks->track_seen_changed = &playlist_track_seen_changed_callback;
+    return Playlist_add_callback(self, args, callbacks);
 }
 
 void
@@ -631,14 +597,9 @@ playlist_description_changed_callback(sp_playlist * playlist,
 static PyObject *
 Playlist_add_description_changed_callback(Playlist * self, PyObject *args)
 {
-    sp_playlist_callbacks *spl_callbacks;
-
-    /* TODO: switch to PyMem_Malloc and audit for coresponding free */
-    spl_callbacks = malloc(sizeof(sp_playlist_callbacks));
-    memset(spl_callbacks, 0, sizeof(sp_playlist_callbacks));
-    spl_callbacks->description_changed =
-        &playlist_description_changed_callback;
-    return Playlist_add_callback(self, args, spl_callbacks);
+    sp_playlist_callbacks *callbacks = create_and_initialize_callbacks();
+    callbacks->description_changed = &playlist_description_changed_callback;
+    return Playlist_add_callback(self, args, callbacks);
 }
 
 void
@@ -664,14 +625,9 @@ playlist_subscribers_changed_callback(sp_playlist * playlist, void *userdata)
 static PyObject *
 Playlist_add_subscribers_changed_callback(Playlist * self, PyObject *args)
 {
-    sp_playlist_callbacks *spl_callbacks;
-
-    /* TODO: switch to PyMem_Malloc and audit for coresponding free */
-    spl_callbacks = malloc(sizeof(sp_playlist_callbacks));
-    memset(spl_callbacks, 0, sizeof(sp_playlist_callbacks));
-    spl_callbacks->subscribers_changed =
-        &playlist_subscribers_changed_callback;
-    return Playlist_add_callback(self, args, spl_callbacks);
+    sp_playlist_callbacks *callbacks = create_and_initialize_callbacks();
+    callbacks->subscribers_changed = &playlist_subscribers_changed_callback;
+    return Playlist_add_callback(self, args, callbacks);
 }
 
 void
@@ -707,13 +663,9 @@ playlist_image_changed_callback(sp_playlist * playlist, const byte * image,
 static PyObject *
 Playlist_add_image_changed_callback(Playlist * self, PyObject *args)
 {
-    sp_playlist_callbacks *spl_callbacks;
-
-    /* TODO: switch to PyMem_Malloc and audit for coresponding free */
-    spl_callbacks = malloc(sizeof(sp_playlist_callbacks));
-    memset(spl_callbacks, 0, sizeof(sp_playlist_callbacks));
-    spl_callbacks->image_changed = &playlist_image_changed_callback;
-    return Playlist_add_callback(self, args, spl_callbacks);
+    sp_playlist_callbacks *callbacks = create_and_initialize_callbacks();
+    callbacks->image_changed = &playlist_image_changed_callback;
+    return Playlist_add_callback(self, args, callbacks);
 }
 
 static PyObject *

@@ -10,7 +10,7 @@
 #include "search.h"
 #include "session.h"
 
-#define MAX_URI_LENGTH 100
+#define MAX_URI_LENGTH 1024
 
 static PyMemberDef Link_members[] = {
     {NULL}

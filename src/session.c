@@ -772,9 +772,9 @@ config_string(PyObject *settings, const char *attr, const char **target) {
 }
 
 static void
-config_data(PyObject *settings, const char *attr, const char **target, int *target_length) {
+config_data(PyObject *settings, const char *attr, const void **target, size_t *target_length) {
     int length;
-    const char * tmp;
+    const void * tmp;
     PyObject *value = PyObject_GetAttrString(settings, attr);
     if (value == NULL) {
         PyErr_Format(SpotifyError, "%s not set", attr);
@@ -782,7 +782,7 @@ config_data(PyObject *settings, const char *attr, const char **target, int *targ
     }
     if (value != Py_None && PyArg_Parse(value, "s#", &tmp, &length)) {
         *target = tmp;
-        *target_length = length;
+        *target_length = (size_t)length;
     }
     Py_DECREF(value);
 }

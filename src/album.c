@@ -40,13 +40,13 @@ Album_dealloc(Album * self)
 static PyObject *
 Album_is_loaded(Album * self)
 {
-    return Py_BuildValue("i", sp_album_is_loaded(self->_album));
+    return PyBool_FromLong(sp_album_is_loaded(self->_album));
 }
 
 static PyObject *
 Album_is_available(Album * self)
 {
-    return Py_BuildValue("i", sp_album_is_available(self->_album));
+    return PyBool_FromLong(sp_album_is_available(self->_album));
 }
 
 static PyObject *
@@ -86,7 +86,9 @@ Album_year(Album * self)
 static PyObject *
 Album_type(Album * self)
 {
-    return Py_BuildValue("i", sp_album_type(self->_album));
+    /* TODO: return enums that represent sp_albumtype */
+    sp_albumtype album_type = sp_album_type(self->_album);
+    return Py_BuildValue("i", album_type);
 }
 
 static PyObject *

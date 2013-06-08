@@ -1,12 +1,21 @@
 #pragma once
 
-// define DEBUG to get lots of extra crap printed out
-// #define DEBUG 1
+/* See http://stackoverflow.com/a/1644898 for details of the hows and whys:
+ * Note that ##__VA_ARGS__ is gcc-ism, we might need to create a debug_print
+ * macro for the cases where there are no arguments to the printf.
+ */
+#ifndef DEBUG
+#define DEBUG 0
+#endif
+#define debug_printf(fmt, ...) \
+        do { if (DEBUG) fprintf(stderr, "[pyspotify] %s:%d:%s(): " fmt "\n", \
+                __FILE__, __LINE__, __func__, ##__VA_ARGS__); } while (0)
 
 #include <Python.h>
 
 #define ENCODING "utf-8"
 
+/* TODO: remove this? */
 #if (PY_MAJOR_VERSION == 2 && PY_MINOR_VERSION < 6)
 #define PyBytes_AS_STRING            PyString_AS_STRING
 #define PyBytes_AsStringAndSize      PyString_AsStringAndSize

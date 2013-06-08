@@ -21,10 +21,11 @@ AlbumBrowser_FromSpotify(sp_albumbrowse * browse)
 static void
 AlbumBrowser_browse_complete(sp_albumbrowse * browse, Callback * st)
 {
-#ifdef DEBUG
-    fprintf(stderr, "[DEBUG]-albbrw- browse complete (%p, %p)\n", browse, st);
-#endif
-    if (!st) return;
+    debug_printf("browse complete (%p, %p)", browse, st);
+
+    if (!st)
+        return;
+
     PyGILState_STATE gstate = PyGILState_Ensure();
     PyObject *browser = AlbumBrowser_FromSpotify(browse);
 
@@ -32,6 +33,7 @@ AlbumBrowser_browse_complete(sp_albumbrowse * browse, Callback * st)
                                                  st->userdata, NULL);
     if (!res)
         PyErr_WriteUnraisable(st->callback);
+
     delete_trampoline(st);
     Py_DECREF(browser);
     Py_XDECREF(res);
@@ -57,6 +59,7 @@ AlbumBrowser_new(PyTypeObject *type, PyObject *args, PyObject *kwds)
             userdata = Py_None;
         cb = create_trampoline(callback, NULL, userdata);
     }
+    /* TODO: audit that we cleanup with _release */
     self->_browser =
         sp_albumbrowse_create(g_session,
                                ((Album *) album)->_album,
@@ -80,7 +83,7 @@ AlbumBrowser_dealloc(PyObject *arg)
 static PyObject *
 AlbumBrowser_is_loaded(AlbumBrowser * self)
 {
-    return Py_BuildValue("i", sp_albumbrowse_is_loaded(self->_browser));
+    return PyBool_FromLong(sp_albumbrowse_is_loaded(self->_browser));
 }
 
 Py_ssize_t

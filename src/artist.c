@@ -39,7 +39,7 @@ Artist_dealloc(Artist * self)
 static PyObject *
 Artist_is_loaded(Artist * self)
 {
-    return Py_BuildValue("i", sp_artist_is_loaded(self->_artist));
+    return PyBool_FromLong(sp_artist_is_loaded(self->_artist));
 }
 
 static PyObject *
@@ -55,12 +55,7 @@ Artist_name(Artist * self)
 static PyObject *
 Artist_str(PyObject *self)
 {
-    Artist *a = (Artist *) self;
-    const char *s = sp_artist_name(a->_artist);
-
-    if (!s)
-        Py_RETURN_NONE;
-    return PyUnicode_FromString(s);
+    return Artist_name((Artist*)self);
 }
 
 static PyMethodDef Artist_methods[] = {

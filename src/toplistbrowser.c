@@ -95,6 +95,7 @@ ToplistBrowser_new(PyTypeObject *potype, PyObject *args, PyObject *kwds)
     }
 
     Py_BEGIN_ALLOW_THREADS
+    /* TODO: audit that we cleanup with _release */
     browser = sp_toplistbrowse_create(g_session,
                                       tl_type, tl_region, username,
                                       (toplistbrowse_complete_cb *)

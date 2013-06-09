@@ -66,6 +66,30 @@ class ArtistTest(unittest.TestCase):
 
         load_mock.assert_called_with(artist, timeout=10)
 
+    def test_portrait_id(self, lib_mock):
+        lib_mock.sp_artist_portrait.return_value = spotify.ffi.new(
+            'char[]', b'portrait-id')
+        sp_artist = spotify.ffi.new('int *')
+        artist = spotify.Artist(sp_artist)
+        image_size = spotify.ImageSize.SMALL
+
+        result = artist.portrait_id(image_size)
+
+        lib_mock.sp_artist_portrait.assert_called_with(
+            sp_artist, int(image_size))
+        self.assertEqual(result, b'portrait-id')
+
+    def test_portrait_id_is_none_if_null(self, lib_mock):
+        lib_mock.sp_artist_portrait.return_value = spotify.ffi.NULL
+        sp_artist = spotify.ffi.new('int *')
+        artist = spotify.Artist(sp_artist)
+
+        result = artist.portrait_id()
+
+        lib_mock.sp_artist_portrait.assert_called_with(
+            sp_artist, int(spotify.ImageSize.NORMAL))
+        self.assertIsNone(result)
+
     @mock.patch('spotify.link.Link', spec=spotify.Link)
     def test_link_creates_link_to_artist(self, link_mock, lib_mock):
         link_mock.return_value = mock.sentinel.link

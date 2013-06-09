@@ -48,7 +48,7 @@ Development status
 .. image:: https://travis-ci.org/jodal/pyspotify.png?branch=pyspotify2
     :target: https://travis-ci.org/jodal/pyspotify
 
-- 2013-06-09: Track subsystem complete.
+- 2013-06-09: Track and artist subsystem complete.
 
 - 2013-06-02: Session subsystem complete, with all methods.
 

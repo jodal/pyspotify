@@ -83,10 +83,12 @@ def load(obj, timeout=None):
 def to_bytes(value):
     if isinstance(value, text_type):
         return value.encode('utf-8')
+    elif isinstance(value, ffi.CData):
+        return ffi.string(value)
     elif isinstance(value, binary_type):
         return value
     else:
-        raise ValueError('Value must be text or bytes')
+        raise ValueError('Value must be text, bytes, or char[]')
 
 
 def to_unicode(value):

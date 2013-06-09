@@ -125,12 +125,7 @@ class Track(object):
         # TODO What happens here if the track is unloaded?
         return bool(lib.sp_track_is_placeholder(self.sp_track))
 
-    @property
     def is_starred(self):
-        """Whether the track is starred by the current user.
-
-        Will always return :class:`None` if the track isn't loaded.
-        """
         if spotify.session_instance is None:
             raise RuntimeError('Session must be initialized')
         Error.maybe_raise(self.error)
@@ -140,13 +135,20 @@ class Track(object):
             spotify.session_instance.sp_session, self.sp_track))
 
     def set_starred(self, star=True):
-        """Mark the track as starred or unstarred."""
         if spotify.session_instance is None:
             raise RuntimeError('Session must be initialized')
         tracks = ffi.new('sp_track *[]', 1)
         tracks[0] = self.sp_track
         Error.maybe_raise(lib.sp_track_set_starred(
             spotify.session_instance.sp_session, tracks, len(tracks), star))
+
+    starred = property(is_starred, set_starred)
+    """Whether the track is starred by the current user.
+
+    Set to :class:`True` or :class:`False` to change.
+
+    Will always return :class:`None` if the track isn't loaded.
+    """
 
     @property
     def artists(self):

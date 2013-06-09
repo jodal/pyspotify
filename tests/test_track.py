@@ -225,7 +225,7 @@ class TrackTest(unittest.TestCase):
         sp_track = spotify.ffi.new('int *')
         track = spotify.Track(sp_track)
 
-        result = track.is_starred
+        result = track.starred
 
         lib_mock.sp_track_is_starred.assert_called_with(
             session.sp_session, sp_track)
@@ -238,16 +238,16 @@ class TrackTest(unittest.TestCase):
         sp_track = spotify.ffi.new('int *')
         track = spotify.Track(sp_track)
 
-        result = track.is_starred
+        result = track.starred
 
         lib_mock.sp_track_is_loaded.assert_called_with(sp_track)
         self.assertIsNone(result)
 
     def test_is_starred_fails_if_no_session(self, lib_mock):
-        self.assert_fails_if_no_session(lib_mock, lambda t: t.is_starred)
+        self.assert_fails_if_no_session(lib_mock, lambda t: t.starred)
 
     def test_is_starred_fails_if_error(self, lib_mock):
-        self.assert_fails_if_error(lib_mock, lambda t: t.is_starred)
+        self.assert_fails_if_error(lib_mock, lambda t: t.starred)
 
     def test_set_starred(self, lib_mock):
         session = self.create_session(lib_mock)
@@ -255,7 +255,7 @@ class TrackTest(unittest.TestCase):
         sp_track = spotify.ffi.cast('sp_track *', spotify.ffi.new('int *'))
         track = spotify.Track(sp_track)
 
-        track.set_starred()
+        track.starred = True
 
         lib_mock.sp_track_set_starred.assert_called_with(
             session.sp_session, mock.ANY, 1, 1)

@@ -1,7 +1,7 @@
 from __future__ import unicode_literals
 
-from spotify import Artist, ffi, lib
-from spotify.utils import load
+from spotify import Artist, ffi, ImageSize, lib
+from spotify.utils import load, to_bytes
 
 
 __all__ = [
@@ -48,6 +48,20 @@ class Album(object):
         """
         sp_artist = lib.sp_album_artist(self.sp_album)
         return Artist(sp_artist) if sp_artist else None
+
+    def cover_id(self, image_size=ImageSize.NORMAL):
+        """The album's cover image ID as a bytestring.
+
+        ``image_size`` is an :class:`ImageSize` value, by default
+        :attr:`ImageSize.NORMAL`.
+
+        Will always return :class:`None` if the album isn't loaded or the
+        album has no cover.
+        """
+        cover_id = lib.sp_album_cover(self.sp_album, image_size)
+        return to_bytes(cover_id) if cover_id != ffi.NULL else None
+
+    # TODO Add cover() helper that returns the image directly
 
     @property
     def link(self):

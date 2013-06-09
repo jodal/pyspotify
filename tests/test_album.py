@@ -90,6 +90,30 @@ class AlbumTest(unittest.TestCase):
         lib_mock.sp_album_artist.assert_called_with(sp_album)
         self.assertIsNone(result)
 
+    def test_cover_id(self, lib_mock):
+        lib_mock.sp_album_cover.return_value = spotify.ffi.new(
+            'char[]', b'cover-id')
+        sp_album = spotify.ffi.new('int *')
+        album = spotify.Album(sp_album)
+        image_size = spotify.ImageSize.SMALL
+
+        result = album.cover_id(image_size)
+
+        lib_mock.sp_album_cover.assert_called_with(
+            sp_album, int(image_size))
+        self.assertEqual(result, b'cover-id')
+
+    def test_cover_id_is_none_if_null(self, lib_mock):
+        lib_mock.sp_album_cover.return_value = spotify.ffi.NULL
+        sp_album = spotify.ffi.new('int *')
+        album = spotify.Album(sp_album)
+
+        result = album.cover_id()
+
+        lib_mock.sp_album_cover.assert_called_with(
+            sp_album, int(spotify.ImageSize.NORMAL))
+        self.assertIsNone(result)
+
     @mock.patch('spotify.link.Link', spec=spotify.Link)
     def test_link_creates_link_to_album(self, link_mock, lib_mock):
         link_mock.return_value = mock.sentinel.link

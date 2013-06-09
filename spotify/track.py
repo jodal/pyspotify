@@ -23,7 +23,7 @@ class Track(Loadable):
 
     @property
     def is_loaded(self):
-        """Whether the track's data is loaded yet."""
+        """Whether the track's data is loaded."""
         return bool(lib.sp_track_is_loaded(self.sp_track))
 
     @property
@@ -42,6 +42,7 @@ class Track(Loadable):
         the offline status changes.
         """
         Error.maybe_raise(self.error)
+        # TODO What happens here if the track is unloaded?
         return TrackOfflineStatus(
             lib.sp_track_offline_get_status(self.sp_track))
 
@@ -51,6 +52,7 @@ class Track(Loadable):
         if spotify.session_instance is None:
             raise RuntimeError('Session must be initialized')
         Error.maybe_raise(self.error)
+        # TODO What happens here if the track is unloaded?
         return TrackAvailability(lib.sp_track_get_availability(
             spotify.session_instance.sp_session, self.sp_track))
 
@@ -58,11 +60,13 @@ class Track(Loadable):
     def is_local(self):
         """Whether the track is a local track.
 
-        Will always return :class:`False` if the track isn't loaded.
+        Will always return :class:`None` if the track isn't loaded.
         """
         if spotify.session_instance is None:
             raise RuntimeError('Session must be initialized')
         Error.maybe_raise(self.error)
+        if not self.is_loaded:
+            return None
         return bool(lib.sp_track_is_local(
             spotify.session_instance.sp_session, self.sp_track))
 
@@ -70,13 +74,15 @@ class Track(Loadable):
     def is_autolinked(self):
         """Whether the track is a autolinked to another track.
 
-        Will always return :class:`False` if the track isn't loaded.
+        Will always return :class:`None` if the track isn't loaded.
 
         See :meth:`playable`.
         """
         if spotify.session_instance is None:
             raise RuntimeError('Session must be initialized')
         Error.maybe_raise(self.error)
+        if not self.is_loaded:
+            return None
         return bool(lib.sp_track_is_autolinked(
             spotify.session_instance.sp_session, self.sp_track))
 
@@ -89,6 +95,7 @@ class Track(Loadable):
         if spotify.session_instance is None:
             raise RuntimeError('Session must be initialized')
         Error.maybe_raise(self.error)
+        # TODO What happens here if the track is unloaded?
         return Track(lib.sp_track_get_playable(
             spotify.session_instance.sp_session, self.sp_track))
 
@@ -107,17 +114,20 @@ class Track(Loadable):
             >>> artist = link.as_artist()
         """
         Error.maybe_raise(self.error)
+        # TODO What happens here if the track is unloaded?
         return bool(lib.sp_track_is_placeholder(self.sp_track))
 
     @property
     def is_starred(self):
         """Whether the track is starred by the current user.
 
-        Will always return :class:`False` if the track isn't loaded.
+        Will always return :class:`None` if the track isn't loaded.
         """
         if spotify.session_instance is None:
             raise RuntimeError('Session must be initialized')
         Error.maybe_raise(self.error)
+        if not self.is_loaded:
+            return None
         return bool(lib.sp_track_is_starred(
             spotify.session_instance.sp_session, self.sp_track))
 
@@ -133,57 +143,60 @@ class Track(Loadable):
         """
         Error.maybe_raise(self.error)
         sp_album = lib.sp_track_album(self.sp_track)
-        if sp_album:
-            return Album(sp_album)
-        else:
-            return None
+        return Album(sp_album) if sp_album else None
 
     @property
     def name(self):
         """The track's name.
 
-        Will always return an empty string if the track isn't loaded yet.
+        Will always return :class:`None` if the track isn't loaded.
         """
         Error.maybe_raise(self.error)
-        return to_unicode(lib.sp_track_name(self.sp_track))
+        name = to_unicode(lib.sp_track_name(self.sp_track))
+        return name if name else None
 
     @property
     def duration(self):
         """The track's duration in milliseconds.
 
-        Will always return 0 if the track isn't loaded yet.
+        Will always return :class:`None` if the track isn't loaded.
         """
         Error.maybe_raise(self.error)
-        return lib.sp_track_duration(self.sp_track)
+        duration = lib.sp_track_duration(self.sp_track)
+        return duration if duration else None
 
     @property
     def popularity(self):
         """The track's popularity in the range 0-100, 0 if undefined.
 
-        Will always return 0 if the track isn't loaded yet.
+        Will always return :class:`None` if the track isn't loaded.
         """
         Error.maybe_raise(self.error)
+        if not self.is_loaded:
+            return None
         return lib.sp_track_popularity(self.sp_track)
 
     @property
     def disc(self):
         """The track's disc number. 1 or higher.
 
-        Will always return 0 if the track isn't part of an album or artist
-        browser.
+        Will always return :class:`None` if the track isn't part of an album or
+        artist browser.
         """
         Error.maybe_raise(self.error)
-        return lib.sp_track_disc(self.sp_track)
+        disc = lib.sp_track_disc(self.sp_track)
+        return disc if disc else None
 
     @property
     def index(self):
         """The track's index number. 1 or higher.
 
-        Will always return 0 if the track isn't part of an album or artist
-        browser.
+        Will always return :class:`None` if the track isn't part of an album or
+        artist browser.
         """
         Error.maybe_raise(self.error)
-        return lib.sp_track_index(self.sp_track)
+        index = lib.sp_track_index(self.sp_track)
+        return index if index else None
 
     def as_link(self, offset=0):
         """Make a :class:`Link` to the track.

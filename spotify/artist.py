@@ -1,7 +1,7 @@
 from __future__ import unicode_literals
 
 from spotify import ffi, lib
-from spotify.utils import to_unicode
+from spotify.utils import load, to_unicode
 
 
 __all__ = [
@@ -29,6 +29,15 @@ class Artist(object):
     def is_loaded(self):
         """Whether the artist's data is loaded."""
         return bool(lib.sp_artist_is_loaded(self.sp_artist))
+
+    def load(self, timeout=None):
+        """Block until the artist's data is loaded.
+
+        :param timeout: seconds before giving up and raising an exception
+        :type timeout: float
+        :returns: self
+        """
+        return load(self, timeout=timeout)
 
     @property
     def link(self):

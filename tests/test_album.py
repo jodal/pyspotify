@@ -36,6 +36,15 @@ class AlbumTest(unittest.TestCase):
         lib_mock.sp_album_is_loaded.assert_called_once_with(sp_album)
         self.assertTrue(result)
 
+    @mock.patch('spotify.album.load')
+    def test_load(self, load_mock, lib_mock):
+        sp_album = spotify.ffi.new('int *')
+        album = spotify.Album(sp_album)
+
+        album.load(10)
+
+        load_mock.assert_called_with(album, timeout=10)
+
     @mock.patch('spotify.link.Link', spec=spotify.Link)
     def test_link_creates_link_to_album(self, link_mock, lib_mock):
         link_mock.return_value = mock.sentinel.link

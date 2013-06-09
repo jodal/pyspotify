@@ -47,6 +47,16 @@ class ArtistTest(unittest.TestCase):
         lib_mock.sp_artist_name.assert_called_once_with(sp_artist)
         self.assertIsNone(result)
 
+    def test_is_loaded(self, lib_mock):
+        lib_mock.sp_artist_is_loaded.return_value = 1
+        sp_artist = spotify.ffi.new('int *')
+        artist = spotify.Artist(sp_artist)
+
+        result = artist.is_loaded
+
+        lib_mock.sp_artist_is_loaded.assert_called_once_with(sp_artist)
+        self.assertTrue(result)
+
     @mock.patch('spotify.link.Link', spec=spotify.Link)
     def test_link_creates_link_to_artist(self, link_mock, lib_mock):
         link_mock.return_value = mock.sentinel.link

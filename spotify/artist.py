@@ -26,6 +26,11 @@ class Artist(object):
         return name if name else None
 
     @property
+    def is_loaded(self):
+        """Whether the artist's data is loaded."""
+        return bool(lib.sp_artist_is_loaded(self.sp_artist))
+
+    @property
     def link(self):
         """A :class:`Link` to the artist."""
         from spotify.link import Link

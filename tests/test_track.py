@@ -249,6 +249,29 @@ class TrackTest(unittest.TestCase):
     def test_is_starred_fails_if_error(self, lib_mock):
         self.assert_fails_if_error(lib_mock, lambda t: t.is_starred)
 
+    def test_set_starred(self, lib_mock):
+        session = self.create_session(lib_mock)
+        lib_mock.sp_track_set_starred.return_value = spotify.ErrorType.OK
+        sp_track = spotify.ffi.cast('sp_track *', spotify.ffi.new('int *'))
+        track = spotify.Track(sp_track)
+
+        track.set_starred()
+
+        lib_mock.sp_track_set_starred.assert_called_with(
+            session.sp_session, mock.ANY, 1, 1)
+
+    def test_set_starred_fails_if_error(self, lib_mock):
+        self.create_session(lib_mock)
+        lib_mock.sp_track_set_starred.return_value = (
+            spotify.ErrorType.BAD_API_VERSION)
+        sp_track = spotify.ffi.cast('sp_track *', spotify.ffi.new('int *'))
+        track = spotify.Track(sp_track)
+
+        self.assertRaises(spotify.Error, track.set_starred)
+
+    def test_set_starred_fails_if_no_session(self, lib_mock):
+        self.assert_fails_if_no_session(lib_mock, lambda t: t.set_starred())
+
     @mock.patch('spotify.album.lib', spec=spotify.lib)
     def test_album(self, album_lib_mock, lib_mock):
         lib_mock.sp_track_error.return_value = spotify.ErrorType.OK

@@ -17,8 +17,9 @@ class Image(object):
         lib.sp_image_add_ref(sp_image)
         self.sp_image = ffi.gc(sp_image, lib.sp_image_release)
 
-    def as_link(self):
-        """Make a :class:`Link` to the search."""
+    @property
+    def link(self):
+        """A :class:`Link` to the search."""
         from spotify.link import Link
         return Link(self)
 

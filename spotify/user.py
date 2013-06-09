@@ -32,8 +32,9 @@ class User(spotify.Loadable):
         """Whether the user's data is loaded yet."""
         return bool(lib.sp_user_is_loaded(self.sp_user))
 
-    def as_link(self):
-        """Make a :class:`Link` to the user."""
+    @property
+    def link(self):
+        """A :class:`Link` to the user."""
         from spotify.link import Link
         return Link(self)
 

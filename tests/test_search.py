@@ -27,12 +27,12 @@ class SearchTest(unittest.TestCase):
         lib_mock.sp_search_release.assert_called_with(sp_search)
 
     @mock.patch('spotify.link.Link', spec=spotify.Link)
-    def test_as_link_creates_link_to_search(self, link_mock, lib_mock):
+    def test_link_creates_link_to_search(self, link_mock, lib_mock):
         link_mock.return_value = mock.sentinel.link
         sp_search = spotify.ffi.new('int *')
         search = spotify.Search(sp_search)
 
-        result = search.as_link()
+        result = search.link
 
         link_mock.assert_called_once_with(search)
         self.assertEqual(result, mock.sentinel.link)

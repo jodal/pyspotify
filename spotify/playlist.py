@@ -17,8 +17,9 @@ class Playlist(object):
             lib.sp_playlist_add_ref(sp_playlist)
         self.sp_playlist = ffi.gc(sp_playlist, lib.sp_playlist_release)
 
-    def as_link(self):
-        """Make a :class:`Link` to the playlist."""
+    @property
+    def link(self):
+        """A :class:`Link` to the playlist."""
         from spotify.link import Link
         return Link(self)
 

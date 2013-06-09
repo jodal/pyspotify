@@ -27,12 +27,12 @@ class ArtistTest(unittest.TestCase):
         lib_mock.sp_artist_release.assert_called_with(sp_artist)
 
     @mock.patch('spotify.link.Link', spec=spotify.Link)
-    def test_as_link_creates_link_to_artist(self, link_mock, lib_mock):
+    def test_link_creates_link_to_artist(self, link_mock, lib_mock):
         link_mock.return_value = mock.sentinel.link
         sp_artist = spotify.ffi.new('int *')
         artist = spotify.Artist(sp_artist)
 
-        result = artist.as_link()
+        result = artist.link
 
         link_mock.assert_called_once_with(artist)
         self.assertEqual(result, mock.sentinel.link)

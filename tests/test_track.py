@@ -403,23 +403,23 @@ class TrackTest(unittest.TestCase):
         self.assert_fails_if_error(lib_mock, lambda t: t.index)
 
     @mock.patch('spotify.link.Link', spec=spotify.Link)
-    def test_as_link_creates_link_to_track(self, link_mock, lib_mock):
+    def test_link_creates_link_to_track(self, link_mock, lib_mock):
         link_mock.return_value = mock.sentinel.link
         sp_track = spotify.ffi.new('int *')
         track = spotify.Track(sp_track)
 
-        result = track.as_link()
+        result = track.link
 
         link_mock.assert_called_once_with(track, offset=0)
         self.assertEqual(result, mock.sentinel.link)
 
     @mock.patch('spotify.link.Link', spec=spotify.Link)
-    def test_as_link_with_offset(self, link_mock, lib_mock):
+    def test_link_with_offset(self, link_mock, lib_mock):
         link_mock.return_value = mock.sentinel.link
         sp_track = spotify.ffi.new('int *')
         track = spotify.Track(sp_track)
 
-        result = track.as_link(offset=90)
+        result = track.link_with_offset(90)
 
         link_mock.assert_called_once_with(track, offset=90)
         self.assertEqual(result, mock.sentinel.link)

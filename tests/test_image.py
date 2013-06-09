@@ -27,12 +27,12 @@ class ImageTest(unittest.TestCase):
         lib_mock.sp_image_release.assert_called_with(sp_image)
 
     @mock.patch('spotify.link.Link', spec=spotify.Link)
-    def test_as_link_creates_link_to_image(self, link_mock, lib_mock):
+    def test_link_creates_link_to_image(self, link_mock, lib_mock):
         link_mock.return_value = mock.sentinel.link
         sp_image = spotify.ffi.new('int *')
         image = spotify.Image(sp_image)
 
-        result = image.as_link()
+        result = image.link
 
         link_mock.assert_called_once_with(image)
         self.assertEqual(result, mock.sentinel.link)

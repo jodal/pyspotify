@@ -33,7 +33,7 @@ class Link(object):
         >>> str(link)
         'spotify:track:2Foc5Q5nqNiosCNqttzHof'
         >>> track = link.as_track()
-        >>> str(track.as_link())
+        >>> str(track.link)
         'spotify:track:2Foc5Q5nqNiosCNqttzHof'
     """
 

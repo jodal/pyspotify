@@ -108,10 +108,9 @@ class Track(Loadable):
 
             >>> track.is_placeholder
             True
-            >>> link = track.as_link()
-            >>> link.type
+            >>> track.link.type
             <LinkType.ARTIST: ...>
-            >>> artist = link.as_artist()
+            >>> artist = track.link.as_artist()
         """
         Error.maybe_raise(self.error)
         # TODO What happens here if the track is unloaded?
@@ -198,12 +197,15 @@ class Track(Loadable):
         index = lib.sp_track_index(self.sp_track)
         return index if index else None
 
-    def as_link(self, offset=0):
-        """Make a :class:`Link` to the track.
+    @property
+    def link(self):
+        """A :class:`Link` to the track."""
+        from spotify.link import Link
+        return Link(self, offset=0)
 
-        ``offset`` is the number of milliseconds into the track the link should
-        point.
-        """
+    def link_with_offset(self, offset):
+        """A :class:`Link` to the track with an ``offset`` in milliseconds into
+        the track."""
         from spotify.link import Link
         return Link(self, offset=offset)
 

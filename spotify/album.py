@@ -31,6 +31,16 @@ class Album(object):
         return load(self, timeout=timeout)
 
     @property
+    def is_available(self):
+        """Whether the album is available in the current region.
+
+        Will always return :class:`None` if the album isn't loaded.
+        """
+        if not self.is_loaded:
+            return None
+        return bool(lib.sp_album_is_available(self.sp_album))
+
+    @property
     def link(self):
         """A :class:`Link` to the album."""
         from spotify.link import Link

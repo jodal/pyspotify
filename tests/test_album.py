@@ -45,6 +45,26 @@ class AlbumTest(unittest.TestCase):
 
         load_mock.assert_called_with(album, timeout=10)
 
+    def test_is_available(self, lib_mock):
+        lib_mock.sp_album_is_available.return_value = 1
+        sp_album = spotify.ffi.new('int *')
+        album = spotify.Album(sp_album)
+
+        result = album.is_available
+
+        lib_mock.sp_album_is_available.assert_called_once_with(sp_album)
+        self.assertTrue(result)
+
+    def test_is_available_is_none_if_unloaded(self, lib_mock):
+        lib_mock.sp_album_is_loaded.return_value = 0
+        sp_album = spotify.ffi.new('int *')
+        album = spotify.Album(sp_album)
+
+        result = album.is_available
+
+        lib_mock.sp_album_is_loaded.assert_called_once_with(sp_album)
+        self.assertIsNone(result)
+
     @mock.patch('spotify.link.Link', spec=spotify.Link)
     def test_link_creates_link_to_album(self, link_mock, lib_mock):
         link_mock.return_value = mock.sentinel.link

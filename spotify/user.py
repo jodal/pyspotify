@@ -2,7 +2,7 @@ from __future__ import unicode_literals
 
 import spotify
 from spotify import ffi, lib
-from spotify.utils import to_unicode
+from spotify.utils import load, to_unicode
 
 
 __all__ = [
@@ -10,7 +10,7 @@ __all__ = [
 ]
 
 
-class User(spotify.Loadable):
+class User(object):
     """A Spotify user."""
 
     def __init__(self, sp_user):
@@ -31,6 +31,15 @@ class User(spotify.Loadable):
     def is_loaded(self):
         """Whether the user's data is loaded yet."""
         return bool(lib.sp_user_is_loaded(self.sp_user))
+
+    def load(self, timeout=None):
+        """Block until the user's data is loaded.
+
+        :param timeout: seconds before giving up and raising an exception
+        :type timeout: float
+        :returns: self
+        """
+        return load(self, timeout=timeout)
 
     @property
     def link(self):

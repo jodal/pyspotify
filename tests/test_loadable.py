@@ -4,12 +4,16 @@ import mock
 import unittest
 
 import spotify
+from spotify.utils import load
 
 
-class Foo(spotify.Loadable):
+class Foo(object):
     @property
     def is_loaded(self):
         return True
+
+    def load(self, timeout=0):
+        return load(self, timeout=timeout)
 
 
 class FooWithError(Foo):
@@ -17,8 +21,8 @@ class FooWithError(Foo):
         return spotify.Error(spotify.Error.OK)
 
 
-@mock.patch('spotify.loadable.time')
-@mock.patch('spotify.loadable.spotify.session_instance')
+@mock.patch('spotify.utils.time')
+@mock.patch('spotify.utils.spotify.session_instance')
 @mock.patch.object(Foo, 'is_loaded', new_callable=mock.PropertyMock)
 class LoadableTest(unittest.TestCase):
 

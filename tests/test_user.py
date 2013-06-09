@@ -58,11 +58,14 @@ class UserTest(unittest.TestCase):
         lib_mock.sp_user_is_loaded.assert_called_once_with(sp_user)
         self.assertTrue(result)
 
-    def test_is_loadable(self, lib_mock):
+    @mock.patch('spotify.user.load')
+    def test_load(self, load_mock, lib_mock):
         sp_user = spotify.ffi.new('int *')
         user = spotify.User(sp_user)
 
-        self.assertIsInstance(user, spotify.Loadable)
+        user.load(10)
+
+        load_mock.assert_called_with(user, timeout=10)
 
     @mock.patch('spotify.link.Link', spec=spotify.Link)
     def test_link_creates_link_to_user(self, link_mock, lib_mock):

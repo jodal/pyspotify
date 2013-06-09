@@ -72,11 +72,14 @@ class TrackTest(unittest.TestCase):
         lib_mock.sp_track_error.assert_called_once_with(sp_track)
         self.assertIs(result, spotify.ErrorType.IS_LOADING)
 
-    def test_is_loadable(self, lib_mock):
+    @mock.patch('spotify.track.load')
+    def test_load(self, load_mock, lib_mock):
         sp_track = spotify.ffi.new('int *')
         track = spotify.Track(sp_track)
 
-        self.assertIsInstance(track, spotify.Loadable)
+        track.load(10)
+
+        load_mock.assert_called_with(track, timeout=10)
 
     def test_offline_status(self, lib_mock):
         lib_mock.sp_track_error.return_value = spotify.ErrorType.OK

@@ -1,7 +1,9 @@
 from __future__ import unicode_literals
 
 import sys
+import time
 
+import spotify
 from spotify import ffi, lib
 
 
@@ -56,6 +58,26 @@ def get_with_growing_buffer(func, obj):
     if actual_length == -1:
         return None
     return to_unicode(buffer_)
+
+
+def load(obj, timeout=None):
+    """Block until the object's data is loaded.
+
+    The ``obj`` must at least have the :attr:`is_loaded` attribute. If it also
+    has an :meth:`error` method, it will be checked for errors to raise.
+
+    :param timeout: seconds before giving up and raising an exception
+    :type timeout: float
+    :returns: self
+    """
+    # TODO Timeout if this takes too long
+    while not obj.is_loaded:
+        spotify.session_instance.process_events()
+        if hasattr(obj, 'error'):
+            spotify.Error.maybe_raise(
+                obj.error, ignores=[spotify.ErrorType.IS_LOADING])
+        time.sleep(0.001)
+    return obj
 
 
 def to_bytes(value):

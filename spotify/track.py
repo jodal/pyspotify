@@ -1,8 +1,8 @@
 from __future__ import unicode_literals
 
 import spotify
-from spotify import Album, Error, ErrorType, ffi, lib, Loadable
-from spotify.utils import IntEnum, make_enum, to_bytes, to_unicode
+from spotify import Album, Error, ErrorType, ffi, lib
+from spotify.utils import IntEnum, load, make_enum, to_bytes, to_unicode
 
 
 __all__ = [
@@ -13,7 +13,7 @@ __all__ = [
 ]
 
 
-class Track(Loadable):
+class Track(object):
     """A Spotify track."""
 
     def __init__(self, sp_track, add_ref=True):
@@ -33,6 +33,15 @@ class Track(Loadable):
         Check to see if there was problems loading the track.
         """
         return ErrorType(lib.sp_track_error(self.sp_track))
+
+    def load(self, timeout=None):
+        """Block until the track's data is loaded.
+
+        :param timeout: seconds before giving up and raising an exception
+        :type timeout: float
+        :returns: self
+        """
+        return load(self, timeout=timeout)
 
     @property
     def offline_status(self):

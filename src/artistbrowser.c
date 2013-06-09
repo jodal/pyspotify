@@ -22,9 +22,8 @@ ArtistBrowser_FromSpotify(sp_artistbrowse * browse)
 void
 ArtistBrowser_browse_complete(sp_artistbrowse *browse, Callback *st)
 {
-#ifdef DEBUG
-    fprintf(stderr, "[DEBUG]-artbrw- browse complete (%p, %p)\n", browse, st);
-#endif
+    debug_printf("browse complete (%p, %p)", browse, st);
+
     if (!st) return;
     PyGILState_STATE gstate = PyGILState_Ensure();
     PyObject *browser = ArtistBrowser_FromSpotify(browse);
@@ -73,6 +72,7 @@ ArtistBrowser_new(PyTypeObject * type, PyObject *args, PyObject *kwds)
             userdata = Py_None;
         cb = create_trampoline(callback, NULL, userdata);
     }
+    /* TODO: audit that we cleanup with _release */
     self->_browser =
         sp_artistbrowse_create(g_session,
                                ((Artist *) artist)->_artist,
@@ -94,7 +94,7 @@ ArtistBrowser_dealloc(PyObject *arg)
 static PyObject *
 ArtistBrowser_is_loaded(ArtistBrowser * self)
 {
-    return Py_BuildValue("i", sp_artistbrowse_is_loaded(self->_browser));
+    return PyBool_FromLong(sp_artistbrowse_is_loaded(self->_browser));
 }
 
 static PyObject *

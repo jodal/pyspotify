@@ -17,11 +17,14 @@
 #include "image.h"
 #include "user.h"
 
+/* TODO: is this safe as just an int, or should it be a condition variable? */
 static int session_constructed = 0;
+
+/* TODO: we probably should have a lock protecting access to this */
 sp_session *g_session;
 
-static int
-create_session(Session *self, PyObject *client, PyObject *settings);
+static sp_session *
+create_session(PyObject *client, PyObject *settings);
 
 static void
 session_callback(sp_session *session, PyObject *extra, const char *attr);
@@ -55,22 +58,16 @@ static PyMemberDef Session_members[] = {
 static PyObject *
 Session_create(PyTypeObject *type, PyObject *args)
 {
-    Session *self;
-    PyObject *client;
-    PyObject *settings;
+    PyObject *client, *settings;
 
     if (!PyArg_ParseTuple(args, "OO", &client, &settings))
         return NULL;
 
-    self = (Session *) PyObject_Call((PyObject *)type, args, NULL);
-
     PyEval_InitThreads();
-
-    if (create_session(self, client, settings) != 0) {
-        Py_XDECREF(self);
+    sp_session *session = create_session(client, settings);
+    if (session == NULL)
         return NULL;
-    }
-    return (PyObject *)self;
+    return Session_FromSpotify(session);
 }
 
 static PyObject *
@@ -113,9 +110,7 @@ Session_user_is_loaded(Session * self)
         PyErr_SetString(SpotifyError, "Not logged in");
         return NULL;
     }
-    bool loaded = sp_user_is_loaded(user);
-
-    return Py_BuildValue("i", loaded);
+    return PyBool_FromLong(sp_user_is_loaded(user));
 };
 
 static PyObject *
@@ -286,6 +281,7 @@ Session_search(Session * self, PyObject *args, PyObject *kwds)
     st = create_trampoline(callback, NULL, userdata);
 
     Py_BEGIN_ALLOW_THREADS;
+    /* TODO: audit that we cleanup with _release */
     search = sp_search_create(self->_session, query,
                               track_offset, track_count,
                               album_offset, album_count,
@@ -326,6 +322,7 @@ Session_image_create(Session * self, PyObject *args)
         PyErr_SetString(SpotifyError, "Image id length != 20");
         return NULL;
     }
+    /* TODO: audit that we cleanup with _release */
     image = sp_image_create(self->_session, image_id);
     return Image_FromSpotify(image);
 }
@@ -349,6 +346,7 @@ Session_starred(Session * self)
     sp_playlist *spl;
 
     Py_BEGIN_ALLOW_THREADS;
+    /* TODO: audit that we cleanup with _release */
     spl = sp_session_starred_create(self->_session);
     Py_END_ALLOW_THREADS;
 
@@ -388,10 +386,7 @@ Session_login(Session *self, PyObject *args, PyObject *kwds)
         return NULL;
     }
 
-#ifdef DEBUG
-    fprintf(stderr, "[DEBUG]-session- login as %s in progress...\n",
-            username);
-#endif
+    debug_printf("login as %s in progress...", username);
     Py_BEGIN_ALLOW_THREADS;
     error = sp_session_login(self->_session, username, password,
                              remember_me, blob);
@@ -408,9 +403,7 @@ Session_relogin(Session *self)
 {
     sp_error error;
 
-#ifdef DEBUG
-    fprintf(stderr, "[DEBUG]-session- relogin in progress...\n");
-#endif
+    debug_printf("relogin in progress...");
     error = sp_session_relogin(self->_session);
     if (error != SP_ERROR_OK) {
         PyErr_SetString(SpotifyError, sp_error_message(error));
@@ -512,8 +505,17 @@ PyTypeObject SessionType = {
 /*           CALLBACK SHIMS          */
 /*************************************/
 
-// TODO: convert to Py_VaBuildValue based solution so we can support
-// music_delivery?
+/* TODO: convert to Py_VaBuildValue based solution so we can support
+ *   music_delivery?
+ * TODO: could we avoid having to pass session into the python callbacks, or
+ *   could we at least store a g_py_session to save us reconstructing it all
+ *   the time? Or would that break in unexpected ways if the session gets
+ *   modified? Measuring the affect of changing say music_delivery to not
+ *   waste time contructing the session would be a good place to start.
+ * TODO: could we avoid having to lookup the attr for the callback on every
+ *   single callback? Would that break cases where people change the config
+ *   later, does that matter?
+ */
 static void
 session_callback(sp_session * session, PyObject *extra, const char *attr)
 {
@@ -541,9 +543,8 @@ session_callback(sp_session * session, PyObject *extra, const char *attr)
 static void
 logged_in(sp_session * session, sp_error error)
 {
-#ifdef DEBUG
-    fprintf(stderr, "[DEBUG]-session- >> logged_in called\n");
-#endif
+    debug_printf(">> logged_in called: %s", sp_error_message(error));
+
     PyGILState_STATE gstate;
     gstate = PyGILState_Ensure();
     PyObject *py_error = error_message(error);
@@ -557,12 +558,11 @@ logged_in(sp_session * session, sp_error error)
 static void
 logged_out(sp_session * session)
 {
-#ifdef DEBUG
-        fprintf(stderr, "[DEBUG]-session- >> logged_out called\n");
-#endif
+    debug_printf(">> logged_out called");
+
     PyGILState_STATE gstate;
     gstate = PyGILState_Ensure();
-    // TODO: should this fallback to logged_out like old code did?
+    /* TODO: should this fallback to logged_out like old code did? */
     session_callback(session, NULL, "_manager_logged_out");
     PyGILState_Release(gstate);
 }
@@ -570,9 +570,8 @@ logged_out(sp_session * session)
 static void
 metadata_updated(sp_session * session)
 {
-#ifdef DEBUG
-        fprintf(stderr, "[DEBUG]-session- >> metadata_updated called\n");
-#endif
+    debug_printf(">> metadata_updated called");
+
     PyGILState_STATE gstate;
     gstate = PyGILState_Ensure();
     session_callback(session, NULL, "metadata_updated");
@@ -582,9 +581,8 @@ metadata_updated(sp_session * session)
 static void
 connection_error(sp_session * session, sp_error error)
 {
-#ifdef DEBUG
-        fprintf(stderr, "[DEBUG]-session- >> connection_error called\n");
-#endif
+    debug_printf(">> connection_error called: %s", sp_error_message(error));
+
     PyGILState_STATE gstate;
     gstate = PyGILState_Ensure();
     PyObject *py_error = error_message(error);
@@ -598,9 +596,8 @@ connection_error(sp_session * session, sp_error error)
 static void
 message_to_user(sp_session * session, const char *data)
 {
-#ifdef DEBUG
-        fprintf(stderr, "[DEBUG]-session- >> message to user: %s\n", data);
-#endif
+    debug_printf(">> message_to_user called: %s", data);
+
     PyGILState_STATE gstate;
     gstate = PyGILState_Ensure();
     PyObject *message = PyUnicode_FromString(data);
@@ -614,9 +611,7 @@ message_to_user(sp_session * session, const char *data)
 static void
 notify_main_thread(sp_session * session)
 {
-#ifdef DEBUG
-        fprintf(stderr, "[DEBUG]-session- >> notify_main_thread called\n");
-#endif
+    debug_printf(">> notify_main_thread called");
 
     if (!session_constructed)
         return;
@@ -647,9 +642,8 @@ music_delivery(sp_session * session, const sp_audioformat * format,
     // quite different in that this needs to handle return values and much more
     // complicated arguments.
 
-#ifdef DEBUG
-        fprintf(stderr, "[DEBUG]-session- >> music_delivery called\n");
-#endif
+    debug_printf(">> music_delivery called: frames %d", num_frames);
+
     int consumed = num_frames;  // assume all consumed
     int size = frame_size(format);
 
@@ -657,11 +651,11 @@ music_delivery(sp_session * session, const sp_audioformat * format,
     PyObject *callback, *client, *py_frames, *py_session, *result;
     gstate = PyGILState_Ensure();
 
-    // TODO: check if session creations succeeds.
+    /* TODO: check if session creations succeeds. */
     py_frames = PyBuffer_FromMemory((void *)frames, num_frames * size);
     py_session = Session_FromSpotify(session);
 
-    // TODO: check if callback get succeeds.
+    /* TODO: check if callback get succeeds. */
     client = (PyObject *)sp_session_userdata(session);
     callback = PyObject_GetAttrString(client, "music_delivery");
 
@@ -694,9 +688,8 @@ music_delivery(sp_session * session, const sp_audioformat * format,
 static void
 play_token_lost(sp_session * session)
 {
-#ifdef DEBUG
-        fprintf(stderr, "[DEBUG]-session- >> play_token_lost called\n");
-#endif
+    debug_printf(">> play_token_lost called");
+
     PyGILState_STATE gstate;
     gstate = PyGILState_Ensure();
     session_callback(session, NULL, "play_token_lost");
@@ -706,9 +699,8 @@ play_token_lost(sp_session * session)
 static void
 log_message(sp_session * session, const char *data)
 {
-#ifdef DEBUG
-        fprintf(stderr, "[DEBUG]-session- >> log message: %s\n", data);
-#endif
+    debug_printf(">> log_message called: %s", data);
+
     PyGILState_STATE gstate;
     gstate = PyGILState_Ensure();
     PyObject *message = PyUnicode_FromString(data);
@@ -722,9 +714,8 @@ log_message(sp_session * session, const char *data)
 static void
 end_of_track(sp_session * session)
 {
-#ifdef DEBUG
-        fprintf(stderr, "[DEBUG]-session- >> end_of_track called\n");
-#endif
+    debug_printf(">> end_of_track called");
+
     PyGILState_STATE gstate;
     gstate = PyGILState_Ensure();
     session_callback(session, NULL, "end_of_track");
@@ -734,9 +725,8 @@ end_of_track(sp_session * session)
 static void
 credentials_blob_updated(sp_session *session, const char *data)
 {
-#ifdef DEBUG
-        fprintf(stderr, "[DEBUG]-session- >> credentials_blob_updated called\n");
-#endif
+    debug_printf(">> credentials_blob_updated called");
+
     PyGILState_STATE gstate;
     gstate = PyGILState_Ensure();
     PyObject *blob = PyBytes_FromString(data);
@@ -752,44 +742,6 @@ session_init(PyObject *m)
 {
     Py_INCREF(&SessionType);
     PyModule_AddObject(m, "Session", (PyObject *)&SessionType);
-}
-
-char *
-PySpotify_GetConfigString(PyObject *client, const char *attr, bool optional)
-{
-    PyObject *py_value, *py_uvalue;
-    char *value;
-
-    py_value = PyObject_GetAttrString(client, attr);
-    if (!py_value || py_value == Py_None) {
-        if (optional) {
-            return (char *)-1;
-        }
-        else {
-            PyErr_Format(SpotifyError, "%s not set", attr);
-            return NULL;
-        }
-    }
-
-    if (PyUnicode_Check(py_value)) {
-        py_uvalue = py_value;
-        py_value = PyUnicode_AsEncodedString(py_uvalue, ENCODING, "replace");
-        Py_DECREF(py_uvalue);
-        if (py_value == NULL) {
-            return NULL;
-        }
-    }
-    else if (!PyBytes_Check(py_value)) {
-        Py_DECREF(py_value);
-        PyErr_Format(SpotifyError,
-                     "configuration value '%s' must be a string/unicode object",
-                     attr);
-        return NULL;
-    }
-    value = PyMem_Malloc(strlen(PyBytes_AS_STRING(py_value)) + 1);
-    strcpy(value, PyBytes_AS_STRING(py_value));
-    Py_DECREF(py_value);
-    return value;
 }
 
 static sp_session_callbacks g_callbacks = {
@@ -813,125 +765,94 @@ static sp_session_callbacks g_callbacks = {
     &credentials_blob_updated,
 };
 
-static int
-create_session(Session *self, PyObject *client, PyObject *settings)
+// populate_config_* functions are used as convenience wrappers to get
+// data from the python attrs to the config objects. Setting the struct
+// members without tmp intermediate would not work due to const char.
+//
+// Attribute not existing is a fatal error, as not being able to convert
+// the attributes value. These cases _only_ set the python exception, so
+// callers must check PyErr_Occurred().
+static void
+config_string(PyObject *settings, const char *attr, const char **target) {
+    const char * tmp;
+    PyObject *value = PyObject_GetAttrString(settings, attr);
+    if (value == NULL) {
+        PyErr_Format(SpotifyError, "%s not set", attr);
+        return;
+    }
+    if (value != Py_None && PyArg_Parse(value, "es", ENCODING, &tmp))
+        *target = tmp;
+    Py_DECREF(value);
+}
+
+static void
+config_data(PyObject *settings, const char *attr, const void **target, size_t *target_length) {
+    int length;
+    const void * tmp;
+    PyObject *value = PyObject_GetAttrString(settings, attr);
+    if (value == NULL) {
+        PyErr_Format(SpotifyError, "%s not set", attr);
+        return;
+    }
+    if (value != Py_None && PyArg_Parse(value, "s#", &tmp, &length)) {
+        *target = tmp;
+        *target_length = (size_t)length;
+    }
+    Py_DECREF(value);
+}
+
+static sp_session *
+create_session(PyObject *client, PyObject *settings)
 {
     sp_session_config config;
-    sp_session *session;
+    sp_session* session;
     sp_error error;
-    char *cache_location, *settings_location, *user_agent;
-    char *proxy, *proxy_username, *proxy_password;
 
     memset(&config, 0, sizeof(config));
     config.api_version = SPOTIFY_API_VERSION;
-    config.userdata = (void *)client;
+    config.userdata = (void*)client;
     config.callbacks = &g_callbacks;
+    config.cache_location = "";
+    config.user_agent = "pyspotify-fallback";
 
-    cache_location = PySpotify_GetConfigString(settings, "cache_location", 0);
-    if (!cache_location) {
-        PyErr_SetString(SpotifyError, "cache_location not set");
-        return -1;
-    }
-    config.cache_location = cache_location;
-#ifdef DEBUG
-    fprintf(stderr, "[DEBUG]-session- Cache location is '%s'\n",
-            cache_location);
-#endif
+    config_data(settings, "application_key", &config.application_key, &config.application_key_size);
+    config_string(settings, "cache_location", &config.cache_location);
+    config_string(settings, "settings_location", &config.settings_location);
+    config_string(settings, "user_agent", &config.user_agent);
+    config_string(client, "proxy", &config.proxy);
+    config_string(client, "proxy_username", &config.proxy_username);
+    config_string(client, "proxy_password", &config.proxy_password);
 
-    settings_location = PySpotify_GetConfigString(settings,
-                                                  "settings_location", 0);
-    config.settings_location = settings_location;
-#ifdef DEBUG
-    fprintf(stderr, "[DEBUG]-session- Settings location is '%s'\n",
-            settings_location);
-#endif
+    debug_printf("cache_location = %s", config.cache_location);
+    debug_printf("settings_location = %s", config.settings_location);
+    debug_printf("user_agent = %s", config.user_agent);
+    debug_printf("proxy = %s", config.proxy);
+    debug_printf("proxy_username = %s", config.proxy_username);
+    debug_printf("proxy_password = %s", config.proxy_password);
+    debug_printf("application_key_size = %zu", config.application_key_size);
 
-    // TODO: this looks like a bad copy of PySpotify_GetConfigString, we should
-    // probably refactor the helper to support this case as well
-    PyObject *application_key =
-        PyObject_GetAttrString(settings, "application_key");
-    if (!application_key) {
-        PyErr_SetString(SpotifyError, "application_key not set");
-        return -1;
-    }
-    else if (!PyBytes_Check(application_key)) {
-        Py_DECREF(application_key);
-        PyErr_SetString(SpotifyError, "application_key must be a byte string");
-        return -1;
-    }
-    char *s_appkey;
-    Py_ssize_t l_appkey;
-
-    PyBytes_AsStringAndSize(application_key, &s_appkey, &l_appkey);
-    Py_DECREF(application_key);
-
-    config.application_key_size = l_appkey;
-    config.application_key = PyMem_Malloc(l_appkey);
-    memcpy((char *)config.application_key, s_appkey, l_appkey);
-
-    user_agent = PySpotify_GetConfigString(settings, "user_agent", 0);
-    if (!user_agent) {
-        PyErr_SetString(SpotifyError, "user_agent not set");
-        return -1;
-    }
-    else if (strlen(user_agent) > 255) {
-        PyErr_SetString(SpotifyError, "user agent must be 255 characters max");
-        return -1;
-    }
-    config.user_agent = user_agent;
-#ifdef DEBUG
-    fprintf(stderr, "[DEBUG]-session- User agent set to '%s'\n",
-                        user_agent);
-#endif
-
-    proxy = PySpotify_GetConfigString(client, "proxy", 1);
-    if (!proxy) {
-        PyErr_SetString(SpotifyError, "proxy attribute missing");
-        return -1;
-    }
-    if ((long) proxy != (-1)) {
-        config.proxy = proxy;
-#ifdef DEBUG
-        fprintf(stderr, "[DEBUG]-session- Proxy set to '%s'\n", proxy);
-#endif
+    if (PyErr_Occurred() != NULL) {
+        return NULL;
     }
 
-    proxy_username = PySpotify_GetConfigString(client, "proxy_username", 1);
-    if (!proxy_username) {
-        PyErr_SetString(SpotifyError, "proxy_username attribute missing");
-        return -1;
-    }
-    if ((long) proxy_username != (-1)) {
-        config.proxy_username = proxy_username;
-#ifdef DEBUG
-        fprintf(stderr, "[DEBUG]-session- Proxy username set to '%s'\n",
-            proxy_username);
-#endif
+    if (strlen(config.user_agent) > 255) {
+        PyErr_SetString(SpotifyError, "user_agent may not be longer than 255.");
+        return NULL;
     }
 
-    proxy_password = PySpotify_GetConfigString(client, "proxy_password", 1);
-    if (!proxy_password) {
-        PyErr_SetString(SpotifyError, "proxy_password attribute missing");
-        return -1;
-    }
-    if ((long) proxy_password != (-1)) {
-        config.proxy_password = proxy_password;
-#ifdef DEBUG
-        fprintf(stderr, "[DEBUG]-session- Proxy password set to '%s'\n",
-            proxy_password);
-#endif
+    if (config.application_key_size == 0) {
+        PyErr_SetString(SpotifyError, "application_key must be provided.");
+        return NULL;
     }
 
-#ifdef DEBUG
-    fprintf(stderr, "[DEBUG]-session- creating session...\n");
-#endif
+    debug_printf("creating session...");
+    /* TODO: audit that we cleanup with _release */
     error = sp_session_create(&config, &session);
     if (error != SP_ERROR_OK) {
         PyErr_SetString(SpotifyError, sp_error_message(error));
-        return -1;
+        return NULL;
     }
     session_constructed = 1;
     g_session = session;
-    self->_session = session;
-    return 0;
+    return session;
 }

@@ -64,10 +64,10 @@ init_spotify(void)
     SpotifyError = PyDict_GetItemString(module_dict, "SpotifyError");
     SpotifyApiVersion = Py_BuildValue("i", SPOTIFY_API_VERSION);
 
-    // TODO: figure out why we store these globaly.
-    Py_XINCREF(SpotifyError);      // SpotifyError has a borrowed ref.
-    Py_XINCREF(SpotifyApiVersion); // PyModule_AddObject steals the ref.
-    Py_XDECREF(spotify);           // dict is borrowed, only cleanup module.
+    /* TODO: figure out why we store these globaly.                          */
+    Py_XINCREF(SpotifyError);      /* SpotifyError has a borrowed ref.       */
+    Py_XINCREF(SpotifyApiVersion); /* PyModule_AddObject steals the ref.     */
+    Py_XDECREF(spotify);           /* dict is borrowed, only cleanup module. */
 
     PyModule_AddObject(m, "api_version", SpotifyApiVersion);
 

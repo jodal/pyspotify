@@ -7,6 +7,7 @@ create_trampoline(PyObject *callback, PyObject *manager, PyObject *userdata)
 {
     Callback *tr = NULL;
 
+    /* TODO: switch to PyMem_Malloc and audit for coresponding free */
     tr = malloc(sizeof(Callback));
     Py_INCREF(callback);
     Py_XINCREF(manager);

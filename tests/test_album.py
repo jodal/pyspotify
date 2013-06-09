@@ -114,6 +114,27 @@ class AlbumTest(unittest.TestCase):
             sp_album, int(spotify.ImageSize.NORMAL))
         self.assertIsNone(result)
 
+    def test_name(self, lib_mock):
+        lib_mock.sp_album_name.return_value = spotify.ffi.new(
+            'char[]', b'Foo Bar Baz')
+        sp_album = spotify.ffi.new('int *')
+        album = spotify.Album(sp_album)
+
+        result = album.name
+
+        lib_mock.sp_album_name.assert_called_once_with(sp_album)
+        self.assertEqual(result, 'Foo Bar Baz')
+
+    def test_name_is_none_if_unloaded(self, lib_mock):
+        lib_mock.sp_album_name.return_value = spotify.ffi.new('char[]', b'')
+        sp_album = spotify.ffi.new('int *')
+        album = spotify.Album(sp_album)
+
+        result = album.name
+
+        lib_mock.sp_album_name.assert_called_once_with(sp_album)
+        self.assertIsNone(result)
+
     @mock.patch('spotify.link.Link', spec=spotify.Link)
     def test_link_creates_link_to_album(self, link_mock, lib_mock):
         link_mock.return_value = mock.sentinel.link

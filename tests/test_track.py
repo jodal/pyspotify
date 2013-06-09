@@ -272,6 +272,51 @@ class TrackTest(unittest.TestCase):
     def test_set_starred_fails_if_no_session(self, lib_mock):
         self.assert_fails_if_no_session(lib_mock, lambda t: t.set_starred())
 
+    @mock.patch('spotify.artist.lib', spec=spotify.lib)
+    def test_artists(self, artist_lib_mock, lib_mock):
+        lib_mock.sp_track_error.return_value = spotify.ErrorType.OK
+        sp_artist = spotify.ffi.cast('sp_artist *', spotify.ffi.new('int *'))
+        lib_mock.sp_track_num_artists.return_value = 1
+        lib_mock.sp_track_artist.return_value = sp_artist
+        sp_track = spotify.ffi.new('int *')
+        track = spotify.Track(sp_track)
+
+        result = track.artists
+
+        lib_mock.sp_track_num_artists.assert_called_with(sp_track)
+        self.assertEqual(lib_mock.sp_track_artist.call_count, 1)
+        lib_mock.sp_track_artist.assert_called_with(sp_track, 0)
+        artist_lib_mock.sp_artist_add_ref.assert_called_with(sp_artist)
+        self.assertEqual(len(result), 1)
+        self.assertIsInstance(result[0], spotify.Artist)
+        self.assertEqual(result[0].sp_artist, sp_artist)
+
+    def test_artists_if_no_artists(self, lib_mock):
+        lib_mock.sp_track_error.return_value = spotify.ErrorType.OK
+        lib_mock.sp_track_num_artists.return_value = 0
+        sp_track = spotify.ffi.new('int *')
+        track = spotify.Track(sp_track)
+
+        result = track.artists
+
+        lib_mock.sp_track_num_artists.assert_called_with(sp_track)
+        self.assertEqual(lib_mock.sp_track_artist.call_count, 0)
+        self.assertEqual(len(result), 0)
+
+    def test_artists_is_none_if_unloaded(self, lib_mock):
+        lib_mock.sp_track_error.return_value = spotify.ErrorType.OK
+        lib_mock.sp_track_is_loaded.return_value = 0
+        sp_track = spotify.ffi.new('int *')
+        track = spotify.Track(sp_track)
+
+        result = track.artists
+
+        lib_mock.sp_track_is_loaded.assert_called_with(sp_track)
+        self.assertIsNone(result)
+
+    def test_artists_fails_if_error(self, lib_mock):
+        self.assert_fails_if_error(lib_mock, lambda t: t.artists)
+
     @mock.patch('spotify.album.lib', spec=spotify.lib)
     def test_album(self, album_lib_mock, lib_mock):
         lib_mock.sp_track_error.return_value = spotify.ErrorType.OK

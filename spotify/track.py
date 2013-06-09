@@ -148,7 +148,21 @@ class Track(object):
         Error.maybe_raise(lib.sp_track_set_starred(
             spotify.session_instance.sp_session, tracks, len(tracks), star))
 
-    # TODO Add track.artists
+    @property
+    def artists(self):
+        """The artists performing on the track.
+
+        Will always return :class:`None` if the track isn't loaded.
+        """
+        Error.maybe_raise(self.error)
+        if not self.is_loaded:
+            return None
+        num_artists = lib.sp_track_num_artists(self.sp_track)
+        artists = []
+        for i in range(num_artists):
+            artists.append(
+                spotify.Artist(lib.sp_track_artist(self.sp_track, i)))
+        return artists
 
     @property
     def album(self):

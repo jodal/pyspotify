@@ -65,6 +65,31 @@ class AlbumTest(unittest.TestCase):
         lib_mock.sp_album_is_loaded.assert_called_once_with(sp_album)
         self.assertIsNone(result)
 
+    @mock.patch('spotify.artist.lib', spec=spotify.lib)
+    def test_artist(self, artist_lib_mock, lib_mock):
+        sp_artist = spotify.ffi.new('int *')
+        lib_mock.sp_album_artist.return_value = sp_artist
+        sp_album = spotify.ffi.new('int *')
+        album = spotify.Album(sp_album)
+
+        result = album.artist
+
+        lib_mock.sp_album_artist.assert_called_with(sp_album)
+        self.assertEqual(artist_lib_mock.sp_artist_add_ref.call_count, 1)
+        self.assertIsInstance(result, spotify.Artist)
+        self.assertEqual(result.sp_artist, sp_artist)
+
+    @mock.patch('spotify.artist.lib', spec=spotify.lib)
+    def test_artist_if_unloaded(self, artist_lib_mock, lib_mock):
+        lib_mock.sp_album_artist.return_value = 0
+        sp_album = spotify.ffi.new('int *')
+        album = spotify.Album(sp_album)
+
+        result = album.artist
+
+        lib_mock.sp_album_artist.assert_called_with(sp_album)
+        self.assertIsNone(result)
+
     @mock.patch('spotify.link.Link', spec=spotify.Link)
     def test_link_creates_link_to_album(self, link_mock, lib_mock):
         link_mock.return_value = mock.sentinel.link

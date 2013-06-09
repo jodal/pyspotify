@@ -42,9 +42,9 @@ session_instance = None
 
 from spotify.error import *  # noqa
 from spotify.image import *  # noqa
-
-from spotify.album import *  # noqa
 from spotify.artist import *  # noqa
+from spotify.album import *  # noqa
+
 from spotify.audio import *  # noqa
 from spotify.connection import *  # noqa
 from spotify.offline import *  # noqa

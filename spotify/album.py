@@ -1,6 +1,6 @@
 from __future__ import unicode_literals
 
-from spotify import ffi, lib
+from spotify import Artist, ffi, lib
 from spotify.utils import load
 
 
@@ -39,6 +39,15 @@ class Album(object):
         if not self.is_loaded:
             return None
         return bool(lib.sp_album_is_available(self.sp_album))
+
+    @property
+    def artist(self):
+        """The artist of the album.
+
+        Will always return :class:`None` if the album isn't loaded.
+        """
+        sp_artist = lib.sp_album_artist(self.sp_album)
+        return Artist(sp_artist) if sp_artist else None
 
     @property
     def link(self):

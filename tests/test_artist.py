@@ -26,6 +26,27 @@ class ArtistTest(unittest.TestCase):
 
         lib_mock.sp_artist_release.assert_called_with(sp_artist)
 
+    def test_name(self, lib_mock):
+        lib_mock.sp_artist_name.return_value = spotify.ffi.new(
+            'char[]', b'Foo Bar Baz')
+        sp_artist = spotify.ffi.new('int *')
+        artist = spotify.Artist(sp_artist)
+
+        result = artist.name
+
+        lib_mock.sp_artist_name.assert_called_once_with(sp_artist)
+        self.assertEqual(result, 'Foo Bar Baz')
+
+    def test_name_is_none_if_unloaded(self, lib_mock):
+        lib_mock.sp_artist_name.return_value = spotify.ffi.new('char[]', b'')
+        sp_artist = spotify.ffi.new('int *')
+        artist = spotify.Artist(sp_artist)
+
+        result = artist.name
+
+        lib_mock.sp_artist_name.assert_called_once_with(sp_artist)
+        self.assertIsNone(result)
+
     @mock.patch('spotify.link.Link', spec=spotify.Link)
     def test_link_creates_link_to_artist(self, link_mock, lib_mock):
         link_mock.return_value = mock.sentinel.link

@@ -16,6 +16,7 @@ Development setup
 1. Make sure you have the following Python versions installed:
 
    - CPython 2.7
+   - CPython 3.2
    - CPython 3.3
    - PyPy 2
 

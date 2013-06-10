@@ -73,6 +73,16 @@ class Album(object):
         return name if name else None
 
     @property
+    def year(self):
+        """The album's release year.
+
+        Will always return :class:`None` if the album isn't loaded.
+        """
+        if not self.is_loaded:
+            return None
+        return lib.sp_album_year(self.sp_album)
+
+    @property
     def link(self):
         """A :class:`Link` to the album."""
         from spotify.link import Link

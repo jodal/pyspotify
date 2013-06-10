@@ -5,9 +5,10 @@ typedef struct {
     sp_albumbrowse *_browser;
 } AlbumBrowser;
 
-#define AlbumBrowser_SP_ALBUMBROWSE(a) ((AlbumBrowser *)a)->_browser
+#define AlbumBrowser_SP_ALBUMBROWSE(o) ((AlbumBrowser *)o)->_browser
 
-extern PyTypeObject AlbumBrowserType;
+extern
+PyTypeObject AlbumBrowserType;
 
 PyObject  *
 AlbumBrowser_FromSpotify(sp_albumbrowse *browser);

@@ -10,6 +10,15 @@ import spotify
 @mock.patch('spotify.album.lib', spec=spotify.lib)
 class AlbumTest(unittest.TestCase):
 
+    def create_session(self, lib_mock):
+        session = mock.sentinel.session
+        session.sp_session = mock.sentinel.sp_session
+        spotify.session_instance = session
+        return session
+
+    def tearDown(self):
+        spotify.session_instance = None
+
     def test_adds_ref_to_sp_album_when_created(self, lib_mock):
         sp_album = spotify.ffi.new('int *')
 
@@ -90,25 +99,38 @@ class AlbumTest(unittest.TestCase):
         lib_mock.sp_album_artist.assert_called_with(sp_album)
         self.assertIsNone(result)
 
-    def test_cover_id(self, lib_mock):
-        lib_mock.sp_album_cover.return_value = spotify.ffi.new(
-            'char[]', b'cover-id')
+    @mock.patch('spotify.image.lib', spec=spotify.lib)
+    def test_cover(self, image_lib_mock, lib_mock):
+        session = self.create_session(lib_mock)
+        sp_image_id = spotify.ffi.new('char[]', b'cover-id')
+        lib_mock.sp_album_cover.return_value = sp_image_id
+        sp_image = spotify.ffi.new('int *')
+        lib_mock.sp_image_create.return_value = sp_image
         sp_album = spotify.ffi.new('int *')
         album = spotify.Album(sp_album)
         image_size = spotify.ImageSize.SMALL
 
-        result = album.cover_id(image_size)
+        result = album.cover(image_size)
 
         lib_mock.sp_album_cover.assert_called_with(
             sp_album, int(image_size))
-        self.assertEqual(result, b'cover-id')
+        lib_mock.sp_image_create.assert_called_with(
+            session.sp_session, sp_image_id)
 
-    def test_cover_id_is_none_if_null(self, lib_mock):
+        self.assertIsInstance(result, spotify.Image)
+        self.assertEqual(result.sp_image, sp_image)
+
+        # Since we *created* the sp_image, we already have a refcount of 1 and
+        # shouldn't increase the refcount when wrapping this sp_image in an
+        # Image object
+        self.assertEqual(image_lib_mock.sp_image_add_ref.call_count, 0)
+
+    def test_cover_is_none_if_null(self, lib_mock):
         lib_mock.sp_album_cover.return_value = spotify.ffi.NULL
         sp_album = spotify.ffi.new('int *')
         album = spotify.Album(sp_album)
 
-        result = album.cover_id()
+        result = album.cover()
 
         lib_mock.sp_album_cover.assert_called_with(
             sp_album, int(spotify.ImageSize.NORMAL))

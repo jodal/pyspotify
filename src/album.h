@@ -1,11 +1,15 @@
 typedef struct {
-    PyObject_HEAD sp_album *_album;
+    PyObject_HEAD
+    sp_album *_album;
 } Album;
 
-#define Album_SP_ALBUM(a) ((Album *)a)->_album
+#define Album_SP_ALBUM(o) ((Album *)o)->_album
 
-extern PyTypeObject AlbumType;
+extern
+PyTypeObject AlbumType;
 
-extern void album_init(PyObject *m);
+PyObject *
+Album_FromSpotify(sp_album * album);
 
-PyObject *Album_FromSpotify(sp_album * album);
+extern void
+album_init(PyObject *module);

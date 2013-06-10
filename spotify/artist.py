@@ -1,7 +1,8 @@
 from __future__ import unicode_literals
 
-from spotify import ffi, ImageSize, lib
-from spotify.utils import load, to_bytes, to_unicode
+import spotify
+from spotify import ffi, Image, ImageSize, lib
+from spotify.utils import load, to_unicode
 
 
 __all__ = [
@@ -39,8 +40,8 @@ class Artist(object):
         """
         return load(self, timeout=timeout)
 
-    def portrait_id(self, image_size=ImageSize.NORMAL):
-        """The artist's portrait image ID as a bytestring.
+    def portrait(self, image_size=ImageSize.NORMAL):
+        """The artist's portrait :class:`Image`.
 
         ``image_size`` is an :class:`ImageSize` value, by default
         :attr:`ImageSize.NORMAL`.
@@ -49,9 +50,11 @@ class Artist(object):
         artist has no portrait.
         """
         portrait_id = lib.sp_artist_portrait(self.sp_artist, image_size)
-        return to_bytes(portrait_id) if portrait_id != ffi.NULL else None
-
-    # TODO Add portrait() helper that returns the image directly
+        if portrait_id == ffi.NULL:
+            return None
+        sp_image = lib.sp_image_create(
+            spotify.session_instance.sp_session, portrait_id)
+        return Image(sp_image, add_ref=False)
 
     @property
     def link(self):

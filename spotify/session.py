@@ -593,7 +593,9 @@ class SessionConfig(object):
     proxy_password = None
     """Password to authenticate with proxy server."""
 
-    ca_certs_filename = None
+    # XXX libspotify 12.1.51 for Darwin does not have this field, so we remove
+    # it for now to be able to run the same code on Linux and OS X.
+    #ca_certs_filename = None
     """Path to a file containing the root CA certificates that the peer should
     be verified with.
 
@@ -641,7 +643,8 @@ class SessionConfig(object):
         proxy = convert(self.proxy)
         proxy_username = convert(self.proxy_username)
         proxy_password = convert(self.proxy_password)
-        ca_certs_filename = convert(self.ca_certs_filename)
+        # XXX See explanation above
+        #ca_certs_filename = convert(self.ca_certs_filename)
         tracefile = convert(self.tracefile)
 
         sp_session_config = ffi.new('sp_session_config *', {
@@ -661,7 +664,8 @@ class SessionConfig(object):
             'proxy': proxy,
             'proxy_username': proxy_username,
             'proxy_password': proxy_password,
-            'ca_certs_filename': ca_certs_filename,
+            # XXX See explanation above
+            #'ca_certs_filename': ca_certs_filename,
             'tracefile': tracefile,
         })
 
@@ -675,7 +679,8 @@ class SessionConfig(object):
             proxy,
             proxy_username,
             proxy_password,
-            ca_certs_filename,
+            # XXX See explanation above
+            #ca_certs_filename,
             tracefile,
         ]
 

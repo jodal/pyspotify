@@ -706,7 +706,7 @@ typedef struct sp_session_config {
    * is a sample pem file in examples. It is recommended that the application export a similar file from
    * the local certificate store.
        */
-  const char *ca_certs_filename;
+  ...;
 
   /**
    * Path to API trace file

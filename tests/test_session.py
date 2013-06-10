@@ -451,8 +451,9 @@ class SessionConfigTest(unittest.TestCase):
     def test_proxy_password_defaults_to_none(self):
         self.assertIsNone(self.config.proxy_password)
 
-    def test_ca_certs_filename_defaults_none(self):
-        self.assertIsNone(self.config.ca_certs_filename)
+    # XXX See explanation in session.py
+    #def test_ca_certs_filename_defaults_none(self):
+    #    self.assertIsNone(self.config.ca_certs_filename)
 
     def test_tracefile_defaults_to_none(self):
         self.assertIsNone(self.config.tracefile)
@@ -512,7 +513,8 @@ class SessionConfigTest(unittest.TestCase):
         self.config.proxy = 'æ proxy'
         self.config.proxy_username = 'æ proxy_username'
         self.config.proxy_password = 'æ proxy_password'
-        self.config.ca_certs_filename = 'æ ca_certs_filename'
+        # XXX See explanation in session.py
+        #self.config.ca_certs_filename = 'æ ca_certs_filename'
         self.config.tracefile = 'æ tracefile'
 
         sp_session_config = self.config.make_sp_session_config()
@@ -529,9 +531,10 @@ class SessionConfigTest(unittest.TestCase):
         self.assertEqual(
             spotify.ffi.string(sp_session_config.proxy_password),
             b'\xc3\xa6 proxy_password')
-        self.assertEqual(
-            spotify.ffi.string(sp_session_config.ca_certs_filename),
-            b'\xc3\xa6 ca_certs_filename')
+        # XXX See explanation in session.py
+        #self.assertEqual(
+        #    spotify.ffi.string(sp_session_config.ca_certs_filename),
+        #    b'\xc3\xa6 ca_certs_filename')
         self.assertEqual(
             spotify.ffi.string(sp_session_config.tracefile),
             b'\xc3\xa6 tracefile')
@@ -542,7 +545,7 @@ class SessionConfigTest(unittest.TestCase):
         sp_session_config = self.config.make_sp_session_config()
 
         self.assertIn(sp_session_config, spotify.weak_key_dict)
-        self.assertEqual(len(spotify.weak_key_dict[sp_session_config]), 11)
+        self.assertEqual(len(spotify.weak_key_dict[sp_session_config]), 10)
 
 
 @mock.patch('spotify.session.lib', spec=spotify.lib)

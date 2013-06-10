@@ -444,7 +444,7 @@ typedef struct sp_session_config {
 
 
 
-  const char *ca_certs_filename;
+  ...;
 
 
 

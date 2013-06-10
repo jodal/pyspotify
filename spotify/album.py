@@ -1,11 +1,12 @@
 from __future__ import unicode_literals
 
 from spotify import Artist, ffi, ImageSize, lib
-from spotify.utils import load, to_bytes, to_unicode
+from spotify.utils import IntEnum, load, make_enum, to_bytes, to_unicode
 
 
 __all__ = [
     'Album',
+    'AlbumType',
 ]
 
 
@@ -83,9 +84,22 @@ class Album(object):
         return lib.sp_album_year(self.sp_album)
 
     @property
+    def type(self):
+        """The album's :class:`AlbumType`.
+
+        Will always return :class:`None` if the album isn't loaded.
+        """
+        if not self.is_loaded:
+            return None
+        return AlbumType(lib.sp_album_type(self.sp_album))
+
+    @property
     def link(self):
         """A :class:`Link` to the album."""
         from spotify.link import Link
         return Link(self)
 
-    # TODO Add sp_album_* methods
+
+@make_enum('SP_ALBUMTYPE_')
+class AlbumType(IntEnum):
+    pass

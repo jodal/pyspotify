@@ -209,6 +209,8 @@ Albums
 
 .. autoclass:: Album
 
+.. autoclass:: AlbumType
+
 TODO: Album browsing
 
 

@@ -155,6 +155,26 @@ class AlbumTest(unittest.TestCase):
         lib_mock.sp_album_is_loaded.assert_called_once_with(sp_album)
         self.assertIsNone(result)
 
+    def test_type(self, lib_mock):
+        lib_mock.sp_album_type.return_value = int(spotify.AlbumType.SINGLE)
+        sp_album = spotify.ffi.new('int *')
+        album = spotify.Album(sp_album)
+
+        result = album.type
+
+        lib_mock.sp_album_type.assert_called_once_with(sp_album)
+        self.assertIs(result, spotify.AlbumType.SINGLE)
+
+    def test_type_is_none_if_unloaded(self, lib_mock):
+        lib_mock.sp_album_is_loaded.return_value = 0
+        sp_album = spotify.ffi.new('int *')
+        album = spotify.Album(sp_album)
+
+        result = album.type
+
+        lib_mock.sp_album_is_loaded.assert_called_once_with(sp_album)
+        self.assertIsNone(result)
+
     @mock.patch('spotify.link.Link', spec=spotify.Link)
     def test_link_creates_link_to_album(self, link_mock, lib_mock):
         link_mock.return_value = mock.sentinel.link
@@ -165,3 +185,10 @@ class AlbumTest(unittest.TestCase):
 
         link_mock.assert_called_once_with(album)
         self.assertEqual(result, mock.sentinel.link)
+
+
+class AlbumTypeTest(unittest.TestCase):
+
+    def test_has_constants(self):
+        self.assertEqual(spotify.AlbumType.ALBUM, 0)
+        self.assertEqual(spotify.AlbumType.SINGLE, 1)

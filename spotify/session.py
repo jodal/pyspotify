@@ -616,7 +616,8 @@ class SessionConfig(object):
     def get_application_key(self):
         """Internal method."""
         if self.application_key is None:
-            return open(self.application_key_filename, 'rb').read()
+            with open(self.application_key_filename, 'rb') as fh:
+                return fh.read()
         else:
             return self.application_key
 

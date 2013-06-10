@@ -32,7 +32,7 @@ Development setup
 
 4. Install development dependencies::
 
-       pip install cffi mock nose six tox
+       pip install cffi mock nose tox
 
 5. Quick test suite run, using the virtualenv's Python version::
 

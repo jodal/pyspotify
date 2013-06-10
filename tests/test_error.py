@@ -2,8 +2,8 @@ from __future__ import unicode_literals
 
 import unittest
 
-import six
 import spotify
+from spotify import utils
 
 
 class ErrorTest(unittest.TestCase):
@@ -28,7 +28,7 @@ class ErrorTest(unittest.TestCase):
     def test_error_has_useful_string_representation(self):
         error = spotify.Error(0)
         self.assertEqual('%s' % error, 'No error')
-        self.assertIsInstance('%s' % error, six.text_type)
+        self.assertIsInstance('%s' % error, utils.text_type)
 
         error = spotify.Error(1)
         self.assertEqual('%s' % error, 'Invalid library version')

@@ -10,6 +10,12 @@ import spotify
 @mock.patch('spotify.link.lib', spec=spotify.lib)
 class LinkTest(unittest.TestCase):
 
+    def create_session(self, lib_mock):
+        session = mock.sentinel.session
+        session.sp_session = mock.sentinel.sp_session
+        spotify.session_instance = session
+        return session
+
     def setUp(self):
         spotify.session_instance = mock.sentinel.session
 
@@ -335,6 +341,37 @@ class LinkTest(unittest.TestCase):
         self.assertIsNone(link.as_user())
 
         lib_mock.sp_link_as_user.assert_called_once_with(sp_link)
+
+    @mock.patch('spotify.image.lib', spec=spotify.lib)
+    def test_as_image(self, image_lib_mock, lib_mock):
+        session = self.create_session(lib_mock)
+        sp_link = spotify.ffi.new('int *')
+        lib_mock.sp_link_create_from_string.return_value = sp_link
+        lib_mock.sp_link_type.return_value = spotify.LinkType.IMAGE
+        sp_image = spotify.ffi.new('int *')
+        lib_mock.sp_image_create_from_link.return_value = sp_image
+
+        link = spotify.Link('spotify:image:foo')
+        self.assertEqual(link.as_image().sp_image, sp_image)
+
+        lib_mock.sp_image_create_from_link.assert_called_once_with(
+            session.sp_session, sp_link)
+
+        # Since we *created* the sp_image, we already have a refcount of 1 and
+        # shouldn't increase the refcount when wrapping this sp_image in an
+        # Image object
+        self.assertEqual(image_lib_mock.sp_image_add_ref.call_count, 0)
+
+    @mock.patch('spotify.image.lib', spec=spotify.lib)
+    def test_as_image_if_not_a_image(self, image_lib_mock, lib_mock):
+        sp_link = spotify.ffi.new('int *')
+        lib_mock.sp_link_create_from_string.return_value = sp_link
+        lib_mock.sp_link_type.return_value = spotify.LinkType.ARTIST
+
+        link = spotify.Link('spotify:image:foo')
+        self.assertIsNone(link.as_image())
+
+        self.assertEqual(lib_mock.sp_image_create_from_link.call_count, 0)
 
 
 class LinkTypeTest(unittest.TestCase):

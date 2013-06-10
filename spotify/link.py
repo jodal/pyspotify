@@ -113,6 +113,15 @@ class Link(object):
         if sp_user:
             return spotify.User(sp_user)
 
+    def as_image(self):
+        """Make a :class:`Image` from the link."""
+        if self.type is not LinkType.IMAGE:
+            return None
+        sp_image = lib.sp_image_create_from_link(
+            spotify.session_instance.sp_session, self.sp_link)
+        if sp_image:
+            return spotify.Image(sp_image, add_ref=False)
+
 
 @make_enum('SP_LINKTYPE_')
 class LinkType(IntEnum):

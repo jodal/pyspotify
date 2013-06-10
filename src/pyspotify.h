@@ -30,14 +30,12 @@ extern PyObject *SpotifyApiVersion;
 
 typedef struct {
     PyObject *callback;
-    PyObject *manager;
     PyObject *userdata;
 } Callback;
 
 /* Trampolines for callback handling */
-Callback *create_trampoline(PyObject *callback, PyObject *manager,
-                            PyObject *userdata);
-void delete_trampoline(Callback * tr);
+Callback *create_trampoline(PyObject *callback, PyObject *userdata);
+void delete_trampoline(Callback *trampoline);
 
 /* Returns o as a function ; o must be a method or a function object
  *   o is a Function object: returns o

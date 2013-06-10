@@ -3,31 +3,29 @@
 #include "pyspotify.h"
 
 Callback *
-create_trampoline(PyObject *callback, PyObject *manager, PyObject *userdata)
+create_trampoline(PyObject *callback, PyObject *userdata)
 {
-    Callback *tr = NULL;
-
     /* TODO: switch to PyMem_Malloc and audit for coresponding free */
-    tr = malloc(sizeof(Callback));
+    Callback *trampoline = malloc(sizeof(Callback));
+
+    if (userdata == NULL)
+        userdata = Py_None;
+
     Py_INCREF(callback);
-    Py_XINCREF(manager);
-    Py_XINCREF(userdata);
-    tr->callback = callback;
-    tr->manager = manager;
-    tr->userdata = userdata;
-    return tr;
+    Py_INCREF(userdata);
+    trampoline->callback = callback;
+    trampoline->userdata = userdata;
+    return trampoline;
 }
 
 void
-delete_trampoline(Callback * tr)
+delete_trampoline(Callback * trampoline)
 {
     PyGILState_STATE gstate;
-
     gstate = PyGILState_Ensure();
-    Py_XDECREF(tr->userdata);
-    Py_XDECREF(tr->manager);
-    Py_DECREF(tr->callback);
-    free(tr);
+    Py_DECREF(trampoline->userdata);
+    Py_DECREF(trampoline->callback);
+    free(trampoline);
     PyGILState_Release(gstate);
 }
 

@@ -216,14 +216,12 @@ Playlist_add_callback(Playlist * self, PyObject *args,
 
     if (!PyArg_ParseTuple(args, "O|O", &callback, &userdata))
         return NULL;
-    if (!userdata)
-        userdata = Py_None;
     if (!(PyFunction_Check(callback) || PyMethod_Check(callback))) {
         PyErr_SetString(PyExc_TypeError,
                     "callback argument must be of function or method type");
         return NULL;
     }
-    tramp = create_trampoline(callback, Py_None, userdata);
+    tramp = create_trampoline(callback, userdata);
     /* TODO: switch to PyMem_Malloc and audit for coresponding free */
     to_add = malloc(sizeof(playlist_callback));
     to_add->callback = pl_callbacks;

@@ -52,11 +52,9 @@ ToplistBrowser_new(PyTypeObject *potype, PyObject *args, PyObject *kwds)
     if (!PyArg_ParseTupleAndKeywords(args, kwds, "esO|OO", kwlist, ENCODING,
                                      &type, &region, &callback, &userdata))
         return NULL;
-    if (callback) { // Optional callback
-        if (!userdata)
-            userdata = Py_None;
-        tramp = create_trampoline(callback, NULL, userdata);
-    }
+    if (callback) // Optional callback
+        tramp = create_trampoline(callback, userdata);
+
     // Toplist type
     if (strcmp(type, "albums") == 0)
         tl_type = SP_TOPLIST_TYPE_ALBUMS;

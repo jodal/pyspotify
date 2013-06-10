@@ -276,9 +276,7 @@ Session_search(Session * self, PyObject *args, PyObject *kwds)
             return NULL;
         }
     }
-    if (!userdata)
-        userdata = Py_None;
-    st = create_trampoline(callback, NULL, userdata);
+    st = create_trampoline(callback, userdata);
 
     Py_BEGIN_ALLOW_THREADS;
     /* TODO: audit that we cleanup with _release */

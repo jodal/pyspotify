@@ -67,11 +67,9 @@ ArtistBrowser_new(PyTypeObject * type, PyObject *args, PyObject *kwds)
         }
     }
     self = (ArtistBrowser *) type->tp_alloc(type, 0);
-    if (callback) {
-        if (!userdata)
-            userdata = Py_None;
-        cb = create_trampoline(callback, NULL, userdata);
-    }
+    if (callback)
+        cb = create_trampoline(callback, userdata);
+
     /* TODO: audit that we cleanup with _release */
     self->_browser =
         sp_artistbrowse_create(g_session,

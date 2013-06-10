@@ -18,20 +18,21 @@ static PyMemberDef ToplistBrowser_members[] = {
 static void
 ToplistBrowser_browse_complete(sp_toplistbrowse *toplistbrowse, void *userdata)
 {
-    Callback *tramp;
+    Callback *trampoline;
     PyObject *browser, *res;
     PyGILState_STATE gstate;
 
-    if (!userdata)
+    if (userdata == NULL)
         return;
-    tramp = (Callback *)userdata;
-    browser = ToplistBrowser_FromSpotify(toplistbrowse);
+
+    trampoline = (Callback *)userdata;
     gstate = PyGILState_Ensure();
-    res = PyObject_CallFunctionObjArgs(tramp->callback, browser,
-                                       tramp->userdata, NULL);
+    browser = ToplistBrowser_FromSpotify(toplistbrowse);
+    res = PyObject_CallFunctionObjArgs(trampoline->callback, browser,
+                                       trampoline->userdata, NULL);
     if (!res)
-        PyErr_WriteUnraisable(tramp->callback);
-    delete_trampoline(tramp);
+        PyErr_WriteUnraisable(trampoline->callback);
+    delete_trampoline(trampoline);
     Py_XDECREF(res);
     Py_DECREF(browser);
     PyGILState_Release(gstate);
@@ -45,15 +46,16 @@ ToplistBrowser_new(PyTypeObject *potype, PyObject *args, PyObject *kwds)
     sp_toplisttype tl_type = 0;
     sp_toplistregion tl_region = 0;
     char *type, *username = NULL;
-    Callback *tramp = NULL;
+    Callback *trampoline = NULL;
     static char *kwlist[] =
         { "type", "region", "callback", "userdata", NULL };
 
     if (!PyArg_ParseTupleAndKeywords(args, kwds, "esO|OO", kwlist, ENCODING,
                                      &type, &region, &callback, &userdata))
         return NULL;
+
     if (callback) // Optional callback
-        tramp = create_trampoline(callback, userdata);
+        trampoline = create_trampoline(callback, userdata);
 
     // Toplist type
     if (strcmp(type, "albums") == 0)
@@ -98,7 +100,7 @@ ToplistBrowser_new(PyTypeObject *potype, PyObject *args, PyObject *kwds)
                                       tl_type, tl_region, username,
                                       (toplistbrowse_complete_cb *)
                                       ToplistBrowser_browse_complete,
-                                      tramp);
+                                      (void*)trampoline);
     Py_END_ALLOW_THREADS
 
     Py_DECREF(region);

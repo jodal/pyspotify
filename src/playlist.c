@@ -211,7 +211,7 @@ Playlist_add_callback(Playlist * self, PyObject *args,
                       sp_playlist_callbacks * pl_callbacks)
 {
     PyObject *callback, *userdata = NULL;
-    Callback *tramp;
+    Callback *trampoline;
     playlist_callback *to_add;
 
     if (!PyArg_ParseTuple(args, "O|O", &callback, &userdata))
@@ -221,17 +221,17 @@ Playlist_add_callback(Playlist * self, PyObject *args,
                     "callback argument must be of function or method type");
         return NULL;
     }
-    tramp = create_trampoline(callback, userdata);
+    trampoline = create_trampoline(callback, userdata);
     /* TODO: switch to PyMem_Malloc and audit for coresponding free */
     to_add = malloc(sizeof(playlist_callback));
     to_add->callback = pl_callbacks;
-    to_add->trampoline = tramp;
+    to_add->trampoline = trampoline;
     pl_callbacks_table_add(self, to_add);
 
     debug_printf("adding callback (%p,%p) py(%p,%p)",
-            pl_callbacks, tramp, tramp->callback, tramp->userdata);
+            pl_callbacks, trampoline, trampoline->callback, trampoline->userdata);
 
-    sp_playlist_add_callbacks(self->_playlist, pl_callbacks, tramp);
+    sp_playlist_add_callbacks(self->_playlist, pl_callbacks, (void*)trampoline);
     Py_RETURN_NONE;
 }
 
@@ -675,6 +675,7 @@ Playlist_remove_callback(Playlist * self, PyObject *args)
     if (!PyArg_ParseTuple(args, "O|O", &callback, &userdata))
         return NULL;
     if (!userdata) {
+        /* TODO: incref this? */
         userdata = Py_None;
     }
     if (!(callback = as_function(callback)))

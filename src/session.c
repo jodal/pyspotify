@@ -218,7 +218,7 @@ Session_process_events(Session * self)
 }
 
 void
-search_complete(sp_search * search, Callback * st)
+search_complete(sp_search * search, Callback * trampoline)
 {
     PyObject *res, *results;
     PyGILState_STATE gstate;
@@ -226,14 +226,14 @@ search_complete(sp_search * search, Callback * st)
     gstate = PyGILState_Ensure();
     results = Results_FromSpotify(search);
     if (results != NULL) {
-        res = PyObject_CallFunctionObjArgs(st->callback, results, st->userdata, NULL);
+        res = PyObject_CallFunctionObjArgs(trampoline->callback, results, trampoline->userdata, NULL);
         if (res == NULL)
-            PyErr_WriteUnraisable(st->callback);
+            PyErr_WriteUnraisable(trampoline->callback);
         else
             Py_DECREF(res);
         Py_DECREF(results);
     }
-    delete_trampoline(st);
+    delete_trampoline(trampoline);
     PyGILState_Release(gstate);
 }
 
@@ -246,7 +246,7 @@ Session_search(Session * self, PyObject *args, PyObject *kwds)
     int track_offset = 0, track_count = 32,
         album_offset = 0, album_count = 32, artist_offset = 0, artist_count =
         32, playlist_offset = 0, playlist_count = 32;
-    Callback *st;
+    Callback *trampoline;
     sp_search_type search_type = SP_SEARCH_STANDARD;
     char *str_search_type = NULL;
 
@@ -276,7 +276,7 @@ Session_search(Session * self, PyObject *args, PyObject *kwds)
             return NULL;
         }
     }
-    st = create_trampoline(callback, userdata);
+    trampoline = create_trampoline(callback, userdata);
 
     Py_BEGIN_ALLOW_THREADS;
     /* TODO: audit that we cleanup with _release */
@@ -287,7 +287,7 @@ Session_search(Session * self, PyObject *args, PyObject *kwds)
                               playlist_offset, playlist_count,
                               search_type,
                               (search_complete_cb *) search_complete,
-                              (void *)st);
+                              (void *)trampoline);
     Py_END_ALLOW_THREADS;
 
     return Results_FromSpotify(search);

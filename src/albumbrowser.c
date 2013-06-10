@@ -19,22 +19,22 @@ AlbumBrowser_FromSpotify(sp_albumbrowse * browse)
 }
 
 static void
-AlbumBrowser_browse_complete(sp_albumbrowse * browse, Callback * st)
+AlbumBrowser_browse_complete(sp_albumbrowse * browse, Callback * trampoline)
 {
-    debug_printf("browse complete (%p, %p)", browse, st);
+    debug_printf("browse complete (%p, %p)", browse, trampoline);
 
-    if (!st)
+    if (!trampoline)
         return;
 
     PyGILState_STATE gstate = PyGILState_Ensure();
     PyObject *browser = AlbumBrowser_FromSpotify(browse);
 
-    PyObject *res = PyObject_CallFunctionObjArgs(st->callback, browser,
-                                                 st->userdata, NULL);
+    PyObject *res = PyObject_CallFunctionObjArgs(
+            trampoline->callback, browser, trampoline->userdata, NULL);
     if (!res)
-        PyErr_WriteUnraisable(st->callback);
+        PyErr_WriteUnraisable(trampoline->callback);
 
-    delete_trampoline(st);
+    delete_trampoline(trampoline);
     Py_DECREF(browser);
     Py_XDECREF(res);
     PyGILState_Release(gstate);
@@ -44,7 +44,7 @@ static PyObject *
 AlbumBrowser_new(PyTypeObject *type, PyObject *args, PyObject *kwds)
 {
     PyObject *album, *callback = NULL, *userdata = NULL;
-    Callback *cb = NULL;
+    Callback *trampoline = NULL;
     AlbumBrowser *self;
     static char *kwlist[] =
         { "album", "callback", "userdata", NULL };
@@ -55,14 +55,14 @@ AlbumBrowser_new(PyTypeObject *type, PyObject *args, PyObject *kwds)
         return NULL;
     self = (AlbumBrowser *) type->tp_alloc(type, 0);
     if (callback)
-        cb = create_trampoline(callback, userdata);
+        trampoline = create_trampoline(callback, userdata);
     /* TODO: audit that we cleanup with _release */
     self->_browser =
         sp_albumbrowse_create(g_session,
                                ((Album *) album)->_album,
                                (albumbrowse_complete_cb *)
                                AlbumBrowser_browse_complete,
-                               cb);
+                               (void*)trampoline);
     return (PyObject *)self;
 }
 

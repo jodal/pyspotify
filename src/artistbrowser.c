@@ -20,19 +20,21 @@ ArtistBrowser_FromSpotify(sp_artistbrowse * browse)
 }
 
 void
-ArtistBrowser_browse_complete(sp_artistbrowse *browse, Callback *st)
+ArtistBrowser_browse_complete(sp_artistbrowse *browse, Callback *trampoline)
 {
-    debug_printf("browse complete (%p, %p)", browse, st);
+    debug_printf("browse complete (%p, %p)", browse, trampoline);
 
-    if (!st) return;
+    if (!trampoline)
+        return;
+
     PyGILState_STATE gstate = PyGILState_Ensure();
     PyObject *browser = ArtistBrowser_FromSpotify(browse);
 
-    PyObject *res = PyObject_CallFunctionObjArgs(st->callback, browser,
-                                                 st->userdata, NULL);
+    PyObject *res = PyObject_CallFunctionObjArgs(trampoline->callback, browser,
+                                                 trampoline->userdata, NULL);
     if (!res)
-        PyErr_WriteUnraisable(st->callback);
-    delete_trampoline(st);
+        PyErr_WriteUnraisable(trampoline->callback);
+    delete_trampoline(trampoline);
     Py_DECREF(browser);
     Py_XDECREF(res);
     PyGILState_Release(gstate);
@@ -44,7 +46,7 @@ ArtistBrowser_new(PyTypeObject * type, PyObject *args, PyObject *kwds)
     PyObject *artist, *callback = NULL, *userdata = NULL;
     char *str_type = NULL;
     sp_artistbrowse_type abtype = SP_ARTISTBROWSE_FULL;
-    Callback *cb = NULL;
+    Callback *trampoline = NULL;
     ArtistBrowser *self;
     static char *kwlist[] =
         { "artist", "type", "callback", "userdata", NULL };
@@ -68,7 +70,7 @@ ArtistBrowser_new(PyTypeObject * type, PyObject *args, PyObject *kwds)
     }
     self = (ArtistBrowser *) type->tp_alloc(type, 0);
     if (callback)
-        cb = create_trampoline(callback, userdata);
+        trampoline = create_trampoline(callback, userdata);
 
     /* TODO: audit that we cleanup with _release */
     self->_browser =
@@ -77,7 +79,7 @@ ArtistBrowser_new(PyTypeObject * type, PyObject *args, PyObject *kwds)
                                abtype,
                                (artistbrowse_complete_cb *)
                                ArtistBrowser_browse_complete,
-                               cb);
+                               (void*)trampoline);
     return (PyObject *)self;
 }
 

@@ -102,14 +102,14 @@ AlbumBrowser_sq_item(PyObject *self, Py_ssize_t index)
 }
 
 PySequenceMethods AlbumBrowser_as_sequence = {
-    (lenfunc) AlbumBrowser_sq_length,    /* sq_length */
-    0,                                   /* sq_concat */
-    0,                                   /* sq_repeat */
-    (ssizeargfunc) AlbumBrowser_sq_item, /* sq_item */
-    0,                                   /* sq_ass_item */
-    0,                                   /* sq_contains */
-    0,                                   /* sq_inplace_concat */
-    0,                                   /* sq_inplace_repeat */
+    (lenfunc) AlbumBrowser_sq_length,    /*sq_length*/
+    0,                                   /*sq_concat*/
+    0,                                   /*sq_repeat*/
+    (ssizeargfunc) AlbumBrowser_sq_item, /*sq_item*/
+    0,                                   /*sq_ass_item*/
+    0,                                   /*sq_contains*/
+    0,                                   /*sq_inplace_concat*/
+    0,                                   /*sq_inplace_repeat*/
 };
 
 static PyMethodDef AlbumBrowser_methods[] = {

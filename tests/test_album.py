@@ -145,7 +145,7 @@ class AlbumTest(unittest.TestCase):
         lib_mock.sp_album_year.assert_called_once_with(sp_album)
         self.assertEqual(result, 2013)
 
-    def test_name_is_none_if_unloaded(self, lib_mock):
+    def test_year_is_none_if_unloaded(self, lib_mock):
         lib_mock.sp_album_is_loaded.return_value = 0
         sp_album = spotify.ffi.new('int *')
         album = spotify.Album(sp_album)

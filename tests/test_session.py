@@ -99,7 +99,7 @@ class SessionCallbacksTest(unittest.TestCase):
         self.callbacks._message_to_user(self.sp_session, data)
 
         self.callbacks.message_to_user.assert_called_once_with(
-            spotify.session_instance, u'a log message')
+            spotify.session_instance, 'a log message')
 
     def test_message_to_user_without_session(self):
         spotify.session_instance = None
@@ -202,7 +202,7 @@ class SessionCallbacksTest(unittest.TestCase):
         self.callbacks._log_message(self.sp_session, data)
 
         self.callbacks.log_message.assert_called_once_with(
-            spotify.session_instance, u'a log message')
+            spotify.session_instance, 'a log message')
 
     def test_log_message_without_session(self):
         spotify.session_instance = None

@@ -27,8 +27,6 @@ static PyMethodDef module_methods[] = {
 PyMODINIT_FUNC
 init_spotify(void)
 {
-    PyObject *m;
-
     if (PyType_Ready(&SessionType) < 0)
         return;
     if (PyType_Ready(&ArtistType) < 0)
@@ -54,8 +52,8 @@ init_spotify(void)
     if (PyType_Ready(&UserType) < 0)
         return;
 
-    m = Py_InitModule("_spotify", module_methods);
-    if (m == NULL)
+    PyObject *module = Py_InitModule("_spotify", module_methods);
+    if (module == NULL)
         return;
 
     PyObject *spotify = PyImport_ImportModule("spotify");
@@ -69,20 +67,23 @@ init_spotify(void)
     Py_XINCREF(SpotifyApiVersion); /* PyModule_AddObject steals the ref.     */
     Py_XDECREF(spotify);           /* dict is borrowed, only cleanup module. */
 
-    PyModule_AddObject(m, "api_version", SpotifyApiVersion);
+    PyModule_AddObject(module, "api_version", SpotifyApiVersion);
 
-    album_init(m);
-    albumbrowser_init(m);
-    artist_init(m);
-    artistbrowser_init(m);
-    link_init(m);
-    playlist_init(m);
-    playlistcontainer_init(m);
-    playlistfolder_init(m);
-    session_init(m);
-    search_init(m);
-    toplistbrowser_init(m);
-    track_init(m);
-    image_init(m);
-    user_init(m);
+    /* TODO: rename to Type_add_to_module? */
+    /* TODO: figure out we we can remove this in favour of generic helper? */
+    /* TODO: figure out if PyType_Ready needs to be both in _init and above? */
+    album_init(module);
+    albumbrowser_init(module);
+    artist_init(module);
+    artistbrowser_init(module);
+    link_init(module);
+    playlist_init(module);
+    playlistcontainer_init(module);
+    playlistfolder_init(module);
+    session_init(module);
+    search_init(module);
+    toplistbrowser_init(module);
+    track_init(module);
+    image_init(module);
+    user_init(module);
 }

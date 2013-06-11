@@ -168,8 +168,6 @@ PyTypeObject AlbumBrowserType = {
 void
 albumbrowser_init(PyObject *module)
 {
-    if (PyType_Ready(&AlbumBrowserType) < 0)
-        return;
     Py_INCREF(&AlbumBrowserType);
     PyModule_AddObject(module, "AlbumBrowser", (PyObject *)&AlbumBrowserType);
 }

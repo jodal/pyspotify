@@ -121,6 +121,8 @@ user_init(PyObject *module)
     Py_INCREF(&UserType);
     PyModule_AddObject(module, "User", (PyObject *)&UserType);
 
+    /* TODO: why is this module levels constants instead of object? */
+    /* TODO: name should be prefixed with USER_* */
     PyModule_AddIntConstant(module, "RELATION_TYPE_UNKNOWN",
                             SP_RELATION_TYPE_UNKNOWN);
     PyModule_AddIntConstant(module, "RELATION_TYPE_NONE",

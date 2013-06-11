@@ -264,8 +264,6 @@ PyTypeObject ArtistBrowserType = {
 void
 artistbrowser_init(PyObject *module)
 {
-    if (PyType_Ready(&ArtistBrowserType) < 0)
-        return;
     Py_INCREF(&ArtistBrowserType);
     PyModule_AddObject(module, "ArtistBrowser", (PyObject *)&ArtistBrowserType);
 }

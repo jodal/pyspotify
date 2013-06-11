@@ -166,7 +166,7 @@ class SpotifyLoop(threading.Thread):
                 'I am %s aka %s. You can find me at %s',
                 self.session.user.canonical_name,
                 self.session.user.display_name,
-                self.session.user.as_link())
+                self.session.user.link)
         else:
             self.logger.info(
                 'I am not logged in, but I may be %s',

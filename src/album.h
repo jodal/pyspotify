@@ -5,8 +5,7 @@ typedef struct {
 
 #define Album_SP_ALBUM(o) ((Album *)o)->_album
 
-extern
-PyTypeObject AlbumType;
+extern PyTypeObject AlbumType;
 
 PyObject *
 Album_FromSpotify(sp_album * album);

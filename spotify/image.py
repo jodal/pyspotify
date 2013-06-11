@@ -56,6 +56,22 @@ class Image(object):
         return ImageFormat(lib.sp_image_format(self.sp_image))
 
     @property
+    def data(self):
+        """The raw image data as a bytestring.
+
+        Will always return :class:`None` if the image isn't loaded.
+        """
+        if not self.is_loaded:
+            return None
+        data_size_ptr = ffi.new('size_t *')
+        data = lib.sp_image_data(self.sp_image, data_size_ptr)
+        buffer_ = ffi.buffer(data, data_size_ptr[0])
+        data_bytes = buffer_[:]
+        assert len(data_bytes) == data_size_ptr[0], '%r == %r' % (
+            len(data_bytes), data_size_ptr[0])
+        return data_bytes
+
+    @property
     def link(self):
         """A :class:`Link` to the image."""
         from spotify.link import Link

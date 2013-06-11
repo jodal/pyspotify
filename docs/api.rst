@@ -203,6 +203,12 @@ Tracks
 .. autoclass:: LocalTrack
     :no-inherited-members:
 
+.. autoclass:: TrackAvailability
+    :no-inherited-members:
+
+.. autoclass:: TrackOfflineStatus
+    :no-inherited-members:
+
 
 Albums
 ======
@@ -210,6 +216,7 @@ Albums
 .. autoclass:: Album
 
 .. autoclass:: AlbumType
+    :no-inherited-members:
 
 TODO: Album browsing
 

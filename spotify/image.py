@@ -20,7 +20,7 @@ class Image(object):
 
     @property
     def link(self):
-        """A :class:`Link` to the search."""
+        """A :class:`Link` to the image."""
         from spotify.link import Link
         return Link(self)
 

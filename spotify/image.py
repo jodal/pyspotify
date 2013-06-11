@@ -1,5 +1,7 @@
 from __future__ import unicode_literals
 
+import base64
+
 from spotify import ErrorType, ffi, lib
 from spotify.utils import IntEnum, load, make_enum
 
@@ -70,6 +72,19 @@ class Image(object):
         assert len(data_bytes) == data_size_ptr[0], '%r == %r' % (
             len(data_bytes), data_size_ptr[0])
         return data_bytes
+
+    @property
+    def data_uri(self):
+        """The raw image data as a data: URI.
+
+        Will always return :class:`None` if the image isn't loaded.
+        """
+        if not self.is_loaded:
+            return None
+        if self.format is not ImageFormat.JPEG:
+            raise ValueError('Unknown image format: %r' % self.format)
+        return 'data:image/jpeg;base64,%s' % (
+            base64.b64encode(self.data).decode('ascii'))
 
     @property
     def link(self):

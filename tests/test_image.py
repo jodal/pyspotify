@@ -107,6 +107,37 @@ class ImageTest(unittest.TestCase):
         lib_mock.sp_image_is_loaded.assert_called_with(sp_image)
         self.assertIsNone(result)
 
+    def test_data_uri(self, lib_mock):
+        lib_mock.sp_image_format.return_value = int(spotify.ImageFormat.JPEG)
+        sp_image = spotify.ffi.new('int *')
+
+        prop_mock = mock.PropertyMock()
+        with mock.patch.object(spotify.Image, 'data', prop_mock):
+            image = spotify.Image(sp_image)
+            prop_mock.return_value = b'01234\x006789'
+
+            result = image.data_uri
+
+        self.assertEqual(result, 'data:image/jpeg;base64,MDEyMzQANjc4OQ==')
+
+    def test_data_uri_is_none_if_unloaded(self, lib_mock):
+        lib_mock.sp_image_is_loaded.return_value = 0
+        sp_image = spotify.ffi.new('int *')
+        image = spotify.Image(sp_image)
+
+        result = image.data_uri
+
+        self.assertIsNone(result)
+
+    def test_data_uri_fails_if_unknown_image_format(self, lib_mock):
+        sp_image = spotify.ffi.new('int *')
+        image = spotify.Image(sp_image)
+        image.__dict__['format'] = mock.Mock(
+            return_value=spotify.ImageFormat.UNKNOWN)
+        image.__dict__['data'] = mock.Mock(return_value=b'01234\x006789')
+
+        self.assertRaises(ValueError, lambda: image.data_uri)
+
     @mock.patch('spotify.link.Link', spec=spotify.Link)
     def test_link_creates_link_to_image(self, link_mock, lib_mock):
         link_mock.return_value = mock.sentinel.link

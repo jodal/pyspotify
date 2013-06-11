@@ -5,6 +5,8 @@ typedef struct {
     PyObject_HEAD sp_playlist *_playlist;
 } Playlist;
 
+#define Playlist_SP_PLAYLIST(o) ((Playlist *)o)->_playlist
+
 extern PyTypeObject PlaylistType;
 
 extern void playlist_init(PyObject *m);

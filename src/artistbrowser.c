@@ -50,6 +50,7 @@ ArtistBrowser_new(PyTypeObject *type, PyObject *args, PyObject *kwds)
     Callback *trampoline = NULL;
 
     char *tmp = NULL;
+    sp_artistbrowse *browser;
     sp_artistbrowse_type browse_type = SP_ARTISTBROWSE_FULL;
 
     static char *kwlist[] = {"artist", "type", "callback", "userdata", NULL};
@@ -80,9 +81,10 @@ ArtistBrowser_new(PyTypeObject *type, PyObject *args, PyObject *kwds)
         trampoline = create_trampoline(callback, userdata);
 
     /* TODO: audit that we cleanup with _release */
-    sp_artistbrowse *browser = sp_artistbrowse_create(
-        g_session, Artist_SP_ARTIST(artist), browse_type,
-        ArtistBrowser_browse_complete, (void*)trampoline);
+    browser = sp_artistbrowse_create(g_session, Artist_SP_ARTIST(artist),
+                                     browse_type,
+                                     ArtistBrowser_browse_complete,
+                                     (void*)trampoline);
 
     self = type->tp_alloc(type, 0);
     ArtistBrowser_SP_ARTISTBROWSE(self) = browser;

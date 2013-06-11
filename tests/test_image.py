@@ -56,6 +56,27 @@ class ImageTest(unittest.TestCase):
 
         load_mock.assert_called_with(image, timeout=10)
 
+    def test_format(self, lib_mock):
+        lib_mock.sp_image_is_loaded.return_value = 1
+        lib_mock.sp_image_format.return_value = int(spotify.ImageFormat.JPEG)
+        sp_image = spotify.ffi.new('int *')
+        image = spotify.Image(sp_image)
+
+        result = image.format
+
+        lib_mock.sp_image_format.assert_called_with(sp_image)
+        self.assertIs(result, spotify.ImageFormat.JPEG)
+
+    def test_format_is_none_if_unloaded(self, lib_mock):
+        lib_mock.sp_image_is_loaded.return_value = 0
+        sp_image = spotify.ffi.new('int *')
+        image = spotify.Image(sp_image)
+
+        result = image.format
+
+        lib_mock.sp_image_is_loaded.assert_called_with(sp_image)
+        self.assertIsNone(result)
+
     @mock.patch('spotify.link.Link', spec=spotify.Link)
     def test_link_creates_link_to_image(self, link_mock, lib_mock):
         link_mock.return_value = mock.sentinel.link
@@ -66,6 +87,13 @@ class ImageTest(unittest.TestCase):
 
         link_mock.assert_called_once_with(image)
         self.assertEqual(result, mock.sentinel.link)
+
+
+class ImageFormatTest(unittest.TestCase):
+
+    def test_has_constants(self):
+        self.assertEqual(spotify.ImageFormat.UNKNOWN, -1)
+        self.assertEqual(spotify.ImageFormat.JPEG, 0)
 
 
 class ImageSizeTest(unittest.TestCase):

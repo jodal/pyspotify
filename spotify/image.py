@@ -6,6 +6,7 @@ from spotify.utils import IntEnum, load, make_enum
 
 __all__ = [
     'Image',
+    'ImageFormat',
     'ImageSize',
 ]
 
@@ -45,12 +46,27 @@ class Image(object):
         return load(self, timeout=timeout)
 
     @property
+    def format(self):
+        """The :class:`ImageFormat` of the image.
+
+        Will always return :class:`None` if the image isn't loaded.
+        """
+        if not self.is_loaded:
+            return None
+        return ImageFormat(lib.sp_image_format(self.sp_image))
+
+    @property
     def link(self):
         """A :class:`Link` to the image."""
         from spotify.link import Link
         return Link(self)
 
     # TODO Add sp_image_* methods
+
+
+@make_enum('SP_IMAGE_FORMAT_')
+class ImageFormat(IntEnum):
+    pass
 
 
 @make_enum('SP_IMAGE_SIZE_')

@@ -72,7 +72,7 @@ class TrackTest(unittest.TestCase):
         lib_mock.sp_track_error.assert_called_once_with(sp_track)
         self.assertIs(result, spotify.ErrorType.IS_LOADING)
 
-    @mock.patch('spotify.track.load')
+    @mock.patch('spotify.utils.load')
     def test_load(self, load_mock, lib_mock):
         sp_track = spotify.ffi.new('int *')
         track = spotify.Track(sp_track)

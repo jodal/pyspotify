@@ -58,7 +58,7 @@ class UserTest(unittest.TestCase):
         lib_mock.sp_user_is_loaded.assert_called_once_with(sp_user)
         self.assertTrue(result)
 
-    @mock.patch('spotify.user.load')
+    @mock.patch('spotify.utils.load')
     def test_load(self, load_mock, lib_mock):
         sp_user = spotify.ffi.new('int *')
         user = spotify.User(sp_user)

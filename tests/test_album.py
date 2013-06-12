@@ -45,7 +45,7 @@ class AlbumTest(unittest.TestCase):
         lib_mock.sp_album_is_loaded.assert_called_once_with(sp_album)
         self.assertTrue(result)
 
-    @mock.patch('spotify.album.load')
+    @mock.patch('spotify.utils.load')
     def test_load(self, load_mock, lib_mock):
         sp_album = spotify.ffi.new('int *')
         album = spotify.Album(sp_album)

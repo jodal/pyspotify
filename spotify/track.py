@@ -1,8 +1,7 @@
 from __future__ import unicode_literals
 
 import spotify
-from spotify import Album, Error, ErrorType, ffi, lib
-from spotify.utils import IntEnum, load, make_enum, to_bytes, to_unicode
+from spotify import Album, Error, ErrorType, ffi, lib, utils
 
 
 __all__ = [
@@ -41,7 +40,7 @@ class Track(object):
         :type timeout: float
         :returns: self
         """
-        return load(self, timeout=timeout)
+        return utils.load(self, timeout=timeout)
 
     @property
     def offline_status(self):
@@ -183,7 +182,7 @@ class Track(object):
         Will always return :class:`None` if the track isn't loaded.
         """
         Error.maybe_raise(self.error)
-        name = to_unicode(lib.sp_track_name(self.sp_track))
+        name = utils.to_unicode(lib.sp_track_name(self.sp_track))
         return name if name else None
 
     @property
@@ -251,7 +250,7 @@ class LocalTrack(Track):
 
     def __init__(self, artist=None, title=None, album=None, length=None):
         convert = lambda value: ffi.NULL if value is None else ffi.new(
-            'char[]', to_bytes(value))
+            'char[]', utils.to_bytes(value))
 
         artist = convert(artist)
         title = convert(title)
@@ -264,11 +263,11 @@ class LocalTrack(Track):
         super(LocalTrack, self).__init__(sp_track, add_ref=False)
 
 
-@make_enum('SP_TRACK_AVAILABILITY_')
-class TrackAvailability(IntEnum):
+@utils.make_enum('SP_TRACK_AVAILABILITY_')
+class TrackAvailability(utils.IntEnum):
     pass
 
 
-@make_enum('SP_TRACK_OFFLINE_')
-class TrackOfflineStatus(IntEnum):
+@utils.make_enum('SP_TRACK_OFFLINE_')
+class TrackOfflineStatus(utils.IntEnum):
     pass

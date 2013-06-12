@@ -7,9 +7,7 @@ import operator
 import spotify
 from spotify import (
     ConnectionState, Error, ErrorType, ffi, lib, Playlist, PlaylistContainer,
-    ScrobblingState, User)
-from spotify.utils import (
-    get_with_growing_buffer, to_bytes, to_unicode, to_country)
+    ScrobblingState, User, utils)
 
 
 __all__ = [
@@ -341,7 +339,7 @@ class SessionCallbacks(object):
     def _message_to_user(self, sp_session, data):
         if not spotify.session_instance:
             return
-        data = to_unicode(data).strip()
+        data = utils.to_unicode(data).strip()
         logger.debug('Message to user: %s', data)
         if self.message_to_user is not None:
             self.message_to_user(spotify.session_instance, data)
@@ -378,7 +376,7 @@ class SessionCallbacks(object):
     def _log_message(self, sp_session, data):
         if not spotify.session_instance:
             return
-        data = to_unicode(data).strip()
+        data = utils.to_unicode(data).strip()
         logger.debug('Log message from Spotify: %s', data)
         if self.log_message is not None:
             self.log_message(spotify.session_instance, data)
@@ -632,13 +630,14 @@ class SessionConfig(object):
         """Internal method."""
 
         convert = lambda value: ffi.NULL if value is None else ffi.new(
-            'char[]', to_bytes(value))
+            'char[]', utils.to_bytes(value))
 
-        cache_location = ffi.new('char[]', to_bytes(self.cache_location))
-        settings_location = ffi.new('char[]', to_bytes(self.settings_location))
+        cache_location = ffi.new('char[]', utils.to_bytes(self.cache_location))
+        settings_location = ffi.new(
+            'char[]', utils.to_bytes(self.settings_location))
         application_key_bytes = self.get_application_key()
         application_key = ffi.new('char[]', application_key_bytes)
-        user_agent = ffi.new('char[]', to_bytes(self.user_agent))
+        user_agent = ffi.new('char[]', utils.to_bytes(self.user_agent))
         callbacks = self.get_callbacks()
         device_id = convert(self.device_id)
         proxy = convert(self.proxy)
@@ -741,14 +740,14 @@ class Session(object):
         calling :meth:`relogin`.
         """
 
-        username = ffi.new('char[]', to_bytes(username))
+        username = ffi.new('char[]', utils.to_bytes(username))
 
         if password is not None:
-            password = ffi.new('char[]', to_bytes(password)) or ffi.NULL
+            password = ffi.new('char[]', utils.to_bytes(password)) or ffi.NULL
             blob = ffi.NULL
         elif blob is not None:
             password = ffi.NULL
-            blob = ffi.new('char[]', to_bytes(blob))
+            blob = ffi.new('char[]', utils.to_bytes(blob))
         else:
             raise AttributeError('password or blob is required to login')
 
@@ -770,13 +769,13 @@ class Session(object):
     def remembered_user_name(self):
         """The username of the remembered user from a previous :meth:`login`
         call."""
-        return get_with_growing_buffer(
+        return utils.get_with_growing_buffer(
             lib.sp_session_remembered_user, self.sp_session)
 
     @property
     def user_name(self):
         """The username of the logged in user."""
-        return to_unicode(lib.sp_session_user_name(self.sp_session))
+        return utils.to_unicode(lib.sp_session_user_name(self.sp_session))
 
     def forget_me(self):
         """Forget the remembered user from a previous :meth:`login` call."""
@@ -898,7 +897,7 @@ class Session(object):
         """The starred :class:`Playlist` for the user with
         ``canonical_username``."""
         sp_playlist = lib.sp_session_starred_for_user_create(
-            self.sp_session, to_bytes(canonical_username))
+            self.sp_session, utils.to_bytes(canonical_username))
         if sp_playlist == ffi.NULL:
             return None
         return Playlist(sp_playlist, add_ref=False)
@@ -912,7 +911,7 @@ class Session(object):
         if canonical_username is None:
             canonical_username = ffi.NULL
         else:
-            canonical_username = to_bytes(canonical_username)
+            canonical_username = utils.to_bytes(canonical_username)
         sp_playlistcontainer = (
             lib.sp_session_publishedcontainer_for_user_create(
                 self.sp_session, canonical_username))
@@ -989,8 +988,8 @@ class Session(object):
         provider. If authentication fails a
         :attr:`~SessionCallbacks.scrobble_error` callback will be sent.
         """
-        username = ffi.new('char[]', to_bytes(username))
-        password = ffi.new('char[]', to_bytes(password))
+        username = ffi.new('char[]', utils.to_bytes(username))
+        password = ffi.new('char[]', utils.to_bytes(password))
         Error.maybe_raise(lib.sp_session_set_social_credentials(
             self.sp_session, social_provider, username, password))
 
@@ -1053,4 +1052,4 @@ class Session(object):
         The :attr:`~SessionCallbacks.offline_status_updated` callback is called
         when this changes.
         """
-        return to_country(lib.sp_session_user_country(self.sp_session))
+        return utils.to_country(lib.sp_session_user_country(self.sp_session))

@@ -2,7 +2,7 @@ from __future__ import unicode_literals
 
 import collections
 
-from spotify.utils import IntEnum, make_enum
+from spotify import utils
 
 
 __all__ = [
@@ -19,13 +19,13 @@ class AudioBufferStats(collections.namedtuple(
     pass
 
 
-@make_enum('SP_BITRATE_', 'BITRATE_')
-class Bitrate(IntEnum):
+@utils.make_enum('SP_BITRATE_', 'BITRATE_')
+class Bitrate(utils.IntEnum):
     pass
 
 
-@make_enum('SP_SAMPLETYPE_')
-class SampleType(IntEnum):
+@utils.make_enum('SP_SAMPLETYPE_')
+class SampleType(utils.IntEnum):
     pass
 
 

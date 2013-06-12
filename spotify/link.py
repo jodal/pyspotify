@@ -1,8 +1,7 @@
 from __future__ import unicode_literals
 
 import spotify
-from spotify import ffi, lib
-from spotify.utils import get_with_growing_buffer, IntEnum, make_enum, to_bytes
+from spotify import ffi, lib, utils
 
 
 __all__ = [
@@ -67,7 +66,7 @@ class Link(object):
             sp_link = lib.sp_link_create_from_image(value.sp_image)
         else:
             sp_link = lib.sp_link_create_from_string(
-                ffi.new('char[]', to_bytes(value)))
+                ffi.new('char[]', utils.to_bytes(value)))
             if sp_link == ffi.NULL:
                 raise ValueError(
                     'Failed to get link from Spotify URI: %r' % value)
@@ -75,7 +74,8 @@ class Link(object):
         self.sp_link = ffi.gc(sp_link, lib.sp_link_release)
 
     def __str__(self):
-        return get_with_growing_buffer(lib.sp_link_as_string, self.sp_link)
+        return utils.get_with_growing_buffer(
+            lib.sp_link_as_string, self.sp_link)
 
     @property
     def type(self):
@@ -123,6 +123,6 @@ class Link(object):
             return spotify.Image(sp_image, add_ref=False)
 
 
-@make_enum('SP_LINKTYPE_')
-class LinkType(IntEnum):
+@utils.make_enum('SP_LINKTYPE_')
+class LinkType(utils.IntEnum):
     pass

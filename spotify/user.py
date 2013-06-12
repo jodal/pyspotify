@@ -1,8 +1,7 @@
 from __future__ import unicode_literals
 
 import spotify
-from spotify import ffi, lib
-from spotify.utils import load, to_unicode
+from spotify import ffi, lib, utils
 
 
 __all__ = [
@@ -20,12 +19,12 @@ class User(object):
     @property
     def canonical_name(self):
         """The user's canonical username."""
-        return to_unicode(lib.sp_user_canonical_name(self.sp_user))
+        return utils.to_unicode(lib.sp_user_canonical_name(self.sp_user))
 
     @property
     def display_name(self):
         """The user's displayable username."""
-        return to_unicode(lib.sp_user_display_name(self.sp_user))
+        return utils.to_unicode(lib.sp_user_display_name(self.sp_user))
 
     @property
     def is_loaded(self):
@@ -39,7 +38,7 @@ class User(object):
         :type timeout: float
         :returns: self
         """
-        return load(self, timeout=timeout)
+        return utils.load(self, timeout=timeout)
 
     @property
     def link(self):

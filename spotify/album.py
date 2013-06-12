@@ -1,8 +1,7 @@
 from __future__ import unicode_literals
 
 import spotify
-from spotify import Artist, ffi, Image, ImageSize, lib
-from spotify.utils import IntEnum, load, make_enum, to_unicode
+from spotify import Artist, ffi, Image, ImageSize, lib, utils
 
 
 __all__ = [
@@ -30,7 +29,7 @@ class Album(object):
         :type timeout: float
         :returns: self
         """
-        return load(self, timeout=timeout)
+        return utils.load(self, timeout=timeout)
 
     @property
     def is_available(self):
@@ -73,7 +72,7 @@ class Album(object):
 
         Will always return :class:`None` if the album isn't loaded.
         """
-        name = to_unicode(lib.sp_album_name(self.sp_album))
+        name = utils.to_unicode(lib.sp_album_name(self.sp_album))
         return name if name else None
 
     @property
@@ -103,6 +102,6 @@ class Album(object):
         return Link(self)
 
 
-@make_enum('SP_ALBUMTYPE_')
-class AlbumType(IntEnum):
+@utils.make_enum('SP_ALBUMTYPE_')
+class AlbumType(utils.IntEnum):
     pass

@@ -1,6 +1,6 @@
 from __future__ import unicode_literals
 
-from spotify.utils import IntEnum, make_enum
+from spotify import utils
 
 
 __all__ = [
@@ -9,11 +9,11 @@ __all__ = [
 ]
 
 
-@make_enum('SP_SCROBBLING_STATE_')
-class ScrobblingState(IntEnum):
+@utils.make_enum('SP_SCROBBLING_STATE_')
+class ScrobblingState(utils.IntEnum):
     pass
 
 
-@make_enum('SP_SOCIAL_PROVIDER_')
-class SocialProvider(IntEnum):
+@utils.make_enum('SP_SOCIAL_PROVIDER_')
+class SocialProvider(utils.IntEnum):
     pass

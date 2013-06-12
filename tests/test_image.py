@@ -47,7 +47,7 @@ class ImageTest(unittest.TestCase):
         lib_mock.sp_image_error.assert_called_once_with(sp_image)
         self.assertIs(result, spotify.ErrorType.IS_LOADING)
 
-    @mock.patch('spotify.image.load')
+    @mock.patch('spotify.utils.load')
     def test_load(self, load_mock, lib_mock):
         sp_image = spotify.ffi.new('int *')
         image = spotify.Image(sp_image)

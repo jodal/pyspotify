@@ -1,8 +1,7 @@
 from __future__ import unicode_literals
 
 import spotify
-from spotify import ffi, Image, ImageSize, lib
-from spotify.utils import load, to_unicode
+from spotify import ffi, Image, ImageSize, lib, utils
 
 
 __all__ = [
@@ -23,7 +22,7 @@ class Artist(object):
 
         Will always return :class:`None` if the artist isn't loaded.
         """
-        name = to_unicode(lib.sp_artist_name(self.sp_artist))
+        name = utils.to_unicode(lib.sp_artist_name(self.sp_artist))
         return name if name else None
 
     @property
@@ -38,7 +37,7 @@ class Artist(object):
         :type timeout: float
         :returns: self
         """
-        return load(self, timeout=timeout)
+        return utils.load(self, timeout=timeout)
 
     def portrait(self, image_size=ImageSize.NORMAL):
         """The artist's portrait :class:`Image`.

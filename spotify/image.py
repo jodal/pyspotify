@@ -2,8 +2,7 @@ from __future__ import unicode_literals
 
 import base64
 
-from spotify import ErrorType, ffi, lib
-from spotify.utils import IntEnum, load, make_enum
+from spotify import ErrorType, ffi, lib, utils
 
 
 __all__ = [
@@ -49,7 +48,7 @@ class Image(object):
         :type timeout: float
         :returns: self
         """
-        return load(self, timeout=timeout)
+        return utils.load(self, timeout=timeout)
 
     @property
     def format(self):
@@ -97,11 +96,11 @@ class Image(object):
         return Link(self)
 
 
-@make_enum('SP_IMAGE_FORMAT_')
-class ImageFormat(IntEnum):
+@utils.make_enum('SP_IMAGE_FORMAT_')
+class ImageFormat(utils.IntEnum):
     pass
 
 
-@make_enum('SP_IMAGE_SIZE_')
-class ImageSize(IntEnum):
+@utils.make_enum('SP_IMAGE_SIZE_')
+class ImageSize(utils.IntEnum):
     pass

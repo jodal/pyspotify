@@ -1,7 +1,6 @@
 from __future__ import unicode_literals
 
-from spotify import lib
-from spotify.utils import IntEnum, make_enum, to_unicode
+from spotify import lib, utils
 
 
 __all__ = [
@@ -15,7 +14,7 @@ class Error(Exception):
 
     def __init__(self, error_type):
         self.error_type = error_type
-        message = to_unicode(lib.sp_error_message(error_type))
+        message = utils.to_unicode(lib.sp_error_message(error_type))
         super(Error, self).__init__(message)
 
     def __eq__(self, other):
@@ -43,6 +42,6 @@ for attr in dir(lib):
             Error, attr.replace('SP_ERROR_', ''), Error(getattr(lib, attr)))
 
 
-@make_enum('SP_ERROR_')
-class ErrorType(IntEnum):
+@utils.make_enum('SP_ERROR_')
+class ErrorType(utils.IntEnum):
     pass

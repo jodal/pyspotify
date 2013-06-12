@@ -165,6 +165,9 @@ PyTypeObject AlbumType = {
 void
 album_init(PyObject *module)
 {
+    if (PyType_Ready(&AlbumType) < 0)
+        return;
+
     Py_INCREF(&AlbumType);
     PyModule_AddObject(module, "Album", (PyObject *)&AlbumType);
 

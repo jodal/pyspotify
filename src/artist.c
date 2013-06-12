@@ -108,6 +108,9 @@ PyTypeObject ArtistType = {
 void
 artist_init(PyObject *module)
 {
+    if (PyType_Ready(&ArtistType) < 0)
+        return;
+
     Py_INCREF(&ArtistType);
     PyModule_AddObject(module, "Artist", (PyObject *)&ArtistType);
 }

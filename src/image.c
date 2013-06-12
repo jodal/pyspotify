@@ -187,6 +187,8 @@ PyTypeObject ImageType = {
 void
 image_init(PyObject *module)
 {
+    if (PyType_Ready(&ImageType) < 0)
+        return;
     Py_INCREF(&ImageType);
     PyModule_AddObject(module, "Image", (PyObject *)&ImageType);
 }

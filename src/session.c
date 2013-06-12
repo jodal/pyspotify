@@ -30,16 +30,6 @@ create_session(PyObject *client, PyObject *settings);
 static void
 session_callback(sp_session *session, const char *attr, PyObject *extra);
 
-/* TODO: move to helper as we probably want to use this other places */
-PyObject *
-handle_error(sp_error error)
-{
-    if (error == SP_ERROR_OK)
-        Py_RETURN_NONE;
-    PyErr_SetString(SpotifyError, sp_error_message(error));
-    return NULL;
-}
-
 static PyObject *
 Session_new(PyTypeObject *type, PyObject *args, PyObject *kwds)
 {
@@ -138,7 +128,7 @@ Session_load(PyObject *self, PyObject *args)
     error = sp_session_player_load(Session_SP_SESSION(self), Track_SP_TRACK(track));
     Py_END_ALLOW_THREADS;
 
-    return handle_error(error);
+    return none_or_raise_error(error);
 }
 
 static PyObject *
@@ -154,7 +144,7 @@ Session_seek(PyObject *self, PyObject *args)
     error = sp_session_player_seek(Session_SP_SESSION(self), seek);
     Py_END_ALLOW_THREADS;
 
-    return handle_error(error);
+    return none_or_raise_error(error);
 }
 
 static PyObject *
@@ -374,7 +364,7 @@ Session_login(PyObject *self, PyObject *args, PyObject *kwds)
                              remember_me, blob);
     Py_END_ALLOW_THREADS;
 
-    return handle_error(error);
+    return none_or_raise_error(error);
 }
 
 static PyObject *
@@ -382,7 +372,7 @@ Session_relogin(PyObject *self)
 {
     debug_printf("relogin in progress...");
     sp_error error = sp_session_relogin(Session_SP_SESSION(self));
-    return handle_error(error);
+    return none_or_raise_error(error);
 }
 
 static PyMethodDef Session_methods[] = {

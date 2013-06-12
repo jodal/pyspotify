@@ -41,12 +41,17 @@ as_function(PyObject *o)
 }
 
 PyObject *
-error_message(int err)
+error_message(sp_error error)
 {
-    if (err != 0) {
-        return PyUnicode_FromString(sp_error_message(err));
-    }
-    else {
+    if (error != SP_ERROR_OK)
+        return PyUnicode_FromString(sp_error_message(error));
+    Py_RETURN_NONE;
+}
+
+PyObject *
+none_or_raise_error(sp_error error) {
+    if (error == SP_ERROR_OK)
         Py_RETURN_NONE;
-    }
+    PyErr_SetString(SpotifyError, sp_error_message(error));
+    return NULL;
 }

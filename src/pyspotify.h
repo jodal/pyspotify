@@ -44,4 +44,5 @@ void delete_trampoline(Callback *trampoline);
 PyObject *as_function(PyObject *o);
 
 /* Returns a Python string for the error, or None if SP_ERROR_OK */
-PyObject *error_message(int err);
+PyObject *error_message(sp_error error);
+PyObject *none_or_raise_error(sp_error error);

@@ -39,7 +39,7 @@ class Artist(object):
         """
         return utils.load(self, timeout=timeout)
 
-    def portrait(self, image_size=spotify.ImageSize.NORMAL):
+    def portrait(self, image_size=None):
         """The artist's portrait :class:`Image`.
 
         ``image_size`` is an :class:`ImageSize` value, by default
@@ -48,6 +48,8 @@ class Artist(object):
         Will always return :class:`None` if the artist isn't loaded or the
         artist has no portrait.
         """
+        if image_size is None:
+            image_size = spotify.ImageSize.NORMAL
         portrait_id = lib.sp_artist_portrait(self.sp_artist, image_size)
         if portrait_id == ffi.NULL:
             return None

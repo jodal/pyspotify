@@ -50,7 +50,7 @@ class Album(object):
         sp_artist = lib.sp_album_artist(self.sp_album)
         return spotify.Artist(sp_artist) if sp_artist else None
 
-    def cover(self, image_size=spotify.ImageSize.NORMAL):
+    def cover(self, image_size=None):
         """The album's cover :class:`Image`.
 
         ``image_size`` is an :class:`ImageSize` value, by default
@@ -59,6 +59,8 @@ class Album(object):
         Will always return :class:`None` if the album isn't loaded or the
         album has no cover.
         """
+        if image_size is None:
+            image_size = spotify.ImageSize.NORMAL
         cover_id = lib.sp_album_cover(self.sp_album, image_size)
         if cover_id == ffi.NULL:
             return None

@@ -5,9 +5,7 @@ import logging
 import operator
 
 import spotify
-from spotify import (
-    ConnectionState, Error, ErrorType, ffi, lib, Playlist, PlaylistContainer,
-    ScrobblingState, User, utils)
+from spotify import ffi, lib, utils
 
 
 __all__ = [
@@ -307,12 +305,12 @@ class SessionCallbacks(object):
     def _logged_in(self, sp_session, sp_error):
         if not spotify.session_instance:
             return
-        if sp_error == ErrorType.OK:
+        if sp_error == spotify.ErrorType.OK:
             logger.info('Logged in')
         else:
-            logger.error('Login error: %s', Error(sp_error))
+            logger.error('Login error: %s', spotify.Error(sp_error))
         if self.logged_in is not None:
-            self.logged_in(spotify.session_instance, Error(sp_error))
+            self.logged_in(spotify.session_instance, spotify.Error(sp_error))
 
     def _logged_out(self, sp_session):
         if not spotify.session_instance:
@@ -331,7 +329,7 @@ class SessionCallbacks(object):
     def _connection_error(self, sp_session, sp_error):
         if not spotify.session_instance:
             return
-        error = Error(sp_error)
+        error = spotify.Error(sp_error)
         logger.error('Connection error: %s', error)
         if self.connection_error is not None:
             self.connection_error(spotify.session_instance, error)
@@ -357,7 +355,7 @@ class SessionCallbacks(object):
         logger.debug('Music delivery')
         if self.music_delivery is not None:
             audio_format = spotify.AudioFormat(sp_audioformat)
-            buffer_ = spotify.ffi.buffer(
+            buffer_ = ffi.buffer(
                 frames, audio_format.frame_size() * num_frames)
             frames_bytes = buffer_[:]
             return self.music_delivery(
@@ -391,7 +389,7 @@ class SessionCallbacks(object):
     def _streaming_error(self, sp_session, sp_error):
         if not spotify.session_instance:
             return
-        error = Error(sp_error)
+        error = spotify.Error(sp_error)
         logger.error('Streaming error: %s', error)
         if self.streaming_error is not None:
             self.streaming_error(spotify.session_instance, error)
@@ -451,7 +449,7 @@ class SessionCallbacks(object):
     def _scrobble_error(self, sp_session, sp_error):
         if not spotify.session_instance:
             return
-        error = Error(sp_error)
+        error = spotify.Error(sp_error)
         logger.error('Scrobble error: %s', error)
         if self.scrobble_error is not None:
             self.scrobble_error(spotify.session_instance, error)
@@ -714,7 +712,7 @@ class Session(object):
         sp_session_config = config.make_sp_session_config()
         sp_session_ptr = ffi.new('sp_session **')
 
-        Error.maybe_raise(lib.sp_session_create(
+        spotify.Error.maybe_raise(lib.sp_session_create(
             sp_session_config, sp_session_ptr))
 
         self.sp_session = ffi.gc(sp_session_ptr[0], lib.sp_session_release)
@@ -751,7 +749,7 @@ class Session(object):
         else:
             raise AttributeError('password or blob is required to login')
 
-        Error.maybe_raise(lib.sp_session_login(
+        spotify.Error.maybe_raise(lib.sp_session_login(
             self.sp_session, username, password, bool(remember_me), blob))
 
     def relogin(self):
@@ -763,7 +761,7 @@ class Session(object):
         To check what user you'll be logged in as if you call this method, see
         :attr:`remembered_user_name`.
         """
-        Error.maybe_raise(lib.sp_session_relogin(self.sp_session))
+        spotify.Error.maybe_raise(lib.sp_session_relogin(self.sp_session))
 
     @property
     def remembered_user_name(self):
@@ -779,7 +777,7 @@ class Session(object):
 
     def forget_me(self):
         """Forget the remembered user from a previous :meth:`login` call."""
-        Error.maybe_raise(lib.sp_session_forget_me(self.sp_session))
+        spotify.Error.maybe_raise(lib.sp_session_forget_me(self.sp_session))
 
     @property
     def user(self):
@@ -787,7 +785,7 @@ class Session(object):
         sp_user = lib.sp_session_user(self.sp_session)
         if sp_user == ffi.NULL:
             return None
-        return User(sp_user)
+        return spotify.User(sp_user)
 
     def logout(self):
         """Log out the current user.
@@ -796,7 +794,7 @@ class Session(object):
         :class:`True`, you will also need to call :meth:`forget_me` to
         completely remove all credentials of the user that was logged in.
         """
-        Error.maybe_raise(lib.sp_session_logout(self.sp_session))
+        spotify.Error.maybe_raise(lib.sp_session_logout(self.sp_session))
 
     def flush_caches(self):
         """Write all cached data to disk.
@@ -804,19 +802,20 @@ class Session(object):
         libspotify does this regularly and on logout, so you should never need
         to call this method yourself.
         """
-        Error.maybe_raise(lib.sp_session_flush_caches(self.sp_session))
+        spotify.Error.maybe_raise(lib.sp_session_flush_caches(self.sp_session))
 
     @property
     def connection_state(self):
         """The current :class:`ConnectionState`."""
-        return ConnectionState(lib.sp_session_connectionstate(self.sp_session))
+        return spotify.ConnectionState(
+            lib.sp_session_connectionstate(self.sp_session))
 
     def set_cache_size(self, size):
         """Set maximum size in MB for libspotify's cache.
 
         If set to 0 (the default), up to 10% of the free disk space will be
         used."""
-        Error.maybe_raise(lib.sp_session_set_cache_size(
+        spotify.Error.maybe_raise(lib.sp_session_set_cache_size(
             self.sp_session, size))
 
     def process_events(self):
@@ -832,19 +831,20 @@ class Session(object):
         """
         next_timeout = ffi.new('int *')
 
-        Error.maybe_raise(lib.sp_session_process_events(
+        spotify.Error.maybe_raise(lib.sp_session_process_events(
             self.sp_session, next_timeout))
 
         return next_timeout[0]
 
     def player_load(self, track):
         """Load :class:`Track` for playback."""
-        Error.maybe_raise(lib.sp_session_player_load(
+        spotify.Error.maybe_raise(lib.sp_session_player_load(
             self.sp_session, track.sp_track))
 
     def player_seek(self, offset):
         """Seek to the offset in ms in the currently loaded track."""
-        Error.maybe_raise(lib.sp_session_player_seek(self.sp_session, offset))
+        spotify.Error.maybe_raise(
+            lib.sp_session_player_seek(self.sp_session, offset))
 
     def player_play(self, play=True):
         """Play the currently loaded track.
@@ -852,12 +852,13 @@ class Session(object):
         This will cause audio data to be passed to the
         :attr:`~SessionCallbacks.music_delivery` callback.
         """
-        Error.maybe_raise(lib.sp_session_player_play(
+        spotify.Error.maybe_raise(lib.sp_session_player_play(
             self.sp_session, play))
 
     def player_unload(self):
         """Stops the currently playing track."""
-        Error.maybe_raise(lib.sp_session_player_unload(self.sp_session))
+        spotify.Error.maybe_raise(
+            lib.sp_session_player_unload(self.sp_session))
 
     def player_prefetch(self, track):
         """Prefetch a :class:`Track` for playback.
@@ -865,7 +866,7 @@ class Session(object):
         This can be used to make libspotify download and cache a track before
         playing it.
         """
-        Error.maybe_raise(lib.sp_session_player_prefetch(
+        spotify.Error.maybe_raise(lib.sp_session_player_prefetch(
             self.sp_session, track.sp_track))
 
     @property
@@ -875,7 +876,7 @@ class Session(object):
             self.sp_session)
         if sp_playlistcontainer == ffi.NULL:
             return None
-        return PlaylistContainer(sp_playlistcontainer)
+        return spotify.PlaylistContainer(sp_playlistcontainer)
 
     @property
     def inbox(self):
@@ -883,7 +884,7 @@ class Session(object):
         sp_playlist = lib.sp_session_inbox_create(self.sp_session)
         if sp_playlist == ffi.NULL:
             return None
-        return Playlist(sp_playlist, add_ref=False)
+        return spotify.Playlist(sp_playlist, add_ref=False)
 
     @property
     def starred(self):
@@ -891,7 +892,7 @@ class Session(object):
         sp_playlist = lib.sp_session_starred_create(self.sp_session)
         if sp_playlist == ffi.NULL:
             return None
-        return Playlist(sp_playlist, add_ref=False)
+        return spotify.Playlist(sp_playlist, add_ref=False)
 
     def starred_for_user(self, canonical_username):
         """The starred :class:`Playlist` for the user with
@@ -900,7 +901,7 @@ class Session(object):
             self.sp_session, utils.to_bytes(canonical_username))
         if sp_playlist == ffi.NULL:
             return None
-        return Playlist(sp_playlist, add_ref=False)
+        return spotify.Playlist(sp_playlist, add_ref=False)
 
     def published_container_for_user(self, canonical_username=None):
         """The :class:`PlaylistContainer` of published playlists for the user
@@ -917,11 +918,11 @@ class Session(object):
                 self.sp_session, canonical_username))
         if sp_playlistcontainer == ffi.NULL:
             return None
-        return PlaylistContainer(sp_playlistcontainer, add_ref=False)
+        return spotify.PlaylistContainer(sp_playlistcontainer, add_ref=False)
 
     def preferred_bitrate(self, bitrate):
         """Set preferred :class:`Bitrate` for music streaming."""
-        Error.maybe_raise(lib.sp_session_preferred_bitrate(
+        spotify.Error.maybe_raise(lib.sp_session_preferred_bitrate(
             self.sp_session, bitrate))
 
     def preferred_offline_bitrate(self, bitrate, allow_resync=False):
@@ -929,14 +930,14 @@ class Session(object):
 
         If ``allow_resync`` is :class:`True` libspotify may resynchronize
         already synced tracks."""
-        Error.maybe_raise(lib.sp_session_preferred_offline_bitrate(
+        spotify.Error.maybe_raise(lib.sp_session_preferred_offline_bitrate(
             self.sp_session, bitrate, allow_resync))
 
     def get_volume_normalization(self):
         return bool(lib.sp_session_get_volume_normalization(self.sp_session))
 
     def set_volume_normalization(self, value):
-        Error.maybe_raise(lib.sp_session_set_volume_normalization(
+        spotify.Error.maybe_raise(lib.sp_session_set_volume_normalization(
             self.sp_session, value))
 
     volume_normalization = property(
@@ -950,7 +951,7 @@ class Session(object):
         return bool(lib.sp_session_is_private_session(self.sp_session))
 
     def set_private_session(self, value):
-        Error.maybe_raise(lib.sp_session_set_private_session(
+        spotify.Error.maybe_raise(lib.sp_session_set_private_session(
             self.sp_session, value))
 
     private_session = property(
@@ -964,20 +965,20 @@ class Session(object):
         """Get the :class:`ScrobblingState` for the given
         ``social_provider``."""
         scrobbling_state = ffi.new('sp_scrobbling_state *')
-        Error.maybe_raise(lib.sp_session_is_scrobbling(
+        spotify.Error.maybe_raise(lib.sp_session_is_scrobbling(
             self.sp_session, social_provider, scrobbling_state))
-        return ScrobblingState(scrobbling_state[0])
+        return spotify.ScrobblingState(scrobbling_state[0])
 
     def is_scrobbling_possible(self, social_provider):
         """Check if the scrobbling settings should be shown to the user."""
         out = ffi.new('bool *')
-        Error.maybe_raise(lib.sp_session_is_scrobbling_possible(
+        spotify.Error.maybe_raise(lib.sp_session_is_scrobbling_possible(
             self.sp_session, social_provider, out))
         return out[0]
 
     def set_scrobbling(self, social_provider, scrobbling_state):
         """Set the ``scrobbling_state`` for the given ``social_provider``."""
-        Error.maybe_raise(lib.sp_session_set_scrobbling(
+        spotify.Error.maybe_raise(lib.sp_session_set_scrobbling(
             self.sp_session, social_provider, scrobbling_state))
 
     def set_social_credentials(self, social_provider, username, password):
@@ -990,7 +991,7 @@ class Session(object):
         """
         username = ffi.new('char[]', utils.to_bytes(username))
         password = ffi.new('char[]', utils.to_bytes(password))
-        Error.maybe_raise(lib.sp_session_set_social_credentials(
+        spotify.Error.maybe_raise(lib.sp_session_set_social_credentials(
             self.sp_session, social_provider, username, password))
 
     def set_connection_type(self, connection_type):
@@ -999,7 +1000,7 @@ class Session(object):
         This is used together with :meth:`set_connection_rules` to control
         offline syncing and network usage.
         """
-        Error.maybe_raise(lib.sp_session_set_connection_type(
+        spotify.Error.maybe_raise(lib.sp_session_set_connection_type(
             self.sp_session, connection_type))
 
     def set_connection_rules(self, *connection_rules):
@@ -1011,7 +1012,7 @@ class Session(object):
         To remove all rules, simply call this method without any arguments.
         """
         connection_rules = functools.reduce(operator.or_, connection_rules, 0)
-        Error.maybe_raise(lib.sp_session_set_connection_rules(
+        spotify.Error.maybe_raise(lib.sp_session_set_connection_rules(
             self.sp_session, connection_rules))
 
     @property

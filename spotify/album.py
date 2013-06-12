@@ -1,7 +1,7 @@
 from __future__ import unicode_literals
 
 import spotify
-from spotify import Artist, ffi, Image, ImageSize, lib, utils
+from spotify import ffi, lib, utils
 
 
 __all__ = [
@@ -48,9 +48,9 @@ class Album(object):
         Will always return :class:`None` if the album isn't loaded.
         """
         sp_artist = lib.sp_album_artist(self.sp_album)
-        return Artist(sp_artist) if sp_artist else None
+        return spotify.Artist(sp_artist) if sp_artist else None
 
-    def cover(self, image_size=ImageSize.NORMAL):
+    def cover(self, image_size=spotify.ImageSize.NORMAL):
         """The album's cover :class:`Image`.
 
         ``image_size`` is an :class:`ImageSize` value, by default
@@ -64,7 +64,7 @@ class Album(object):
             return None
         sp_image = lib.sp_image_create(
             spotify.session_instance.sp_session, cover_id)
-        return Image(sp_image, add_ref=False)
+        return spotify.Image(sp_image, add_ref=False)
 
     @property
     def name(self):

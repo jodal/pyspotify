@@ -1,7 +1,7 @@
 from __future__ import unicode_literals
 
 import spotify
-from spotify import ffi, Image, ImageSize, lib, utils
+from spotify import ffi, lib, utils
 
 
 __all__ = [
@@ -39,7 +39,7 @@ class Artist(object):
         """
         return utils.load(self, timeout=timeout)
 
-    def portrait(self, image_size=ImageSize.NORMAL):
+    def portrait(self, image_size=spotify.ImageSize.NORMAL):
         """The artist's portrait :class:`Image`.
 
         ``image_size`` is an :class:`ImageSize` value, by default
@@ -53,7 +53,7 @@ class Artist(object):
             return None
         sp_image = lib.sp_image_create(
             spotify.session_instance.sp_session, portrait_id)
-        return Image(sp_image, add_ref=False)
+        return spotify.Image(sp_image, add_ref=False)
 
     @property
     def link(self):

@@ -2,7 +2,8 @@ from __future__ import unicode_literals
 
 import base64
 
-from spotify import ErrorType, ffi, lib, utils
+import spotify
+from spotify import ffi, lib, utils
 
 
 __all__ = [
@@ -39,7 +40,7 @@ class Image(object):
 
         Check to see if there was problems loading the image.
         """
-        return ErrorType(lib.sp_image_error(self.sp_image))
+        return spotify.ErrorType(lib.sp_image_error(self.sp_image))
 
     def load(self, timeout=None):
         """Block until the image's data is loaded.

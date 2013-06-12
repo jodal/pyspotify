@@ -195,15 +195,15 @@ Session_search_complete(sp_search *search, void *data)
     PyGILState_STATE gstate = PyGILState_Ensure();
 
     search_results = Results_FromSpotify(search);
-    if (search_results != NULL) {
-        result = PyObject_CallFunctionObjArgs(trampoline->callback, search_results,
-                                              trampoline->userdata, NULL);
-        if (result == NULL)
-            PyErr_WriteUnraisable(trampoline->callback);
-        else
-            Py_DECREF(result);
-        Py_DECREF(search_results);
-    }
+    result = PyObject_CallFunction(trampoline->callback, "NN", search_results,
+                                   trampoline->userdata);
+    Py_XDECREF(search_results);
+
+    if (result != NULL)
+        Py_DECREF(result);
+    else
+        PyErr_WriteUnraisable(trampoline->callback);
+
     delete_trampoline(trampoline);
     PyGILState_Release(gstate);
 }

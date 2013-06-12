@@ -493,6 +493,7 @@ class SessionConfigTest(unittest.TestCase):
         self.config.get_callbacks()
 
         mock.assert_called_once_with()
+        self.assertIsInstance(self.config.callbacks, spotify.SessionCallbacks)
 
     def test_make_sp_session_config_returns_a_c_object(self):
         self.config.application_key = b''
@@ -618,6 +619,11 @@ class SessionTest(unittest.TestCase):
 
         self.assertIn(session.sp_session, spotify.weak_key_dict)
         self.assertEqual(len(spotify.weak_key_dict[session.sp_session]), 1)
+
+    def test_callbacks(self, lib_mock):
+        session = self.create_session(lib_mock)
+
+        self.assertIsInstance(session.callbacks, spotify.SessionCallbacks)
 
     def test_login_raises_error_if_no_password_and_no_blob(self, lib_mock):
         lib_mock.sp_session_login.return_value = spotify.ErrorType.OK

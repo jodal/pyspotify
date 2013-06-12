@@ -620,9 +620,8 @@ class SessionConfig(object):
     def get_callbacks(self):
         """Internal method."""
         if self.callbacks is None:
-            return SessionCallbacks()
-        else:
-            return self.callbacks
+            self.callbacks = SessionCallbacks()
+        return self.callbacks
 
     def make_sp_session_config(self):
         """Internal method."""
@@ -719,7 +718,17 @@ class Session(object):
 
         spotify.weak_key_dict[self.sp_session] = [sp_session_config]
 
+        self._callbacks = config.callbacks
         spotify.session_instance = self
+
+    @property
+    def callbacks(self):
+        """The session's :class:`SessionCallbacks` instance.
+
+        You can assign functions to the instance's attributes to change
+        callbacks on the fly.
+        """
+        return self._callbacks
 
     def login(self, username, password=None, remember_me=False, blob=None):
         """Authenticate to Spotify's servers.

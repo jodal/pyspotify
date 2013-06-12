@@ -951,6 +951,10 @@ class Session(object):
         return bool(lib.sp_session_is_private_session(self.sp_session))
 
     def set_private_session(self, value):
+        # TODO Segfaults unless we're logged in and have called
+        # process_events() at least once afterwards. Need to identify the
+        # relevant session callback, set a threading.Event from it, and check
+        # here if that event is set before calling the sp_ function.
         spotify.Error.maybe_raise(lib.sp_session_set_private_session(
             self.sp_session, value))
 

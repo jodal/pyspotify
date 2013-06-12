@@ -4,70 +4,71 @@
 #include "pyspotify.h"
 #include "playlistfolder.h"
 
-static PyMemberDef PlaylistFolder_members[] = {
-    {NULL}
-};
-
+/* TODO: store type, container and index instead? */
 static PyObject *
-PlaylistFolder_new(PyTypeObject * type, PyObject *args, PyObject *kwds)
+PlaylistFolder_new(PyTypeObject *type, PyObject *args, PyObject *kwds)
 {
-    PlaylistFolder *self;
-
-    self = (PlaylistFolder *) type->tp_alloc(type, 0);
-    self->_name = "";
-    self->_id = 0;
-    self->_type = SP_PLAYLIST_TYPE_PLACEHOLDER;
-    return (PyObject *)self;
+    PyObject *self = type->tp_alloc(type, 0);
+    PlaylistFolder_NAME(self) = "";
+    PlaylistFolder_ID(self) = 0;
+    PlaylistFolder_SP_PLAYLIST_TYPE(self) = SP_PLAYLIST_TYPE_PLACEHOLDER;
+    return self;
 }
 
+/* NOTE: this is the only *_FromSpotify that does not ref count anything... */
 PyObject *
-PlaylistFolder_FromSpotify(sp_playlistcontainer *pc, int index, sp_playlist_type type)
+PlaylistFolder_FromSpotify(sp_playlistcontainer *container, int index,
+                           sp_playlist_type type)
 {
-    char *name;
-    sp_error err;
+    sp_error error;
 
-    PyObject *pf =
-        PyObject_CallObject((PyObject *)&PlaylistFolderType, NULL);
-    ((PlaylistFolder *)pf)->_type = type;
+    /* TODO: consider using callobject in this and other FromSpotify calls? */
+    PyObject *self = PlaylistFolderType.tp_alloc(&PlaylistFolderType, 0);
+    PlaylistFolder_NAME(self) = "";
+    PlaylistFolder_ID(self) = 0;
+    PlaylistFolder_SP_PLAYLIST_TYPE(self) = type;
+
     if (type == SP_PLAYLIST_TYPE_START_FOLDER) {
-        ((PlaylistFolder *)pf)->_id =
-            sp_playlistcontainer_playlist_folder_id(pc, index);
-        name = PyMem_New(char, 256);
-        err = sp_playlistcontainer_playlist_folder_name(pc, index, name, 256);
-        ((PlaylistFolder *)pf)->_name = name;
-        if (err > 0) {
-            PyErr_SetString(SpotifyError, sp_error_message(err));
+        PlaylistFolder_ID(self) = sp_playlistcontainer_playlist_folder_id(
+            container, index);
+
+        PlaylistFolder_NAME(self) = PyMem_New(char, 256);
+        error = sp_playlistcontainer_playlist_folder_name(
+            container, index, PlaylistFolder_NAME(self), 256);
+
+        if (error != SP_ERROR_OK) {
+            PyErr_SetString(SpotifyError, sp_error_message(error));
             return NULL;
         }
     }
-    return pf;
+    return self;
 }
 
 static void
-PlaylistFolder_dealloc(PlaylistFolder * self)
+PlaylistFolder_dealloc(PyObject *self)
 {
-    if (self->_type == SP_PLAYLIST_TYPE_START_FOLDER)
-        PyMem_Del(self->_name);
+    if (PlaylistFolder_SP_PLAYLIST_TYPE(self) == SP_PLAYLIST_TYPE_START_FOLDER)
+        PyMem_Del(PlaylistFolder_NAME(self));
     self->ob_type->tp_free(self);
 }
 
 
 static PyObject *
-PlaylistFolder_id(PlaylistFolder *self)
+PlaylistFolder_id(PyObject *self)
 {
-    return PyLong_FromUnsignedLongLong(self->_id);
+    return PyLong_FromUnsignedLongLong(PlaylistFolder_ID(self));
 }
 
 static PyObject *
-PlaylistFolder_name(PlaylistFolder *self)
+PlaylistFolder_name(PyObject *self)
 {
-    return PyUnicode_FromString(self->_name);
+    return PyUnicode_FromString((PlaylistFolder_NAME(self)));
 }
 
 static PyObject *
-PlaylistFolder_type(PlaylistFolder *self)
+PlaylistFolder_type(PyObject *self)
 {
-    switch (self->_type) {
+    switch (PlaylistFolder_SP_PLAYLIST_TYPE(self)) {
     case SP_PLAYLIST_TYPE_START_FOLDER:
         return PyBytes_FromString("folder_start");
         break;
@@ -84,77 +85,78 @@ PlaylistFolder_type(PlaylistFolder *self)
 }
 
 static PyObject *
-PlaylistFolder_is_loaded(PlaylistFolder *self)
+PlaylistFolder_is_loaded(PyObject *self)
 {
     Py_INCREF(Py_True);
     return Py_True;
 }
 
 static PyMethodDef PlaylistFolder_methods[] = {
-    {"id",
-     (PyCFunction)PlaylistFolder_id,
-     METH_NOARGS,
-     "Returns this folder's id."},
-    {"name",
-     (PyCFunction)PlaylistFolder_name,
-     METH_NOARGS,
-     "Returns this folder's name."},
-    {"type",
-     (PyCFunction)PlaylistFolder_type,
-     METH_NOARGS,
-     "Returns this folder's type."},
-    {"is_loaded",
-     (PyCFunction)PlaylistFolder_is_loaded,
-     METH_NOARGS,
-     "Returns True."},
-    {NULL}
+    {"id", (PyCFunction)PlaylistFolder_id, METH_NOARGS,
+     "Returns this folder's id."
+    },
+    {"name", (PyCFunction)PlaylistFolder_name, METH_NOARGS,
+     "Returns this folder's name."
+    },
+    {"type", (PyCFunction)PlaylistFolder_type, METH_NOARGS,
+     "Returns this folder's type."
+    },
+    {"is_loaded", (PyCFunction)PlaylistFolder_is_loaded, METH_NOARGS,
+     "Returns True."
+    },
+    {NULL} /* Sentinel */
+};
+
+static PyMemberDef PlaylistFolder_members[] = {
+    {NULL} /* Sentinel */
 };
 
 PyTypeObject PlaylistFolderType = {
-    PyObject_HEAD_INIT(NULL) 0, /*ob_size */
-    "spotify.PlaylistFolder",        /*tp_name */
-    sizeof(PlaylistFolder),  /*tp_basicsize */
-    0,                  /*tp_itemsize */
-    (destructor) PlaylistFolder_dealloc,     /*tp_dealloc */
-    0,                  /*tp_print */
-    0,                  /*tp_getattr */
-    0,                  /*tp_setattr */
-    0,                  /*tp_compare */
-    0,                  /*tp_repr */
-    0,                  /*tp_as_number */
-    0,                  /*tp_as_sequence */
-    0,                  /*tp_as_mapping */
-    0,                  /*tp_hash */
-    0,                  /*tp_call */
-    0,                  /*tp_str */
-    0,                  /*tp_getattro */
-    0,                  /*tp_setattro */
-    0,                  /*tp_as_buffer */
-    Py_TPFLAGS_DEFAULT | Py_TPFLAGS_BASETYPE,   /*tp_flags */
-    "PlaylistFolder objects",        /* tp_doc */
-    0,                  /* tp_traverse */
-    0,                  /* tp_clear */
-    0,                  /* tp_richcompare */
-    0,                  /* tp_weaklistoffset */
-    0,                  /* tp_iter */
-    0,                  /* tp_iternext */
-    PlaylistFolder_methods,  /* tp_methods */
-    PlaylistFolder_members,  /* tp_members */
-    0,                  /* tp_getset */
-    0,                  /* tp_base */
-    0,                  /* tp_dict */
-    0,                  /* tp_descr_get */
-    0,                  /* tp_descr_set */
-    0,                  /* tp_dictoffset */
-    0,                  /* tp_init */
-    0,                  /* tp_alloc */
-    PlaylistFolder_new,      /* tp_new */
+    PyObject_HEAD_INIT(NULL)
+    0,                                        /*ob_size*/
+    "spotify.PlaylistFolder",                 /*tp_name*/
+    sizeof(PlaylistFolder),                   /*tp_basicsize*/
+    0,                                        /*tp_itemsize*/
+    (destructor) PlaylistFolder_dealloc,      /*tp_dealloc*/
+    0,                                        /*tp_print*/
+    0,                                        /*tp_getattr*/
+    0,                                        /*tp_setattr*/
+    0,                                        /*tp_compare*/
+    0,                                        /*tp_repr*/
+    0,                                        /*tp_as_number*/
+    0,                                        /*tp_as_sequence*/
+    0,                                        /*tp_as_mapping*/
+    0,                                        /*tp_hash*/
+    0,                                        /*tp_call*/
+    0,                                        /*tp_str*/
+    0,                                        /*tp_getattro*/
+    0,                                        /*tp_setattro*/
+    0,                                        /*tp_as_buffer*/
+    Py_TPFLAGS_DEFAULT | Py_TPFLAGS_BASETYPE, /*tp_flags*/
+    "PlaylistFolder objects",                 /* tp_doc */
+    0,                                        /* tp_traverse */
+    0,                                        /* tp_clear */
+    0,                                        /* tp_richcompare */
+    0,                                        /* tp_weaklistoffset */
+    0,                                        /* tp_iter */
+    0,                                        /* tp_iternext */
+    PlaylistFolder_methods,                   /* tp_methods */
+    PlaylistFolder_members,                   /* tp_members */
+    0,                                        /* tp_getset */
+    0,                                        /* tp_base */
+    0,                                        /* tp_dict */
+    0,                                        /* tp_descr_get */
+    0,                                        /* tp_descr_set */
+    0,                                        /* tp_dictoffset */
+    0,                                        /* tp_init */
+    0,                                        /* tp_alloc */
+    PlaylistFolder_new,                       /* tp_new */
 };
 
 void
-playlistfolder_init(PyObject *m)
+playlistfolder_init(PyObject *module)
 {
     Py_INCREF(&PlaylistFolderType);
-    PyModule_AddObject(m, "PlaylistFolder",
+    PyModule_AddObject(module, "PlaylistFolder",
                        (PyObject *)&PlaylistFolderType);
 }

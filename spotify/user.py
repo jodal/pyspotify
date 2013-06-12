@@ -14,22 +14,22 @@ class User(object):
 
     def __init__(self, sp_user):
         lib.sp_user_add_ref(sp_user)
-        self.sp_user = ffi.gc(sp_user, lib.sp_user_release)
+        self._sp_user = ffi.gc(sp_user, lib.sp_user_release)
 
     @property
     def canonical_name(self):
         """The user's canonical username."""
-        return utils.to_unicode(lib.sp_user_canonical_name(self.sp_user))
+        return utils.to_unicode(lib.sp_user_canonical_name(self._sp_user))
 
     @property
     def display_name(self):
         """The user's displayable username."""
-        return utils.to_unicode(lib.sp_user_display_name(self.sp_user))
+        return utils.to_unicode(lib.sp_user_display_name(self._sp_user))
 
     @property
     def is_loaded(self):
         """Whether the user's data is loaded yet."""
-        return bool(lib.sp_user_is_loaded(self.sp_user))
+        return bool(lib.sp_user_is_loaded(self._sp_user))
 
     def load(self, timeout=None):
         """Block until the user's data is loaded.

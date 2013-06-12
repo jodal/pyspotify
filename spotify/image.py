@@ -23,7 +23,7 @@ class Image(object):
     def __init__(self, sp_image, add_ref=True):
         if add_ref:
             lib.sp_image_add_ref(sp_image)
-        self.sp_image = ffi.gc(sp_image, lib.sp_image_release)
+        self._sp_image = ffi.gc(sp_image, lib.sp_image_release)
 
     # TODO Add load callback support using
     # - sp_image_add_load_callback
@@ -32,7 +32,7 @@ class Image(object):
     @property
     def is_loaded(self):
         """Whether the image's data is loaded."""
-        return bool(lib.sp_image_is_loaded(self.sp_image))
+        return bool(lib.sp_image_is_loaded(self._sp_image))
 
     @property
     def error(self):
@@ -40,7 +40,7 @@ class Image(object):
 
         Check to see if there was problems loading the image.
         """
-        return spotify.ErrorType(lib.sp_image_error(self.sp_image))
+        return spotify.ErrorType(lib.sp_image_error(self._sp_image))
 
     def load(self, timeout=None):
         """Block until the image's data is loaded.
@@ -59,7 +59,7 @@ class Image(object):
         """
         if not self.is_loaded:
             return None
-        return ImageFormat(lib.sp_image_format(self.sp_image))
+        return ImageFormat(lib.sp_image_format(self._sp_image))
 
     @property
     def data(self):
@@ -70,7 +70,7 @@ class Image(object):
         if not self.is_loaded:
             return None
         data_size_ptr = ffi.new('size_t *')
-        data = lib.sp_image_data(self.sp_image, data_size_ptr)
+        data = lib.sp_image_data(self._sp_image, data_size_ptr)
         buffer_ = ffi.buffer(data, data_size_ptr[0])
         data_bytes = buffer_[:]
         assert len(data_bytes) == data_size_ptr[0], '%r == %r' % (

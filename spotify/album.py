@@ -15,12 +15,12 @@ class Album(object):
 
     def __init__(self, sp_album):
         lib.sp_album_add_ref(sp_album)
-        self.sp_album = ffi.gc(sp_album, lib.sp_album_release)
+        self._sp_album = ffi.gc(sp_album, lib.sp_album_release)
 
     @property
     def is_loaded(self):
         """Whether the album's data is loaded."""
-        return bool(lib.sp_album_is_loaded(self.sp_album))
+        return bool(lib.sp_album_is_loaded(self._sp_album))
 
     def load(self, timeout=None):
         """Block until the album's data is loaded.
@@ -39,7 +39,7 @@ class Album(object):
         """
         if not self.is_loaded:
             return None
-        return bool(lib.sp_album_is_available(self.sp_album))
+        return bool(lib.sp_album_is_available(self._sp_album))
 
     @property
     def artist(self):
@@ -47,7 +47,7 @@ class Album(object):
 
         Will always return :class:`None` if the album isn't loaded.
         """
-        sp_artist = lib.sp_album_artist(self.sp_album)
+        sp_artist = lib.sp_album_artist(self._sp_album)
         return spotify.Artist(sp_artist) if sp_artist else None
 
     def cover(self, image_size=None):
@@ -61,11 +61,11 @@ class Album(object):
         """
         if image_size is None:
             image_size = spotify.ImageSize.NORMAL
-        cover_id = lib.sp_album_cover(self.sp_album, image_size)
+        cover_id = lib.sp_album_cover(self._sp_album, image_size)
         if cover_id == ffi.NULL:
             return None
         sp_image = lib.sp_image_create(
-            spotify.session_instance.sp_session, cover_id)
+            spotify.session_instance._sp_session, cover_id)
         return spotify.Image(sp_image, add_ref=False)
 
     @property
@@ -74,7 +74,7 @@ class Album(object):
 
         Will always return :class:`None` if the album isn't loaded.
         """
-        name = utils.to_unicode(lib.sp_album_name(self.sp_album))
+        name = utils.to_unicode(lib.sp_album_name(self._sp_album))
         return name if name else None
 
     @property
@@ -85,7 +85,7 @@ class Album(object):
         """
         if not self.is_loaded:
             return None
-        return lib.sp_album_year(self.sp_album)
+        return lib.sp_album_year(self._sp_album)
 
     @property
     def type(self):
@@ -95,7 +95,7 @@ class Album(object):
         """
         if not self.is_loaded:
             return None
-        return AlbumType(lib.sp_album_type(self.sp_album))
+        return AlbumType(lib.sp_album_type(self._sp_album))
 
     @property
     def link(self):

@@ -12,7 +12,7 @@ class TrackTest(unittest.TestCase):
 
     def create_session(self, lib_mock):
         session = mock.sentinel.session
-        session.sp_session = mock.sentinel.sp_session
+        session._sp_session = mock.sentinel.sp_session
         spotify.session_instance = session
         return session
 
@@ -111,7 +111,7 @@ class TrackTest(unittest.TestCase):
         result = track.availability
 
         lib_mock.sp_track_get_availability.assert_called_with(
-            session.sp_session, sp_track)
+            session._sp_session, sp_track)
         self.assertIs(result, spotify.TrackAvailability.AVAILABLE)
 
     def test_availability_fails_if_no_session(self, lib_mock):
@@ -130,7 +130,7 @@ class TrackTest(unittest.TestCase):
         result = track.is_local
 
         lib_mock.sp_track_is_local.assert_called_with(
-            session.sp_session, sp_track)
+            session._sp_session, sp_track)
         self.assertTrue(result)
 
     def test_is_local_is_none_if_unloaded(self, lib_mock):
@@ -161,7 +161,7 @@ class TrackTest(unittest.TestCase):
         result = track.is_autolinked
 
         lib_mock.sp_track_is_autolinked.assert_called_with(
-            session.sp_session, sp_track)
+            session._sp_session, sp_track)
         self.assertTrue(result)
 
     def test_is_autolinked_is_none_if_unloaded(self, lib_mock):
@@ -193,10 +193,10 @@ class TrackTest(unittest.TestCase):
         result = track.playable
 
         lib_mock.sp_track_get_playable.assert_called_with(
-            session.sp_session, sp_track)
+            session._sp_session, sp_track)
         lib_mock.sp_track_add_ref.assert_called_with(sp_track_playable)
         self.assertIsInstance(result, spotify.Track)
-        self.assertEqual(result.sp_track, sp_track_playable)
+        self.assertEqual(result._sp_track, sp_track_playable)
 
     def test_playable_fails_if_no_session(self, lib_mock):
         self.assert_fails_if_no_session(lib_mock, lambda t: t.playable)
@@ -228,7 +228,7 @@ class TrackTest(unittest.TestCase):
         result = track.starred
 
         lib_mock.sp_track_is_starred.assert_called_with(
-            session.sp_session, sp_track)
+            session._sp_session, sp_track)
         self.assertTrue(result)
 
     def test_is_starred_is_none_if_unloaded(self, lib_mock):
@@ -258,7 +258,7 @@ class TrackTest(unittest.TestCase):
         track.starred = True
 
         lib_mock.sp_track_set_starred.assert_called_with(
-            session.sp_session, mock.ANY, 1, 1)
+            session._sp_session, mock.ANY, 1, 1)
 
     def test_set_starred_fails_if_error(self, lib_mock):
         self.create_session(lib_mock)
@@ -289,7 +289,7 @@ class TrackTest(unittest.TestCase):
         artist_lib_mock.sp_artist_add_ref.assert_called_with(sp_artist)
         self.assertEqual(len(result), 1)
         self.assertIsInstance(result[0], spotify.Artist)
-        self.assertEqual(result[0].sp_artist, sp_artist)
+        self.assertEqual(result[0]._sp_artist, sp_artist)
 
     def test_artists_if_no_artists(self, lib_mock):
         lib_mock.sp_track_error.return_value = spotify.ErrorType.OK
@@ -330,7 +330,7 @@ class TrackTest(unittest.TestCase):
         lib_mock.sp_track_album.assert_called_with(sp_track)
         self.assertEqual(album_lib_mock.sp_album_add_ref.call_count, 1)
         self.assertIsInstance(result, spotify.Album)
-        self.assertEqual(result.sp_album, sp_album)
+        self.assertEqual(result._sp_album, sp_album)
 
     @mock.patch('spotify.album.lib', spec=spotify.lib)
     def test_album_if_unloaded(self, album_lib_mock, lib_mock):
@@ -506,7 +506,7 @@ class LocalTrackTest(unittest.TestCase):
         track = spotify.LocalTrack(
             artist='foo', title='bar', album='baz', length=210)
 
-        self.assertEqual(track.sp_track, sp_track)
+        self.assertEqual(track._sp_track, sp_track)
         lib_mock.sp_localtrack_create.assert_called_once_with(
             mock.ANY, mock.ANY, mock.ANY, 210)
         self.assertEqual(
@@ -532,7 +532,7 @@ class LocalTrackTest(unittest.TestCase):
 
         track = spotify.LocalTrack()
 
-        self.assertEqual(track.sp_track, sp_track)
+        self.assertEqual(track._sp_track, sp_track)
         lib_mock.sp_localtrack_create.assert_called_once_with(
             mock.ANY, mock.ANY, mock.ANY, -1)
         self.assertEqual(

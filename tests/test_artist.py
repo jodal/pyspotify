@@ -12,7 +12,7 @@ class ArtistTest(unittest.TestCase):
 
     def create_session(self, lib_mock):
         session = mock.sentinel.session
-        session.sp_session = mock.sentinel.sp_session
+        session._sp_session = mock.sentinel.sp_session
         spotify.session_instance = session
         return session
 
@@ -91,10 +91,10 @@ class ArtistTest(unittest.TestCase):
         lib_mock.sp_artist_portrait.assert_called_with(
             sp_artist, int(image_size))
         lib_mock.sp_image_create.assert_called_with(
-            session.sp_session, sp_image_id)
+            session._sp_session, sp_image_id)
 
         self.assertIsInstance(result, spotify.Image)
-        self.assertEqual(result.sp_image, sp_image)
+        self.assertEqual(result._sp_image, sp_image)
 
         # Since we *created* the sp_image, we already have a refcount of 1 and
         # shouldn't increase the refcount when wrapping this sp_image in an

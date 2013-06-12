@@ -21,12 +21,12 @@ class AudioBufferStatsTest(unittest.TestCase):
 class AudioFormatTest(unittest.TestCase):
 
     def setUp(self):
-        self.sp_audioformat = spotify.ffi.new('sp_audioformat *')
-        self.sp_audioformat.sample_type = (
+        self._sp_audioformat = spotify.ffi.new('sp_audioformat *')
+        self._sp_audioformat.sample_type = (
             spotify.SampleType.INT16_NATIVE_ENDIAN)
-        self.sp_audioformat.sample_rate = 44100
-        self.sp_audioformat.channels = 2
-        self.audio_format = spotify.AudioFormat(self.sp_audioformat)
+        self._sp_audioformat.sample_rate = 44100
+        self._sp_audioformat.channels = 2
+        self.audio_format = spotify.AudioFormat(self._sp_audioformat)
 
     def test_sample_type(self):
         self.assertIs(
@@ -41,17 +41,17 @@ class AudioFormatTest(unittest.TestCase):
 
     def test_frame_size(self):
         # INT16 means 16 bits aka 2 bytes per channel
-        self.sp_audioformat.sample_type = (
+        self._sp_audioformat.sample_type = (
             spotify.SampleType.INT16_NATIVE_ENDIAN)
 
-        self.sp_audioformat.channels = 1
+        self._sp_audioformat.channels = 1
         self.assertEqual(self.audio_format.frame_size(), 2)
 
-        self.sp_audioformat.channels = 2
+        self._sp_audioformat.channels = 2
         self.assertEqual(self.audio_format.frame_size(), 4)
 
     def test_frame_size_fails_if_sample_type_is_unknown(self):
-        self.sp_audioformat.sample_type = 666
+        self._sp_audioformat.sample_type = 666
 
         self.assertRaises(ValueError, self.audio_format.frame_size)
 

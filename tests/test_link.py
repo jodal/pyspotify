@@ -12,7 +12,7 @@ class LinkTest(unittest.TestCase):
 
     def create_session(self, lib_mock):
         session = mock.sentinel.session
-        session.sp_session = mock.sentinel.sp_session
+        session._sp_session = mock.sentinel.sp_session
         spotify.session_instance = session
         return session
 
@@ -54,7 +54,7 @@ class LinkTest(unittest.TestCase):
 
         link = spotify.Link(track)
 
-        self.assertEqual(link.sp_link, sp_link)
+        self.assertEqual(link._sp_link, sp_link)
         lib_mock.sp_link_create_from_track.assert_called_once_with(
             sp_track, 0)
 
@@ -67,7 +67,7 @@ class LinkTest(unittest.TestCase):
 
         link = spotify.Link(track, offset=90)
 
-        self.assertEqual(link.sp_link, sp_link)
+        self.assertEqual(link._sp_link, sp_link)
         lib_mock.sp_link_create_from_track.assert_called_once_with(
             sp_track, 90)
 
@@ -80,7 +80,7 @@ class LinkTest(unittest.TestCase):
 
         link = spotify.Link(album)
 
-        self.assertEqual(link.sp_link, sp_link)
+        self.assertEqual(link._sp_link, sp_link)
         lib_mock.sp_link_create_from_album.assert_called_once_with(sp_album)
 
     @mock.patch('spotify.album.lib', spec=spotify.lib)
@@ -92,7 +92,7 @@ class LinkTest(unittest.TestCase):
 
         link = spotify.Link(album, image_size=spotify.ImageSize.NORMAL)
 
-        self.assertEqual(link.sp_link, sp_link)
+        self.assertEqual(link._sp_link, sp_link)
         lib_mock.sp_link_create_from_album_cover.assert_called_once_with(
             sp_album, spotify.ImageSize.NORMAL)
 
@@ -105,7 +105,7 @@ class LinkTest(unittest.TestCase):
 
         link = spotify.Link(artist)
 
-        self.assertEqual(link.sp_link, sp_link)
+        self.assertEqual(link._sp_link, sp_link)
         lib_mock.sp_link_create_from_artist.assert_called_once_with(sp_artist)
 
     @mock.patch('spotify.artist.lib', spec=spotify.lib)
@@ -117,7 +117,7 @@ class LinkTest(unittest.TestCase):
 
         link = spotify.Link(artist, image_size=spotify.ImageSize.NORMAL)
 
-        self.assertEqual(link.sp_link, sp_link)
+        self.assertEqual(link._sp_link, sp_link)
         lib_mock.sp_link_create_from_artist_portrait.assert_called_once_with(
             sp_artist, spotify.ImageSize.NORMAL)
 
@@ -134,7 +134,7 @@ class LinkTest(unittest.TestCase):
 
         link = spotify.Link(search)
 
-        self.assertEqual(link.sp_link, sp_link)
+        self.assertEqual(link._sp_link, sp_link)
         lib_mock.sp_link_create_from_search.assert_called_once_with(sp_search)
 
     @mock.patch('spotify.playlist.lib', spec=spotify.lib)
@@ -146,7 +146,7 @@ class LinkTest(unittest.TestCase):
 
         link = spotify.Link(playlist)
 
-        self.assertEqual(link.sp_link, sp_link)
+        self.assertEqual(link._sp_link, sp_link)
         lib_mock.sp_link_create_from_playlist.assert_called_once_with(
             sp_playlist)
 
@@ -159,7 +159,7 @@ class LinkTest(unittest.TestCase):
 
         link = spotify.Link(user)
 
-        self.assertEqual(link.sp_link, sp_link)
+        self.assertEqual(link._sp_link, sp_link)
         lib_mock.sp_link_create_from_user.assert_called_once_with(sp_user)
 
     @mock.patch('spotify.image.lib', spec=spotify.lib)
@@ -171,7 +171,7 @@ class LinkTest(unittest.TestCase):
 
         link = spotify.Link(image)
 
-        self.assertEqual(link.sp_link, sp_link)
+        self.assertEqual(link._sp_link, sp_link)
         lib_mock.sp_link_create_from_image.assert_called_once_with(sp_image)
 
     def test_releases_sp_link_when_link_dies(self, lib_mock):
@@ -225,7 +225,7 @@ class LinkTest(unittest.TestCase):
         lib_mock.sp_link_as_track.return_value = sp_track
 
         link = spotify.Link('spotify:track:foo')
-        self.assertEqual(link.as_track().sp_track, sp_track)
+        self.assertEqual(link.as_track()._sp_track, sp_track)
 
         lib_mock.sp_link_as_track.assert_called_once_with(sp_link)
 
@@ -281,7 +281,7 @@ class LinkTest(unittest.TestCase):
         lib_mock.sp_link_as_album.return_value = sp_album
 
         link = spotify.Link('spotify:album:foo')
-        self.assertEqual(link.as_album().sp_album, sp_album)
+        self.assertEqual(link.as_album()._sp_album, sp_album)
 
         lib_mock.sp_link_as_album.assert_called_once_with(sp_link)
 
@@ -304,7 +304,7 @@ class LinkTest(unittest.TestCase):
         lib_mock.sp_link_as_artist.return_value = sp_artist
 
         link = spotify.Link('spotify:artist:foo')
-        self.assertEqual(link.as_artist().sp_artist, sp_artist)
+        self.assertEqual(link.as_artist()._sp_artist, sp_artist)
 
         lib_mock.sp_link_as_artist.assert_called_once_with(sp_link)
 
@@ -327,7 +327,7 @@ class LinkTest(unittest.TestCase):
         lib_mock.sp_link_as_user.return_value = sp_user
 
         link = spotify.Link('spotify:user:foo')
-        self.assertEqual(link.as_user().sp_user, sp_user)
+        self.assertEqual(link.as_user()._sp_user, sp_user)
 
         lib_mock.sp_link_as_user.assert_called_once_with(sp_link)
 
@@ -352,10 +352,10 @@ class LinkTest(unittest.TestCase):
         lib_mock.sp_image_create_from_link.return_value = sp_image
 
         link = spotify.Link('spotify:image:foo')
-        self.assertEqual(link.as_image().sp_image, sp_image)
+        self.assertEqual(link.as_image()._sp_image, sp_image)
 
         lib_mock.sp_image_create_from_link.assert_called_once_with(
-            session.sp_session, sp_link)
+            session._sp_session, sp_link)
 
         # Since we *created* the sp_image, we already have a refcount of 1 and
         # shouldn't increase the refcount when wrapping this sp_image in an

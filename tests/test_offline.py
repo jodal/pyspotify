@@ -8,17 +8,17 @@ import spotify
 class OfflineSyncStatusTest(unittest.TestCase):
 
     def setUp(self):
-        self.sp_offline_sync_status = spotify.ffi.new(
+        self._sp_offline_sync_status = spotify.ffi.new(
             'sp_offline_sync_status *')
-        self.sp_offline_sync_status.queued_tracks = 5
-        self.sp_offline_sync_status.done_tracks = 16
-        self.sp_offline_sync_status.copied_tracks = 27
-        self.sp_offline_sync_status.willnotcopy_tracks = 2
-        self.sp_offline_sync_status.error_tracks = 3
-        self.sp_offline_sync_status.syncing = True
+        self._sp_offline_sync_status.queued_tracks = 5
+        self._sp_offline_sync_status.done_tracks = 16
+        self._sp_offline_sync_status.copied_tracks = 27
+        self._sp_offline_sync_status.willnotcopy_tracks = 2
+        self._sp_offline_sync_status.error_tracks = 3
+        self._sp_offline_sync_status.syncing = True
 
         self.offline_sync_status = spotify.OfflineSyncStatus(
-            self.sp_offline_sync_status)
+            self._sp_offline_sync_status)
 
     def test_queued_tracks(self):
         self.assertEqual(self.offline_sync_status.queued_tracks, 5)

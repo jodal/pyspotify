@@ -15,7 +15,7 @@ class Playlist(object):
     def __init__(self, sp_playlist, add_ref=True):
         if add_ref:
             lib.sp_playlist_add_ref(sp_playlist)
-        self.sp_playlist = ffi.gc(sp_playlist, lib.sp_playlist_release)
+        self._sp_playlist = ffi.gc(sp_playlist, lib.sp_playlist_release)
 
     @property
     def link(self):
@@ -32,7 +32,7 @@ class PlaylistContainer(object):
     def __init__(self, sp_playlistcontainer, add_ref=True):
         if add_ref:
             lib.sp_playlistcontainer_add_ref(sp_playlistcontainer)
-        self.sp_playlistcontainer = ffi.gc(
+        self._sp_playlistcontainer = ffi.gc(
             sp_playlistcontainer, lib.sp_playlistcontainer_release)
 
     # TODO Add sp_playlistcontainer_* methods

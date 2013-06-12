@@ -33,23 +33,23 @@ class AudioFormat(object):
     """A Spotify audio format."""
 
     def __init__(self, sp_audioformat):
-        self.sp_audioformat = sp_audioformat
+        self._sp_audioformat = sp_audioformat
 
     @property
     def sample_type(self):
         """The :class:`SampleType`, currently always
         :attr:`SampleType.INT16_NATIVE_ENDIAN`."""
-        return SampleType(self.sp_audioformat.sample_type)
+        return SampleType(self._sp_audioformat.sample_type)
 
     @property
     def sample_rate(self):
         """The sample rate, typically 44100 Hz."""
-        return self.sp_audioformat.sample_rate
+        return self._sp_audioformat.sample_rate
 
     @property
     def channels(self):
         """The number of audio channels, typically 2."""
-        return self.sp_audioformat.channels
+        return self._sp_audioformat.channels
 
     def frame_size(self):
         """The byte size of a single frame of this format."""

@@ -14,7 +14,7 @@ class Artist(object):
 
     def __init__(self, sp_artist):
         lib.sp_artist_add_ref(sp_artist)
-        self.sp_artist = ffi.gc(sp_artist, lib.sp_artist_release)
+        self._sp_artist = ffi.gc(sp_artist, lib.sp_artist_release)
 
     @property
     def name(self):
@@ -22,13 +22,13 @@ class Artist(object):
 
         Will always return :class:`None` if the artist isn't loaded.
         """
-        name = utils.to_unicode(lib.sp_artist_name(self.sp_artist))
+        name = utils.to_unicode(lib.sp_artist_name(self._sp_artist))
         return name if name else None
 
     @property
     def is_loaded(self):
         """Whether the artist's data is loaded."""
-        return bool(lib.sp_artist_is_loaded(self.sp_artist))
+        return bool(lib.sp_artist_is_loaded(self._sp_artist))
 
     def load(self, timeout=None):
         """Block until the artist's data is loaded.
@@ -50,11 +50,11 @@ class Artist(object):
         """
         if image_size is None:
             image_size = spotify.ImageSize.NORMAL
-        portrait_id = lib.sp_artist_portrait(self.sp_artist, image_size)
+        portrait_id = lib.sp_artist_portrait(self._sp_artist, image_size)
         if portrait_id == ffi.NULL:
             return None
         sp_image = lib.sp_image_create(
-            spotify.session_instance.sp_session, portrait_id)
+            spotify.session_instance._sp_session, portrait_id)
         return spotify.Image(sp_image, add_ref=False)
 
     @property

@@ -302,7 +302,7 @@ class SessionCallbacks(object):
         self._private_session_mode_changed = ffi.callback(
             'void(sp_session *, bool)', self._private_session_mode_changed)
 
-        self.sp_session_callbacks = ffi.new('sp_session_callbacks *', {
+        self._sp_session_callbacks = ffi.new('sp_session_callbacks *', {
             'logged_in': self._logged_in,
             'logged_out': self._logged_out,
             'metadata_updated': self._metadata_updated,
@@ -648,7 +648,7 @@ class SessionConfig(object):
             'application_key': ffi.cast('void *', application_key),
             'application_key_size': len(application_key_bytes),
             'user_agent': user_agent,
-            'callbacks': callbacks.sp_session_callbacks,
+            'callbacks': callbacks._sp_session_callbacks,
             'compress_playlists': bool(self.compress_playlists),
             'dont_save_metadata_for_playlists': bool(
                 self.dont_save_metadata_for_playlists),
@@ -711,9 +711,9 @@ class Session(object):
         spotify.Error.maybe_raise(lib.sp_session_create(
             sp_session_config, sp_session_ptr))
 
-        self.sp_session = ffi.gc(sp_session_ptr[0], lib.sp_session_release)
+        self._sp_session = ffi.gc(sp_session_ptr[0], lib.sp_session_release)
 
-        spotify.weak_key_dict[self.sp_session] = [sp_session_config]
+        spotify.weak_key_dict[self._sp_session] = [sp_session_config]
 
         self._callbacks = config.callbacks
         spotify.session_instance = self
@@ -756,7 +756,7 @@ class Session(object):
             raise AttributeError('password or blob is required to login')
 
         spotify.Error.maybe_raise(lib.sp_session_login(
-            self.sp_session, username, password, bool(remember_me), blob))
+            self._sp_session, username, password, bool(remember_me), blob))
 
     def relogin(self):
         """Relogin as the remembered user.
@@ -767,28 +767,28 @@ class Session(object):
         To check what user you'll be logged in as if you call this method, see
         :attr:`remembered_user_name`.
         """
-        spotify.Error.maybe_raise(lib.sp_session_relogin(self.sp_session))
+        spotify.Error.maybe_raise(lib.sp_session_relogin(self._sp_session))
 
     @property
     def remembered_user_name(self):
         """The username of the remembered user from a previous :meth:`login`
         call."""
         return utils.get_with_growing_buffer(
-            lib.sp_session_remembered_user, self.sp_session)
+            lib.sp_session_remembered_user, self._sp_session)
 
     @property
     def user_name(self):
         """The username of the logged in user."""
-        return utils.to_unicode(lib.sp_session_user_name(self.sp_session))
+        return utils.to_unicode(lib.sp_session_user_name(self._sp_session))
 
     def forget_me(self):
         """Forget the remembered user from a previous :meth:`login` call."""
-        spotify.Error.maybe_raise(lib.sp_session_forget_me(self.sp_session))
+        spotify.Error.maybe_raise(lib.sp_session_forget_me(self._sp_session))
 
     @property
     def user(self):
         """The logged in :class:`User`."""
-        sp_user = lib.sp_session_user(self.sp_session)
+        sp_user = lib.sp_session_user(self._sp_session)
         if sp_user == ffi.NULL:
             return None
         return spotify.User(sp_user)
@@ -800,7 +800,7 @@ class Session(object):
         :class:`True`, you will also need to call :meth:`forget_me` to
         completely remove all credentials of the user that was logged in.
         """
-        spotify.Error.maybe_raise(lib.sp_session_logout(self.sp_session))
+        spotify.Error.maybe_raise(lib.sp_session_logout(self._sp_session))
 
     def flush_caches(self):
         """Write all cached data to disk.
@@ -808,13 +808,13 @@ class Session(object):
         libspotify does this regularly and on logout, so you should never need
         to call this method yourself.
         """
-        spotify.Error.maybe_raise(lib.sp_session_flush_caches(self.sp_session))
+        spotify.Error.maybe_raise(lib.sp_session_flush_caches(self._sp_session))
 
     @property
     def connection_state(self):
         """The current :class:`ConnectionState`."""
         return spotify.ConnectionState(
-            lib.sp_session_connectionstate(self.sp_session))
+            lib.sp_session_connectionstate(self._sp_session))
 
     def set_cache_size(self, size):
         """Set maximum size in MB for libspotify's cache.
@@ -822,7 +822,7 @@ class Session(object):
         If set to 0 (the default), up to 10% of the free disk space will be
         used."""
         spotify.Error.maybe_raise(lib.sp_session_set_cache_size(
-            self.sp_session, size))
+            self._sp_session, size))
 
     def process_events(self):
         """Process pending events in libspotify.
@@ -838,19 +838,19 @@ class Session(object):
         next_timeout = ffi.new('int *')
 
         spotify.Error.maybe_raise(lib.sp_session_process_events(
-            self.sp_session, next_timeout))
+            self._sp_session, next_timeout))
 
         return next_timeout[0]
 
     def player_load(self, track):
         """Load :class:`Track` for playback."""
         spotify.Error.maybe_raise(lib.sp_session_player_load(
-            self.sp_session, track.sp_track))
+            self._sp_session, track._sp_track))
 
     def player_seek(self, offset):
         """Seek to the offset in ms in the currently loaded track."""
         spotify.Error.maybe_raise(
-            lib.sp_session_player_seek(self.sp_session, offset))
+            lib.sp_session_player_seek(self._sp_session, offset))
 
     def player_play(self, play=True):
         """Play the currently loaded track.
@@ -859,12 +859,12 @@ class Session(object):
         :attr:`~SessionCallbacks.music_delivery` callback.
         """
         spotify.Error.maybe_raise(lib.sp_session_player_play(
-            self.sp_session, play))
+            self._sp_session, play))
 
     def player_unload(self):
         """Stops the currently playing track."""
         spotify.Error.maybe_raise(
-            lib.sp_session_player_unload(self.sp_session))
+            lib.sp_session_player_unload(self._sp_session))
 
     def player_prefetch(self, track):
         """Prefetch a :class:`Track` for playback.
@@ -873,13 +873,13 @@ class Session(object):
         playing it.
         """
         spotify.Error.maybe_raise(lib.sp_session_player_prefetch(
-            self.sp_session, track.sp_track))
+            self._sp_session, track._sp_track))
 
     @property
     def playlist_container(self):
         """The :class:`PlaylistContainer` for the currently logged in user."""
         sp_playlistcontainer = lib.sp_session_playlistcontainer(
-            self.sp_session)
+            self._sp_session)
         if sp_playlistcontainer == ffi.NULL:
             return None
         return spotify.PlaylistContainer(sp_playlistcontainer)
@@ -887,7 +887,7 @@ class Session(object):
     @property
     def inbox(self):
         """The inbox :class:`Playlist` for the currently logged in user."""
-        sp_playlist = lib.sp_session_inbox_create(self.sp_session)
+        sp_playlist = lib.sp_session_inbox_create(self._sp_session)
         if sp_playlist == ffi.NULL:
             return None
         return spotify.Playlist(sp_playlist, add_ref=False)
@@ -895,7 +895,7 @@ class Session(object):
     @property
     def starred(self):
         """The starred :class:`Playlist` for the currently logged in user."""
-        sp_playlist = lib.sp_session_starred_create(self.sp_session)
+        sp_playlist = lib.sp_session_starred_create(self._sp_session)
         if sp_playlist == ffi.NULL:
             return None
         return spotify.Playlist(sp_playlist, add_ref=False)
@@ -904,7 +904,7 @@ class Session(object):
         """The starred :class:`Playlist` for the user with
         ``canonical_username``."""
         sp_playlist = lib.sp_session_starred_for_user_create(
-            self.sp_session, utils.to_bytes(canonical_username))
+            self._sp_session, utils.to_bytes(canonical_username))
         if sp_playlist == ffi.NULL:
             return None
         return spotify.Playlist(sp_playlist, add_ref=False)
@@ -921,7 +921,7 @@ class Session(object):
             canonical_username = utils.to_bytes(canonical_username)
         sp_playlistcontainer = (
             lib.sp_session_publishedcontainer_for_user_create(
-                self.sp_session, canonical_username))
+                self._sp_session, canonical_username))
         if sp_playlistcontainer == ffi.NULL:
             return None
         return spotify.PlaylistContainer(sp_playlistcontainer, add_ref=False)
@@ -929,7 +929,7 @@ class Session(object):
     def preferred_bitrate(self, bitrate):
         """Set preferred :class:`Bitrate` for music streaming."""
         spotify.Error.maybe_raise(lib.sp_session_preferred_bitrate(
-            self.sp_session, bitrate))
+            self._sp_session, bitrate))
 
     def preferred_offline_bitrate(self, bitrate, allow_resync=False):
         """Set preferred :class:`Bitrate` for offline sync.
@@ -937,14 +937,14 @@ class Session(object):
         If ``allow_resync`` is :class:`True` libspotify may resynchronize
         already synced tracks."""
         spotify.Error.maybe_raise(lib.sp_session_preferred_offline_bitrate(
-            self.sp_session, bitrate, allow_resync))
+            self._sp_session, bitrate, allow_resync))
 
     def get_volume_normalization(self):
-        return bool(lib.sp_session_get_volume_normalization(self.sp_session))
+        return bool(lib.sp_session_get_volume_normalization(self._sp_session))
 
     def set_volume_normalization(self, value):
         spotify.Error.maybe_raise(lib.sp_session_set_volume_normalization(
-            self.sp_session, value))
+            self._sp_session, value))
 
     volume_normalization = property(
         get_volume_normalization, set_volume_normalization)
@@ -954,7 +954,7 @@ class Session(object):
     """
 
     def is_private_session(self):
-        return bool(lib.sp_session_is_private_session(self.sp_session))
+        return bool(lib.sp_session_is_private_session(self._sp_session))
 
     def set_private_session(self, value):
         # TODO Segfaults unless we're logged in and have called
@@ -962,7 +962,7 @@ class Session(object):
         # relevant session callback, set a threading.Event from it, and check
         # here if that event is set before calling the sp_ function.
         spotify.Error.maybe_raise(lib.sp_session_set_private_session(
-            self.sp_session, value))
+            self._sp_session, value))
 
     private_session = property(
         is_private_session, set_private_session)
@@ -976,20 +976,20 @@ class Session(object):
         ``social_provider``."""
         scrobbling_state = ffi.new('sp_scrobbling_state *')
         spotify.Error.maybe_raise(lib.sp_session_is_scrobbling(
-            self.sp_session, social_provider, scrobbling_state))
+            self._sp_session, social_provider, scrobbling_state))
         return spotify.ScrobblingState(scrobbling_state[0])
 
     def is_scrobbling_possible(self, social_provider):
         """Check if the scrobbling settings should be shown to the user."""
         out = ffi.new('bool *')
         spotify.Error.maybe_raise(lib.sp_session_is_scrobbling_possible(
-            self.sp_session, social_provider, out))
+            self._sp_session, social_provider, out))
         return bool(out[0])
 
     def set_scrobbling(self, social_provider, scrobbling_state):
         """Set the ``scrobbling_state`` for the given ``social_provider``."""
         spotify.Error.maybe_raise(lib.sp_session_set_scrobbling(
-            self.sp_session, social_provider, scrobbling_state))
+            self._sp_session, social_provider, scrobbling_state))
 
     def set_social_credentials(self, social_provider, username, password):
         """Set the user's credentials with a social provider.
@@ -1002,7 +1002,7 @@ class Session(object):
         username = ffi.new('char[]', utils.to_bytes(username))
         password = ffi.new('char[]', utils.to_bytes(password))
         spotify.Error.maybe_raise(lib.sp_session_set_social_credentials(
-            self.sp_session, social_provider, username, password))
+            self._sp_session, social_provider, username, password))
 
     def set_connection_type(self, connection_type):
         """Set the :class:`ConnectionType`.
@@ -1011,7 +1011,7 @@ class Session(object):
         offline syncing and network usage.
         """
         spotify.Error.maybe_raise(lib.sp_session_set_connection_type(
-            self.sp_session, connection_type))
+            self._sp_session, connection_type))
 
     def set_connection_rules(self, *connection_rules):
         """Set one or more :class:`connection rules <ConnectionRule>`.
@@ -1023,19 +1023,19 @@ class Session(object):
         """
         connection_rules = functools.reduce(operator.or_, connection_rules, 0)
         spotify.Error.maybe_raise(lib.sp_session_set_connection_rules(
-            self.sp_session, connection_rules))
+            self._sp_session, connection_rules))
 
     @property
     def offline_tracks_to_sync(self):
         """Total number of tracks that needs download before everything from
         all playlists that is marked for offline is fully synchronized.
         """
-        return lib.sp_offline_tracks_to_sync(self.sp_session)
+        return lib.sp_offline_tracks_to_sync(self._sp_session)
 
     @property
     def offline_num_playlists(self):
         """Number of playlists that is marked for offline synchronization."""
-        return lib.sp_offline_num_playlists(self.sp_session)
+        return lib.sp_offline_num_playlists(self._sp_session)
 
     @property
     def offline_sync_status(self):
@@ -1046,7 +1046,7 @@ class Session(object):
         """
         sp_offline_sync_status = ffi.new('sp_offline_sync_status *')
         syncing = lib.sp_offline_sync_get_status(
-            self.sp_session, sp_offline_sync_status)
+            self._sp_session, sp_offline_sync_status)
         if syncing:
             return spotify.OfflineSyncStatus(sp_offline_sync_status)
 
@@ -1054,7 +1054,7 @@ class Session(object):
     def offline_time_left(self):
         """The number of seconds until the user has to get online and
         relogin."""
-        return lib.sp_offline_time_left(self.sp_session)
+        return lib.sp_offline_time_left(self._sp_session)
 
     @property
     def user_country(self):
@@ -1063,4 +1063,4 @@ class Session(object):
         The :attr:`~SessionCallbacks.offline_status_updated` callback is called
         when this changes.
         """
-        return utils.to_country(lib.sp_session_user_country(self.sp_session))
+        return utils.to_country(lib.sp_session_user_country(self._sp_session))

@@ -18,12 +18,12 @@ class Track(object):
     def __init__(self, sp_track, add_ref=True):
         if add_ref:
             lib.sp_track_add_ref(sp_track)
-        self.sp_track = ffi.gc(sp_track, lib.sp_track_release)
+        self._sp_track = ffi.gc(sp_track, lib.sp_track_release)
 
     @property
     def is_loaded(self):
         """Whether the track's data is loaded."""
-        return bool(lib.sp_track_is_loaded(self.sp_track))
+        return bool(lib.sp_track_is_loaded(self._sp_track))
 
     @property
     def error(self):
@@ -31,7 +31,7 @@ class Track(object):
 
         Check to see if there was problems loading the track.
         """
-        return spotify.ErrorType(lib.sp_track_error(self.sp_track))
+        return spotify.ErrorType(lib.sp_track_error(self._sp_track))
 
     def load(self, timeout=None):
         """Block until the track's data is loaded.
@@ -52,7 +52,7 @@ class Track(object):
         spotify.Error.maybe_raise(self.error)
         # TODO What happens here if the track is unloaded?
         return TrackOfflineStatus(
-            lib.sp_track_offline_get_status(self.sp_track))
+            lib.sp_track_offline_get_status(self._sp_track))
 
     @property
     def availability(self):
@@ -62,7 +62,7 @@ class Track(object):
         spotify.Error.maybe_raise(self.error)
         # TODO What happens here if the track is unloaded?
         return TrackAvailability(lib.sp_track_get_availability(
-            spotify.session_instance.sp_session, self.sp_track))
+            spotify.session_instance._sp_session, self._sp_track))
 
     @property
     def is_local(self):
@@ -76,7 +76,7 @@ class Track(object):
         if not self.is_loaded:
             return None
         return bool(lib.sp_track_is_local(
-            spotify.session_instance.sp_session, self.sp_track))
+            spotify.session_instance._sp_session, self._sp_track))
 
     @property
     def is_autolinked(self):
@@ -92,7 +92,7 @@ class Track(object):
         if not self.is_loaded:
             return None
         return bool(lib.sp_track_is_autolinked(
-            spotify.session_instance.sp_session, self.sp_track))
+            spotify.session_instance._sp_session, self._sp_track))
 
     @property
     def playable(self):
@@ -105,7 +105,7 @@ class Track(object):
         spotify.Error.maybe_raise(self.error)
         # TODO What happens here if the track is unloaded?
         return Track(lib.sp_track_get_playable(
-            spotify.session_instance.sp_session, self.sp_track))
+            spotify.session_instance._sp_session, self._sp_track))
 
     @property
     def is_placeholder(self):
@@ -122,7 +122,7 @@ class Track(object):
         """
         spotify.Error.maybe_raise(self.error)
         # TODO What happens here if the track is unloaded?
-        return bool(lib.sp_track_is_placeholder(self.sp_track))
+        return bool(lib.sp_track_is_placeholder(self._sp_track))
 
     def is_starred(self):
         if spotify.session_instance is None:
@@ -131,15 +131,15 @@ class Track(object):
         if not self.is_loaded:
             return None
         return bool(lib.sp_track_is_starred(
-            spotify.session_instance.sp_session, self.sp_track))
+            spotify.session_instance._sp_session, self._sp_track))
 
     def set_starred(self, star=True):
         if spotify.session_instance is None:
             raise RuntimeError('Session must be initialized')
         tracks = ffi.new('sp_track *[]', 1)
-        tracks[0] = self.sp_track
+        tracks[0] = self._sp_track
         spotify.Error.maybe_raise(lib.sp_track_set_starred(
-            spotify.session_instance.sp_session, tracks, len(tracks), star))
+            spotify.session_instance._sp_session, tracks, len(tracks), star))
 
     starred = property(is_starred, set_starred)
     """Whether the track is starred by the current user.
@@ -158,11 +158,11 @@ class Track(object):
         spotify.Error.maybe_raise(self.error)
         if not self.is_loaded:
             return None
-        num_artists = lib.sp_track_num_artists(self.sp_track)
+        num_artists = lib.sp_track_num_artists(self._sp_track)
         artists = []
         for i in range(num_artists):
             artists.append(
-                spotify.Artist(lib.sp_track_artist(self.sp_track, i)))
+                spotify.Artist(lib.sp_track_artist(self._sp_track, i)))
         return artists
 
     @property
@@ -172,7 +172,7 @@ class Track(object):
         Will always return :class:`None` if the track isn't loaded.
         """
         spotify.Error.maybe_raise(self.error)
-        sp_album = lib.sp_track_album(self.sp_track)
+        sp_album = lib.sp_track_album(self._sp_track)
         return spotify.Album(sp_album) if sp_album else None
 
     @property
@@ -182,7 +182,7 @@ class Track(object):
         Will always return :class:`None` if the track isn't loaded.
         """
         spotify.Error.maybe_raise(self.error)
-        name = utils.to_unicode(lib.sp_track_name(self.sp_track))
+        name = utils.to_unicode(lib.sp_track_name(self._sp_track))
         return name if name else None
 
     @property
@@ -192,7 +192,7 @@ class Track(object):
         Will always return :class:`None` if the track isn't loaded.
         """
         spotify.Error.maybe_raise(self.error)
-        duration = lib.sp_track_duration(self.sp_track)
+        duration = lib.sp_track_duration(self._sp_track)
         return duration if duration else None
 
     @property
@@ -204,7 +204,7 @@ class Track(object):
         spotify.Error.maybe_raise(self.error)
         if not self.is_loaded:
             return None
-        return lib.sp_track_popularity(self.sp_track)
+        return lib.sp_track_popularity(self._sp_track)
 
     @property
     def disc(self):
@@ -214,7 +214,7 @@ class Track(object):
         artist browser.
         """
         spotify.Error.maybe_raise(self.error)
-        disc = lib.sp_track_disc(self.sp_track)
+        disc = lib.sp_track_disc(self._sp_track)
         return disc if disc else None
 
     @property
@@ -225,7 +225,7 @@ class Track(object):
         artist browser.
         """
         spotify.Error.maybe_raise(self.error)
-        index = lib.sp_track_index(self.sp_track)
+        index = lib.sp_track_index(self._sp_track)
         return index if index else None
 
     @property

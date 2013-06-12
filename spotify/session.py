@@ -1034,11 +1034,11 @@ class Session(object):
         The :attr:`~SessionCallbacks.offline_status_updated` callback is called
         when this is updated.
         """
-        sp_offline_sync_status_ptr = ffi.new('sp_offline_sync_status **')
+        sp_offline_sync_status = ffi.new('sp_offline_sync_status *')
         syncing = lib.sp_offline_sync_get_status(
-            self.sp_session, sp_offline_sync_status_ptr)
+            self.sp_session, sp_offline_sync_status)
         if syncing:
-            return spotify.OfflineSyncStatus(sp_offline_sync_status_ptr[0])
+            return spotify.OfflineSyncStatus(sp_offline_sync_status)
 
     @property
     def offline_time_left(self):

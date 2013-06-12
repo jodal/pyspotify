@@ -1364,11 +1364,8 @@ class SessionTest(unittest.TestCase):
         self.assertEqual(result, 5)
 
     def test_offline_sync_status(self, lib_mock):
-        sp_offline_sync_status = spotify.ffi.new('sp_offline_sync_status *')
-        sp_offline_sync_status.queued_tracks = 3
-
-        def func(sp_session_ptr, sp_offline_sync_status_ptr):
-            sp_offline_sync_status_ptr[0] = sp_offline_sync_status
+        def func(sp_session_ptr, sp_offline_sync_status):
+            sp_offline_sync_status.queued_tracks = 3
             return 1
 
         lib_mock.sp_offline_sync_get_status.side_effect = func

@@ -180,7 +180,7 @@ PyObject *
 ArtistBrowser_sq_item(PyObject *self, Py_ssize_t index)
 {
     if (index >= ArtistBrowser_sq_length(self)) {
-        PyErr_SetString(PyExc_IndexError, "");
+        PyErr_SetNone(PyExc_IndexError);
         return NULL;
     }
     sp_track *track = sp_artistbrowse_track(

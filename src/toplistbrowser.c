@@ -174,7 +174,7 @@ ToplistBrowser_sq_item(PyObject *self, Py_ssize_t index)
     else if (index < sp_toplistbrowse_num_tracks(browser))
         return Track_FromSpotify( sp_toplistbrowse_track(browser, i));
 
-    PyErr_SetString(PyExc_IndexError, "");
+    PyErr_SetNone(PyExc_IndexError);
     return NULL;
 }
 

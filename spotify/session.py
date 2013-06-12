@@ -302,6 +302,29 @@ class SessionCallbacks(object):
         self._private_session_mode_changed = ffi.callback(
             'void(sp_session *, bool)', self._private_session_mode_changed)
 
+        self.sp_session_callbacks = ffi.new('sp_session_callbacks *', {
+            'logged_in': self._logged_in,
+            'logged_out': self._logged_out,
+            'metadata_updated': self._metadata_updated,
+            'connection_error': self._connection_error,
+            'message_to_user': self._message_to_user,
+            'notify_main_thread': self._notify_main_thread,
+            'music_delivery': self._music_delivery,
+            'play_token_lost': self._play_token_lost,
+            'log_message': self._log_message,
+            'end_of_track': self._end_of_track,
+            'streaming_error': self._streaming_error,
+            'userinfo_updated': self._user_info_updated,
+            'start_playback': self._start_playback,
+            'stop_playback': self._stop_playback,
+            'get_audio_buffer_stats': self._get_audio_buffer_stats,
+            'offline_status_updated': self._offline_status_updated,
+            'credentials_blob_updated': self._credentials_blob_updated,
+            'connectionstate_updated': self._connection_state_updated,
+            'scrobble_error': self._scrobble_error,
+            'private_session_mode_changed': self._private_session_mode_changed,
+        })
+
     def _logged_in(self, sp_session, sp_error):
         if not spotify.session_instance:
             return
@@ -464,32 +487,6 @@ class SessionCallbacks(object):
             self.private_session_mode_changed(
                 spotify.session_instance, is_private)
 
-    def make_sp_session_callbacks(self):
-        """Internal method."""
-
-        return ffi.new('sp_session_callbacks *', {
-            'logged_in': self._logged_in,
-            'logged_out': self._logged_out,
-            'metadata_updated': self._metadata_updated,
-            'connection_error': self._connection_error,
-            'message_to_user': self._message_to_user,
-            'notify_main_thread': self._notify_main_thread,
-            'music_delivery': self._music_delivery,
-            'play_token_lost': self._play_token_lost,
-            'log_message': self._log_message,
-            'end_of_track': self._end_of_track,
-            'streaming_error': self._streaming_error,
-            'userinfo_updated': self._user_info_updated,
-            'start_playback': self._start_playback,
-            'stop_playback': self._stop_playback,
-            'get_audio_buffer_stats': self._get_audio_buffer_stats,
-            'offline_status_updated': self._offline_status_updated,
-            'credentials_blob_updated': self._credentials_blob_updated,
-            'connectionstate_updated': self._connection_state_updated,
-            'scrobble_error': self._scrobble_error,
-            'private_session_mode_changed': self._private_session_mode_changed,
-        })
-
 
 class SessionConfig(object):
     """The session config.
@@ -651,7 +648,7 @@ class SessionConfig(object):
             'application_key': ffi.cast('void *', application_key),
             'application_key_size': len(application_key_bytes),
             'user_agent': user_agent,
-            'callbacks': callbacks.make_sp_session_callbacks(),
+            'callbacks': callbacks.sp_session_callbacks,
             'compress_playlists': bool(self.compress_playlists),
             'dont_save_metadata_for_playlists': bool(
                 self.dont_save_metadata_for_playlists),

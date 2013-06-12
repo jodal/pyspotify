@@ -974,7 +974,7 @@ class Session(object):
         out = ffi.new('bool *')
         spotify.Error.maybe_raise(lib.sp_session_is_scrobbling_possible(
             self.sp_session, social_provider, out))
-        return out[0]
+        return bool(out[0])
 
     def set_scrobbling(self, social_provider, scrobbling_state):
         """Set the ``scrobbling_state`` for the given ``social_provider``."""

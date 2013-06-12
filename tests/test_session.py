@@ -685,7 +685,8 @@ class SessionTest(unittest.TestCase):
 
         session.relogin()
 
-        lib_mock.sp_session_relogin.assert_called_once_with(session._sp_session)
+        lib_mock.sp_session_relogin.assert_called_once_with(
+            session._sp_session)
 
     def test_relogin_fail_raises_error(self, lib_mock):
         lib_mock.sp_session_relogin.return_value = (

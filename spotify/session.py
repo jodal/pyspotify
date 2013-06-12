@@ -808,7 +808,8 @@ class Session(object):
         libspotify does this regularly and on logout, so you should never need
         to call this method yourself.
         """
-        spotify.Error.maybe_raise(lib.sp_session_flush_caches(self._sp_session))
+        spotify.Error.maybe_raise(
+            lib.sp_session_flush_caches(self._sp_session))
 
     @property
     def connection_state(self):

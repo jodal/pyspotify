@@ -195,7 +195,7 @@ Session_search_complete(sp_search *search, void *data)
     PyGILState_STATE gstate = PyGILState_Ensure();
 
     search_results = Results_FromSpotify(search);
-    result = PyObject_CallFunction(trampoline->callback, "NN", search_results,
+    result = PyObject_CallFunction(trampoline->callback, "OO", search_results,
                                    trampoline->userdata);
     Py_XDECREF(search_results);
 

@@ -23,7 +23,7 @@ ToplistBrowser_browse_complete(sp_toplistbrowse *browser, void *data)
     PyGILState_STATE gstate = PyGILState_Ensure();
 
     self = ToplistBrowser_FromSpotify(browser);
-    result = PyObject_CallFunction(trampoline->callback, "NN", self,
+    result = PyObject_CallFunction(trampoline->callback, "OO", self,
                                    trampoline->userdata);
     Py_XDECREF(self);
 
@@ -42,7 +42,7 @@ ToplistBrowser_new(PyTypeObject *type, PyObject *args, PyObject *kwds)
     PyObject *region, *self, *callback = NULL, *userdata = NULL;
     Callback *trampoline = NULL;
 
-    char *tmp, *username = NULL;
+    char *tmp = NULL, *username = NULL;
     sp_toplistbrowse *browser;
     sp_toplisttype browse_type = SP_TOPLIST_TYPE_ARTISTS;
     sp_toplistregion browse_region = SP_TOPLIST_REGION_EVERYWHERE;

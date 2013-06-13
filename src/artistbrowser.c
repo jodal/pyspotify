@@ -30,7 +30,7 @@ ArtistBrowser_browse_complete(sp_artistbrowse *browser, void *data)
     PyGILState_STATE gstate = PyGILState_Ensure();
 
     self = ArtistBrowser_FromSpotify(browser);
-    result = PyObject_CallFunction(trampoline->callback, "NN", self,
+    result = PyObject_CallFunction(trampoline->callback, "OO", self,
                                    trampoline->userdata);
     Py_XDECREF(self);
 

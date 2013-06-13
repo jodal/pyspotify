@@ -132,7 +132,7 @@ playlistcontainer_loaded_callback(sp_playlistcontainer *container, void *data)
     PyGILState_STATE gstate = PyGILState_Ensure();
 
     self = PlaylistContainer_FromSpotify(container);
-    result = PyObject_CallFunction(trampoline->callback, "NN", self,
+    result = PyObject_CallFunction(trampoline->callback, "OO", self,
                                    trampoline->userdata);
     Py_XDECREF(self);
 
@@ -166,7 +166,7 @@ playlistcontainer_playlist_added_callback(
     self = PlaylistContainer_FromSpotify(container);
     py_playlist = Playlist_FromSpotify(playlist);
 
-    result = PyObject_CallFunction(trampoline->callback, "NNiN",
+    result = PyObject_CallFunction(trampoline->callback, "OOiO",
                                    self, py_playlist, position,
                                    trampoline->userdata);
     Py_XDECREF(self);
@@ -203,7 +203,7 @@ playlistcontainer_playlist_moved_callback(
     self = PlaylistContainer_FromSpotify(container);
     py_playlist = Playlist_FromSpotify(playlist);
 
-    result = PyObject_CallFunction(trampoline->callback, "NNiiN", self,
+    result = PyObject_CallFunction(trampoline->callback, "OOiiO", self,
                                    py_playlist, position, new_position,
                                    trampoline->userdata);
     Py_XDECREF(self);
@@ -240,7 +240,7 @@ playlistcontainer_playlist_removed_callback(
     self = PlaylistContainer_FromSpotify(container);
     py_playlist = Playlist_FromSpotify(playlist);
 
-    result = PyObject_CallFunction(trampoline->callback, "NNiN",
+    result = PyObject_CallFunction(trampoline->callback, "OOiO",
                                    self, py_playlist, position,
                                    trampoline->userdata);
     Py_XDECREF(self);

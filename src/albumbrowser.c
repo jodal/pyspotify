@@ -29,7 +29,7 @@ AlbumBrowser_browse_complete(sp_albumbrowse *browser, void *data)
     PyGILState_STATE gstate = PyGILState_Ensure();
 
     self = AlbumBrowser_FromSpotify(browser);
-    result = PyObject_CallFunction(trampoline->callback, "NN", self,
+    result = PyObject_CallFunction(trampoline->callback, "OO", self,
                                    trampoline->userdata);
     Py_XDECREF(self);
 

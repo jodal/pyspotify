@@ -19,7 +19,7 @@ static plc_cb_entry *playlistcontainer_callbacks_table = NULL;
 
 /* Mallocs and memsets a new sp_playlist_callbacks structure. */
 static sp_playlistcontainer_callbacks *
-create_and_initialize_callbacks() {
+create_and_initialize_callbacks(void) {
     /* TODO: switch to PyMem_Malloc and audit for coresponding free */
     sp_playlistcontainer_callbacks *callbacks = malloc(
         sizeof(sp_playlistcontainer_callbacks));

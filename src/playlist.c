@@ -18,16 +18,14 @@
  */
 static pl_cb_entry *playlist_callbacks_table = NULL;
 
-
 /* Mallocs and memsets a new sp_playlist_callbacks structure. */
 static sp_playlist_callbacks *
-create_and_initialize_callbacks() {
+create_and_initialize_callbacks(void) {
     /* TODO: switch to PyMem_Malloc and audit for coresponding free */
     sp_playlist_callbacks *callbacks = malloc(sizeof(sp_playlist_callbacks));
     memset(callbacks, 0, sizeof(sp_playlist_callbacks));
     return callbacks;
 }
-
 
 /* TODO: cleanup table add and remove */
 static void
@@ -190,7 +188,7 @@ Playlist_remove_tracks(PyObject *self, PyObject *args)
             return NULL;
         }
 
-        if (0 >= indices[i] > playlist_length) {
+        if (indices[i] < 0 || indices[i] > playlist_length) {
             PyErr_SetString(PyExc_IndexError, "specified track does not exist");
             PyMem_Free(indices);
             return NULL;

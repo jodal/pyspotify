@@ -214,7 +214,7 @@ Session_search(PyObject *self, PyObject *args, PyObject *kwds)
     PyObject *callback, *userdata = NULL;
     Callback *trampoline;
 
-    char *query, *tmp;
+    char *query, *tmp = NULL;
     sp_search *search;
     sp_search_type search_type = SP_SEARCH_STANDARD;
 

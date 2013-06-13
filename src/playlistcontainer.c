@@ -118,7 +118,7 @@ PlaylistContainer_add_callback(PyObject *self, PyObject *args,
 
     sp_playlistcontainer_add_callbacks(
             PlaylistContainer_SP_PLAYLISTCONTAINER(self), container_callbacks,
-            (void*)trampoline);
+            (void *)trampoline);
     Py_RETURN_NONE;
 }
 

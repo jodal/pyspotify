@@ -116,7 +116,7 @@ ArtistBrowser_albums(PyObject *self)
 
     for (i = 0; i < count; ++i) {
         album = sp_artistbrowse_album(browser, i);
-        PyList_SetItem(list, i, Album_FromSpotify(album));
+        PyList_SET_ITEM(list, i, Album_FromSpotify(album));
     }
     return list;
 }
@@ -132,7 +132,7 @@ ArtistBrowser_similar_artists(PyObject *self)
 
     for (i = 0; i < count; ++i) {
         artist = sp_artistbrowse_similar_artist(browser, i);
-        PyList_SetItem(list, i, Artist_FromSpotify(artist));
+        PyList_SET_ITEM(list, i, Artist_FromSpotify(artist));
     }
     return list;
 }
@@ -148,7 +148,7 @@ ArtistBrowser_tracks(PyObject *self)
 
     for (i = 0; i < count; ++i) {
         track = sp_artistbrowse_track(browser, i);
-        PyList_SetItem(list, i, Track_FromSpotify(track));
+        PyList_SET_ITEM(list, i, Track_FromSpotify(track));
     }
     return list;
 }
@@ -164,7 +164,7 @@ ArtistBrowser_tophit_tracks(PyObject *self)
 
     for (i = 0; i < count; ++i) {
         track = sp_artistbrowse_tophit_track(browser, i);
-        PyList_SetItem(list, i, Track_FromSpotify(track));
+        PyList_SET_ITEM(list, i, Track_FromSpotify(track));
     }
     return list;
 }

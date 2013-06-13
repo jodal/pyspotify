@@ -48,7 +48,7 @@ Track_artists(PyObject *self, PyObject *args)
 
     for (i = 0; i < count; ++i) {
         artist = sp_track_artist(Track_SP_TRACK(self), i);
-        PyList_SetItem(list, i, Artist_FromSpotify(artist));
+        PyList_SET_ITEM(list, i, Artist_FromSpotify(artist));
     }
     return list;
 }

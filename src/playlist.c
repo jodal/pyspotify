@@ -297,7 +297,7 @@ playlist_tracks_added_callback(sp_playlist *playlist, sp_track *const *tracks,
     /* TODO: Create Tracks_FromSpotify(tracks, num), Albums...? */
     for (i = 0; i < num_tracks; i++) {
         PyObject *track = Track_FromSpotify(tracks[i]);
-        PyList_SetItem(py_tracks, i, track);
+        PyList_SET_ITEM(py_tracks, i, track);
     }
 
     result = PyObject_CallFunction(trampoline->callback, "NNiN", self,
@@ -335,7 +335,7 @@ playlist_tracks_removed_callback(
     removed = PyList_New(num_tracks);
 
     for (i = 0; i < num_tracks; i++) {
-        PyList_SetItem(removed, i, Py_BuildValue("i", tracks[i]));
+        PyList_SET_ITEM(removed, i, Py_BuildValue("i", tracks[i]));
     }
 
     result = PyObject_CallFunction(trampoline->callback, "NNN", self,
@@ -374,7 +374,7 @@ playlist_tracks_moved_callback(
     moved = PyList_New(num_tracks);
 
     for (i = 0; i < num_tracks; i++) {
-        PyList_SetItem(moved, i, Py_BuildValue("i", tracks[i]));
+        PyList_SET_ITEM(moved, i, Py_BuildValue("i", tracks[i]));
     }
 
     result = PyObject_CallFunction(trampoline->callback, "NNiN", self,

@@ -63,7 +63,7 @@ Results_artists(PyObject *self)
 
     for (i = 0; i < count; ++i) {
         artist = sp_search_artist(Results_SP_SEARCH(self), i);
-        PyList_SetItem(list, i, Artist_FromSpotify(artist));
+        PyList_SET_ITEM(list, i, Artist_FromSpotify(artist));
     }
     return list;
 }
@@ -78,7 +78,7 @@ Results_albums(PyObject *self)
 
     for (i = 0; i < count; ++i) {
         album = sp_search_album(Results_SP_SEARCH(self), i);
-        PyList_SetItem(list, i, Album_FromSpotify(album));
+        PyList_SET_ITEM(list, i, Album_FromSpotify(album));
     }
     return list;
 }
@@ -93,7 +93,7 @@ Results_tracks(PyObject *self)
 
     for (i = 0; i < count; ++i) {
         track = sp_search_track(Results_SP_SEARCH(self), i);
-        PyList_SetItem(list, i, Track_FromSpotify(track));
+        PyList_SET_ITEM(list, i, Track_FromSpotify(track));
     }
     return list;
 }

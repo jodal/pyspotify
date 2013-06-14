@@ -10,9 +10,11 @@ from spotify import ffi, lib
 PY2 = sys.version_info[0] == 2
 
 if PY2:  # pragma: no branch
+    string_types = (basestring,)
     text_type = unicode
     binary_type = str
 else:
+    string_types = (str,)
     text_type = str
     binary_type = bytes
 

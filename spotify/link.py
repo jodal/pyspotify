@@ -86,7 +86,7 @@ class Link(object):
         """Make a :class:`Track` from the link."""
         sp_track = lib.sp_link_as_track(self._sp_link)
         if sp_track:
-            return spotify.Track(sp_track)
+            return spotify.Track(sp_track=sp_track)
 
     def as_track_offset(self):
         """Get the track offset in milliseconds from the link."""

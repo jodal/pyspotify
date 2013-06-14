@@ -13,11 +13,27 @@ __all__ = [
 
 
 class Track(object):
-    """A Spotify track."""
+    """A Spotify track.
 
-    def __init__(self, sp_track, add_ref=True):
-        if add_ref:
-            lib.sp_track_add_ref(sp_track)
+    You can get tracks from playlists or albums, or you can create a
+    :class:`Track` yourself from a Spotify URI::
+
+        >>> track = spotify.Track('spotify:track:2Foc5Q5nqNiosCNqttzHof')
+        >>> track.load().name
+        u'Get Lucky'
+    """
+
+    def __init__(self, uri=None, sp_track=None, add_ref=True):
+        assert uri or sp_track, 'uri or sp_track is required'
+        if uri is not None:
+            link = spotify.Link(uri)
+            sp_track = lib.sp_link_as_track(link._sp_link)
+            if sp_track is ffi.NULL:
+                raise ValueError(
+                    'Failed to get track from Spotify URI: %r' % uri)
+        elif sp_track is not None:
+            if add_ref:
+                lib.sp_track_add_ref(sp_track)
         self._sp_track = ffi.gc(sp_track, lib.sp_track_release)
 
     @property
@@ -104,7 +120,7 @@ class Track(object):
             raise RuntimeError('Session must be initialized')
         spotify.Error.maybe_raise(self.error)
         # TODO What happens here if the track is unloaded?
-        return Track(lib.sp_track_get_playable(
+        return Track(sp_track=lib.sp_track_get_playable(
             spotify.session_instance._sp_session, self._sp_track))
 
     @property
@@ -260,7 +276,7 @@ class LocalTrack(Track):
 
         sp_track = lib.sp_localtrack_create(artist, title, album, length)
 
-        super(LocalTrack, self).__init__(sp_track, add_ref=False)
+        super(LocalTrack, self).__init__(sp_track=sp_track, add_ref=False)
 
 
 @utils.make_enum('SP_TRACK_AVAILABILITY_')

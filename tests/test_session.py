@@ -854,7 +854,7 @@ class SessionTest(unittest.TestCase):
         lib_mock.sp_session_player_load.return_value = spotify.ErrorType.OK
         session = self.create_session(lib_mock)
         sp_track = spotify.ffi.new('int *')
-        track = spotify.Track(sp_track)
+        track = spotify.Track(sp_track=sp_track)
 
         session.player_load(track)
 
@@ -867,7 +867,7 @@ class SessionTest(unittest.TestCase):
             spotify.ErrorType.TRACK_NOT_PLAYABLE)
         session = self.create_session(lib_mock)
         sp_track = spotify.ffi.new('int *')
-        track = spotify.Track(sp_track)
+        track = spotify.Track(sp_track=sp_track)
 
         self.assertRaises(spotify.Error, session.player_load, track)
 
@@ -933,7 +933,7 @@ class SessionTest(unittest.TestCase):
         lib_mock.sp_session_player_prefetch.return_value = spotify.ErrorType.OK
         session = self.create_session(lib_mock)
         sp_track = spotify.ffi.new('int *')
-        track = spotify.Track(sp_track)
+        track = spotify.Track(sp_track=sp_track)
 
         session.player_prefetch(track)
 
@@ -946,7 +946,7 @@ class SessionTest(unittest.TestCase):
             spotify.ErrorType.NO_CACHE)
         session = self.create_session(lib_mock)
         sp_track = spotify.ffi.new('int *')
-        track = spotify.Track(sp_track)
+        track = spotify.Track(sp_track=sp_track)
 
         self.assertRaises(spotify.Error, session.player_prefetch, track)
 

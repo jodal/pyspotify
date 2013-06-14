@@ -50,7 +50,7 @@ class LinkTest(unittest.TestCase):
         sp_link = spotify.ffi.new('int *')
         lib_mock.sp_link_create_from_track.return_value = sp_link
         sp_track = spotify.ffi.new('int *')
-        track = spotify.Track(sp_track)
+        track = spotify.Track(sp_track=sp_track)
 
         link = spotify.Link(track)
 
@@ -63,7 +63,7 @@ class LinkTest(unittest.TestCase):
         sp_link = spotify.ffi.new('int *')
         lib_mock.sp_link_create_from_track.return_value = sp_link
         sp_track = spotify.ffi.new('int *')
-        track = spotify.Track(sp_track)
+        track = spotify.Track(sp_track=sp_track)
 
         link = spotify.Link(track, offset=90)
 

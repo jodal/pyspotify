@@ -11,10 +11,26 @@ __all__ = [
 
 
 class Album(object):
-    """A Spotify album."""
+    """A Spotify album.
 
-    def __init__(self, sp_album):
-        lib.sp_album_add_ref(sp_album)
+    You can get an album from a track or an artist, or you can create an
+    :class:`Album` yourself from a Spotify URI::
+
+        >>> album = spotify.Album('spotify:album:6wXDbHLesy6zWqQawAa91d')
+        >>> album.load().name
+        u'Forward / Return'
+    """
+
+    def __init__(self, uri=None, sp_album=None):
+        assert uri or sp_album, 'uri or sp_album is required'
+        if uri is not None:
+            link = spotify.Link(uri)
+            sp_album = lib.sp_link_as_album(link._sp_link)
+            if sp_album is ffi.NULL:
+                raise ValueError(
+                    'Failed to get album from Spotify URI: %r' % uri)
+        elif sp_album is not None:
+            lib.sp_album_add_ref(sp_album)
         self._sp_album = ffi.gc(sp_album, lib.sp_album_release)
 
     @property

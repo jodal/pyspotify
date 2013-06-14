@@ -189,7 +189,7 @@ class Track(object):
         """
         spotify.Error.maybe_raise(self.error)
         sp_album = lib.sp_track_album(self._sp_track)
-        return spotify.Album(sp_album) if sp_album else None
+        return spotify.Album(sp_album=sp_album) if sp_album else None
 
     @property
     def name(self):

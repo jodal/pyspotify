@@ -76,7 +76,7 @@ class LinkTest(unittest.TestCase):
         sp_link = spotify.ffi.new('int *')
         lib_mock.sp_link_create_from_album.return_value = sp_link
         sp_album = spotify.ffi.new('int *')
-        album = spotify.Album(sp_album)
+        album = spotify.Album(sp_album=sp_album)
 
         link = spotify.Link(album)
 
@@ -88,7 +88,7 @@ class LinkTest(unittest.TestCase):
         sp_link = spotify.ffi.new('int *')
         lib_mock.sp_link_create_from_album_cover.return_value = sp_link
         sp_album = spotify.ffi.new('int *')
-        album = spotify.Album(sp_album)
+        album = spotify.Album(sp_album=sp_album)
 
         link = spotify.Link(album, image_size=spotify.ImageSize.NORMAL)
 

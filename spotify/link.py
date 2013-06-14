@@ -99,7 +99,7 @@ class Link(object):
         """Make an :class:`Album` from the link."""
         sp_album = lib.sp_link_as_album(self._sp_link)
         if sp_album:
-            return spotify.Album(sp_album)
+            return spotify.Album(sp_album=sp_album)
 
     def as_artist(self):
         """Make an :class:`Artist` from the link."""

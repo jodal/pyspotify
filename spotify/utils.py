@@ -73,6 +73,8 @@ def load(obj, timeout=None):
     :returns: self
     """
     # TODO Timeout if this takes too long
+    # TODO Pretty error if sessions doesn't exist
+    # TODO We probably need to be logged in, so we should check for that too
     while not obj.is_loaded:
         spotify.session_instance.process_events()
         if hasattr(obj, 'error'):

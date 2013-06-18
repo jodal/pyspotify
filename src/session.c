@@ -529,8 +529,7 @@ logged_in(sp_session * session, sp_error error)
 {
     debug_printf(">> logged_in called: %s", sp_error_message(error));
 
-    PyGILState_STATE gstate;
-    gstate = PyGILState_Ensure();
+    PyGILState_STATE gstate = PyGILState_Ensure();
     PyObject *py_error = error_message(error);
     if (py_error != NULL) {
         session_callback(session, "logged_in", py_error);
@@ -544,8 +543,7 @@ logged_out(sp_session * session)
 {
     debug_printf(">> logged_out called");
 
-    PyGILState_STATE gstate;
-    gstate = PyGILState_Ensure();
+    PyGILState_STATE gstate = PyGILState_Ensure();
     /* TODO: should this fallback to logged_out like old code did? */
     session_callback(session, "_manager_logged_out", NULL);
     PyGILState_Release(gstate);
@@ -556,8 +554,7 @@ metadata_updated(sp_session * session)
 {
     debug_printf(">> metadata_updated called");
 
-    PyGILState_STATE gstate;
-    gstate = PyGILState_Ensure();
+    PyGILState_STATE gstate = PyGILState_Ensure();
     session_callback(session, "metadata_updated", NULL);
     PyGILState_Release(gstate);
 }
@@ -567,8 +564,7 @@ connection_error(sp_session * session, sp_error error)
 {
     debug_printf(">> connection_error called: %s", sp_error_message(error));
 
-    PyGILState_STATE gstate;
-    gstate = PyGILState_Ensure();
+    PyGILState_STATE gstate = PyGILState_Ensure();
     PyObject *py_error = error_message(error);
     if (py_error != NULL) {
         session_callback(session, "connection_error", py_error);
@@ -582,8 +578,7 @@ message_to_user(sp_session * session, const char *data)
 {
     debug_printf(">> message_to_user called: %s", data);
 
-    PyGILState_STATE gstate;
-    gstate = PyGILState_Ensure();
+    PyGILState_STATE gstate = PyGILState_Ensure();
     PyObject *message = PyUnicode_FromString(data);
     if (message != NULL) {
         session_callback(session, "message_to_user", message);
@@ -600,8 +595,7 @@ notify_main_thread(sp_session * session)
     if (!session_constructed)
         return;
 
-    PyGILState_STATE gstate;
-    gstate = PyGILState_Ensure();
+    PyGILState_STATE gstate = PyGILState_Ensure();
     session_callback(session, "notify_main_thread", NULL);
     PyGILState_Release(gstate);
 }
@@ -675,8 +669,7 @@ play_token_lost(sp_session * session)
 {
     debug_printf(">> play_token_lost called");
 
-    PyGILState_STATE gstate;
-    gstate = PyGILState_Ensure();
+    PyGILState_STATE gstate = PyGILState_Ensure();
     session_callback(session, "play_token_lost", NULL);
     PyGILState_Release(gstate);
 }
@@ -686,8 +679,7 @@ log_message(sp_session * session, const char *data)
 {
     debug_printf(">> log_message called: %s", data);
 
-    PyGILState_STATE gstate;
-    gstate = PyGILState_Ensure();
+    PyGILState_STATE gstate = PyGILState_Ensure();
     PyObject *message = PyUnicode_FromString(data);
     if (message != NULL) {
         session_callback(session, "log_message", message);
@@ -701,8 +693,7 @@ end_of_track(sp_session * session)
 {
     debug_printf(">> end_of_track called");
 
-    PyGILState_STATE gstate;
-    gstate = PyGILState_Ensure();
+    PyGILState_STATE gstate = PyGILState_Ensure();
     session_callback(session, "end_of_track", NULL);
     PyGILState_Release(gstate);
 }
@@ -712,8 +703,7 @@ credentials_blob_updated(sp_session *session, const char *data)
 {
     debug_printf(">> credentials_blob_updated called");
 
-    PyGILState_STATE gstate;
-    gstate = PyGILState_Ensure();
+    PyGILState_STATE gstate = PyGILState_Ensure();
     PyObject *blob = PyBytes_FromString(data);
     if (blob != NULL) {
         session_callback(session, "credentials_blob_updated", blob);

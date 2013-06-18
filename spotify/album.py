@@ -29,8 +29,7 @@ class Album(object):
             if sp_album is ffi.NULL:
                 raise ValueError(
                     'Failed to get album from Spotify URI: %r' % uri)
-        elif sp_album is not None:
-            lib.sp_album_add_ref(sp_album)
+        lib.sp_album_add_ref(sp_album)
         self._sp_album = ffi.gc(sp_album, lib.sp_album_release)
 
     @property

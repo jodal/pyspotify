@@ -36,6 +36,7 @@ class AlbumTest(unittest.TestCase):
 
         link_mock.assert_called_with(uri)
         lib_mock.sp_link_as_album.assert_called_with(sp_link)
+        lib_mock.sp_album_add_ref.assert_called_with(sp_album)
         self.assertEqual(result._sp_album, sp_album)
 
     @mock.patch('spotify.Link')

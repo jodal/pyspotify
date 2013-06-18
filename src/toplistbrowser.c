@@ -50,21 +50,23 @@ ToplistBrowser_new(PyTypeObject *type, PyObject *args, PyObject *kwds)
     static char *kwlist[] = {"type", "region", "callback", "userdata", NULL};
 
     if (!PyArg_ParseTupleAndKeywords(args, kwds, "esO|OO", kwlist, ENCODING,
-                                     &type, &region, &callback, &userdata))
+                                     &tmp, &region, &callback, &userdata))
         return NULL;
 
     /* TODO: create type string constants. */
     /* TODO: extract to helper */
-    if (strcmp(tmp, "albums") == 0)
-        browse_type = SP_TOPLIST_TYPE_ALBUMS;
-    else if(strcmp(tmp, "artists") == 0)
-        browse_type = SP_TOPLIST_TYPE_ARTISTS;
-    else if (strcmp(tmp, "tracks") == 0)
-        browse_type = SP_TOPLIST_TYPE_TRACKS;
-    else {
-        PyErr_Format(PyExc_ValueError,
-                     "%s is not a valid toplist type", tmp);
-        return NULL;
+    if (tmp != NULL) {
+        if (strcmp(tmp, "albums") == 0)
+            browse_type = SP_TOPLIST_TYPE_ALBUMS;
+        else if(strcmp(tmp, "artists") == 0)
+            browse_type = SP_TOPLIST_TYPE_ARTISTS;
+        else if (strcmp(tmp, "tracks") == 0)
+            browse_type = SP_TOPLIST_TYPE_TRACKS;
+        else {
+            PyErr_Format(PyExc_ValueError,
+                         "%s is not a valid toplist type", tmp);
+            return NULL;
+        }
     }
 
     /* Region, can be

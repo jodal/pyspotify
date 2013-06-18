@@ -295,6 +295,8 @@ playlist_tracks_added_callback(sp_playlist *playlist, sp_track *const *tracks,
     /* TODO: Create Tracks_FromSpotify(tracks, num), Albums...? */
     for (i = 0; i < num_tracks; i++) {
         PyObject *track = Track_FromSpotify(tracks[i]);
+        /* TODO: if (track == NULL) { track = Py_None; Py_INCREF(track) }
+         * or some other error handling for this case and others like it. */
         PyList_SET_ITEM(py_tracks, i, track);
     }
 
@@ -711,6 +713,7 @@ Playlist_rename(PyObject *self, PyObject *args)
     int len;
     sp_error error;
 
+    /* TODO: free name memory? */
     if (!PyArg_ParseTuple(args, "es#", ENCODING, &name, &len))
         return NULL;
 

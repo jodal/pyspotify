@@ -298,6 +298,7 @@ PlaylistContainer_add_new_playlist(PyObject *self, PyObject *args)
         PyErr_SetString(SpotifyError, "PlaylistContainer not loaded");
         return NULL;
     }
+    /* TODO: free name memory? */
     if (!PyArg_ParseTuple(args, "es#", ENCODING, &name, &len))
         return NULL;
 

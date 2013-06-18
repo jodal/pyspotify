@@ -226,6 +226,7 @@ Session_search(PyObject *self, PyObject *args, PyObject *kwds)
         "album_count", "artist_offset", "artist_count", "playlist_offset",
         "playlist_count", "search_type", "userdata", NULL };
 
+    /* TODO: free query memory? */
     if (!PyArg_ParseTupleAndKeywords(args, kwds, "esO|iiiiiiiisO", kwlist,
                                      ENCODING, &query, &callback,
                                      &track_offset, &track_count,
@@ -345,6 +346,8 @@ Session_login(PyObject *self, PyObject *args, PyObject *kwds)
     static char *kwlist[] = {"username", "password", "remember_me", "blob",
                              NULL};
 
+    /* TODO: free username and password memory? */
+    /* TODO: Don't encode password (and username)? */
     if (!PyArg_ParseTupleAndKeywords(args, kwds, "es|esiz", kwlist,
                                      ENCODING, &username, ENCODING, &password,
                                      &remember_me, &blob))

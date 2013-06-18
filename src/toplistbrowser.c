@@ -48,6 +48,7 @@ ToplistBrowser_new(PyTypeObject *type, PyObject *args, PyObject *kwds)
 
     static char *kwlist[] = {"type", "region", "callback", "userdata", NULL};
 
+    /* TODO: free tmp memory? */
     if (!PyArg_ParseTupleAndKeywords(args, kwds, "esO|OO", kwlist, ENCODING,
                                      &tmp, &region, &callback, &userdata))
         return NULL;

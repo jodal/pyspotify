@@ -555,14 +555,15 @@ playlist_track_message_changed_callback(
 {
     Callback *trampoline = (Callback *)data;
 
-    PyObject *result, *self;
+    PyObject *result, *self, *py_message;
     PyGILState_STATE gstate = PyGILState_Ensure();
 
     self = Playlist_FromSpotify(playlist);
-    result = PyObject_CallFunction(trampoline->callback, "OiesO", self,
-                                   position, ENCODING, message,
-                                   trampoline->userdata);
+    py_message = PyUnicode_FromString(message);
+    result = PyObject_CallFunction(trampoline->callback, "OiOO", self,
+                                   position, py_message, trampoline->userdata);
     Py_XDECREF(self);
+    Py_XDECREF(py_message);
 
     if (result != NULL)
         Py_DECREF(result);
@@ -618,13 +619,15 @@ playlist_description_changed_callback(
 {
     Callback *trampoline = (Callback *)data;
 
-    PyObject *result, *self;
+    PyObject *result, *self, *py_description;
     PyGILState_STATE gstate = PyGILState_Ensure();
 
     self = Playlist_FromSpotify(playlist);
-    result = PyObject_CallFunction(trampoline->callback, "OesO", self,
-                                   ENCODING, description, trampoline->userdata);
+    py_description = PyUnicode_FromString(description);
+    result = PyObject_CallFunction(trampoline->callback, "OOO", self,
+                                   py_description, trampoline->userdata);
     Py_XDECREF(self);
+    Py_XDECREF(py_description);
 
     if (result != NULL)
         Py_DECREF(result);

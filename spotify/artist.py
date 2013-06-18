@@ -37,6 +37,8 @@ class Artist(object):
         :type timeout: float
         :returns: self
         """
+        # TODO Need to send a browse request for the object to be populated
+        # with data
         return utils.load(self, timeout=timeout)
 
     def portrait(self, image_size=None):

@@ -120,7 +120,7 @@ class Link(object):
         sp_image = lib.sp_image_create_from_link(
             spotify.session_instance._sp_session, self._sp_link)
         if sp_image:
-            return spotify.Image(sp_image, add_ref=False)
+            return spotify.Image(sp_image=sp_image, add_ref=False)
 
 
 @utils.make_enum('SP_LINKTYPE_')

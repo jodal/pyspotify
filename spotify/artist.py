@@ -72,7 +72,7 @@ class Artist(object):
             return None
         sp_image = lib.sp_image_create(
             spotify.session_instance._sp_session, portrait_id)
-        return spotify.Image(sp_image, add_ref=False)
+        return spotify.Image(sp_image=sp_image, add_ref=False)
 
     @property
     def link(self):

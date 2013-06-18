@@ -167,7 +167,7 @@ class LinkTest(unittest.TestCase):
         sp_link = spotify.ffi.new('int *')
         lib_mock.sp_link_create_from_image.return_value = sp_link
         sp_image = spotify.ffi.new('int *')
-        image = spotify.Image(sp_image)
+        image = spotify.Image(sp_image=sp_image)
 
         link = spotify.Link(image)
 

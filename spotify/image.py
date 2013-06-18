@@ -17,10 +17,24 @@ class Image(object):
     """A Spotify image.
 
     You can get images from :meth:`Album.cover`, :meth:`Artist.portrait`, or
-    from :meth:`Link.as_image` when the link is of the image type.
+    you can create a :class:`Track` yourself from a Spotify URI::
+
+        >>> image = spotify.Image(
+        ... 'spotify:image:a0bdcbe11b5cd126968e519b5ed1050b0e8183d0')
+        >>> image.load().data_uri[:50]
+        u'data:image/jpeg;base64,/9j/4AAQSkZJRgABAQEBLAEsAAD'
     """
 
-    def __init__(self, sp_image, add_ref=True):
+    def __init__(self, uri=None, sp_image=None, add_ref=True):
+        assert uri or sp_image, 'uri or sp_image is required'
+        if uri is not None:
+            link = spotify.Link(uri)
+            sp_image = lib.sp_image_create_from_link(
+                spotify.session_instance._sp_session, link._sp_link)
+            add_ref = False
+            if sp_image is ffi.NULL:
+                raise ValueError(
+                    'Failed to get image from Spotify URI: %r' % uri)
         if add_ref:
             lib.sp_image_add_ref(sp_image)
         self._sp_image = ffi.gc(sp_image, lib.sp_image_release)

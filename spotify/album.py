@@ -65,7 +65,7 @@ class Album(object):
         Will always return :class:`None` if the album isn't loaded.
         """
         sp_artist = lib.sp_album_artist(self._sp_album)
-        return spotify.Artist(sp_artist) if sp_artist else None
+        return spotify.Artist(sp_artist=sp_artist) if sp_artist else None
 
     def cover(self, image_size=None):
         """The album's cover :class:`Image`.

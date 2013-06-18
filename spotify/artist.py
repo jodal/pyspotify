@@ -10,9 +10,24 @@ __all__ = [
 
 
 class Artist(object):
-    """A Spotify artist."""
+    """A Spotify artist.
 
-    def __init__(self, sp_artist):
+    You can get artists from tracks and albums, or you can create an
+    :class:`Artist` yourself from a Spotify URI::
+
+        >>> artist = spotify.Artist('spotify:artist:22xRIphSN7IkPVbErICu7s')
+        >>> artist.load().name
+        u'Rob Dougan'
+    """
+
+    def __init__(self, uri=None, sp_artist=None):
+        assert uri or sp_artist, 'uri or sp_artist is required'
+        if uri is not None:
+            link = spotify.Link(uri)
+            sp_artist = lib.sp_link_as_artist(link._sp_link)
+            if sp_artist is ffi.NULL:
+                raise ValueError(
+                    'Failed to get artist from Spotify URI: %r' % uri)
         lib.sp_artist_add_ref(sp_artist)
         self._sp_artist = ffi.gc(sp_artist, lib.sp_artist_release)
 

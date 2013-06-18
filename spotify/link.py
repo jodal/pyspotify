@@ -105,7 +105,7 @@ class Link(object):
         """Make an :class:`Artist` from the link."""
         sp_artist = lib.sp_link_as_artist(self._sp_link)
         if sp_artist:
-            return spotify.Artist(sp_artist)
+            return spotify.Artist(sp_artist=sp_artist)
 
     def as_user(self):
         """Make a :class:`User` from the link."""

@@ -101,7 +101,7 @@ class LinkTest(unittest.TestCase):
         sp_link = spotify.ffi.new('int *')
         lib_mock.sp_link_create_from_artist.return_value = sp_link
         sp_artist = spotify.ffi.new('int *')
-        artist = spotify.Artist(sp_artist)
+        artist = spotify.Artist(sp_artist=sp_artist)
 
         link = spotify.Link(artist)
 
@@ -113,7 +113,7 @@ class LinkTest(unittest.TestCase):
         sp_link = spotify.ffi.new('int *')
         lib_mock.sp_link_create_from_artist_portrait.return_value = sp_link
         sp_artist = spotify.ffi.new('int *')
-        artist = spotify.Artist(sp_artist)
+        artist = spotify.Artist(sp_artist=sp_artist)
 
         link = spotify.Link(artist, image_size=spotify.ImageSize.NORMAL)
 

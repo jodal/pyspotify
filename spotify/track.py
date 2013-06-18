@@ -176,8 +176,8 @@ class Track(object):
         num_artists = lib.sp_track_num_artists(self._sp_track)
         artists = []
         for i in range(num_artists):
-            artists.append(
-                spotify.Artist(lib.sp_track_artist(self._sp_track, i)))
+            artists.append(spotify.Artist(
+                sp_artist=lib.sp_track_artist(self._sp_track, i)))
         return artists
 
     @property

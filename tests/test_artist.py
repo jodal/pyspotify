@@ -19,17 +19,48 @@ class ArtistTest(unittest.TestCase):
     def tearDown(self):
         spotify.session_instance = None
 
+    def test_create_without_uri_or_sp_artist_fails(self, lib_mock):
+        self.assertRaises(AssertionError, spotify.Artist)
+
+    @mock.patch('spotify.Link')
+    def test_create_from_uri(self, link_mock, lib_mock):
+        self.create_session(lib_mock)
+        sp_link = spotify.ffi.new('int *')
+        link_instance_mock = link_mock.return_value
+        link_instance_mock._sp_link = sp_link
+        sp_artist = spotify.ffi.new('int *')
+        lib_mock.sp_link_as_artist.return_value = sp_artist
+        uri = 'spotify:artist:foo'
+
+        result = spotify.Artist(uri)
+
+        link_mock.assert_called_with(uri)
+        lib_mock.sp_link_as_artist.assert_called_with(sp_link)
+        lib_mock.sp_artist_add_ref.assert_called_with(sp_artist)
+        self.assertEqual(result._sp_artist, sp_artist)
+
+    @mock.patch('spotify.Link')
+    def test_create_from_uri_fail_raises_error(self, link_mock, lib_mock):
+        self.create_session(lib_mock)
+        sp_link = spotify.ffi.new('int *')
+        link_instance_mock = link_mock.return_value
+        link_instance_mock._sp_link = sp_link
+        lib_mock.sp_link_as_artist.return_value = spotify.ffi.NULL
+        uri = 'spotify:artist:foo'
+
+        self.assertRaises(ValueError, spotify.Artist, uri)
+
     def test_adds_ref_to_sp_artist_when_created(self, lib_mock):
         sp_artist = spotify.ffi.new('int *')
 
-        spotify.Artist(sp_artist)
+        spotify.Artist(sp_artist=sp_artist)
 
         lib_mock.sp_artist_add_ref.assert_called_with(sp_artist)
 
     def test_releases_sp_artist_when_artist_dies(self, lib_mock):
         sp_artist = spotify.ffi.new('int *')
 
-        artist = spotify.Artist(sp_artist)
+        artist = spotify.Artist(sp_artist=sp_artist)
         artist = None  # noqa
         gc.collect()  # Needed for PyPy
 
@@ -39,7 +70,7 @@ class ArtistTest(unittest.TestCase):
         lib_mock.sp_artist_name.return_value = spotify.ffi.new(
             'char[]', b'Foo Bar Baz')
         sp_artist = spotify.ffi.new('int *')
-        artist = spotify.Artist(sp_artist)
+        artist = spotify.Artist(sp_artist=sp_artist)
 
         result = artist.name
 
@@ -49,7 +80,7 @@ class ArtistTest(unittest.TestCase):
     def test_name_is_none_if_unloaded(self, lib_mock):
         lib_mock.sp_artist_name.return_value = spotify.ffi.new('char[]', b'')
         sp_artist = spotify.ffi.new('int *')
-        artist = spotify.Artist(sp_artist)
+        artist = spotify.Artist(sp_artist=sp_artist)
 
         result = artist.name
 
@@ -59,7 +90,7 @@ class ArtistTest(unittest.TestCase):
     def test_is_loaded(self, lib_mock):
         lib_mock.sp_artist_is_loaded.return_value = 1
         sp_artist = spotify.ffi.new('int *')
-        artist = spotify.Artist(sp_artist)
+        artist = spotify.Artist(sp_artist=sp_artist)
 
         result = artist.is_loaded
 
@@ -69,7 +100,7 @@ class ArtistTest(unittest.TestCase):
     @mock.patch('spotify.utils.load')
     def test_load(self, load_mock, lib_mock):
         sp_artist = spotify.ffi.new('int *')
-        artist = spotify.Artist(sp_artist)
+        artist = spotify.Artist(sp_artist=sp_artist)
 
         artist.load(10)
 
@@ -83,7 +114,7 @@ class ArtistTest(unittest.TestCase):
         sp_image = spotify.ffi.new('int *')
         lib_mock.sp_image_create.return_value = sp_image
         sp_artist = spotify.ffi.new('int *')
-        artist = spotify.Artist(sp_artist)
+        artist = spotify.Artist(sp_artist=sp_artist)
         image_size = spotify.ImageSize.SMALL
 
         result = artist.portrait(image_size)
@@ -104,7 +135,7 @@ class ArtistTest(unittest.TestCase):
     def test_portrait_is_none_if_null(self, lib_mock):
         lib_mock.sp_artist_portrait.return_value = spotify.ffi.NULL
         sp_artist = spotify.ffi.new('int *')
-        artist = spotify.Artist(sp_artist)
+        artist = spotify.Artist(sp_artist=sp_artist)
 
         result = artist.portrait()
 
@@ -116,7 +147,7 @@ class ArtistTest(unittest.TestCase):
     def test_link_creates_link_to_artist(self, link_mock, lib_mock):
         link_mock.return_value = mock.sentinel.link
         sp_artist = spotify.ffi.new('int *')
-        artist = spotify.Artist(sp_artist)
+        artist = spotify.Artist(sp_artist=sp_artist)
 
         result = artist.link
 

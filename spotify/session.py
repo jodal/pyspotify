@@ -791,7 +791,7 @@ class Session(object):
         sp_user = lib.sp_session_user(self._sp_session)
         if sp_user == ffi.NULL:
             return None
-        return spotify.User(sp_user)
+        return spotify.User(sp_user=sp_user)
 
     def logout(self):
         """Log out the current user.

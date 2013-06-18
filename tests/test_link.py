@@ -155,7 +155,7 @@ class LinkTest(unittest.TestCase):
         sp_link = spotify.ffi.new('int *')
         lib_mock.sp_link_create_from_user.return_value = sp_link
         sp_user = spotify.ffi.new('int *')
-        user = spotify.User(sp_user)
+        user = spotify.User(sp_user=sp_user)
 
         link = spotify.Link(user)
 

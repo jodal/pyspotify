@@ -10,9 +10,24 @@ __all__ = [
 
 
 class User(object):
-    """A Spotify user."""
+    """A Spotify user.
 
-    def __init__(self, sp_user):
+    You can get users from the session, or you can create a :class:`User`
+    yourself from a Spotify URI::
+
+        >>> user = spotify.User('spotify:user:jodal')
+        >>> user.load().display_name
+        u'jodal'
+    """
+
+    def __init__(self, uri=None, sp_user=None):
+        assert uri or sp_user, 'uri or sp_user is required'
+        if uri is not None:
+            link = spotify.Link(uri)
+            sp_user = lib.sp_link_as_user(link._sp_link)
+            if sp_user is ffi.NULL:
+                raise ValueError(
+                    'Failed to get user from Spotify URI: %r' % uri)
         lib.sp_user_add_ref(sp_user)
         self._sp_user = ffi.gc(sp_user, lib.sp_user_release)
 

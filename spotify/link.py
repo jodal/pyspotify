@@ -111,7 +111,7 @@ class Link(object):
         """Make a :class:`User` from the link."""
         sp_user = lib.sp_link_as_user(self._sp_link)
         if sp_user:
-            return spotify.User(sp_user)
+            return spotify.User(sp_user=sp_user)
 
     def as_image(self):
         """Make a :class:`Image` from the link."""

@@ -298,10 +298,8 @@ playlist_tracks_added_callback(sp_playlist *playlist, sp_track *const *tracks,
         PyList_SET_ITEM(py_tracks, i, track);
     }
 
-    result = PyObject_CallFunction(trampoline->callback, "OOiO", self,
+    result = PyObject_CallFunction(trampoline->callback, "NNiO", self,
                                    py_tracks, position, trampoline->userdata);
-    Py_XDECREF(self);
-    Py_XDECREF(py_tracks);
 
     if (result != NULL)
         Py_DECREF(result);
@@ -336,10 +334,8 @@ playlist_tracks_removed_callback(
         PyList_SET_ITEM(removed, i, Py_BuildValue("i", tracks[i]));
     }
 
-    result = PyObject_CallFunction(trampoline->callback, "OOO", self,
+    result = PyObject_CallFunction(trampoline->callback, "NNO", self,
                                    removed, trampoline->userdata);
-    Py_XDECREF(self);
-    Py_XDECREF(removed);
 
     if (result != NULL)
         Py_DECREF(result);
@@ -375,10 +371,8 @@ playlist_tracks_moved_callback(
         PyList_SET_ITEM(moved, i, Py_BuildValue("i", tracks[i]));
     }
 
-    result = PyObject_CallFunction(trampoline->callback, "OOiO", self,
+    result = PyObject_CallFunction(trampoline->callback, "NNiO", self,
                                    moved, new_position, trampoline->userdata);
-    Py_XDECREF(self);
-    Py_XDECREF(moved);
 
     if (result != NULL)
         Py_DECREF(result);
@@ -405,9 +399,8 @@ playlist_renamed_callback(sp_playlist *playlist, void *data)
     PyGILState_STATE gstate = PyGILState_Ensure();
 
     self = Playlist_FromSpotify(playlist);
-    result = PyObject_CallFunction(trampoline->callback, "OO", self,
+    result = PyObject_CallFunction(trampoline->callback, "NO", self,
                                    trampoline->userdata);
-    Py_XDECREF(self);
 
     if (result != NULL)
         Py_DECREF(result);
@@ -435,9 +428,8 @@ playlist_state_changed_callback(sp_playlist *playlist, void *data)
     PyGILState_STATE gstate = PyGILState_Ensure();
 
     self = Playlist_FromSpotify(playlist);
-    result = PyObject_CallFunction(trampoline->callback, "OO", self,
+    result = PyObject_CallFunction(trampoline->callback, "NO", self,
                                    trampoline->userdata);
-    Py_XDECREF(self);
 
     if (result != NULL)
         Py_DECREF(result);
@@ -464,10 +456,9 @@ playlist_update_in_progress_callback(sp_playlist *playlist, bool done, void *dat
     PyGILState_STATE gstate = PyGILState_Ensure();
 
     self = Playlist_FromSpotify(playlist);
-    result = PyObject_CallFunction(trampoline->callback, "OOO", self,
+    result = PyObject_CallFunction(trampoline->callback, "NOO", self,
                                    done ? Py_True : Py_False,
                                    trampoline->userdata);
-    Py_XDECREF(self);
 
     if (result != NULL)
         Py_DECREF(result);
@@ -495,9 +486,8 @@ playlist_metadata_updated_callback(sp_playlist * playlist, void *data)
     PyGILState_STATE gstate = PyGILState_Ensure();
 
     self = Playlist_FromSpotify(playlist);
-    result = PyObject_CallFunction(trampoline->callback, "OO", self,
+    result = PyObject_CallFunction(trampoline->callback, "NO", self,
                                    trampoline->userdata);
-    Py_XDECREF(self);
 
     if (result != NULL)
         Py_DECREF(result);
@@ -527,10 +517,8 @@ playlist_track_created_changed_callback(
     self = Playlist_FromSpotify(playlist);
     py_user = User_FromSpotify(user);
 
-    result = PyObject_CallFunction(trampoline->callback, "OiOiO", self,
+    result = PyObject_CallFunction(trampoline->callback, "NiNiO", self,
                                    position, py_user, when, trampoline->userdata);
-    Py_XDECREF(self);
-    Py_XDECREF(py_user);
 
     if (result != NULL)
         Py_DECREF(result);
@@ -559,10 +547,8 @@ playlist_track_message_changed_callback(
 
     self = Playlist_FromSpotify(playlist);
     py_message = PyUnicode_FromString(message);
-    result = PyObject_CallFunction(trampoline->callback, "OiOO", self,
+    result = PyObject_CallFunction(trampoline->callback, "NiNO", self,
                                    position, py_message, trampoline->userdata);
-    Py_XDECREF(self);
-    Py_XDECREF(py_message);
 
     if (result != NULL)
         Py_DECREF(result);
@@ -590,10 +576,9 @@ playlist_track_seen_changed_callback(
     PyGILState_STATE gstate = PyGILState_Ensure();
 
     self = Playlist_FromSpotify(playlist);
-    result = PyObject_CallFunction(trampoline->callback, "OiOO", self,
+    result = PyObject_CallFunction(trampoline->callback, "NiOO", self,
                                    position, seen ? Py_True : Py_False,
                                    trampoline->userdata);
-    Py_XDECREF(self);
 
     if (result != NULL)
         Py_DECREF(result);
@@ -622,10 +607,8 @@ playlist_description_changed_callback(
 
     self = Playlist_FromSpotify(playlist);
     py_description = PyUnicode_FromString(description);
-    result = PyObject_CallFunction(trampoline->callback, "OOO", self,
+    result = PyObject_CallFunction(trampoline->callback, "NNO", self,
                                    py_description, trampoline->userdata);
-    Py_XDECREF(self);
-    Py_XDECREF(py_description);
 
     if (result != NULL)
         Py_DECREF(result);
@@ -653,9 +636,8 @@ playlist_subscribers_changed_callback(sp_playlist *playlist, void *data)
     PyGILState_STATE gstate = PyGILState_Ensure();
 
     self = Playlist_FromSpotify(playlist);
-    result = PyObject_CallFunction(trampoline->callback, "OO", self,
+    result = PyObject_CallFunction(trampoline->callback, "NO", self,
                                    trampoline->userdata);
-    Py_XDECREF(self);
 
     if (result != NULL)
         Py_DECREF(result);
@@ -685,9 +667,8 @@ playlist_image_changed_callback(
     self = Playlist_FromSpotify(playlist);
 
     /* TODO: go with a Image_FromSpotify or an image from id instead? */
-    result = PyObject_CallFunction(trampoline->callback, "Os#O", self,
+    result = PyObject_CallFunction(trampoline->callback, "Ns#O", self,
                                    image, 20, trampoline->userdata);
-    Py_XDECREF(self);
 
     if (result != NULL)
         Py_DECREF(result);

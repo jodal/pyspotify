@@ -31,9 +31,8 @@ class Track(object):
             if sp_track is ffi.NULL:
                 raise ValueError(
                     'Failed to get track from Spotify URI: %r' % uri)
-        elif sp_track is not None:
-            if add_ref:
-                lib.sp_track_add_ref(sp_track)
+        if add_ref:
+            lib.sp_track_add_ref(sp_track)
         self._sp_track = ffi.gc(sp_track, lib.sp_track_release)
 
     @property

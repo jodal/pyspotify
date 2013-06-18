@@ -52,6 +52,7 @@ class TrackTest(unittest.TestCase):
 
         link_mock.assert_called_with(uri)
         lib_mock.sp_link_as_track.assert_called_with(sp_link)
+        lib_mock.sp_track_add_ref.assert_called_with(sp_track)
         self.assertEqual(result._sp_track, sp_track)
 
     @mock.patch('spotify.Link')

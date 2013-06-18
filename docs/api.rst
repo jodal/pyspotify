@@ -147,6 +147,8 @@ Sessions
 
 .. autoclass:: Session
 
+.. autoclass:: spotify.session.Player
+
 
 Connection
 ==========

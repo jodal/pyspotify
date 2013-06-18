@@ -695,6 +695,9 @@ class Session(object):
     :type callbacks: :class:`SessionCallbacks` or :class:`None`
     """
 
+    player = None
+    """A :class:`~spotify.session.Player` instance for controlling playback."""
+
     def __init__(self, config=None, callbacks=None):
         if spotify.session_instance is not None:
             raise RuntimeError('Session has already been initialized')
@@ -716,6 +719,7 @@ class Session(object):
         spotify.weak_key_dict[self._sp_session] = [sp_session_config]
 
         self._callbacks = config.callbacks
+        self.player = Player(self)
         spotify.session_instance = self
 
     @property
@@ -842,39 +846,6 @@ class Session(object):
             self._sp_session, next_timeout))
 
         return next_timeout[0]
-
-    def player_load(self, track):
-        """Load :class:`Track` for playback."""
-        spotify.Error.maybe_raise(lib.sp_session_player_load(
-            self._sp_session, track._sp_track))
-
-    def player_seek(self, offset):
-        """Seek to the offset in ms in the currently loaded track."""
-        spotify.Error.maybe_raise(
-            lib.sp_session_player_seek(self._sp_session, offset))
-
-    def player_play(self, play=True):
-        """Play the currently loaded track.
-
-        This will cause audio data to be passed to the
-        :attr:`~SessionCallbacks.music_delivery` callback.
-        """
-        spotify.Error.maybe_raise(lib.sp_session_player_play(
-            self._sp_session, play))
-
-    def player_unload(self):
-        """Stops the currently playing track."""
-        spotify.Error.maybe_raise(
-            lib.sp_session_player_unload(self._sp_session))
-
-    def player_prefetch(self, track):
-        """Prefetch a :class:`Track` for playback.
-
-        This can be used to make libspotify download and cache a track before
-        playing it.
-        """
-        spotify.Error.maybe_raise(lib.sp_session_player_prefetch(
-            self._sp_session, track._sp_track))
 
     @property
     def playlist_container(self):
@@ -1065,3 +1036,48 @@ class Session(object):
         when this changes.
         """
         return utils.to_country(lib.sp_session_user_country(self._sp_session))
+
+
+class Player(object):
+    """Playback controller.
+
+    You'll never need to create an instance of this class yourself. You'll find
+    it ready to use as the :attr:`~Session.player` attribute on the
+    :class:`Session` instance.
+    """
+
+    def __init__(self, session):
+        self._session = session
+
+    def load(self, track):
+        """Load :class:`Track` for playback."""
+        spotify.Error.maybe_raise(lib.sp_session_player_load(
+            self._session._sp_session, track._sp_track))
+
+    def seek(self, offset):
+        """Seek to the offset in ms in the currently loaded track."""
+        spotify.Error.maybe_raise(
+            lib.sp_session_player_seek(self._session._sp_session, offset))
+
+    def play(self, play=True):
+        """Play the currently loaded track.
+
+        This will cause audio data to be passed to the
+        :attr:`~SessionCallbacks.music_delivery` callback.
+        """
+        spotify.Error.maybe_raise(lib.sp_session_player_play(
+            self._session._sp_session, play))
+
+    def unload(self):
+        """Stops the currently playing track."""
+        spotify.Error.maybe_raise(
+            lib.sp_session_player_unload(self._session._sp_session))
+
+    def prefetch(self, track):
+        """Prefetch a :class:`Track` for playback.
+
+        This can be used to make libspotify download and cache a track before
+        playing it.
+        """
+        spotify.Error.maybe_raise(lib.sp_session_player_prefetch(
+            self._session._sp_session, track._sp_track))

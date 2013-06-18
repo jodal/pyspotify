@@ -132,9 +132,8 @@ playlistcontainer_loaded_callback(sp_playlistcontainer *container, void *data)
     PyGILState_STATE gstate = PyGILState_Ensure();
 
     self = PlaylistContainer_FromSpotify(container);
-    result = PyObject_CallFunction(trampoline->callback, "OO", self,
+    result = PyObject_CallFunction(trampoline->callback, "NO", self,
                                    trampoline->userdata);
-    Py_XDECREF(self);
 
     if (result != NULL)
         Py_DECREF(result);
@@ -166,11 +165,9 @@ playlistcontainer_playlist_added_callback(
     self = PlaylistContainer_FromSpotify(container);
     py_playlist = Playlist_FromSpotify(playlist);
 
-    result = PyObject_CallFunction(trampoline->callback, "OOiO",
+    result = PyObject_CallFunction(trampoline->callback, "NNiO",
                                    self, py_playlist, position,
                                    trampoline->userdata);
-    Py_XDECREF(self);
-    Py_XDECREF(py_playlist);
 
     if (result != NULL)
         Py_DECREF(result);
@@ -203,11 +200,9 @@ playlistcontainer_playlist_moved_callback(
     self = PlaylistContainer_FromSpotify(container);
     py_playlist = Playlist_FromSpotify(playlist);
 
-    result = PyObject_CallFunction(trampoline->callback, "OOiiO", self,
+    result = PyObject_CallFunction(trampoline->callback, "NNiiO", self,
                                    py_playlist, position, new_position,
                                    trampoline->userdata);
-    Py_XDECREF(self);
-    Py_XDECREF(py_playlist);
 
     if (result != NULL)
         Py_DECREF(result);
@@ -240,11 +235,9 @@ playlistcontainer_playlist_removed_callback(
     self = PlaylistContainer_FromSpotify(container);
     py_playlist = Playlist_FromSpotify(playlist);
 
-    result = PyObject_CallFunction(trampoline->callback, "OOiO",
+    result = PyObject_CallFunction(trampoline->callback, "NNiO",
                                    self, py_playlist, position,
                                    trampoline->userdata);
-    Py_XDECREF(self);
-    Py_XDECREF(py_playlist);
 
     if (result != NULL)
         Py_DECREF(result);

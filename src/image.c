@@ -79,9 +79,8 @@ Image_loaded(sp_image *image, void *data)
     PyGILState_STATE gstate = PyGILState_Ensure();
 
     self = Image_FromSpotify(image);
-    result = PyObject_CallFunction(trampoline->callback, "OO", self,
+    result = PyObject_CallFunction(trampoline->callback, "NO", self,
                                    trampoline->userdata);
-    Py_XDECREF(self);
 
     if (result != NULL)
         Py_DECREF(result);

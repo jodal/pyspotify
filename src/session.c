@@ -195,9 +195,8 @@ Session_search_complete(sp_search *search, void *data)
     PyGILState_STATE gstate = PyGILState_Ensure();
 
     search_results = Results_FromSpotify(search);
-    result = PyObject_CallFunction(trampoline->callback, "OO", search_results,
+    result = PyObject_CallFunction(trampoline->callback, "NO", search_results,
                                    trampoline->userdata);
-    Py_XDECREF(search_results);
 
     if (result != NULL)
         Py_DECREF(result);
@@ -638,12 +637,9 @@ music_delivery(sp_session * session, const sp_audioformat * format,
     client = (PyObject *)sp_session_userdata(session);
     callback = PyObject_GetAttrString(client, "music_delivery");
 
-    result = PyObject_CallFunction(callback, "OOiiiii", py_session, py_frames,
+    result = PyObject_CallFunction(callback, "NNiiiii", py_session, py_frames,
                                    size, num_frames, format->sample_type,
                                    format->sample_rate, format->channels);
-
-    Py_XDECREF(py_frames);
-    Py_XDECREF(py_session);
 
     if (result == NULL)
         PyErr_WriteUnraisable(callback);

@@ -464,10 +464,9 @@ playlist_update_in_progress_callback(sp_playlist *playlist, bool done, void *dat
     PyGILState_STATE gstate = PyGILState_Ensure();
 
     self = Playlist_FromSpotify(playlist);
-
-    /* TODO: bool instead of int for done? */
-    result = PyObject_CallFunction(trampoline->callback, "OiO", self,
-                                   done, trampoline->userdata);
+    result = PyObject_CallFunction(trampoline->callback, "OOO", self,
+                                   done ? Py_True : Py_False,
+                                   trampoline->userdata);
     Py_XDECREF(self);
 
     if (result != NULL)
@@ -591,10 +590,9 @@ playlist_track_seen_changed_callback(
     PyGILState_STATE gstate = PyGILState_Ensure();
 
     self = Playlist_FromSpotify(playlist);
-
-    /* TODO: bool instead of int for seen? */
-    result = PyObject_CallFunction(trampoline->callback, "OiiO", self,
-                                   position, seen, trampoline->userdata);
+    result = PyObject_CallFunction(trampoline->callback, "OiOO", self,
+                                   position, seen ? Py_True : Py_False,
+                                   trampoline->userdata);
     Py_XDECREF(self);
 
     if (result != NULL)

@@ -695,6 +695,10 @@ class Session(object):
     :type callbacks: :class:`SessionCallbacks` or :class:`None`
     """
 
+    offline = None
+    """A :class:`~spotify.session.Offline` instance for controlling offline
+    sync."""
+
     player = None
     """A :class:`~spotify.session.Player` instance for controlling playback."""
 
@@ -719,6 +723,7 @@ class Session(object):
         spotify.weak_key_dict[self._sp_session] = [sp_session_config]
 
         self._callbacks = config.callbacks
+        self.offline = Offline(self)
         self.player = Player(self)
         spotify.session_instance = self
 
@@ -976,6 +981,27 @@ class Session(object):
         spotify.Error.maybe_raise(lib.sp_session_set_social_credentials(
             self._sp_session, social_provider, username, password))
 
+    @property
+    def user_country(self):
+        """The country of the currently logged in user.
+
+        The :attr:`~SessionCallbacks.offline_status_updated` callback is called
+        when this changes.
+        """
+        return utils.to_country(lib.sp_session_user_country(self._sp_session))
+
+
+class Offline(object):
+    """Offline sync controller.
+
+    You'll never need to create an instance of this class yourself. You'll find
+    it ready to use as the :attr:`~Session.offline` attribute on the
+    :class:`Session` instance.
+    """
+
+    def __init__(self, session):
+        self._session = session
+
     def set_connection_type(self, connection_type):
         """Set the :class:`ConnectionType`.
 
@@ -983,7 +1009,7 @@ class Session(object):
         offline syncing and network usage.
         """
         spotify.Error.maybe_raise(lib.sp_session_set_connection_type(
-            self._sp_session, connection_type))
+            self._session._sp_session, connection_type))
 
     def set_connection_rules(self, *connection_rules):
         """Set one or more :class:`connection rules <ConnectionRule>`.
@@ -995,22 +1021,22 @@ class Session(object):
         """
         connection_rules = functools.reduce(operator.or_, connection_rules, 0)
         spotify.Error.maybe_raise(lib.sp_session_set_connection_rules(
-            self._sp_session, connection_rules))
+            self._session._sp_session, connection_rules))
 
     @property
-    def offline_tracks_to_sync(self):
+    def tracks_to_sync(self):
         """Total number of tracks that needs download before everything from
         all playlists that is marked for offline is fully synchronized.
         """
-        return lib.sp_offline_tracks_to_sync(self._sp_session)
+        return lib.sp_offline_tracks_to_sync(self._session._sp_session)
 
     @property
-    def offline_num_playlists(self):
+    def num_playlists(self):
         """Number of playlists that is marked for offline synchronization."""
-        return lib.sp_offline_num_playlists(self._sp_session)
+        return lib.sp_offline_num_playlists(self._session._sp_session)
 
     @property
-    def offline_sync_status(self):
+    def sync_status(self):
         """The :class:`OfflineSyncStatus` or :class:`None` if not syncing.
 
         The :attr:`~SessionCallbacks.offline_status_updated` callback is called
@@ -1018,24 +1044,15 @@ class Session(object):
         """
         sp_offline_sync_status = ffi.new('sp_offline_sync_status *')
         syncing = lib.sp_offline_sync_get_status(
-            self._sp_session, sp_offline_sync_status)
+            self._session._sp_session, sp_offline_sync_status)
         if syncing:
             return spotify.OfflineSyncStatus(sp_offline_sync_status)
 
     @property
-    def offline_time_left(self):
+    def time_left(self):
         """The number of seconds until the user has to get online and
         relogin."""
-        return lib.sp_offline_time_left(self._sp_session)
-
-    @property
-    def user_country(self):
-        """The country of the currently logged in user.
-
-        The :attr:`~SessionCallbacks.offline_status_updated` callback is called
-        when this changes.
-        """
-        return utils.to_country(lib.sp_session_user_country(self._sp_session))
+        return lib.sp_offline_time_left(self._session._sp_session)
 
 
 class Player(object):

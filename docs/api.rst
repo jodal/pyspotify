@@ -162,9 +162,7 @@ Connection
 .. autoclass:: ConnectionType
     :no-inherited-members:
 
-
-Offline
-=======
+.. autoclass:: spotify.session.Offline
 
 .. autoclass:: OfflineSyncStatus
 

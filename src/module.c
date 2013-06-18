@@ -70,7 +70,7 @@ init_spotify(void)
     PyModule_AddObject(module, "api_version", SpotifyApiVersion);
 
     /* TODO: rename to Type_add_to_module? */
-    /* TODO: figure out we we can remove this in favour of generic helper? */
+    /* TODO: figure out if we can remove this in favour of generic helper? */
     /* TODO: figure out if PyType_Ready needs to be both in _init and above? */
     album_init(module);
     albumbrowser_init(module);

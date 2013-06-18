@@ -69,7 +69,7 @@ Image_image_id(PyObject *self)
 void
 Image_loaded(sp_image *image, void *data)
 {
-    Callback *trampoline= (Callback *)data;
+    Callback *trampoline = (Callback *)data;
     debug_printf(">> image loaded (%p, %p)", image, trampoline);
 
     if (trampoline == NULL)

@@ -61,7 +61,7 @@ Link_from_track(PyObject *self, PyObject *args)
 
     sp_link *link = sp_link_create_from_track(Track_SP_TRACK(track), offset);
     if (link == NULL) {
-        PyErr_SetString(SpotifyError, "Failed to get track from a Link");
+        PyErr_SetString(SpotifyError, "Failed to get link from a track");
         return NULL;
     }
     return Link_FromSpotify(link);
@@ -92,7 +92,7 @@ Link_from_artist(PyObject *self, PyObject *args)
 
     sp_link *link = sp_link_create_from_artist(Artist_SP_ARTIST(artist));
     if (link == NULL) {
-        PyErr_SetString(SpotifyError, "Failed to get track from a Link");
+        PyErr_SetString(SpotifyError, "Failed to get link from an artist");
         return NULL;
     }
     return Link_FromSpotify(link);
@@ -303,7 +303,7 @@ link_init(PyObject *module)
     PyObject *playlist = Py_BuildValue("i", SP_LINKTYPE_PLAYLIST);
     PyObject *profile = Py_BuildValue("i", SP_LINKTYPE_PROFILE);
     PyObject *starred = Py_BuildValue("i", SP_LINKTYPE_STARRED);
-    PyObject *locatrack = Py_BuildValue("i", SP_LINKTYPE_LOCALTRACK);
+    PyObject *localtrack = Py_BuildValue("i", SP_LINKTYPE_LOCALTRACK);
     PyObject *image = Py_BuildValue("i", SP_LINKTYPE_IMAGE);
 
     PyMapping_SetItemString(LinkType.tp_dict, "LINK_INVALID", invalid);
@@ -314,6 +314,17 @@ link_init(PyObject *module)
     PyMapping_SetItemString(LinkType.tp_dict, "LINK_PLAYLIST", playlist);
     PyMapping_SetItemString(LinkType.tp_dict, "LINK_PROFILE", profile);
     PyMapping_SetItemString(LinkType.tp_dict, "LINK_STARRED", starred);
-    PyMapping_SetItemString(LinkType.tp_dict, "LINK_LOCALTRACK", locatrack);
+    PyMapping_SetItemString(LinkType.tp_dict, "LINK_LOCALTRACK", localtrack);
     PyMapping_SetItemString(LinkType.tp_dict, "LINK_IMAGE", image);
+
+    /* TODO: should we decref as SetItem does not steal the ref? */
+    /* TODO: consider following code instead? */
+    /*
+    PyObject *types = Py_BuildValue("{sisi...}",
+                                    "LINK_INVALID", SP_LINKTYPE_INVALID,
+                                    "LINK_TRACK", SP_LINKTYPE_TRACK,
+                                    ...);
+    PyDict_Update(LinkType.tp_dict, types);
+    Py_DECREF(types);
+     */
 }

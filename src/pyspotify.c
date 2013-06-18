@@ -5,6 +5,8 @@
 Callback *
 create_trampoline(PyObject *callback, PyObject *userdata)
 {
+    PyGILState_STATE gstate = PyGILState_Ensure();
+
     /* TODO: switch to PyMem_Malloc and audit for coresponding free */
     Callback *trampoline = malloc(sizeof(Callback));
 
@@ -15,14 +17,16 @@ create_trampoline(PyObject *callback, PyObject *userdata)
     Py_INCREF(userdata);
     trampoline->callback = callback;
     trampoline->userdata = userdata;
+
+    PyGILState_Release(gstate);
+
     return trampoline;
 }
 
 void
 delete_trampoline(Callback * trampoline)
 {
-    PyGILState_STATE gstate;
-    gstate = PyGILState_Ensure();
+    PyGILState_STATE gstate = PyGILState_Ensure();
     Py_DECREF(trampoline->userdata);
     Py_DECREF(trampoline->callback);
     free(trampoline);

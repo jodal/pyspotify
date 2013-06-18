@@ -19,7 +19,7 @@ AlbumBrowser_FromSpotify(sp_albumbrowse *browser)
 static void
 AlbumBrowser_browse_complete(sp_albumbrowse *browser, void *data)
 {
-    Callback *trampoline= (Callback *)data;
+    Callback *trampoline = (Callback *)data;
     debug_printf("browse complete (%p, %p)", browser, trampoline);
 
     if (trampoline == NULL)

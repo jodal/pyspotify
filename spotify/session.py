@@ -702,6 +702,10 @@ class Session(object):
     player = None
     """A :class:`~spotify.session.Player` instance for controlling playback."""
 
+    social = None
+    """A :class:`~spotify.session.Social` instance for controlling social
+    sharing."""
+
     def __init__(self, config=None, callbacks=None):
         if spotify.session_instance is not None:
             raise RuntimeError('Session has already been initialized')
@@ -725,6 +729,7 @@ class Session(object):
         self._callbacks = config.callbacks
         self.offline = Offline(self)
         self.player = Player(self)
+        self.social = Social(self)
         spotify.session_instance = self
 
     @property
@@ -930,57 +935,6 @@ class Session(object):
     Set to :class:`True` or :class:`False` to change.
     """
 
-    def is_private_session(self):
-        return bool(lib.sp_session_is_private_session(self._sp_session))
-
-    def set_private_session(self, value):
-        # TODO Segfaults unless we're logged in and have called
-        # process_events() at least once afterwards. Need to identify the
-        # relevant session callback, set a threading.Event from it, and check
-        # here if that event is set before calling the sp_ function.
-        spotify.Error.maybe_raise(lib.sp_session_set_private_session(
-            self._sp_session, value))
-
-    private_session = property(
-        is_private_session, set_private_session)
-    """Whether the session is private.
-
-    Set to :class:`True` or :class:`False` to change.
-    """
-
-    def is_scrobbling(self, social_provider):
-        """Get the :class:`ScrobblingState` for the given
-        ``social_provider``."""
-        scrobbling_state = ffi.new('sp_scrobbling_state *')
-        spotify.Error.maybe_raise(lib.sp_session_is_scrobbling(
-            self._sp_session, social_provider, scrobbling_state))
-        return spotify.ScrobblingState(scrobbling_state[0])
-
-    def is_scrobbling_possible(self, social_provider):
-        """Check if the scrobbling settings should be shown to the user."""
-        out = ffi.new('bool *')
-        spotify.Error.maybe_raise(lib.sp_session_is_scrobbling_possible(
-            self._sp_session, social_provider, out))
-        return bool(out[0])
-
-    def set_scrobbling(self, social_provider, scrobbling_state):
-        """Set the ``scrobbling_state`` for the given ``social_provider``."""
-        spotify.Error.maybe_raise(lib.sp_session_set_scrobbling(
-            self._sp_session, social_provider, scrobbling_state))
-
-    def set_social_credentials(self, social_provider, username, password):
-        """Set the user's credentials with a social provider.
-
-        Currently this is only relevant for Last.fm. Call
-        :meth:`set_scrobbling` to force an authentication attempt with the
-        provider. If authentication fails a
-        :attr:`~SessionCallbacks.scrobble_error` callback will be sent.
-        """
-        username = ffi.new('char[]', utils.to_bytes(username))
-        password = ffi.new('char[]', utils.to_bytes(password))
-        spotify.Error.maybe_raise(lib.sp_session_set_social_credentials(
-            self._sp_session, social_provider, username, password))
-
     @property
     def user_country(self):
         """The country of the currently logged in user.
@@ -1098,3 +1052,67 @@ class Player(object):
         """
         spotify.Error.maybe_raise(lib.sp_session_player_prefetch(
             self._session._sp_session, track._sp_track))
+
+
+class Social(object):
+    """Social sharing controller.
+
+    You'll never need to create an instance of this class yourself. You'll find
+    it ready to use as the :attr:`~Session.social` attribute on the
+    :class:`Session` instance.
+    """
+
+    def __init__(self, session):
+        self._session = session
+
+    def is_private_session(self):
+        return bool(
+            lib.sp_session_is_private_session(self._session._sp_session))
+
+    def set_private_session(self, value):
+        # TODO Segfaults unless we're logged in and have called
+        # process_events() at least once afterwards. Need to identify the
+        # relevant session callback, set a threading.Event from it, and check
+        # here if that event is set before calling the sp_ function.
+        spotify.Error.maybe_raise(lib.sp_session_set_private_session(
+            self._session._sp_session, value))
+
+    private_session = property(
+        is_private_session, set_private_session)
+    """Whether the session is private.
+
+    Set to :class:`True` or :class:`False` to change.
+    """
+
+    def is_scrobbling(self, social_provider):
+        """Get the :class:`ScrobblingState` for the given
+        ``social_provider``."""
+        scrobbling_state = ffi.new('sp_scrobbling_state *')
+        spotify.Error.maybe_raise(lib.sp_session_is_scrobbling(
+            self._session._sp_session, social_provider, scrobbling_state))
+        return spotify.ScrobblingState(scrobbling_state[0])
+
+    def is_scrobbling_possible(self, social_provider):
+        """Check if the scrobbling settings should be shown to the user."""
+        out = ffi.new('bool *')
+        spotify.Error.maybe_raise(lib.sp_session_is_scrobbling_possible(
+            self._session._sp_session, social_provider, out))
+        return bool(out[0])
+
+    def set_scrobbling(self, social_provider, scrobbling_state):
+        """Set the ``scrobbling_state`` for the given ``social_provider``."""
+        spotify.Error.maybe_raise(lib.sp_session_set_scrobbling(
+            self._session._sp_session, social_provider, scrobbling_state))
+
+    def set_social_credentials(self, social_provider, username, password):
+        """Set the user's credentials with a social provider.
+
+        Currently this is only relevant for Last.fm. Call
+        :meth:`set_scrobbling` to force an authentication attempt with the
+        provider. If authentication fails a
+        :attr:`~SessionCallbacks.scrobble_error` callback will be sent.
+        """
+        username = ffi.new('char[]', utils.to_bytes(username))
+        password = ffi.new('char[]', utils.to_bytes(password))
+        spotify.Error.maybe_raise(lib.sp_session_set_social_credentials(
+            self._session._sp_session, social_provider, username, password))

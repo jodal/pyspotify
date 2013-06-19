@@ -153,6 +153,8 @@ Sessions
 Connection
 ==========
 
+.. autoclass:: spotify.session.Offline
+
 .. autoclass:: ConnectionRule
     :no-inherited-members:
 
@@ -161,8 +163,6 @@ Connection
 
 .. autoclass:: ConnectionType
     :no-inherited-members:
-
-.. autoclass:: spotify.session.Offline
 
 .. autoclass:: OfflineSyncStatus
 
@@ -250,6 +250,8 @@ Search
 Social
 ======
 
+.. autoclass:: spotify.session.Social
+
 .. autoclass:: ScrobblingState
     :no-inherited-members:
 
@@ -261,7 +263,6 @@ Playlists
 =========
 
 .. autoclass:: Playlist
-
 
 .. autoclass:: PlaylistContainer
 

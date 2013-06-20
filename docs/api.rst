@@ -244,7 +244,7 @@ Images
 Search
 ======
 
-.. autoclass:: Search
+.. autoclass:: SearchResult
 
 .. autoclass:: SearchResultPlaylist
     :no-inherited-members:

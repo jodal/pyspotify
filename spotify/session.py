@@ -696,17 +696,6 @@ class Session(object):
     :type callbacks: :class:`SessionCallbacks` or :class:`None`
     """
 
-    offline = None
-    """A :class:`~spotify.session.Offline` instance for controlling offline
-    sync."""
-
-    player = None
-    """A :class:`~spotify.session.Player` instance for controlling playback."""
-
-    social = None
-    """A :class:`~spotify.session.Social` instance for controlling social
-    sharing."""
-
     def __init__(self, config=None, callbacks=None):
         if spotify.session_instance is not None:
             raise RuntimeError('Session has already been initialized')
@@ -732,6 +721,17 @@ class Session(object):
         self.player = Player(self)
         self.social = Social(self)
         spotify.session_instance = self
+
+    offline = None
+    """An :class:`~spotify.session.Offline` instance for controlling offline
+    sync."""
+
+    player = None
+    """A :class:`~spotify.session.Player` instance for controlling playback."""
+
+    social = None
+    """A :class:`~spotify.session.Social` instance for controlling social
+    sharing."""
 
     @property
     def callbacks(self):

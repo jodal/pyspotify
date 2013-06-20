@@ -16,6 +16,11 @@ class Search(object):
         self._sp_search = ffi.gc(sp_search, lib.sp_search_release)
 
     @property
+    def is_loaded(self):
+        """Whether the search's data is loaded."""
+        return bool(lib.sp_search_is_loaded(self._sp_search))
+
+    @property
     def link(self):
         """A :class:`Link` to the search."""
         from spotify.link import Link

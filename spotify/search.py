@@ -52,6 +52,22 @@ class Search(object):
         return did_you_mean if did_you_mean else None
 
     @property
+    def tracks(self):
+        """The tracks matching the search query.
+
+        Will always return :class:`None` if the search isn't loaded.
+        """
+        spotify.Error.maybe_raise(self.error)
+        if not self.is_loaded:
+            return None
+        num_tracks = lib.sp_search_num_tracks(self._sp_search)
+        tracks = []
+        for i in range(num_tracks):
+            tracks.append(spotify.Track(
+                sp_track=lib.sp_search_track(self._sp_search, i)))
+        return tracks
+
+    @property
     def total_tracks(self):
         """The total number of tracks matching the search query.
 

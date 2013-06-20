@@ -55,7 +55,51 @@ class SearchTest(unittest.TestCase):
         lib_mock.sp_search_error.assert_called_once_with(sp_search)
         self.assertIs(result, spotify.ErrorType.IS_LOADING)
 
-    # TODO tracks
+    @mock.patch('spotify.track.lib', spec=spotify.lib)
+    def test_tracks(self, track_lib_mock, lib_mock):
+        lib_mock.sp_search_error.return_value = spotify.ErrorType.OK
+        sp_track = spotify.ffi.cast('sp_track *', spotify.ffi.new('int *'))
+        lib_mock.sp_search_num_tracks.return_value = 1
+        lib_mock.sp_search_track.return_value = sp_track
+        sp_search = spotify.ffi.new('int *')
+        search = spotify.Search(sp_search)
+
+        result = search.tracks
+
+        lib_mock.sp_search_num_tracks.assert_called_with(sp_search)
+        self.assertEqual(lib_mock.sp_search_track.call_count, 1)
+        lib_mock.sp_search_track.assert_called_with(sp_search, 0)
+        track_lib_mock.sp_track_add_ref.assert_called_with(sp_track)
+        self.assertEqual(len(result), 1)
+        self.assertIsInstance(result[0], spotify.Track)
+        self.assertEqual(result[0]._sp_track, sp_track)
+
+    def test_tracks_if_no_tracks(self, lib_mock):
+        lib_mock.sp_search_error.return_value = spotify.ErrorType.OK
+        lib_mock.sp_search_num_tracks.return_value = 0
+        sp_search = spotify.ffi.new('int *')
+        search = spotify.Search(sp_search)
+
+        result = search.tracks
+
+        lib_mock.sp_search_num_tracks.assert_called_with(sp_search)
+        self.assertEqual(lib_mock.sp_search_track.call_count, 0)
+        self.assertEqual(len(result), 0)
+
+    def test_tracks_is_none_if_unloaded(self, lib_mock):
+        lib_mock.sp_search_error.return_value = spotify.ErrorType.OK
+        lib_mock.sp_search_is_loaded.return_value = 0
+        sp_search = spotify.ffi.new('int *')
+        search = spotify.Search(sp_search)
+
+        result = search.tracks
+
+        lib_mock.sp_search_is_loaded.assert_called_with(sp_search)
+        self.assertIsNone(result)
+
+    def test_tracks_fails_if_error(self, lib_mock):
+        self.assert_fails_if_error(lib_mock, lambda s: s.tracks)
+
     # TODO albums
     # TODO playlists
     # TODO artists

@@ -190,7 +190,59 @@ class SearchTest(unittest.TestCase):
     def test_artists_fails_if_error(self, lib_mock):
         self.assert_fails_if_error(lib_mock, lambda s: s.artists)
 
-    # TODO playlists
+    @mock.patch('spotify.playlist.lib', spec=spotify.lib)
+    def test_playlists(self, playlist_lib_mock, lib_mock):
+        lib_mock.sp_search_error.return_value = spotify.ErrorType.OK
+        lib_mock.sp_search_num_playlists.return_value = 1
+        lib_mock.sp_search_playlist_name.return_value = spotify.ffi.new(
+            'char[]', b'The Party List')
+        lib_mock.sp_search_playlist_uri.return_value = spotify.ffi.new(
+            'char[]', b'spotify:playlist:foo')
+        lib_mock.sp_search_playlist_image_uri.return_value = spotify.ffi.new(
+            'char[]', b'spotify:image:foo')
+        sp_search = spotify.ffi.new('int *')
+        search = spotify.Search(sp_search)
+
+        result = search.playlists
+
+        lib_mock.sp_search_num_playlists.assert_called_with(sp_search)
+        self.assertEqual(lib_mock.sp_search_playlist_name.call_count, 1)
+        lib_mock.sp_search_playlist_name.assert_called_with(sp_search, 0)
+        self.assertEqual(lib_mock.sp_search_playlist_uri.call_count, 1)
+        lib_mock.sp_search_playlist_uri.assert_called_with(sp_search, 0)
+        self.assertEqual(lib_mock.sp_search_playlist_image_uri.call_count, 1)
+        lib_mock.sp_search_playlist_image_uri.assert_called_with(sp_search, 0)
+        self.assertEqual(len(result), 1)
+        self.assertIsInstance(result[0], spotify.SearchResultPlaylist)
+        self.assertEqual(result[0].name, 'The Party List')
+        self.assertEqual(result[0].uri, 'spotify:playlist:foo')
+        self.assertEqual(result[0].image_uri, 'spotify:image:foo')
+
+    def test_playlists_if_no_playlists(self, lib_mock):
+        lib_mock.sp_search_error.return_value = spotify.ErrorType.OK
+        lib_mock.sp_search_num_playlists.return_value = 0
+        sp_search = spotify.ffi.new('int *')
+        search = spotify.Search(sp_search)
+
+        result = search.playlists
+
+        lib_mock.sp_search_num_playlists.assert_called_with(sp_search)
+        self.assertEqual(lib_mock.sp_search_playlist.call_count, 0)
+        self.assertEqual(len(result), 0)
+
+    def test_playlists_is_none_if_unloaded(self, lib_mock):
+        lib_mock.sp_search_error.return_value = spotify.ErrorType.OK
+        lib_mock.sp_search_is_loaded.return_value = 0
+        sp_search = spotify.ffi.new('int *')
+        search = spotify.Search(sp_search)
+
+        result = search.playlists
+
+        lib_mock.sp_search_is_loaded.assert_called_with(sp_search)
+        self.assertIsNone(result)
+
+    def test_playlists_fails_if_error(self, lib_mock):
+        self.assert_fails_if_error(lib_mock, lambda s: s.playlists)
 
     def test_query(self, lib_mock):
         lib_mock.sp_search_error.return_value = spotify.ErrorType.OK

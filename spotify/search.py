@@ -1,11 +1,14 @@
 from __future__ import unicode_literals
 
+import collections
+
 import spotify
 from spotify import ffi, lib, utils
 
 
 __all__ = [
     'Search',
+    'SearchResultPlaylist',
 ]
 
 
@@ -133,6 +136,30 @@ class Search(object):
         return lib.sp_search_total_artists(self._sp_search)
 
     @property
+    def playlists(self):
+        """The playlists matching the search query as
+        :class:`SearchResultPlaylist` objects containing the name, URI and
+        image URI for matching playlists.
+
+        Will always return :class:`None` if the search isn't loaded.
+        """
+        spotify.Error.maybe_raise(self.error)
+        if not self.is_loaded:
+            return None
+        num_playlists = lib.sp_search_num_playlists(self._sp_search)
+        playlists = []
+        for i in range(num_playlists):
+            playlists.append(spotify.SearchResultPlaylist(
+                name=utils.to_unicode(
+                    lib.sp_search_playlist_name(self._sp_search, i)),
+                uri=utils.to_unicode(
+                    lib.sp_search_playlist_uri(self._sp_search, i)),
+                image_uri=utils.to_unicode(
+                    lib.sp_search_playlist_image_uri(self._sp_search, i)),
+            ))
+        return playlists
+
+    @property
     def total_playlists(self):
         """The total number of playlists matching the search query.
 
@@ -148,3 +175,9 @@ class Search(object):
         """A :class:`Link` to the search."""
         from spotify.link import Link
         return Link(self)
+
+
+class SearchResultPlaylist(collections.namedtuple(
+        'SearchResultPlaylist', ['name', 'uri', 'image_uri'])):
+    """A playlist matching a search query."""
+    pass

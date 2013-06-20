@@ -246,6 +246,15 @@ Search
 
 .. autoclass:: Search
 
+.. autoclass:: SearchResultPlaylist
+    :no-inherited-members:
+
+    .. autoattribute:: name
+
+    .. autoattribute:: uri
+
+    .. autoattribute:: image_uri
+
 
 Social
 ======

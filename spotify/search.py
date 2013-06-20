@@ -79,6 +79,22 @@ class Search(object):
         return lib.sp_search_total_tracks(self._sp_search)
 
     @property
+    def albums(self):
+        """The albums matching the search query.
+
+        Will always return :class:`None` if the search isn't loaded.
+        """
+        spotify.Error.maybe_raise(self.error)
+        if not self.is_loaded:
+            return None
+        num_albums = lib.sp_search_num_albums(self._sp_search)
+        albums = []
+        for i in range(num_albums):
+            albums.append(spotify.Album(
+                sp_album=lib.sp_search_album(self._sp_search, i)))
+        return albums
+
+    @property
     def total_albums(self):
         """The total number of albums matching the search query.
 

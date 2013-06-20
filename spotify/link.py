@@ -17,7 +17,7 @@ class Link(object):
 
     ``value`` can either be a string containing a Spotify URI on the form
     ``spotify:...``, or a :class:`Track`, :class:`Album`, :class:`Artist`,
-    :class:`Search`, :class:`Playlist`, :class:`User`, or :class:`Image`.
+    :class:`SearchResult`, :class:`Playlist`, :class:`User`, or :class:`Image`.
 
     If ``value`` is a :class:`Track`, ``offset`` will be used as the position
     in milliseconds into the track to link to.
@@ -56,7 +56,7 @@ class Link(object):
                     value._sp_artist, image_size)
             else:
                 sp_link = lib.sp_link_create_from_artist(value._sp_artist)
-        elif isinstance(value, spotify.Search):
+        elif isinstance(value, spotify.SearchResult):
             sp_link = lib.sp_link_create_from_search(value._sp_search)
         elif isinstance(value, spotify.Playlist):
             sp_link = lib.sp_link_create_from_playlist(value._sp_playlist)

@@ -7,13 +7,17 @@ from spotify import ffi, lib, utils
 
 
 __all__ = [
-    'Search',
+    'SearchResult',
     'SearchResultPlaylist',
 ]
 
 
-class Search(object):
-    """A Spotify search."""
+class SearchResult(object):
+    """A Spotify search result.
+
+    Call the :meth:`~Session.search` method on your :class:`Session` instance
+    to do a search and get a :class:`SearchResult` back.
+    """
 
     def __init__(self, sp_search):
         lib.sp_search_add_ref(sp_search)
@@ -31,6 +35,8 @@ class Search(object):
         Check to see if there was problems loading the search.
         """
         return spotify.ErrorType(lib.sp_search_error(self._sp_search))
+
+    # TODO load()
 
     @property
     def query(self):

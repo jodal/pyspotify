@@ -14,21 +14,21 @@ class SearchTest(unittest.TestCase):
         lib_mock.sp_search_error.return_value = (
             spotify.ErrorType.BAD_API_VERSION)
         sp_search = spotify.ffi.new('int *')
-        search = spotify.Search(sp_search)
+        search = spotify.SearchResult(sp_search)
 
         self.assertRaises(spotify.Error, func, search)
 
     def test_adds_ref_to_sp_search_when_created(self, lib_mock):
         sp_search = spotify.ffi.new('int *')
 
-        spotify.Search(sp_search)
+        spotify.SearchResult(sp_search)
 
         lib_mock.sp_search_add_ref.assert_called_with(sp_search)
 
     def test_releases_sp_search_when_search_dies(self, lib_mock):
         sp_search = spotify.ffi.new('int *')
 
-        search = spotify.Search(sp_search)
+        search = spotify.SearchResult(sp_search)
         search = None  # noqa
         gc.collect()  # Needed for PyPy
 
@@ -37,7 +37,7 @@ class SearchTest(unittest.TestCase):
     def test_is_loaded(self, lib_mock):
         lib_mock.sp_search_is_loaded.return_value = 1
         sp_search = spotify.ffi.new('int *')
-        search = spotify.Search(sp_search)
+        search = spotify.SearchResult(sp_search)
 
         result = search.is_loaded
 
@@ -48,7 +48,7 @@ class SearchTest(unittest.TestCase):
         lib_mock.sp_search_error.return_value = int(
             spotify.ErrorType.IS_LOADING)
         sp_search = spotify.ffi.new('int *')
-        search = spotify.Search(sp_search)
+        search = spotify.SearchResult(sp_search)
 
         result = search.error
 
@@ -62,7 +62,7 @@ class SearchTest(unittest.TestCase):
         lib_mock.sp_search_num_tracks.return_value = 1
         lib_mock.sp_search_track.return_value = sp_track
         sp_search = spotify.ffi.new('int *')
-        search = spotify.Search(sp_search)
+        search = spotify.SearchResult(sp_search)
 
         result = search.tracks
 
@@ -78,7 +78,7 @@ class SearchTest(unittest.TestCase):
         lib_mock.sp_search_error.return_value = spotify.ErrorType.OK
         lib_mock.sp_search_num_tracks.return_value = 0
         sp_search = spotify.ffi.new('int *')
-        search = spotify.Search(sp_search)
+        search = spotify.SearchResult(sp_search)
 
         result = search.tracks
 
@@ -90,7 +90,7 @@ class SearchTest(unittest.TestCase):
         lib_mock.sp_search_error.return_value = spotify.ErrorType.OK
         lib_mock.sp_search_is_loaded.return_value = 0
         sp_search = spotify.ffi.new('int *')
-        search = spotify.Search(sp_search)
+        search = spotify.SearchResult(sp_search)
 
         result = search.tracks
 
@@ -107,7 +107,7 @@ class SearchTest(unittest.TestCase):
         lib_mock.sp_search_num_albums.return_value = 1
         lib_mock.sp_search_album.return_value = sp_album
         sp_search = spotify.ffi.new('int *')
-        search = spotify.Search(sp_search)
+        search = spotify.SearchResult(sp_search)
 
         result = search.albums
 
@@ -123,7 +123,7 @@ class SearchTest(unittest.TestCase):
         lib_mock.sp_search_error.return_value = spotify.ErrorType.OK
         lib_mock.sp_search_num_albums.return_value = 0
         sp_search = spotify.ffi.new('int *')
-        search = spotify.Search(sp_search)
+        search = spotify.SearchResult(sp_search)
 
         result = search.albums
 
@@ -135,7 +135,7 @@ class SearchTest(unittest.TestCase):
         lib_mock.sp_search_error.return_value = spotify.ErrorType.OK
         lib_mock.sp_search_is_loaded.return_value = 0
         sp_search = spotify.ffi.new('int *')
-        search = spotify.Search(sp_search)
+        search = spotify.SearchResult(sp_search)
 
         result = search.albums
 
@@ -152,7 +152,7 @@ class SearchTest(unittest.TestCase):
         lib_mock.sp_search_num_artists.return_value = 1
         lib_mock.sp_search_artist.return_value = sp_artist
         sp_search = spotify.ffi.new('int *')
-        search = spotify.Search(sp_search)
+        search = spotify.SearchResult(sp_search)
 
         result = search.artists
 
@@ -168,7 +168,7 @@ class SearchTest(unittest.TestCase):
         lib_mock.sp_search_error.return_value = spotify.ErrorType.OK
         lib_mock.sp_search_num_artists.return_value = 0
         sp_search = spotify.ffi.new('int *')
-        search = spotify.Search(sp_search)
+        search = spotify.SearchResult(sp_search)
 
         result = search.artists
 
@@ -180,7 +180,7 @@ class SearchTest(unittest.TestCase):
         lib_mock.sp_search_error.return_value = spotify.ErrorType.OK
         lib_mock.sp_search_is_loaded.return_value = 0
         sp_search = spotify.ffi.new('int *')
-        search = spotify.Search(sp_search)
+        search = spotify.SearchResult(sp_search)
 
         result = search.artists
 
@@ -201,7 +201,7 @@ class SearchTest(unittest.TestCase):
         lib_mock.sp_search_playlist_image_uri.return_value = spotify.ffi.new(
             'char[]', b'spotify:image:foo')
         sp_search = spotify.ffi.new('int *')
-        search = spotify.Search(sp_search)
+        search = spotify.SearchResult(sp_search)
 
         result = search.playlists
 
@@ -222,7 +222,7 @@ class SearchTest(unittest.TestCase):
         lib_mock.sp_search_error.return_value = spotify.ErrorType.OK
         lib_mock.sp_search_num_playlists.return_value = 0
         sp_search = spotify.ffi.new('int *')
-        search = spotify.Search(sp_search)
+        search = spotify.SearchResult(sp_search)
 
         result = search.playlists
 
@@ -234,7 +234,7 @@ class SearchTest(unittest.TestCase):
         lib_mock.sp_search_error.return_value = spotify.ErrorType.OK
         lib_mock.sp_search_is_loaded.return_value = 0
         sp_search = spotify.ffi.new('int *')
-        search = spotify.Search(sp_search)
+        search = spotify.SearchResult(sp_search)
 
         result = search.playlists
 
@@ -249,7 +249,7 @@ class SearchTest(unittest.TestCase):
         lib_mock.sp_search_query.return_value = spotify.ffi.new(
             'char[]', b'Foo Bar Baz')
         sp_search = spotify.ffi.new('int *')
-        search = spotify.Search(sp_search)
+        search = spotify.SearchResult(sp_search)
 
         result = search.query
 
@@ -260,7 +260,7 @@ class SearchTest(unittest.TestCase):
         lib_mock.sp_search_error.return_value = spotify.ErrorType.OK
         lib_mock.sp_search_query.return_value = spotify.ffi.new('char[]', b'')
         sp_search = spotify.ffi.new('int *')
-        search = spotify.Search(sp_search)
+        search = spotify.SearchResult(sp_search)
 
         result = search.query
 
@@ -275,7 +275,7 @@ class SearchTest(unittest.TestCase):
         lib_mock.sp_search_did_you_mean.return_value = spotify.ffi.new(
             'char[]', b'Foo Bar Baz')
         sp_search = spotify.ffi.new('int *')
-        search = spotify.Search(sp_search)
+        search = spotify.SearchResult(sp_search)
 
         result = search.did_you_mean
 
@@ -287,7 +287,7 @@ class SearchTest(unittest.TestCase):
         lib_mock.sp_search_did_you_mean.return_value = spotify.ffi.new(
             'char[]', b'')
         sp_search = spotify.ffi.new('int *')
-        search = spotify.Search(sp_search)
+        search = spotify.SearchResult(sp_search)
 
         result = search.did_you_mean
 
@@ -301,7 +301,7 @@ class SearchTest(unittest.TestCase):
         lib_mock.sp_search_error.return_value = spotify.ErrorType.OK
         lib_mock.sp_search_total_tracks.return_value = 75
         sp_search = spotify.ffi.new('int *')
-        search = spotify.Search(sp_search)
+        search = spotify.SearchResult(sp_search)
 
         result = search.total_tracks
 
@@ -315,7 +315,7 @@ class SearchTest(unittest.TestCase):
         lib_mock.sp_search_error.return_value = spotify.ErrorType.OK
         lib_mock.sp_search_total_albums.return_value = 75
         sp_search = spotify.ffi.new('int *')
-        search = spotify.Search(sp_search)
+        search = spotify.SearchResult(sp_search)
 
         result = search.total_albums
 
@@ -329,7 +329,7 @@ class SearchTest(unittest.TestCase):
         lib_mock.sp_search_error.return_value = spotify.ErrorType.OK
         lib_mock.sp_search_total_artists.return_value = 75
         sp_search = spotify.ffi.new('int *')
-        search = spotify.Search(sp_search)
+        search = spotify.SearchResult(sp_search)
 
         result = search.total_artists
 
@@ -343,7 +343,7 @@ class SearchTest(unittest.TestCase):
         lib_mock.sp_search_error.return_value = spotify.ErrorType.OK
         lib_mock.sp_search_total_playlists.return_value = 75
         sp_search = spotify.ffi.new('int *')
-        search = spotify.Search(sp_search)
+        search = spotify.SearchResult(sp_search)
 
         result = search.total_playlists
 
@@ -357,7 +357,7 @@ class SearchTest(unittest.TestCase):
     def test_link_creates_link_to_search(self, link_mock, lib_mock):
         link_mock.return_value = mock.sentinel.link
         sp_search = spotify.ffi.new('int *')
-        search = spotify.Search(sp_search)
+        search = spotify.SearchResult(sp_search)
 
         result = search.link
 

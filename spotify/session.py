@@ -944,6 +944,8 @@ class Session(object):
         """
         return utils.to_country(lib.sp_session_user_country(self._sp_session))
 
+    # TODO search()
+
 
 class Offline(object):
     """Offline sync controller.

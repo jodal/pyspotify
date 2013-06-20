@@ -691,11 +691,11 @@ Playlist_add_image_changed_callback(PyObject *self, PyObject *args)
 static PyObject *
 Playlist_track_create_time(PyObject *self, PyObject *args)
 {
-	int index;
-	if (!PyArg_ParseTuple(args, "i", &index))
+    int index;
+    if (!PyArg_ParseTuple(args, "i", &index))
         return NULL;
 
-	return Py_BuildValue("i", sp_playlist_track_create_time(
+    return Py_BuildValue("i", sp_playlist_track_create_time(
         Playlist_SP_PLAYLIST(self), index));
 }
 
@@ -924,7 +924,7 @@ static PyMethodDef Playlist_methods[] = {
      (PyCFunction)Playlist_remove_callback, METH_VARARGS,
      ""
     },
- 	{"track_create_time",
+    {"track_create_time",
      (PyCFunction)Playlist_track_create_time, METH_VARARGS,
      "Return when the given index was added to the playlist"
     },

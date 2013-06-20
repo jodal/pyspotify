@@ -64,6 +64,7 @@ mock_user(PyObject *self, PyObject *args, PyObject *kwds)
     static char *kwlist[] =
         { "canonical_name", "display_name", "is_loaded", NULL };
 
+    /* TODO: free canonical_name and display_name memory? */
     if (!PyArg_ParseTupleAndKeywords(args, kwds, "es|esb", kwlist,
                                      ENCODING, &canonical_name,
                                      ENCODING, &display_name,
@@ -94,6 +95,7 @@ mock_albumbrowse(PyObject *self, PyObject *args, PyObject *kwds)
         { "album", "tracks", "artist", "error", "request_duration",
           "copyrights", "review", NULL };
 
+    /* TODO: free review memory? */
     if (!PyArg_ParseTupleAndKeywords(args, kwds,
                 "O!O!|O!iiO!es", kwlist, &AlbumType, &album, &PyList_Type,
                 &py_tracks, &ArtistType, &artist, &error, &request_duration,
@@ -146,6 +148,7 @@ mock_artistbrowse(PyObject *self, PyObject *args, PyObject *kwds)
         { "artist", "tracks", "albums", "similar_artists", "error",
           "request_duration", "portraits", "biography", "type", NULL };
 
+    /* TODO: free biography memory? */
     if (!PyArg_ParseTupleAndKeywords(args, kwds,
                 "O!O!O!O!|iiO!esiOO", kwlist, &ArtistType, &artist,
                 &PyList_Type, &py_tracks, &PyList_Type, &py_albums,
@@ -202,6 +205,7 @@ mock_artist(PyObject *self, PyObject *args, PyObject *kwds)
     static char *kwlist[] =
         { "name", "portrait", "is_loaded", NULL };
 
+    /* TODO: free name memory? */
     if (!PyArg_ParseTupleAndKeywords(args, kwds, "es|sb", kwlist,
                                      ENCODING, &name, &portrait, &is_loaded))
         return NULL;
@@ -233,6 +237,7 @@ mock_track(PyObject *self, PyObject *args, PyObject *kwds)
           "index", "error", "is_loaded", "availability", "status", "is_local",
           "is_autolinked", "is_starred", "is_placeholder", "playable", NULL };
 
+    /* TODO: free name memory? */
     if (!PyArg_ParseTupleAndKeywords(args, kwds, "esO!O!|iiiiibiibbbbO!",
             kwlist,
             ENCODING, &name, &PyList_Type, &py_artists, &AlbumType, &album,
@@ -273,6 +278,7 @@ mock_album(PyObject *self, PyObject *args, PyObject *kwds)
         { "name", "artist", "year", "cover", "type", "is_loaded",
           "is_available", NULL };
 
+    /* TODO: free name memory? */
     if (!PyArg_ParseTupleAndKeywords(args, kwds, "esO!|isibb", kwlist,
                 ENCODING, &name, &ArtistType, &artist, &year, &cover, &type,
                 &is_loaded, &is_available))
@@ -313,6 +319,7 @@ mock_playlist(PyObject *self, PyObject *args, PyObject *kwds)
           "has_pending_changes", "is_in_ram", "offline_status",
           "offline_download_completed", NULL };
 
+    /* TODO: free name memory? */
     if (!PyArg_ParseTupleAndKeywords(args, kwds, "esO!O!|O!iessbbbbii", kwlist,
                 ENCODING, &name, &PyList_Type, &py_tracks, &UserType, &owner,
                 &PyList_Type, &py_subscribers, &num_subscribers, ENCODING,
@@ -327,6 +334,7 @@ mock_playlist(PyObject *self, PyObject *args, PyObject *kwds)
         create_time = 0;
         message = "";
         seen = 0;
+        /* TODO: free message memory? */
         if (!PyArg_ParseTuple(PyList_GET_ITEM(py_tracks, i), "O!O!|iesb",
                               &TrackType, &track, &UserType, &creator,
                               &create_time, ENCODING, &message, &seen))
@@ -474,6 +482,7 @@ mock_search(PyObject *self, PyObject *args, PyObject *kwds)
           "total_tracks", "total_albums", "total_artists", "did_you_mean",
           "error", NULL };
 
+    /* TODO: free query and did_you_mean memory? */
     if (!PyArg_ParseTupleAndKeywords(args, kwds,
                 "esO!O!O!|iiiesi", kwlist, ENCODING, &query,
                 &PyList_Type, &py_tracks, &PyList_Type, &py_albums,
@@ -537,6 +546,7 @@ mock_session(PyObject *self, PyObject *args, PyObject *kwds)
 
     static char *kwlist[] = { "username", "inbox", NULL};
 
+    /* TODO: free username memory? */
     if (!PyArg_ParseTupleAndKeywords(args, kwds, "|esO!", kwlist,
                                      ENCODING, &username,
                                      &PlaylistType, &inbox))

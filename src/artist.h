@@ -1,9 +1,14 @@
 typedef struct {
-    PyObject_HEAD sp_artist *_artist;
+    PyObject_HEAD
+    sp_artist *_artist;
 } Artist;
+
+#define Artist_SP_ARTIST(o) ((Artist *)o)->_artist
 
 extern PyTypeObject ArtistType;
 
-extern void artist_init(PyObject *m);
+PyObject *
+Artist_FromSpotify(sp_artist * artist);
 
-PyObject *Artist_FromSpotify(sp_artist * artist);
+extern void
+artist_init(PyObject *module);

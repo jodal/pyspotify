@@ -1,9 +1,14 @@
 typedef struct {
-    PyObject_HEAD sp_image *_image;
+    PyObject_HEAD
+    sp_image *_image;
 } Image;
+
+#define Image_SP_IMAGE(o) ((Image *)o)->_image
 
 extern PyTypeObject ImageType;
 
-extern void image_init(PyObject *m);
+PyObject *
+Image_FromSpotify(sp_image * image);
 
-PyObject *Image_FromSpotify(sp_image * image);
+extern void
+image_init(PyObject *module);

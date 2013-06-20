@@ -133,10 +133,10 @@ static PyMethodDef Results_methods[] = {
      "True if these results have been loaded"
     },
     {"did_you_mean", (PyCFunction)Results_did_you_mean, METH_NOARGS,
-     "True if this results has been loaded by the client"
+     "Return did you mean suggestion for the query"
     },
     {"error", (PyCFunction)Results_error, METH_NOARGS,
-     "True if this results has been loaded by the client"
+     "Return the error that occured while getting the results, if any "
     },
     {"artists", (PyCFunction)Results_artists, METH_NOARGS,
      "Return a list of all the artists found by the search"

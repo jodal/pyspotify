@@ -186,7 +186,7 @@ void
 Session_search_complete(sp_search *search, void *data)
 {
     Callback *trampoline = (Callback *)data;
-    debug_printf("browse complete (%p, %p)", search, trampoline);
+    debug_printf(">> search complete (%p, %p)", search, trampoline);
 
     if (trampoline == NULL)
         return;

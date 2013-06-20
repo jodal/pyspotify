@@ -225,7 +225,7 @@ Playlist_add_callback(PyObject *self, PyObject *args, sp_playlist_callbacks *pla
 
     /* TODO: switch to PyMem_Malloc and audit for coresponding free */
     /* TODO: extract to helper */
-    entry = malloc(sizeof(playlist_callbacks));
+    entry = malloc(sizeof(playlist_callback));
     entry->callback = playlist_callbacks;
     entry->trampoline = trampoline;
     pl_callbacks_table_add((Playlist *)self, entry);

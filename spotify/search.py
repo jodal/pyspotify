@@ -1,5 +1,6 @@
 from __future__ import unicode_literals
 
+import spotify
 from spotify import ffi, lib
 
 
@@ -19,6 +20,14 @@ class Search(object):
     def is_loaded(self):
         """Whether the search's data is loaded."""
         return bool(lib.sp_search_is_loaded(self._sp_search))
+
+    @property
+    def error(self):
+        """An :class:`ErrorType` associated with the search.
+
+        Check to see if there was problems loading the search.
+        """
+        return spotify.ErrorType(lib.sp_search_error(self._sp_search))
 
     @property
     def link(self):

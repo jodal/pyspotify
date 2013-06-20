@@ -113,6 +113,20 @@ class SearchTest(unittest.TestCase):
     def test_did_you_mean_fails_if_error(self, lib_mock):
         self.assert_fails_if_error(lib_mock, lambda s: s.did_you_mean)
 
+    def test_total_tracks(self, lib_mock):
+        lib_mock.sp_search_error.return_value = spotify.ErrorType.OK
+        lib_mock.sp_search_total_tracks.return_value = 75
+        sp_search = spotify.ffi.new('int *')
+        search = spotify.Search(sp_search)
+
+        result = search.total_tracks
+
+        lib_mock.sp_search_total_tracks.assert_called_with(sp_search)
+        self.assertEqual(result, 75)
+
+    def test_total_tracks_fails_if_error(self, lib_mock):
+        self.assert_fails_if_error(lib_mock, lambda s: s.total_tracks)
+
     @mock.patch('spotify.link.Link', spec=spotify.Link)
     def test_link_creates_link_to_search(self, link_mock, lib_mock):
         link_mock.return_value = mock.sentinel.link

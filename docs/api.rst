@@ -90,12 +90,12 @@ out of pyspotify::
 
 If your application is already using :mod:`logging`, and you want debug log
 output from your own application, but not from pyspotify, you can ignore debug
-log messages from pyspotify by increasing the threshold on the pyspotify logger
+log messages from pyspotify by increasing the threshold on the "spotify" logger
 to "info" level or higher::
 
     import logging
     logging.basicConfig(level=logging.DEBUG)
-    logging.getLogger('pyspotify').setLevel(logging.INFO)
+    logging.getLogger('spotify').setLevel(logging.INFO)
 
 For more details on how to use :mod:`logging`, please refer to the Python
 standard library documentation.

@@ -16,6 +16,9 @@ class ImageTest(unittest.TestCase):
         spotify.session_instance = session
         return session
 
+    def tearDown(self):
+        spotify.session_instance = None
+
     def test_create_without_uri_or_sp_image_fails(self, lib_mock):
         self.assertRaises(AssertionError, spotify.Image)
 

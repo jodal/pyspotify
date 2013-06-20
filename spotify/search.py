@@ -74,6 +74,17 @@ class Search(object):
         return lib.sp_search_total_albums(self._sp_search)
 
     @property
+    def total_artists(self):
+        """The total number of artists matching the search query.
+
+        If the number is larger than the interval specified at search object
+        creation, more search results are available. To fetch these, create a
+        new search object with a new interval.
+        """
+        spotify.Error.maybe_raise(self.error)
+        return lib.sp_search_total_artists(self._sp_search)
+
+    @property
     def link(self):
         """A :class:`Link` to the search."""
         from spotify.link import Link

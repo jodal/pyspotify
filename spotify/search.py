@@ -1,7 +1,7 @@
 from __future__ import unicode_literals
 
 import spotify
-from spotify import ffi, lib
+from spotify import ffi, lib, utils
 
 
 __all__ = [
@@ -28,6 +28,16 @@ class Search(object):
         Check to see if there was problems loading the search.
         """
         return spotify.ErrorType(lib.sp_search_error(self._sp_search))
+
+    @property
+    def query(self):
+        """The search query.
+
+        Will always return :class:`None` if the search isn't loaded.
+        """
+        spotify.Error.maybe_raise(self.error)
+        query = utils.to_unicode(lib.sp_search_query(self._sp_search))
+        return query if query else None
 
     @property
     def link(self):

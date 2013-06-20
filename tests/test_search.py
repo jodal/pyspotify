@@ -10,6 +10,14 @@ import spotify
 @mock.patch('spotify.search.lib', spec=spotify.lib)
 class SearchTest(unittest.TestCase):
 
+    def assert_fails_if_error(self, lib_mock, func):
+        lib_mock.sp_search_error.return_value = (
+            spotify.ErrorType.BAD_API_VERSION)
+        sp_search = spotify.ffi.new('int *')
+        search = spotify.Search(sp_search)
+
+        self.assertRaises(spotify.Error, func, search)
+
     def test_adds_ref_to_sp_search_when_created(self, lib_mock):
         sp_search = spotify.ffi.new('int *')
 
@@ -46,6 +54,37 @@ class SearchTest(unittest.TestCase):
 
         lib_mock.sp_search_error.assert_called_once_with(sp_search)
         self.assertIs(result, spotify.ErrorType.IS_LOADING)
+
+    # TODO tracks
+    # TODO albums
+    # TODO playlists
+    # TODO artists
+
+    def test_query(self, lib_mock):
+        lib_mock.sp_search_error.return_value = spotify.ErrorType.OK
+        lib_mock.sp_search_query.return_value = spotify.ffi.new(
+            'char[]', b'Foo Bar Baz')
+        sp_search = spotify.ffi.new('int *')
+        search = spotify.Search(sp_search)
+
+        result = search.query
+
+        lib_mock.sp_search_query.assert_called_once_with(sp_search)
+        self.assertEqual(result, 'Foo Bar Baz')
+
+    def test_query_is_none_if_empty(self, lib_mock):
+        lib_mock.sp_search_error.return_value = spotify.ErrorType.OK
+        lib_mock.sp_search_query.return_value = spotify.ffi.new('char[]', b'')
+        sp_search = spotify.ffi.new('int *')
+        search = spotify.Search(sp_search)
+
+        result = search.query
+
+        lib_mock.sp_search_query.assert_called_once_with(sp_search)
+        self.assertIsNone(result)
+
+    def test_query_fails_if_error(self, lib_mock):
+        self.assert_fails_if_error(lib_mock, lambda s: s.query)
 
     @mock.patch('spotify.link.Link', spec=spotify.Link)
     def test_link_creates_link_to_search(self, link_mock, lib_mock):

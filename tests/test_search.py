@@ -86,6 +86,33 @@ class SearchTest(unittest.TestCase):
     def test_query_fails_if_error(self, lib_mock):
         self.assert_fails_if_error(lib_mock, lambda s: s.query)
 
+    def test_did_you_mean(self, lib_mock):
+        lib_mock.sp_search_error.return_value = spotify.ErrorType.OK
+        lib_mock.sp_search_did_you_mean.return_value = spotify.ffi.new(
+            'char[]', b'Foo Bar Baz')
+        sp_search = spotify.ffi.new('int *')
+        search = spotify.Search(sp_search)
+
+        result = search.did_you_mean
+
+        lib_mock.sp_search_did_you_mean.assert_called_once_with(sp_search)
+        self.assertEqual(result, 'Foo Bar Baz')
+
+    def test_did_you_mean_is_none_if_empty(self, lib_mock):
+        lib_mock.sp_search_error.return_value = spotify.ErrorType.OK
+        lib_mock.sp_search_did_you_mean.return_value = spotify.ffi.new(
+            'char[]', b'')
+        sp_search = spotify.ffi.new('int *')
+        search = spotify.Search(sp_search)
+
+        result = search.did_you_mean
+
+        lib_mock.sp_search_did_you_mean.assert_called_once_with(sp_search)
+        self.assertIsNone(result)
+
+    def test_did_you_mean_fails_if_error(self, lib_mock):
+        self.assert_fails_if_error(lib_mock, lambda s: s.did_you_mean)
+
     @mock.patch('spotify.link.Link', spec=spotify.Link)
     def test_link_creates_link_to_search(self, link_mock, lib_mock):
         link_mock.return_value = mock.sentinel.link

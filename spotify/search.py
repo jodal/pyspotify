@@ -40,6 +40,18 @@ class Search(object):
         return query if query else None
 
     @property
+    def did_you_mean(self):
+        """The search's "did you mean" query or :class:`None` if no such
+        suggestion exists.
+
+        Will always return :class:`None` if the search isn't loaded.
+        """
+        spotify.Error.maybe_raise(self.error)
+        did_you_mean = utils.to_unicode(
+            lib.sp_search_did_you_mean(self._sp_search))
+        return did_you_mean if did_you_mean else None
+
+    @property
     def link(self):
         """A :class:`Link` to the search."""
         from spotify.link import Link

@@ -8,7 +8,7 @@ import spotify
 
 
 @mock.patch('spotify.search.lib', spec=spotify.lib)
-class SearchTest(unittest.TestCase):
+class SearchResultTest(unittest.TestCase):
 
     def assert_fails_if_error(self, lib_mock, func):
         lib_mock.sp_search_error.return_value = (

@@ -22,6 +22,11 @@ PlaylistFolder_FromSpotify(sp_playlistcontainer *container, int index,
 {
     sp_error error;
 
+    if (index < 0 || index >= sp_playlistcontainer_num_playlists(container)) {
+        PyErr_SetString(SpotifyError, "playlist index does not exist");
+        return NULL;
+    }
+
     /* TODO: consider using callobject in this and other FromSpotify calls? */
     PyObject *self = PlaylistFolderType.tp_alloc(&PlaylistFolderType, 0);
     PlaylistFolder_NAME(self) = "";

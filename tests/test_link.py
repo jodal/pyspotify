@@ -142,7 +142,7 @@ class LinkTest(unittest.TestCase):
         sp_link = spotify.ffi.new('int *')
         lib_mock.sp_link_create_from_playlist.return_value = sp_link
         sp_playlist = spotify.ffi.new('int *')
-        playlist = spotify.Playlist(sp_playlist)
+        playlist = spotify.Playlist(sp_playlist=sp_playlist)
 
         link = spotify.Link(playlist)
 

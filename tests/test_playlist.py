@@ -10,17 +10,58 @@ import spotify
 @mock.patch('spotify.playlist.lib', spec=spotify.lib)
 class PlaylistTest(unittest.TestCase):
 
+    def create_session(self, lib_mock):
+        session = mock.sentinel.session
+        session._sp_session = mock.sentinel.sp_session
+        spotify.session_instance = session
+        return session
+
+    def tearDown(self):
+        spotify.session_instance = None
+
+    def test_create_without_uri_or_sp_playlist_fails(self, lib_mock):
+        self.assertRaises(AssertionError, spotify.Playlist)
+
+    @mock.patch('spotify.Link')
+    def test_create_from_uri(self, link_mock, lib_mock):
+        session = self.create_session(lib_mock)
+        sp_link = spotify.ffi.new('int *')
+        link_instance_mock = link_mock.return_value
+        link_instance_mock._sp_link = sp_link
+        sp_playlist = spotify.ffi.new('int *')
+        lib_mock.sp_playlist_create.return_value = sp_playlist
+        uri = 'spotify:playlist:foo'
+
+        result = spotify.Playlist(uri)
+
+        link_mock.assert_called_with(uri)
+        lib_mock.sp_playlist_create.assert_called_with(
+            session._sp_session, sp_link)
+        self.assertEqual(lib_mock.sp_playlist_add_ref.call_count, 0)
+        self.assertEqual(result._sp_playlist, sp_playlist)
+
+    @mock.patch('spotify.Link')
+    def test_create_from_uri_fail_raises_error(self, link_mock, lib_mock):
+        self.create_session(lib_mock)
+        sp_link = spotify.ffi.new('int *')
+        link_instance_mock = link_mock.return_value
+        link_instance_mock._sp_link = sp_link
+        lib_mock.sp_playlist_create.return_value = spotify.ffi.NULL
+        uri = 'spotify:playlist:foo'
+
+        self.assertRaises(ValueError, spotify.Playlist, uri)
+
     def test_adds_ref_to_sp_playlist_when_created(self, lib_mock):
         sp_playlist = spotify.ffi.new('int *')
 
-        spotify.Playlist(sp_playlist)
+        spotify.Playlist(sp_playlist=sp_playlist)
 
         lib_mock.sp_playlist_add_ref.assert_called_with(sp_playlist)
 
     def test_releases_sp_playlist_when_playlist_dies(self, lib_mock):
         sp_playlist = spotify.ffi.new('int *')
 
-        playlist = spotify.Playlist(sp_playlist)
+        playlist = spotify.Playlist(sp_playlist=sp_playlist)
         playlist = None  # noqa
         gc.collect()  # Needed for PyPy
 
@@ -30,7 +71,7 @@ class PlaylistTest(unittest.TestCase):
     def test_link_creates_link_to_playlist(self, link_mock, lib_mock):
         link_mock.return_value = mock.sentinel.link
         sp_playlist = spotify.ffi.new('int *')
-        playlist = spotify.Playlist(sp_playlist)
+        playlist = spotify.Playlist(sp_playlist=sp_playlist)
 
         result = playlist.link
 

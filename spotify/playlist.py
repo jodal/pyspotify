@@ -1,5 +1,6 @@
 from __future__ import unicode_literals
 
+import spotify
 from spotify import ffi, lib
 
 
@@ -10,9 +11,29 @@ __all__ = [
 
 
 class Playlist(object):
-    """A Spotify playlist."""
+    """A Spotify playlist.
 
-    def __init__(self, sp_playlist, add_ref=True):
+    You can get playlists from the :attr:`~Session.playlist_container`,
+    :attr:`~Session.inbox`, :attr:`~Session.starred`,
+    :meth:`~Session.starred_for_user`, :meth:`~Session.search`, etc., or you
+    can create a playlist yourself from a Spotify URI::
+
+        >>> playlist = spotify.Playlist(
+        ...     'spotify:user:fiat500c:playlist:54k50VZdvtnIPt4d8RBCmZ')
+        >>> playlist.load().name
+        u'500C feelgood playlist'
+    """
+
+    def __init__(self, uri=None, sp_playlist=None, add_ref=True):
+        assert uri or sp_playlist, 'uri or sp_playlist is required'
+        if uri is not None:
+            link = spotify.Link(uri)
+            sp_playlist = lib.sp_playlist_create(
+                spotify.session_instance._sp_session, link._sp_link)
+            if sp_playlist is ffi.NULL:
+                raise ValueError(
+                    'Failed to get playlist from Spotify URI: %r' % uri)
+            add_ref = False
         if add_ref:
             lib.sp_playlist_add_ref(sp_playlist)
         self._sp_playlist = ffi.gc(sp_playlist, lib.sp_playlist_release)

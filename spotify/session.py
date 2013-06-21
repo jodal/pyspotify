@@ -873,7 +873,7 @@ class Session(object):
         sp_playlist = lib.sp_session_inbox_create(self._sp_session)
         if sp_playlist == ffi.NULL:
             return None
-        return spotify.Playlist(sp_playlist, add_ref=False)
+        return spotify.Playlist(sp_playlist=sp_playlist, add_ref=False)
 
     @property
     def starred(self):
@@ -881,7 +881,7 @@ class Session(object):
         sp_playlist = lib.sp_session_starred_create(self._sp_session)
         if sp_playlist == ffi.NULL:
             return None
-        return spotify.Playlist(sp_playlist, add_ref=False)
+        return spotify.Playlist(sp_playlist=sp_playlist, add_ref=False)
 
     def starred_for_user(self, canonical_username):
         """The starred :class:`Playlist` for the user with
@@ -890,7 +890,7 @@ class Session(object):
             self._sp_session, utils.to_bytes(canonical_username))
         if sp_playlist == ffi.NULL:
             return None
-        return spotify.Playlist(sp_playlist, add_ref=False)
+        return spotify.Playlist(sp_playlist=sp_playlist, add_ref=False)
 
     def published_container_for_user(self, canonical_username=None):
         """The :class:`PlaylistContainer` of published playlists for the user

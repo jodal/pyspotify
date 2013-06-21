@@ -1,7 +1,7 @@
 from __future__ import unicode_literals
 
 import spotify
-from spotify import ffi, lib
+from spotify import ffi, lib, utils
 
 
 __all__ = [
@@ -42,6 +42,15 @@ class Playlist(object):
     def is_loaded(self):
         """Whether the playlist's data is loaded."""
         return bool(lib.sp_playlist_is_loaded(self._sp_playlist))
+
+    def load(self, timeout=None):
+        """Block until the playlist's data is loaded.
+
+        :param timeout: seconds before giving up and raising an exception
+        :type timeout: float
+        :returns: self
+        """
+        return utils.load(self, timeout=timeout)
 
     @property
     def link(self):

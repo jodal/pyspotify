@@ -77,6 +77,15 @@ class PlaylistTest(unittest.TestCase):
         lib_mock.sp_playlist_is_loaded.assert_called_once_with(sp_playlist)
         self.assertTrue(result)
 
+    @mock.patch('spotify.utils.load')
+    def test_load(self, load_mock, lib_mock):
+        sp_playlist = spotify.ffi.new('int *')
+        playlist = spotify.Playlist(sp_playlist=sp_playlist)
+
+        playlist.load(10)
+
+        load_mock.assert_called_with(playlist, timeout=10)
+
     @mock.patch('spotify.Link', spec=spotify.Link)
     def test_link_creates_link_to_playlist(self, link_mock, lib_mock):
         link_mock.return_value = mock.sentinel.link

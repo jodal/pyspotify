@@ -108,6 +108,22 @@ class Playlist(object):
             lib.sp_playlist_get_description(self._sp_playlist))
         return description if description else None
 
+    @property
+    def image(self):
+        """The playlist's :class:`Image`.
+
+        Will always return :class:`None` if the playlist isn't loaded or the
+        playlist has no image.
+        """
+        cover_id = ffi.new('char[20]')
+        has_image = bool(
+            lib.sp_playlist_get_image(self._sp_playlist, cover_id))
+        if not has_image:
+            return None
+        sp_image = lib.sp_image_create(
+            spotify.session_instance._sp_session, cover_id)
+        return spotify.Image(sp_image=sp_image, add_ref=False)
+
     # TODO Add sp_playlist_* methods
 
     @property

@@ -221,6 +221,51 @@ class PlaylistTest(unittest.TestCase):
         lib_mock.sp_playlist_get_description.assert_called_with(sp_playlist)
         self.assertIsNone(result)
 
+    @mock.patch('spotify.image.lib', spec=spotify.lib)
+    def test_image(self, image_lib_mock, lib_mock):
+        session = self.create_session(lib_mock)
+        image_id = b'image-id'
+
+        def func(sp_playlist, sp_image_id):
+            buf = spotify.ffi.buffer(sp_image_id)
+            buf[:len(image_id)] = image_id
+            return 1
+
+        lib_mock.sp_playlist_get_image.side_effect = func
+        sp_image = spotify.ffi.new('int *')
+        lib_mock.sp_image_create.return_value = sp_image
+        sp_playlist = spotify.ffi.new('int *')
+        playlist = spotify.Playlist(sp_playlist=sp_playlist)
+
+        result = playlist.image
+
+        lib_mock.sp_playlist_get_image.assert_called_with(
+            sp_playlist, mock.ANY)
+        lib_mock.sp_image_create.assert_called_with(
+            session._sp_session, mock.ANY)
+        self.assertEqual(
+            spotify.ffi.string(lib_mock.sp_image_create.call_args[0][1]),
+            b'image-id')
+
+        self.assertIsInstance(result, spotify.Image)
+        self.assertEqual(result._sp_image, sp_image)
+
+        # Since we *created* the sp_image, we already have a refcount of 1 and
+        # shouldn't increase the refcount when wrapping this sp_image in an
+        # Image object
+        self.assertEqual(image_lib_mock.sp_image_add_ref.call_count, 0)
+
+    def test_image_is_none_if_no_image(self, lib_mock):
+        lib_mock.sp_playlist_get_image.return_value = 0
+        sp_playlist = spotify.ffi.new('int *')
+        playlist = spotify.Playlist(sp_playlist=sp_playlist)
+
+        result = playlist.image
+
+        lib_mock.sp_playlist_get_image.assert_called_with(
+            sp_playlist, mock.ANY)
+        self.assertIsNone(result)
+
     @mock.patch('spotify.Link', spec=spotify.Link)
     def test_link_creates_link_to_playlist(self, link_mock, lib_mock):
         link_mock.return_value = mock.sentinel.link

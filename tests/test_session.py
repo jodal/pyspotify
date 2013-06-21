@@ -1098,7 +1098,7 @@ class SessionTest(unittest.TestCase):
         search_complete_cb = lib_mock.sp_search_create.call_args[0][11]
         userdata = lib_mock.sp_search_create.call_args[0][12]
         search_complete_cb(sp_search, userdata)
-        self.assertTrue(result.complete_event.wait(1))
+        self.assertTrue(result.complete_event.wait(3))
 
     @mock.patch('spotify.search.lib', spec=spotify.lib)
     def test_search_with_callback(self, search_lib_mock, lib_mock):
@@ -1113,6 +1113,7 @@ class SessionTest(unittest.TestCase):
         userdata = lib_mock.sp_search_create.call_args[0][12]
         search_complete_cb(sp_search, userdata)
 
+        result.complete_event.wait(3)
         callback.assert_called_with(result)
 
     @mock.patch('spotify.search.lib', spec=spotify.lib)

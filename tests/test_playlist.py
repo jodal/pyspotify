@@ -199,6 +199,28 @@ class PlaylistTest(unittest.TestCase):
 
         self.assertRaises(spotify.Error, playlist.set_autolink_tracks, True)
 
+    def test_description(self, lib_mock):
+        lib_mock.sp_playlist_get_description.return_value = spotify.ffi.new(
+            'char[]', b'Lorem ipsum')
+        sp_playlist = spotify.ffi.new('int *')
+        playlist = spotify.Playlist(sp_playlist=sp_playlist)
+
+        result = playlist.description
+
+        lib_mock.sp_playlist_get_description.assert_called_with(sp_playlist)
+        self.assertEqual(result, 'Lorem ipsum')
+
+    def test_description_is_none_if_unset(self, lib_mock):
+        lib_mock.sp_playlist_get_description.return_value = spotify.ffi.new(
+            'char[]', b'')
+        sp_playlist = spotify.ffi.new('int *')
+        playlist = spotify.Playlist(sp_playlist=sp_playlist)
+
+        result = playlist.description
+
+        lib_mock.sp_playlist_get_description.assert_called_with(sp_playlist)
+        self.assertIsNone(result)
+
     @mock.patch('spotify.Link', spec=spotify.Link)
     def test_link_creates_link_to_playlist(self, link_mock, lib_mock):
         link_mock.return_value = mock.sentinel.link

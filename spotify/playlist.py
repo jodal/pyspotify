@@ -98,6 +98,16 @@ class Playlist(object):
         spotify.Error.maybe_raise(
             lib.sp_playlist_set_autolink_tracks(self._sp_playlist, int(link)))
 
+    @property
+    def description(self):
+        """The playlist's description.
+
+        Will return :class:`None` if the description is unset.
+        """
+        description = utils.to_unicode(
+            lib.sp_playlist_get_description(self._sp_playlist))
+        return description if description else None
+
     # TODO Add sp_playlist_* methods
 
     @property

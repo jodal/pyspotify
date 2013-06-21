@@ -89,6 +89,10 @@ class Commander(cmd.Cmd):
         "play <spotify track uri>"
         self.spotify_queue.put(('play_uri', line))
 
+    def do_search(self, line):
+        "search <query>"
+        self.spotify_queue.put(('search', line))
+
 
 def logged_in(session, error):
     # TODO Handle error situations
@@ -186,6 +190,25 @@ class SpotifyLoop(threading.Thread):
         self.session.player_load(track)
         self.logger.info('Playing track')
         self.session.player_play()
+
+    def do_search(self, query):
+        if not spotify_logged_in.is_set():
+            self.logger.warning('You must be logged in to search')
+            return
+        try:
+            result = self.session.search(query)
+            result.load()
+        except spotify.Error as e:
+            self.logger.warning(e)
+            return
+        self.logger.info(
+            '%d tracks, %d albums, %d artists, and %d playlists found.',
+            result.total_tracks, result.total_albums,
+            result.total_artists, result.total_playlists)
+        self.logger.info('Top tracks:')
+        for track in result.tracks:
+            self.logger.info(
+                '[%s] %s - %s', track.link, track.artists[0].name, track.name)
 
 
 if __name__ == '__main__':

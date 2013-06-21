@@ -1090,7 +1090,7 @@ class SessionTest(unittest.TestCase):
             int(spotify.SearchType.STANDARD), mock.ANY, mock.ANY)
         self.assertEqual(
             spotify.ffi.string(lib_mock.sp_search_create.call_args[0][1]),
-            'alice')
+            b'alice')
         self.assertEqual(search_lib_mock.sp_search_add_ref.call_count, 0)
         self.assertIsInstance(result, spotify.SearchResult)
 

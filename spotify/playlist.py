@@ -39,6 +39,11 @@ class Playlist(object):
         self._sp_playlist = ffi.gc(sp_playlist, lib.sp_playlist_release)
 
     @property
+    def is_loaded(self):
+        """Whether the playlist's data is loaded."""
+        return bool(lib.sp_playlist_is_loaded(self._sp_playlist))
+
+    @property
     def link(self):
         """A :class:`Link` to the playlist."""
         return spotify.Link(self)

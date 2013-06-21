@@ -187,9 +187,9 @@ class SpotifyLoop(threading.Thread):
             self.logger.warning(e)
             return
         self.logger.info('Loading track into player')
-        self.session.player_load(track)
+        self.session.player.load(track)
         self.logger.info('Playing track')
-        self.session.player_play()
+        self.session.player.play()
 
     def do_search(self, query):
         if not spotify_logged_in.is_set():

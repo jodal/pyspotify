@@ -363,3 +363,10 @@ class SearchResultTest(unittest.TestCase):
 
         link_mock.assert_called_once_with(search)
         self.assertEqual(result, mock.sentinel.link)
+
+
+class SearchTypeTest(unittest.TestCase):
+
+    def test_has_constants(self):
+        self.assertEqual(spotify.SearchType.STANDARD, 0)
+        self.assertEqual(spotify.SearchType.SUGGEST, 1)

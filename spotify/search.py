@@ -9,6 +9,7 @@ from spotify import ffi, lib, utils
 __all__ = [
     'SearchResult',
     'SearchResultPlaylist',
+    'SearchType',
 ]
 
 
@@ -186,4 +187,9 @@ class SearchResult(object):
 class SearchResultPlaylist(collections.namedtuple(
         'SearchResultPlaylist', ['name', 'uri', 'image_uri'])):
     """A playlist matching a search query."""
+    pass
+
+
+@utils.make_enum('SP_SEARCH_')
+class SearchType(utils.IntEnum):
     pass

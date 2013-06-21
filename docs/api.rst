@@ -255,6 +255,9 @@ Search
 
     .. autoattribute:: image_uri
 
+.. autoclass:: SearchType
+    :no-inherited-members:
+
 
 Social
 ======

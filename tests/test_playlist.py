@@ -150,6 +150,36 @@ class PlaylistTest(unittest.TestCase):
         self.assertEqual(result._sp_user, sp_user)
         user_lib_mock.sp_user_add_ref.assert_called_with(sp_user)
 
+    def test_is_collaborative(self, lib_mock):
+        lib_mock.sp_playlist_is_collaborative.return_value = 1
+        sp_playlist = spotify.ffi.new('int *')
+        playlist = spotify.Playlist(sp_playlist=sp_playlist)
+
+        result = playlist.collaborative
+
+        lib_mock.sp_playlist_is_collaborative.assert_called_with(sp_playlist)
+        self.assertTrue(result)
+
+    def test_set_collaborative(self, lib_mock):
+        lib_mock.sp_playlist_set_collaborative.return_value = int(
+            spotify.ErrorType.OK)
+        sp_playlist = spotify.ffi.new('int *')
+        playlist = spotify.Playlist(sp_playlist=sp_playlist)
+
+        playlist.collaborative = False
+
+        lib_mock.sp_playlist_set_collaborative.assert_called_with(
+            sp_playlist, 0)
+
+    def test_set_collaborative_fails_if_error(self, lib_mock):
+        lib_mock.sp_playlist_set_collaborative.return_value = int(
+            spotify.ErrorType.BAD_API_VERSION)
+        sp_playlist = spotify.ffi.new('int *')
+        playlist = spotify.Playlist(sp_playlist=sp_playlist)
+
+        self.assertRaises(
+            spotify.Error, setattr, playlist, 'collaborative', False)
+
     @mock.patch('spotify.Link', spec=spotify.Link)
     def test_link_creates_link_to_playlist(self, link_mock, lib_mock):
         link_mock.return_value = mock.sentinel.link

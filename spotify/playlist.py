@@ -82,6 +82,16 @@ class Playlist(object):
         """The :class:`User` object for the owner of the playlist."""
         return spotify.User(sp_user=lib.sp_playlist_owner(self._sp_playlist))
 
+    def is_collaborative(self):
+        return bool(lib.sp_playlist_is_collaborative(self._sp_playlist))
+
+    def set_collaborative(self, value):
+        spotify.Error.maybe_raise(
+            lib.sp_playlist_set_collaborative(self._sp_playlist, int(value)))
+
+    collaborative = property(is_collaborative, set_collaborative)
+    """Whether the playlist can be modified by all users or not."""
+
     # TODO Add sp_playlist_* methods
 
     @property

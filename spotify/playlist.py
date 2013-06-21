@@ -60,10 +60,22 @@ class Playlist(object):
     def name(self):
         """The playlist's name.
 
+        Assigning to :attr:`name` will rename the playlist.
+
         Will always return :class:`None` if the track isn't loaded.
         """
         name = utils.to_unicode(lib.sp_playlist_name(self._sp_playlist))
         return name if name else None
+
+    @name.setter
+    def name(self, new_name):
+        self.rename(new_name)
+
+    def rename(self, new_name):
+        """Rename the playlist."""
+        new_name = ffi.new('char[]', utils.to_bytes(new_name))
+        spotify.Error.maybe_raise(
+            lib.sp_playlist_rename(self._sp_playlist, new_name))
 
     # TODO Add sp_playlist_* methods
 

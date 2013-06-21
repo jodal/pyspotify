@@ -77,6 +77,11 @@ class Playlist(object):
         spotify.Error.maybe_raise(
             lib.sp_playlist_rename(self._sp_playlist, new_name))
 
+    @property
+    def owner(self):
+        """The :class:`User` object for the owner of the playlist."""
+        return spotify.User(sp_user=lib.sp_playlist_owner(self._sp_playlist))
+
     # TODO Add sp_playlist_* methods
 
     @property

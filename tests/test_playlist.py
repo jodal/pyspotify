@@ -136,6 +136,20 @@ class PlaylistTest(unittest.TestCase):
 
         playlist.rename.assert_called_with('Quux')
 
+    @mock.patch('spotify.user.lib', spec=spotify.lib)
+    def test_owner(self, user_lib_mock, lib_mock):
+        sp_user = spotify.ffi.new('int *')
+        lib_mock.sp_playlist_owner.return_value = sp_user
+        sp_playlist = spotify.ffi.new('int *')
+        playlist = spotify.Playlist(sp_playlist=sp_playlist)
+
+        result = playlist.owner
+
+        lib_mock.sp_playlist_owner.assert_called_with(sp_playlist)
+        self.assertIsInstance(result, spotify.User)
+        self.assertEqual(result._sp_user, sp_user)
+        user_lib_mock.sp_user_add_ref.assert_called_with(sp_user)
+
     @mock.patch('spotify.Link', spec=spotify.Link)
     def test_link_creates_link_to_playlist(self, link_mock, lib_mock):
         link_mock.return_value = mock.sentinel.link

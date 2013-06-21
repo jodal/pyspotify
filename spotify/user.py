@@ -58,8 +58,7 @@ class User(object):
     @property
     def link(self):
         """A :class:`Link` to the user."""
-        from spotify.link import Link
-        return Link(self)
+        return spotify.Link(self)
 
     @property
     def starred(self):

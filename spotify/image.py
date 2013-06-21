@@ -107,8 +107,7 @@ class Image(object):
     @property
     def link(self):
         """A :class:`Link` to the image."""
-        from spotify.link import Link
-        return Link(self)
+        return spotify.Link(self)
 
 
 @utils.make_enum('SP_IMAGE_FORMAT_')

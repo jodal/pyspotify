@@ -22,7 +22,7 @@ class AlbumTest(unittest.TestCase):
     def test_create_without_uri_or_sp_album_fails(self, lib_mock):
         self.assertRaises(AssertionError, spotify.Album)
 
-    @mock.patch('spotify.Link')
+    @mock.patch('spotify.Link', spec=spotify.Link)
     def test_create_from_uri(self, link_mock, lib_mock):
         self.create_session(lib_mock)
         sp_link = spotify.ffi.new('int *')
@@ -39,7 +39,7 @@ class AlbumTest(unittest.TestCase):
         lib_mock.sp_album_add_ref.assert_called_with(sp_album)
         self.assertEqual(result._sp_album, sp_album)
 
-    @mock.patch('spotify.Link')
+    @mock.patch('spotify.Link', spec=spotify.Link)
     def test_create_from_uri_fail_raises_error(self, link_mock, lib_mock):
         self.create_session(lib_mock)
         sp_link = spotify.ffi.new('int *')
@@ -228,7 +228,7 @@ class AlbumTest(unittest.TestCase):
         lib_mock.sp_album_is_loaded.assert_called_once_with(sp_album)
         self.assertIsNone(result)
 
-    @mock.patch('spotify.link.Link', spec=spotify.Link)
+    @mock.patch('spotify.Link', spec=spotify.Link)
     def test_link_creates_link_to_album(self, link_mock, lib_mock):
         link_mock.return_value = mock.sentinel.link
         sp_album = spotify.ffi.new('int *')

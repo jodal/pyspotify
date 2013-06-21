@@ -193,8 +193,7 @@ class SearchResult(object):
     @property
     def link(self):
         """A :class:`Link` to the search."""
-        from spotify.link import Link
-        return Link(self)
+        return spotify.Link(self)
 
 
 class SearchResultPlaylist(collections.namedtuple(

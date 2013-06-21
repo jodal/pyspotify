@@ -368,7 +368,7 @@ class SearchResultTest(unittest.TestCase):
     def test_total_playlists_fails_if_error(self, lib_mock):
         self.assert_fails_if_error(lib_mock, lambda s: s.total_playlists)
 
-    @mock.patch('spotify.link.Link', spec=spotify.Link)
+    @mock.patch('spotify.Link', spec=spotify.Link)
     def test_link_creates_link_to_search(self, link_mock, lib_mock):
         link_mock.return_value = mock.sentinel.link
         sp_search = spotify.ffi.new('int *')

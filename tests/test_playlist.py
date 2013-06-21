@@ -22,7 +22,7 @@ class PlaylistTest(unittest.TestCase):
     def test_create_without_uri_or_sp_playlist_fails(self, lib_mock):
         self.assertRaises(AssertionError, spotify.Playlist)
 
-    @mock.patch('spotify.Link')
+    @mock.patch('spotify.Link', spec=spotify.Link)
     def test_create_from_uri(self, link_mock, lib_mock):
         session = self.create_session(lib_mock)
         sp_link = spotify.ffi.new('int *')
@@ -40,7 +40,7 @@ class PlaylistTest(unittest.TestCase):
         self.assertEqual(lib_mock.sp_playlist_add_ref.call_count, 0)
         self.assertEqual(result._sp_playlist, sp_playlist)
 
-    @mock.patch('spotify.Link')
+    @mock.patch('spotify.Link', spec=spotify.Link)
     def test_create_from_uri_fail_raises_error(self, link_mock, lib_mock):
         self.create_session(lib_mock)
         sp_link = spotify.ffi.new('int *')
@@ -67,7 +67,7 @@ class PlaylistTest(unittest.TestCase):
 
         lib_mock.sp_playlist_release.assert_called_with(sp_playlist)
 
-    @mock.patch('spotify.link.Link', spec=spotify.Link)
+    @mock.patch('spotify.Link', spec=spotify.Link)
     def test_link_creates_link_to_playlist(self, link_mock, lib_mock):
         link_mock.return_value = mock.sentinel.link
         sp_playlist = spotify.ffi.new('int *')

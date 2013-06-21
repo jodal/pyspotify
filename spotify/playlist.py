@@ -41,8 +41,7 @@ class Playlist(object):
     @property
     def link(self):
         """A :class:`Link` to the playlist."""
-        from spotify.link import Link
-        return Link(self)
+        return spotify.Link(self)
 
     # TODO Add sp_playlist_* methods
 

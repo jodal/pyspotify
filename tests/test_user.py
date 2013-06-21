@@ -19,7 +19,7 @@ class UserTest(unittest.TestCase):
     def test_create_without_uri_or_sp_user_fails(self, lib_mock):
         self.assertRaises(AssertionError, spotify.User)
 
-    @mock.patch('spotify.Link')
+    @mock.patch('spotify.Link', spec=spotify.Link)
     def test_create_from_uri(self, link_mock, lib_mock):
         self.create_session(lib_mock)
         sp_link = spotify.ffi.new('int *')
@@ -36,7 +36,7 @@ class UserTest(unittest.TestCase):
         lib_mock.sp_user_add_ref.assert_called_with(sp_user)
         self.assertEqual(result._sp_user, sp_user)
 
-    @mock.patch('spotify.Link')
+    @mock.patch('spotify.Link', spec=spotify.Link)
     def test_create_from_uri_fail_raises_error(self, link_mock, lib_mock):
         self.create_session(lib_mock)
         sp_link = spotify.ffi.new('int *')
@@ -104,7 +104,7 @@ class UserTest(unittest.TestCase):
 
         load_mock.assert_called_with(user, timeout=10)
 
-    @mock.patch('spotify.link.Link', spec=spotify.Link)
+    @mock.patch('spotify.Link', spec=spotify.Link)
     def test_link_creates_link_to_user(self, link_mock, lib_mock):
         link_mock.return_value = mock.sentinel.link
         sp_user = spotify.ffi.new('int *')

@@ -246,14 +246,12 @@ class Track(object):
     @property
     def link(self):
         """A :class:`Link` to the track."""
-        from spotify.link import Link
-        return Link(self, offset=0)
+        return spotify.Link(self, offset=0)
 
     def link_with_offset(self, offset):
         """A :class:`Link` to the track with an ``offset`` in milliseconds into
         the track."""
-        from spotify.link import Link
-        return Link(self, offset=offset)
+        return spotify.Link(self, offset=offset)
 
 
 class LocalTrack(Track):

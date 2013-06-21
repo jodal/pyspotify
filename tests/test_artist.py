@@ -22,7 +22,7 @@ class ArtistTest(unittest.TestCase):
     def test_create_without_uri_or_sp_artist_fails(self, lib_mock):
         self.assertRaises(AssertionError, spotify.Artist)
 
-    @mock.patch('spotify.Link')
+    @mock.patch('spotify.Link', spec=spotify.Link)
     def test_create_from_uri(self, link_mock, lib_mock):
         self.create_session(lib_mock)
         sp_link = spotify.ffi.new('int *')
@@ -39,7 +39,7 @@ class ArtistTest(unittest.TestCase):
         lib_mock.sp_artist_add_ref.assert_called_with(sp_artist)
         self.assertEqual(result._sp_artist, sp_artist)
 
-    @mock.patch('spotify.Link')
+    @mock.patch('spotify.Link', spec=spotify.Link)
     def test_create_from_uri_fail_raises_error(self, link_mock, lib_mock):
         self.create_session(lib_mock)
         sp_link = spotify.ffi.new('int *')
@@ -143,7 +143,7 @@ class ArtistTest(unittest.TestCase):
             sp_artist, int(spotify.ImageSize.NORMAL))
         self.assertIsNone(result)
 
-    @mock.patch('spotify.link.Link', spec=spotify.Link)
+    @mock.patch('spotify.Link', spec=spotify.Link)
     def test_link_creates_link_to_artist(self, link_mock, lib_mock):
         link_mock.return_value = mock.sentinel.link
         sp_artist = spotify.ffi.new('int *')

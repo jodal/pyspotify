@@ -38,7 +38,7 @@ class TrackTest(unittest.TestCase):
     def test_create_without_uri_or_sp_track_fails(self, lib_mock):
         self.assertRaises(AssertionError, spotify.Track)
 
-    @mock.patch('spotify.Link')
+    @mock.patch('spotify.Link', spec=spotify.Link)
     def test_create_from_uri(self, link_mock, lib_mock):
         self.create_session(lib_mock)
         sp_link = spotify.ffi.new('int *')
@@ -55,7 +55,7 @@ class TrackTest(unittest.TestCase):
         lib_mock.sp_track_add_ref.assert_called_with(sp_track)
         self.assertEqual(result._sp_track, sp_track)
 
-    @mock.patch('spotify.Link')
+    @mock.patch('spotify.Link', spec=spotify.Link)
     def test_create_from_uri_fail_raises_error(self, link_mock, lib_mock):
         self.create_session(lib_mock)
         sp_link = spotify.ffi.new('int *')
@@ -504,7 +504,7 @@ class TrackTest(unittest.TestCase):
     def test_index_fails_if_error(self, lib_mock):
         self.assert_fails_if_error(lib_mock, lambda t: t.index)
 
-    @mock.patch('spotify.link.Link', spec=spotify.Link)
+    @mock.patch('spotify.Link', spec=spotify.Link)
     def test_link_creates_link_to_track(self, link_mock, lib_mock):
         link_mock.return_value = mock.sentinel.link
         sp_track = spotify.ffi.new('int *')
@@ -515,7 +515,7 @@ class TrackTest(unittest.TestCase):
         link_mock.assert_called_once_with(track, offset=0)
         self.assertEqual(result, mock.sentinel.link)
 
-    @mock.patch('spotify.link.Link', spec=spotify.Link)
+    @mock.patch('spotify.Link', spec=spotify.Link)
     def test_link_with_offset(self, link_mock, lib_mock):
         link_mock.return_value = mock.sentinel.link
         sp_track = spotify.ffi.new('int *')

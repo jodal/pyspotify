@@ -77,5 +77,4 @@ class Artist(object):
     @property
     def link(self):
         """A :class:`Link` to the artist."""
-        from spotify.link import Link
-        return Link(self)
+        return spotify.Link(self)

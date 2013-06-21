@@ -117,8 +117,7 @@ class Album(object):
     @property
     def link(self):
         """A :class:`Link` to the album."""
-        from spotify.link import Link
-        return Link(self)
+        return spotify.Link(self)
 
 
 @utils.make_enum('SP_ALBUMTYPE_')

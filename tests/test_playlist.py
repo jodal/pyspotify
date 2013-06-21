@@ -86,6 +86,27 @@ class PlaylistTest(unittest.TestCase):
 
         load_mock.assert_called_with(playlist, timeout=10)
 
+    def test_name(self, lib_mock):
+        lib_mock.sp_playlist_name.return_value = spotify.ffi.new(
+            'char[]', b'Foo Bar Baz')
+        sp_playlist = spotify.ffi.new('int *')
+        playlist = spotify.Playlist(sp_playlist=sp_playlist)
+
+        result = playlist.name
+
+        lib_mock.sp_playlist_name.assert_called_once_with(sp_playlist)
+        self.assertEqual(result, 'Foo Bar Baz')
+
+    def test_name_is_none_if_unloaded(self, lib_mock):
+        lib_mock.sp_playlist_name.return_value = spotify.ffi.new('char[]', b'')
+        sp_playlist = spotify.ffi.new('int *')
+        playlist = spotify.Playlist(sp_playlist=sp_playlist)
+
+        result = playlist.name
+
+        lib_mock.sp_playlist_name.assert_called_once_with(sp_playlist)
+        self.assertIsNone(result)
+
     @mock.patch('spotify.Link', spec=spotify.Link)
     def test_link_creates_link_to_playlist(self, link_mock, lib_mock):
         link_mock.return_value = mock.sentinel.link

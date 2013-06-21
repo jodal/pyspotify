@@ -52,12 +52,25 @@ class Playlist(object):
         """
         return utils.load(self, timeout=timeout)
 
+    # TODO add_callbacks()
+    # TODO remove_callbacks()
+    # TODO tracks
+
+    @property
+    def name(self):
+        """The playlist's name.
+
+        Will always return :class:`None` if the track isn't loaded.
+        """
+        name = utils.to_unicode(lib.sp_playlist_name(self._sp_playlist))
+        return name if name else None
+
+    # TODO Add sp_playlist_* methods
+
     @property
     def link(self):
         """A :class:`Link` to the playlist."""
         return spotify.Link(self)
-
-    # TODO Add sp_playlist_* methods
 
 
 class PlaylistContainer(object):

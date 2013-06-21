@@ -3,6 +3,7 @@ from __future__ import unicode_literals
 import functools
 import logging
 import operator
+import uuid
 
 import spotify
 from spotify import ffi, lib, utils
@@ -944,7 +945,72 @@ class Session(object):
         """
         return utils.to_country(lib.sp_session_user_country(self._sp_session))
 
-    # TODO search()
+    def search(
+            self, query, callback=None,
+            track_offset=0, track_count=20,
+            album_offset=0, album_count=20,
+            artist_offset=0, artist_count=20,
+            playlist_offset=0, playlist_count=20,
+            search_type=None):
+        """
+        Search Spotify for tracks, albums, artists, and playlists matching
+        ``query``.
+
+        The ``query`` string can be free format, or use some prefixes like
+        ``title:`` and ``artist:`` to limit what to match on. There is no
+        official docs on the search query format, but there's a `Spotify blog
+        post
+        <https://www.spotify.com/blog/archives/2008/01/22/searching-spotify/>`_
+        from 2008 with some examples.
+
+        If ``callback`` isn't :class:`None`, it is expected to be a callable
+        that accepts a single argument, a :class:`SearchResult` instance, when
+        the search completes.
+
+        The ``*_offset`` and ``*_count`` arguments can be used to retrieve more
+        search results. libspotify will currently not respect ``*_count``
+        values higher than 200, though this may change at any time as the limit
+        isn't documented in any official docs. If you want to retrieve more
+        than 200 results, you'll have to search multiple times with different
+        ``*_offset`` values. See the ``*_total`` attributes on the
+        :class:`SearchResult` to see how many results exists, and to figure out
+        how many searches you'll need to make to retrieve everything.
+
+        ``search_type`` is a :class:`SearchType` value. It defaults to
+        :attr:`SearchType.STANDARD`.
+        """
+        if search_type is None:
+            search_type = spotify.SearchType.STANDARD
+        query = ffi.new('char[]', utils.to_bytes(query))
+        key = uuid.uuid4().bytes
+        userdata = ffi.new('char[16]', key)
+
+        sp_search = lib.sp_search_create(
+            self._sp_session, query,
+            track_offset, track_count,
+            album_offset, album_count,
+            artist_offset, artist_count,
+            playlist_offset, playlist_count,
+            int(search_type), _search_complete_callback, userdata)
+
+        search_result = spotify.SearchResult(sp_search, add_ref=False)
+        spotify.callback_dict[key] = (callback, search_result)
+        return search_result
+
+
+@ffi.callback('void(sp_search *, void *)')
+def _search_complete_callback(sp_search, userdata):
+    logger.debug('Search complete')
+    if userdata is ffi.NULL:
+        return
+    key = ffi.string(ffi.cast('char[16]', userdata))
+    value = spotify.callback_dict.pop(key, None)
+    if value is None:
+        return
+    (callback, search_result) = value
+    search_result.complete_event.set()
+    if callback is not None:
+        callback(search_result)
 
 
 class Offline(object):

@@ -1,6 +1,7 @@
 from __future__ import unicode_literals
 
 import collections
+import threading
 
 import spotify
 from spotify import ffi, lib, utils
@@ -20,9 +21,14 @@ class SearchResult(object):
     to do a search and get a :class:`SearchResult` back.
     """
 
-    def __init__(self, sp_search):
-        lib.sp_search_add_ref(sp_search)
+    def __init__(self, sp_search, add_ref=True):
+        if add_ref:
+            lib.sp_search_add_ref(sp_search)
         self._sp_search = ffi.gc(sp_search, lib.sp_search_release)
+        self.complete_event = threading.Event()
+
+    complete_event = None
+    """:class:`threading.Event` that is set when the search is completed."""
 
     @property
     def is_loaded(self):

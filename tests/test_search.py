@@ -34,6 +34,12 @@ class SearchResultTest(unittest.TestCase):
 
         lib_mock.sp_search_release.assert_called_with(sp_search)
 
+    def test_complete_event_is_unset_by_default(self, lib_mock):
+        sp_search = spotify.ffi.new('int *')
+        search = spotify.SearchResult(sp_search)
+
+        self.assertFalse(search.complete_event.is_set())
+
     def test_is_loaded(self, lib_mock):
         lib_mock.sp_search_is_loaded.return_value = 1
         sp_search = spotify.ffi.new('int *')

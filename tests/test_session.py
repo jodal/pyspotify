@@ -1076,6 +1076,64 @@ class SessionTest(unittest.TestCase):
             session._sp_session)
         self.assertEqual(result, 'SE')
 
+    @mock.patch('spotify.search.lib', spec=spotify.lib)
+    def test_search(self, search_lib_mock, lib_mock):
+        session = self.create_session(lib_mock)
+        sp_search = spotify.ffi.cast('sp_search *', spotify.ffi.new('int *'))
+        lib_mock.sp_search_create.return_value = sp_search
+
+        result = session.search('alice')
+
+        lib_mock.sp_search_create.assert_called_with(
+            session._sp_session, mock.ANY,
+            0, 20, 0, 20, 0, 20, 0, 20,
+            int(spotify.SearchType.STANDARD), mock.ANY, mock.ANY)
+        self.assertEqual(
+            spotify.ffi.string(lib_mock.sp_search_create.call_args[0][1]),
+            'alice')
+        self.assertEqual(search_lib_mock.sp_search_add_ref.call_count, 0)
+        self.assertIsInstance(result, spotify.SearchResult)
+
+        self.assertFalse(result.complete_event.is_set())
+        search_complete_cb = lib_mock.sp_search_create.call_args[0][11]
+        userdata = lib_mock.sp_search_create.call_args[0][12]
+        search_complete_cb(sp_search, userdata)
+        self.assertTrue(result.complete_event.wait(1))
+
+    @mock.patch('spotify.search.lib', spec=spotify.lib)
+    def test_search_with_callback(self, search_lib_mock, lib_mock):
+        session = self.create_session(lib_mock)
+        sp_search = spotify.ffi.cast('sp_search *', spotify.ffi.new('int *'))
+        lib_mock.sp_search_create.return_value = sp_search
+        callback = mock.Mock()
+
+        result = session.search('alice', callback=callback)
+
+        search_complete_cb = lib_mock.sp_search_create.call_args[0][11]
+        userdata = lib_mock.sp_search_create.call_args[0][12]
+        search_complete_cb(sp_search, userdata)
+
+        callback.assert_called_with(result)
+
+    @mock.patch('spotify.search.lib', spec=spotify.lib)
+    def test_search_where_result_is_gone_before_callback_is_called(
+            self, search_lib_mock, lib_mock):
+        session = self.create_session(lib_mock)
+        sp_search = spotify.ffi.cast('sp_search *', spotify.ffi.new('int *'))
+        lib_mock.sp_search_create.return_value = sp_search
+        callback = mock.Mock()
+
+        result = session.search('alice', callback=callback)
+        result = None  # noqa
+        gc.collect()  # Needed for PyPy
+
+        search_complete_cb = lib_mock.sp_search_create.call_args[0][11]
+        userdata = lib_mock.sp_search_create.call_args[0][12]
+        search_complete_cb(sp_search, userdata)
+
+        self.assertEqual(callback.call_count, 1)
+        self.assertEqual(callback.call_args[0][0]._sp_search, sp_search)
+
 
 @mock.patch('spotify.session.lib', spec=spotify.lib)
 class OfflineTest(unittest.TestCase):

@@ -180,6 +180,25 @@ class PlaylistTest(unittest.TestCase):
         self.assertRaises(
             spotify.Error, setattr, playlist, 'collaborative', False)
 
+    def test_set_autolink_tracks(self, lib_mock):
+        lib_mock.sp_playlist_set_autolink_tracks.return_value = int(
+            spotify.ErrorType.OK)
+        sp_playlist = spotify.ffi.new('int *')
+        playlist = spotify.Playlist(sp_playlist=sp_playlist)
+
+        playlist.set_autolink_tracks(True)
+
+        lib_mock.sp_playlist_set_autolink_tracks.assert_called_with(
+            sp_playlist, 1)
+
+    def test_set_autolink_tracks_fails_if_error(self, lib_mock):
+        lib_mock.sp_playlist_set_autolink_tracks.return_value = int(
+            spotify.ErrorType.BAD_API_VERSION)
+        sp_playlist = spotify.ffi.new('int *')
+        playlist = spotify.Playlist(sp_playlist=sp_playlist)
+
+        self.assertRaises(spotify.Error, playlist.set_autolink_tracks, True)
+
     @mock.patch('spotify.Link', spec=spotify.Link)
     def test_link_creates_link_to_playlist(self, link_mock, lib_mock):
         link_mock.return_value = mock.sentinel.link

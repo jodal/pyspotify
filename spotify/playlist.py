@@ -92,6 +92,12 @@ class Playlist(object):
     collaborative = property(is_collaborative, set_collaborative)
     """Whether the playlist can be modified by all users or not."""
 
+    def set_autolink_tracks(self, link=True):
+        """If a playlist is autolinked, unplayable tracks will be made playable
+        by linking them to other Spotify tracks, where possible."""
+        spotify.Error.maybe_raise(
+            lib.sp_playlist_set_autolink_tracks(self._sp_playlist, int(link)))
+
     # TODO Add sp_playlist_* methods
 
     @property

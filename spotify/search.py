@@ -43,7 +43,14 @@ class SearchResult(object):
         """
         return spotify.ErrorType(lib.sp_search_error(self._sp_search))
 
-    # TODO load()
+    def load(self, timeout=None):
+        """Block until the search's data is loaded.
+
+        :param timeout: seconds before giving up and raising an exception
+        :type timeout: float
+        :returns: self
+        """
+        return utils.load(self, timeout=timeout)
 
     @property
     def query(self):

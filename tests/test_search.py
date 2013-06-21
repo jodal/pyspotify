@@ -61,6 +61,15 @@ class SearchResultTest(unittest.TestCase):
         lib_mock.sp_search_error.assert_called_once_with(sp_search)
         self.assertIs(result, spotify.ErrorType.IS_LOADING)
 
+    @mock.patch('spotify.utils.load')
+    def test_load(self, load_mock, lib_mock):
+        sp_search = spotify.ffi.new('int *')
+        search = spotify.SearchResult(sp_search)
+
+        search.load(10)
+
+        load_mock.assert_called_with(search, timeout=10)
+
     @mock.patch('spotify.track.lib', spec=spotify.lib)
     def test_tracks(self, track_lib_mock, lib_mock):
         lib_mock.sp_search_error.return_value = spotify.ErrorType.OK

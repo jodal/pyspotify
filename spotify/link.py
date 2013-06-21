@@ -107,14 +107,23 @@ class Link(object):
         if sp_artist:
             return spotify.Artist(sp_artist=sp_artist)
 
+    def as_playlist(self):
+        """Make a :class:`Playlist` from the link."""
+        if self.type is not LinkType.PLAYLIST:
+            return None
+        sp_playlist = lib.sp_playlist_create(
+            spotify.session_instance._sp_session, self._sp_link)
+        if sp_playlist:
+            return spotify.Playlist(sp_playlist=sp_playlist, add_ref=False)
+
     def as_user(self):
-        """Make a :class:`User` from the link."""
+        """Make an :class:`User` from the link."""
         sp_user = lib.sp_link_as_user(self._sp_link)
         if sp_user:
             return spotify.User(sp_user=sp_user)
 
     def as_image(self):
-        """Make a :class:`Image` from the link."""
+        """Make an :class:`Image` from the link."""
         if self.type is not LinkType.IMAGE:
             return None
         sp_image = lib.sp_image_create_from_link(

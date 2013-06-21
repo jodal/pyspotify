@@ -319,6 +319,37 @@ class LinkTest(unittest.TestCase):
 
         lib_mock.sp_link_as_artist.assert_called_once_with(sp_link)
 
+    @mock.patch('spotify.playlist.lib', spec=spotify.lib)
+    def test_as_playlist(self, playlist_lib_mock, lib_mock):
+        session = self.create_session(lib_mock)
+        sp_link = spotify.ffi.new('int *')
+        lib_mock.sp_link_create_from_string.return_value = sp_link
+        lib_mock.sp_link_type.return_value = spotify.LinkType.PLAYLIST
+        sp_playlist = spotify.ffi.new('int *')
+        lib_mock.sp_playlist_create.return_value = sp_playlist
+
+        link = spotify.Link('spotify:playlist:foo')
+        self.assertEqual(link.as_playlist()._sp_playlist, sp_playlist)
+
+        lib_mock.sp_playlist_create.assert_called_once_with(
+            session._sp_session, sp_link)
+
+        # Since we *created* the sp_playlist, we already have a refcount of 1
+        # and shouldn't increase the refcount when wrapping this sp_playlist in
+        # an Playlist object
+        self.assertEqual(playlist_lib_mock.sp_playlist_add_ref.call_count, 0)
+
+    @mock.patch('spotify.playlist.lib', spec=spotify.lib)
+    def test_as_playlist_if_not_a_playlist(self, playlist_lib_mock, lib_mock):
+        sp_link = spotify.ffi.new('int *')
+        lib_mock.sp_link_create_from_string.return_value = sp_link
+        lib_mock.sp_link_type.return_value = spotify.LinkType.ARTIST
+
+        link = spotify.Link('spotify:playlist:foo')
+        self.assertIsNone(link.as_playlist())
+
+        self.assertEqual(lib_mock.sp_playlist_create.call_count, 0)
+
     @mock.patch('spotify.user.lib', spec=spotify.lib)
     def test_as_user(self, user_lib_mock, lib_mock):
         sp_link = spotify.ffi.new('int *')

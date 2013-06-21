@@ -1125,6 +1125,7 @@ class SessionTest(unittest.TestCase):
         callback = mock.Mock()
 
         result = session.search('alice', callback=callback)
+        complete_event = result.complete_event
         result = None  # noqa
         gc.collect()  # Needed for PyPy
 
@@ -1132,6 +1133,7 @@ class SessionTest(unittest.TestCase):
         userdata = lib_mock.sp_search_create.call_args[0][12]
         search_complete_cb(sp_search, userdata)
 
+        complete_event.wait(3)
         self.assertEqual(callback.call_count, 1)
         self.assertEqual(callback.call_args[0][0]._sp_search, sp_search)
 

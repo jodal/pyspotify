@@ -205,6 +205,10 @@ class SearchResult(object):
         """A :class:`Link` to the search."""
         return spotify.Link(self)
 
+    # TODO Add more(count=None) method to search for the next "page" of search
+    # results without having to manually manage the *_limit and *_count kwargs
+    # and check the *_total counts.
+
 
 class SearchResultPlaylist(collections.namedtuple(
         'SearchResultPlaylist', ['name', 'uri', 'image_uri'])):

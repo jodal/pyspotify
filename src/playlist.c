@@ -393,7 +393,7 @@ Playlist_add_tracks_moved_callback(PyObject *self, PyObject *args)
 }
 
 void
-playlist_renamed_callback(sp_playlist *playlist, void *data)
+playlist_simple_callback(sp_playlist *playlist, void *data)
 {
     Callback *trampoline = (Callback *)data;
 
@@ -416,36 +416,15 @@ static PyObject *
 Playlist_add_playlist_renamed_callback(PyObject *self, PyObject *args)
 {
     sp_playlist_callbacks *callbacks = create_and_initialize_callbacks();
-    callbacks->playlist_renamed = &playlist_renamed_callback;
+    callbacks->playlist_renamed = &playlist_simple_callback;
     return Playlist_add_callback(self, args, callbacks);
-}
-
-void
-playlist_state_changed_callback(sp_playlist *playlist, void *data)
-{
-    /* TODO: indenditical with playlist_renamed_callback... */
-    Callback *trampoline = (Callback *)data;
-
-    PyObject *result, *self;
-    PyGILState_STATE gstate = PyGILState_Ensure();
-
-    self = Playlist_FromSpotify(playlist);
-    result = PyObject_CallFunction(trampoline->callback, "NO", self,
-                                   trampoline->userdata);
-
-    if (result != NULL)
-        Py_DECREF(result);
-    else
-        PyErr_WriteUnraisable(trampoline->callback);
-
-    PyGILState_Release(gstate);
 }
 
 static PyObject *
 Playlist_add_playlist_state_changed_callback(PyObject *self, PyObject *args)
 {
     sp_playlist_callbacks *callbacks = create_and_initialize_callbacks();
-    callbacks->playlist_state_changed = &playlist_state_changed_callback;
+    callbacks->playlist_state_changed = &playlist_simple_callback;
     return Playlist_add_callback(self, args, callbacks);
 }
 
@@ -478,32 +457,11 @@ Playlist_add_playlist_update_in_progress_callback(PyObject *self, PyObject *args
     return Playlist_add_callback(self, args, callbacks);
 }
 
-void
-playlist_metadata_updated_callback(sp_playlist * playlist, void *data)
-{
-    /* TODO: indenditical with playlist_renamed_callback... */
-    Callback *trampoline = (Callback *)data;
-
-    PyObject *result, *self;
-    PyGILState_STATE gstate = PyGILState_Ensure();
-
-    self = Playlist_FromSpotify(playlist);
-    result = PyObject_CallFunction(trampoline->callback, "NO", self,
-                                   trampoline->userdata);
-
-    if (result != NULL)
-        Py_DECREF(result);
-    else
-        PyErr_WriteUnraisable(trampoline->callback);
-
-    PyGILState_Release(gstate);
-}
-
 static PyObject *
 Playlist_add_playlist_metadata_updated_callback(PyObject *self, PyObject *args)
 {
     sp_playlist_callbacks *callbacks = create_and_initialize_callbacks();
-    callbacks->playlist_metadata_updated = &playlist_metadata_updated_callback;
+    callbacks->playlist_metadata_updated = &playlist_simple_callback;
     return Playlist_add_callback((PyObject *)self, args, callbacks);
 }
 
@@ -628,32 +586,11 @@ Playlist_add_description_changed_callback(PyObject *self, PyObject *args)
     return Playlist_add_callback(self, args, callbacks);
 }
 
-void
-playlist_subscribers_changed_callback(sp_playlist *playlist, void *data)
-{
-    /* TODO: indenditical with playlist_renamed_callback... */
-    Callback *trampoline = (Callback *)data;
-
-    PyObject *result, *self;
-    PyGILState_STATE gstate = PyGILState_Ensure();
-
-    self = Playlist_FromSpotify(playlist);
-    result = PyObject_CallFunction(trampoline->callback, "NO", self,
-                                   trampoline->userdata);
-
-    if (result != NULL)
-        Py_DECREF(result);
-    else
-        PyErr_WriteUnraisable(trampoline->callback);
-
-    PyGILState_Release(gstate);
-}
-
 static PyObject *
 Playlist_add_subscribers_changed_callback(PyObject *self, PyObject *args)
 {
     sp_playlist_callbacks *callbacks = create_and_initialize_callbacks();
-    callbacks->subscribers_changed = &playlist_subscribers_changed_callback;
+    callbacks->subscribers_changed = &playlist_simple_callback;
     return Playlist_add_callback(self, args, callbacks);
 }
 

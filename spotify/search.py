@@ -50,6 +50,8 @@ class SearchResult(object):
         :type timeout: float
         :returns: self
         """
+        # TODO Replace with self.complete_event.wait(timeout) when we have a
+        # thread that takes care of all ``process_events()`` calls for us.
         return utils.load(self, timeout=timeout)
 
     @property

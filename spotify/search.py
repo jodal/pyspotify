@@ -82,6 +82,8 @@ class SearchResult(object):
 
         Will always return :class:`None` if the search isn't loaded.
         """
+        # TODO Replace with collections.Sequence subclass
+        # TODO Return empty list if not loaded
         spotify.Error.maybe_raise(self.error)
         if not self.is_loaded:
             return None
@@ -109,6 +111,8 @@ class SearchResult(object):
 
         Will always return :class:`None` if the search isn't loaded.
         """
+        # TODO Replace with collections.Sequence subclass
+        # TODO Return empty list if not loaded
         spotify.Error.maybe_raise(self.error)
         if not self.is_loaded:
             return None
@@ -136,6 +140,8 @@ class SearchResult(object):
 
         Will always return :class:`None` if the search isn't loaded.
         """
+        # TODO Replace with collections.Sequence subclass
+        # TODO Return empty list if not loaded
         spotify.Error.maybe_raise(self.error)
         if not self.is_loaded:
             return None
@@ -165,6 +171,8 @@ class SearchResult(object):
 
         Will always return :class:`None` if the search isn't loaded.
         """
+        # TODO Replace with collections.Sequence subclass
+        # TODO Return empty list if not loaded
         spotify.Error.maybe_raise(self.error)
         if not self.is_loaded:
             return None

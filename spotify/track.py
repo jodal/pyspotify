@@ -129,6 +129,8 @@ class Track(object):
 
         To convert to the real object::
 
+            >>> track = spotify.Track('spotify:track:2Foc5Q5nqNiosCNqttzHof')
+            >>> track.load()
             >>> track.is_placeholder
             True
             >>> track.link.type

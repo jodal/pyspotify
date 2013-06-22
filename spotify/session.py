@@ -1010,7 +1010,9 @@ def _search_complete_callback(sp_search, userdata):
     key = ffi.string(ffi.cast('char[32]', userdata))
     value = spotify.callback_dict.pop(key, None)
     if value is None:
-        logger.warning('search_complete_callback key missing in callback_dict')
+        logger.warning(
+            'search_complete_callback key %r not in callback_dict: %r',
+            key, spotify.callback_dict.keys())
         return
     (callback, search_result) = value
     search_result.complete_event.set()

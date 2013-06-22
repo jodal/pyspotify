@@ -95,6 +95,9 @@ class Playlist(object):
     def set_autolink_tracks(self, link=True):
         """If a playlist is autolinked, unplayable tracks will be made playable
         by linking them to other Spotify tracks, where possible."""
+        # TODO Add a global default setting for if playlists just be autolinked
+        # or not. pyspotify 1.x defaults to always autolinking, and doesn't
+        # give the user any choice.
         spotify.Error.maybe_raise(
             lib.sp_playlist_set_autolink_tracks(self._sp_playlist, int(link)))
 

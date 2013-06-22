@@ -21,28 +21,23 @@ class UserTest(unittest.TestCase):
 
     @mock.patch('spotify.Link', spec=spotify.Link)
     def test_create_from_uri(self, link_mock, lib_mock):
-        self.create_session(lib_mock)
-        sp_link = spotify.ffi.new('int *')
-        link_instance_mock = link_mock.return_value
-        link_instance_mock._sp_link = sp_link
         sp_user = spotify.ffi.new('int *')
-        lib_mock.sp_link_as_user.return_value = sp_user
+        link_instance_mock = link_mock.return_value
+        link_instance_mock.as_user.return_value = spotify.User(
+            sp_user=sp_user)
         uri = 'spotify:user:foo'
 
         result = spotify.User(uri)
 
         link_mock.assert_called_with(uri)
-        lib_mock.sp_link_as_user.assert_called_with(sp_link)
+        link_instance_mock.as_user.assert_called_with()
         lib_mock.sp_user_add_ref.assert_called_with(sp_user)
         self.assertEqual(result._sp_user, sp_user)
 
     @mock.patch('spotify.Link', spec=spotify.Link)
     def test_create_from_uri_fail_raises_error(self, link_mock, lib_mock):
-        self.create_session(lib_mock)
-        sp_link = spotify.ffi.new('int *')
         link_instance_mock = link_mock.return_value
-        link_instance_mock._sp_link = sp_link
-        lib_mock.sp_link_as_user.return_value = spotify.ffi.NULL
+        link_instance_mock.as_user.return_value = None
         uri = 'spotify:user:foo'
 
         self.assertRaises(ValueError, spotify.User, uri)

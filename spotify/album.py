@@ -24,11 +24,11 @@ class Album(object):
     def __init__(self, uri=None, sp_album=None):
         assert uri or sp_album, 'uri or sp_album is required'
         if uri is not None:
-            link = spotify.Link(uri)
-            sp_album = lib.sp_link_as_album(link._sp_link)
-            if sp_album is ffi.NULL:
+            album = spotify.Link(uri).as_album()
+            if album is None:
                 raise ValueError(
                     'Failed to get album from Spotify URI: %r' % uri)
+            sp_album = album._sp_album
         lib.sp_album_add_ref(sp_album)
         self._sp_album = ffi.gc(sp_album, lib.sp_album_release)
 

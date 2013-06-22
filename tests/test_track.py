@@ -40,28 +40,23 @@ class TrackTest(unittest.TestCase):
 
     @mock.patch('spotify.Link', spec=spotify.Link)
     def test_create_from_uri(self, link_mock, lib_mock):
-        self.create_session(lib_mock)
-        sp_link = spotify.ffi.new('int *')
-        link_instance_mock = link_mock.return_value
-        link_instance_mock._sp_link = sp_link
         sp_track = spotify.ffi.new('int *')
-        lib_mock.sp_link_as_track.return_value = sp_track
+        link_instance_mock = link_mock.return_value
+        link_instance_mock.as_track.return_value = spotify.Track(
+            sp_track=sp_track)
         uri = 'spotify:track:foo'
 
         result = spotify.Track(uri)
 
         link_mock.assert_called_with(uri)
-        lib_mock.sp_link_as_track.assert_called_with(sp_link)
+        link_instance_mock.as_track.assert_called_with()
         lib_mock.sp_track_add_ref.assert_called_with(sp_track)
         self.assertEqual(result._sp_track, sp_track)
 
     @mock.patch('spotify.Link', spec=spotify.Link)
     def test_create_from_uri_fail_raises_error(self, link_mock, lib_mock):
-        self.create_session(lib_mock)
-        sp_link = spotify.ffi.new('int *')
         link_instance_mock = link_mock.return_value
-        link_instance_mock._sp_link = sp_link
-        lib_mock.sp_link_as_track.return_value = spotify.ffi.NULL
+        link_instance_mock.as_track.return_value = None
         uri = 'spotify:track:foo'
 
         self.assertRaises(ValueError, spotify.Track, uri)

@@ -24,27 +24,24 @@ class ArtistTest(unittest.TestCase):
 
     @mock.patch('spotify.Link', spec=spotify.Link)
     def test_create_from_uri(self, link_mock, lib_mock):
-        self.create_session(lib_mock)
-        sp_link = spotify.ffi.new('int *')
-        link_instance_mock = link_mock.return_value
-        link_instance_mock._sp_link = sp_link
         sp_artist = spotify.ffi.new('int *')
+        link_instance_mock = link_mock.return_value
+        link_instance_mock.as_artist.return_value = spotify.Artist(
+            sp_artist=sp_artist)
         lib_mock.sp_link_as_artist.return_value = sp_artist
         uri = 'spotify:artist:foo'
 
         result = spotify.Artist(uri)
 
         link_mock.assert_called_with(uri)
-        lib_mock.sp_link_as_artist.assert_called_with(sp_link)
+        link_instance_mock.as_artist.assert_called_with()
         lib_mock.sp_artist_add_ref.assert_called_with(sp_artist)
         self.assertEqual(result._sp_artist, sp_artist)
 
     @mock.patch('spotify.Link', spec=spotify.Link)
     def test_create_from_uri_fail_raises_error(self, link_mock, lib_mock):
-        self.create_session(lib_mock)
-        sp_link = spotify.ffi.new('int *')
         link_instance_mock = link_mock.return_value
-        link_instance_mock._sp_link = sp_link
+        link_instance_mock.as_artist.return_value = None
         lib_mock.sp_link_as_artist.return_value = spotify.ffi.NULL
         uri = 'spotify:artist:foo'
 

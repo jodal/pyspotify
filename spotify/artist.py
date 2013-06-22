@@ -23,11 +23,11 @@ class Artist(object):
     def __init__(self, uri=None, sp_artist=None):
         assert uri or sp_artist, 'uri or sp_artist is required'
         if uri is not None:
-            link = spotify.Link(uri)
-            sp_artist = lib.sp_link_as_artist(link._sp_link)
-            if sp_artist is ffi.NULL:
+            artist = spotify.Link(uri).as_artist()
+            if artist is None:
                 raise ValueError(
                     'Failed to get artist from Spotify URI: %r' % uri)
+            sp_artist = artist._sp_artist
         lib.sp_artist_add_ref(sp_artist)
         self._sp_artist = ffi.gc(sp_artist, lib.sp_artist_release)
 

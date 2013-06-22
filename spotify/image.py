@@ -28,13 +28,12 @@ class Image(object):
     def __init__(self, uri=None, sp_image=None, add_ref=True):
         assert uri or sp_image, 'uri or sp_image is required'
         if uri is not None:
-            link = spotify.Link(uri)
-            sp_image = lib.sp_image_create_from_link(
-                spotify.session_instance._sp_session, link._sp_link)
-            add_ref = False
-            if sp_image is ffi.NULL:
+            image = spotify.Link(uri).as_image()
+            if image is None:
                 raise ValueError(
                     'Failed to get image from Spotify URI: %r' % uri)
+            sp_image = image._sp_image
+            add_ref = True
         if add_ref:
             lib.sp_image_add_ref(sp_image)
         self._sp_image = ffi.gc(sp_image, lib.sp_image_release)

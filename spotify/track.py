@@ -26,11 +26,12 @@ class Track(object):
     def __init__(self, uri=None, sp_track=None, add_ref=True):
         assert uri or sp_track, 'uri or sp_track is required'
         if uri is not None:
-            link = spotify.Link(uri)
-            sp_track = lib.sp_link_as_track(link._sp_link)
-            if sp_track is ffi.NULL:
+            track = spotify.Link(uri).as_track()
+            if track is None:
                 raise ValueError(
                     'Failed to get track from Spotify URI: %r' % uri)
+            sp_track = track._sp_track
+            add_ref = True
         if add_ref:
             lib.sp_track_add_ref(sp_track)
         self._sp_track = ffi.gc(sp_track, lib.sp_track_release)

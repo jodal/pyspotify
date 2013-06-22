@@ -27,13 +27,12 @@ class Playlist(object):
     def __init__(self, uri=None, sp_playlist=None, add_ref=True):
         assert uri or sp_playlist, 'uri or sp_playlist is required'
         if uri is not None:
-            link = spotify.Link(uri)
-            sp_playlist = lib.sp_playlist_create(
-                spotify.session_instance._sp_session, link._sp_link)
-            if sp_playlist is ffi.NULL:
+            playlist = spotify.Link(uri).as_playlist()
+            if playlist is None:
                 raise ValueError(
                     'Failed to get playlist from Spotify URI: %r' % uri)
-            add_ref = False
+            sp_playlist = playlist._sp_playlist
+            add_ref = True
         if add_ref:
             lib.sp_playlist_add_ref(sp_playlist)
         self._sp_playlist = ffi.gc(sp_playlist, lib.sp_playlist_release)

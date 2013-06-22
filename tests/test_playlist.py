@@ -24,29 +24,23 @@ class PlaylistTest(unittest.TestCase):
 
     @mock.patch('spotify.Link', spec=spotify.Link)
     def test_create_from_uri(self, link_mock, lib_mock):
-        session = self.create_session(lib_mock)
-        sp_link = spotify.ffi.new('int *')
-        link_instance_mock = link_mock.return_value
-        link_instance_mock._sp_link = sp_link
         sp_playlist = spotify.ffi.new('int *')
-        lib_mock.sp_playlist_create.return_value = sp_playlist
+        link_instance_mock = link_mock.return_value
+        link_instance_mock.as_playlist.return_value = spotify.Playlist(
+            sp_playlist=sp_playlist)
         uri = 'spotify:playlist:foo'
 
         result = spotify.Playlist(uri)
 
         link_mock.assert_called_with(uri)
-        lib_mock.sp_playlist_create.assert_called_with(
-            session._sp_session, sp_link)
-        self.assertEqual(lib_mock.sp_playlist_add_ref.call_count, 0)
+        link_instance_mock.as_playlist.assert_called_with()
+        lib_mock.sp_playlist_add_ref.assert_called_with(sp_playlist)
         self.assertEqual(result._sp_playlist, sp_playlist)
 
     @mock.patch('spotify.Link', spec=spotify.Link)
     def test_create_from_uri_fail_raises_error(self, link_mock, lib_mock):
-        self.create_session(lib_mock)
-        sp_link = spotify.ffi.new('int *')
         link_instance_mock = link_mock.return_value
-        link_instance_mock._sp_link = sp_link
-        lib_mock.sp_playlist_create.return_value = spotify.ffi.NULL
+        link_instance_mock.as_playlist.return_value = None
         uri = 'spotify:playlist:foo'
 
         self.assertRaises(ValueError, spotify.Playlist, uri)

@@ -1001,12 +1001,14 @@ class Session(object):
 
 @ffi.callback('void(sp_search *, void *)')
 def _search_complete_callback(sp_search, userdata):
-    logger.debug('Search complete')
+    logger.debug('search_complete_callback called')
     if userdata is ffi.NULL:
+        logger.warning('search_complete_callback called without userdata')
         return
     key = ffi.string(ffi.cast('char[32]', userdata))
     value = spotify.callback_dict.pop(key, None)
     if value is None:
+        logger.warning('search_complete_callback key missing in callback_dict')
         return
     (callback, search_result) = value
     search_result.complete_event.set()

@@ -986,6 +986,8 @@ class Session(object):
         assert key not in spotify.callback_dict
         userdata = ffi.new('char[32]', key)
 
+        # TODO Move the following into SearchResult.__init__ to avoid a race
+        # condition between the callback and our assignment to callback_dict
         sp_search = lib.sp_search_create(
             self._sp_session, query,
             track_offset, track_count,

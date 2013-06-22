@@ -982,7 +982,7 @@ class Session(object):
         if search_type is None:
             search_type = spotify.SearchType.STANDARD
         query = ffi.new('char[]', utils.to_bytes(query))
-        key = uuid.uuid4().hex
+        key = utils.to_bytes(uuid.uuid4().hex)
         userdata = ffi.new('char[32]', key)
 
         sp_search = lib.sp_search_create(

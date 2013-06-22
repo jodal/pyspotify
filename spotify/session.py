@@ -982,8 +982,8 @@ class Session(object):
         if search_type is None:
             search_type = spotify.SearchType.STANDARD
         query = ffi.new('char[]', utils.to_bytes(query))
-        key = uuid.uuid4().bytes
-        userdata = ffi.new('char[16]', key)
+        key = uuid.uuid4().hex
+        userdata = ffi.new('char[32]', key)
 
         sp_search = lib.sp_search_create(
             self._sp_session, query,
@@ -1003,7 +1003,7 @@ def _search_complete_callback(sp_search, userdata):
     logger.debug('Search complete')
     if userdata is ffi.NULL:
         return
-    key = ffi.string(ffi.cast('char[16]', userdata))
+    key = ffi.string(ffi.cast('char[32]', userdata))
     value = spotify.callback_dict.pop(key, None)
     if value is None:
         return

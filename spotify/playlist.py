@@ -118,13 +118,13 @@ class Playlist(object):
         Will always return :class:`None` if the playlist isn't loaded or the
         playlist has no image.
         """
-        cover_id = ffi.new('char[20]')
+        image_id = ffi.new('char[20]')
         has_image = bool(
-            lib.sp_playlist_get_image(self._sp_playlist, cover_id))
+            lib.sp_playlist_get_image(self._sp_playlist, image_id))
         if not has_image:
             return None
         sp_image = lib.sp_image_create(
-            spotify.session_instance._sp_session, cover_id)
+            spotify.session_instance._sp_session, image_id)
         return spotify.Image(sp_image=sp_image, add_ref=False)
 
     # TODO Add sp_playlist_* methods

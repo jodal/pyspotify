@@ -5,6 +5,7 @@ import mock
 import unittest
 
 import spotify
+from spotify import utils
 
 
 @mock.patch('spotify.image.lib', spec=spotify.lib)
@@ -61,6 +62,70 @@ class ImageTest(unittest.TestCase):
         gc.collect()  # Needed for PyPy
 
         lib_mock.sp_image_release.assert_called_with(sp_image)
+
+    def test_load_event_is_unset_by_default(self, lib_mock):
+        sp_image = spotify.ffi.new('int *')
+        image = spotify.Image(sp_image=sp_image)
+
+        self.assertFalse(image.load_event.is_set())
+
+    def test_add_and_call_and_remove_load_callback(self, lib_mock):
+        lib_mock.sp_image_add_load_callback.return_value = int(
+            spotify.ErrorType.OK)
+        lib_mock.sp_image_remove_load_callback.return_value = int(
+            spotify.ErrorType.OK)
+        sp_image = spotify.ffi.cast('sp_image *', spotify.ffi.new('int *'))
+        image = spotify.Image(sp_image=sp_image)
+        callback = mock.Mock()
+
+        # Add
+        callback_id = image.add_load_callback(callback)
+        lib_mock.sp_image_add_load_callback.assert_called_with(
+            sp_image, mock.ANY, mock.ANY)
+        self.assertIsInstance(callback_id, utils.string_types)
+
+        # Call
+        self.assertEqual(callback.call_count, 0)
+        image_load_cb = lib_mock.sp_image_add_load_callback.call_args[0][1]
+        userdata = lib_mock.sp_image_add_load_callback.call_args[0][2]
+        image_load_cb(sp_image, userdata)
+        self.assertEqual(callback.call_count, 1)
+
+        # Remove
+        image.remove_load_callback(callback_id)
+        lib_mock.sp_image_remove_load_callback.assert_called_with(
+            sp_image, image_load_cb, mock.ANY)
+        self.assertEqual(
+            spotify.ffi.string(spotify.ffi.cast(
+                'char[32]',
+                lib_mock.sp_image_remove_load_callback.call_args[0][2])),
+            callback_id)
+
+    def test_add_load_callback_fails_if_error(self, lib_mock):
+        lib_mock.sp_image_add_load_callback.return_value = int(
+            spotify.ErrorType.BAD_API_VERSION)
+        sp_image = spotify.ffi.new('int *')
+        image = spotify.Image(sp_image=sp_image)
+
+        self.assertRaises(spotify.Error, image.add_load_callback, None)
+
+    def test_remove_load_callback_fails_if_error(self, lib_mock):
+        lib_mock.sp_image_add_load_callback.return_value = int(
+            spotify.ErrorType.OK)
+        lib_mock.sp_image_remove_load_callback.return_value = int(
+            spotify.ErrorType.BAD_API_VERSION)
+        sp_image = spotify.ffi.new('int *')
+        image = spotify.Image(sp_image=sp_image)
+        callback_id = image.add_load_callback(None)
+
+        self.assertRaises(
+            spotify.Error, image.remove_load_callback, callback_id)
+
+    def test_remove_load_callback_fails_if_unknown_callback(self, lib_mock):
+        sp_image = spotify.ffi.new('int *')
+        image = spotify.Image(sp_image=sp_image)
+
+        self.assertRaises(ValueError, image.remove_load_callback, b'foo')
 
     def test_is_loaded(self, lib_mock):
         lib_mock.sp_image_is_loaded.return_value = 1

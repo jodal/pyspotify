@@ -348,10 +348,43 @@ Session_flush_caches(PyObject *self)
     Py_RETURN_NONE;
 }
 
+/* Caller is responsible for free-ing memory with PyMem_Free */
+static bool
+encoded_string_converter(PyObject *o, void *address) {
+    char **target = (char **)address;
+    char *buffer;
+    Py_ssize_t length;
+
+    if (o == NULL || o == Py_None) {
+        return 1;
+    }
+
+    if (PyUnicode_Check(o))
+        o = PyUnicode_AsEncodedString(o, ENCODING, "strict");
+    else
+        Py_INCREF(o);
+
+    if (PyString_AsStringAndSize(o, &buffer, &length) == -1) {
+        Py_DECREF(o);
+        return 0;
+    }
+
+    *target = PyMem_Malloc(length+1);
+    if (target == NULL) {
+        PyErr_NoMemory();
+        Py_DECREF(o);
+        return 0;
+    }
+
+    strcpy(*target, buffer);
+    Py_DECREF(o);
+    return 1;
+}
+
 static PyObject *
 Session_login(PyObject *self, PyObject *args, PyObject *kwds)
 {
-    char *username, *password = NULL, *blob = NULL;
+    char *username = NULL, *password = NULL, *blob = NULL;
     int remember_me = 1;
 
     sp_error error;
@@ -359,16 +392,16 @@ Session_login(PyObject *self, PyObject *args, PyObject *kwds)
     static char *kwlist[] = {"username", "password", "remember_me", "blob",
                              NULL};
 
-    /* TODO: free username and password memory? */
-    /* TODO: Don't encode password (and username)? */
-    if (!PyArg_ParseTupleAndKeywords(args, kwds, "es|esiz", kwlist,
-                                     ENCODING, &username, ENCODING, &password,
+    if (!PyArg_ParseTupleAndKeywords(args, kwds, "O&|O&iz", kwlist,
+                                     &encoded_string_converter, (void *)&username,
+                                     &encoded_string_converter, (void *)&password,
                                      &remember_me, &blob))
         return NULL;
 
-    if ((!password) && (!blob)) {
+    if (password == NULL && blob == NULL) {
         PyErr_SetString(SpotifyError, "one of the password or login blob " \
                         "is required to login");
+        PyMem_Free(username);
         return NULL;
     }
 
@@ -378,6 +411,9 @@ Session_login(PyObject *self, PyObject *args, PyObject *kwds)
     error = sp_session_login(Session_SP_SESSION(self), username, password,
                              remember_me, blob);
     Py_END_ALLOW_THREADS;
+
+    PyMem_Free(username);
+    if (password != NULL) PyMem_Free(password);
 
     return none_or_raise_error(error);
 }

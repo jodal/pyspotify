@@ -53,7 +53,7 @@ AlbumBrowser_new(PyTypeObject *type, PyObject *args, PyObject *kwds)
                                      &album, &callback, &userdata))
         return NULL;
 
-    if (callback)
+    if (callback != NULL)
         trampoline = create_trampoline(callback, userdata);
 
     /* TODO: audit that we cleanup with _release */

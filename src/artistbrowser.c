@@ -42,41 +42,53 @@ ArtistBrowser_browse_complete(sp_artistbrowse *browser, void *data)
     PyGILState_Release(gstate);
 }
 
+static bool
+sp_artistbrowse_type_converter(PyObject *o, void *address) {
+    sp_artistbrowse_type *type = (sp_artistbrowse_type *)address;
+
+    if (o == NULL || o == Py_None)
+        return 1;
+
+    if (!PyString_Check(o))
+        goto error;
+
+    char *tmp = PyString_AsString(o);
+    if (strcmp(tmp, "full") == 0)
+        *type = SP_ARTISTBROWSE_FULL;
+    else if (strcmp(tmp, "no_tracks") == 0)
+        *type = SP_ARTISTBROWSE_NO_TRACKS;
+    else if (strcmp(tmp, "no_albums") == 0)
+        *type = SP_ARTISTBROWSE_NO_ALBUMS;
+    else
+        goto error;
+
+    return 1;
+
+error:
+    PyErr_Format(PyExc_ValueError, "Unknown artist browser type: %s",
+                 PyString_AsString(PyObject_Repr(o)));
+    return 0;
+}
+
 static PyObject *
 ArtistBrowser_new(PyTypeObject *type, PyObject *args, PyObject *kwds)
 {
     PyObject *artist, *self, *callback = NULL, *userdata = NULL;
     Callback *trampoline = NULL;
 
-    char *tmp = NULL;
     sp_artistbrowse *browser;
     sp_artistbrowse_type browse_type = SP_ARTISTBROWSE_FULL;
 
     static char *kwlist[] = {"artist", "type", "callback", "userdata", NULL};
 
-    if (!PyArg_ParseTupleAndKeywords (args, kwds, "O!|sOO", kwlist,
-                                      &ArtistType, &artist, &tmp,
-                                      &callback, &userdata))
+    if (!PyArg_ParseTupleAndKeywords (args, kwds, "O!|O&OO", kwlist,
+                                      &ArtistType, &artist,
+                                      &sp_artistbrowse_type_converter,
+                                      (void *)&browse_type, &callback,
+                                      &userdata))
         return NULL;
 
-    /* TODO: create type string constants. */
-    /* TODO: extract to helper */
-    if (tmp != NULL) {
-        if (strcmp(tmp, "full") == 0) {
-        }
-        else if (strcmp(tmp, "no_tracks") == 0) {
-            browse_type = SP_ARTISTBROWSE_NO_TRACKS;
-        }
-        else if (strcmp(tmp, "no_albums") == 0) {
-            browse_type = SP_ARTISTBROWSE_NO_ALBUMS;
-        }
-        else {
-            PyErr_SetString(PyExc_ValueError, "Unknown artist browser type.");
-            return NULL;
-        }
-    }
-
-    if (callback)
+    if (callback != NULL)
         trampoline = create_trampoline(callback, userdata);
 
     /* TODO: audit that we cleanup with _release */

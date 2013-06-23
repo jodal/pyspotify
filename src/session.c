@@ -207,13 +207,39 @@ Session_search_complete(sp_search *search, void *data)
     PyGILState_Release(gstate);
 }
 
+static bool
+sp_search_type_converter(PyObject *o, void *address) {
+    sp_search_type *type = (sp_search_type *)address;
+
+    if (o == NULL || o == Py_None)
+        return 1;
+
+    if (!PyString_Check(o))
+        goto error;
+
+    char *tmp = PyString_AsString(o);
+    if (strcmp(tmp, "standard") == 0)
+        *type = SP_SEARCH_STANDARD;
+    else if (strcmp(tmp, "suggest") == 0)
+        *type = SP_SEARCH_SUGGEST;
+    else
+        goto error;
+
+    return 1;
+
+error:
+    PyErr_Format(PyExc_ValueError, "Unknown search type: %s",
+                 PyString_AsString(PyObject_Repr(o)));
+    return 0;
+}
+
 static PyObject *
 Session_search(PyObject *self, PyObject *args, PyObject *kwds)
 {
     PyObject *callback, *userdata = NULL;
     Callback *trampoline;
 
-    char *query, *tmp = NULL;
+    char *query;
     sp_search *search;
     sp_search_type search_type = SP_SEARCH_STANDARD;
 
@@ -227,28 +253,15 @@ Session_search(PyObject *self, PyObject *args, PyObject *kwds)
         "playlist_count", "search_type", "userdata", NULL };
 
     /* TODO: free query memory? */
-    if (!PyArg_ParseTupleAndKeywords(args, kwds, "esO|iiiiiiiisO", kwlist,
+    if (!PyArg_ParseTupleAndKeywords(args, kwds, "esO|iiiiiiiiO&O", kwlist,
                                      ENCODING, &query, &callback,
                                      &track_offset, &track_count,
                                      &album_offset, &album_count,
                                      &artist_offset, &artist_count,
                                      &playlist_offset, &playlist_count,
-                                     &tmp, &userdata))
+                                     &sp_search_type_converter,
+                                     (void *)&search_type, &userdata))
         return NULL;
-
-    /* TODO: create type string constants. */
-    /* TODO: extract to helper */
-    if (tmp) {
-        if (strcmp(tmp, "standard") == 0) {
-        }
-        else if (strcmp(tmp, "suggest") == 0) {
-            search_type = SP_SEARCH_SUGGEST;
-        }
-        else {
-            PyErr_Format(SpotifyError, "Unknown search type: %s", tmp);
-            return NULL;
-        }
-    }
 
     trampoline = create_trampoline(callback, userdata);
 

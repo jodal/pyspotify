@@ -3,6 +3,11 @@ typedef struct {
     sp_toplistbrowse *_toplistbrowse;
 } ToplistBrowser;
 
+typedef struct {
+    sp_toplistregion type;
+    char *username;
+} toplistregion;
+
 #define ToplistBrowser_SP_TOPLISTBROWSE(o) ((ToplistBrowser *)o)->_toplistbrowse
 
 extern PyTypeObject ToplistBrowserType;

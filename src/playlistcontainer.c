@@ -298,16 +298,18 @@ PlaylistContainer_add_new_playlist(PyObject *self, PyObject *args)
         PyErr_SetString(SpotifyError, "PlaylistContainer not loaded");
         return NULL;
     }
-    /* TODO: free name memory? */
     if (!PyArg_ParseTuple(args, "es#", ENCODING, &name, &len))
         return NULL;
 
     if (len > 255) {
         PyErr_SetString(PyExc_ValueError,
                         "Playlist name must be < 255 characters long");
+        PyMem_Free(name);
         return NULL;
     }
     playlist = sp_playlistcontainer_add_new_playlist(container, name);
+    PyMem_Free(name);
+
     /* TODO: not sure if the playlist is a borrowed ref in this case */
     return Playlist_FromSpotify(playlist);
 }

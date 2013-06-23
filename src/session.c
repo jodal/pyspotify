@@ -252,7 +252,6 @@ Session_search(PyObject *self, PyObject *args, PyObject *kwds)
         "album_count", "artist_offset", "artist_count", "playlist_offset",
         "playlist_count", "search_type", "userdata", NULL };
 
-    /* TODO: free query memory? */
     if (!PyArg_ParseTupleAndKeywords(args, kwds, "esO|iiiiiiiiO&O", kwlist,
                                      ENCODING, &query, &callback,
                                      &track_offset, &track_count,
@@ -273,6 +272,7 @@ Session_search(PyObject *self, PyObject *args, PyObject *kwds)
                               playlist_count, search_type,
                               Session_search_complete, (void *)trampoline);
     Py_END_ALLOW_THREADS;
+    PyMem_Free(query);
 
     /* TODO: this leaks a ref */
     return Results_FromSpotify(search);

@@ -650,16 +650,17 @@ Playlist_rename(PyObject *self, PyObject *args)
     int len;
     sp_error error;
 
-    /* TODO: free name memory? */
     if (!PyArg_ParseTuple(args, "es#", ENCODING, &name, &len))
         return NULL;
 
     if (len > 255) {
         PyErr_SetString(PyExc_ValueError, "Name too long (255ch max).");
+        PyMem_Free(name);
         return NULL;
     }
 
     error = sp_playlist_rename(Playlist_SP_PLAYLIST(self), (const char *)name);
+    PyMem_Free(name);
     return none_or_raise_error(error);
 }
 

@@ -82,7 +82,7 @@ class ImageTest(unittest.TestCase):
         callback_id = image.add_load_callback(callback)
         lib_mock.sp_image_add_load_callback.assert_called_with(
             sp_image, mock.ANY, mock.ANY)
-        self.assertIsInstance(callback_id, utils.string_types)
+        self.assertIsInstance(callback_id, utils.binary_type)
 
         # Call
         self.assertEqual(callback.call_count, 0)

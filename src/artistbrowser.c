@@ -92,7 +92,6 @@ ArtistBrowser_new(PyTypeObject *type, PyObject *args, PyObject *kwds)
     if (callback != NULL)
         trampoline = create_trampoline(callback, userdata);
 
-    /* TODO: audit that we cleanup with _release */
     browser = sp_artistbrowse_create(g_session, Artist_SP_ARTIST(artist),
                                      browse_type,
                                      ArtistBrowser_browse_complete,
@@ -105,7 +104,7 @@ static void
 ArtistBrowser_dealloc(PyObject *self)
 {
     sp_artistbrowse_release(ArtistBrowser_SP_ARTISTBROWSE(self));
-    ArtistBrowserType.tp_free(self);
+    self->ob_type->tp_free(self);
 }
 
 static PyObject *

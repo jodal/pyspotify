@@ -57,7 +57,6 @@ AlbumBrowser_new(PyTypeObject *type, PyObject *args, PyObject *kwds)
     if (callback != NULL)
         trampoline = create_trampoline(callback, userdata);
 
-    /* TODO: audit that we cleanup with _release */
     sp_albumbrowse *browser = sp_albumbrowse_create(
         g_session, Album_SP_ALBUM(album), AlbumBrowser_browse_complete,
         (void*)trampoline);
@@ -68,7 +67,7 @@ static void
 AlbumBrowser_dealloc(PyObject *self)
 {
     sp_albumbrowse_release(AlbumBrowser_SP_ALBUMBROWSE(self));
-    AlbumBrowserType.tp_free(self);
+    self->ob_type->tp_free(self);
 }
 
 static PyObject *

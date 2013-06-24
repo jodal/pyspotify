@@ -180,7 +180,6 @@ Link_as_playlist(PyObject *self)
         return NULL;
     }
 
-    /* TODO: audit that we cleanup with _release */
     sp_playlist *playlist = sp_playlist_create(g_session, Link_SP_LINK(self));
     if (playlist == NULL) {
         PyErr_SetString(SpotifyError, "Not a playlist link");

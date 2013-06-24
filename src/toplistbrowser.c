@@ -130,7 +130,6 @@ ToplistBrowser_new(PyTypeObject *type, PyObject *args, PyObject *kwds)
         trampoline = create_trampoline(callback, userdata);
 
     Py_BEGIN_ALLOW_THREADS
-    /* TODO: audit that we cleanup with _release */
     browser = sp_toplistbrowse_create(g_session, browse_type, region.type,
                                       region.username,
                                       ToplistBrowser_browse_complete,

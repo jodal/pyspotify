@@ -266,7 +266,6 @@ Session_search(PyObject *self, PyObject *args, PyObject *kwds)
     trampoline = create_trampoline(callback, userdata);
 
     Py_BEGIN_ALLOW_THREADS;
-    /* TODO: audit that we cleanup with _release */
     search = sp_search_create(Session_SP_SESSION(self), query, track_offset,
                               track_count, album_offset, album_count,
                               artist_offset, artist_count, playlist_offset,
@@ -306,7 +305,6 @@ Session_image_create(PyObject *self, PyObject *args)
         return NULL;
     }
 
-    /* TODO: audit that we cleanup with _release */
     image = sp_image_create(Session_SP_SESSION(self), image_id);
     return Image_FromSpotify(image, 0 /* add_ref */);
 }
@@ -329,7 +327,6 @@ Session_starred(PyObject *self)
     sp_playlist *playlist;
 
     Py_BEGIN_ALLOW_THREADS;
-    /* TODO: audit that we cleanup with _release */
     playlist  = sp_session_starred_create(Session_SP_SESSION(self));
     Py_END_ALLOW_THREADS;
 
@@ -867,7 +864,7 @@ create_session(PyObject *client, PyObject *settings)
     }
 
     debug_printf("creating session...");
-    /* TODO: audit that we cleanup with _release */
+    /* TODO: Figure out if we should ever release the session */
     error = sp_session_create(&config, &session);
     if (error != SP_ERROR_OK) {
         PyErr_SetString(SpotifyError, sp_error_message(error));

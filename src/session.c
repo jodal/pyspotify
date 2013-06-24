@@ -369,7 +369,7 @@ encoded_string_converter(PyObject *o, void *address) {
         return 0;
     }
 
-    *target = PyMem_Malloc(length+1);
+    *target = PyMem_Malloc(length + 1);
     if (target == NULL) {
         PyErr_NoMemory();
         Py_DECREF(o);

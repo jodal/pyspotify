@@ -26,7 +26,7 @@ typedef struct _plc_cb_entry {
 extern PyTypeObject PlaylistContainerType;
 
 PyObject *
-PlaylistContainer_FromSpotify(sp_playlistcontainer *container);
+PlaylistContainer_FromSpotify(sp_playlistcontainer *container, bool add_ref);
 
 extern void
 playlistcontainer_init(PyObject *module);

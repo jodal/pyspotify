@@ -74,7 +74,7 @@ mock_user(PyObject *self, PyObject *args, PyObject *kwds)
         display_name = canonical_name;
 
     user = mocksp_user_create(canonical_name, display_name, is_loaded);
-    return User_FromSpotify(user);
+    return User_FromSpotify(user, 0);
 }
 
 /// Generate a mock spotify.Albumbrowse object
@@ -125,7 +125,7 @@ mock_albumbrowse(PyObject *self, PyObject *args, PyObject *kwds)
                                    artist, num_copyrights,
                                    (const char **)copyrights, num_tracks, tracks,
                                    (const char *)review, NULL, NULL);
-    return AlbumBrowser_FromSpotify(ab);
+    return AlbumBrowser_FromSpotify(ab, 0);
 }
 
 /// Generate a mock spotify.Artistbrowse object
@@ -190,7 +190,7 @@ mock_artistbrowse(PyObject *self, PyObject *args, PyObject *kwds)
                                     num_similar_artists, similar_artists,
                                     0, NULL,
                                     (const char *)biography, type, NULL, NULL);
-    return ArtistBrowser_FromSpotify(ab);
+    return ArtistBrowser_FromSpotify(ab, 0);
 }
 
 /// Generate a mock spotify.Artist python object
@@ -211,7 +211,7 @@ mock_artist(PyObject *self, PyObject *args, PyObject *kwds)
         return NULL;
 
     artist = mocksp_artist_create(name, portrait, is_loaded);
-    return Artist_FromSpotify(artist);
+    return Artist_FromSpotify(artist, 0);
 }
 
 /// Generate a mock spotify.Track python object
@@ -259,7 +259,7 @@ mock_track(PyObject *self, PyObject *args, PyObject *kwds)
                                 is_loaded, availability, status, is_local,
                                 is_autolinked, sp_playable, is_starred,
                                 is_placeholder);
-    return Track_FromSpotify(track);
+    return Track_FromSpotify(track, 0);
 }
 
 /// Generate a mock spotify.Album python object
@@ -287,7 +287,7 @@ mock_album(PyObject *self, PyObject *args, PyObject *kwds)
     album = mocksp_album_create(name, artist->_artist, year,
                                 (const byte *)cover, type, is_loaded,
                                 is_available);
-    return Album_FromSpotify(album);
+    return Album_FromSpotify(album, 0);
 }
 
 /// Generate a mock spotify.Playlist python object
@@ -366,7 +366,7 @@ mock_playlist(PyObject *self, PyObject *args, PyObject *kwds)
                     subscribers, is_in_ram, offline_status,
                     offline_download_completed, num_tracks, tracks);
     free(tracks);
-    return Playlist_FromSpotify(playlist);
+    return Playlist_FromSpotify(playlist, 0);
 }
 
 /// Generate a mock spotify.PlaylistContainer python object
@@ -421,7 +421,7 @@ mock_playlistcontainer(PyObject *self, PyObject *args, PyObject *kwds)
                                                 num_playlists, playlists,
                                                 NULL, NULL);
     free(playlists);
-    return PlaylistContainer_FromSpotify(container);
+    return PlaylistContainer_FromSpotify(container, 0);
 }
 
 /// Generate a mock spotify.PlaylistFolder python object
@@ -528,7 +528,7 @@ mock_search(PyObject *self, PyObject *args, PyObject *kwds)
     free(tracks);
     free(albums);
     free(artists);
-    return Results_FromSpotify(search);
+    return Results_FromSpotify(search, 0);
 }
 
 /// Generate a mock spotify.Session python object
@@ -610,7 +610,7 @@ mock_toplistbrowse(PyObject *self, PyObject *args, PyObject *kwds)
     tb = mocksp_toplistbrowse_create(error, request_duration, num_artists,
                                     artists, num_albums, albums, num_tracks,
                                     tracks, NULL, NULL);
-    return ToplistBrowser_FromSpotify(tb);
+    return ToplistBrowser_FromSpotify(tb, 0);
 }
 
 /************************* REGISTRY MANIPULATION ****************************/

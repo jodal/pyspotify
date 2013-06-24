@@ -12,7 +12,7 @@ extern PyObject *
 handle_error(sp_error error);
 
 PyObject *
-Session_FromSpotify(sp_session * session);
+Session_FromSpotify(sp_session *session);
 
 extern void
 session_init(PyObject *module);

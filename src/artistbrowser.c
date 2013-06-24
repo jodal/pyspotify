@@ -9,11 +9,12 @@
 #include "track.h"
 
 PyObject *
-ArtistBrowser_FromSpotify(sp_artistbrowse * browser)
+ArtistBrowser_FromSpotify(sp_artistbrowse *browser, bool add_ref)
 {
     PyObject *self = ArtistBrowserType.tp_alloc(&ArtistBrowserType, 0);
     ArtistBrowser_SP_ARTISTBROWSE(self) = browser;
-    sp_artistbrowse_add_ref(browser);
+    if (add_ref)
+        sp_artistbrowse_add_ref(browser);
     return self;
 }
 
@@ -29,7 +30,7 @@ ArtistBrowser_browse_complete(sp_artistbrowse *browser, void *data)
     PyObject *result, *self;
     PyGILState_STATE gstate = PyGILState_Ensure();
 
-    self = ArtistBrowser_FromSpotify(browser);
+    self = ArtistBrowser_FromSpotify(browser, 1 /* add_ref */);
     result = PyObject_CallFunction(trampoline->callback, "NO", self,
                                    trampoline->userdata);
 
@@ -73,7 +74,7 @@ error:
 static PyObject *
 ArtistBrowser_new(PyTypeObject *type, PyObject *args, PyObject *kwds)
 {
-    PyObject *artist, *self, *callback = NULL, *userdata = NULL;
+    PyObject *artist, *callback = NULL, *userdata = NULL;
     Callback *trampoline = NULL;
 
     sp_artistbrowse *browser;
@@ -97,9 +98,7 @@ ArtistBrowser_new(PyTypeObject *type, PyObject *args, PyObject *kwds)
                                      ArtistBrowser_browse_complete,
                                      (void*)trampoline);
 
-    self = type->tp_alloc(type, 0);
-    ArtistBrowser_SP_ARTISTBROWSE(self) = browser;
-    return self;
+    return ArtistBrowser_FromSpotify(browser, 0 /* add_ref */);
 }
 
 static void
@@ -127,7 +126,7 @@ ArtistBrowser_albums(PyObject *self)
 
     for (i = 0; i < count; ++i) {
         album = sp_artistbrowse_album(browser, i);
-        PyList_SET_ITEM(list, i, Album_FromSpotify(album));
+        PyList_SET_ITEM(list, i, Album_FromSpotify(album, 1 /* add_ref */));
     }
     return list;
 }
@@ -143,7 +142,7 @@ ArtistBrowser_similar_artists(PyObject *self)
 
     for (i = 0; i < count; ++i) {
         artist = sp_artistbrowse_similar_artist(browser, i);
-        PyList_SET_ITEM(list, i, Artist_FromSpotify(artist));
+        PyList_SET_ITEM(list, i, Artist_FromSpotify(artist, 1 /* add_ref */));
     }
     return list;
 }
@@ -159,7 +158,7 @@ ArtistBrowser_tracks(PyObject *self)
 
     for (i = 0; i < count; ++i) {
         track = sp_artistbrowse_track(browser, i);
-        PyList_SET_ITEM(list, i, Track_FromSpotify(track));
+        PyList_SET_ITEM(list, i, Track_FromSpotify(track, 1 /* add_ref */));
     }
     return list;
 }
@@ -175,7 +174,7 @@ ArtistBrowser_tophit_tracks(PyObject *self)
 
     for (i = 0; i < count; ++i) {
         track = sp_artistbrowse_tophit_track(browser, i);
-        PyList_SET_ITEM(list, i, Track_FromSpotify(track));
+        PyList_SET_ITEM(list, i, Track_FromSpotify(track, 1 /* add_ref */));
     }
     return list;
 }
@@ -196,7 +195,7 @@ ArtistBrowser_sq_item(PyObject *self, Py_ssize_t index)
     }
     sp_track *track = sp_artistbrowse_track(
         ArtistBrowser_SP_ARTISTBROWSE(self), (int)index);
-    return Track_FromSpotify(track);
+    return Track_FromSpotify(track, 1 /* add_ref */);
 }
 
 PySequenceMethods ArtistBrowser_as_sequence = {

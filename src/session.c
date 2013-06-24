@@ -38,6 +38,7 @@ Session_new(PyTypeObject *type, PyObject *args, PyObject *kwds)
     return self;
 }
 
+/* NOTE: this is does not ref count anything so no add_ref */
 PyObject *
 Session_FromSpotify(sp_session *session)
 {
@@ -112,7 +113,7 @@ Session_playlist_container(PyObject *self)
     container = sp_session_playlistcontainer(Session_SP_SESSION(self));
     Py_END_ALLOW_THREADS;
 
-    return PlaylistContainer_FromSpotify(container);
+    return PlaylistContainer_FromSpotify(container, 1 /* add_ref */);
 }
 
 static PyObject *
@@ -194,7 +195,7 @@ Session_search_complete(sp_search *search, void *data)
     PyObject *result, *search_results;
     PyGILState_STATE gstate = PyGILState_Ensure();
 
-    search_results = Results_FromSpotify(search);
+    search_results = Results_FromSpotify(search, 1 /* add_ref */);
     result = PyObject_CallFunction(trampoline->callback, "NO", search_results,
                                    trampoline->userdata);
 
@@ -274,8 +275,7 @@ Session_search(PyObject *self, PyObject *args, PyObject *kwds)
     Py_END_ALLOW_THREADS;
     PyMem_Free(query);
 
-    /* TODO: this leaks a ref */
-    return Results_FromSpotify(search);
+    return Results_FromSpotify(search, 0 /* add_ref */);
 }
 
 static PyObject *
@@ -308,8 +308,7 @@ Session_image_create(PyObject *self, PyObject *args)
 
     /* TODO: audit that we cleanup with _release */
     image = sp_image_create(Session_SP_SESSION(self), image_id);
-    /* TODO: this leaks a ref */
-    return Image_FromSpotify(image);
+    return Image_FromSpotify(image, 0 /* add_ref */);
 }
 
 static PyObject *
@@ -334,8 +333,7 @@ Session_starred(PyObject *self)
     playlist  = sp_session_starred_create(Session_SP_SESSION(self));
     Py_END_ALLOW_THREADS;
 
-    /* TODO: this leaks a ref */
-    return Playlist_FromSpotify(playlist);
+    return Playlist_FromSpotify(playlist, 0 /* add_ref */);
 }
 
 static PyObject *

@@ -16,11 +16,12 @@ Track_new(PyTypeObject *type, PyObject *args, PyObject *kwds)
 }
 
 PyObject *
-Track_FromSpotify(sp_track *track)
+Track_FromSpotify(sp_track *track, bool add_ref)
 {
     PyObject *self = TrackType.tp_alloc(&TrackType, 0);
     Track_SP_TRACK(self) = track;
-    sp_track_add_ref(track);
+    if (add_ref)
+        sp_track_add_ref(track);
     return self;
 }
 
@@ -48,7 +49,7 @@ Track_artists(PyObject *self, PyObject *args)
 
     for (i = 0; i < count; ++i) {
         artist = sp_track_artist(Track_SP_TRACK(self), i);
-        PyList_SET_ITEM(list, i, Artist_FromSpotify(artist));
+        PyList_SET_ITEM(list, i, Artist_FromSpotify(artist, 1 /* add_ref */));
     }
     return list;
 }
@@ -59,7 +60,7 @@ Track_album(PyObject *self)
     sp_album *album = sp_track_album(Track_SP_TRACK(self));
     if (album == NULL)
         Py_RETURN_NONE;
-    return Album_FromSpotify(album);
+    return Album_FromSpotify(album, 1 /* add_ref */);
 }
 
 static PyObject *
@@ -153,7 +154,7 @@ static PyObject *
 Track_get_playable(PyObject *self)
 {
     return Track_FromSpotify(sp_track_get_playable(
-        g_session, Track_SP_TRACK(self)));
+        g_session, Track_SP_TRACK(self)), 1 /* add_ref */);
 }
 
 static PyMethodDef Track_methods[] = {

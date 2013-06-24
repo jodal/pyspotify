@@ -10,7 +10,7 @@ typedef struct {
 extern PyTypeObject ArtistBrowserType;
 
 PyObject *
-ArtistBrowser_FromSpotify(sp_artistbrowse * browser);
+ArtistBrowser_FromSpotify(sp_artistbrowse *browser, bool add_ref);
 
 extern void
 artistbrowser_init(PyObject *module);

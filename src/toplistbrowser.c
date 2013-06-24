@@ -22,7 +22,7 @@ ToplistBrowser_browse_complete(sp_toplistbrowse *browser, void *data)
     PyObject *result, *self;
     PyGILState_STATE gstate = PyGILState_Ensure();
 
-    self = ToplistBrowser_FromSpotify(browser);
+    self = ToplistBrowser_FromSpotify(browser, 1 /* add_ref */);
     result = PyObject_CallFunction(trampoline->callback, "NO", self,
                                    trampoline->userdata);
 
@@ -107,7 +107,7 @@ toplistregion_converter(PyObject *o, void *address)
 static PyObject *
 ToplistBrowser_new(PyTypeObject *type, PyObject *args, PyObject *kwds)
 {
-    PyObject *self, *callback = NULL, *userdata = NULL;
+    PyObject *callback = NULL, *userdata = NULL;
     Callback *trampoline = NULL;
 
     sp_toplistbrowse *browser;
@@ -136,20 +136,16 @@ ToplistBrowser_new(PyTypeObject *type, PyObject *args, PyObject *kwds)
                                       ToplistBrowser_browse_complete,
                                       (void*)trampoline);
     Py_END_ALLOW_THREADS
-
-    self = type->tp_alloc(type, 0);
-    ToplistBrowser_SP_TOPLISTBROWSE(self) = browser;
-    /* TODO: this leaks a ref */
-    sp_toplistbrowse_add_ref(browser);
-    return self;
+    return ToplistBrowser_FromSpotify(browser, 0 /* add_ref */);
 }
 
 PyObject *
-ToplistBrowser_FromSpotify(sp_toplistbrowse * browser)
+ToplistBrowser_FromSpotify(sp_toplistbrowse *browser, bool add_ref)
 {
     PyObject *self = ToplistBrowserType.tp_alloc(&ToplistBrowserType, 0);
     ToplistBrowser_SP_TOPLISTBROWSE(self) = browser;
-    sp_toplistbrowse_add_ref(browser);
+    if (add_ref)
+        sp_toplistbrowse_add_ref(browser);
     return self;
 }
 
@@ -199,11 +195,14 @@ ToplistBrowser_sq_item(PyObject *self, Py_ssize_t index)
 
     /* TODO: see if we can store type to avoid this crazy hack */
     if (index < sp_toplistbrowse_num_albums(browser))
-        return Album_FromSpotify(sp_toplistbrowse_album(browser, i));
+        return Album_FromSpotify(
+            sp_toplistbrowse_album(browser, i), 1 /* add_ref */);
     else if (index < sp_toplistbrowse_num_artists(browser))
-        return Artist_FromSpotify( sp_toplistbrowse_artist(browser, i));
+        return Artist_FromSpotify(
+            sp_toplistbrowse_artist(browser, i), 1 /* add_ref */);
     else if (index < sp_toplistbrowse_num_tracks(browser))
-        return Track_FromSpotify( sp_toplistbrowse_track(browser, i));
+        return Track_FromSpotify(
+            sp_toplistbrowse_track(browser, i), 1 /* add_ref */);
 
     PyErr_SetNone(PyExc_IndexError);
     return NULL;

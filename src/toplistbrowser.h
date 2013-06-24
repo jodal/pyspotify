@@ -13,7 +13,7 @@ typedef struct {
 extern PyTypeObject ToplistBrowserType;
 
 PyObject *
-ToplistBrowser_FromSpotify(sp_toplistbrowse *browser);
+ToplistBrowser_FromSpotify(sp_toplistbrowse *browser, bool add_ref);
 
 extern void
 toplistbrowser_init(PyObject *module);

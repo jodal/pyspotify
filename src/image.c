@@ -13,11 +13,12 @@ Image_new(PyTypeObject *type, PyObject *args, PyObject *kwds)
 }
 
 PyObject *
-Image_FromSpotify(sp_image *image)
+Image_FromSpotify(sp_image *image, bool add_ref)
 {
     PyObject *self = ImageType.tp_alloc(&ImageType, 0);
     Image_SP_IMAGE(self) = image;
-    sp_image_add_ref(image);
+    if (add_ref)
+        sp_image_add_ref(image);
     return self;
 }
 
@@ -78,7 +79,7 @@ Image_loaded(sp_image *image, void *data)
     PyObject *result, *self;
     PyGILState_STATE gstate = PyGILState_Ensure();
 
-    self = Image_FromSpotify(image);
+    self = Image_FromSpotify(image, 1 /* add_ref */);
     result = PyObject_CallFunction(trampoline->callback, "NO", self,
                                    trampoline->userdata);
 

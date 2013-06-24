@@ -15,7 +15,7 @@ typedef struct {
 extern PyTypeObject PlaylistFolderType;
 
 PyObject *
-PlaylistFolder_FromSpotify(sp_playlistcontainer *pc, int index,
+PlaylistFolder_FromSpotify(sp_playlistcontainer *container, int index,
                            sp_playlist_type type);
 
 extern void playlistfolder_init(PyObject *module);

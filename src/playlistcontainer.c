@@ -36,11 +36,12 @@ PlaylistContainer_new(PyTypeObject *type, PyObject *args, PyObject *kwds)
 }
 
 PyObject *
-PlaylistContainer_FromSpotify(sp_playlistcontainer *container)
+PlaylistContainer_FromSpotify(sp_playlistcontainer *container, bool add_ref)
 {
     PyObject *self = PlaylistContainerType.tp_alloc(&PlaylistContainerType, 0);
     PlaylistContainer_SP_PLAYLISTCONTAINER(self) = container;
-    sp_playlistcontainer_add_ref(container);
+    if (add_ref)
+        sp_playlistcontainer_add_ref(container);
     return self;
 }
 
@@ -131,7 +132,7 @@ playlistcontainer_loaded_callback(sp_playlistcontainer *container, void *data)
     PyObject *result, *self;
     PyGILState_STATE gstate = PyGILState_Ensure();
 
-    self = PlaylistContainer_FromSpotify(container);
+    self = PlaylistContainer_FromSpotify(container, 1 /* add_ref */);
     result = PyObject_CallFunction(trampoline->callback, "NO", self,
                                    trampoline->userdata);
 
@@ -162,8 +163,8 @@ playlistcontainer_playlist_added_callback(
     PyObject *py_playlist, *result, *self;
     PyGILState_STATE gstate = PyGILState_Ensure();
 
-    self = PlaylistContainer_FromSpotify(container);
-    py_playlist = Playlist_FromSpotify(playlist);
+    self = PlaylistContainer_FromSpotify(container, 1 /* add_ref */);
+    py_playlist = Playlist_FromSpotify(playlist, 1 /* add_ref */);
 
     result = PyObject_CallFunction(trampoline->callback, "NNiO",
                                    self, py_playlist, position,
@@ -197,8 +198,8 @@ playlistcontainer_playlist_moved_callback(
     PyObject *py_playlist, *result, *self;
     PyGILState_STATE gstate = PyGILState_Ensure();
 
-    self = PlaylistContainer_FromSpotify(container);
-    py_playlist = Playlist_FromSpotify(playlist);
+    self = PlaylistContainer_FromSpotify(container, 1 /* add_ref */);
+    py_playlist = Playlist_FromSpotify(playlist, 1 /* add_ref */);
 
     result = PyObject_CallFunction(trampoline->callback, "NNiiO", self,
                                    py_playlist, position, new_position,
@@ -232,8 +233,8 @@ playlistcontainer_playlist_removed_callback(
     PyObject *py_playlist, *result, *self;
     PyGILState_STATE gstate = PyGILState_Ensure();
 
-    self = PlaylistContainer_FromSpotify(container);
-    py_playlist = Playlist_FromSpotify(playlist);
+    self = PlaylistContainer_FromSpotify(container, 1 /* add_ref */);
+    py_playlist = Playlist_FromSpotify(playlist, 1 /* add_ref */);
 
     result = PyObject_CallFunction(trampoline->callback, "NNiO",
                                    self, py_playlist, position,
@@ -310,8 +311,7 @@ PlaylistContainer_add_new_playlist(PyObject *self, PyObject *args)
     playlist = sp_playlistcontainer_add_new_playlist(container, name);
     PyMem_Free(name);
 
-    /* TODO: not sure if the playlist is a borrowed ref in this case */
-    return Playlist_FromSpotify(playlist);
+    return Playlist_FromSpotify(playlist, 0 /* add_ref */);
 }
 
 /* sequence protocol: */
@@ -336,9 +336,9 @@ PlaylistContainer_sq_item(PyObject *self, Py_ssize_t index)
     type = sp_playlistcontainer_playlist_type(container, (int)index);
     if (type == SP_PLAYLIST_TYPE_PLAYLIST)
         return Playlist_FromSpotify(
-            sp_playlistcontainer_playlist(container, (int)index));
+            sp_playlistcontainer_playlist(container, (int)index), 1 /* add_ref */);
     else
-         return PlaylistFolder_FromSpotify(container, (int)index, type);
+        return PlaylistFolder_FromSpotify(container, (int)index, type);
 }
 
 PyObject *

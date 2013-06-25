@@ -8,7 +8,7 @@ typedef struct {
 extern PyTypeObject ArtistType;
 
 PyObject *
-Artist_FromSpotify(sp_artist * artist);
+Artist_FromSpotify(sp_artist *artist, bool add_ref);
 
 extern void
 artist_init(PyObject *module);

@@ -14,11 +14,12 @@ Album_new(PyTypeObject *type, PyObject *args, PyObject *kwds)
 }
 
 PyObject *
-Album_FromSpotify(sp_album *album)
+Album_FromSpotify(sp_album *album, bool add_ref)
 {
     PyObject *self = AlbumType.tp_alloc(&AlbumType, 0);
     Album_SP_ALBUM(self) = album;
-    sp_album_add_ref(album);
+    if (add_ref)
+        sp_album_add_ref(album);
     return self;
 }
 
@@ -51,7 +52,7 @@ Album_artist(PyObject *self)
     if (artist == NULL)
         Py_RETURN_NONE;
 
-    return Artist_FromSpotify(artist);
+    return Artist_FromSpotify(artist, 1 /* add_ref */);
 }
 
 static PyObject *

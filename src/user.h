@@ -8,7 +8,7 @@ typedef struct {
 extern PyTypeObject UserType;
 
 PyObject *
-User_FromSpotify(sp_user * user);
+User_FromSpotify(sp_user *user, bool add_ref);
 
 extern void
 user_init(PyObject *module);

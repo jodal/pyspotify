@@ -19,11 +19,12 @@ Link_new(PyTypeObject *type, PyObject *args, PyObject *kwds)
 }
 
 PyObject *
-Link_FromSpotify(sp_link *link)
+Link_FromSpotify(sp_link *link, bool add_ref)
 {
     PyObject *self = LinkType.tp_alloc(&LinkType, 0);
     Link_SP_LINK(self) = link;
-    sp_link_add_ref(link);
+    if (add_ref)
+        sp_link_add_ref(link);
     return self;
 }
 
@@ -47,7 +48,7 @@ Link_from_string(PyObject *self, PyObject *args)
         PyErr_SetString(SpotifyError, "Failed to get link from a Spotify URI");
         return NULL;
     }
-    return Link_FromSpotify(link);
+    return Link_FromSpotify(link, 0 /* add_ref */);
 }
 
 static PyObject *
@@ -64,7 +65,7 @@ Link_from_track(PyObject *self, PyObject *args)
         PyErr_SetString(SpotifyError, "Failed to get link from a track");
         return NULL;
     }
-    return Link_FromSpotify(link);
+    return Link_FromSpotify(link, 0 /* add_ref */);
 }
 
 static PyObject *
@@ -79,7 +80,7 @@ Link_from_album(PyObject *self, PyObject *args)
         PyErr_SetString(SpotifyError, "Failed to get link from an album");
         return NULL;
     }
-    return Link_FromSpotify(link);
+    return Link_FromSpotify(link, 0 /* add_ref */);
 }
 
 static PyObject *
@@ -95,7 +96,7 @@ Link_from_artist(PyObject *self, PyObject *args)
         PyErr_SetString(SpotifyError, "Failed to get link from an artist");
         return NULL;
     }
-    return Link_FromSpotify(link);
+    return Link_FromSpotify(link, 0 /* add_ref */);
 }
 
 static PyObject *
@@ -111,7 +112,7 @@ Link_from_search(PyObject *self, PyObject *args)
         PyErr_SetString(SpotifyError, "Failed to get link from a search");
         return NULL;
     }
-    return Link_FromSpotify(link);
+    return Link_FromSpotify(link, 0 /* add_ref */);
 }
 
 static PyObject *
@@ -127,7 +128,7 @@ Link_from_playlist(PyObject *self, PyObject *args)
         PyErr_SetString(SpotifyError, "Failed to get link from a playlist");
         return NULL;
     }
-    return Link_FromSpotify(link);
+    return Link_FromSpotify(link, 0 /* add_ref */);
 }
 
 static PyObject *
@@ -146,7 +147,7 @@ Link_as_track(PyObject *self)
         PyErr_SetString(SpotifyError, "Not a track link");
         return NULL;
     }
-    return Track_FromSpotify(track);
+    return Track_FromSpotify(track, 1 /* add_ref */);
 }
 
 static PyObject *
@@ -157,7 +158,7 @@ Link_as_album(PyObject *self)
         PyErr_SetString(SpotifyError, "Not an album link");
         return NULL;
     }
-    return Album_FromSpotify(album);
+    return Album_FromSpotify(album, 1 /* add_ref */);
 }
 
 static PyObject *
@@ -168,7 +169,7 @@ Link_as_artist(PyObject *self)
         PyErr_SetString(SpotifyError, "Not an artist link");
         return NULL;
     }
-    return Artist_FromSpotify(artist);
+    return Artist_FromSpotify(artist, 1 /* add_ref */);
 }
 
 static PyObject *
@@ -179,14 +180,12 @@ Link_as_playlist(PyObject *self)
         return NULL;
     }
 
-    /* TODO: audit that we cleanup with _release */
     sp_playlist *playlist = sp_playlist_create(g_session, Link_SP_LINK(self));
     if (playlist == NULL) {
         PyErr_SetString(SpotifyError, "Not a playlist link");
         return NULL;
     }
-    /* TODO: this probably leaks the playlist... */
-    return Playlist_FromSpotify(playlist);
+    return Playlist_FromSpotify(playlist, 0 /* add_ref */);
 }
 
 static PyObject *

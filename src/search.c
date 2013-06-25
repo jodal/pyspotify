@@ -16,11 +16,12 @@ Results_new(PyTypeObject *type, PyObject *args, PyObject *kwds)
 }
 
 PyObject *
-Results_FromSpotify(sp_search * search)
+Results_FromSpotify(sp_search *search, bool add_ref)
 {
     PyObject *self = ResultsType.tp_alloc(&ResultsType, 0);
     Results_SP_SEARCH(self) = search;
-    sp_search_add_ref(search);
+    if (add_ref)
+        sp_search_add_ref(search);
     return self;
 }
 
@@ -63,7 +64,7 @@ Results_artists(PyObject *self)
 
     for (i = 0; i < count; ++i) {
         artist = sp_search_artist(Results_SP_SEARCH(self), i);
-        PyList_SET_ITEM(list, i, Artist_FromSpotify(artist));
+        PyList_SET_ITEM(list, i, Artist_FromSpotify(artist, 1 /* add_ref */));
     }
     return list;
 }
@@ -78,7 +79,7 @@ Results_albums(PyObject *self)
 
     for (i = 0; i < count; ++i) {
         album = sp_search_album(Results_SP_SEARCH(self), i);
-        PyList_SET_ITEM(list, i, Album_FromSpotify(album));
+        PyList_SET_ITEM(list, i, Album_FromSpotify(album, 1 /* add_ref */));
     }
     return list;
 }
@@ -93,7 +94,7 @@ Results_tracks(PyObject *self)
 
     for (i = 0; i < count; ++i) {
         track = sp_search_track(Results_SP_SEARCH(self), i);
-        PyList_SET_ITEM(list, i, Track_FromSpotify(track));
+        PyList_SET_ITEM(list, i, Track_FromSpotify(track, 1 /* add_ref */));
     }
     return list;
 }

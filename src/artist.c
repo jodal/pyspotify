@@ -13,11 +13,12 @@ Artist_new(PyTypeObject *type, PyObject *args, PyObject *kwds)
 }
 
 PyObject *
-Artist_FromSpotify(sp_artist *artist)
+Artist_FromSpotify(sp_artist *artist, bool add_ref)
 {
     PyObject *self = ArtistType.tp_alloc(&ArtistType, 0);
     Artist_SP_ARTIST(self) = artist;
-    sp_artist_add_ref(artist);
+    if (add_ref)
+        sp_artist_add_ref(artist);
     return self;
 }
 

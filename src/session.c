@@ -38,6 +38,7 @@ Session_new(PyTypeObject *type, PyObject *args, PyObject *kwds)
     return self;
 }
 
+/* NOTE: this is does not ref count anything so no add_ref */
 PyObject *
 Session_FromSpotify(sp_session *session)
 {
@@ -112,7 +113,7 @@ Session_playlist_container(PyObject *self)
     container = sp_session_playlistcontainer(Session_SP_SESSION(self));
     Py_END_ALLOW_THREADS;
 
-    return PlaylistContainer_FromSpotify(container);
+    return PlaylistContainer_FromSpotify(container, 1 /* add_ref */);
 }
 
 static PyObject *
@@ -194,7 +195,7 @@ Session_search_complete(sp_search *search, void *data)
     PyObject *result, *search_results;
     PyGILState_STATE gstate = PyGILState_Ensure();
 
-    search_results = Results_FromSpotify(search);
+    search_results = Results_FromSpotify(search, 1 /* add_ref */);
     result = PyObject_CallFunction(trampoline->callback, "NO", search_results,
                                    trampoline->userdata);
 
@@ -207,13 +208,39 @@ Session_search_complete(sp_search *search, void *data)
     PyGILState_Release(gstate);
 }
 
+static bool
+sp_search_type_converter(PyObject *o, void *address) {
+    sp_search_type *type = (sp_search_type *)address;
+
+    if (o == NULL || o == Py_None)
+        return 1;
+
+    if (!PyString_Check(o))
+        goto error;
+
+    char *tmp = PyString_AsString(o);
+    if (strcmp(tmp, "standard") == 0)
+        *type = SP_SEARCH_STANDARD;
+    else if (strcmp(tmp, "suggest") == 0)
+        *type = SP_SEARCH_SUGGEST;
+    else
+        goto error;
+
+    return 1;
+
+error:
+    PyErr_Format(PyExc_ValueError, "Unknown search type: %s",
+                 PyString_AsString(PyObject_Repr(o)));
+    return 0;
+}
+
 static PyObject *
 Session_search(PyObject *self, PyObject *args, PyObject *kwds)
 {
     PyObject *callback, *userdata = NULL;
     Callback *trampoline;
 
-    char *query, *tmp = NULL;
+    char *query;
     sp_search *search;
     sp_search_type search_type = SP_SEARCH_STANDARD;
 
@@ -226,43 +253,28 @@ Session_search(PyObject *self, PyObject *args, PyObject *kwds)
         "album_count", "artist_offset", "artist_count", "playlist_offset",
         "playlist_count", "search_type", "userdata", NULL };
 
-    /* TODO: free query memory? */
-    if (!PyArg_ParseTupleAndKeywords(args, kwds, "esO|iiiiiiiisO", kwlist,
+    if (!PyArg_ParseTupleAndKeywords(args, kwds, "esO|iiiiiiiiO&O", kwlist,
                                      ENCODING, &query, &callback,
                                      &track_offset, &track_count,
                                      &album_offset, &album_count,
                                      &artist_offset, &artist_count,
                                      &playlist_offset, &playlist_count,
-                                     &tmp, &userdata))
+                                     &sp_search_type_converter,
+                                     (void *)&search_type, &userdata))
         return NULL;
-
-    /* TODO: create type string constants. */
-    /* TODO: extract to helper */
-    if (tmp) {
-        if (strcmp(tmp, "standard") == 0) {
-        }
-        else if (strcmp(tmp, "suggest") == 0) {
-            search_type = SP_SEARCH_SUGGEST;
-        }
-        else {
-            PyErr_Format(SpotifyError, "Unknown search type: %s", tmp);
-            return NULL;
-        }
-    }
 
     trampoline = create_trampoline(callback, userdata);
 
     Py_BEGIN_ALLOW_THREADS;
-    /* TODO: audit that we cleanup with _release */
     search = sp_search_create(Session_SP_SESSION(self), query, track_offset,
                               track_count, album_offset, album_count,
                               artist_offset, artist_count, playlist_offset,
                               playlist_count, search_type,
                               Session_search_complete, (void *)trampoline);
     Py_END_ALLOW_THREADS;
+    PyMem_Free(query);
 
-    /* TODO: this leaks a ref */
-    return Results_FromSpotify(search);
+    return Results_FromSpotify(search, 0 /* add_ref */);
 }
 
 static PyObject *
@@ -293,10 +305,8 @@ Session_image_create(PyObject *self, PyObject *args)
         return NULL;
     }
 
-    /* TODO: audit that we cleanup with _release */
     image = sp_image_create(Session_SP_SESSION(self), image_id);
-    /* TODO: this leaks a ref */
-    return Image_FromSpotify(image);
+    return Image_FromSpotify(image, 0 /* add_ref */);
 }
 
 static PyObject *
@@ -317,12 +327,10 @@ Session_starred(PyObject *self)
     sp_playlist *playlist;
 
     Py_BEGIN_ALLOW_THREADS;
-    /* TODO: audit that we cleanup with _release */
     playlist  = sp_session_starred_create(Session_SP_SESSION(self));
     Py_END_ALLOW_THREADS;
 
-    /* TODO: this leaks a ref */
-    return Playlist_FromSpotify(playlist);
+    return Playlist_FromSpotify(playlist, 0 /* add_ref */);
 }
 
 static PyObject *
@@ -335,10 +343,43 @@ Session_flush_caches(PyObject *self)
     Py_RETURN_NONE;
 }
 
+/* Caller is responsible for free-ing memory with PyMem_Free */
+static bool
+encoded_string_converter(PyObject *o, void *address) {
+    char **target = (char **)address;
+    char *buffer;
+    Py_ssize_t length;
+
+    if (o == NULL || o == Py_None) {
+        return 1;
+    }
+
+    if (PyUnicode_Check(o))
+        o = PyUnicode_AsEncodedString(o, ENCODING, "strict");
+    else
+        Py_INCREF(o);
+
+    if (PyString_AsStringAndSize(o, &buffer, &length) == -1) {
+        Py_DECREF(o);
+        return 0;
+    }
+
+    *target = PyMem_Malloc(length + 1);
+    if (target == NULL) {
+        PyErr_NoMemory();
+        Py_DECREF(o);
+        return 0;
+    }
+
+    strcpy(*target, buffer);
+    Py_DECREF(o);
+    return 1;
+}
+
 static PyObject *
 Session_login(PyObject *self, PyObject *args, PyObject *kwds)
 {
-    char *username, *password = NULL, *blob = NULL;
+    char *username = NULL, *password = NULL, *blob = NULL;
     int remember_me = 1;
 
     sp_error error;
@@ -346,16 +387,16 @@ Session_login(PyObject *self, PyObject *args, PyObject *kwds)
     static char *kwlist[] = {"username", "password", "remember_me", "blob",
                              NULL};
 
-    /* TODO: free username and password memory? */
-    /* TODO: Don't encode password (and username)? */
-    if (!PyArg_ParseTupleAndKeywords(args, kwds, "es|esiz", kwlist,
-                                     ENCODING, &username, ENCODING, &password,
+    if (!PyArg_ParseTupleAndKeywords(args, kwds, "O&|O&iz", kwlist,
+                                     &encoded_string_converter, (void *)&username,
+                                     &encoded_string_converter, (void *)&password,
                                      &remember_me, &blob))
         return NULL;
 
-    if ((!password) && (!blob)) {
+    if (password == NULL && blob == NULL) {
         PyErr_SetString(SpotifyError, "one of the password or login blob " \
                         "is required to login");
+        PyMem_Free(username);
         return NULL;
     }
 
@@ -365,6 +406,9 @@ Session_login(PyObject *self, PyObject *args, PyObject *kwds)
     error = sp_session_login(Session_SP_SESSION(self), username, password,
                              remember_me, blob);
     Py_END_ALLOW_THREADS;
+
+    PyMem_Free(username);
+    if (password != NULL) PyMem_Free(password);
 
     return none_or_raise_error(error);
 }
@@ -820,7 +864,7 @@ create_session(PyObject *client, PyObject *settings)
     }
 
     debug_printf("creating session...");
-    /* TODO: audit that we cleanup with _release */
+    /* TODO: Figure out if we should ever release the session */
     error = sp_session_create(&config, &session);
     if (error != SP_ERROR_OK) {
         PyErr_SetString(SpotifyError, sp_error_message(error));

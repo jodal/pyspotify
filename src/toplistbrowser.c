@@ -22,7 +22,7 @@ ToplistBrowser_browse_complete(sp_toplistbrowse *browser, void *data)
     PyObject *result, *self;
     PyGILState_STATE gstate = PyGILState_Ensure();
 
-    self = ToplistBrowser_FromSpotify(browser);
+    self = ToplistBrowser_FromSpotify(browser, 1 /* add_ref */);
     result = PyObject_CallFunction(trampoline->callback, "NO", self,
                                    trampoline->userdata);
 
@@ -35,92 +35,116 @@ ToplistBrowser_browse_complete(sp_toplistbrowse *browser, void *data)
     PyGILState_Release(gstate);
 }
 
-static PyObject *
-ToplistBrowser_new(PyTypeObject *type, PyObject *args, PyObject *kwds)
-{
-    PyObject *region, *self, *callback = NULL, *userdata = NULL;
-    Callback *trampoline = NULL;
+static bool
+sp_toplisttype_converter(PyObject *o, void *address) {
+    sp_toplisttype *type = (sp_toplisttype *)address;
 
-    char *tmp = NULL, *username = NULL;
-    sp_toplistbrowse *browser;
-    sp_toplisttype browse_type = SP_TOPLIST_TYPE_ARTISTS;
-    sp_toplistregion browse_region = SP_TOPLIST_REGION_EVERYWHERE;
+    if (o == NULL || o == Py_None)
+        return 1;
 
-    static char *kwlist[] = {"type", "region", "callback", "userdata", NULL};
+    if (!PyString_Check(o))
+        goto error;
 
-    /* TODO: free tmp memory? */
-    if (!PyArg_ParseTupleAndKeywords(args, kwds, "esO|OO", kwlist, ENCODING,
-                                     &tmp, &region, &callback, &userdata))
-        return NULL;
+    // This points into the pyobject, no need cleanup memory
+    char *tmp = PyString_AsString(o);
 
     /* TODO: create type string constants. */
-    /* TODO: extract to helper */
-    if (tmp != NULL) {
-        if (strcmp(tmp, "albums") == 0)
-            browse_type = SP_TOPLIST_TYPE_ALBUMS;
-        else if(strcmp(tmp, "artists") == 0)
-            browse_type = SP_TOPLIST_TYPE_ARTISTS;
-        else if (strcmp(tmp, "tracks") == 0)
-            browse_type = SP_TOPLIST_TYPE_TRACKS;
-        else {
-            PyErr_Format(PyExc_ValueError,
-                         "%s is not a valid toplist type", tmp);
-            return NULL;
-        }
-    }
+    if (strcmp(tmp, "albums") == 0)
+        *type = SP_TOPLIST_TYPE_ALBUMS;
+    else if (strcmp(tmp, "artists") == 0)
+        *type = SP_TOPLIST_TYPE_ARTISTS;
+    else if (strcmp(tmp, "tracks") == 0)
+        *type = SP_TOPLIST_TYPE_TRACKS;
+    else
+        goto error;
 
+    return 1;
+
+error:
+    PyErr_Format(PyExc_ValueError, "Unknown toplist type: %s",
+                 PyString_AsString(PyObject_Repr(o)));
+    return 0;
+}
+
+static bool
+toplistregion_converter(PyObject *o, void *address)
+{
     /* Region, can be
      *   - "XY" where XY is a 2 letter country code
      *   - "all" to get worlwide toplists
      *   - "current" to get the current user's toplists
      *   - user (spotify.User) to get this user's toplists
      */
-    /* TODO: extract to helper */
-    /* TODO: use parse helpers with es to get region? */
-    if (PyUnicode_Check(region)) {
-        region = PyUnicode_AsUTF8String(region);
-        if (!region)
-            return NULL;
-    } else
-        Py_INCREF(region);
+    toplistregion *region = (toplistregion *)address;
 
-    if (PyBytes_Check(region)) {
-        tmp = PyBytes_AS_STRING(region);
-        if (strcmp(tmp, "all") == 0)
-            browse_region = SP_TOPLIST_REGION_EVERYWHERE;
-        else if (strcmp(tmp, "current") == 0)
-            browse_region = SP_TOPLIST_REGION_USER;
-        else /* TODO: sanity checking country code */
-            browse_region = SP_TOPLIST_REGION(tmp[0], tmp[1]);
-    } else if (Py_TYPE(region) == &UserType) {
-        browse_region = SP_TOPLIST_REGION_USER;
-        username = (char *)sp_user_canonical_name(User_SP_USER(region));
+    if (o == NULL || o == Py_None)
+        return 1;
+
+    if (Py_TYPE(o) == &UserType) {
+        region->type = SP_TOPLIST_REGION_USER;
+        region->username = (char *)sp_user_canonical_name(User_SP_USER(o));
+        return 1;
     }
-    Py_DECREF(region);
 
-    if (callback)
+    if (!PyString_Check(o)) {
+        PyErr_Format(PyExc_ValueError, "Unknown toplist region: %s",
+                     PyString_AsString(PyObject_Repr(o)));
+        return 0;
+    }
+
+    /* TODO: create type string constants. */
+    char *tmp = PyString_AsString(o);
+    if (strcmp(tmp, "all") == 0)
+        region->type = SP_TOPLIST_REGION_EVERYWHERE;
+    else if (strcmp(tmp, "current") == 0)
+        region->type = SP_TOPLIST_REGION_USER;
+    else /* TODO: sanity checking country code */
+        region->type = SP_TOPLIST_REGION(tmp[0], tmp[1]);
+
+    return 1;
+}
+
+static PyObject *
+ToplistBrowser_new(PyTypeObject *type, PyObject *args, PyObject *kwds)
+{
+    PyObject *callback = NULL, *userdata = NULL;
+    Callback *trampoline = NULL;
+
+    sp_toplistbrowse *browser;
+    sp_toplisttype browse_type = SP_TOPLIST_TYPE_ARTISTS;
+
+    toplistregion region;
+    region.username = NULL;
+    region.type = SP_TOPLIST_REGION_EVERYWHERE;
+
+    static char *kwlist[] = {"type", "region", "callback", "userdata", NULL};
+
+    if (!PyArg_ParseTupleAndKeywords(args, kwds, "O&O&|OO", kwlist,
+                                     &sp_toplisttype_converter,
+                                     (void *)&browse_type,
+                                     &toplistregion_converter,
+                                     (void *)&region, &callback, &userdata))
+        return NULL;
+
+    if (callback != NULL)
         trampoline = create_trampoline(callback, userdata);
 
     Py_BEGIN_ALLOW_THREADS
-    /* TODO: audit that we cleanup with _release */
-    browser = sp_toplistbrowse_create(g_session, browse_type, browse_region,
-                                      username, ToplistBrowser_browse_complete,
+    browser = sp_toplistbrowse_create(g_session, browse_type, region.type,
+                                      region.username,
+                                      ToplistBrowser_browse_complete,
                                       (void*)trampoline);
     Py_END_ALLOW_THREADS
-
-    self = type->tp_alloc(type, 0);
-    ToplistBrowser_SP_TOPLISTBROWSE(self) = browser;
-    /* TODO: this leaks a ref */
-    sp_toplistbrowse_add_ref(browser);
-    return self;
+    return ToplistBrowser_FromSpotify(browser, 0 /* add_ref */);
 }
 
 PyObject *
-ToplistBrowser_FromSpotify(sp_toplistbrowse * browser)
+ToplistBrowser_FromSpotify(sp_toplistbrowse *browser, bool add_ref)
 {
     PyObject *self = ToplistBrowserType.tp_alloc(&ToplistBrowserType, 0);
     ToplistBrowser_SP_TOPLISTBROWSE(self) = browser;
-    sp_toplistbrowse_add_ref(browser);
+    if (add_ref)
+        sp_toplistbrowse_add_ref(browser);
     return self;
 }
 
@@ -170,11 +194,14 @@ ToplistBrowser_sq_item(PyObject *self, Py_ssize_t index)
 
     /* TODO: see if we can store type to avoid this crazy hack */
     if (index < sp_toplistbrowse_num_albums(browser))
-        return Album_FromSpotify(sp_toplistbrowse_album(browser, i));
+        return Album_FromSpotify(
+            sp_toplistbrowse_album(browser, i), 1 /* add_ref */);
     else if (index < sp_toplistbrowse_num_artists(browser))
-        return Artist_FromSpotify( sp_toplistbrowse_artist(browser, i));
+        return Artist_FromSpotify(
+            sp_toplistbrowse_artist(browser, i), 1 /* add_ref */);
     else if (index < sp_toplistbrowse_num_tracks(browser))
-        return Track_FromSpotify( sp_toplistbrowse_track(browser, i));
+        return Track_FromSpotify(
+            sp_toplistbrowse_track(browser, i), 1 /* add_ref */);
 
     PyErr_SetNone(PyExc_IndexError);
     return NULL;

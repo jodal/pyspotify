@@ -8,7 +8,7 @@ typedef struct {
 extern PyTypeObject TrackType;
 
 PyObject *
-Track_FromSpotify(sp_track * track);
+Track_FromSpotify(sp_track *track, bool add_ref);
 
 extern void
 track_init(PyObject *module);

@@ -8,7 +8,7 @@ typedef struct {
 extern PyTypeObject AlbumType;
 
 PyObject *
-Album_FromSpotify(sp_album * album);
+Album_FromSpotify(sp_album *album, bool add_ref);
 
 extern void
 album_init(PyObject *module);

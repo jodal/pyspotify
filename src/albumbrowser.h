@@ -10,7 +10,7 @@ typedef struct {
 extern PyTypeObject AlbumBrowserType;
 
 PyObject  *
-AlbumBrowser_FromSpotify(sp_albumbrowse *browser);
+AlbumBrowser_FromSpotify(sp_albumbrowse *browser, bool add_ref);
 
 void
 albumbrowser_init(PyObject *module);

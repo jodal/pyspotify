@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2006-2012 Spotify Ltd
+ * Copyright (c) 2006-2013 Spotify Ltd
  *
  * The terms of use for this and related files can be read in
  * the associated LICENSE file, usually stored in share/doc/libspotify/LICENSE.
@@ -620,6 +620,23 @@ typedef struct sp_session_callbacks {
    */
   void (SP_CALLCONV *connectionstate_updated)(sp_session *session);
 
+  /**
+   * Called when the licenses the user needs to accept has been changed.
+   *
+   * When this callback is fired, you should get the number of unaccepted licenses using
+   * sp_session_num_unaccepted_licenses(). If this figure is > 0, present the licenses to
+   * the user by sending them to the HTTP URL you get from sp_session_url_for_license().
+   * Once the user has accepted the given license(s), you must call sp_session_accept_licenses(),
+   * or log out if the user doesn't accept.
+   *
+   * @param[in]  session         Session
+   * @see sp_session_num_unaccepted_licenses()
+   * @see sp_session_unaccepted_license_id()
+   * @see sp_session_url_for_license()
+   * @see sp_session_accept_licenses()
+   */
+  void (SP_CALLCONV *unaccepted_licenses_updated)(sp_session *session);
+
    /**
   * Called when there is a scrobble error event
   *
@@ -635,6 +652,7 @@ typedef struct sp_session_callbacks {
   * @param[in]  isPrivate  True if in private session, false otherwhise
   */
   void (SP_CALLCONV *private_session_mode_changed)(sp_session *session, bool is_private);
+
 } sp_session_callbacks;
 
 /**
@@ -706,7 +724,7 @@ typedef struct sp_session_config {
    * is a sample pem file in examples. It is recommended that the application export a similar file from
    * the local certificate store.
        */
-  ...;
+  const char *ca_certs_filename;
 
   /**
    * Path to API trace file
@@ -842,6 +860,65 @@ SP_LIBEXPORT(sp_user *) sp_session_user(sp_session *session);
  */
 SP_LIBEXPORT(sp_error) sp_session_logout(sp_session *session);
 
+
+/**
+ * Get the number of licenses the user needs to agree to before using their account.
+ *
+ * If this returns more than 0, you should present the licenses to the user by sending them
+ * to the HTTP URL you get from sp_session_url_for_license(). Once the user has accepted
+ * the given license(s), you must call sp_session_accept_licenses(), or log out if the user
+ * doesn't accept.
+ *
+ * @param[in]    session    Your session object.
+ * @return       The number of license identifiers available.
+ * @see sp_session_unaccepted_license_id()
+ * @see sp_session_url_for_license()
+ * @see sp_session_accept_licenses()
+ */
+SP_LIBEXPORT(int) sp_session_num_unaccepted_licenses(sp_session *session);
+
+/**
+ * Get the license ID of the license at the given index.
+ *
+ * Note: The lifetime of the returned pointer is undefined. You should
+ * copy its value if you need to keep it.
+ *
+ * @param[in]    session    Your session object.
+ * @param[in]    license_id_index The index of the license id to get.
+ * @return       A pointer to a string containing the license id, or NULL if given an invalid index.
+ * @see sp_session_num_unaccepted_licenses()
+ * @see sp_session_url_for_license()
+ * @see sp_session_accept_licenses()
+ */
+SP_LIBEXPORT(const char *) sp_session_unaccepted_license_id(sp_session *session, int license_id_index);
+
+/**
+ * Get HTTP url for the given license identifier.
+ *
+ * The HTTP url returned by this leads to a HTML page of the license to present to the user. This should
+ * be loaded in a HTML view so the user can read through it before accepting.
+ *
+ * @param[in]    session    Your session object.
+ * @param[in]    license_id    The license identifier to get the HTTP url for.
+ * @return       The license url, or NULL if an error occurred.
+ * @see sp_session_num_unaccepted_licenses()
+ * @see sp_session_unaccepted_license_id()
+ */
+SP_LIBEXPORT(const char *) sp_session_url_for_license(sp_session *session, const char *license_id);
+
+/**
+ * Signal that the user has accepted the given licenses.
+ *
+ * @param[in]    session    Your session object.
+ * @param[out]   license_ids       Pointer to an array of char * holding the license identifiers the user has accepted.
+ * @param[in]    license_id_count   The size of your licenses array.
+ * @return       One of the following errors, from ::sp_error
+ *               SP_ERROR_OK
+ *               SP_ERROR_INVALID_ARGUMENT
+ * @see sp_session_num_unaccepted_licenses()
+ * @see sp_session_unaccepted_license_id()
+ */
+SP_LIBEXPORT(sp_error) sp_session_accept_licenses(sp_session *session, const char **license_ids, int license_id_count);
 
 /**
  * Flush the caches
@@ -1007,6 +1084,19 @@ SP_LIBEXPORT(sp_playlist *) sp_session_starred_create(sp_session *session);
  * @see sp_playlist_release()
  */
 SP_LIBEXPORT(sp_playlist *) sp_session_starred_for_user_create(sp_session *session, const char *canonical_username);
+
+/**
+ * Returns the toplist list for a user
+ *
+ * @param[in]  session        Session object
+ * @param[in]  canonical_username       Canonical username
+ *
+ * @return     A playlist or NULL if no user is logged in
+ * @note You need to release the playlist when you are done with it.
+ * @see sp_playlist_release()
+ */
+SP_LIBEXPORT(sp_playlist *) sp_session_toplist_for_user_create(sp_session *session, const char *canonical_username);
+
 
 /**
  * Return the published container for a given @a canonical_username,
@@ -1265,6 +1355,7 @@ typedef enum {
   SP_LINKTYPE_STARRED  = 7, ///< Link type is starred
   SP_LINKTYPE_LOCALTRACK  = 8, ///< Link type is a local file
   SP_LINKTYPE_IMAGE = 9, ///< Link type is an image
+  SP_LINKTYPE_TOPLIST  = 10, ///< Link type is user toplist
 } sp_linktype;
 
 /**
@@ -1533,6 +1624,7 @@ SP_LIBEXPORT(sp_error) sp_link_release(sp_link *link);
  */
 SP_LIBEXPORT(bool) sp_track_is_loaded(sp_track *track);
 
+
 /**
  * Return an error code associated with a track. For example if it could not load
  *
@@ -1736,6 +1828,18 @@ SP_LIBEXPORT(int) sp_track_disc(sp_track *track);
  *                         artist or browse album result (otherwise returns 0).
  */
 SP_LIBEXPORT(int) sp_track_index(sp_track *track);
+
+/**
+ * Return true if the track has explicit lyrics
+ *
+ * @param[in]   track      A track object
+ *
+ * @return                 True if track has explicit lyrics.
+ *
+ * @note Whether or not the function returns true for a given track depends on the
+ * logged in user's region.
+ */
+SP_LIBEXPORT(bool) sp_track_has_explicit_lyrics(sp_track *track);
 
 /**
  * Returns the newly created local track
@@ -1973,7 +2077,7 @@ typedef void SP_CALLCONV albumbrowse_complete_cb(sp_albumbrowse *result, void *u
  * @param[in]   callback        Callback to be invoked when browsing has been completed. Pass NULL if you are not interested in this event.
  * @param[in]   userdata        Userdata passed to callback.
  *
- * @return                      Album browse object
+ * @return                      Album browse object, or NULL if the browse request could not be created.
  *
  * @see ::albumbrowse_complete_cb
  */
@@ -2140,7 +2244,7 @@ typedef void SP_CALLCONV artistbrowse_complete_cb(sp_artistbrowse *result, void 
  * @param[in] callback        Callback to be invoked when browsing has been completed. Pass NULL if you are not interested in this event.
  * @param[in] userdata        Userdata passed to callback.
  *
- * @return                    Artist browse object
+ * @return                    Artist browse object, or NULL if the browse request could not be created.
  *
  * @see ::artistbrowse_complete_cb
  */

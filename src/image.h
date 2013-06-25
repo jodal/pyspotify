@@ -8,7 +8,7 @@ typedef struct {
 extern PyTypeObject ImageType;
 
 PyObject *
-Image_FromSpotify(sp_image * image);
+Image_FromSpotify(sp_image *image, bool add_ref);
 
 extern void
 image_init(PyObject *module);

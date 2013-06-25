@@ -25,7 +25,7 @@ typedef struct _pl_cb_entry {
 } pl_cb_entry;
 
 PyObject *
-Playlist_FromSpotify(sp_playlist * playlist);
+Playlist_FromSpotify(sp_playlist *playlist, bool add_ref);
 
 extern void
 playlist_init(PyObject *module);

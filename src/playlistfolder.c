@@ -15,7 +15,7 @@ PlaylistFolder_new(PyTypeObject *type, PyObject *args, PyObject *kwds)
     return self;
 }
 
-/* NOTE: this is the only *_FromSpotify that does not ref count anything... */
+/* NOTE: this is does not ref count anything so no add_ref */
 PyObject *
 PlaylistFolder_FromSpotify(sp_playlistcontainer *container, int index,
                            sp_playlist_type type)

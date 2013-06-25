@@ -8,11 +8,12 @@
 #include "session.h"
 
 PyObject *
-AlbumBrowser_FromSpotify(sp_albumbrowse *browser)
+AlbumBrowser_FromSpotify(sp_albumbrowse *browser, bool add_ref)
 {
     PyObject *self = AlbumBrowserType.tp_alloc(&AlbumBrowserType, 0);
     AlbumBrowser_SP_ALBUMBROWSE(self) = browser;
-    sp_albumbrowse_add_ref(browser);
+    if (add_ref)
+        sp_albumbrowse_add_ref(browser);
     return self;
 }
 
@@ -28,7 +29,7 @@ AlbumBrowser_browse_complete(sp_albumbrowse *browser, void *data)
     PyObject *result, *self;
     PyGILState_STATE gstate = PyGILState_Ensure();
 
-    self = AlbumBrowser_FromSpotify(browser);
+    self = AlbumBrowser_FromSpotify(browser, 1 /* add_ref */);
     result = PyObject_CallFunction(trampoline->callback, "NO", self,
                                    trampoline->userdata);
 
@@ -44,7 +45,7 @@ AlbumBrowser_browse_complete(sp_albumbrowse *browser, void *data)
 static PyObject *
 AlbumBrowser_new(PyTypeObject *type, PyObject *args, PyObject *kwds)
 {
-    PyObject *album, *self, *callback = NULL, *userdata = NULL;
+    PyObject *album, *callback = NULL, *userdata = NULL;
     Callback *trampoline = NULL;
 
     static char *kwlist[] = {"album", "callback", "userdata", NULL};
@@ -53,25 +54,20 @@ AlbumBrowser_new(PyTypeObject *type, PyObject *args, PyObject *kwds)
                                      &album, &callback, &userdata))
         return NULL;
 
-    if (callback)
+    if (callback != NULL)
         trampoline = create_trampoline(callback, userdata);
 
-    /* TODO: audit that we cleanup with _release */
     sp_albumbrowse *browser = sp_albumbrowse_create(
         g_session, Album_SP_ALBUM(album), AlbumBrowser_browse_complete,
         (void*)trampoline);
-
-    /* This code duplicates AlbumBrowser_FromSpotify but without sp incref */
-    self = AlbumBrowserType.tp_alloc(&AlbumBrowserType, 0);
-    AlbumBrowser_SP_ALBUMBROWSE(self) = browser;
-    return self;
+    return AlbumBrowser_FromSpotify(browser, 0 /* add_ref */);
 }
 
 static void
 AlbumBrowser_dealloc(PyObject *self)
 {
     sp_albumbrowse_release(AlbumBrowser_SP_ALBUMBROWSE(self));
-    AlbumBrowserType.tp_free(self);
+    self->ob_type->tp_free(self);
 }
 
 static PyObject *
@@ -97,7 +93,7 @@ AlbumBrowser_sq_item(PyObject *self, Py_ssize_t index)
     }
     sp_track *track = sp_albumbrowse_track(
         AlbumBrowser_SP_ALBUMBROWSE(self), (int)index);
-    return Track_FromSpotify(track);
+    return Track_FromSpotify(track, 1 /* add_ref */);
 }
 
 PySequenceMethods AlbumBrowser_as_sequence = {

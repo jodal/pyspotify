@@ -8,7 +8,7 @@ typedef struct {
 extern PyTypeObject ResultsType;
 
 PyObject *
-Results_FromSpotify(sp_search * search);
+Results_FromSpotify(sp_search *search, bool add_ref);
 
 extern void
 search_init(PyObject *m);

@@ -14,11 +14,12 @@ User_new(PyTypeObject *type, PyObject *args, PyObject *kwds)
 }
 
 PyObject *
-User_FromSpotify(sp_user *user)
+User_FromSpotify(sp_user *user, bool add_ref)
 {
     PyObject *self = UserType.tp_alloc(&UserType, 0);
     User_SP_USER(self) = user;
-    sp_user_add_ref(user);
+    if (add_ref)
+        sp_user_add_ref(user);
     return self;
 }
 

@@ -635,7 +635,9 @@ typedef struct sp_session_callbacks {
    * @see sp_session_url_for_license()
    * @see sp_session_accept_licenses()
    */
-  void (SP_CALLCONV *unaccepted_licenses_updated)(sp_session *session);
+  // XXX As of 2013-06-25 only available in armv6hf build
+  //void (SP_CALLCONV *unaccepted_licenses_updated)(sp_session *session);
+  ...;
 
    /**
   * Called when there is a scrobble error event
@@ -724,7 +726,9 @@ typedef struct sp_session_config {
    * is a sample pem file in examples. It is recommended that the application export a similar file from
    * the local certificate store.
        */
-  const char *ca_certs_filename;
+  // XXX As of 2013-06-25 this isn't available in the OS X build of libspotify.
+  //const char *ca_certs_filename;
+  ...;
 
   /**
    * Path to API trace file
@@ -875,7 +879,8 @@ SP_LIBEXPORT(sp_error) sp_session_logout(sp_session *session);
  * @see sp_session_url_for_license()
  * @see sp_session_accept_licenses()
  */
-SP_LIBEXPORT(int) sp_session_num_unaccepted_licenses(sp_session *session);
+// XXX As of 2013-06-25 only available in armv6hf build
+//SP_LIBEXPORT(int) sp_session_num_unaccepted_licenses(sp_session *session);
 
 /**
  * Get the license ID of the license at the given index.
@@ -890,7 +895,8 @@ SP_LIBEXPORT(int) sp_session_num_unaccepted_licenses(sp_session *session);
  * @see sp_session_url_for_license()
  * @see sp_session_accept_licenses()
  */
-SP_LIBEXPORT(const char *) sp_session_unaccepted_license_id(sp_session *session, int license_id_index);
+// XXX As of 2013-06-25 only available in armv6hf build
+//SP_LIBEXPORT(const char *) sp_session_unaccepted_license_id(sp_session *session, int license_id_index);
 
 /**
  * Get HTTP url for the given license identifier.
@@ -904,7 +910,8 @@ SP_LIBEXPORT(const char *) sp_session_unaccepted_license_id(sp_session *session,
  * @see sp_session_num_unaccepted_licenses()
  * @see sp_session_unaccepted_license_id()
  */
-SP_LIBEXPORT(const char *) sp_session_url_for_license(sp_session *session, const char *license_id);
+// XXX As of 2013-06-25 only available in armv6hf build
+//SP_LIBEXPORT(const char *) sp_session_url_for_license(sp_session *session, const char *license_id);
 
 /**
  * Signal that the user has accepted the given licenses.
@@ -918,7 +925,8 @@ SP_LIBEXPORT(const char *) sp_session_url_for_license(sp_session *session, const
  * @see sp_session_num_unaccepted_licenses()
  * @see sp_session_unaccepted_license_id()
  */
-SP_LIBEXPORT(sp_error) sp_session_accept_licenses(sp_session *session, const char **license_ids, int license_id_count);
+// XXX As of 2013-06-25 only available in armv6hf build
+//SP_LIBEXPORT(sp_error) sp_session_accept_licenses(sp_session *session, const char **license_ids, int license_id_count);
 
 /**
  * Flush the caches
@@ -1095,7 +1103,8 @@ SP_LIBEXPORT(sp_playlist *) sp_session_starred_for_user_create(sp_session *sessi
  * @note You need to release the playlist when you are done with it.
  * @see sp_playlist_release()
  */
-SP_LIBEXPORT(sp_playlist *) sp_session_toplist_for_user_create(sp_session *session, const char *canonical_username);
+// XXX As of 2013-06-25 only available in armv6hf build
+//SP_LIBEXPORT(sp_playlist *) sp_session_toplist_for_user_create(sp_session *session, const char *canonical_username);
 
 
 /**
@@ -1355,7 +1364,8 @@ typedef enum {
   SP_LINKTYPE_STARRED  = 7, ///< Link type is starred
   SP_LINKTYPE_LOCALTRACK  = 8, ///< Link type is a local file
   SP_LINKTYPE_IMAGE = 9, ///< Link type is an image
-  SP_LINKTYPE_TOPLIST  = 10, ///< Link type is user toplist
+  // XXX As of 2013-06-25 only available in armv6hf build
+  //SP_LINKTYPE_TOPLIST  = 10, ///< Link type is user toplist
 } sp_linktype;
 
 /**
@@ -1839,7 +1849,8 @@ SP_LIBEXPORT(int) sp_track_index(sp_track *track);
  * @note Whether or not the function returns true for a given track depends on the
  * logged in user's region.
  */
-SP_LIBEXPORT(bool) sp_track_has_explicit_lyrics(sp_track *track);
+// XXX As of 2013-06-25 only available in armv6hf build
+//SP_LIBEXPORT(bool) sp_track_has_explicit_lyrics(sp_track *track);
 
 /**
  * Returns the newly created local track

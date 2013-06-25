@@ -357,8 +357,8 @@ typedef struct sp_session_callbacks {
 
 
   void ( *connectionstate_updated)(sp_session *session);
-# 638 "spotify/api.h"
-  void ( *unaccepted_licenses_updated)(sp_session *session);
+# 640 "spotify/api.h"
+  ...;
 
 
 
@@ -440,14 +440,8 @@ typedef struct sp_session_config {
 
 
   const char *proxy_password;
-
-
-
-
-
-
-
-  const char *ca_certs_filename;
+# 731 "spotify/api.h"
+  ...;
 
 
 
@@ -455,99 +449,89 @@ typedef struct sp_session_config {
   const char *tracefile;
 
 } sp_session_config;
-# 757 "spotify/api.h"
+# 761 "spotify/api.h"
 sp_error sp_session_create(const sp_session_config *config, sp_session **sess);
-# 766 "spotify/api.h"
+# 770 "spotify/api.h"
 sp_error sp_session_release(sp_session *sess);
-# 790 "spotify/api.h"
+# 794 "spotify/api.h"
 sp_error sp_session_login(sp_session *session, const char *username, const char *password, bool remember_me, const char *blob);
-# 803 "spotify/api.h"
+# 807 "spotify/api.h"
 sp_error sp_session_relogin(sp_session *session);
-# 819 "spotify/api.h"
+# 823 "spotify/api.h"
 int sp_session_remembered_user(sp_session *session, char *buffer, size_t buffer_size);
-# 829 "spotify/api.h"
+# 833 "spotify/api.h"
 const char * sp_session_user_name(sp_session *session);
-# 839 "spotify/api.h"
+# 843 "spotify/api.h"
 sp_error sp_session_forget_me(sp_session *session);
-# 849 "spotify/api.h"
+# 853 "spotify/api.h"
 sp_user * sp_session_user(sp_session *session);
-# 861 "spotify/api.h"
+# 865 "spotify/api.h"
 sp_error sp_session_logout(sp_session *session);
-# 878 "spotify/api.h"
-int sp_session_num_unaccepted_licenses(sp_session *session);
-# 893 "spotify/api.h"
-const char * sp_session_unaccepted_license_id(sp_session *session, int license_id_index);
-# 907 "spotify/api.h"
-const char * sp_session_url_for_license(sp_session *session, const char *license_id);
-# 921 "spotify/api.h"
-sp_error sp_session_accept_licenses(sp_session *session, const char **license_ids, int license_id_count);
-# 935 "spotify/api.h"
+# 943 "spotify/api.h"
 sp_error sp_session_flush_caches(sp_session *session);
-# 944 "spotify/api.h"
+# 952 "spotify/api.h"
 sp_connectionstate sp_session_connectionstate(sp_session *session);
-# 953 "spotify/api.h"
+# 961 "spotify/api.h"
 void * sp_session_userdata(sp_session *session);
-# 965 "spotify/api.h"
+# 973 "spotify/api.h"
 sp_error sp_session_set_cache_size(sp_session *session, size_t size);
-# 975 "spotify/api.h"
+# 983 "spotify/api.h"
 sp_error sp_session_process_events(sp_session *session, int *next_timeout);
-# 993 "spotify/api.h"
+# 1001 "spotify/api.h"
 sp_error sp_session_player_load(sp_session *session, sp_track *track);
-# 1003 "spotify/api.h"
+# 1011 "spotify/api.h"
 sp_error sp_session_player_seek(sp_session *session, int offset);
-# 1013 "spotify/api.h"
+# 1021 "spotify/api.h"
 sp_error sp_session_player_play(sp_session *session, bool play);
-# 1025 "spotify/api.h"
+# 1033 "spotify/api.h"
 sp_error sp_session_player_unload(sp_session *session);
-# 1043 "spotify/api.h"
+# 1051 "spotify/api.h"
 sp_error sp_session_player_prefetch(sp_session *session, sp_track *track);
-# 1052 "spotify/api.h"
+# 1060 "spotify/api.h"
 sp_playlistcontainer * sp_session_playlistcontainer(sp_session *session);
-# 1063 "spotify/api.h"
+# 1071 "spotify/api.h"
 sp_playlist * sp_session_inbox_create(sp_session *session);
-# 1074 "spotify/api.h"
+# 1082 "spotify/api.h"
 sp_playlist * sp_session_starred_create(sp_session *session);
-# 1086 "spotify/api.h"
+# 1094 "spotify/api.h"
 sp_playlist * sp_session_starred_for_user_create(sp_session *session, const char *canonical_username);
-# 1098 "spotify/api.h"
-sp_playlist * sp_session_toplist_for_user_create(sp_session *session, const char *canonical_username);
-# 1113 "spotify/api.h"
+# 1122 "spotify/api.h"
 sp_playlistcontainer * sp_session_publishedcontainer_for_user_create(sp_session *session, const char *canonical_username);
-# 1125 "spotify/api.h"
+# 1134 "spotify/api.h"
 sp_error sp_session_preferred_bitrate(sp_session *session, sp_bitrate bitrate);
-# 1138 "spotify/api.h"
+# 1147 "spotify/api.h"
 sp_error sp_session_preferred_offline_bitrate(sp_session *session, sp_bitrate bitrate, bool allow_resync);
-# 1149 "spotify/api.h"
+# 1158 "spotify/api.h"
 bool sp_session_get_volume_normalization(sp_session *session);
-# 1160 "spotify/api.h"
+# 1169 "spotify/api.h"
 sp_error sp_session_set_volume_normalization(sp_session *session, bool on);
-# 1174 "spotify/api.h"
-sp_error sp_session_set_private_session(sp_session *session, bool enabled);
 # 1183 "spotify/api.h"
+sp_error sp_session_set_private_session(sp_session *session, bool enabled);
+# 1192 "spotify/api.h"
 bool sp_session_is_private_session(sp_session *session);
-# 1198 "spotify/api.h"
+# 1207 "spotify/api.h"
 sp_error sp_session_set_scrobbling(sp_session *session, sp_social_provider provider, sp_scrobbling_state state);
-# 1210 "spotify/api.h"
+# 1219 "spotify/api.h"
 sp_error sp_session_is_scrobbling(sp_session *session, sp_social_provider provider, sp_scrobbling_state* state);
-# 1224 "spotify/api.h"
+# 1233 "spotify/api.h"
   sp_error sp_session_is_scrobbling_possible(sp_session *session, sp_social_provider provider, bool* out);
-# 1245 "spotify/api.h"
+# 1254 "spotify/api.h"
 sp_error sp_session_set_social_credentials(sp_session *session, sp_social_provider provider, const char* username, const char* password);
-# 1260 "spotify/api.h"
+# 1269 "spotify/api.h"
 sp_error sp_session_set_connection_type(sp_session *session, sp_connection_type type);
-# 1276 "spotify/api.h"
+# 1285 "spotify/api.h"
 sp_error sp_session_set_connection_rules(sp_session *session, sp_connection_rules rules);
-# 1288 "spotify/api.h"
-int sp_offline_tracks_to_sync(sp_session *session);
 # 1297 "spotify/api.h"
+int sp_offline_tracks_to_sync(sp_session *session);
+# 1306 "spotify/api.h"
 int sp_offline_num_playlists(sp_session *session);
-# 1310 "spotify/api.h"
+# 1319 "spotify/api.h"
 bool sp_offline_sync_get_status(sp_session *session, sp_offline_sync_status *status);
-# 1320 "spotify/api.h"
+# 1329 "spotify/api.h"
 int sp_offline_time_left(sp_session *session);
-# 1330 "spotify/api.h"
+# 1339 "spotify/api.h"
 int sp_session_user_country(sp_session *session);
-# 1347 "spotify/api.h"
+# 1356 "spotify/api.h"
 typedef enum {
   SP_LINKTYPE_INVALID = 0,
   SP_LINKTYPE_TRACK = 1,
@@ -559,93 +543,92 @@ typedef enum {
   SP_LINKTYPE_STARRED = 7,
   SP_LINKTYPE_LOCALTRACK = 8,
   SP_LINKTYPE_IMAGE = 9,
-  SP_LINKTYPE_TOPLIST = 10,
+
+
 } sp_linktype;
-# 1373 "spotify/api.h"
+# 1383 "spotify/api.h"
 sp_link * sp_link_create_from_string(const char *link);
-# 1386 "spotify/api.h"
+# 1396 "spotify/api.h"
 sp_link * sp_link_create_from_track(sp_track *track, int offset);
-# 1398 "spotify/api.h"
+# 1408 "spotify/api.h"
 sp_link * sp_link_create_from_album(sp_album *album);
-# 1411 "spotify/api.h"
+# 1421 "spotify/api.h"
 sp_link * sp_link_create_from_album_cover(sp_album *album, sp_image_size size);
-# 1423 "spotify/api.h"
+# 1433 "spotify/api.h"
 sp_link * sp_link_create_from_artist(sp_artist *artist);
-# 1437 "spotify/api.h"
+# 1447 "spotify/api.h"
 sp_link * sp_link_create_from_artist_portrait(sp_artist *artist, sp_image_size size);
-# 1456 "spotify/api.h"
+# 1466 "spotify/api.h"
 sp_link * sp_link_create_from_artistbrowse_portrait(sp_artistbrowse *arb, int index);
-# 1469 "spotify/api.h"
+# 1479 "spotify/api.h"
 sp_link * sp_link_create_from_search(sp_search *search);
-# 1486 "spotify/api.h"
+# 1496 "spotify/api.h"
 sp_link * sp_link_create_from_playlist(sp_playlist *playlist);
-# 1498 "spotify/api.h"
+# 1508 "spotify/api.h"
 sp_link * sp_link_create_from_user(sp_user *user);
-# 1510 "spotify/api.h"
+# 1520 "spotify/api.h"
 sp_link * sp_link_create_from_image(sp_image *image);
-# 1524 "spotify/api.h"
+# 1534 "spotify/api.h"
 int sp_link_as_string(sp_link *link, char *buffer, int buffer_size);
-# 1533 "spotify/api.h"
-sp_linktype sp_link_type(sp_link *link);
 # 1543 "spotify/api.h"
+sp_linktype sp_link_type(sp_link *link);
+# 1553 "spotify/api.h"
 sp_track * sp_link_as_track(sp_link *link);
-# 1555 "spotify/api.h"
-sp_track * sp_link_as_track_and_offset(sp_link *link, int *offset);
 # 1565 "spotify/api.h"
-sp_album * sp_link_as_album(sp_link *link);
+sp_track * sp_link_as_track_and_offset(sp_link *link, int *offset);
 # 1575 "spotify/api.h"
+sp_album * sp_link_as_album(sp_link *link);
+# 1585 "spotify/api.h"
 sp_artist * sp_link_as_artist(sp_link *link);
-# 1586 "spotify/api.h"
-sp_user * sp_link_as_user(sp_link *link);
 # 1596 "spotify/api.h"
+sp_user * sp_link_as_user(sp_link *link);
+# 1606 "spotify/api.h"
 sp_error sp_link_add_ref(sp_link *link);
-# 1605 "spotify/api.h"
+# 1615 "spotify/api.h"
 sp_error sp_link_release(sp_link *link);
-# 1625 "spotify/api.h"
+# 1635 "spotify/api.h"
 bool sp_track_is_loaded(sp_track *track);
-# 1638 "spotify/api.h"
+# 1648 "spotify/api.h"
 sp_error sp_track_error(sp_track *track);
-# 1650 "spotify/api.h"
+# 1660 "spotify/api.h"
 sp_track_offline_status sp_track_offline_get_status(sp_track *track);
-# 1663 "spotify/api.h"
+# 1673 "spotify/api.h"
 sp_track_availability sp_track_get_availability(sp_session *session, sp_track *track);
-# 1676 "spotify/api.h"
+# 1686 "spotify/api.h"
 bool sp_track_is_local(sp_session *session, sp_track *track);
-# 1689 "spotify/api.h"
+# 1699 "spotify/api.h"
 bool sp_track_is_autolinked(sp_session *session, sp_track *track);
-# 1701 "spotify/api.h"
+# 1711 "spotify/api.h"
 sp_track * sp_track_get_playable(sp_session *session, sp_track *track);
-# 1718 "spotify/api.h"
+# 1728 "spotify/api.h"
 bool sp_track_is_placeholder(sp_track *track);
-# 1732 "spotify/api.h"
+# 1742 "spotify/api.h"
 bool sp_track_is_starred(sp_session *session, sp_track *track);
-# 1745 "spotify/api.h"
-sp_error sp_track_set_starred(sp_session *session, sp_track *const*tracks, int num_tracks, bool star);
 # 1755 "spotify/api.h"
-int sp_track_num_artists(sp_track *track);
+sp_error sp_track_set_starred(sp_session *session, sp_track *const*tracks, int num_tracks, bool star);
 # 1765 "spotify/api.h"
+int sp_track_num_artists(sp_track *track);
+# 1775 "spotify/api.h"
 sp_artist * sp_track_artist(sp_track *track, int index);
-# 1776 "spotify/api.h"
+# 1786 "spotify/api.h"
 sp_album * sp_track_album(sp_track *track);
-# 1788 "spotify/api.h"
-const char * sp_track_name(sp_track *track);
 # 1798 "spotify/api.h"
-int sp_track_duration(sp_track *track);
+const char * sp_track_name(sp_track *track);
 # 1808 "spotify/api.h"
+int sp_track_duration(sp_track *track);
+# 1818 "spotify/api.h"
 int sp_track_popularity(sp_track *track);
-# 1819 "spotify/api.h"
+# 1829 "spotify/api.h"
 int sp_track_disc(sp_track *track);
-# 1830 "spotify/api.h"
+# 1840 "spotify/api.h"
 int sp_track_index(sp_track *track);
-# 1842 "spotify/api.h"
-bool sp_track_has_explicit_lyrics(sp_track *track);
-# 1854 "spotify/api.h"
+# 1865 "spotify/api.h"
 sp_track * sp_localtrack_create(const char *artist, const char *title, const char *album, int length);
-# 1863 "spotify/api.h"
+# 1874 "spotify/api.h"
 sp_error sp_track_add_ref(sp_track *track);
-# 1872 "spotify/api.h"
+# 1883 "spotify/api.h"
 sp_error sp_track_release(sp_track *track);
-# 1886 "spotify/api.h"
+# 1897 "spotify/api.h"
 typedef enum {
   SP_ALBUMTYPE_ALBUM = 0,
   SP_ALBUMTYPE_SINGLE = 1,
@@ -660,7 +643,7 @@ typedef enum {
 
 
 bool sp_album_is_loaded(sp_album *album);
-# 1912 "spotify/api.h"
+# 1923 "spotify/api.h"
 bool sp_album_is_available(sp_album *album);
 
 
@@ -670,95 +653,95 @@ bool sp_album_is_available(sp_album *album);
 
 
 sp_artist * sp_album_artist(sp_album *album);
-# 1934 "spotify/api.h"
-const byte * sp_album_cover(sp_album *album, sp_image_size size);
 # 1945 "spotify/api.h"
+const byte * sp_album_cover(sp_album *album, sp_image_size size);
+# 1956 "spotify/api.h"
 const char * sp_album_name(sp_album *album);
-# 1954 "spotify/api.h"
+# 1965 "spotify/api.h"
 int sp_album_year(sp_album *album);
-# 1964 "spotify/api.h"
+# 1975 "spotify/api.h"
 sp_albumtype sp_album_type(sp_album *album);
-# 1974 "spotify/api.h"
+# 1985 "spotify/api.h"
 sp_error sp_album_add_ref(sp_album *album);
-# 1983 "spotify/api.h"
+# 1994 "spotify/api.h"
 sp_error sp_album_release(sp_album *album);
-# 2003 "spotify/api.h"
+# 2014 "spotify/api.h"
 const char * sp_artist_name(sp_artist *artist);
-# 2013 "spotify/api.h"
+# 2024 "spotify/api.h"
 bool sp_artist_is_loaded(sp_artist *artist);
-# 2026 "spotify/api.h"
+# 2037 "spotify/api.h"
 const byte * sp_artist_portrait(sp_artist *artist, sp_image_size size);
-# 2035 "spotify/api.h"
+# 2046 "spotify/api.h"
 sp_error sp_artist_add_ref(sp_artist *artist);
-# 2044 "spotify/api.h"
+# 2055 "spotify/api.h"
 sp_error sp_artist_release(sp_artist *artist);
-# 2068 "spotify/api.h"
+# 2079 "spotify/api.h"
 typedef void albumbrowse_complete_cb(sp_albumbrowse *result, void *userdata);
-# 2084 "spotify/api.h"
+# 2095 "spotify/api.h"
 sp_albumbrowse * sp_albumbrowse_create(sp_session *session, sp_album *album, albumbrowse_complete_cb *callback, void *userdata);
-# 2093 "spotify/api.h"
+# 2104 "spotify/api.h"
 bool sp_albumbrowse_is_loaded(sp_albumbrowse *alb);
-# 2107 "spotify/api.h"
+# 2118 "spotify/api.h"
 sp_error sp_albumbrowse_error(sp_albumbrowse *alb);
-# 2116 "spotify/api.h"
+# 2127 "spotify/api.h"
 sp_album * sp_albumbrowse_album(sp_albumbrowse *alb);
-# 2125 "spotify/api.h"
+# 2136 "spotify/api.h"
 sp_artist * sp_albumbrowse_artist(sp_albumbrowse *alb);
-# 2134 "spotify/api.h"
+# 2145 "spotify/api.h"
 int sp_albumbrowse_num_copyrights(sp_albumbrowse *alb);
-# 2146 "spotify/api.h"
+# 2157 "spotify/api.h"
 const char * sp_albumbrowse_copyright(sp_albumbrowse *alb, int index);
-# 2155 "spotify/api.h"
+# 2166 "spotify/api.h"
 int sp_albumbrowse_num_tracks(sp_albumbrowse *alb);
-# 2167 "spotify/api.h"
-sp_track * sp_albumbrowse_track(sp_albumbrowse *alb, int index);
 # 2178 "spotify/api.h"
+sp_track * sp_albumbrowse_track(sp_albumbrowse *alb, int index);
+# 2189 "spotify/api.h"
 const char * sp_albumbrowse_review(sp_albumbrowse *alb);
-# 2188 "spotify/api.h"
+# 2199 "spotify/api.h"
 int sp_albumbrowse_backend_request_duration(sp_albumbrowse *alb);
-# 2198 "spotify/api.h"
+# 2209 "spotify/api.h"
 sp_error sp_albumbrowse_add_ref(sp_albumbrowse *alb);
-# 2207 "spotify/api.h"
+# 2218 "spotify/api.h"
 sp_error sp_albumbrowse_release(sp_albumbrowse *alb);
-# 2234 "spotify/api.h"
+# 2245 "spotify/api.h"
 typedef void artistbrowse_complete_cb(sp_artistbrowse *result, void *userdata);
-# 2251 "spotify/api.h"
+# 2262 "spotify/api.h"
 sp_artistbrowse * sp_artistbrowse_create(sp_session *session, sp_artist *artist, sp_artistbrowse_type type, artistbrowse_complete_cb *callback, void *userdata);
-# 2260 "spotify/api.h"
+# 2271 "spotify/api.h"
 bool sp_artistbrowse_is_loaded(sp_artistbrowse *arb);
-# 2273 "spotify/api.h"
+# 2284 "spotify/api.h"
 sp_error sp_artistbrowse_error(sp_artistbrowse *arb);
-# 2282 "spotify/api.h"
+# 2293 "spotify/api.h"
 sp_artist * sp_artistbrowse_artist(sp_artistbrowse *arb);
-# 2291 "spotify/api.h"
+# 2302 "spotify/api.h"
 int sp_artistbrowse_num_portraits(sp_artistbrowse *arb);
-# 2303 "spotify/api.h"
+# 2314 "spotify/api.h"
 const byte * sp_artistbrowse_portrait(sp_artistbrowse *arb, int index);
-# 2312 "spotify/api.h"
+# 2323 "spotify/api.h"
 int sp_artistbrowse_num_tracks(sp_artistbrowse *arb);
-# 2324 "spotify/api.h"
-sp_track * sp_artistbrowse_track(sp_artistbrowse *arb, int index);
 # 2335 "spotify/api.h"
+sp_track * sp_artistbrowse_track(sp_artistbrowse *arb, int index);
+# 2346 "spotify/api.h"
 int sp_artistbrowse_num_tophit_tracks(sp_artistbrowse *arb);
-# 2348 "spotify/api.h"
+# 2359 "spotify/api.h"
 sp_track * sp_artistbrowse_tophit_track(sp_artistbrowse *arb, int index);
-# 2357 "spotify/api.h"
+# 2368 "spotify/api.h"
 int sp_artistbrowse_num_albums(sp_artistbrowse *arb);
-# 2369 "spotify/api.h"
+# 2380 "spotify/api.h"
 sp_album * sp_artistbrowse_album(sp_artistbrowse *arb, int index);
-# 2378 "spotify/api.h"
+# 2389 "spotify/api.h"
 int sp_artistbrowse_num_similar_artists(sp_artistbrowse *arb);
-# 2390 "spotify/api.h"
+# 2401 "spotify/api.h"
 sp_artist * sp_artistbrowse_similar_artist(sp_artistbrowse *arb, int index);
-# 2402 "spotify/api.h"
+# 2413 "spotify/api.h"
 const char * sp_artistbrowse_biography(sp_artistbrowse *arb);
-# 2412 "spotify/api.h"
+# 2423 "spotify/api.h"
 int sp_artistbrowse_backend_request_duration(sp_artistbrowse *arb);
-# 2422 "spotify/api.h"
+# 2433 "spotify/api.h"
 sp_error sp_artistbrowse_add_ref(sp_artistbrowse *arb);
-# 2431 "spotify/api.h"
+# 2442 "spotify/api.h"
 sp_error sp_artistbrowse_release(sp_artistbrowse *arb);
-# 2445 "spotify/api.h"
+# 2456 "spotify/api.h"
 typedef enum {
   SP_IMAGE_FORMAT_UNKNOWN = -1,
   SP_IMAGE_FORMAT_JPEG = 0,
@@ -769,81 +752,81 @@ typedef enum {
 
 
 typedef void image_loaded_cb(sp_image *image, void *userdata);
-# 2468 "spotify/api.h"
+# 2479 "spotify/api.h"
 sp_image * sp_image_create(sp_session *session, const byte image_id[20]);
-# 2481 "spotify/api.h"
+# 2492 "spotify/api.h"
 sp_image * sp_image_create_from_link(sp_session *session, sp_link *l);
-# 2495 "spotify/api.h"
+# 2506 "spotify/api.h"
 sp_error sp_image_add_load_callback(sp_image *image, image_loaded_cb *callback, void *userdata);
-# 2507 "spotify/api.h"
+# 2518 "spotify/api.h"
 sp_error sp_image_remove_load_callback(sp_image *image, image_loaded_cb *callback, void *userdata);
-# 2517 "spotify/api.h"
+# 2528 "spotify/api.h"
 bool sp_image_is_loaded(sp_image *image);
-# 2530 "spotify/api.h"
+# 2541 "spotify/api.h"
 sp_error sp_image_error(sp_image *image);
-# 2539 "spotify/api.h"
-sp_imageformat sp_image_format(sp_image *image);
 # 2550 "spotify/api.h"
+sp_imageformat sp_image_format(sp_image *image);
+# 2561 "spotify/api.h"
 const void * sp_image_data(sp_image *image, size_t *data_size);
-# 2559 "spotify/api.h"
+# 2570 "spotify/api.h"
 const byte * sp_image_image_id(sp_image *image);
-# 2569 "spotify/api.h"
+# 2580 "spotify/api.h"
 sp_error sp_image_add_ref(sp_image *image);
-# 2578 "spotify/api.h"
+# 2589 "spotify/api.h"
 sp_error sp_image_release(sp_image *image);
-# 2599 "spotify/api.h"
+# 2610 "spotify/api.h"
 typedef void search_complete_cb(sp_search *result, void *userdata);
-# 2620 "spotify/api.h"
+# 2631 "spotify/api.h"
 sp_search * sp_search_create(sp_session *session, const char *query, int track_offset, int track_count, int album_offset, int album_count, int artist_offset, int artist_count, int playlist_offset, int playlist_count, sp_search_type search_type, search_complete_cb *callback, void *userdata);
-# 2629 "spotify/api.h"
+# 2640 "spotify/api.h"
 bool sp_search_is_loaded(sp_search *search);
-# 2642 "spotify/api.h"
+# 2653 "spotify/api.h"
 sp_error sp_search_error(sp_search *search);
-# 2651 "spotify/api.h"
+# 2662 "spotify/api.h"
 int sp_search_num_tracks(sp_search *search);
-# 2661 "spotify/api.h"
+# 2672 "spotify/api.h"
 sp_track * sp_search_track(sp_search *search, int index);
-# 2670 "spotify/api.h"
+# 2681 "spotify/api.h"
 int sp_search_num_albums(sp_search *search);
-# 2680 "spotify/api.h"
+# 2691 "spotify/api.h"
 sp_album * sp_search_album(sp_search *search, int index);
-# 2689 "spotify/api.h"
+# 2700 "spotify/api.h"
 int sp_search_num_playlists(sp_search *search);
-# 2699 "spotify/api.h"
+# 2710 "spotify/api.h"
 sp_playlist * sp_search_playlist(sp_search *search, int index);
-# 2709 "spotify/api.h"
+# 2720 "spotify/api.h"
 const char * sp_search_playlist_name(sp_search *search, int index);
-# 2719 "spotify/api.h"
+# 2730 "spotify/api.h"
 const char * sp_search_playlist_uri(sp_search *search, int index);
-# 2729 "spotify/api.h"
+# 2740 "spotify/api.h"
 const char * sp_search_playlist_image_uri(sp_search *search, int index);
-# 2738 "spotify/api.h"
+# 2749 "spotify/api.h"
 int sp_search_num_artists(sp_search *search);
-# 2748 "spotify/api.h"
+# 2759 "spotify/api.h"
 sp_artist * sp_search_artist(sp_search *search, int index);
-# 2757 "spotify/api.h"
+# 2768 "spotify/api.h"
 const char * sp_search_query(sp_search *search);
-# 2766 "spotify/api.h"
-const char * sp_search_did_you_mean(sp_search *search);
 # 2777 "spotify/api.h"
-int sp_search_total_tracks(sp_search *search);
+const char * sp_search_did_you_mean(sp_search *search);
 # 2788 "spotify/api.h"
-int sp_search_total_albums(sp_search *search);
+int sp_search_total_tracks(sp_search *search);
 # 2799 "spotify/api.h"
-int sp_search_total_artists(sp_search *search);
+int sp_search_total_albums(sp_search *search);
 # 2810 "spotify/api.h"
+int sp_search_total_artists(sp_search *search);
+# 2821 "spotify/api.h"
 int sp_search_total_playlists(sp_search *search);
-# 2819 "spotify/api.h"
+# 2830 "spotify/api.h"
 sp_error sp_search_add_ref(sp_search *search);
-# 2828 "spotify/api.h"
+# 2839 "spotify/api.h"
 sp_error sp_search_release(sp_search *search);
-# 2853 "spotify/api.h"
-typedef struct sp_playlist_callbacks {
 # 2864 "spotify/api.h"
+typedef struct sp_playlist_callbacks {
+# 2875 "spotify/api.h"
   void ( *tracks_added)(sp_playlist *pl, sp_track * const *tracks, int num_tracks, int position, void *userdata);
-# 2874 "spotify/api.h"
-  void ( *tracks_removed)(sp_playlist *pl, const int *tracks, int num_tracks, void *userdata);
 # 2885 "spotify/api.h"
+  void ( *tracks_removed)(sp_playlist *pl, const int *tracks, int num_tracks, void *userdata);
+# 2896 "spotify/api.h"
   void ( *tracks_moved)(sp_playlist *pl, const int *tracks, int num_tracks, int new_position, void *userdata);
 
 
@@ -853,9 +836,9 @@ typedef struct sp_playlist_callbacks {
 
 
   void ( *playlist_renamed)(sp_playlist *pl, void *userdata);
-# 2909 "spotify/api.h"
+# 2920 "spotify/api.h"
   void ( *playlist_state_changed)(sp_playlist *pl, void *userdata);
-# 2922 "spotify/api.h"
+# 2933 "spotify/api.h"
   void ( *playlist_update_in_progress)(sp_playlist *pl, bool done, void *userdata);
 
 
@@ -865,95 +848,95 @@ typedef struct sp_playlist_callbacks {
 
 
   void ( *playlist_metadata_updated)(sp_playlist *pl, void *userdata);
-# 2941 "spotify/api.h"
+# 2952 "spotify/api.h"
   void ( *track_created_changed)(sp_playlist *pl, int position, sp_user *user, int when, void *userdata);
-# 2951 "spotify/api.h"
+# 2962 "spotify/api.h"
   void ( *track_seen_changed)(sp_playlist *pl, int position, bool seen, void *userdata);
-# 2960 "spotify/api.h"
+# 2971 "spotify/api.h"
   void ( *description_changed)(sp_playlist *pl, const char *desc, void *userdata);
-# 2970 "spotify/api.h"
-  void ( *image_changed)(sp_playlist *pl, const byte *image, void *userdata);
 # 2981 "spotify/api.h"
+  void ( *image_changed)(sp_playlist *pl, const byte *image, void *userdata);
+# 2992 "spotify/api.h"
   void ( *track_message_changed)(sp_playlist *pl, int position, const char *message, void *userdata);
-# 2990 "spotify/api.h"
+# 3001 "spotify/api.h"
   void ( *subscribers_changed)(sp_playlist *pl, void *userdata);
 
 } sp_playlist_callbacks;
-# 3003 "spotify/api.h"
+# 3014 "spotify/api.h"
 bool sp_playlist_is_loaded(sp_playlist *playlist);
-# 3018 "spotify/api.h"
+# 3029 "spotify/api.h"
 sp_error sp_playlist_add_callbacks(sp_playlist *playlist, sp_playlist_callbacks *callbacks, void *userdata);
-# 3037 "spotify/api.h"
+# 3048 "spotify/api.h"
 sp_error sp_playlist_remove_callbacks(sp_playlist *playlist, sp_playlist_callbacks *callbacks, void *userdata);
-# 3046 "spotify/api.h"
+# 3057 "spotify/api.h"
 int sp_playlist_num_tracks(sp_playlist *playlist);
-# 3056 "spotify/api.h"
+# 3067 "spotify/api.h"
 sp_track * sp_playlist_track(sp_playlist *playlist, int index);
-# 3066 "spotify/api.h"
+# 3077 "spotify/api.h"
 int sp_playlist_track_create_time(sp_playlist *playlist, int index);
-# 3076 "spotify/api.h"
+# 3087 "spotify/api.h"
 sp_user * sp_playlist_track_creator(sp_playlist *playlist, int index);
-# 3086 "spotify/api.h"
+# 3097 "spotify/api.h"
 bool sp_playlist_track_seen(sp_playlist *playlist, int index);
-# 3099 "spotify/api.h"
+# 3110 "spotify/api.h"
 sp_error sp_playlist_track_set_seen(sp_playlist *playlist, int index, bool seen);
-# 3109 "spotify/api.h"
+# 3120 "spotify/api.h"
 const char * sp_playlist_track_message(sp_playlist *playlist, int index);
-# 3118 "spotify/api.h"
+# 3129 "spotify/api.h"
 const char * sp_playlist_name(sp_playlist *playlist);
-# 3132 "spotify/api.h"
+# 3143 "spotify/api.h"
 sp_error sp_playlist_rename(sp_playlist *playlist, const char *new_name);
-# 3141 "spotify/api.h"
-sp_user * sp_playlist_owner(sp_playlist *playlist);
 # 3152 "spotify/api.h"
+sp_user * sp_playlist_owner(sp_playlist *playlist);
+# 3163 "spotify/api.h"
 bool sp_playlist_is_collaborative(sp_playlist *playlist);
-# 3164 "spotify/api.h"
+# 3175 "spotify/api.h"
 sp_error sp_playlist_set_collaborative(sp_playlist *playlist, bool collaborative);
-# 3177 "spotify/api.h"
-sp_error sp_playlist_set_autolink_tracks(sp_playlist *playlist, bool link);
 # 3188 "spotify/api.h"
+sp_error sp_playlist_set_autolink_tracks(sp_playlist *playlist, bool link);
+# 3199 "spotify/api.h"
 const char * sp_playlist_get_description(sp_playlist *playlist);
-# 3200 "spotify/api.h"
+# 3211 "spotify/api.h"
 bool sp_playlist_get_image(sp_playlist *playlist, byte image[20]);
-# 3212 "spotify/api.h"
+# 3223 "spotify/api.h"
 bool sp_playlist_has_pending_changes(sp_playlist *playlist);
-# 3228 "spotify/api.h"
+# 3239 "spotify/api.h"
 sp_error sp_playlist_add_tracks(sp_playlist *playlist, sp_track *const*tracks, int num_tracks, int position, sp_session *session);
-# 3243 "spotify/api.h"
+# 3254 "spotify/api.h"
 sp_error sp_playlist_remove_tracks(sp_playlist *playlist, const int *tracks, int num_tracks);
-# 3260 "spotify/api.h"
-sp_error sp_playlist_reorder_tracks(sp_playlist *playlist, const int *tracks, int num_tracks, int new_position);
 # 3271 "spotify/api.h"
+sp_error sp_playlist_reorder_tracks(sp_playlist *playlist, const int *tracks, int num_tracks, int new_position);
+# 3282 "spotify/api.h"
 unsigned int sp_playlist_num_subscribers(sp_playlist *playlist);
-# 3286 "spotify/api.h"
+# 3297 "spotify/api.h"
 sp_subscribers * sp_playlist_subscribers(sp_playlist *playlist);
-# 3295 "spotify/api.h"
+# 3306 "spotify/api.h"
 sp_error sp_playlist_subscribers_free(sp_subscribers *subscribers);
-# 3312 "spotify/api.h"
+# 3323 "spotify/api.h"
 sp_error sp_playlist_update_subscribers(sp_session *session, sp_playlist *playlist);
-# 3343 "spotify/api.h"
+# 3354 "spotify/api.h"
 bool sp_playlist_is_in_ram(sp_session *session, sp_playlist *playlist);
-# 3355 "spotify/api.h"
-sp_error sp_playlist_set_in_ram(sp_session *session, sp_playlist *playlist, bool in_ram);
 # 3366 "spotify/api.h"
+sp_error sp_playlist_set_in_ram(sp_session *session, sp_playlist *playlist, bool in_ram);
+# 3377 "spotify/api.h"
 sp_playlist * sp_playlist_create(sp_session *session, sp_link *link);
-# 3378 "spotify/api.h"
+# 3389 "spotify/api.h"
 sp_error sp_playlist_set_offline_mode(sp_session *session, sp_playlist *playlist, bool offline);
-# 3392 "spotify/api.h"
+# 3403 "spotify/api.h"
 sp_playlist_offline_status sp_playlist_get_offline_status(sp_session *session, sp_playlist *playlist);
-# 3405 "spotify/api.h"
+# 3416 "spotify/api.h"
 int sp_playlist_get_offline_download_completed(sp_session *session, sp_playlist *playlist);
-# 3414 "spotify/api.h"
+# 3425 "spotify/api.h"
 sp_error sp_playlist_add_ref(sp_playlist *playlist);
-# 3423 "spotify/api.h"
+# 3434 "spotify/api.h"
 sp_error sp_playlist_release(sp_playlist *playlist);
-# 3433 "spotify/api.h"
+# 3444 "spotify/api.h"
 typedef struct sp_playlistcontainer_callbacks {
-# 3442 "spotify/api.h"
-  void ( *playlist_added)(sp_playlistcontainer *pc, sp_playlist *playlist, int position, void *userdata);
 # 3453 "spotify/api.h"
+  void ( *playlist_added)(sp_playlistcontainer *pc, sp_playlist *playlist, int position, void *userdata);
+# 3464 "spotify/api.h"
   void ( *playlist_removed)(sp_playlistcontainer *pc, sp_playlist *playlist, int position, void *userdata);
-# 3465 "spotify/api.h"
+# 3476 "spotify/api.h"
   void ( *playlist_moved)(sp_playlistcontainer *pc, sp_playlist *playlist, int position, int new_position, void *userdata);
 
 
@@ -964,105 +947,105 @@ typedef struct sp_playlistcontainer_callbacks {
 
   void ( *container_loaded)(sp_playlistcontainer *pc, void *userdata);
 } sp_playlistcontainer_callbacks;
-# 3494 "spotify/api.h"
+# 3505 "spotify/api.h"
 sp_error sp_playlistcontainer_add_callbacks(sp_playlistcontainer *pc, sp_playlistcontainer_callbacks *callbacks, void *userdata);
-# 3509 "spotify/api.h"
-sp_error sp_playlistcontainer_remove_callbacks(sp_playlistcontainer *pc, sp_playlistcontainer_callbacks *callbacks, void *userdata);
 # 3520 "spotify/api.h"
-int sp_playlistcontainer_num_playlists(sp_playlistcontainer *pc);
+sp_error sp_playlistcontainer_remove_callbacks(sp_playlistcontainer *pc, sp_playlistcontainer_callbacks *callbacks, void *userdata);
 # 3531 "spotify/api.h"
+int sp_playlistcontainer_num_playlists(sp_playlistcontainer *pc);
+# 3542 "spotify/api.h"
 bool sp_playlistcontainer_is_loaded(sp_playlistcontainer *pc);
-# 3543 "spotify/api.h"
+# 3554 "spotify/api.h"
 sp_playlist * sp_playlistcontainer_playlist(sp_playlistcontainer *pc, int index);
-# 3555 "spotify/api.h"
+# 3566 "spotify/api.h"
 sp_playlist_type sp_playlistcontainer_playlist_type(sp_playlistcontainer *pc, int index);
-# 3572 "spotify/api.h"
+# 3583 "spotify/api.h"
 sp_error sp_playlistcontainer_playlist_folder_name(sp_playlistcontainer *pc, int index, char *buffer, int buffer_size);
-# 3584 "spotify/api.h"
-sp_uint64 sp_playlistcontainer_playlist_folder_id(sp_playlistcontainer *pc, int index);
 # 3595 "spotify/api.h"
+sp_uint64 sp_playlistcontainer_playlist_folder_id(sp_playlistcontainer *pc, int index);
+# 3606 "spotify/api.h"
 sp_playlist * sp_playlistcontainer_add_new_playlist(sp_playlistcontainer *pc, const char *name);
-# 3605 "spotify/api.h"
+# 3616 "spotify/api.h"
 sp_playlist * sp_playlistcontainer_add_playlist(sp_playlistcontainer *pc, sp_link *link);
-# 3617 "spotify/api.h"
+# 3628 "spotify/api.h"
 sp_error sp_playlistcontainer_remove_playlist(sp_playlistcontainer *pc, int index);
-# 3632 "spotify/api.h"
+# 3643 "spotify/api.h"
 sp_error sp_playlistcontainer_move_playlist(sp_playlistcontainer *pc, int index, int new_position, bool dry_run);
-# 3656 "spotify/api.h"
+# 3667 "spotify/api.h"
 sp_error sp_playlistcontainer_add_folder(sp_playlistcontainer *pc, int index, const char *name);
-# 3665 "spotify/api.h"
+# 3676 "spotify/api.h"
 sp_user * sp_playlistcontainer_owner(sp_playlistcontainer *pc);
-# 3675 "spotify/api.h"
+# 3686 "spotify/api.h"
 sp_error sp_playlistcontainer_add_ref(sp_playlistcontainer *pc);
-# 3684 "spotify/api.h"
+# 3695 "spotify/api.h"
 sp_error sp_playlistcontainer_release(sp_playlistcontainer *pc);
-# 3699 "spotify/api.h"
+# 3710 "spotify/api.h"
 int sp_playlistcontainer_get_unseen_tracks(sp_playlistcontainer *pc, sp_playlist *playlist, sp_track **tracks, int num_tracks);
-# 3708 "spotify/api.h"
+# 3719 "spotify/api.h"
 int sp_playlistcontainer_clear_unseen_tracks(sp_playlistcontainer *pc, sp_playlist *playlist);
-# 3722 "spotify/api.h"
+# 3733 "spotify/api.h"
 typedef enum sp_relation_type {
   SP_RELATION_TYPE_UNKNOWN = 0,
   SP_RELATION_TYPE_NONE = 1,
   SP_RELATION_TYPE_UNIDIRECTIONAL = 2,
   SP_RELATION_TYPE_BIDIRECTIONAL = 3,
 } sp_relation_type;
-# 3738 "spotify/api.h"
+# 3749 "spotify/api.h"
 const char * sp_user_canonical_name(sp_user *user);
-# 3750 "spotify/api.h"
+# 3761 "spotify/api.h"
 const char * sp_user_display_name(sp_user *user);
-# 3760 "spotify/api.h"
+# 3771 "spotify/api.h"
 bool sp_user_is_loaded(sp_user *user);
-# 3770 "spotify/api.h"
+# 3781 "spotify/api.h"
 sp_error sp_user_add_ref(sp_user *user);
-# 3779 "spotify/api.h"
+# 3790 "spotify/api.h"
 sp_error sp_user_release(sp_user *user);
-# 3792 "spotify/api.h"
+# 3803 "spotify/api.h"
 typedef enum {
   SP_TOPLIST_TYPE_ARTISTS = 0,
   SP_TOPLIST_TYPE_ALBUMS = 1,
   SP_TOPLIST_TYPE_TRACKS = 2,
 } sp_toplisttype;
-# 3811 "spotify/api.h"
+# 3822 "spotify/api.h"
 typedef enum {
   SP_TOPLIST_REGION_EVERYWHERE = 0,
   SP_TOPLIST_REGION_USER = 1,
 } sp_toplistregion;
-# 3827 "spotify/api.h"
+# 3838 "spotify/api.h"
 typedef void toplistbrowse_complete_cb(sp_toplistbrowse *result, void *userdata);
-# 3846 "spotify/api.h"
+# 3857 "spotify/api.h"
 sp_toplistbrowse * sp_toplistbrowse_create(sp_session *session, sp_toplisttype type, sp_toplistregion region, const char *username, toplistbrowse_complete_cb *callback, void *userdata);
-# 3856 "spotify/api.h"
+# 3867 "spotify/api.h"
 bool sp_toplistbrowse_is_loaded(sp_toplistbrowse *tlb);
-# 3869 "spotify/api.h"
-sp_error sp_toplistbrowse_error(sp_toplistbrowse *tlb);
 # 3880 "spotify/api.h"
+sp_error sp_toplistbrowse_error(sp_toplistbrowse *tlb);
+# 3891 "spotify/api.h"
 sp_error sp_toplistbrowse_add_ref(sp_toplistbrowse *tlb);
-# 3889 "spotify/api.h"
+# 3900 "spotify/api.h"
 sp_error sp_toplistbrowse_release(sp_toplistbrowse *tlb);
-# 3898 "spotify/api.h"
+# 3909 "spotify/api.h"
 int sp_toplistbrowse_num_artists(sp_toplistbrowse *tlb);
-# 3908 "spotify/api.h"
+# 3919 "spotify/api.h"
 sp_artist * sp_toplistbrowse_artist(sp_toplistbrowse *tlb, int index);
-# 3918 "spotify/api.h"
-int sp_toplistbrowse_num_albums(sp_toplistbrowse *tlb);
 # 3929 "spotify/api.h"
+int sp_toplistbrowse_num_albums(sp_toplistbrowse *tlb);
+# 3940 "spotify/api.h"
 sp_album * sp_toplistbrowse_album(sp_toplistbrowse *tlb, int index);
-# 3939 "spotify/api.h"
-int sp_toplistbrowse_num_tracks(sp_toplistbrowse *tlb);
 # 3950 "spotify/api.h"
+int sp_toplistbrowse_num_tracks(sp_toplistbrowse *tlb);
+# 3961 "spotify/api.h"
 sp_track * sp_toplistbrowse_track(sp_toplistbrowse *tlb, int index);
-# 3960 "spotify/api.h"
+# 3971 "spotify/api.h"
 int sp_toplistbrowse_backend_request_duration(sp_toplistbrowse *tlb);
-# 3980 "spotify/api.h"
+# 3991 "spotify/api.h"
 typedef void inboxpost_complete_cb(sp_inbox *result, void *userdata);
-# 3995 "spotify/api.h"
+# 4006 "spotify/api.h"
 sp_inbox * sp_inbox_post_tracks(sp_session *session, const char *user, sp_track * const *tracks, int num_tracks, const char *message, inboxpost_complete_cb *callback, void *userdata);
-# 4012 "spotify/api.h"
+# 4023 "spotify/api.h"
 sp_error sp_inbox_error(sp_inbox *inbox);
-# 4021 "spotify/api.h"
+# 4032 "spotify/api.h"
 sp_error sp_inbox_add_ref(sp_inbox *inbox);
-# 4030 "spotify/api.h"
+# 4041 "spotify/api.h"
 sp_error sp_inbox_release(sp_inbox *inbox);
-# 4040 "spotify/api.h"
+# 4051 "spotify/api.h"
 const char * sp_build_id(void);

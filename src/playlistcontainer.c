@@ -20,8 +20,10 @@ static plc_cb_entry *playlistcontainer_callbacks_table = NULL;
 /* Mallocs and memsets a new sp_playlist_callbacks structure. */
 static sp_playlistcontainer_callbacks *
 create_and_initialize_callbacks(void) {
-    /* TODO: switch to PyMem_Malloc and audit for coresponding free */
-    sp_playlistcontainer_callbacks *callbacks = malloc(
+    /* TODO: Playlist container callbacks are never cleaned up, no
+     * corresponding free exists, thus could leak memory. */
+    /* TODO: handle memory allocation failing. */
+    sp_playlistcontainer_callbacks *callbacks = PyMem_Malloc(
         sizeof(sp_playlistcontainer_callbacks));
     memset(callbacks, 0, sizeof(sp_playlistcontainer_callbacks));
     return callbacks;
@@ -48,12 +50,14 @@ PlaylistContainer_FromSpotify(sp_playlistcontainer *container, bool add_ref)
 static void
 PlaylistContainer_dealloc(PyObject *self)
 {
+    /* TODO: do we need to remove all callbacks upon removing a container? */
     if (PlaylistContainer_SP_PLAYLISTCONTAINER(self) != NULL)
         sp_playlistcontainer_release(PlaylistContainer_SP_PLAYLISTCONTAINER(self));
     self->ob_type->tp_free(self);
 }
 
 /* TODO: cleanup this code with respect to variables and formating */
+/* TODO: replace with a generic linked list */
 static void
 plc_callbacks_table_add(PlaylistContainer *plc,
                         playlistcontainer_callback * cb)
@@ -76,8 +80,10 @@ plc_callbacks_table_add(PlaylistContainer *plc,
     }
     else {
         cb->next = NULL;
-        /* TODO: switch to PyMem_Malloc and audit for coresponding free */
-        entry = malloc(sizeof(plc_cb_entry));
+        /* TODO: these entries are never cleaned up, probably leaks memory. */
+        /* TODO: playlistcontainer gets an extra ref here that never goes away. */
+        /* TODO: handle memory allocation failing. */
+        entry = PyMem_Malloc(sizeof(plc_cb_entry));
         sp_playlistcontainer_add_ref(plc->_playlistcontainer);
         entry->playlistcontainer = plc->_playlistcontainer;
         entry->callbacks = cb;
@@ -106,9 +112,9 @@ PlaylistContainer_add_callback(PyObject *self, PyObject *args,
 
     trampoline = create_trampoline(callback, userdata);
 
-    /* TODO: switch to PyMem_Malloc and audit for coresponding free */
-    /* TODO: extract to helper */
-    to_add = malloc(sizeof(playlistcontainer_callback));
+    /* TODO: these entries are never cleaned up, probably leaks memory. */
+    /* TODO: handle memory allocation failing. */
+    to_add = PyMem_Malloc(sizeof(playlistcontainer_callback));
     to_add->callback = container_callbacks;
     to_add->trampoline = trampoline;
     plc_callbacks_table_add((PlaylistContainer *)self, to_add);

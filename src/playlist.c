@@ -21,8 +21,8 @@ static pl_cb_entry *playlist_callbacks_table = NULL;
 /* Mallocs and memsets a new sp_playlist_callbacks structure. */
 static sp_playlist_callbacks *
 create_and_initialize_callbacks(void) {
-    /* TODO: switch to PyMem_Malloc and audit for coresponding free */
-    sp_playlist_callbacks *callbacks = malloc(sizeof(sp_playlist_callbacks));
+    /* TODO: handle memory allocation failing. */
+    sp_playlist_callbacks *callbacks = PyMem_Malloc(sizeof(sp_playlist_callbacks));
     memset(callbacks, 0, sizeof(sp_playlist_callbacks));
     return callbacks;
 }
@@ -49,8 +49,8 @@ pl_callbacks_table_add(Playlist * pl, playlist_callback * cb)
     }
     else {
         cb->next = NULL;
-        /* TODO: switch to PyMem_Malloc and audit for coresponding free */
-        entry = malloc(sizeof(pl_cb_entry));
+        /* TODO: handle memory allocation failing. */
+        entry = PyMem_Malloc(sizeof(pl_cb_entry));
         sp_playlist_add_ref(pl->_playlist);
         entry->playlist = pl->_playlist;
         entry->callbacks = cb;
@@ -118,7 +118,7 @@ pl_callbacks_table_remove(Playlist *pl,
             playlist_callbacks_table = entry->next;
         }
         sp_playlist_release(entry->playlist);
-        free(entry);
+        PyMem_Free(entry);
     }
     return result;
 }
@@ -146,6 +146,7 @@ Playlist_FromSpotify(sp_playlist *playlist, bool add_ref)
 static void
 Playlist_dealloc(PyObject *self)
 {
+    /* TODO: do we need to remove all callbacks upon removing a playlist? */
     if (Playlist_SP_PLAYLIST(self) != NULL)
         sp_playlist_release(Playlist_SP_PLAYLIST(self));
     self->ob_type->tp_free(self);
@@ -224,9 +225,8 @@ Playlist_add_callback(PyObject *self, PyObject *args, sp_playlist_callbacks *pla
 
     trampoline = create_trampoline(callback, userdata);
 
-    /* TODO: switch to PyMem_Malloc and audit for coresponding free */
-    /* TODO: extract to helper */
-    entry = malloc(sizeof(playlist_callback));
+    /* TODO: handle memory allocation failing. */
+    entry = PyMem_Malloc(sizeof(playlist_callback));
     entry->callback = playlist_callbacks;
     entry->trampoline = trampoline;
     pl_callbacks_table_add((Playlist *)self, entry);
@@ -274,8 +274,8 @@ Playlist_remove_callback(PyObject *self, PyObject *args)
                                  entry->trampoline);
 
     delete_trampoline(entry->trampoline);
-    free(entry->callback);
-    free(entry);
+    PyMem_Free(entry->callback);
+    PyMem_Free(entry);
 
     Py_RETURN_NONE;
 }

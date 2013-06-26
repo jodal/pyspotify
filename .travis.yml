@@ -17,12 +17,11 @@ install:
 script:
   - "tox -e $TOX_ENV"
 
-# TODO Activate when pyspotify2 is released
-#notifications:
-#  irc:
-#    channels:
-#      - "irc.freenode.org#mopidy"
-#    on_success: change
-#    on_failure: change
-#    use_notice: true
-#    skip_join: true
+notifications:
+  irc:
+    channels:
+      - "irc.freenode.org#mopidy"
+    on_success: change
+    on_failure: change
+    use_notice: true
+    skip_join: true

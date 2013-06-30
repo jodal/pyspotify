@@ -33,30 +33,44 @@ v1.11 (UNRELEASED)
 
 **Code cleanups**
 
-- Fixed formating and style of entire C code base with exception of mock code.
-- Fixed multiple Python refcount bugs found by using gcc-python-plugin and
-  manual inspection.
-- Fixed multiple libspotify refcount bugs by forcing all ``*_FromSpotify`` calls
-  to specify if a ref needs to be added or not. Also audited for corresponding
-  release calls.
-- Converted all malloc/free calls to use the Python allocator. Also audited for
-  missing free calls and marked outstanding issues with TODOs (only
-  playlistcontainer callbacks remain as known issues).
+- Fixed formatting and style of entire C code base with exception of mock code.
+
+- Fixed multiple Python reference count bugs found by using gcc-python-plugin
+  and manual inspection.
+
+- Fixed multiple libspotify reference count bugs by forcing all
+  ``*_FromSpotify`` calls to specify if a reference needs to be added or not.
+  Also audited for corresponding release calls.
+
+- Converted all ``malloc``/``free`` calls to use the Python allocator. Also
+  audited for missing ``free`` calls and marked outstanding issues with TODOs
+  (only playlistcontainer callbacks remain as known issues).
+
 - Simplified session callback handling by creating a common callback handler.
+
 - Added ``<Object>_SP_<OBJECT>`` macros to hide access to the internal ``sp_*``
   pointers.
+
 - Switched to being strict about avoiding ``Py_XDECREF`` and making sure we
   check for ``NULL``.
+
 - Switched to proper ``debug_printf`` macro that always ends up in code but
   optimized out so we never have broken debug printing.
+
 - Switched to using existing helpers inside the ``<Object>_str`` functions
   instead of duplicating code.
+
 - Return boolean values in API calls that have ``bool`` return values.
+
 - Simplify session creation code and add helpers for building session configs.
+
 - Switch to using ``PyErr_SetNone`` for errors without a description.
+
 - Use ``PyArg_Parse*`` type format strings for argument handling and refcount
   handling in most of the callback code.
+
 - Ensure all encoded strings are freed after use.
+
 - Reuse single callback function for "simple" playlist callbacks.
 
 

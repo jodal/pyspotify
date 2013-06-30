@@ -5,8 +5,10 @@ Changes
 .. currentmodule:: spotify
 
 
-v1.11 (UNRELEASED)
+v1.11 (2013-07-01)
 ==================
+
+This version is compatible with *libspotify* version 12.
 
 **API changes**
 

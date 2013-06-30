@@ -5,9 +5,12 @@ typedef struct {
     sp_artistbrowse *_browser;
 } ArtistBrowser;
 
+#define ArtistBrowser_SP_ARTISTBROWSE(o) ((ArtistBrowser *)o)->_browser
+
 extern PyTypeObject ArtistBrowserType;
 
-extern void artistbrowser_init(PyObject *m);
-
 PyObject *
-ArtistBrowser_FromSpotify(sp_artistbrowse * browse);
+ArtistBrowser_FromSpotify(sp_artistbrowse *browser, bool add_ref);
+
+extern void
+artistbrowser_init(PyObject *module);

@@ -2,12 +2,13 @@
 #include "pyspotify.h"
 
 typedef struct {
-    PyObject_HEAD sp_playlist *_playlist;
+    PyObject_HEAD
+    sp_playlist *_playlist;
 } Playlist;
 
-extern PyTypeObject PlaylistType;
+#define Playlist_SP_PLAYLIST(o) ((Playlist *)o)->_playlist
 
-extern void playlist_init(PyObject *m);
+extern PyTypeObject PlaylistType;
 
 /* Keep track of callbacks added to a playlist */
 typedef struct _playlist_callback {
@@ -23,4 +24,9 @@ typedef struct _pl_cb_entry {
     struct _pl_cb_entry *next;
 } pl_cb_entry;
 
-PyObject *Playlist_FromSpotify(sp_playlist * spl);
+PyObject *
+Playlist_FromSpotify(sp_playlist *playlist, bool add_ref);
+
+extern void
+playlist_init(PyObject *module);
+

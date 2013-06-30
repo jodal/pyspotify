@@ -1,13 +1,16 @@
 #include "pyspotify.h"
 
 typedef struct {
-    PyObject_HEAD sp_albumbrowse *_browser;
-    Callback _callback;
+    PyObject_HEAD
+    sp_albumbrowse *_browser;
 } AlbumBrowser;
+
+#define AlbumBrowser_SP_ALBUMBROWSE(o) ((AlbumBrowser *)o)->_browser
 
 extern PyTypeObject AlbumBrowserType;
 
-extern void albumbrowser_init(PyObject *m);
+PyObject  *
+AlbumBrowser_FromSpotify(sp_albumbrowse *browser, bool add_ref);
 
-PyObject *
-AlbumBrowser_FromSpotify(sp_albumbrowse *browse);
+void
+albumbrowser_init(PyObject *module);

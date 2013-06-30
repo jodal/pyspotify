@@ -17,295 +17,282 @@
 #include "image.h"
 #include "user.h"
 
+/* TODO: is this safe as just an int, or should it be a condition variable? */
 static int session_constructed = 0;
+
+/* TODO: we probably should have a lock protecting access to this */
+/* TODO: more or less all use of Session_SP_SESSION(self) could just be g_session... */
 sp_session *g_session;
 
-static int
-create_session(Session *self, PyObject *client, PyObject *settings);
+static sp_session *
+create_session(PyObject *client, PyObject *settings);
+
+static void
+session_callback(sp_session *session, const char *attr, PyObject *extra);
 
 static PyObject *
 Session_new(PyTypeObject *type, PyObject *args, PyObject *kwds)
 {
-    Session *self;
-
-    self = (Session *) type->tp_alloc(type, 0);
-    self->_session = NULL;
-    return (PyObject *)self;
+    PyObject *self = type->tp_alloc(type, 0);
+    Session_SP_SESSION(self) = NULL;
+    return self;
 }
 
+/* NOTE: this is does not ref count anything so no add_ref */
 PyObject *
-Session_FromSpotify(sp_session * session)
+Session_FromSpotify(sp_session *session)
 {
-    PyObject *s = PyObject_CallObject((PyObject *)&SessionType, NULL);
-
-    ((Session *) s)->_session = session;
-    return s;
+    PyObject *self = SessionType.tp_alloc(&SessionType, 0);
+    Session_SP_SESSION(self) = session;
+    return self;
 }
-
-static PyMemberDef Session_members[] = {
-    {NULL}
-};
 
 static PyObject *
 Session_create(PyTypeObject *type, PyObject *args)
 {
-    Session *self;
-    PyObject *client;
-    PyObject *settings;
-
+    PyObject *client, *settings;
     if (!PyArg_ParseTuple(args, "OO", &client, &settings))
         return NULL;
 
-    self = (Session *) PyObject_Call((PyObject *)type, args, NULL);
-
     PyEval_InitThreads();
-
-    if (create_session(self, client, settings) != 0) {
-        Py_XDECREF(self);
+    sp_session *session = create_session(client, settings);
+    if (session == NULL)
         return NULL;
-    }
-    return (PyObject *)self;
+    return Session_FromSpotify(session);
 }
 
 static PyObject *
-Session_username(Session * self)
+Session_username(PyObject *self)
 {
-    sp_user *user;
-
-    user = sp_session_user(self->_session);
+    sp_user *user = sp_session_user(Session_SP_SESSION(self));
     if (user == NULL) {
         PyErr_SetString(SpotifyError, "Not logged in");
         return NULL;
     }
-    const char *username = sp_user_canonical_name(user);
-
-    return PyUnicode_FromString(username);
+    return PyUnicode_FromString(sp_user_canonical_name(user));
 };
 
 static PyObject *
-Session_display_name(Session * self)
+Session_display_name(PyObject *self)
 {
-    sp_user *user;
-
-    user = sp_session_user(self->_session);
+    sp_user *user = sp_session_user(Session_SP_SESSION(self));
     if (user == NULL) {
         PyErr_SetString(SpotifyError, "Not logged in");
         return NULL;
     }
-    const char *username = sp_user_display_name(user);
-
-    return PyUnicode_FromString(username);
+    return PyUnicode_FromString(sp_user_display_name(user));
 };
 
 static PyObject *
-Session_user_is_loaded(Session * self)
+Session_user_is_loaded(PyObject *self)
 {
-    sp_user *user;
-
-    user = sp_session_user(self->_session);
+    sp_user *user = sp_session_user(Session_SP_SESSION(self));
     if (user == NULL) {
         PyErr_SetString(SpotifyError, "Not logged in");
         return NULL;
     }
-    bool loaded = sp_user_is_loaded(user);
-
-    return Py_BuildValue("i", loaded);
+    return PyBool_FromLong(sp_user_is_loaded(user));
 };
 
 static PyObject *
-Session_logout(Session * self)
+Session_logout(PyObject *self)
 {
     Py_BEGIN_ALLOW_THREADS;
-    sp_session_logout(self->_session);
+    sp_session_logout(Session_SP_SESSION(self));
     Py_END_ALLOW_THREADS;
 
     Py_RETURN_NONE;
 };
 
-PyObject *
-handle_error(int err)
-{
-    if (err != 0) {
-        PyErr_SetString(SpotifyError, sp_error_message(err));
-        return NULL;
-    }
-    else {
-        Py_RETURN_NONE;
-    }
-}
-
 static PyObject *
-Session_playlist_container(Session * self)
+Session_playlist_container(PyObject *self)
 {
-    sp_playlistcontainer *pc;
+    sp_playlistcontainer *container;
 
     Py_BEGIN_ALLOW_THREADS;
-    pc = sp_session_playlistcontainer(self->_session);
+    container = sp_session_playlistcontainer(Session_SP_SESSION(self));
     Py_END_ALLOW_THREADS;
 
-    return PlaylistContainer_FromSpotify(pc);
+    return PlaylistContainer_FromSpotify(container, 1 /* add_ref */);
 }
 
 static PyObject *
-Session_load(Session * self, PyObject *args)
+Session_load(PyObject *self, PyObject *args)
 {
-    Track *track;
-    sp_track *t;
-    sp_session *s;
-    sp_error err;
+    PyObject *track;
+    sp_error error;
 
-    if (!PyArg_ParseTuple(args, "O!", &TrackType, &track)) {
+    if (!PyArg_ParseTuple(args, "O!", &TrackType, &track))
         return NULL;
-    }
-    t = track->_track;
-    s = self->_session;
 
     Py_BEGIN_ALLOW_THREADS;
-    err = sp_session_player_load(s, t);
+    error = sp_session_player_load(Session_SP_SESSION(self), Track_SP_TRACK(track));
     Py_END_ALLOW_THREADS;
 
-    return handle_error(err);
+    return none_or_raise_error(error);
 }
 
 static PyObject *
-Session_seek(Session * self, PyObject *args)
+Session_seek(PyObject *self, PyObject *args)
 {
     int seek;
+    sp_error error;
 
     if (!PyArg_ParseTuple(args, "i", &seek))
         return NULL;
 
     Py_BEGIN_ALLOW_THREADS;
-    sp_session_player_seek(self->_session, seek);
+    error = sp_session_player_seek(Session_SP_SESSION(self), seek);
     Py_END_ALLOW_THREADS;
 
-    Py_RETURN_NONE;
+    return none_or_raise_error(error);
 }
 
 static PyObject *
-Session_play(Session * self, PyObject *args)
+Session_play(PyObject *self, PyObject *args)
 {
     int play;
 
+    /* TODO: Expect bool or something that can be coerced into one? */
     if (!PyArg_ParseTuple(args, "i", &play))
         return NULL;
 
     Py_BEGIN_ALLOW_THREADS;
-    sp_session_player_play(self->_session, play);
+    sp_session_player_play(Session_SP_SESSION(self), play);
     Py_END_ALLOW_THREADS;
 
     Py_RETURN_NONE;
 }
 
 static PyObject *
-Session_unload(Session * self)
+Session_unload(PyObject *self)
 {
-    sp_session_player_unload(self->_session);
+    sp_session_player_unload(Session_SP_SESSION(self));
     Py_RETURN_NONE;
 }
 
 static PyObject *
-Session_process_events(Session * self)
+Session_process_events(PyObject *self)
 {
     int timeout;
 
     Py_BEGIN_ALLOW_THREADS;
-    sp_session_process_events(self->_session, &timeout);
+    sp_session_process_events(Session_SP_SESSION(self), &timeout);
     Py_END_ALLOW_THREADS;
 
     return Py_BuildValue("i", timeout);
 }
 
 void
-search_complete(sp_search * search, Callback * st)
+Session_search_complete(sp_search *search, void *data)
 {
-    PyObject *res, *results;
-    PyGILState_STATE gstate;
+    Callback *trampoline = (Callback *)data;
+    debug_printf(">> search complete (%p, %p)", search, trampoline);
 
-    gstate = PyGILState_Ensure();
-    results = Results_FromSpotify(search);
-    res = PyObject_CallFunctionObjArgs(st->callback, results, st->userdata, NULL);
-    if (!res)
-        PyErr_WriteUnraisable(st->callback);
-    delete_trampoline(st);
-    Py_XDECREF(res);
-    Py_DECREF(results);
+    if (trampoline == NULL)
+        return;
+
+    PyObject *result, *search_results;
+    PyGILState_STATE gstate = PyGILState_Ensure();
+
+    search_results = Results_FromSpotify(search, 1 /* add_ref */);
+    result = PyObject_CallFunction(trampoline->callback, "NO", search_results,
+                                   trampoline->userdata);
+
+    if (result != NULL)
+        Py_DECREF(result);
+    else
+        PyErr_WriteUnraisable(trampoline->callback);
+
+    delete_trampoline(trampoline);
     PyGILState_Release(gstate);
 }
 
+static bool
+sp_search_type_converter(PyObject *o, void *address) {
+    sp_search_type *type = (sp_search_type *)address;
+
+    if (o == NULL || o == Py_None)
+        return 1;
+
+    if (!PyString_Check(o))
+        goto error;
+
+    char *tmp = PyString_AsString(o);
+    if (strcmp(tmp, "standard") == 0)
+        *type = SP_SEARCH_STANDARD;
+    else if (strcmp(tmp, "suggest") == 0)
+        *type = SP_SEARCH_SUGGEST;
+    else
+        goto error;
+
+    return 1;
+
+error:
+    PyErr_Format(PyExc_ValueError, "Unknown search type: %s",
+                 PyString_AsString(PyObject_Repr(o)));
+    return 0;
+}
+
 static PyObject *
-Session_search(Session * self, PyObject *args, PyObject *kwds)
+Session_search(PyObject *self, PyObject *args, PyObject *kwds)
 {
+    PyObject *callback, *userdata = NULL;
+    Callback *trampoline;
+
     char *query;
     sp_search *search;
-    PyObject *callback, *userdata = NULL;
-    int track_offset = 0, track_count = 32,
-        album_offset = 0, album_count = 32, artist_offset = 0, artist_count =
-        32, playlist_offset = 0, playlist_count = 32;
-    Callback *st;
     sp_search_type search_type = SP_SEARCH_STANDARD;
-    char *str_search_type = NULL;
 
-    static char *kwlist[] = { "query", "callback",
-        "track_offset", "track_count",
-        "album_offset", "album_count",
-        "artist_offset", "artist_count",
-        "playlist_offset", "playlist_count",
-        "search_type", "userdata", NULL
-    };
-    if (!PyArg_ParseTupleAndKeywords(args, kwds, "esO|iiiiiiiisO", kwlist,
+    int track_offset = 0, track_count = 32, album_offset = 0, album_count = 32,
+        artist_offset = 0, artist_count = 32, playlist_offset = 0,
+        playlist_count = 32;
+
+    static char *kwlist[] = {
+        "query", "callback", "track_offset", "track_count", "album_offset",
+        "album_count", "artist_offset", "artist_count", "playlist_offset",
+        "playlist_count", "search_type", "userdata", NULL };
+
+    if (!PyArg_ParseTupleAndKeywords(args, kwds, "esO|iiiiiiiiO&O", kwlist,
                                      ENCODING, &query, &callback,
                                      &track_offset, &track_count,
                                      &album_offset, &album_count,
                                      &artist_offset, &artist_count,
                                      &playlist_offset, &playlist_count,
-                                     &str_search_type, &userdata))
+                                     &sp_search_type_converter,
+                                     (void *)&search_type, &userdata))
         return NULL;
-    /* Determine search type */
-    if (str_search_type) {
-        if (strcmp(str_search_type, "standard") == 0) {} // default
-        else if (strcmp(str_search_type, "suggest") == 0) {
-            search_type = SP_SEARCH_SUGGEST;
-        }
-        else {
-            PyErr_Format(SpotifyError, "Unknown search type: %s", str_search_type);
-            return NULL;
-        }
-    }
-    if (!userdata)
-        userdata = Py_None;
-    st = create_trampoline(callback, NULL, userdata);
+
+    trampoline = create_trampoline(callback, userdata);
 
     Py_BEGIN_ALLOW_THREADS;
-    search = sp_search_create(self->_session, query,
-                              track_offset, track_count,
-                              album_offset, album_count,
-                              artist_offset, artist_count,
-                              playlist_offset, playlist_count,
-                              search_type,
-                              (search_complete_cb *) search_complete,
-                              (void *)st);
+    search = sp_search_create(Session_SP_SESSION(self), query, track_offset,
+                              track_count, album_offset, album_count,
+                              artist_offset, artist_count, playlist_offset,
+                              playlist_count, search_type,
+                              Session_search_complete, (void *)trampoline);
     Py_END_ALLOW_THREADS;
+    PyMem_Free(query);
 
-    return Results_FromSpotify(search);
+    return Results_FromSpotify(search, 0 /* add_ref */);
 }
 
 static PyObject *
-Session_browse_album(Session * self, PyObject *args, PyObject *kwds)
+Session_browse_album(PyObject *self, PyObject *args, PyObject *kwds)
 {
-    /* Deprecated, calls the AlbumBrowserType object */
+    PyErr_Warn(PyExc_DeprecationWarning, "use the album browser directly.");
     return PyObject_Call((PyObject *)&AlbumBrowserType, args, kwds);
 }
 
 static PyObject *
-Session_browse_artist(Session * self, PyObject *args, PyObject *kwds)
+Session_browse_artist(PyObject *self, PyObject *args, PyObject *kwds)
 {
-    /* Deprecated, calls the ArtistBrowserType object */
+    PyErr_Warn(PyExc_DeprecationWarning, "use the artist browser directly.");
     return PyObject_Call((PyObject *)&ArtistBrowserType, args, kwds);
 }
 
 static PyObject *
-Session_image_create(Session * self, PyObject *args)
+Session_image_create(PyObject *self, PyObject *args)
 {
     byte *image_id;
     size_t len;
@@ -313,356 +300,349 @@ Session_image_create(Session * self, PyObject *args)
 
     if (!PyArg_ParseTuple(args, "s#", &image_id, &len))
         return NULL;
-    if (len != 20) {
+    if ((int)len != 20) {
         PyErr_SetString(SpotifyError, "Image id length != 20");
         return NULL;
     }
-    image = sp_image_create(self->_session, image_id);
-    return Image_FromSpotify(image);
+
+    image = sp_image_create(Session_SP_SESSION(self), image_id);
+    return Image_FromSpotify(image, 0 /* add_ref */);
 }
 
 static PyObject *
-Session_set_preferred_bitrate(Session * self, PyObject *args)
+Session_set_preferred_bitrate(PyObject *self, PyObject *args)
 {
     int bitrate;
 
     if (!PyArg_ParseTuple(args, "i", &bitrate))
         return NULL;
 
-    sp_session_preferred_bitrate(self->_session, bitrate);
-
+    sp_session_preferred_bitrate(Session_SP_SESSION(self), bitrate);
     Py_RETURN_NONE;
 }
 
 static PyObject *
-Session_starred(Session * self)
+Session_starred(PyObject *self)
 {
-    sp_playlist *spl;
+    sp_playlist *playlist;
 
     Py_BEGIN_ALLOW_THREADS;
-    spl = sp_session_starred_create(self->_session);
+    playlist  = sp_session_starred_create(Session_SP_SESSION(self));
     Py_END_ALLOW_THREADS;
 
-    PyObject *pl = Playlist_FromSpotify(spl);
-
-    return pl;
+    return Playlist_FromSpotify(playlist, 0 /* add_ref */);
 }
 
 static PyObject *
-Session_flush_caches(Session * self)
+Session_flush_caches(PyObject *self)
 {
     Py_BEGIN_ALLOW_THREADS;
-    sp_session_flush_caches(self->_session);
+    sp_session_flush_caches(Session_SP_SESSION(self));
     Py_END_ALLOW_THREADS;
 
     Py_RETURN_NONE;
 }
 
+/* Caller is responsible for free-ing memory with PyMem_Free */
+static bool
+encoded_string_converter(PyObject *o, void *address) {
+    char **target = (char **)address;
+    char *buffer;
+    Py_ssize_t length;
+
+    if (o == NULL || o == Py_None) {
+        return 1;
+    }
+
+    if (PyUnicode_Check(o))
+        o = PyUnicode_AsEncodedString(o, ENCODING, "strict");
+    else
+        Py_INCREF(o);
+
+    if (PyString_AsStringAndSize(o, &buffer, &length) == -1) {
+        Py_DECREF(o);
+        return 0;
+    }
+
+    *target = PyMem_Malloc(length + 1);
+    if (target == NULL) {
+        PyErr_NoMemory();
+        Py_DECREF(o);
+        return 0;
+    }
+
+    strcpy(*target, buffer);
+    Py_DECREF(o);
+    return 1;
+}
+
 static PyObject *
-Session_login(Session *self, PyObject *args, PyObject *kwds)
+Session_login(PyObject *self, PyObject *args, PyObject *kwds)
 {
-    char *username, *password = NULL;
+    char *username = NULL, *password = NULL, *blob = NULL;
     int remember_me = 1;
-    char *blob = NULL;
-    sp_error error;
-    static char *kwlist[] = { "username", "password", "remember_me",
-                              "blob", NULL };
 
-    if (!PyArg_ParseTupleAndKeywords(args, kwds, "es|esiz", kwlist,
-                                     ENCODING, &username, ENCODING, &password,
+    sp_error error;
+
+    static char *kwlist[] = {"username", "password", "remember_me", "blob",
+                             NULL};
+
+    if (!PyArg_ParseTupleAndKeywords(args, kwds, "O&|O&iz", kwlist,
+                                     &encoded_string_converter, (void *)&username,
+                                     &encoded_string_converter, (void *)&password,
                                      &remember_me, &blob))
         return NULL;
 
-    if ((!password) && (!blob)) {
-        PyErr_SetString(SpotifyError, "one of the password or login blob "
+    if (password == NULL && blob == NULL) {
+        PyErr_SetString(SpotifyError, "one of the password or login blob " \
                         "is required to login");
+        PyMem_Free(username);
         return NULL;
     }
 
-#ifdef DEBUG
-    fprintf(stderr, "[DEBUG]-session- login as %s in progress...\n",
-            username);
-#endif
+    debug_printf("login as %s in progress...", username);
+
     Py_BEGIN_ALLOW_THREADS;
-    error = sp_session_login(self->_session, username, password,
+    error = sp_session_login(Session_SP_SESSION(self), username, password,
                              remember_me, blob);
     Py_END_ALLOW_THREADS;
-    if (error != SP_ERROR_OK) {
-        PyErr_SetString(SpotifyError, sp_error_message(error));
-        return NULL;
-    }
-    Py_RETURN_NONE;
+
+    PyMem_Free(username);
+    if (password != NULL) PyMem_Free(password);
+
+    return none_or_raise_error(error);
 }
 
 static PyObject *
-Session_relogin(Session *self)
+Session_relogin(PyObject *self)
 {
-    sp_error error;
-
-#ifdef DEBUG
-    fprintf(stderr, "[DEBUG]-session- relogin in progress...\n");
-#endif
-    error = sp_session_relogin(self->_session);
-    if (error != SP_ERROR_OK) {
-        PyErr_SetString(SpotifyError, sp_error_message(error));
-        return NULL;
-    }
-    Py_RETURN_NONE;
+    debug_printf("relogin in progress...");
+    sp_error error = sp_session_relogin(Session_SP_SESSION(self));
+    return none_or_raise_error(error);
 }
 
 static PyMethodDef Session_methods[] = {
     {"create",   (PyCFunction)Session_create, METH_VARARGS | METH_CLASS,
-     "Returns a Session object embedding a newly created Spotify session"},
+     "Returns a Session object embedding a newly created Spotify session"
+    },
     {"username", (PyCFunction)Session_username, METH_NOARGS,
-     "Return the canonical username for the logged in user"},
+     "Return the canonical username for the logged in user"
+    },
     {"display_name", (PyCFunction)Session_display_name, METH_NOARGS,
-     "Return the full name for the logged in user"},
+     "Return the full name for the logged in user"
+    },
     {"user_is_loaded", (PyCFunction)Session_user_is_loaded, METH_NOARGS,
-     "Return whether the user is loaded or not"},
+     "Return whether the user is loaded or not"
+    },
     {"logout", (PyCFunction)Session_logout, METH_NOARGS,
-     "Logs out the user from the Spotify service"},
+     "Logs out the user from the Spotify service"
+    },
     {"process_events", (PyCFunction)Session_process_events, METH_NOARGS,
-     "Process any outstanding events"},
+     "Process any outstanding events"
+    },
     {"load", (PyCFunction)Session_load, METH_VARARGS,
-     "Load the specified track on the player"},
+     "Load the specified track on the player"
+    },
     {"seek", (PyCFunction)Session_seek, METH_VARARGS,
-     "Seek the currently loaded track"},
+     "Seek the currently loaded track"
+    },
     {"play", (PyCFunction)Session_play, METH_VARARGS,
-     "Play or pause the currently loaded track"},
+     "Play or pause the currently loaded track"
+    },
     {"unload", (PyCFunction)Session_unload, METH_NOARGS,
-     "Stop the currently playing track"},
-    {"playlist_container", (PyCFunction)Session_playlist_container,
-     METH_NOARGS,
-     "Return the playlist container for the currently logged in user"},
-    {"browse_album", (PyCFunction)Session_browse_album,
-     METH_VARARGS | METH_KEYWORDS,
-     "Browse an album, calling the callback when the browse request completes"},
-    {"browse_artist", (PyCFunction)Session_browse_artist,
-     METH_VARARGS | METH_KEYWORDS,
-     "Browse an artist, calling the callback when the browse request completes"},
+     "Stop the currently playing track"
+    },
+    {"playlist_container", (PyCFunction)Session_playlist_container, METH_NOARGS,
+     "Return the playlist container for the currently logged in user"
+    },
+    {"browse_album", (PyCFunction)Session_browse_album, METH_VARARGS | METH_KEYWORDS,
+     "Browse an album, calling the callback when the browse request completes"
+    },
+    {"browse_artist", (PyCFunction)Session_browse_artist, METH_VARARGS | METH_KEYWORDS,
+     "Browse an artist, calling the callback when the browse request completes"
+    },
     {"search", (PyCFunction)Session_search, METH_VARARGS | METH_KEYWORDS,
-     "Conduct a search, calling the callback when results are available"},
+     "Conduct a search, calling the callback when results are available"
+    },
     {"image_create", (PyCFunction)Session_image_create, METH_VARARGS,
-     "Create an image of album cover art"},
-    {"set_preferred_bitrate", (PyCFunction)Session_set_preferred_bitrate,
-     METH_VARARGS,
-     "Set the preferred bitrate of the audio stream. 0 = 160k, 1 = 320k"},
+     "Create an image of album cover art"
+    },
+    {"set_preferred_bitrate", (PyCFunction)Session_set_preferred_bitrate, METH_VARARGS,
+     "Set the preferred bitrate of the audio stream. 0 = 160k, 1 = 320k"
+    },
     {"starred", (PyCFunction)Session_starred, METH_NOARGS,
-     "Get the starred playlist for the logged in user"},
+     "Get the starred playlist for the logged in user"
+    },
     {"flush_caches", (PyCFunction)Session_flush_caches, METH_NOARGS,
-     "Flush the libspotify caches"},
+     "Flush the libspotify caches"
+    },
     {"login", (PyCFunction)Session_login, METH_VARARGS | METH_KEYWORDS,
-     "Logs in the specified user to the Spotify service"},
+     "Logs in the specified user to the Spotify service"
+    },
     {"relogin", (PyCFunction)Session_relogin, METH_NOARGS,
-     "Logs in the last user that logged in with the remember_me flag set"},
-    {NULL}
+     "Logs in the last user that logged in with the remember_me flag set"
+    },
+    {NULL} /* Sentinel */
+};
+
+static PyMemberDef Session_members[] = {
+    {NULL} /* Sentinel */
 };
 
 PyTypeObject SessionType = {
-    PyObject_HEAD_INIT(NULL) 0, /*ob_size */
-    "spotify.Session", /*tp_name */
-    sizeof(Session),    /*tp_basicsize */
-    0,                  /*tp_itemsize */
-    0,                  /*tp_dealloc */
-    0,                  /*tp_print */
-    0,                  /*tp_getattr */
-    0,                  /*tp_setattr */
-    0,                  /*tp_compare */
-    0,                  /*tp_repr */
-    0,                  /*tp_as_number */
-    0,                  /*tp_as_sequence */
-    0,                  /*tp_as_mapping */
-    0,                  /*tp_hash */
-    0,                  /*tp_call */
-    0,                  /*tp_str */
-    0,                  /*tp_getattro */
-    0,                  /*tp_setattro */
-    0,                  /*tp_as_buffer */
-    Py_TPFLAGS_DEFAULT | Py_TPFLAGS_BASETYPE,   /*tp_flags */
-    "Session objects",  /* tp_doc */
-    0,                  /* tp_traverse */
-    0,                  /* tp_clear */
-    0,                  /* tp_richcompare */
-    0,                  /* tp_weaklistoffset */
-    0,                  /* tp_iter */
-    0,                  /* tp_iternext */
-    Session_methods,    /* tp_methods */
-    Session_members,    /* tp_members */
-    0,                  /* tp_getset */
-    0,                  /* tp_base */
-    0,                  /* tp_dict */
-    0,                  /* tp_descr_get */
-    0,                  /* tp_descr_set */
-    0,                  /* tp_dictoffset */
-    0,                  /* tp_init */
-    0,                  /* tp_alloc */
-    Session_new         /* tp_new */
+    PyObject_HEAD_INIT(NULL)
+    0,                                        /*ob_size*/
+    "spotify.Session",                        /*tp_name*/
+    sizeof(Session),                          /*tp_basicsize*/
+    0,                                        /*tp_itemsize*/
+    0,                                        /*tp_dealloc*/
+    0,                                        /*tp_print*/
+    0,                                        /*tp_getattr*/
+    0,                                        /*tp_setattr*/
+    0,                                        /*tp_compare*/
+    0,                                        /*tp_repr*/
+    0,                                        /*tp_as_number*/
+    0,                                        /*tp_as_sequence*/
+    0,                                        /*tp_as_mapping*/
+    0,                                        /*tp_hash*/
+    0,                                        /*tp_call*/
+    0,                                        /*tp_str*/
+    0,                                        /*tp_getattro*/
+    0,                                        /*tp_setattro*/
+    0,                                        /*tp_as_buffer*/
+    Py_TPFLAGS_DEFAULT | Py_TPFLAGS_BASETYPE, /*tp_flags*/
+    "Session objects",                        /* tp_doc */
+    0,                                        /* tp_traverse */
+    0,                                        /* tp_clear */
+    0,                                        /* tp_richcompare */
+    0,                                        /* tp_weaklistoffset */
+    0,                                        /* tp_iter */
+    0,                                        /* tp_iternext */
+    Session_methods,                          /* tp_methods */
+    Session_members,                          /* tp_members */
+    0,                                        /* tp_getset */
+    0,                                        /* tp_base */
+    0,                                        /* tp_dict */
+    0,                                        /* tp_descr_get */
+    0,                                        /* tp_descr_set */
+    0,                                        /* tp_dictoffset */
+    0,                                        /* tp_init */
+    0,                                        /* tp_alloc */
+    Session_new                               /* tp_new */
 };
 
 /*************************************/
 /*           CALLBACK SHIMS          */
 /*************************************/
 
+/* TODO: convert to Py_VaBuildValue based solution so we can support
+ *   music_delivery?
+ * TODO: could we avoid having to pass session into the python callbacks, or
+ *   could we at least store a g_py_session to save us reconstructing it all
+ *   the time? Or would that break in unexpected ways if the session gets
+ *   modified? Measuring the affect of changing say music_delivery to not
+ *   waste time contructing the session would be a good place to start.
+ * TODO: could we avoid having to lookup the attr for the callback on every
+ *   single callback? Would that break cases where people change the config
+ *   later, does that matter?
+ */
+static void
+session_callback(sp_session * session, const char *attr, PyObject *extra)
+{
+    PyObject *callback, *client, *py_session, *result;
+    py_session = Session_FromSpotify(session);
+    if (py_session != NULL) {
+
+        client = (PyObject *)sp_session_userdata(session);
+        callback = PyObject_GetAttrString(client, attr);
+
+        if (callback != NULL) {
+            result = PyObject_CallFunctionObjArgs(callback, py_session, extra, NULL);
+
+            if (result == NULL)
+                PyErr_WriteUnraisable(callback);
+            else
+                Py_DECREF(result);
+
+            Py_DECREF(callback);
+        }
+        Py_DECREF(py_session);
+    }
+}
+
 static void
 logged_in(sp_session * session, sp_error error)
 {
-    PyGILState_STATE gstate;
-    PyObject *res, *err, *method;
+    debug_printf(">> logged_in called: %s", sp_error_message(error));
 
-#ifdef DEBUG
-    fprintf(stderr, "[DEBUG]-session- >> logged_in called\n");
-#endif
-    gstate = PyGILState_Ensure();
-    Session *psession =
-        (Session *) PyObject_CallObject((PyObject *)&SessionType, NULL);
-    psession->_session = session;
-    PyObject *client = (PyObject *)sp_session_userdata(session);
-
-    err = error_message(error);
-    method = PyObject_GetAttrString(client, "logged_in");
-    res = PyObject_CallFunctionObjArgs(method, psession, err, NULL);
-    if (!res)
-        PyErr_WriteUnraisable(method);
-    Py_DECREF(psession);
-    Py_DECREF(err);
-    Py_XDECREF(res);
-    Py_DECREF(method);
+    PyGILState_STATE gstate = PyGILState_Ensure();
+    PyObject *py_error = error_message(error);
+    if (py_error != NULL) {
+        session_callback(session, "logged_in", py_error);
+        Py_DECREF(py_error);
+    }
     PyGILState_Release(gstate);
 }
 
 static void
 logged_out(sp_session * session)
 {
-    PyGILState_STATE gstate;
-    PyObject *res, *method;
+    debug_printf(">> logged_out called");
 
-#ifdef DEBUG
-        fprintf(stderr, "[DEBUG]-session- >> logged_out called\n");
-#endif
-    gstate = PyGILState_Ensure();
-    Session *psession =
-        (Session *) PyObject_CallObject((PyObject *)&SessionType, NULL);
-    psession->_session = session;
-    PyObject *client = (PyObject *)sp_session_userdata(session);
-
-    method = PyObject_GetAttrString(client, "_manager_logged_out");
-    if (!method) { // Stay compatible
-        method = PyObject_GetAttrString(client, "logged_out");
-    }
-    res = PyObject_CallFunctionObjArgs(method, psession, NULL);
-    if (!res)
-        PyErr_WriteUnraisable(method);
-    Py_DECREF(psession);
-    Py_XDECREF(res);
-    Py_DECREF(method);
+    PyGILState_STATE gstate = PyGILState_Ensure();
+    /* TODO: should this fallback to logged_out like old code did? */
+    session_callback(session, "_manager_logged_out", NULL);
     PyGILState_Release(gstate);
 }
 
 static void
 metadata_updated(sp_session * session)
 {
-    PyGILState_STATE gstate;
-    PyObject *res, *method;
+    debug_printf(">> metadata_updated called");
 
-#ifdef DEBUG
-        fprintf(stderr, "[DEBUG]-session- >> metadata_updated called\n");
-#endif
-    gstate = PyGILState_Ensure();
-    Session *psession =
-        (Session *) PyObject_CallObject((PyObject *)&SessionType, NULL);
-    psession->_session = session;
-    PyObject *client = (PyObject *)sp_session_userdata(session);
-
-    method = PyObject_GetAttrString(client, "metadata_updated");
-    res = PyObject_CallFunctionObjArgs(method, psession, NULL);
-    if (!res)
-        PyErr_WriteUnraisable(method);
-    Py_DECREF(psession);
-    Py_XDECREF(res);
-    Py_DECREF(method);
+    PyGILState_STATE gstate = PyGILState_Ensure();
+    session_callback(session, "metadata_updated", NULL);
     PyGILState_Release(gstate);
 }
 
 static void
 connection_error(sp_session * session, sp_error error)
 {
-    PyGILState_STATE gstate;
-    PyObject *res, *err, *method;
+    debug_printf(">> connection_error called: %s", sp_error_message(error));
 
-#ifdef DEBUG
-        fprintf(stderr, "[DEBUG]-session- >> connection_error called\n");
-#endif
-    gstate = PyGILState_Ensure();
-    Session *psession =
-        (Session *) PyObject_CallObject((PyObject *)&SessionType, NULL);
-    psession->_session = session;
-    PyObject *client = (PyObject *)sp_session_userdata(session);
-
-    err = error_message(error);
-    method = PyObject_GetAttrString(client, "connection_error");
-    res = PyObject_CallFunctionObjArgs(method, psession, err, NULL);
-    if (!res)
-        PyErr_WriteUnraisable(method);
-    Py_DECREF(psession);
-    Py_DECREF(err);
-    Py_XDECREF(res);
-    Py_DECREF(method);
+    PyGILState_STATE gstate = PyGILState_Ensure();
+    PyObject *py_error = error_message(error);
+    if (py_error != NULL) {
+        session_callback(session, "connection_error", py_error);
+        Py_DECREF(py_error);
+    }
     PyGILState_Release(gstate);
 }
 
 static void
-message_to_user(sp_session * session, const char *message)
+message_to_user(sp_session * session, const char *data)
 {
-    PyGILState_STATE gstate;
-    PyObject *res, *method, *msg;
+    debug_printf(">> message_to_user called: %s", data);
 
-#ifdef DEBUG
-        fprintf(stderr, "[DEBUG]-session- >> message to user: %s\n", message);
-#endif
-    gstate = PyGILState_Ensure();
-    Session *psession =
-        (Session *) PyObject_CallObject((PyObject *)&SessionType, NULL);
-    psession->_session = session;
-    PyObject *client = (PyObject *)sp_session_userdata(session);
-
-    msg = PyUnicode_FromString(message);
-    method = PyObject_GetAttrString(client, "message_to_user");
-    res =
-        PyObject_CallFunctionObjArgs(method, psession, msg, NULL);
-    if (!res)
-        PyErr_WriteUnraisable(method);
-    Py_DECREF(psession);
-    Py_XDECREF(res);
-    Py_DECREF(method);
+    PyGILState_STATE gstate = PyGILState_Ensure();
+    PyObject *message = PyUnicode_FromString(data);
+    if (message != NULL) {
+        session_callback(session, "message_to_user", message);
+        Py_DECREF(message);
+    }
     PyGILState_Release(gstate);
 }
 
 static void
 notify_main_thread(sp_session * session)
 {
-    PyGILState_STATE gstate;
-    PyObject *res, *method;
+    debug_printf(">> notify_main_thread called");
 
-#ifdef DEBUG
-        fprintf(stderr, "[DEBUG]-session- >> notify_main_thread called\n");
-#endif
     if (!session_constructed)
         return;
-    gstate = PyGILState_Ensure();
-    Session *psession =
-        (Session *) PyObject_CallObject((PyObject *)&SessionType, NULL);
-    psession->_session = session;
-    PyObject *client = (PyObject *)sp_session_userdata(session);
 
-    if (client != NULL) {
-        method = PyObject_GetAttrString(client, "notify_main_thread");
-        res = PyObject_CallFunctionObjArgs(method, psession, NULL);
-        if (!res)
-            PyErr_WriteUnraisable(method);
-        Py_XDECREF(res);
-        Py_DECREF(method);
-    }
-    Py_DECREF(psession);
+    PyGILState_STATE gstate = PyGILState_Ensure();
+    session_callback(session, "notify_main_thread", NULL);
     PyGILState_Release(gstate);
 }
 
@@ -682,40 +662,47 @@ static int
 music_delivery(sp_session * session, const sp_audioformat * format,
                const void *frames, int num_frames)
 {
-    PyGILState_STATE gstate;
-    PyObject *res, *method;
+    /* TODO: This is called _all_ the time, make it faster? */
 
-#ifdef DEBUG
-        fprintf(stderr, "[DEBUG]-session- >> music_delivery called\n");
-#endif
-    gstate = PyGILState_Ensure();
-    int siz = frame_size(format);
-    PyObject *pyframes = PyBuffer_FromMemory((void *)frames, num_frames * siz);
-    Session *psession =
-        (Session *) PyObject_CallObject((PyObject *)&SessionType, NULL);
-    psession->_session = session;
-    PyObject *client = (PyObject *)sp_session_userdata(session);
-    method = PyObject_GetAttrString(client, "music_delivery");
-    res =
-        PyObject_CallFunction(method, "OOiiiii", psession,
-                              pyframes, siz, num_frames, format->sample_type,
-                              format->sample_rate, format->channels);
+    // Note that we do not try to shoe horn this into session_callback as it is
+    // quite different in that this needs to handle return values and much more
+    // complicated arguments.
+
+    debug_printf(">> music_delivery called: frames %d", num_frames);
+
     int consumed = num_frames;  // assume all consumed
-    if (!res)
-        PyErr_WriteUnraisable(method);
-    else if (PyInt_Check(res))
-        consumed = (int)PyInt_AsLong(res);
-    else if (PyLong_Check(res))
-        consumed = (int)PyLong_AsLong(res);
+    int size = frame_size(format);
+
+    PyObject *callback, *client, *py_frames, *py_session, *result;
+    PyGILState_STATE gstate = PyGILState_Ensure();
+
+    /* TODO: check if session creations succeeds. */
+    py_frames = PyBuffer_FromMemory((void *)frames, num_frames * size);
+    py_session = Session_FromSpotify(session);
+
+    /* TODO: check if callback get succeeds. */
+    client = (PyObject *)sp_session_userdata(session);
+    callback = PyObject_GetAttrString(client, "music_delivery");
+
+    result = PyObject_CallFunction(callback, "NNiiiii", py_session, py_frames,
+                                   size, num_frames, format->sample_type,
+                                   format->sample_rate, format->channels);
+
+    if (result == NULL)
+        PyErr_WriteUnraisable(callback);
     else {
-        PyErr_SetString(PyExc_TypeError,
-                        "music_delivery must return an integer");
-        PyErr_WriteUnraisable(method);
+        if (PyInt_Check(result))
+            consumed = (int)PyInt_AsLong(result);
+        else if (PyLong_Check(result))
+            consumed = (int)PyLong_AsLong(result);
+        else {
+            PyErr_SetString(PyExc_TypeError,
+                            "music_delivery must return an integer");
+            PyErr_WriteUnraisable(callback);
+        }
+        Py_DECREF(result);
     }
-    Py_DECREF(pyframes);
-    Py_DECREF(psession);
-    Py_XDECREF(res);
-    Py_DECREF(method);
+    Py_XDECREF(callback);
     PyGILState_Release(gstate);
     return consumed;
 }
@@ -723,272 +710,167 @@ music_delivery(sp_session * session, const sp_audioformat * format,
 static void
 play_token_lost(sp_session * session)
 {
-    PyGILState_STATE gstate;
-    PyObject *res, *method;
+    debug_printf(">> play_token_lost called");
 
-#ifdef DEBUG
-        fprintf(stderr, "[DEBUG]-session- >> play_token_lost called\n");
-#endif
-    gstate = PyGILState_Ensure();
-    Session *psession =
-        (Session *) PyObject_CallObject((PyObject *)&SessionType, NULL);
-    psession->_session = session;
-    PyObject *client = (PyObject *)sp_session_userdata(session);
-
-    method = PyObject_GetAttrString(client, "play_token_lost");
-    res = PyObject_CallFunctionObjArgs(method, psession, NULL);
-    if (!res)
-        PyErr_WriteUnraisable(method);
-    Py_DECREF(psession);
-    Py_XDECREF(res);
-    Py_DECREF(method);
+    PyGILState_STATE gstate = PyGILState_Ensure();
+    session_callback(session, "play_token_lost", NULL);
     PyGILState_Release(gstate);
 }
 
 static void
 log_message(sp_session * session, const char *data)
 {
-    PyGILState_STATE gstate;
-    PyObject *res, *method, *msg;
+    debug_printf(">> log_message called: %s", data);
 
-#ifdef DEBUG
-        fprintf(stderr, "[DEBUG]-session- >> log message: %s\n", data);
-#endif
-    gstate = PyGILState_Ensure();
-    Session *psession =
-        (Session *) PyObject_CallObject((PyObject *)&SessionType, NULL);
-    psession->_session = session;
-    PyObject *client = (PyObject *)sp_session_userdata(session);
-
-    msg = PyUnicode_FromString(data);
-    method = PyObject_GetAttrString(client, "log_message");
-    res = PyObject_CallFunctionObjArgs(method, psession, msg, NULL);
-    if (!res)
-        PyErr_WriteUnraisable(method);
-    Py_DECREF(psession);
-    Py_XDECREF(res);
-    Py_DECREF(msg);
-    Py_DECREF(method);
+    PyGILState_STATE gstate = PyGILState_Ensure();
+    PyObject *message = PyUnicode_FromString(data);
+    if (message != NULL) {
+        session_callback(session, "log_message", message);
+        Py_DECREF(message);
+    }
     PyGILState_Release(gstate);
 }
 
 static void
 end_of_track(sp_session * session)
 {
-    PyGILState_STATE gstate;
-    PyObject *res, *method;
+    debug_printf(">> end_of_track called");
 
-#ifdef DEBUG
-        fprintf(stderr, "[DEBUG]-session- >> end_of_track called\n");
-#endif
-    gstate = PyGILState_Ensure();
-    Session *psession =
-        (Session *) PyObject_CallObject((PyObject *)&SessionType, NULL);
-    psession->_session = session;
-    PyObject *client = (PyObject *)sp_session_userdata(session);
-
-    method = PyObject_GetAttrString(client, "end_of_track");
-    res = PyObject_CallFunctionObjArgs(method, psession, NULL);
-    if (!res)
-        PyErr_WriteUnraisable(method);
-    Py_DECREF(psession);
-    Py_XDECREF(res);
-    Py_DECREF(method);
+    PyGILState_STATE gstate = PyGILState_Ensure();
+    session_callback(session, "end_of_track", NULL);
     PyGILState_Release(gstate);
 }
 
 static void
-credentials_blob_updated(sp_session *session, const char *blob)
+credentials_blob_updated(sp_session *session, const char *data)
 {
-    PyGILState_STATE gstate;
-    PyObject *res, *method, *client, *py_session, *py_blob;
+    debug_printf(">> credentials_blob_updated called");
 
-#ifdef DEBUG
-        fprintf(stderr, "[DEBUG]-session- >> credentials_blob_updated called\n");
-#endif
-    gstate = PyGILState_Ensure();
-    client = (PyObject *)sp_session_userdata(session);
-    py_session = Session_FromSpotify(session);
-    py_blob = PyBytes_FromString(blob);
-
-    method = PyObject_GetAttrString(client, "credentials_blob_updated");
-    res = PyObject_CallFunctionObjArgs(method, py_session, py_blob, NULL);
-    if (!res)
-        PyErr_WriteUnraisable(method);
-    Py_DECREF(py_session);
-    Py_DECREF(py_blob);
-    Py_XDECREF(res);
-    Py_DECREF(method);
+    PyGILState_STATE gstate = PyGILState_Ensure();
+    PyObject *blob = PyBytes_FromString(data);
+    if (blob != NULL) {
+        session_callback(session, "credentials_blob_updated", blob);
+        Py_DECREF(blob);
+    }
     PyGILState_Release(gstate);
 }
 
 void
-session_init(PyObject *m)
+session_init(PyObject *module)
 {
     Py_INCREF(&SessionType);
-    PyModule_AddObject(m, "Session", (PyObject *)&SessionType);
-}
-
-char *
-PySpotify_GetConfigString(PyObject *client, const char *attr, bool optional)
-{
-    PyObject *py_value, *py_uvalue;
-    char *value;
-
-    py_value = PyObject_GetAttrString(client, attr);
-    if (!py_value || py_value == Py_None) {
-        if (optional) {
-            return (char *)-1;
-        }
-        else {
-            PyErr_Format(SpotifyError, "%s not set", attr);
-            return NULL;
-        }
-    }
-    if (PyUnicode_Check(py_value)) {
-        py_uvalue = py_value;
-        py_value = PyUnicode_AsEncodedString(py_uvalue, ENCODING, "replace");
-        Py_DECREF(py_uvalue);
-    }
-    else if (!PyBytes_Check(py_value)) {
-        PyErr_Format(SpotifyError,
-                     "configuration value '%s' must be a string/unicode object",
-                     attr);
-        return NULL;
-    }
-    value = PyMem_Malloc(strlen(PyBytes_AS_STRING(py_value)) + 1);
-    strcpy(value, PyBytes_AS_STRING(py_value));
-    Py_DECREF(py_value);
-    return value;
+    PyModule_AddObject(module, "Session", (PyObject *)&SessionType);
 }
 
 static sp_session_callbacks g_callbacks = {
-    &logged_in,
-    &logged_out,
-    &metadata_updated,
-    &connection_error,
-    &message_to_user,
-    &notify_main_thread,
-    &music_delivery,
-    &play_token_lost,
-    &log_message,
-    &end_of_track,
-    NULL, /* streaming_error */
-    NULL, /* userinfo_updated */
-    NULL, /* start_playback */
-    NULL, /* stop_playback */
-    NULL, /* get_audio_buffer_stats */
-    NULL, /* offline_status_updated */
-    NULL, /* offline_error */
-    &credentials_blob_updated,
+    &logged_in,                /* logged_in */
+    &logged_out,               /* logged_out */
+    &metadata_updated,         /* metadata_updated */
+    &connection_error,         /* connection_error */
+    &message_to_user,          /* message_to_user */
+    &notify_main_thread,       /* notify_main_thread */
+    &music_delivery,           /* music_delivery */
+    &play_token_lost,          /* play_token_lost */
+    &log_message,              /* log_message */
+    &end_of_track,             /* end_of_track */
+    NULL,                      /* streaming_error */
+    NULL,                      /* userinfo_updated */
+    NULL,                      /* start_playback */
+    NULL,                      /* stop_playback */
+    NULL,                      /* get_audio_buffer_stats */
+    NULL,                      /* offline_status_updated */
+    NULL,                      /* offline_error */
+    &credentials_blob_updated, /* credentials_blob_updated */
 };
 
-static int
-create_session(Session *self, PyObject *client, PyObject *settings)
+// config_* functions are used as convenience wrappers to get
+// data from the python attrs to the config objects. Setting the struct
+// members without tmp intermediate would not work due to const char.
+//
+// Attribute not existing is a fatal error, as not being able to convert
+// the attributes value. These cases _only_ set the python exception, so
+// callers must check PyErr_Occurred().
+static void
+config_string(PyObject *instance, const char *attr, const char **target) {
+    const char * tmp;
+    PyObject *value = PyObject_GetAttrString(instance, attr);
+    if (value == NULL) {
+        PyErr_Format(SpotifyError, "%s not set", attr);
+        return;
+    }
+    if (value != Py_None && PyArg_Parse(value, "es", ENCODING, &tmp))
+        *target = tmp;
+    Py_DECREF(value);
+}
+
+static void
+config_data(PyObject *instance, const char *attr, const void **target, size_t *target_length) {
+    int length;
+    const void * tmp;
+    PyObject *value = PyObject_GetAttrString(instance, attr);
+    if (value == NULL) {
+        PyErr_Format(SpotifyError, "%s not set", attr);
+        return;
+    }
+    if (value != Py_None && PyArg_Parse(value, "s#", &tmp, &length)) {
+        *target = tmp;
+        *target_length = (size_t)length;
+    }
+    Py_DECREF(value);
+}
+
+static sp_session *
+create_session(PyObject *client, PyObject *settings)
 {
     sp_session_config config;
-    sp_session *session;
+    sp_session* session;
     sp_error error;
-    char *cache_location, *settings_location, *user_agent;
-    char *proxy, *proxy_username, *proxy_password;
 
     memset(&config, 0, sizeof(config));
     config.api_version = SPOTIFY_API_VERSION;
-    config.userdata = (void *)client;
+    config.userdata = (void*)client;
     config.callbacks = &g_callbacks;
+    config.cache_location = "";
+    config.user_agent = "pyspotify-fallback";
 
-    cache_location = PySpotify_GetConfigString(settings, "cache_location", 0);
-    if (!cache_location)
-        return -1;
-    config.cache_location = cache_location;
-#ifdef DEBUG
-    fprintf(stderr, "[DEBUG]-session- Cache location is '%s'\n",
-            cache_location);
-#endif
+    config_data(settings, "application_key", &config.application_key, &config.application_key_size);
+    config_string(settings, "cache_location", &config.cache_location);
+    config_string(settings, "settings_location", &config.settings_location);
+    config_string(settings, "user_agent", &config.user_agent);
+    config_string(client, "proxy", &config.proxy);
+    config_string(client, "proxy_username", &config.proxy_username);
+    config_string(client, "proxy_password", &config.proxy_password);
 
-    settings_location = PySpotify_GetConfigString(settings,
-                                                  "settings_location", 0);
-    config.settings_location = settings_location;
-#ifdef DEBUG
-    fprintf(stderr, "[DEBUG]-session- Settings location is '%s'\n",
-            settings_location);
-#endif
+    debug_printf("cache_location = %s", config.cache_location);
+    debug_printf("settings_location = %s", config.settings_location);
+    debug_printf("user_agent = %s", config.user_agent);
+    debug_printf("proxy = %s", config.proxy);
+    debug_printf("proxy_username = %s", config.proxy_username);
+    debug_printf("proxy_password = %s", config.proxy_password);
+    debug_printf("application_key_size = %zu", config.application_key_size);
 
-    PyObject *application_key =
-        PyObject_GetAttr(settings, PyBytes_FromString("application_key"));
-    if (!application_key) {
-        PyErr_SetString(SpotifyError,
-                        "application_key not set");
-        return -1;
-    }
-    else if (!PyBytes_Check(application_key)) {
-        PyErr_SetString(SpotifyError,
-                        "application_key must be a byte string");
-        return -1;
-    }
-    char *s_appkey;
-    Py_ssize_t l_appkey;
-
-    PyBytes_AsStringAndSize(application_key, &s_appkey, &l_appkey);
-    config.application_key_size = l_appkey;
-    config.application_key = PyMem_Malloc(l_appkey);
-    memcpy((char *)config.application_key, s_appkey, l_appkey);
-
-    user_agent = PySpotify_GetConfigString(settings, "user_agent", 0);
-    if (!user_agent)
-        return -1;
-    if (strlen(user_agent) > 255) {
-        PyErr_SetString(SpotifyError, "user agent must be 255 characters max");
-        return -1;
-    }
-    config.user_agent = user_agent;
-#ifdef DEBUG
-    fprintf(stderr, "[DEBUG]-session- User agent set to '%s'\n",
-                        user_agent);
-#endif
-
-    proxy = PySpotify_GetConfigString(client, "proxy", 1);
-    if (!proxy)
-        return -1;
-    if ((long) proxy != (-1)) {
-    config.proxy = proxy;
-#ifdef DEBUG
-    fprintf(stderr, "[DEBUG]-session- Proxy set to '%s'\n", proxy);
-#endif
+    if (PyErr_Occurred() != NULL) {
+        return NULL;
     }
 
-    proxy_username = PySpotify_GetConfigString(client, "proxy_username", 1);
-    if (!proxy_username)
-       return -1;
-    if ((long) proxy_username != (-1)) {
-        config.proxy_username = proxy_username;
-#ifdef DEBUG
-        fprintf(stderr, "[DEBUG]-session- Proxy username set to '%s'\n",
-            proxy_username);
-#endif
+    if (strlen(config.user_agent) > 255) {
+        PyErr_SetString(SpotifyError, "user_agent may not be longer than 255.");
+        return NULL;
     }
 
-    proxy_password = PySpotify_GetConfigString(client, "proxy_password", 1);
-    if (!proxy_password)
-       return -1;
-    if ((long) proxy_password != (-1)) {
-        config.proxy_password = proxy_password;
-#ifdef DEBUG
-        fprintf(stderr, "[DEBUG]-session- Proxy password set to '%s'\n",
-            proxy_password);
-#endif
+    if (config.application_key_size == 0) {
+        PyErr_SetString(SpotifyError, "application_key must be provided.");
+        return NULL;
     }
 
-#ifdef DEBUG
-    fprintf(stderr, "[DEBUG]-session- creating session...\n");
-#endif
+    debug_printf("creating session...");
+    /* TODO: Figure out if we should ever release the session */
     error = sp_session_create(&config, &session);
     if (error != SP_ERROR_OK) {
         PyErr_SetString(SpotifyError, sp_error_message(error));
-        return -1;
+        return NULL;
     }
     session_constructed = 1;
     g_session = session;
-    self->_session = session;
-    return 0;
+    return session;
 }

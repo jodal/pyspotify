@@ -3,10 +3,12 @@
 import unittest
 from nose.tools import raises
 
-from spotify._mockspotify import mock_album, mock_artist, mock_track, mock_playlist
-from spotify._mockspotify import mock_playlistcontainer, mock_user, Album
+from spotify._mockspotify import (
+    mock_album, mock_artist, mock_track, mock_playlist)
+from spotify._mockspotify import mock_playlistcontainer, mock_user
 from spotify._mockspotify import mock_session, mock_set_current_session
 from spotify._mockspotify import mock_playlistfolder
+
 
 class TestPlaylistContainer(unittest.TestCase):
 
@@ -25,25 +27,37 @@ class TestPlaylistContainer(unittest.TestCase):
 
     def test_sq_item_exception(self):
         pc = mock_playlistcontainer(self.owner, [self.p1, self.p2])
+
         def _():
             return pc[2]
+
         self.assertRaises(IndexError, _)
 
     def test_add_new_playlist(self):
         pc = mock_playlistcontainer(self.owner, [])
-        pc.add_new_playlist('foo');
+        pc.add_new_playlist('foo')
         self.assertRaises(ValueError, pc.add_new_playlist, 'foo' * 100)
 
     def test_playlistfolder(self):
         p1 = mock_playlistfolder("folder_start", "foo", folder_id=42)
         p2 = mock_playlistfolder("folder_end", "")
         pc = mock_playlistcontainer(self.owner, [p1, p2])
-        f1,f2  = pc[0],pc[1]
+        f1, f2 = pc[0], pc[1]
         self.assertEqual(f1.name(), u'foo')
         self.assertEqual(f1.type(), 'folder_start')
         self.assertEqual(f2.type(), 'folder_end')
         self.assertEqual(f1.id(), 42)
         self.assertTrue(f1.is_loaded())
+
+    def test_remove_playlist(self):
+        pc = mock_playlistcontainer(self.owner, [self.p1, self.p2])
+        pc.remove_playlist(1)
+        self.assertEqual(len(pc), 1)
+
+    def test_remove_playlist_out_of_range(self):
+        pc = mock_playlistcontainer(self.owner, [])
+        self.assertRaises(IndexError, pc.remove_playlist, 0)
+
 
 class TestPlaylist(unittest.TestCase):
 

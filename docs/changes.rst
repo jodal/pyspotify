@@ -4,6 +4,78 @@ Changes
 
 .. currentmodule:: spotify
 
+
+v1.11 (2013-07-01)
+==================
+
+This version is compatible with *libspotify* version 12.
+
+**API changes**
+
+- :class:`spotify.audiosink.alsa.AlsaSink` now defaults to using
+  ``PCM_NONBLOCK``, which seems to help on audio underruns on Raspberry Pi.
+  Thanks to Stefan Hoffmann.
+
+- :class:`spotify.audiosink.alsa.AlsaSink` now accepts a ``period_size`` kwarg,
+  which defaults to 8192. Thanks to Stefan Hoffmann.
+
+- :meth:`spotify.manager.SpotifyPlaylistManager.watch` now listen to 10
+  additional types of playlist modification events, in total 13 types.
+
+**New features**
+
+- Add missing link types:
+
+  - :data:`spotify.Link.LINK_PROFILE`
+  - :data:`spotify.Link.LINK_STARRED`
+  - :data:`spotify.Link.LINK_LOCALTRACK`
+  - :data:`spotify.Link.LINK_IMAGE`
+
+- Add :meth:`spotify.PlaylistContainer.remove_playlist`.
+
+**Code cleanups**
+
+- Fixed formatting and style of entire C code base with exception of mock code.
+
+- Fixed multiple Python reference count bugs found by using gcc-python-plugin
+  and manual inspection.
+
+- Fixed multiple libspotify reference count bugs by forcing all
+  ``*_FromSpotify`` calls to specify if a reference needs to be added or not.
+  Also audited for corresponding release calls.
+
+- Converted all ``malloc``/``free`` calls to use the Python allocator. Also
+  audited for missing ``free`` calls and marked outstanding issues with TODOs
+  (only playlistcontainer callbacks remain as known issues).
+
+- Simplified session callback handling by creating a common callback handler.
+
+- Added ``<Object>_SP_<OBJECT>`` macros to hide access to the internal ``sp_*``
+  pointers.
+
+- Switched to being strict about avoiding ``Py_XDECREF`` and making sure we
+  check for ``NULL``.
+
+- Switched to proper ``debug_printf`` macro that always ends up in code but
+  optimized out so we never have broken debug printing.
+
+- Switched to using existing helpers inside the ``<Object>_str`` functions
+  instead of duplicating code.
+
+- Return boolean values in API calls that have ``bool`` return values.
+
+- Simplify session creation code and add helpers for building session configs.
+
+- Switch to using ``PyErr_SetNone`` for errors without a description.
+
+- Use ``PyArg_Parse*`` type format strings for argument handling and refcount
+  handling in most of the callback code.
+
+- Ensure all encoded strings are freed after use.
+
+- Reuse single callback function for "simple" playlist callbacks.
+
+
 v1.10 (2012-12-12)
 ==================
 

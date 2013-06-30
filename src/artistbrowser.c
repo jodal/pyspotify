@@ -9,263 +9,274 @@
 #include "track.h"
 
 PyObject *
-ArtistBrowser_FromSpotify(sp_artistbrowse * browse)
+ArtistBrowser_FromSpotify(sp_artistbrowse *browser, bool add_ref)
 {
-    ArtistBrowser *b = (ArtistBrowser *)ArtistBrowserType.tp_alloc(&ArtistBrowserType, 0);
-
-    b->_browser = browse;
-    sp_artistbrowse_add_ref(browse);
-
-    return (PyObject *)b;
+    PyObject *self = ArtistBrowserType.tp_alloc(&ArtistBrowserType, 0);
+    ArtistBrowser_SP_ARTISTBROWSE(self) = browser;
+    if (add_ref)
+        sp_artistbrowse_add_ref(browser);
+    return self;
 }
 
 void
-ArtistBrowser_browse_complete(sp_artistbrowse *browse, Callback *st)
+ArtistBrowser_browse_complete(sp_artistbrowse *browser, void *data)
 {
-#ifdef DEBUG
-    fprintf(stderr, "[DEBUG]-artbrw- browse complete (%p, %p)\n", browse, st);
-#endif
-    if (!st) return;
-    PyGILState_STATE gstate = PyGILState_Ensure();
-    PyObject *browser = ArtistBrowser_FromSpotify(browse);
+    Callback *trampoline = (Callback *)data;
+    debug_printf("browse complete (%p, %p)", browser, trampoline);
 
-    PyObject *res = PyObject_CallFunctionObjArgs(st->callback, browser,
-                                                 st->userdata, NULL);
-    if (!res)
-        PyErr_WriteUnraisable(st->callback);
-    delete_trampoline(st);
-    Py_DECREF(browser);
-    Py_XDECREF(res);
+    if (trampoline == NULL)
+        return;
+
+    PyObject *result, *self;
+    PyGILState_STATE gstate = PyGILState_Ensure();
+
+    self = ArtistBrowser_FromSpotify(browser, 1 /* add_ref */);
+    result = PyObject_CallFunction(trampoline->callback, "NO", self,
+                                   trampoline->userdata);
+
+    if (result != NULL)
+        Py_DECREF(result);
+    else
+        PyErr_WriteUnraisable(trampoline->callback);
+
+    delete_trampoline(trampoline);
     PyGILState_Release(gstate);
 }
 
+static bool
+sp_artistbrowse_type_converter(PyObject *o, void *address) {
+    sp_artistbrowse_type *type = (sp_artistbrowse_type *)address;
+
+    if (o == NULL || o == Py_None)
+        return 1;
+
+    if (!PyString_Check(o))
+        goto error;
+
+    char *tmp = PyString_AsString(o);
+    if (strcmp(tmp, "full") == 0)
+        *type = SP_ARTISTBROWSE_FULL;
+    else if (strcmp(tmp, "no_tracks") == 0)
+        *type = SP_ARTISTBROWSE_NO_TRACKS;
+    else if (strcmp(tmp, "no_albums") == 0)
+        *type = SP_ARTISTBROWSE_NO_ALBUMS;
+    else
+        goto error;
+
+    return 1;
+
+error:
+    PyErr_Format(PyExc_ValueError, "Unknown artist browser type: %s",
+                 PyString_AsString(PyObject_Repr(o)));
+    return 0;
+}
+
 static PyObject *
-ArtistBrowser_new(PyTypeObject * type, PyObject *args, PyObject *kwds)
+ArtistBrowser_new(PyTypeObject *type, PyObject *args, PyObject *kwds)
 {
     PyObject *artist, *callback = NULL, *userdata = NULL;
-    char *str_type = NULL;
-    sp_artistbrowse_type abtype = SP_ARTISTBROWSE_FULL;
-    Callback *cb = NULL;
-    ArtistBrowser *self;
-    static char *kwlist[] =
-        { "artist", "type", "callback", "userdata", NULL };
+    Callback *trampoline = NULL;
 
-    if (!PyArg_ParseTupleAndKeywords
-        (args, kwds, "O!|sOO", kwlist, &ArtistType, &artist, &str_type,
-         &callback, &userdata))
+    sp_artistbrowse *browser;
+    sp_artistbrowse_type browse_type = SP_ARTISTBROWSE_FULL;
+
+    static char *kwlist[] = {"artist", "type", "callback", "userdata", NULL};
+
+    if (!PyArg_ParseTupleAndKeywords (args, kwds, "O!|O&OO", kwlist,
+                                      &ArtistType, &artist,
+                                      &sp_artistbrowse_type_converter,
+                                      (void *)&browse_type, &callback,
+                                      &userdata))
         return NULL;
-    if (str_type) {
-        if (strcmp(str_type, "full") == 0) {} // default
-        else if (strcmp(str_type, "no_tracks") == 0) {
-            abtype = SP_ARTISTBROWSE_NO_TRACKS;
-        }
-        else if (strcmp(str_type, "no_albums") == 0) {
-            abtype = SP_ARTISTBROWSE_NO_ALBUMS;
-        }
-        else {
-            PyErr_SetString(PyExc_ValueError, "Unknown artist browser type.");
-            return NULL;
-        }
-    }
-    self = (ArtistBrowser *) type->tp_alloc(type, 0);
-    if (callback) {
-        if (!userdata)
-            userdata = Py_None;
-        cb = create_trampoline(callback, NULL, userdata);
-    }
-    self->_browser =
-        sp_artistbrowse_create(g_session,
-                               ((Artist *) artist)->_artist,
-                               abtype,
-                               (artistbrowse_complete_cb *)
-                               ArtistBrowser_browse_complete,
-                               cb);
-    return (PyObject *)self;
+
+    if (callback != NULL)
+        trampoline = create_trampoline(callback, userdata);
+
+    browser = sp_artistbrowse_create(g_session, Artist_SP_ARTIST(artist),
+                                     browse_type,
+                                     ArtistBrowser_browse_complete,
+                                     (void*)trampoline);
+
+    return ArtistBrowser_FromSpotify(browser, 0 /* add_ref */);
 }
 
 static void
-ArtistBrowser_dealloc(PyObject *arg)
+ArtistBrowser_dealloc(PyObject *self)
 {
-    ArtistBrowser *self = (ArtistBrowser *) arg;
-    sp_artistbrowse_release(self->_browser);
-    ArtistBrowserType.tp_free(self);
+    sp_artistbrowse_release(ArtistBrowser_SP_ARTISTBROWSE(self));
+    self->ob_type->tp_free(self);
 }
 
 static PyObject *
-ArtistBrowser_is_loaded(ArtistBrowser * self)
+ArtistBrowser_is_loaded(PyObject *self)
 {
-    return Py_BuildValue("i", sp_artistbrowse_is_loaded(self->_browser));
+    sp_artistbrowse *browser = ArtistBrowser_SP_ARTISTBROWSE(self);
+    return PyBool_FromLong(sp_artistbrowse_is_loaded(browser));
 }
 
 static PyObject *
-ArtistBrowser_albums(ArtistBrowser * self)
+ArtistBrowser_albums(PyObject *self)
 {
+    sp_artistbrowse *browser = ArtistBrowser_SP_ARTISTBROWSE(self);
     sp_album *album;
-    int count = sp_artistbrowse_num_albums(self->_browser);
-    PyObject *l = PyList_New(count);
     int i;
+    int count = sp_artistbrowse_num_albums(browser);
+    PyObject *list = PyList_New(count);
 
     for (i = 0; i < count; ++i) {
-        album = sp_artistbrowse_album(self->_browser, i);
-        PyObject *a = Album_FromSpotify(album);
-
-        PyList_SetItem(l, i, a);
+        album = sp_artistbrowse_album(browser, i);
+        PyList_SET_ITEM(list, i, Album_FromSpotify(album, 1 /* add_ref */));
     }
-    return l;
+    return list;
 }
 
 static PyObject *
-ArtistBrowser_similar_artists(ArtistBrowser * self)
+ArtistBrowser_similar_artists(PyObject *self)
 {
+    sp_artistbrowse *browser = ArtistBrowser_SP_ARTISTBROWSE(self);
     sp_artist *artist;
-    int count = sp_artistbrowse_num_similar_artists(self->_browser);
-    PyObject *l = PyList_New(count);
     int i;
+    int count = sp_artistbrowse_num_similar_artists(browser);
+    PyObject *list = PyList_New(count);
 
     for (i = 0; i < count; ++i) {
-        artist = sp_artistbrowse_similar_artist(self->_browser, i);
-        PyObject *a = Artist_FromSpotify(artist);
-
-        PyList_SetItem(l, i, a);
+        artist = sp_artistbrowse_similar_artist(browser, i);
+        PyList_SET_ITEM(list, i, Artist_FromSpotify(artist, 1 /* add_ref */));
     }
-    return l;
+    return list;
 }
 
 static PyObject *
-ArtistBrowser_tracks(ArtistBrowser * self)
+ArtistBrowser_tracks(PyObject *self)
 {
-    int count = sp_artistbrowse_num_tracks(self->_browser);
-    PyObject *l = PyList_New(count);
+    sp_artistbrowse *browser = ArtistBrowser_SP_ARTISTBROWSE(self);
+    sp_track *track;
     int i;
+    int count = sp_artistbrowse_num_tracks(browser);
+    PyObject *list = PyList_New(count);
 
     for (i = 0; i < count; ++i) {
-        PyObject *a = Track_FromSpotify(sp_artistbrowse_track(self->_browser, i));
-
-        PyList_SetItem(l, i, a);
+        track = sp_artistbrowse_track(browser, i);
+        PyList_SET_ITEM(list, i, Track_FromSpotify(track, 1 /* add_ref */));
     }
-    return l;
+    return list;
 }
 
 static PyObject *
-ArtistBrowser_tophit_tracks(ArtistBrowser * self)
+ArtistBrowser_tophit_tracks(PyObject *self)
 {
-    int count = sp_artistbrowse_num_tophit_tracks(self->_browser);
-    PyObject *l = PyList_New(count);
+    sp_artistbrowse *browser = ArtistBrowser_SP_ARTISTBROWSE(self);
+    sp_track *track;
     int i;
+    int count = sp_artistbrowse_num_tophit_tracks(browser);
+    PyObject *list = PyList_New(count);
 
     for (i = 0; i < count; ++i) {
-        PyObject *a = Track_FromSpotify(sp_artistbrowse_tophit_track(self->_browser, i));
-
-        PyList_SetItem(l, i, a);
+        track = sp_artistbrowse_tophit_track(browser, i);
+        PyList_SET_ITEM(list, i, Track_FromSpotify(track, 1 /* add_ref */));
     }
-    return l;
+    return list;
 }
 
+/* sequence protocol: */
 Py_ssize_t
-ArtistBrowser_sq_length(ArtistBrowser * self)
+ArtistBrowser_sq_length(PyObject *self)
 {
-    return sp_artistbrowse_num_tracks(self->_browser);
+    return sp_artistbrowse_num_tracks(ArtistBrowser_SP_ARTISTBROWSE(self));
 }
 
 PyObject *
-ArtistBrowser_sq_item(ArtistBrowser * self, Py_ssize_t index)
+ArtistBrowser_sq_item(PyObject *self, Py_ssize_t index)
 {
-    if (index >= sp_artistbrowse_num_tracks(self->_browser)) {
-        PyErr_SetString(PyExc_IndexError, "");
+    if (index >= ArtistBrowser_sq_length(self)) {
+        PyErr_SetNone(PyExc_IndexError);
         return NULL;
     }
-    sp_track *track = sp_artistbrowse_track(self->_browser, (int)index);
-    PyObject *wrapper = Track_FromSpotify(track);
-
-    return wrapper;
+    sp_track *track = sp_artistbrowse_track(
+        ArtistBrowser_SP_ARTISTBROWSE(self), (int)index);
+    return Track_FromSpotify(track, 1 /* add_ref */);
 }
 
 PySequenceMethods ArtistBrowser_as_sequence = {
-    (lenfunc) ArtistBrowser_sq_length,  // sq_length
-    0,                  // sq_concat
-    0,                  // sq_repeat
-    (ssizeargfunc) ArtistBrowser_sq_item,       // sq_item
-    0,                  // sq_ass_item
-    0,                  // sq_contains
-    0,                  // sq_inplace_concat
-    0,                  // sq_inplace_repeat
+    (lenfunc) ArtistBrowser_sq_length,          /*sq_length*/
+    0,                                          /*sq_concat*/
+    0,                                          /*sq_repeat*/
+    (ssizeargfunc) ArtistBrowser_sq_item,       /*sq_item*/
+    0,                                          /*sq_ass_item*/
+    0,                                          /*sq_contains*/
+    0,                                          /*sq_inplace_concat*/
+    0,                                          /*sq_inplace_repeat*/
 };
 
 static PyMethodDef ArtistBrowser_methods[] = {
-    {"is_loaded",
-     (PyCFunction)ArtistBrowser_is_loaded,
-     METH_NOARGS,
-     "True if this artist browser has finished loading"},
-    {"albums",
-     (PyCFunction)ArtistBrowser_albums,
-     METH_NOARGS,
-     "Return a list of all the albums found while browsing."},
-    {"similar_artists",
-     (PyCFunction)ArtistBrowser_similar_artists,
-     METH_NOARGS,
-     "Return a list of all the artists found while browsing."},
-    {"tracks",
-     (PyCFunction)ArtistBrowser_tracks,
-     METH_NOARGS,
-     "Return a list of all the tracks found while browsing."},
-    {"tophit_tracks",
-     (PyCFunction)ArtistBrowser_tophit_tracks,
-     METH_NOARGS,
-     "Return a list of all the top tracks found while browsing."},
-    {NULL}
+    {"is_loaded", (PyCFunction)ArtistBrowser_is_loaded, METH_NOARGS,
+     "True if this artist browser has finished loading"
+    },
+    {"albums", (PyCFunction)ArtistBrowser_albums, METH_NOARGS,
+     "Return a list of all the albums found while browsing."
+    },
+    {"similar_artists", (PyCFunction)ArtistBrowser_similar_artists, METH_NOARGS,
+     "Return a list of all the artists found while browsing."
+    },
+    {"tracks", (PyCFunction)ArtistBrowser_tracks, METH_NOARGS,
+     "Return a list of all the tracks found while browsing."
+    },
+    {"tophit_tracks", (PyCFunction)ArtistBrowser_tophit_tracks, METH_NOARGS,
+     "Return a list of all the top tracks found while browsing."
+    },
+    {NULL} /* Sentinel */
 };
 
 static PyMemberDef ArtistBrowser_members[] = {
-    {NULL}
+    {NULL} /* Sentinel */
 };
 
 PyTypeObject ArtistBrowserType = {
-    PyObject_HEAD_INIT(NULL) 0, /*ob_size */
-    "spotify.ArtistBrowser",    /*tp_name */
-    sizeof(ArtistBrowser),      /*tp_basicsize */
-    0,                  /*tp_itemsize */
-    ArtistBrowser_dealloc,      /*tp_dealloc */
-    0,                  /*tp_print */
-    0,                  /*tp_getattr */
-    0,                  /*tp_setattr */
-    0,                  /*tp_compare */
-    0,                  /*tp_repr */
-    0,                  /*tp_as_number */
-    &ArtistBrowser_as_sequence, /*tp_as_sequence */
-    0,                  /*tp_as_mapping */
-    0,                  /*tp_hash */
-    0,                  /*tp_call */
-    0,                  /*tp_str */
-    0,                  /*tp_getattro */
-    0,                  /*tp_setattro */
-    0,                  /*tp_as_buffer */
-    Py_TPFLAGS_DEFAULT | Py_TPFLAGS_BASETYPE,   /*tp_flags */
-    "ArtistBrowser objects",    /* tp_doc */
-    0,                  /* tp_traverse */
-    0,                  /* tp_clear */
-    0,                  /* tp_richcompare */
-    0,                  /* tp_weaklistoffset */
-    0,                  /* tp_iter */
-    0,                  /* tp_iternext */
-    ArtistBrowser_methods,      /* tp_methods */
-    ArtistBrowser_members,      /* tp_members */
-    0,                  /* tp_getset */
-    0,                  /* tp_base */
-    0,                  /* tp_dict */
-    0,                  /* tp_descr_get */
-    0,                  /* tp_descr_set */
-    0,                  /* tp_dictoffset */
-    0,                  /* tp_init */
-    0,                  /* tp_alloc */
-    ArtistBrowser_new,  /* tp_new */
+    PyObject_HEAD_INIT(NULL) 0,               /*ob_size */
+    "spotify.ArtistBrowser",                  /*tp_name */
+    sizeof(ArtistBrowser),                    /*tp_basicsize */
+    0,                                        /*tp_itemsize */
+    (destructor)ArtistBrowser_dealloc,        /*tp_dealloc */
+    0,                                        /*tp_print */
+    0,                                        /*tp_getattr */
+    0,                                        /*tp_setattr */
+    0,                                        /*tp_compare */
+    0,                                        /*tp_repr */
+    0,                                        /*tp_as_number */
+    &ArtistBrowser_as_sequence,               /*tp_as_sequence */
+    0,                                        /*tp_as_mapping */
+    0,                                        /*tp_hash */
+    0,                                        /*tp_call */
+    0,                                        /*tp_str */
+    0,                                        /*tp_getattro */
+    0,                                        /*tp_setattro */
+    0,                                        /*tp_as_buffer */
+    Py_TPFLAGS_DEFAULT | Py_TPFLAGS_BASETYPE, /*tp_flags */
+    "ArtistBrowser objects",                  /* tp_doc */
+    0,                                        /* tp_traverse */
+    0,                                        /* tp_clear */
+    0,                                        /* tp_richcompare */
+    0,                                        /* tp_weaklistoffset */
+    0,                                        /* tp_iter */
+    0,                                        /* tp_iternext */
+    ArtistBrowser_methods,                    /* tp_methods */
+    ArtistBrowser_members,                    /* tp_members */
+    0,                                        /* tp_getset */
+    0,                                        /* tp_base */
+    0,                                        /* tp_dict */
+    0,                                        /* tp_descr_get */
+    0,                                        /* tp_descr_set */
+    0,                                        /* tp_dictoffset */
+    0,                                        /* tp_init */
+    0,                                        /* tp_alloc */
+    ArtistBrowser_new,                        /* tp_new */
 };
 
 void
-artistbrowser_init(PyObject *m)
+artistbrowser_init(PyObject *module)
 {
     if (PyType_Ready(&ArtistBrowserType) < 0)
         return;
-
     Py_INCREF(&ArtistBrowserType);
-    PyModule_AddObject(m, "ArtistBrowser", (PyObject *)&ArtistBrowserType);
+    PyModule_AddObject(module, "ArtistBrowser", (PyObject *)&ArtistBrowserType);
 }

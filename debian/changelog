@@ -1,3 +1,10 @@
+python-spotify (1.11-0mopidy1) unstable; urgency=low
+
+  * New upstream release.
+  * Increase Standards-Version to 3.9.4.
+
+ -- Stein Magnus Jodal <stein.magnus@jodal.no>  Mon, 01 Jul 2013 00:51:58 +0200
+
 python-spotify (1.10-0mopidy1) unstable; urgency=low
 
   * New upstream release.

@@ -7,7 +7,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <libspotify/api.h>
-#include <libmockspotify.h>
+#include "libmockspotify.h"
 #include "pyspotify.h"
 #include "album.h"
 #include "albumbrowser.h"

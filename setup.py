@@ -5,10 +5,12 @@ import os
 import re
 import sys
 
+
 def get_version():
     init_py = open('spotify/__init__.py').read()
     metadata = dict(re.findall("__([a-z]+)__ = '([^']+)'", init_py))
     return metadata['version']
+
 
 def fullsplit(path, result=None):
     """
@@ -24,6 +26,7 @@ def fullsplit(path, result=None):
         return result
     return fullsplit(head, [tail] + result)
 
+
 def with_mock():
     """
     Checks whether the user wants to build the mockmodule (off by default).
@@ -33,6 +36,7 @@ def with_mock():
         return True
     except ValueError:
         return False
+
 
 # Compile the list of packages available, because distutils doesn't have
 # an easy way to do this.
@@ -50,54 +54,60 @@ for dirpath, dirnames, filenames in os.walk(project_dir):
     if '__init__.py' in filenames:
         packages.append('.'.join(fullsplit(dirpath)))
     elif filenames:
-        data_files.append([dirpath,
-            [os.path.join(dirpath, f) for f in filenames]])
+        data_files.append(
+            [dirpath, [os.path.join(dirpath, f) for f in filenames]])
 
-spotify_ext = Extension('spotify._spotify',
-    [
-        'src/module.c',
-        'src/session.c',
-        'src/link.c',
-        'src/track.c',
-        'src/album.c',
-        'src/albumbrowser.c',
-        'src/artist.c',
-        'src/artistbrowser.c',
-        'src/search.c',
-        'src/playlist.c',
-        'src/playlistcontainer.c',
-        'src/playlistfolder.c',
-        'src/image.c',
-        'src/user.c',
-        'src/pyspotify.c',
-        'src/toplistbrowser.c',
-    ],
-    include_dirs=['src'],
-    libraries=['spotify'],
-)
+common_src_files = [
+    'src/session.c',
+    'src/link.c',
+    'src/track.c',
+    'src/album.c',
+    'src/albumbrowser.c',
+    'src/artist.c',
+    'src/artistbrowser.c',
+    'src/search.c',
+    'src/playlist.c',
+    'src/playlistcontainer.c',
+    'src/playlistfolder.c',
+    'src/image.c',
+    'src/user.c',
+    'src/pyspotify.c',
+    'src/toplistbrowser.c',
+]
 
-mockspotify_ext = Extension('spotify._mockspotify',
-    [
-        'src/mockmodule.c',
-        'src/session.c',
-        'src/link.c',
-        'src/track.c',
-        'src/album.c',
-        'src/albumbrowser.c',
-        'src/artist.c',
-        'src/artistbrowser.c',
-        'src/search.c',
-        'src/playlist.c',
-        'src/playlistcontainer.c',
-        'src/playlistfolder.c',
-        'src/image.c',
-        'src/user.c',
-        'src/pyspotify.c',
-        'src/toplistbrowser.c',
-    ],
+mock_src_files = [
+    'libmockspotify/albumbrowse.c',
+    'libmockspotify/album.c',
+    'libmockspotify/artistbrowse.c',
+    'libmockspotify/artist.c',
+    'libmockspotify/error.c',
+    'libmockspotify/event.c',
+    'libmockspotify/image.c',
+    'libmockspotify/inbox.c',
+    'libmockspotify/libmockspotify.c',
+    'libmockspotify/link.c',
+    'libmockspotify/player.c',
+    'libmockspotify/playlist.c',
+    'libmockspotify/playlistcontainer.c',
+    'libmockspotify/search.c',
+    'libmockspotify/session.c',
+    'libmockspotify/toplistbrowse.c',
+    'libmockspotify/track.c',
+    'libmockspotify/urlcode.c',
+    'libmockspotify/user.c',
+    'libmockspotify/util.c',
+]
+
+spotify_ext = Extension(
+    'spotify._spotify',
+    ['src/module.c'] + common_src_files,
     include_dirs=['src'],
-    libraries=['mockspotify'],
-)
+    libraries=['spotify'])
+
+mockspotify_ext = Extension(
+    'spotify._mockspotify',
+    mock_src_files + ['src/mockmodule.c'] + common_src_files,
+    include_dirs=['src', 'libmockspotify'])
 
 modules = [spotify_ext]
 if with_mock():

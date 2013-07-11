@@ -195,7 +195,7 @@ sp_link_as_track_and_offset(sp_link *link, int *offset)
   sp_link *my_link = ALLOC(sp_link);
   my_link->data = strclone(link->data);
 
-  if (optr = strchr(my_link->data, '#'))
+  if ((optr = strchr(my_link->data, '#')))
   {
     sscanf(optr, "#%2u:%2u", &mins, &secs);
     *offset = (mins * 60 + secs) * 1000;

@@ -4,9 +4,6 @@
 static sp_error
 mocksp_playlistcontainer_insert(sp_playlistcontainer *, int, sp_playlistcontainer_playlist_t);
 
-static sp_error
-mocksp_playlistcontainer_remove(sp_playlistcontainer *pc, int index);
-
 static sp_playlistcontainer_playlist_t *
 mocksp_playlistcontainer_find_playlist(sp_playlistcontainer *, sp_playlist *);
 

@@ -7,7 +7,7 @@ Build-Depends:
     libspotify-dev (>= 12), libspotify-dev (<< 13),
     python-all-dev (>= 2.6.6-3~),
     python-all-dbg (>= 2.6.6-3~)
-Build-Depends-Indep: python-sphinx (>= 1.0)
+Build-Depends-Indep: python-sphinx (>= 1.0.7+dfsg)
 Standards-Version: 3.9.4
 Homepage: http://pyspotify.mopidy.com/
 Vcs-Git: git://github.com/mopidy/pyspotify.git
@@ -37,7 +37,7 @@ Depends:
     ${misc:Depends},
     ${shlibs:Depends},
     python-spotify (= ${binary:Version})
-Description: Python bindings for libspotify - debug extension
+Description: Python bindings for libspotify (debug extension)
  The Python bindings for libspotify allows third party developers to write
  applications that utilize the Spotify music streaming service in Python.
  .
@@ -47,12 +47,11 @@ Package: python-spotify-doc
 Section: doc
 Architecture: all
 Depends:
-    ${misc:Depends},
-    libjs-jquery,
-    libjs-underscore
+    ${sphinxdoc:Depends},
+    ${misc:Depends}
 Recommends: python-spotify
 Replaces: python-spotify (<< 1.7-2)
-Description: Python bindings for libspotify - documentation
+Description: Python bindings for libspotify (documentation)
  The Python bindings for libspotify allows third party developers to write
  applications that utilize the Spotify music streaming service in Python.
  .

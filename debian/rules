@@ -4,7 +4,7 @@
 #export DH_VERBOSE=1
 
 %:
-	dh $@
+	dh $@ --with python2
 
 override_dh_install:
 	dh_install -X "*_d.so" "debian/tmp/*" -p python-spotify
@@ -18,6 +18,7 @@ override_dh_installdocs-indep:
 	make -C docs/ clean html
 	dh_installdocs
 
-override_dh_clean-indep:
+override_dh_auto_clean-indep:
+	dh_auto_clean
 	make -C docs/ clean
-	dh_clean
+	rm -rf build/

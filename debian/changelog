@@ -1,3 +1,10 @@
+python-spotify (1.11-0mopidy2) unstable; urgency=low
+
+  * Convert to dh_python2.
+  * Bump debhelper compat level to 8.
+
+ -- Stein Magnus Jodal <stein.magnus@jodal.no>  Fri, 19 Jul 2013 16:50:23 +0200
+
 python-spotify (1.11-0mopidy1) unstable; urgency=low
 
   * New upstream release.

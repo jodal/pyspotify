@@ -3,19 +3,16 @@ Section: python
 Priority: optional
 Maintainer: Stein Magnus Jodal <stein.magnus@jodal.no>
 Build-Depends:
-    debhelper (>= 7.0.50~),
+    debhelper (>= 8.0.0),
     libspotify-dev (>= 12), libspotify-dev (<< 13),
-    python-support,
-    python-all-dev (>= 2.5),
-    python-all-dbg (>= 2.5)
+    python-all-dev (>= 2.6.6-3~),
+    python-all-dbg (>= 2.6.6-3~)
 Build-Depends-Indep: python-sphinx (>= 1.0)
 Standards-Version: 3.9.4
-Homepage: http://github.com/mopidy/pyspotify
+Homepage: http://pyspotify.mopidy.com/
 Vcs-Git: git://github.com/mopidy/pyspotify.git
-Vcs-Browser: http://github.com/mopidy/pyspotify
-XS-Python-Version: >= 2.5
-X-Python-Version: >= 2.5
-X-Python3-Version: << 3
+Vcs-Browser: https://github.com/mopidy/pyspotify
+X-Python-Version: >= 2.6
 
 Package: python-spotify
 Architecture: any

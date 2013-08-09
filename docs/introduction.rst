@@ -37,7 +37,7 @@ Requirements
 ============
 
 To use this package you will also need `libspotify
-<http://developer.spotify.com/en/libspotify/overview/>`_, which is available
+<https://developer.spotify.com/technologies/libspotify/>`_, which is available
 from Spotify.
 
 You will need a Spotify Premium account. You will also need to apply for, and

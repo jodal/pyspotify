@@ -9,7 +9,7 @@ pyspotify provides a Python interface to `Spotify's <http://www.spotify.com/>`_
 online music streaming service.
 
 To use this package you will also need `libspotify
-<http://developer.spotify.com/en/libspotify/overview/>`_, which is available
+<https://developer.spotify.com/technologies/libspotify/>`_, which is available
 from Spotify. You will need a Spotify Premium account. You will also need to
 apply for, and receive an API key from Spotify.
 

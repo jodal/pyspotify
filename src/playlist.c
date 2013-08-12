@@ -935,6 +935,18 @@ static PyMethodDef Playlist_methods[] = {
      (PyCFunction)Playlist_update_subscribers, METH_NOARGS,
      "Update the subscribers information for this playlist"
     },
+    {"get_offline_status",
+     (PyCFunction)Playlist_get_offline_status, METH_NOARGS,
+     "Get offline status for this playlist"
+    },
+    {"set_offline_mode",
+     (PyCFunction)Playlist_set_offline_mode, METH_VARARGS,
+     "Set the playlists offline mode."
+    },
+    {"get_offline_download_completed",
+     (PyCFunction)Playlist_get_offline_download_completed, METH_NOARGS,
+     "Get download progress for this playlist"
+    },
     {"type",
      (PyCFunction)Playlist_type, METH_NOARGS,
      ""

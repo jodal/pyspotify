@@ -759,6 +759,49 @@ Playlist_add_tracks(PyObject *self, PyObject *args)
 }
 
 static PyObject *
+Playlist_get_offline_status(PyObject *self)
+{
+    if (!g_session) {
+        PyErr_SetString(SpotifyError, "Not logged in.");
+        return NULL;
+    }
+    /* TODO: return enums that represent sp_playlist_offline_status */
+    enum sp_playlist_offline_status offline_status =  sp_playlist_get_offline_status(
+        g_session, Playlist_SP_PLAYLIST(self));
+    return Py_BuildValue("i", offline_status);
+}
+
+static PyObject *
+Playlist_set_offline_mode(PyObject *self, PyObject *args)
+{
+    bool offline;
+    sp_error error;
+
+    if (!g_session) {
+        PyErr_SetString(SpotifyError, "Not logged in.");
+        return NULL;
+    }
+
+    if (!PyArg_ParseTuple(args, "i", &offline))
+        return NULL;
+
+    error = sp_playlist_set_offline_mode(g_session, Playlist_SP_PLAYLIST(self), offline);
+    return none_or_raise_error(error);
+}
+
+static PyObject *
+Playlist_get_offline_download_completed(PyObject *self)
+{
+    if (!g_session) {
+        PyErr_SetString(SpotifyError, "Not logged in.");
+        return NULL;
+    }
+
+    int completed = sp_playlist_get_offline_download_completed(g_session, Playlist_SP_PLAYLIST(self));
+    return Py_BuildValue("i", completed);
+}
+
+static PyObject *
 Playlist_type(PyObject *self)
 {
     return PyBytes_FromString("playlist");

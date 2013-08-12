@@ -766,7 +766,7 @@ Playlist_get_offline_status(PyObject *self)
         return NULL;
     }
     /* TODO: return enums that represent sp_playlist_offline_status */
-    enum sp_playlist_offline_status offline_status =  sp_playlist_get_offline_status(
+    enum sp_playlist_offline_status offline_status = sp_playlist_get_offline_status(
         g_session, Playlist_SP_PLAYLIST(self));
     return Py_BuildValue("i", offline_status);
 }

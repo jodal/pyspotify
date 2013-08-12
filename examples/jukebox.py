@@ -228,6 +228,62 @@ playlist."""
                 return
             self.jukebox.watch(self.jukebox.ctr[p], True)
 
+    def do_get_offline_status(self, line):
+        if not line:
+            print "Usage: get_offline_status [playlist]"
+        else:
+            try:
+                p = int(line)
+            except ValueError:
+                print "That's not a number!"
+                return
+            if p < 0 or p >= len(self.jukebox.ctr):
+                print "That's out of range!"
+                return
+            self.jukebox.get_offline_status(self.jukebox.ctr[p])
+
+    def do_set_offline_on(self, line):
+        if not line:
+            print "Usage: set_offline_on [playlist]"
+        else:
+            try:
+                p = int(line)
+            except ValueError:
+                print "That's not a number!"
+                return
+            if p < 0 or p >= len(self.jukebox.ctr):
+                print "That's out of range!"
+                return
+            self.jukebox.set_offline_mode(self.jukebox.ctr[p], True)
+
+    def do_set_offline_off(self, line):
+        if not line:
+            print "Usage: set_offline_off [playlist]"
+        else:
+            try:
+                p = int(line)
+            except ValueError:
+                print "That's not a number!"
+                return
+            if p < 0 or p >= len(self.jukebox.ctr):
+                print "That's out of range!"
+                return
+            self.jukebox.set_offline_mode(self.jukebox.ctr[p], False)
+
+    def do_get_offline_download_completed(self, line):
+        if not line:
+            print "Usage: set_offline_off [playlist]"
+        else:
+            try:
+                p = int(line)
+            except ValueError:
+                print "That's not a number!"
+                return
+            if p < 0 or p >= len(self.jukebox.ctr):
+                print "That's out of range!"
+                return
+            self.jukebox.get_offline_download_completed(self.jukebox.ctr[p])
+
     def do_toplist(self, line):
         usage = "Usage: toplist (albums|artists|tracks) (GB|FR|..|all|current)"
         if not line:
@@ -483,6 +539,15 @@ class Jukebox(SpotifySessionManager):
                 print '%3d: %s' % (i+1, tb[i].name())
 
         ToplistBrowser(tl_type, tl_region, callback)
+
+    def get_offline_status(self, playlist):
+        print playlist.get_offline_status()
+
+    def set_offline_mode(self, playlist, offline):
+        playlist.set_offline_mode(offline)
+
+    def get_offline_download_completed(self, playlist):
+        print "%i %% of download completed" % playlist.get_offline_download_completed()
 
     def shell(self):
         import code

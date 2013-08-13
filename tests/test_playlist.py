@@ -142,3 +142,20 @@ class TestPlaylist(unittest.TestCase):
         playlist = mock_playlist('foo', [], self.owner)
         self.assertEqual(playlist.owner().canonical_name(),
                          self.owner.canonical_name())
+
+    def test_offline_status(self):
+        playlist = mock_playlist('foo', [], self.owner)
+        self.assertEqual(playlist.get_offline_status(), 0)
+        self.assertEqual(playlist.get_offline_download_completed(), 0)
+
+    def test_offline_downloading(self):
+        playlist = mock_playlist('foo', [], self.owner,
+                                 offline_status=2,
+                                 offline_download_completed=70)
+        self.assertEqual(playlist.get_offline_status(), 2)
+        self.assertEqual(playlist.get_offline_download_completed(), 70)
+
+    def test_offline_set_mode(self):
+        playlist = mock_playlist('foo', [], self.owner)
+        playlist.set_offline_mode(1)
+        self.assertEqual(playlist.get_offline_status(), 1)

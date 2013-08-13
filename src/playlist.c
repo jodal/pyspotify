@@ -785,7 +785,9 @@ Playlist_set_offline_mode(PyObject *self, PyObject *args)
     if (!PyArg_ParseTuple(args, "i", &offline))
         return NULL;
 
-    error = sp_playlist_set_offline_mode(g_session, Playlist_SP_PLAYLIST(self), offline);
+    error = sp_playlist_set_offline_mode(g_session,
+                                         Playlist_SP_PLAYLIST(self),
+                                         offline);
     return none_or_raise_error(error);
 }
 
@@ -797,7 +799,8 @@ Playlist_get_offline_download_completed(PyObject *self)
         return NULL;
     }
 
-    int completed = sp_playlist_get_offline_download_completed(g_session, Playlist_SP_PLAYLIST(self));
+    int completed = sp_playlist_get_offline_download_completed(
+        g_session, Playlist_SP_PLAYLIST(self));
     return Py_BuildValue("i", completed);
 }
 

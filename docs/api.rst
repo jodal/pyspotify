@@ -137,6 +137,10 @@ when using pyspotify.
 .. autoclass:: ErrorType
     :no-inherited-members:
 
+.. autoclass:: Timeout
+    :no-undoc-members:
+    :no-inherited-members:
+
 
 Sessions
 ========

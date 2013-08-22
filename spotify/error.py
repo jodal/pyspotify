@@ -6,6 +6,7 @@ from spotify import lib, utils
 __all__ = [
     'Error',
     'ErrorType',
+    'Timeout',
 ]
 
 
@@ -45,3 +46,12 @@ for attr in dir(lib):
 @utils.make_enum('SP_ERROR_')
 class ErrorType(utils.IntEnum):
     pass
+
+
+class Timeout(Exception):
+    """Exception raised by an operation not completing within the given
+    timeout."""
+
+    def __init__(self, timeout):
+        message = 'Operation did not complete in %.3fs' % timeout
+        super(Timeout, self).__init__(message)

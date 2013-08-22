@@ -72,6 +72,14 @@ class LoadableTest(unittest.TestCase):
         self.assertEqual(session_mock.process_events.call_count, 1)
         self.assertEqual(time_mock.sleep.call_count, 0)
 
+    def test_load_rasies_exception_on_error_even_if_already_loaded(
+            self, is_loaded_mock, session_mock, time_mock):
+        is_loaded_mock.return_value = True
+
+        foo = Foo()
+        foo.error = spotify.ErrorType.OTHER_PERMANENT
+        self.assertRaises(spotify.Error, foo.load)
+
     def test_load_does_not_abort_on_is_loading_error(
             self, is_loaded_mock, session_mock, time_mock):
         is_loaded_mock.side_effect = [False, False, True]

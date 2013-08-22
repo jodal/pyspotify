@@ -85,12 +85,13 @@ def load(obj, timeout=None):
     deadline = time.time() + timeout
     while not obj.is_loaded:
         spotify.session_instance.process_events()
-        if hasattr(obj, 'error'):
-            spotify.Error.maybe_raise(
-                obj.error, ignores=[spotify.ErrorType.IS_LOADING])
+        spotify.Error.maybe_raise(
+            getattr(obj, 'error', 0), ignores=[spotify.ErrorType.IS_LOADING])
         if time.time() > deadline:
             raise spotify.Timeout(timeout)
         time.sleep(0.001)
+    spotify.Error.maybe_raise(
+        getattr(obj, 'error', 0), ignores=[spotify.ErrorType.IS_LOADING])
     return obj
 
 

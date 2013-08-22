@@ -106,9 +106,10 @@ class Playlist(object):
 
         Will return :class:`None` if the description is unset.
         """
-        description = utils.to_unicode(
-            lib.sp_playlist_get_description(self._sp_playlist))
-        return description if description else None
+        description = lib.sp_playlist_get_description(self._sp_playlist)
+        if description == ffi.NULL:
+            return None
+        return utils.to_unicode(description)
 
     @property
     def image(self):

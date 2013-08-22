@@ -205,8 +205,7 @@ class PlaylistTest(unittest.TestCase):
         self.assertEqual(result, 'Lorem ipsum')
 
     def test_description_is_none_if_unset(self, lib_mock):
-        lib_mock.sp_playlist_get_description.return_value = spotify.ffi.new(
-            'char[]', b'')
+        lib_mock.sp_playlist_get_description.return_value = spotify.ffi.NULL
         sp_playlist = spotify.ffi.new('int *')
         playlist = spotify.Playlist(sp_playlist=sp_playlist)
 

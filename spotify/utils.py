@@ -72,10 +72,11 @@ def load(obj, timeout=None):
     :type timeout: float
     :returns: self
     """
-    # TODO Timeout if this takes too long
-    # TODO We probably need to be logged in, so we should check for that too
     if spotify.session_instance is None:
         raise RuntimeError('Session must be initialized to load objects')
+    if spotify.session_instance.user is None:
+        raise RuntimeError('Session must be logged in to load objects')
+    # TODO Timeout if this takes too long
     while not obj.is_loaded:
         spotify.session_instance.process_events()
         if hasattr(obj, 'error'):

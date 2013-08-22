@@ -72,7 +72,7 @@ class LoadableTest(unittest.TestCase):
         self.assertEqual(session_mock.process_events.call_count, 1)
         self.assertEqual(time_mock.sleep.call_count, 0)
 
-    def test_load_rasies_exception_on_error_even_if_already_loaded(
+    def test_load_raises_exception_on_error_even_if_already_loaded(
             self, is_loaded_mock, session_mock, time_mock):
         is_loaded_mock.return_value = True
 

@@ -2,6 +2,7 @@ from __future__ import unicode_literals
 
 import mock
 import unittest
+import time
 
 import spotify
 from spotify.utils import load
@@ -12,7 +13,7 @@ class Foo(object):
     def is_loaded(self):
         return True
 
-    def load(self, timeout=0):
+    def load(self, timeout=None):
         return load(self, timeout=timeout)
 
 
@@ -41,9 +42,18 @@ class LoadableTest(unittest.TestCase):
 
         self.assertRaises(RuntimeError, foo.load)
 
+    def test_load_raises_error_when_timeout_is_reached(
+            self, is_loaded_mock, session_mock, time_mock):
+        is_loaded_mock.return_value = False
+        time_mock.time.side_effect = time.time
+        foo = Foo()
+
+        self.assertRaises(spotify.Timeout, foo.load, timeout=0)
+
     def test_load_processes_events_until_loaded(
             self, is_loaded_mock, session_mock, time_mock):
         is_loaded_mock.side_effect = [False, False, True]
+        time_mock.time.side_effect = time.time
 
         foo = Foo()
         foo.load()
@@ -65,6 +75,7 @@ class LoadableTest(unittest.TestCase):
     def test_load_does_not_abort_on_is_loading_error(
             self, is_loaded_mock, session_mock, time_mock):
         is_loaded_mock.side_effect = [False, False, True]
+        time_mock.time.side_effect = time.time
 
         foo = Foo()
         foo.error = spotify.ErrorType.IS_LOADING

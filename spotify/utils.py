@@ -68,6 +68,10 @@ def load(obj, timeout=None):
     The ``obj`` must at least have the :attr:`is_loaded` attribute. If it also
     has an :meth:`error` method, it will be checked for errors to raise.
 
+    If unspecified, the ``timeout`` defaults to 10s. Any timeout is better than
+    no timeout, since no timeout would cause programs to potentially hang
+    forever without any information to help debug the issue.
+
     :param timeout: seconds before giving up and raising an exception
     :type timeout: float
     :returns: self
@@ -76,12 +80,16 @@ def load(obj, timeout=None):
         raise RuntimeError('Session must be initialized to load objects')
     if spotify.session_instance.user is None:
         raise RuntimeError('Session must be logged in to load objects')
-    # TODO Timeout if this takes too long
+    if timeout is None:
+        timeout = 10
+    deadline = time.time() + timeout
     while not obj.is_loaded:
         spotify.session_instance.process_events()
         if hasattr(obj, 'error'):
             spotify.Error.maybe_raise(
                 obj.error, ignores=[spotify.ErrorType.IS_LOADING])
+        if time.time() > deadline:
+            raise spotify.Timeout(timeout)
         time.sleep(0.001)
     return obj
 

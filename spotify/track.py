@@ -64,19 +64,28 @@ class Track(object):
 
         The :attr:`~SessionCallbacks.metadata_updated` callback is called when
         the offline status changes.
+
+        Will always return :class:`None` if the track isn't loaded.
         """
-        spotify.Error.maybe_raise(self.error)
-        # TODO What happens here if the track is unloaded?
+        spotify.Error.maybe_raise(
+            self.error, ignores=[spotify.ErrorType.IS_LOADING])
+        if not self.is_loaded:
+            return None
         return TrackOfflineStatus(
             lib.sp_track_offline_get_status(self._sp_track))
 
     @property
     def availability(self):
-        """The :class:`TrackAvailability` of the track."""
+        """The :class:`TrackAvailability` of the track.
+
+        Will always return :class:`None` if the track isn't loaded.
+        """
         if spotify.session_instance is None:
             raise RuntimeError('Session must be initialized')
-        spotify.Error.maybe_raise(self.error)
-        # TODO What happens here if the track is unloaded?
+        spotify.Error.maybe_raise(
+            self.error, ignores=[spotify.ErrorType.IS_LOADING])
+        if not self.is_loaded:
+            return None
         return TrackAvailability(lib.sp_track_get_availability(
             spotify.session_instance._sp_session, self._sp_track))
 
@@ -114,12 +123,16 @@ class Track(object):
     def playable(self):
         """The actual track that will be played when this track is played.
 
+        Will always return :class:`None` if the track isn't loaded.
+
         See :meth:`is_autolinked`.
         """
         if spotify.session_instance is None:
             raise RuntimeError('Session must be initialized')
-        spotify.Error.maybe_raise(self.error)
-        # TODO What happens here if the track is unloaded?
+        spotify.Error.maybe_raise(
+            self.error, ignores=[spotify.ErrorType.IS_LOADING])
+        if not self.is_loaded:
+            return None
         return Track(sp_track=lib.sp_track_get_playable(
             spotify.session_instance._sp_session, self._sp_track))
 
@@ -137,9 +150,13 @@ class Track(object):
             >>> track.link.type
             <LinkType.ARTIST: ...>
             >>> artist = track.link.as_artist()
+
+        Will always return :class:`None` if the track isn't loaded.
         """
-        spotify.Error.maybe_raise(self.error)
-        # TODO What happens here if the track is unloaded?
+        spotify.Error.maybe_raise(
+            self.error, ignores=[spotify.ErrorType.IS_LOADING])
+        if not self.is_loaded:
+            return None
         return bool(lib.sp_track_is_placeholder(self._sp_track))
 
     def is_starred(self):

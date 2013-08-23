@@ -10,6 +10,7 @@ from spotify import ffi, lib, utils
 __all__ = [
     'SearchResult',
     'SearchResultPlaylist',
+    'SearchResultSequence',
     'SearchType',
 ]
 
@@ -82,16 +83,15 @@ class SearchResult(object):
 
         Will always return an empty list if the search isn't loaded.
         """
-        # TODO Replace with collections.Sequence subclass
         spotify.Error.maybe_raise(self.error)
         if not self.is_loaded:
             return []
-        num_tracks = lib.sp_search_num_tracks(self._sp_search)
-        tracks = []
-        for i in range(num_tracks):
-            tracks.append(spotify.Track(
-                sp_track=lib.sp_search_track(self._sp_search, i)))
-        return tracks
+        return SearchResultSequence(
+            sp_search=self._sp_search,
+            len_func=lib.sp_search_num_tracks,
+            getitem_func=(
+                lambda sp_search, key:
+                spotify.Track(sp_track=lib.sp_search_track(sp_search, key))))
 
     @property
     def total_tracks(self):
@@ -110,16 +110,15 @@ class SearchResult(object):
 
         Will always return an empty list if the search isn't loaded.
         """
-        # TODO Replace with collections.Sequence subclass
         spotify.Error.maybe_raise(self.error)
         if not self.is_loaded:
             return []
-        num_albums = lib.sp_search_num_albums(self._sp_search)
-        albums = []
-        for i in range(num_albums):
-            albums.append(spotify.Album(
-                sp_album=lib.sp_search_album(self._sp_search, i)))
-        return albums
+        return SearchResultSequence(
+            sp_search=self._sp_search,
+            len_func=lib.sp_search_num_albums,
+            getitem_func=(
+                lambda sp_search, key:
+                spotify.Album(sp_album=lib.sp_search_album(sp_search, key))))
 
     @property
     def total_albums(self):
@@ -138,16 +137,16 @@ class SearchResult(object):
 
         Will always return an empty list if the search isn't loaded.
         """
-        # TODO Replace with collections.Sequence subclass
         spotify.Error.maybe_raise(self.error)
         if not self.is_loaded:
             return []
-        num_artists = lib.sp_search_num_artists(self._sp_search)
-        artists = []
-        for i in range(num_artists):
-            artists.append(spotify.Artist(
-                sp_artist=lib.sp_search_artist(self._sp_search, i)))
-        return artists
+        return SearchResultSequence(
+            sp_search=self._sp_search,
+            len_func=lib.sp_search_num_artists,
+            getitem_func=(
+                lambda sp_search, key:
+                spotify.Artist(
+                    sp_artist=lib.sp_search_artist(sp_search, key))))
 
     @property
     def total_artists(self):
@@ -168,22 +167,23 @@ class SearchResult(object):
 
         Will always return an empty list if the search isn't loaded.
         """
-        # TODO Replace with collections.Sequence subclass
         spotify.Error.maybe_raise(self.error)
         if not self.is_loaded:
             return []
-        num_playlists = lib.sp_search_num_playlists(self._sp_search)
-        playlists = []
-        for i in range(num_playlists):
-            playlists.append(spotify.SearchResultPlaylist(
+
+        def getitem(sp_search, key):
+            return spotify.SearchResultPlaylist(
                 name=utils.to_unicode(
-                    lib.sp_search_playlist_name(self._sp_search, i)),
+                    lib.sp_search_playlist_name(self._sp_search, key)),
                 uri=utils.to_unicode(
-                    lib.sp_search_playlist_uri(self._sp_search, i)),
+                    lib.sp_search_playlist_uri(self._sp_search, key)),
                 image_uri=utils.to_unicode(
-                    lib.sp_search_playlist_image_uri(self._sp_search, i)),
-            ))
-        return playlists
+                    lib.sp_search_playlist_image_uri(self._sp_search, key)))
+
+        return SearchResultSequence(
+            sp_search=self._sp_search,
+            len_func=lib.sp_search_num_playlists,
+            getitem_func=getitem)
 
     @property
     def total_playlists(self):
@@ -210,6 +210,26 @@ class SearchResultPlaylist(collections.namedtuple(
         'SearchResultPlaylist', ['name', 'uri', 'image_uri'])):
     """A playlist matching a search query."""
     pass
+
+
+class SearchResultSequence(collections.Sequence):
+    def __init__(self, sp_search, len_func, getitem_func):
+        lib.sp_search_add_ref(sp_search)
+        self._sp_search = ffi.gc(sp_search, lib.sp_search_release)
+        self._len_func = len_func
+        self._getitem_func = getitem_func
+
+    def __len__(self):
+        return self._len_func(self._sp_search)
+
+    def __getitem__(self, key):
+        if not isinstance(key, int):
+            raise TypeError(
+                'list indices must be integers, not %s' %
+                key.__class__.__name__)
+        if not 0 <= key < self.__len__():
+            raise IndexError('list index out of range')
+        return self._getitem_func(self._sp_search, key)
 
 
 @utils.make_enum('SP_SEARCH_')

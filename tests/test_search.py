@@ -79,15 +79,19 @@ class SearchResultTest(unittest.TestCase):
         sp_search = spotify.ffi.new('int *')
         search = spotify.SearchResult(sp_search)
 
+        self.assertEqual(lib_mock.sp_search_add_ref.call_count, 1)
         result = search.tracks
+        self.assertEqual(lib_mock.sp_search_add_ref.call_count, 2)
 
+        self.assertEqual(len(result), 1)
         lib_mock.sp_search_num_tracks.assert_called_with(sp_search)
+
+        item = result[0]
+        self.assertIsInstance(item, spotify.Track)
+        self.assertEqual(item._sp_track, sp_track)
         self.assertEqual(lib_mock.sp_search_track.call_count, 1)
         lib_mock.sp_search_track.assert_called_with(sp_search, 0)
         track_lib_mock.sp_track_add_ref.assert_called_with(sp_track)
-        self.assertEqual(len(result), 1)
-        self.assertIsInstance(result[0], spotify.Track)
-        self.assertEqual(result[0]._sp_track, sp_track)
 
     def test_tracks_if_no_tracks(self, lib_mock):
         lib_mock.sp_search_error.return_value = spotify.ErrorType.OK
@@ -97,9 +101,9 @@ class SearchResultTest(unittest.TestCase):
 
         result = search.tracks
 
+        self.assertEqual(len(result), 0)
         lib_mock.sp_search_num_tracks.assert_called_with(sp_search)
         self.assertEqual(lib_mock.sp_search_track.call_count, 0)
-        self.assertEqual(len(result), 0)
 
     def test_tracks_if_unloaded(self, lib_mock):
         lib_mock.sp_search_error.return_value = spotify.ErrorType.OK
@@ -124,15 +128,19 @@ class SearchResultTest(unittest.TestCase):
         sp_search = spotify.ffi.new('int *')
         search = spotify.SearchResult(sp_search)
 
+        self.assertEqual(lib_mock.sp_search_add_ref.call_count, 1)
         result = search.albums
+        self.assertEqual(lib_mock.sp_search_add_ref.call_count, 2)
 
+        self.assertEqual(len(result), 1)
         lib_mock.sp_search_num_albums.assert_called_with(sp_search)
+
+        item = result[0]
+        self.assertIsInstance(item, spotify.Album)
+        self.assertEqual(item._sp_album, sp_album)
         self.assertEqual(lib_mock.sp_search_album.call_count, 1)
         lib_mock.sp_search_album.assert_called_with(sp_search, 0)
         album_lib_mock.sp_album_add_ref.assert_called_with(sp_album)
-        self.assertEqual(len(result), 1)
-        self.assertIsInstance(result[0], spotify.Album)
-        self.assertEqual(result[0]._sp_album, sp_album)
 
     def test_albums_if_no_albums(self, lib_mock):
         lib_mock.sp_search_error.return_value = spotify.ErrorType.OK
@@ -142,9 +150,9 @@ class SearchResultTest(unittest.TestCase):
 
         result = search.albums
 
+        self.assertEqual(len(result), 0)
         lib_mock.sp_search_num_albums.assert_called_with(sp_search)
         self.assertEqual(lib_mock.sp_search_album.call_count, 0)
-        self.assertEqual(len(result), 0)
 
     def test_albums_if_unloaded(self, lib_mock):
         lib_mock.sp_search_error.return_value = spotify.ErrorType.OK
@@ -169,15 +177,19 @@ class SearchResultTest(unittest.TestCase):
         sp_search = spotify.ffi.new('int *')
         search = spotify.SearchResult(sp_search)
 
+        self.assertEqual(lib_mock.sp_search_add_ref.call_count, 1)
         result = search.artists
+        self.assertEqual(lib_mock.sp_search_add_ref.call_count, 2)
 
+        self.assertEqual(len(result), 1)
         lib_mock.sp_search_num_artists.assert_called_with(sp_search)
+
+        item = result[0]
+        self.assertIsInstance(item, spotify.Artist)
+        self.assertEqual(item._sp_artist, sp_artist)
         self.assertEqual(lib_mock.sp_search_artist.call_count, 1)
         lib_mock.sp_search_artist.assert_called_with(sp_search, 0)
         artist_lib_mock.sp_artist_add_ref.assert_called_with(sp_artist)
-        self.assertEqual(len(result), 1)
-        self.assertIsInstance(result[0], spotify.Artist)
-        self.assertEqual(result[0]._sp_artist, sp_artist)
 
     def test_artists_if_no_artists(self, lib_mock):
         lib_mock.sp_search_error.return_value = spotify.ErrorType.OK
@@ -187,9 +199,9 @@ class SearchResultTest(unittest.TestCase):
 
         result = search.artists
 
+        self.assertEqual(len(result), 0)
         lib_mock.sp_search_num_artists.assert_called_with(sp_search)
         self.assertEqual(lib_mock.sp_search_artist.call_count, 0)
-        self.assertEqual(len(result), 0)
 
     def test_artists_if_unloaded(self, lib_mock):
         lib_mock.sp_search_error.return_value = spotify.ErrorType.OK
@@ -218,20 +230,24 @@ class SearchResultTest(unittest.TestCase):
         sp_search = spotify.ffi.new('int *')
         search = spotify.SearchResult(sp_search)
 
+        self.assertEqual(lib_mock.sp_search_add_ref.call_count, 1)
         result = search.playlists
+        self.assertEqual(lib_mock.sp_search_add_ref.call_count, 2)
 
+        self.assertEqual(len(result), 1)
         lib_mock.sp_search_num_playlists.assert_called_with(sp_search)
+
+        item = result[0]
+        self.assertIsInstance(item, spotify.SearchResultPlaylist)
+        self.assertEqual(item.name, 'The Party List')
+        self.assertEqual(item.uri, 'spotify:playlist:foo')
+        self.assertEqual(item.image_uri, 'spotify:image:foo')
         self.assertEqual(lib_mock.sp_search_playlist_name.call_count, 1)
         lib_mock.sp_search_playlist_name.assert_called_with(sp_search, 0)
         self.assertEqual(lib_mock.sp_search_playlist_uri.call_count, 1)
         lib_mock.sp_search_playlist_uri.assert_called_with(sp_search, 0)
         self.assertEqual(lib_mock.sp_search_playlist_image_uri.call_count, 1)
         lib_mock.sp_search_playlist_image_uri.assert_called_with(sp_search, 0)
-        self.assertEqual(len(result), 1)
-        self.assertIsInstance(result[0], spotify.SearchResultPlaylist)
-        self.assertEqual(result[0].name, 'The Party List')
-        self.assertEqual(result[0].uri, 'spotify:playlist:foo')
-        self.assertEqual(result[0].image_uri, 'spotify:image:foo')
 
     def test_playlists_if_no_playlists(self, lib_mock):
         lib_mock.sp_search_error.return_value = spotify.ErrorType.OK
@@ -241,9 +257,9 @@ class SearchResultTest(unittest.TestCase):
 
         result = search.playlists
 
+        self.assertEqual(len(result), 0)
         lib_mock.sp_search_num_playlists.assert_called_with(sp_search)
         self.assertEqual(lib_mock.sp_search_playlist.call_count, 0)
-        self.assertEqual(len(result), 0)
 
     def test_playlists_if_unloaded(self, lib_mock):
         lib_mock.sp_search_error.return_value = spotify.ErrorType.OK
@@ -378,6 +394,72 @@ class SearchResultTest(unittest.TestCase):
 
         link_mock.assert_called_once_with(search)
         self.assertEqual(result, mock.sentinel.link)
+
+
+@mock.patch('spotify.search.lib', spec=spotify.lib)
+class SearchResultSequenceTest(unittest.TestCase):
+
+    def test_adds_ref_to_sp_search_when_created(self, lib_mock):
+        sp_search = spotify.ffi.new('int *')
+
+        spotify.SearchResultSequence(sp_search, None, None)
+
+        lib_mock.sp_search_add_ref.assert_called_with(sp_search)
+
+    def test_releases_sp_search_when_search_dies(self, lib_mock):
+        sp_search = spotify.ffi.new('int *')
+
+        seq = spotify.SearchResultSequence(sp_search, None, None)
+        seq = None  # noqa
+        gc.collect()  # Needed for PyPy
+
+        lib_mock.sp_search_release.assert_called_with(sp_search)
+
+    def test_len_calls_len_func(self, lib_mock):
+        sp_search = spotify.ffi.new('int *')
+
+        len_func = mock.Mock()
+        len_func.return_value = 0
+        seq = spotify.SearchResultSequence(sp_search, len_func, None)
+
+        result = len(seq)
+
+        self.assertEqual(result, 0)
+        len_func.assert_called_with(sp_search)
+
+    def test_getitem_calls_getitem_func(self, lib_mock):
+        sp_search = spotify.ffi.new('int *')
+
+        getitem_func = mock.Mock()
+        getitem_func.return_value = mock.sentinel.item_one
+        seq = spotify.SearchResultSequence(
+            sp_search, lambda x: 1, getitem_func)
+
+        result = seq[0]
+
+        self.assertEqual(result, mock.sentinel.item_one)
+        getitem_func.assert_called_with(sp_search, 0)
+
+    def test_getitem_raises_index_error_on_negative_index(self, lib_mock):
+        sp_search = spotify.ffi.new('int *')
+
+        seq = spotify.SearchResultSequence(sp_search, lambda x: 1, None)
+
+        self.assertRaises(IndexError, seq.__getitem__, -1)
+
+    def test_getitem_raises_index_error_on_too_high_index(self, lib_mock):
+        sp_search = spotify.ffi.new('int *')
+
+        seq = spotify.SearchResultSequence(sp_search, lambda x: 1, None)
+
+        self.assertRaises(IndexError, seq.__getitem__, 1)
+
+    def test_getitem_raises_type_error_on_non_integral_index(self, lib_mock):
+        sp_search = spotify.ffi.new('int *')
+
+        seq = spotify.SearchResultSequence(sp_search, lambda x: 1, None)
+
+        self.assertRaises(TypeError, seq.__getitem__, 'abc')
 
 
 class SearchTypeTest(unittest.TestCase):

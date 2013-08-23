@@ -80,13 +80,12 @@ class SearchResult(object):
     def tracks(self):
         """The tracks matching the search query.
 
-        Will always return :class:`None` if the search isn't loaded.
+        Will always return an empty list if the search isn't loaded.
         """
         # TODO Replace with collections.Sequence subclass
-        # TODO Return empty list if not loaded
         spotify.Error.maybe_raise(self.error)
         if not self.is_loaded:
-            return None
+            return []
         num_tracks = lib.sp_search_num_tracks(self._sp_search)
         tracks = []
         for i in range(num_tracks):
@@ -109,13 +108,12 @@ class SearchResult(object):
     def albums(self):
         """The albums matching the search query.
 
-        Will always return :class:`None` if the search isn't loaded.
+        Will always return an empty list if the search isn't loaded.
         """
         # TODO Replace with collections.Sequence subclass
-        # TODO Return empty list if not loaded
         spotify.Error.maybe_raise(self.error)
         if not self.is_loaded:
-            return None
+            return []
         num_albums = lib.sp_search_num_albums(self._sp_search)
         albums = []
         for i in range(num_albums):
@@ -138,13 +136,12 @@ class SearchResult(object):
     def artists(self):
         """The artists matching the search query.
 
-        Will always return :class:`None` if the search isn't loaded.
+        Will always return an empty list if the search isn't loaded.
         """
         # TODO Replace with collections.Sequence subclass
-        # TODO Return empty list if not loaded
         spotify.Error.maybe_raise(self.error)
         if not self.is_loaded:
-            return None
+            return []
         num_artists = lib.sp_search_num_artists(self._sp_search)
         artists = []
         for i in range(num_artists):
@@ -169,13 +166,12 @@ class SearchResult(object):
         :class:`SearchResultPlaylist` objects containing the name, URI and
         image URI for matching playlists.
 
-        Will always return :class:`None` if the search isn't loaded.
+        Will always return an empty list if the search isn't loaded.
         """
         # TODO Replace with collections.Sequence subclass
-        # TODO Return empty list if not loaded
         spotify.Error.maybe_raise(self.error)
         if not self.is_loaded:
-            return None
+            return []
         num_playlists = lib.sp_search_num_playlists(self._sp_search)
         playlists = []
         for i in range(num_playlists):

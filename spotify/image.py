@@ -52,8 +52,11 @@ class Image(object):
 
         Returns a callback ID that can be used to remove the callback again.
 
-        TODO: Check if callback is called when it is added after the image is
-        loaded."""
+        Callbacks added after the image is loaded is called immediately.
+        """
+        # FIXME Currently, callbacks added before load doesn't seem to be
+        # called at all, while callbacks added after load is called
+        # immediately.
         key = utils.to_bytes(uuid.uuid4().hex)
         assert key not in spotify.callback_dict
         # TODO This dict entry will survive forever if the Image object is

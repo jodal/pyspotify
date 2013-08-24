@@ -10,7 +10,6 @@ from spotify import ffi, lib, utils
 __all__ = [
     'SearchResult',
     'SearchResultPlaylist',
-    'SearchResultSequence',
     'SearchType',
 ]
 
@@ -86,8 +85,9 @@ class SearchResult(object):
         spotify.Error.maybe_raise(self.error)
         if not self.is_loaded:
             return []
-        return SearchResultSequence(
-            sp_search=self._sp_search,
+        lib.sp_search_add_ref(self._sp_search)
+        return utils.Sequence(
+            sp_obj=ffi.gc(self._sp_search, lib.sp_search_release),
             len_func=lib.sp_search_num_tracks,
             getitem_func=(
                 lambda sp_search, key:
@@ -113,8 +113,9 @@ class SearchResult(object):
         spotify.Error.maybe_raise(self.error)
         if not self.is_loaded:
             return []
-        return SearchResultSequence(
-            sp_search=self._sp_search,
+        lib.sp_search_add_ref(self._sp_search)
+        return utils.Sequence(
+            sp_obj=ffi.gc(self._sp_search, lib.sp_search_release),
             len_func=lib.sp_search_num_albums,
             getitem_func=(
                 lambda sp_search, key:
@@ -140,8 +141,9 @@ class SearchResult(object):
         spotify.Error.maybe_raise(self.error)
         if not self.is_loaded:
             return []
-        return SearchResultSequence(
-            sp_search=self._sp_search,
+        lib.sp_search_add_ref(self._sp_search)
+        return utils.Sequence(
+            sp_obj=ffi.gc(self._sp_search, lib.sp_search_release),
             len_func=lib.sp_search_num_artists,
             getitem_func=(
                 lambda sp_search, key:
@@ -180,8 +182,9 @@ class SearchResult(object):
                 image_uri=utils.to_unicode(
                     lib.sp_search_playlist_image_uri(self._sp_search, key)))
 
-        return SearchResultSequence(
-            sp_search=self._sp_search,
+        lib.sp_search_add_ref(self._sp_search)
+        return utils.Sequence(
+            sp_obj=ffi.gc(self._sp_search, lib.sp_search_release),
             len_func=lib.sp_search_num_playlists,
             getitem_func=getitem)
 
@@ -210,26 +213,6 @@ class SearchResultPlaylist(collections.namedtuple(
         'SearchResultPlaylist', ['name', 'uri', 'image_uri'])):
     """A playlist matching a search query."""
     pass
-
-
-class SearchResultSequence(collections.Sequence):
-    def __init__(self, sp_search, len_func, getitem_func):
-        lib.sp_search_add_ref(sp_search)
-        self._sp_search = ffi.gc(sp_search, lib.sp_search_release)
-        self._len_func = len_func
-        self._getitem_func = getitem_func
-
-    def __len__(self):
-        return self._len_func(self._sp_search)
-
-    def __getitem__(self, key):
-        if not isinstance(key, int):
-            raise TypeError(
-                'list indices must be integers, not %s' %
-                key.__class__.__name__)
-        if not 0 <= key < self.__len__():
-            raise IndexError('list index out of range')
-        return self._getitem_func(self._sp_search, key)
 
 
 @utils.make_enum('SP_SEARCH_')

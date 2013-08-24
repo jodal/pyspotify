@@ -2,6 +2,8 @@
 
 from __future__ import unicode_literals
 
+import gc
+import mock
 import unittest
 
 import spotify
@@ -32,6 +34,71 @@ class IntEnumTest(unittest.TestCase):
         self.assertIs(self.Foo(2), self.Foo.baz)
         self.assertIsNot(self.Foo(2), self.Foo.bar)
         self.assertIsNot(self.Foo(1), self.Foo.baz)
+
+
+@mock.patch('spotify.search.lib', spec=spotify.lib)
+class SequenceTest(unittest.TestCase):
+
+    def test_does_not_add_ref_to_sp_obj_when_created(self, lib_mock):
+        sp_search = spotify.ffi.new('int *')
+
+        utils.Sequence(sp_search, None, None)
+
+        self.assertEqual(lib_mock.sp_search_add_ref.call_count, 0)
+
+    def test_does_not_release_sp_search_when_search_dies(self, lib_mock):
+        sp_search = spotify.ffi.new('int *')
+
+        seq = utils.Sequence(sp_search, None, None)
+        seq = None  # noqa
+        gc.collect()  # Needed for PyPy
+
+        self.assertEqual(lib_mock.sp_search_release.call_count, 0)
+
+    def test_len_calls_len_func(self, lib_mock):
+        sp_search = spotify.ffi.new('int *')
+
+        len_func = mock.Mock()
+        len_func.return_value = 0
+        seq = utils.Sequence(sp_search, len_func, None)
+
+        result = len(seq)
+
+        self.assertEqual(result, 0)
+        len_func.assert_called_with(sp_search)
+
+    def test_getitem_calls_getitem_func(self, lib_mock):
+        sp_search = spotify.ffi.new('int *')
+
+        getitem_func = mock.Mock()
+        getitem_func.return_value = mock.sentinel.item_one
+        seq = utils.Sequence(sp_search, lambda x: 1, getitem_func)
+
+        result = seq[0]
+
+        self.assertEqual(result, mock.sentinel.item_one)
+        getitem_func.assert_called_with(sp_search, 0)
+
+    def test_getitem_raises_index_error_on_negative_index(self, lib_mock):
+        sp_search = spotify.ffi.new('int *')
+
+        seq = utils.Sequence(sp_search, lambda x: 1, None)
+
+        self.assertRaises(IndexError, seq.__getitem__, -1)
+
+    def test_getitem_raises_index_error_on_too_high_index(self, lib_mock):
+        sp_search = spotify.ffi.new('int *')
+
+        seq = utils.Sequence(sp_search, lambda x: 1, None)
+
+        self.assertRaises(IndexError, seq.__getitem__, 1)
+
+    def test_getitem_raises_type_error_on_non_integral_index(self, lib_mock):
+        sp_search = spotify.ffi.new('int *')
+
+        seq = utils.Sequence(sp_search, lambda x: 1, None)
+
+        self.assertRaises(TypeError, seq.__getitem__, 'abc')
 
 
 class ToBytesTest(unittest.TestCase):

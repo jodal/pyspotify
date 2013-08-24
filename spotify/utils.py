@@ -1,5 +1,6 @@
 from __future__ import unicode_literals
 
+import collections
 import sys
 import time
 
@@ -93,6 +94,32 @@ def load(obj, timeout=None):
     spotify.Error.maybe_raise(
         getattr(obj, 'error', 0), ignores=[spotify.ErrorType.IS_LOADING])
     return obj
+
+
+class Sequence(collections.Sequence):
+    """Helper class for making sequences from a length and getitem function.
+
+    The ``sp_obj`` is assumed to already have gotten an extra reference through
+    ``sp_*_add_ref`` and to be automatically released through ``sp_*_release``
+    when the ``sp_obj`` object is GC-ed.
+    """
+
+    def __init__(self, sp_obj, len_func, getitem_func):
+        self._sp_obj = sp_obj
+        self._len_func = len_func
+        self._getitem_func = getitem_func
+
+    def __len__(self):
+        return self._len_func(self._sp_obj)
+
+    def __getitem__(self, key):
+        if not isinstance(key, int):
+            raise TypeError(
+                'list indices must be integers, not %s' %
+                key.__class__.__name__)
+        if not 0 <= key < self.__len__():
+            raise IndexError('list index out of range')
+        return self._getitem_func(self._sp_obj, key)
 
 
 def to_bytes(value):

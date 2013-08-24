@@ -194,12 +194,14 @@ class Track(object):
         spotify.Error.maybe_raise(self.error)
         if not self.is_loaded:
             return []
-        num_artists = lib.sp_track_num_artists(self._sp_track)
-        artists = []
-        for i in range(num_artists):
-            artists.append(spotify.Artist(
-                sp_artist=lib.sp_track_artist(self._sp_track, i)))
-        return artists
+        lib.sp_track_add_ref(self._sp_track)
+        return utils.Sequence(
+            sp_obj=ffi.gc(self._sp_track, lib.sp_track_release),
+            len_func=lib.sp_track_num_artists,
+            getitem_func=(
+                lambda sp_track, key:
+                spotify.Artist(
+                    sp_artist=lib.sp_track_artist(sp_track, key))))
 
     @property
     def album(self):

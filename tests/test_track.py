@@ -355,13 +355,15 @@ class TrackTest(unittest.TestCase):
 
         result = track.artists
 
+        self.assertEqual(len(result), 1)
         lib_mock.sp_track_num_artists.assert_called_with(sp_track)
+
+        item = result[0]
+        self.assertIsInstance(item, spotify.Artist)
+        self.assertEqual(item._sp_artist, sp_artist)
         self.assertEqual(lib_mock.sp_track_artist.call_count, 1)
         lib_mock.sp_track_artist.assert_called_with(sp_track, 0)
         artist_lib_mock.sp_artist_add_ref.assert_called_with(sp_artist)
-        self.assertEqual(len(result), 1)
-        self.assertIsInstance(result[0], spotify.Artist)
-        self.assertEqual(result[0]._sp_artist, sp_artist)
 
     def test_artists_if_no_artists(self, lib_mock):
         lib_mock.sp_track_error.return_value = spotify.ErrorType.OK
@@ -371,9 +373,9 @@ class TrackTest(unittest.TestCase):
 
         result = track.artists
 
+        self.assertEqual(len(result), 0)
         lib_mock.sp_track_num_artists.assert_called_with(sp_track)
         self.assertEqual(lib_mock.sp_track_artist.call_count, 0)
-        self.assertEqual(len(result), 0)
 
     def test_artists_if_unloaded(self, lib_mock):
         lib_mock.sp_track_error.return_value = spotify.ErrorType.OK

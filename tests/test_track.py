@@ -375,7 +375,7 @@ class TrackTest(unittest.TestCase):
         self.assertEqual(lib_mock.sp_track_artist.call_count, 0)
         self.assertEqual(len(result), 0)
 
-    def test_artists_is_none_if_unloaded(self, lib_mock):
+    def test_artists_if_unloaded(self, lib_mock):
         lib_mock.sp_track_error.return_value = spotify.ErrorType.OK
         lib_mock.sp_track_is_loaded.return_value = 0
         sp_track = spotify.ffi.new('int *')
@@ -384,7 +384,7 @@ class TrackTest(unittest.TestCase):
         result = track.artists
 
         lib_mock.sp_track_is_loaded.assert_called_with(sp_track)
-        self.assertIsNone(result)
+        self.assertEqual(len(result), 0)
 
     def test_artists_fails_if_error(self, lib_mock):
         self.assert_fails_if_error(lib_mock, lambda t: t.artists)

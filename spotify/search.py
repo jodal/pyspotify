@@ -305,10 +305,14 @@ class SearchPlaylist(collections.namedtuple(
 
     @property
     def playlist(self):
+        """The :class:`~spotify.Playlist` object for this
+        :class:`SearchPlaylist`."""
         return spotify.Playlist(self.uri)
 
     @property
     def image(self):
+        """The :class:`~spotify.Image` object for this
+        :class:`SearchPlaylist`."""
         return spotify.Image(self.image_uri)
 
 

@@ -184,7 +184,26 @@ class LinkTest(unittest.TestCase):
 
         lib_mock.sp_link_release.assert_called_with(sp_link)
 
-    def test_str_grows_buffer_to_fit_link(self, lib_mock):
+    def test_str(self, lib_mock):
+        sp_link = spotify.ffi.new('int *')
+        lib_mock.sp_link_create_from_string.return_value = sp_link
+        string = 'foo'
+
+        def func(sp_link, buffer_, buffer_size):
+            # -1 to keep a char free for \0 terminating the string
+            length = min(len(string), buffer_size - 1)
+            # Due to Python 3 treating bytes as an array of ints, we have to
+            # encode and copy chars one by one.
+            for i in range(length):
+                buffer_[i] = string[i].encode('utf-8')
+            return len(string)
+
+        lib_mock.sp_link_as_string.side_effect = func
+        link = spotify.Link(string)
+
+        self.assertEqual(str(link), link.uri)
+
+    def test_uri_grows_buffer_to_fit_link(self, lib_mock):
         sp_link = spotify.ffi.new('int *')
         lib_mock.sp_link_create_from_string.return_value = sp_link
         string = 'foo' * 100
@@ -201,7 +220,7 @@ class LinkTest(unittest.TestCase):
         lib_mock.sp_link_as_string.side_effect = func
         link = spotify.Link(string)
 
-        result = str(link)
+        result = link.uri
 
         lib_mock.sp_link_as_string.assert_called_with(
             sp_link, mock.ANY, mock.ANY)

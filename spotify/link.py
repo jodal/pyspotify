@@ -74,6 +74,10 @@ class Link(object):
         self._sp_link = ffi.gc(sp_link, lib.sp_link_release)
 
     def __str__(self):
+        return self.uri
+
+    @property
+    def uri(self):
         return utils.get_with_growing_buffer(
             lib.sp_link_as_string, self._sp_link)
 

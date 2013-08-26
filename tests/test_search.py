@@ -106,6 +106,17 @@ class SearchResultTest(unittest.TestCase):
 
         self.assertFalse(search.complete_event.is_set())
 
+    @mock.patch('spotify.Link', spec=spotify.Link)
+    def test_repr(self, link_mock, lib_mock):
+        link_instance_mock = link_mock.return_value
+        link_instance_mock.uri = 'foo'
+        sp_search = spotify.ffi.new('int *')
+        search = spotify.SearchResult(sp_search=sp_search)
+
+        result = repr(search)
+
+        self.assertEqual(result, 'spotify.SearchResult(%r)' % 'foo')
+
     def test_is_loaded(self, lib_mock):
         lib_mock.sp_search_is_loaded.return_value = 1
         sp_search = spotify.ffi.new('int *')

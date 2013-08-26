@@ -61,6 +61,17 @@ class AlbumTest(unittest.TestCase):
 
         lib_mock.sp_album_release.assert_called_with(sp_album)
 
+    @mock.patch('spotify.Link', spec=spotify.Link)
+    def test_repr(self, link_mock, lib_mock):
+        link_instance_mock = link_mock.return_value
+        link_instance_mock.uri = 'foo'
+        sp_album = spotify.ffi.new('int *')
+        album = spotify.Album(sp_album=sp_album)
+
+        result = repr(album)
+
+        self.assertEqual(result, 'spotify.Album(%r)' % 'foo')
+
     def test_is_loaded(self, lib_mock):
         lib_mock.sp_album_is_loaded.return_value = 1
         sp_album = spotify.ffi.new('int *')

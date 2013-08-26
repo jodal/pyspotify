@@ -302,7 +302,10 @@ def _search_complete_callback(sp_search, userdata):
 class SearchResultPlaylist(collections.namedtuple(
         'SearchResultPlaylist', ['name', 'uri', 'image_uri'])):
     """A playlist matching a search query."""
-    pass
+
+    @property
+    def playlist(self):
+        return spotify.Playlist(self.uri)
 
 
 @utils.make_enum('SP_SEARCH_')

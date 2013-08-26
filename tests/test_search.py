@@ -509,6 +509,20 @@ class SearchResultTest(unittest.TestCase):
         self.assertEqual(result, mock.sentinel.link)
 
 
+class SearchResultPlaylistTest(unittest.TestCase):
+
+    @mock.patch('spotify.Playlist', spec=spotify.Playlist)
+    def test_playlist(self, playlist_mock):
+        playlist_mock.return_value = mock.sentinel.playlist
+        pl = spotify.SearchResultPlaylist(
+            name='foo', uri='uri:foo', image_uri='image:foo')
+
+        result = pl.playlist
+
+        self.assertEqual(result, mock.sentinel.playlist)
+        playlist_mock.assert_called_with(pl.uri)
+
+
 class SearchTypeTest(unittest.TestCase):
 
     def test_has_constants(self):

@@ -3,7 +3,6 @@ from __future__ import unicode_literals
 import functools
 import logging
 import operator
-import uuid
 
 import spotify
 from spotify import ffi, lib, utils
@@ -979,45 +978,13 @@ class Session(object):
         ``search_type`` is a :class:`SearchType` value. It defaults to
         :attr:`SearchType.STANDARD`.
         """
-        if search_type is None:
-            search_type = spotify.SearchType.STANDARD
-        query = ffi.new('char[]', utils.to_bytes(query))
-        key = utils.to_bytes(uuid.uuid4().hex)
-        assert key not in spotify.callback_dict
-        userdata = ffi.new('char[32]', key)
-
-        # TODO Move the following into SearchResult.__init__ to avoid a race
-        # condition between the callback and our assignment to callback_dict
-        sp_search = lib.sp_search_create(
-            self._sp_session, query,
-            track_offset, track_count,
-            album_offset, album_count,
-            artist_offset, artist_count,
-            playlist_offset, playlist_count,
-            int(search_type), _search_complete_callback, userdata)
-
-        search_result = spotify.SearchResult(sp_search, add_ref=False)
-        spotify.callback_dict[key] = (callback, search_result)
-        return search_result
-
-
-@ffi.callback('void(sp_search *, void *)')
-def _search_complete_callback(sp_search, userdata):
-    logger.debug('search_complete_callback called')
-    if userdata is ffi.NULL:
-        logger.warning('search_complete_callback called without userdata')
-        return
-    key = ffi.string(ffi.cast('char[32]', userdata))
-    value = spotify.callback_dict.pop(key, None)
-    if value is None:
-        logger.warning(
-            'search_complete_callback key %r not in callback_dict: %r',
-            key, spotify.callback_dict.keys())
-        return
-    (callback, search_result) = value
-    search_result.complete_event.set()
-    if callback is not None:
-        callback(search_result)
+        return spotify.SearchResult(
+            query=query, callback=callback,
+            track_offset=track_offset, track_count=track_count,
+            album_offset=album_offset, album_count=album_count,
+            artist_offset=artist_offset, artist_count=artist_count,
+            playlist_offset=playlist_offset, playlist_count=playlist_count,
+            search_type=search_type)
 
 
 class Offline(object):

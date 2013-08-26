@@ -1076,66 +1076,21 @@ class SessionTest(unittest.TestCase):
             session._sp_session)
         self.assertEqual(result, 'SE')
 
-    @mock.patch('spotify.search.lib', spec=spotify.lib)
-    def test_search(self, search_lib_mock, lib_mock):
+    @mock.patch('spotify.SearchResult')
+    def test_search(self, search_mock, lib_mock):
         session = self.create_session(lib_mock)
-        sp_search = spotify.ffi.cast('sp_search *', spotify.ffi.new('int *'))
-        lib_mock.sp_search_create.return_value = sp_search
+        search_mock.return_value = mock.sentinel.search
 
         result = session.search('alice')
 
-        lib_mock.sp_search_create.assert_called_with(
-            session._sp_session, mock.ANY,
-            0, 20, 0, 20, 0, 20, 0, 20,
-            int(spotify.SearchType.STANDARD), mock.ANY, mock.ANY)
-        self.assertEqual(
-            spotify.ffi.string(lib_mock.sp_search_create.call_args[0][1]),
-            b'alice')
-        self.assertEqual(search_lib_mock.sp_search_add_ref.call_count, 0)
-        self.assertIsInstance(result, spotify.SearchResult)
-
-        self.assertFalse(result.complete_event.is_set())
-        search_complete_cb = lib_mock.sp_search_create.call_args[0][11]
-        userdata = lib_mock.sp_search_create.call_args[0][12]
-        search_complete_cb(sp_search, userdata)
-        self.assertTrue(result.complete_event.wait(3))
-
-    @mock.patch('spotify.search.lib', spec=spotify.lib)
-    def test_search_with_callback(self, search_lib_mock, lib_mock):
-        session = self.create_session(lib_mock)
-        sp_search = spotify.ffi.cast('sp_search *', spotify.ffi.new('int *'))
-        lib_mock.sp_search_create.return_value = sp_search
-        callback = mock.Mock()
-
-        result = session.search('alice', callback=callback)
-
-        search_complete_cb = lib_mock.sp_search_create.call_args[0][11]
-        userdata = lib_mock.sp_search_create.call_args[0][12]
-        search_complete_cb(sp_search, userdata)
-
-        result.complete_event.wait(3)
-        callback.assert_called_with(result)
-
-    @mock.patch('spotify.search.lib', spec=spotify.lib)
-    def test_search_where_result_is_gone_before_callback_is_called(
-            self, search_lib_mock, lib_mock):
-        session = self.create_session(lib_mock)
-        sp_search = spotify.ffi.cast('sp_search *', spotify.ffi.new('int *'))
-        lib_mock.sp_search_create.return_value = sp_search
-        callback = mock.Mock()
-
-        result = session.search('alice', callback=callback)
-        complete_event = result.complete_event
-        result = None  # noqa
-        gc.collect()  # Needed for PyPy
-
-        search_complete_cb = lib_mock.sp_search_create.call_args[0][11]
-        userdata = lib_mock.sp_search_create.call_args[0][12]
-        search_complete_cb(sp_search, userdata)
-
-        complete_event.wait(3)
-        self.assertEqual(callback.call_count, 1)
-        self.assertEqual(callback.call_args[0][0]._sp_search, sp_search)
+        self.assertIs(result, mock.sentinel.search)
+        search_mock.assert_called_with(
+            query='alice', callback=None,
+            track_offset=0, track_count=20,
+            album_offset=0, album_count=20,
+            artist_offset=0, artist_count=20,
+            playlist_offset=0, playlist_count=20,
+            search_type=None)
 
 
 @mock.patch('spotify.session.lib', spec=spotify.lib)

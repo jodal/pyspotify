@@ -1,7 +1,9 @@
 from __future__ import unicode_literals
 
 import collections
+import logging
 import threading
+import uuid
 
 import spotify
 from spotify import ffi, lib, utils
@@ -13,6 +15,8 @@ __all__ = [
     'SearchType',
 ]
 
+logger = logging.getLogger(__name__)
+
 
 class SearchResult(object):
     """A Spotify search result.
@@ -21,11 +25,40 @@ class SearchResult(object):
     to do a search and get a :class:`SearchResult` back.
     """
 
-    def __init__(self, sp_search, add_ref=True):
+    def __init__(
+            self, query='', callback=None,
+            track_offset=0, track_count=20,
+            album_offset=0, album_count=20,
+            artist_offset=0, artist_count=20,
+            playlist_offset=0, playlist_count=20,
+            search_type=None,
+            sp_search=None, add_ref=True):
+
+        self.complete_event = threading.Event()
+
+        if sp_search is None:
+            if search_type is None:
+                search_type = SearchType.STANDARD
+            query = ffi.new('char[]', utils.to_bytes(query))
+
+            key = utils.to_bytes(uuid.uuid4().hex)
+            assert key not in spotify.callback_dict
+            userdata = ffi.new('char[32]', key)
+
+            spotify.callback_dict[key] = (callback, self)
+
+            sp_search = lib.sp_search_create(
+                spotify.session_instance._sp_session, query,
+                track_offset, track_count,
+                album_offset, album_count,
+                artist_offset, artist_count,
+                playlist_offset, playlist_count,
+                int(search_type), _search_complete_callback, userdata)
+            add_ref = False
+
         if add_ref:
             lib.sp_search_add_ref(sp_search)
         self._sp_search = ffi.gc(sp_search, lib.sp_search_release)
-        self.complete_event = threading.Event()
 
     complete_event = None
     """:class:`threading.Event` that is set when the search is completed."""
@@ -207,6 +240,25 @@ class SearchResult(object):
     # TODO Add more(count=None) method to search for the next "page" of search
     # results without having to manually manage the *_limit and *_count kwargs
     # and check the *_total counts.
+
+
+@ffi.callback('void(sp_search *, void *)')
+def _search_complete_callback(sp_search, userdata):
+    logger.debug('search_complete_callback called')
+    if userdata is ffi.NULL:
+        logger.warning('search_complete_callback called without userdata')
+        return
+    key = ffi.string(ffi.cast('char[32]', userdata))
+    value = spotify.callback_dict.pop(key, None)
+    if value is None:
+        logger.warning(
+            'search_complete_callback key %r not in callback_dict: %r',
+            key, spotify.callback_dict.keys())
+        return
+    (callback, search_result) = value
+    search_result.complete_event.set()
+    if callback is not None:
+        callback(search_result)
 
 
 class SearchResultPlaylist(collections.namedtuple(

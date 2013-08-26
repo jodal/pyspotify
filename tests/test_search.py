@@ -461,6 +461,14 @@ class SearchResultTest(unittest.TestCase):
     def test_playlist_total_fails_if_error(self, lib_mock):
         self.assert_fails_if_error(lib_mock, lambda s: s.playlist_total)
 
+    def test_search_type_defaults_to_standard(self, lib_mock):
+        sp_search = spotify.ffi.new('int *')
+        search = spotify.SearchResult(sp_search=sp_search)
+
+        result = search.search_type
+
+        self.assertEqual(result, spotify.SearchType.STANDARD)
+
     def test_more(self, lib_mock):
         session = self.create_session(lib_mock)
         sp_search1 = spotify.ffi.cast('sp_search *', spotify.ffi.new('int *'))

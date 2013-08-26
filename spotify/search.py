@@ -43,13 +43,13 @@ class SearchResult(object):
         self.artist_count = artist_count
         self.playlist_offset = playlist_offset
         self.playlist_count = playlist_count
+        if search_type is None:
+            search_type = SearchType.STANDARD
         self.search_type = search_type
 
         self.complete_event = threading.Event()
 
         if sp_search is None:
-            if search_type is None:
-                search_type = SearchType.STANDARD
             query = ffi.new('char[]', utils.to_bytes(query))
 
             key = utils.to_bytes(uuid.uuid4().hex)

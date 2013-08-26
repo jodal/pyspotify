@@ -450,6 +450,42 @@ class SearchResultTest(unittest.TestCase):
     def test_total_playlists_fails_if_error(self, lib_mock):
         self.assert_fails_if_error(lib_mock, lambda s: s.total_playlists)
 
+    def test_more(self, lib_mock):
+        session = self.create_session(lib_mock)
+        sp_search1 = spotify.ffi.cast('sp_search *', spotify.ffi.new('int *'))
+        sp_search2 = spotify.ffi.cast('sp_search *', spotify.ffi.new('int *'))
+        lib_mock.sp_search_create.side_effect = [sp_search1, sp_search2]
+        lib_mock.sp_search_error.return_value = spotify.ErrorType.OK
+        lib_mock.sp_search_query.return_value = spotify.ffi.new(
+            'char[]', b'alice')
+
+        result = spotify.SearchResult('alice')
+
+        lib_mock.sp_search_create.assert_called_with(
+            session._sp_session, mock.ANY,
+            0, 20, 0, 20, 0, 20, 0, 20,
+            int(spotify.SearchType.STANDARD), mock.ANY, mock.ANY)
+        self.assertEqual(
+            spotify.ffi.string(lib_mock.sp_search_create.call_args[0][1]),
+            b'alice')
+        self.assertEqual(lib_mock.sp_search_add_ref.call_count, 0)
+        self.assertIsInstance(result, spotify.SearchResult)
+        self.assertEqual(result._sp_search, sp_search1)
+
+        result = result.more(
+            track_count=30, album_count=30, artist_count=30, playlist_count=30)
+
+        lib_mock.sp_search_create.assert_called_with(
+            session._sp_session, mock.ANY,
+            20, 30, 20, 30, 20, 30, 20, 30,
+            int(spotify.SearchType.STANDARD), mock.ANY, mock.ANY)
+        self.assertEqual(
+            spotify.ffi.string(lib_mock.sp_search_create.call_args[0][1]),
+            b'alice')
+        self.assertEqual(lib_mock.sp_search_add_ref.call_count, 0)
+        self.assertIsInstance(result, spotify.SearchResult)
+        self.assertEqual(result._sp_search, sp_search2)
+
     @mock.patch('spotify.Link', spec=spotify.Link)
     def test_link_creates_link_to_search(self, link_mock, lib_mock):
         link_mock.return_value = mock.sentinel.link

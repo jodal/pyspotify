@@ -34,6 +34,17 @@ class SearchResult(object):
             search_type=None,
             sp_search=None, add_ref=True):
 
+        self.callback = callback
+        self.track_offset = track_offset
+        self.track_count = track_count
+        self.album_offset = album_offset
+        self.album_count = album_count
+        self.artist_offset = artist_offset
+        self.artist_count = artist_count
+        self.playlist_offset = playlist_offset
+        self.playlist_count = playlist_count
+        self.search_type = search_type
+
         self.complete_event = threading.Event()
 
         if sp_search is None:
@@ -232,14 +243,38 @@ class SearchResult(object):
         spotify.Error.maybe_raise(self.error)
         return lib.sp_search_total_playlists(self._sp_search)
 
+    def more(
+            self, callback=None,
+            track_count=None, album_count=None, artist_count=None,
+            playlist_count=None):
+        """Get the next page of search results for the same query.
+
+        If called without arguments, the ``callback`` and ``*_count`` arguments
+        from the original search is reused. If anything other than
+        :class:`None` is specified, the value is used instead.
+        """
+        callback = callback or self.callback
+        track_offset = self.track_offset + self.track_count
+        track_count = track_count or self.track_count
+        album_offset = self.album_offset + self.album_count
+        album_count = album_count or self.album_count
+        artist_offset = self.artist_offset + self.artist_count
+        artist_count = artist_count or self.artist_count
+        playlist_offset = self.playlist_offset + self.playlist_count
+        playlist_count = playlist_count or self.playlist_count
+
+        return SearchResult(
+            query=self.query, callback=callback,
+            track_offset=track_offset, track_count=track_count,
+            album_offset=album_offset, album_count=album_count,
+            artist_offset=artist_offset, artist_count=artist_count,
+            playlist_offset=playlist_offset, playlist_count=playlist_count,
+            search_type=self.search_type)
+
     @property
     def link(self):
         """A :class:`Link` to the search."""
         return spotify.Link(self)
-
-    # TODO Add more(count=None) method to search for the next "page" of search
-    # results without having to manually manage the *_limit and *_count kwargs
-    # and check the *_total counts.
 
 
 @ffi.callback('void(sp_search *, void *)')

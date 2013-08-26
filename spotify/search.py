@@ -138,7 +138,7 @@ class SearchResult(object):
                 spotify.Track(sp_track=lib.sp_search_track(sp_search, key))))
 
     @property
-    def total_tracks(self):
+    def track_total(self):
         """The total number of tracks matching the search query.
 
         If the number is larger than the interval specified at search object
@@ -166,7 +166,7 @@ class SearchResult(object):
                 spotify.Album(sp_album=lib.sp_search_album(sp_search, key))))
 
     @property
-    def total_albums(self):
+    def album_total(self):
         """The total number of albums matching the search query.
 
         If the number is larger than the interval specified at search object
@@ -195,7 +195,7 @@ class SearchResult(object):
                     sp_artist=lib.sp_search_artist(sp_search, key))))
 
     @property
-    def total_artists(self):
+    def artist_total(self):
         """The total number of artists matching the search query.
 
         If the number is larger than the interval specified at search object
@@ -233,7 +233,7 @@ class SearchResult(object):
             getitem_func=getitem)
 
     @property
-    def total_playlists(self):
+    def playlist_total(self):
         """The total number of playlists matching the search query.
 
         If the number is larger than the interval specified at search object

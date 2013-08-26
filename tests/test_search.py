@@ -394,61 +394,61 @@ class SearchResultTest(unittest.TestCase):
     def test_did_you_mean_fails_if_error(self, lib_mock):
         self.assert_fails_if_error(lib_mock, lambda s: s.did_you_mean)
 
-    def test_total_tracks(self, lib_mock):
+    def test_track_total(self, lib_mock):
         lib_mock.sp_search_error.return_value = spotify.ErrorType.OK
         lib_mock.sp_search_total_tracks.return_value = 75
         sp_search = spotify.ffi.new('int *')
         search = spotify.SearchResult(sp_search=sp_search)
 
-        result = search.total_tracks
+        result = search.track_total
 
         lib_mock.sp_search_total_tracks.assert_called_with(sp_search)
         self.assertEqual(result, 75)
 
-    def test_total_tracks_fails_if_error(self, lib_mock):
-        self.assert_fails_if_error(lib_mock, lambda s: s.total_tracks)
+    def test_track_total_fails_if_error(self, lib_mock):
+        self.assert_fails_if_error(lib_mock, lambda s: s.track_total)
 
-    def test_total_albums(self, lib_mock):
+    def test_album_total(self, lib_mock):
         lib_mock.sp_search_error.return_value = spotify.ErrorType.OK
         lib_mock.sp_search_total_albums.return_value = 75
         sp_search = spotify.ffi.new('int *')
         search = spotify.SearchResult(sp_search=sp_search)
 
-        result = search.total_albums
+        result = search.album_total
 
         lib_mock.sp_search_total_albums.assert_called_with(sp_search)
         self.assertEqual(result, 75)
 
-    def test_total_albums_fails_if_error(self, lib_mock):
-        self.assert_fails_if_error(lib_mock, lambda s: s.total_albums)
+    def test_album_total_fails_if_error(self, lib_mock):
+        self.assert_fails_if_error(lib_mock, lambda s: s.album_total)
 
-    def test_total_artists(self, lib_mock):
+    def test_artist_total(self, lib_mock):
         lib_mock.sp_search_error.return_value = spotify.ErrorType.OK
         lib_mock.sp_search_total_artists.return_value = 75
         sp_search = spotify.ffi.new('int *')
         search = spotify.SearchResult(sp_search=sp_search)
 
-        result = search.total_artists
+        result = search.artist_total
 
         lib_mock.sp_search_total_artists.assert_called_with(sp_search)
         self.assertEqual(result, 75)
 
-    def test_total_artists_fails_if_error(self, lib_mock):
-        self.assert_fails_if_error(lib_mock, lambda s: s.total_artists)
+    def test_artist_total_fails_if_error(self, lib_mock):
+        self.assert_fails_if_error(lib_mock, lambda s: s.artist_total)
 
-    def test_total_playlists(self, lib_mock):
+    def test_playlist_total(self, lib_mock):
         lib_mock.sp_search_error.return_value = spotify.ErrorType.OK
         lib_mock.sp_search_total_playlists.return_value = 75
         sp_search = spotify.ffi.new('int *')
         search = spotify.SearchResult(sp_search=sp_search)
 
-        result = search.total_playlists
+        result = search.playlist_total
 
         lib_mock.sp_search_total_playlists.assert_called_with(sp_search)
         self.assertEqual(result, 75)
 
-    def test_total_playlists_fails_if_error(self, lib_mock):
-        self.assert_fails_if_error(lib_mock, lambda s: s.total_playlists)
+    def test_playlist_total_fails_if_error(self, lib_mock):
+        self.assert_fails_if_error(lib_mock, lambda s: s.playlist_total)
 
     def test_more(self, lib_mock):
         session = self.create_session(lib_mock)

@@ -963,7 +963,7 @@ class Session(object):
         from 2008 with some examples.
 
         If ``callback`` isn't :class:`None`, it is expected to be a callable
-        that accepts a single argument, a :class:`SearchResult` instance, when
+        that accepts a single argument, a :class:`Search` instance, when
         the search completes.
 
         The ``*_offset`` and ``*_count`` arguments can be used to retrieve more
@@ -972,13 +972,13 @@ class Session(object):
         isn't documented in any official docs. If you want to retrieve more
         than 200 results, you'll have to search multiple times with different
         ``*_offset`` values. See the ``*_total`` attributes on the
-        :class:`SearchResult` to see how many results exists, and to figure out
+        :class:`Search` to see how many results exists, and to figure out
         how many searches you'll need to make to retrieve everything.
 
         ``search_type`` is a :class:`SearchType` value. It defaults to
         :attr:`SearchType.STANDARD`.
         """
-        return spotify.SearchResult(
+        return spotify.Search(
             query=query, callback=callback,
             track_offset=track_offset, track_count=track_count,
             album_offset=album_offset, album_count=album_count,

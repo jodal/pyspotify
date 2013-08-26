@@ -1076,7 +1076,7 @@ class SessionTest(unittest.TestCase):
             session._sp_session)
         self.assertEqual(result, 'SE')
 
-    @mock.patch('spotify.SearchResult')
+    @mock.patch('spotify.Search')
     def test_search(self, search_mock, lib_mock):
         session = self.create_session(lib_mock)
         search_mock.return_value = mock.sentinel.search

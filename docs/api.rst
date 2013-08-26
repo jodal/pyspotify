@@ -248,9 +248,9 @@ Images
 Search
 ======
 
-.. autoclass:: SearchResult
+.. autoclass:: Search
 
-.. autoclass:: SearchResultPlaylist
+.. autoclass:: SearchPlaylist
     :no-inherited-members:
 
     .. autoattribute:: name

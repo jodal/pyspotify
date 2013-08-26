@@ -10,19 +10,19 @@ from spotify import ffi, lib, utils
 
 
 __all__ = [
-    'SearchResult',
-    'SearchResultPlaylist',
+    'Search',
+    'SearchPlaylist',
     'SearchType',
 ]
 
 logger = logging.getLogger(__name__)
 
 
-class SearchResult(object):
+class Search(object):
     """A Spotify search result.
 
     Call the :meth:`~Session.search` method on your :class:`Session` instance
-    to do a search and get a :class:`SearchResult` back.
+    to do a search and get a :class:`Search` back.
     """
 
     def __init__(
@@ -75,7 +75,7 @@ class SearchResult(object):
     """:class:`threading.Event` that is set when the search is completed."""
 
     def __repr__(self):
-        return 'spotify.SearchResult(%r)' % self.link.uri
+        return 'spotify.Search(%r)' % self.link.uri
 
     @property
     def is_loaded(self):
@@ -211,7 +211,7 @@ class SearchResult(object):
     @property
     def playlists(self):
         """The playlists matching the search query as
-        :class:`SearchResultPlaylist` objects containing the name, URI and
+        :class:`SearchPlaylist` objects containing the name, URI and
         image URI for matching playlists.
 
         Will always return an empty list if the search isn't loaded.
@@ -221,7 +221,7 @@ class SearchResult(object):
             return []
 
         def getitem(sp_search, key):
-            return spotify.SearchResultPlaylist(
+            return spotify.SearchPlaylist(
                 name=utils.to_unicode(
                     lib.sp_search_playlist_name(self._sp_search, key)),
                 uri=utils.to_unicode(
@@ -266,7 +266,7 @@ class SearchResult(object):
         playlist_offset = self.playlist_offset + self.playlist_count
         playlist_count = playlist_count or self.playlist_count
 
-        return SearchResult(
+        return Search(
             query=self.query, callback=callback,
             track_offset=track_offset, track_count=track_count,
             album_offset=album_offset, album_count=album_count,
@@ -299,8 +299,8 @@ def _search_complete_callback(sp_search, userdata):
         callback(search_result)
 
 
-class SearchResultPlaylist(collections.namedtuple(
-        'SearchResultPlaylist', ['name', 'uri', 'image_uri'])):
+class SearchPlaylist(collections.namedtuple(
+        'SearchPlaylist', ['name', 'uri', 'image_uri'])):
     """A playlist matching a search query."""
 
     @property

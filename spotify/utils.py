@@ -1,6 +1,7 @@
 from __future__ import unicode_literals
 
 import collections
+import pprint
 import sys
 import time
 
@@ -120,6 +121,9 @@ class Sequence(collections.Sequence):
         if not 0 <= key < self.__len__():
             raise IndexError('list index out of range')
         return self._getitem_func(self._sp_obj, key)
+
+    def __repr__(self):
+        return pprint.pformat(list(self))
 
 
 def to_bytes(value):

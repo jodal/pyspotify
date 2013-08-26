@@ -100,6 +100,14 @@ class SequenceTest(unittest.TestCase):
 
         self.assertRaises(TypeError, seq.__getitem__, 'abc')
 
+    def test_repr(self, lib_mock):
+        sp_search = spotify.ffi.new('int *')
+        seq = utils.Sequence(sp_search, lambda s: 1, lambda s, i: 123)
+
+        result = repr(seq)
+
+        self.assertEqual(result, '[123]')
+
 
 class ToBytesTest(unittest.TestCase):
 

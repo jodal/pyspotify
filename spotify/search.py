@@ -307,6 +307,10 @@ class SearchResultPlaylist(collections.namedtuple(
     def playlist(self):
         return spotify.Playlist(self.uri)
 
+    @property
+    def image(self):
+        return spotify.Image(self.image_uri)
+
 
 @utils.make_enum('SP_SEARCH_')
 class SearchType(utils.IntEnum):

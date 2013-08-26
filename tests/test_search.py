@@ -522,6 +522,17 @@ class SearchResultPlaylistTest(unittest.TestCase):
         self.assertEqual(result, mock.sentinel.playlist)
         playlist_mock.assert_called_with(pl.uri)
 
+    @mock.patch('spotify.Image', spec=spotify.Image)
+    def test_image(self, image_mock):
+        image_mock.return_value = mock.sentinel.image
+        pl = spotify.SearchResultPlaylist(
+            name='foo', uri='uri:foo', image_uri='image:foo')
+
+        result = pl.image
+
+        self.assertEqual(result, mock.sentinel.image)
+        image_mock.assert_called_with(pl.image_uri)
+
 
 class SearchTypeTest(unittest.TestCase):
 

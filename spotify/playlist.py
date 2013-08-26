@@ -37,6 +37,9 @@ class Playlist(object):
             lib.sp_playlist_add_ref(sp_playlist)
         self._sp_playlist = ffi.gc(sp_playlist, lib.sp_playlist_release)
 
+    def __repr__(self):
+        return 'spotify.Playlist(%r)' % self.link.uri
+
     @property
     def is_loaded(self):
         """Whether the playlist's data is loaded."""

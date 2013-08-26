@@ -61,6 +61,17 @@ class PlaylistTest(unittest.TestCase):
 
         lib_mock.sp_playlist_release.assert_called_with(sp_playlist)
 
+    @mock.patch('spotify.Link', spec=spotify.Link)
+    def test_repr(self, link_mock, lib_mock):
+        link_instance_mock = link_mock.return_value
+        link_instance_mock.uri = 'foo'
+        sp_playlist = spotify.ffi.new('int *')
+        playlist = spotify.Playlist(sp_playlist=sp_playlist)
+
+        result = repr(playlist)
+
+        self.assertEqual(result, 'spotify.Playlist(%r)' % 'foo')
+
     def test_is_loaded(self, lib_mock):
         lib_mock.sp_playlist_is_loaded.return_value = 1
         sp_playlist = spotify.ffi.new('int *')

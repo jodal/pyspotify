@@ -31,6 +31,9 @@ class Artist(object):
         lib.sp_artist_add_ref(sp_artist)
         self._sp_artist = ffi.gc(sp_artist, lib.sp_artist_release)
 
+    def __repr__(self):
+        return 'spotify.Artist(%r)' % self.link.uri
+
     @property
     def name(self):
         """The artist's name.

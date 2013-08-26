@@ -63,6 +63,17 @@ class ArtistTest(unittest.TestCase):
 
         lib_mock.sp_artist_release.assert_called_with(sp_artist)
 
+    @mock.patch('spotify.Link', spec=spotify.Link)
+    def test_repr(self, link_mock, lib_mock):
+        link_instance_mock = link_mock.return_value
+        link_instance_mock.uri = 'foo'
+        sp_artist = spotify.ffi.new('int *')
+        artist = spotify.Artist(sp_artist=sp_artist)
+
+        result = repr(artist)
+
+        self.assertEqual(result, 'spotify.Artist(%r)' % 'foo')
+
     def test_name(self, lib_mock):
         lib_mock.sp_artist_name.return_value = spotify.ffi.new(
             'char[]', b'Foo Bar Baz')

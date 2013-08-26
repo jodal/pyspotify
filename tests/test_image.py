@@ -63,6 +63,17 @@ class ImageTest(unittest.TestCase):
 
         lib_mock.sp_image_release.assert_called_with(sp_image)
 
+    @mock.patch('spotify.Link', spec=spotify.Link)
+    def test_repr(self, link_mock, lib_mock):
+        link_instance_mock = link_mock.return_value
+        link_instance_mock.uri = 'foo'
+        sp_image = spotify.ffi.new('int *')
+        image = spotify.Image(sp_image=sp_image)
+
+        result = repr(image)
+
+        self.assertEqual(result, 'spotify.Image(%r)' % 'foo')
+
     def test_load_event_is_unset_by_default(self, lib_mock):
         sp_image = spotify.ffi.new('int *')
         image = spotify.Image(sp_image=sp_image)

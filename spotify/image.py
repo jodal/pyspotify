@@ -44,6 +44,9 @@ class Image(object):
         self._sp_image = ffi.gc(sp_image, lib.sp_image_release)
         self.load_event = threading.Event()
 
+    def __repr__(self):
+        return 'spotify.Image(%r)' % self.link.uri
+
     load_event = None
     """:class:`threading.Event` that is set when the image is loaded."""
 

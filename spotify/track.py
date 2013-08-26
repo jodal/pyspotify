@@ -36,6 +36,9 @@ class Track(object):
             lib.sp_track_add_ref(sp_track)
         self._sp_track = ffi.gc(sp_track, lib.sp_track_release)
 
+    def __repr__(self):
+        return 'spotify.Track(%r)' % self.link.uri
+
     @property
     def is_loaded(self):
         """Whether the track's data is loaded."""

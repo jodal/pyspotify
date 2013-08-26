@@ -77,6 +77,17 @@ class TrackTest(unittest.TestCase):
 
         lib_mock.sp_track_release.assert_called_with(sp_track)
 
+    @mock.patch('spotify.Link', spec=spotify.Link)
+    def test_repr(self, link_mock, lib_mock):
+        link_instance_mock = link_mock.return_value
+        link_instance_mock.uri = 'foo'
+        sp_track = spotify.ffi.new('int *')
+        track = spotify.Track(sp_track=sp_track)
+
+        result = repr(track)
+
+        self.assertEqual(result, 'spotify.Track(%r)' % 'foo')
+
     def test_is_loaded(self, lib_mock):
         lib_mock.sp_track_is_loaded.return_value = 1
         sp_track = spotify.ffi.new('int *')

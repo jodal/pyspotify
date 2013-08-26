@@ -58,6 +58,17 @@ class UserTest(unittest.TestCase):
 
         lib_mock.sp_user_release.assert_called_with(sp_user)
 
+    @mock.patch('spotify.Link', spec=spotify.Link)
+    def test_repr(self, link_mock, lib_mock):
+        link_instance_mock = link_mock.return_value
+        link_instance_mock.uri = 'foo'
+        sp_user = spotify.ffi.new('int *')
+        user = spotify.User(sp_user=sp_user)
+
+        result = repr(user)
+
+        self.assertEqual(result, 'spotify.User(%r)' % 'foo')
+
     def test_canonical_name(self, lib_mock):
         lib_mock.sp_user_canonical_name.return_value = spotify.ffi.new(
             'char[]', b'alicefoobar')

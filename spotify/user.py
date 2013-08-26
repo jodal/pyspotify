@@ -31,6 +31,9 @@ class User(object):
         lib.sp_user_add_ref(sp_user)
         self._sp_user = ffi.gc(sp_user, lib.sp_user_release)
 
+    def __repr__(self):
+        return 'spotify.User(%r)' % self.link.uri
+
     @property
     def canonical_name(self):
         """The user's canonical username."""

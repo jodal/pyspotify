@@ -18,6 +18,17 @@ class SearchTest(unittest.TestCase):
     def tearDown(self):
         spotify.session_instance = None
 
+    def assert_fails_if_error(self, lib_mock, func):
+        lib_mock.sp_search_error.return_value = (
+            spotify.ErrorType.BAD_API_VERSION)
+        sp_search = spotify.ffi.new('int *')
+        search = spotify.Search(sp_search=sp_search)
+
+        self.assertRaises(spotify.Error, func, search)
+
+    def test_create_without_query_or_sp_search_fails(self, lib_mock):
+        self.assertRaises(AssertionError, spotify.Search)
+
     def test_search(self, lib_mock):
         session = self.create_session(lib_mock)
         sp_search = spotify.ffi.cast('sp_search *', spotify.ffi.new('int *'))
@@ -75,14 +86,6 @@ class SearchTest(unittest.TestCase):
         complete_event.wait(3)
         self.assertEqual(callback.call_count, 1)
         self.assertEqual(callback.call_args[0][0]._sp_search, sp_search)
-
-    def assert_fails_if_error(self, lib_mock, func):
-        lib_mock.sp_search_error.return_value = (
-            spotify.ErrorType.BAD_API_VERSION)
-        sp_search = spotify.ffi.new('int *')
-        search = spotify.Search(sp_search=sp_search)
-
-        self.assertRaises(spotify.Error, func, search)
 
     def test_adds_ref_to_sp_search_when_created(self, lib_mock):
         sp_search = spotify.ffi.new('int *')

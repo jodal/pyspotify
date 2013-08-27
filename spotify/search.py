@@ -34,6 +34,8 @@ class Search(object):
             search_type=None,
             sp_search=None, add_ref=True):
 
+        assert query or sp_search, 'query or sp_search is required'
+
         self.callback = callback
         self.track_offset = track_offset
         self.track_count = track_count

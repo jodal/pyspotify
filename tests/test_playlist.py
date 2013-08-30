@@ -270,6 +270,17 @@ class PlaylistTest(unittest.TestCase):
             sp_playlist, mock.ANY)
         self.assertIsNone(result)
 
+    def test_has_pending_changes(self, lib_mock):
+        lib_mock.sp_playlist_has_pending_changes.return_value = 1
+        sp_playlist = spotify.ffi.new('int *')
+        playlist = spotify.Playlist(sp_playlist=sp_playlist)
+
+        result = playlist.has_pending_changes
+
+        lib_mock.sp_playlist_has_pending_changes.assert_called_with(
+            sp_playlist)
+        self.assertTrue(result)
+
     @mock.patch('spotify.Link', spec=spotify.Link)
     def test_link_creates_link_to_playlist(self, link_mock, lib_mock):
         link_mock.return_value = mock.sentinel.link

@@ -130,6 +130,13 @@ class Playlist(object):
             spotify.session_instance._sp_session, image_id)
         return spotify.Image(sp_image=sp_image, add_ref=False)
 
+    @property
+    def has_pending_changes(self):
+        """Check if the playlist has local changes that has not been
+        acknowledged by the server yet.
+        """
+        return bool(lib.sp_playlist_has_pending_changes(self._sp_playlist))
+
     # TODO Add sp_playlist_* methods
 
     @property

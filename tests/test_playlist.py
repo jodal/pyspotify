@@ -347,3 +347,10 @@ class PlaylistContainerTest(unittest.TestCase):
 
         lib_mock.sp_playlistcontainer_release.assert_called_with(
             sp_playlistcontainer)
+
+
+class PlaylistOfflineStatusTest(unittest.TestCase):
+
+    def test_has_constants(self):
+        self.assertEqual(spotify.PlaylistOfflineStatus.NO, 0)
+        self.assertEqual(spotify.PlaylistOfflineStatus.DOWNLOADING, 2)

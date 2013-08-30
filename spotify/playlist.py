@@ -7,6 +7,7 @@ from spotify import ffi, lib, utils
 __all__ = [
     'Playlist',
     'PlaylistContainer',
+    'PlaylistOfflineStatus',
 ]
 
 
@@ -174,3 +175,8 @@ class PlaylistContainer(object):
             sp_playlistcontainer, lib.sp_playlistcontainer_release)
 
     # TODO Add sp_playlistcontainer_* methods
+
+
+@utils.make_enum('SP_PLAYLIST_OFFLINE_STATUS_')
+class PlaylistOfflineStatus(utils.IntEnum):
+    pass

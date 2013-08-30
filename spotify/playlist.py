@@ -56,7 +56,8 @@ class Playlist(object):
 
     # TODO add_callbacks()
     # TODO remove_callbacks()
-    # TODO tracks
+
+    # TODO tracks collection
 
     @property
     def name(self):
@@ -136,6 +137,24 @@ class Playlist(object):
         acknowledged by the server yet.
         """
         return bool(lib.sp_playlist_has_pending_changes(self._sp_playlist))
+
+    # TODO subscribers collection
+
+    def is_in_ram(self):
+        return bool(lib.sp_playlist_is_in_ram(
+            spotify.session_instance._sp_session, self._sp_playlist))
+
+    def set_in_ram(self, value):
+        spotify.Error.maybe_raise(lib.sp_playlist_set_in_ram(
+            spotify.session_instance._sp_session, self._sp_playlist,
+            int(value)))
+
+    in_ram = property(is_in_ram, set_in_ram)
+    """Whether the playlist is in RAM, and not only on disk.
+
+    A playlist must *currently be* in RAM for tracks to be available. A
+    playlist must *have been* in RAM for other metadata to be available.
+    """
 
     # TODO Add sp_playlist_* methods
 

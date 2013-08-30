@@ -59,6 +59,9 @@ class Link(object):
         elif isinstance(value, spotify.Search):
             sp_link = lib.sp_link_create_from_search(value._sp_search)
         elif isinstance(value, spotify.Playlist):
+            # TODO If we get NULL in return here, check sp_playlist_is_in_ram
+            # and raise a helpful error saying that the playlist must be in RAM
+            # before you can create a link to it.
             sp_link = lib.sp_link_create_from_playlist(value._sp_playlist)
         elif isinstance(value, spotify.User):
             sp_link = lib.sp_link_create_from_user(value._sp_user)

@@ -157,6 +157,15 @@ class Playlist(object):
     playlist must *have been* in RAM for other metadata to be available.
     """
 
+    def set_offline_mode(self, offline=True):
+        """Mark the playlist to be synchronized for offline playback.
+
+        The playlist must be in the current user's playlist container.
+        """
+        spotify.Error.maybe_raise(lib.sp_playlist_set_offline_mode(
+            spotify.session_instance._sp_session, self._sp_playlist,
+            int(offline)))
+
     # TODO Add sp_playlist_* methods
 
     @property

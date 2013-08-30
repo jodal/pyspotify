@@ -349,6 +349,32 @@ class PlaylistTest(unittest.TestCase):
             session._sp_session, sp_playlist)
         self.assertIs(result, spotify.PlaylistOfflineStatus.DOWNLOADING)
 
+    def test_offline_download_completed(self, lib_mock):
+        session = self.create_session(lib_mock)
+        lib_mock.sp_playlist_get_offline_status.return_value = 2
+        lib_mock.sp_playlist_get_offline_download_completed.return_value = 73
+        sp_playlist = spotify.ffi.new('int *')
+        playlist = spotify.Playlist(sp_playlist=sp_playlist)
+
+        result = playlist.offline_download_completed
+
+        lib_mock.sp_playlist_get_offline_download_completed.assert_called_with(
+            session._sp_session, sp_playlist)
+        self.assertEqual(result, 73)
+
+    def test_offline_download_completed_when_not_downloading(self, lib_mock):
+        self.create_session(lib_mock)
+        lib_mock.sp_playlist_get_offline_status.return_value = 0
+        lib_mock.sp_playlist_get_offline_download_completed.return_value = 0
+        sp_playlist = spotify.ffi.new('int *')
+        playlist = spotify.Playlist(sp_playlist=sp_playlist)
+
+        result = playlist.offline_download_completed
+
+        self.assertEqual(
+            lib_mock.sp_playlist_get_offline_download_completed.call_count, 0)
+        self.assertIsNone(result)
+
     @mock.patch('spotify.Link', spec=spotify.Link)
     def test_link_creates_link_to_playlist(self, link_mock, lib_mock):
         link_mock.return_value = mock.sentinel.link

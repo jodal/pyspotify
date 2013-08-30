@@ -174,7 +174,17 @@ class Playlist(object):
         return PlaylistOfflineStatus(lib.sp_playlist_get_offline_status(
             spotify.session_instance._sp_session, self._sp_playlist))
 
-    # TODO Add sp_playlist_* methods
+    @property
+    def offline_download_completed(self):
+        """The download progress for an offline playlist.
+
+        A number in the range 0-100. Always 0 if :attr:`offline_status` isn't
+        :attr:`PlaylistOfflineStatus.DOWNLOADING`.
+        """
+        if self.offline_status != PlaylistOfflineStatus.DOWNLOADING:
+            return None
+        return int(lib.sp_playlist_get_offline_download_completed(
+            spotify.session_instance._sp_session, self._sp_playlist))
 
     @property
     def link(self):

@@ -430,6 +430,22 @@ class PlaylistContainerTest(unittest.TestCase):
 
         load_mock.assert_called_with(playlist_container, timeout=10)
 
+    @mock.patch('spotify.User', spec=spotify.User)
+    def test_owner(self, user_mock, lib_mock):
+        user_mock.return_value = mock.sentinel.user
+        sp_user = spotify.ffi.new('int *')
+        lib_mock.sp_playlistcontainer_owner.return_value = sp_user
+        sp_playlistcontainer = spotify.ffi.new('int *')
+        playlist_container = spotify.PlaylistContainer(
+            sp_playlistcontainer=sp_playlistcontainer)
+
+        result = playlist_container.owner
+
+        lib_mock.sp_playlistcontainer_owner.assert_called_with(
+            sp_playlistcontainer)
+        user_mock.assert_called_with(sp_user=sp_user)
+        self.assertEqual(result, mock.sentinel.user)
+
 
 class PlaylistOfflineStatusTest(unittest.TestCase):
 

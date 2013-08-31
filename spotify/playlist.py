@@ -216,7 +216,21 @@ class PlaylistContainer(object):
         """
         return utils.load(self, timeout=timeout)
 
-    # TODO Add sp_playlistcontainer_* methods
+    # TODO playlists collection
+    # TODO add_new_playlist(name)
+    # TODO add_playlist(link)
+    # TODO add_playlist(playlist)
+    # TODO remove_playlist(index)
+    # TODO move_playlist(old_index, new_index, dry_run=False)
+    # TODO add_folder(name)
+
+    @property
+    def owner(self):
+        sp_user = lib.sp_playlistcontainer_owner(self._sp_playlistcontainer)
+        return spotify.User(sp_user=sp_user)
+
+    # TODO get_unseen_tracks()
+    # TODO clear_unseen_tracks()
 
 
 @utils.make_enum('SP_PLAYLIST_OFFLINE_STATUS_')

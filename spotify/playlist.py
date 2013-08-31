@@ -201,6 +201,9 @@ class PlaylistContainer(object):
         self._sp_playlistcontainer = ffi.gc(
             sp_playlistcontainer, lib.sp_playlistcontainer_release)
 
+    def __repr__(self):
+        return '<spotify.PlaylistContainer owned by %s>' % self.owner.link.uri
+
     @property
     def is_loaded(self):
         """Whether the playlist container's data is loaded."""

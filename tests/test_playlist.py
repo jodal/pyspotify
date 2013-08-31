@@ -408,6 +408,22 @@ class PlaylistContainerTest(unittest.TestCase):
         lib_mock.sp_playlistcontainer_release.assert_called_with(
             sp_playlistcontainer)
 
+    @mock.patch('spotify.User', spec=spotify.User)
+    @mock.patch('spotify.Link', spec=spotify.Link)
+    def test_repr(self, link_mock, user_mock, lib_mock):
+        link_instance_mock = link_mock.return_value
+        link_instance_mock.uri = 'foo'
+        user_instance_mock = user_mock.return_value
+        user_instance_mock.link = link_instance_mock
+        sp_playlistcontainer = spotify.ffi.new('int *')
+        playlist_container = spotify.PlaylistContainer(
+            sp_playlistcontainer=sp_playlistcontainer)
+
+        result = repr(playlist_container)
+
+        self.assertEqual(
+            result, '<spotify.PlaylistContainer owned by %s>' % 'foo')
+
     def test_is_loaded(self, lib_mock):
         lib_mock.sp_playlistcontainer_is_loaded.return_value = 1
         sp_playlistcontainer = spotify.ffi.new('int *')

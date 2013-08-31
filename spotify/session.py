@@ -858,7 +858,7 @@ class Session(object):
         return next_timeout[0]
 
     @property
-    def playlist_container(self):
+    def playlists(self):
         """The :class:`PlaylistContainer` for the currently logged in user."""
         sp_playlistcontainer = lib.sp_session_playlistcontainer(
             self._sp_session)

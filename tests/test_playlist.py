@@ -446,6 +446,30 @@ class PlaylistContainerTest(unittest.TestCase):
 
         load_mock.assert_called_with(playlist_container, timeout=10)
 
+    def test_len(self, lib_mock):
+        lib_mock.sp_playlistcontainer_num_playlists.return_value = 8
+        sp_playlistcontainer = spotify.ffi.new('int *')
+        playlist_container = spotify.PlaylistContainer(
+            sp_playlistcontainer=sp_playlistcontainer)
+
+        result = len(playlist_container)
+
+        lib_mock.sp_playlistcontainer_num_playlists.assert_called_with(
+            sp_playlistcontainer)
+        self.assertEqual(result, 8)
+
+    def test_len_if_undefined(self, lib_mock):
+        lib_mock.sp_playlistcontainer_num_playlists.return_value = -1
+        sp_playlistcontainer = spotify.ffi.new('int *')
+        playlist_container = spotify.PlaylistContainer(
+            sp_playlistcontainer=sp_playlistcontainer)
+
+        result = len(playlist_container)
+
+        lib_mock.sp_playlistcontainer_num_playlists.assert_called_with(
+            sp_playlistcontainer)
+        self.assertEqual(result, 0)
+
     @mock.patch('spotify.User', spec=spotify.User)
     def test_owner(self, user_mock, lib_mock):
         user_mock.return_value = mock.sentinel.user

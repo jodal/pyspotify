@@ -219,13 +219,27 @@ class PlaylistContainer(object):
         """
         return utils.load(self, timeout=timeout)
 
-    # TODO playlists collection
+    # TODO add_callbacks()
+    # TODO remove_callbacks()
+
+    def __len__(self):
+        length = lib.sp_playlistcontainer_num_playlists(
+            self._sp_playlistcontainer)
+        if length == -1:
+            return 0
+        return length
+
+    # TODO playlist/folder collection, using:
+    # - playlist
+    # - playlist_type
+    # - playlist_folder_name
+    # - playlist_folder_id
+
     # TODO add_new_playlist(name)
-    # TODO add_playlist(link)
-    # TODO add_playlist(playlist)
-    # TODO remove_playlist(index)
-    # TODO move_playlist(old_index, new_index, dry_run=False)
+    # TODO add_playlist(link_or_playlist)
     # TODO add_folder(name)
+    # TODO remove_playlist(index) / __delitem__(index)
+    # TODO move_playlist(old_index, new_index, dry_run=False)
 
     @property
     def owner(self):

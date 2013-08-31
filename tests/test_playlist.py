@@ -487,6 +487,27 @@ class PlaylistContainerTest(unittest.TestCase):
         self.assertEqual(result, mock.sentinel.user)
 
 
+class PlaylistFolderTest(unittest.TestCase):
+
+    def test_id(self):
+        folder = spotify.PlaylistFolder(
+            id=123, name='foo', type=spotify.PlaylistType.START_FOLDER)
+
+        self.assertEqual(folder.id, 123)
+
+    def test_image(self):
+        folder = spotify.PlaylistFolder(
+            id=123, name='foo', type=spotify.PlaylistType.START_FOLDER)
+
+        self.assertEqual(folder.name, 'foo')
+
+    def test_type(self):
+        folder = spotify.PlaylistFolder(
+            id=123, name='foo', type=spotify.PlaylistType.START_FOLDER)
+
+        self.assertEqual(folder.type, spotify.PlaylistType.START_FOLDER)
+
+
 class PlaylistOfflineStatusTest(unittest.TestCase):
 
     def test_has_constants(self):

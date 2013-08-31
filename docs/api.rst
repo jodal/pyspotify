@@ -282,6 +282,15 @@ Playlists
 
 .. autoclass:: PlaylistContainer
 
+.. autoclass:: PlaylistFolder
+   :no-inherited-members:
+
+   .. autoattribute:: id
+
+   .. autoattribute:: name
+
+   .. autoattribute:: type
+
 .. autoclass:: PlaylistOfflineStatus
     :no-inherited-members:
 

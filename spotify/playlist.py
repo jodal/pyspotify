@@ -1,5 +1,7 @@
 from __future__ import unicode_literals
 
+import collections
+
 import spotify
 from spotify import ffi, lib, utils
 
@@ -7,6 +9,7 @@ from spotify import ffi, lib, utils
 __all__ = [
     'Playlist',
     'PlaylistContainer',
+    'PlaylistFolder',
     'PlaylistOfflineStatus',
     'PlaylistType',
 ]
@@ -249,6 +252,12 @@ class PlaylistContainer(object):
 
     # TODO get_unseen_tracks()
     # TODO clear_unseen_tracks()
+
+
+class PlaylistFolder(collections.namedtuple(
+        'PlaylistFolder', ['id', 'name', 'type'])):
+    """A playlist folder."""
+    pass
 
 
 @utils.make_enum('SP_PLAYLIST_OFFLINE_STATUS_')

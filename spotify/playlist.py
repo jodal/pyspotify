@@ -207,6 +207,15 @@ class PlaylistContainer(object):
         return bool(lib.sp_playlistcontainer_is_loaded(
             self._sp_playlistcontainer))
 
+    def load(self, timeout=None):
+        """Block until the playlist container's data is loaded.
+
+        :param timeout: seconds before giving up and raising an exception
+        :type timeout: float
+        :returns: self
+        """
+        return utils.load(self, timeout=timeout)
+
     # TODO Add sp_playlistcontainer_* methods
 
 

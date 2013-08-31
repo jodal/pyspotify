@@ -12,9 +12,10 @@ install:
   - "sudo wget -q -O /etc/apt/sources.list.d/mopidy.list http://apt.mopidy.com/mopidy.list"
   - "sudo apt-get update -qq"
   - "sudo apt-get install -qq python-all-dev libffi-dev libspotify-dev"
-  - "pip install tox"
+  - "pip install flake8 tox"
 
 script:
+  - "flake8 $(find . -iname '*.py')"
   - "tox -e $TOX_ENV"
 
 notifications:

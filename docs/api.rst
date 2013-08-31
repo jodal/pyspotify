@@ -282,6 +282,12 @@ Playlists
 
 .. autoclass:: PlaylistContainer
 
+.. autoclass:: PlaylistOfflineStatus
+    :no-inherited-members:
+
+.. autoclass:: PlaylistType
+    :no-inherited-members:
+
 
 Users
 =====

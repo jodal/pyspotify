@@ -8,6 +8,7 @@ __all__ = [
     'Playlist',
     'PlaylistContainer',
     'PlaylistOfflineStatus',
+    'PlaylistType',
 ]
 
 
@@ -252,4 +253,9 @@ class PlaylistContainer(object):
 
 @utils.make_enum('SP_PLAYLIST_OFFLINE_STATUS_')
 class PlaylistOfflineStatus(utils.IntEnum):
+    pass
+
+
+@utils.make_enum('SP_PLAYLIST_TYPE_')
+class PlaylistType(utils.IntEnum):
     pass

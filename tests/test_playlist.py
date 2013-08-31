@@ -492,3 +492,11 @@ class PlaylistOfflineStatusTest(unittest.TestCase):
     def test_has_constants(self):
         self.assertEqual(spotify.PlaylistOfflineStatus.NO, 0)
         self.assertEqual(spotify.PlaylistOfflineStatus.DOWNLOADING, 2)
+
+
+class PlaylistTypeTest(unittest.TestCase):
+
+    def test_has_constants(self):
+        self.assertEqual(spotify.PlaylistType.PLAYLIST, 0)
+        self.assertEqual(spotify.PlaylistType.START_FOLDER, 1)
+        self.assertEqual(spotify.PlaylistType.END_FOLDER, 2)

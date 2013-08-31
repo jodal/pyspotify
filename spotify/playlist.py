@@ -201,6 +201,12 @@ class PlaylistContainer(object):
         self._sp_playlistcontainer = ffi.gc(
             sp_playlistcontainer, lib.sp_playlistcontainer_release)
 
+    @property
+    def is_loaded(self):
+        """Whether the playlist container's data is loaded."""
+        return bool(lib.sp_playlistcontainer_is_loaded(
+            self._sp_playlistcontainer))
+
     # TODO Add sp_playlistcontainer_* methods
 
 

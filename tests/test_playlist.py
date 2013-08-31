@@ -408,6 +408,18 @@ class PlaylistContainerTest(unittest.TestCase):
         lib_mock.sp_playlistcontainer_release.assert_called_with(
             sp_playlistcontainer)
 
+    def test_is_loaded(self, lib_mock):
+        lib_mock.sp_playlistcontainer_is_loaded.return_value = 1
+        sp_playlistcontainer = spotify.ffi.new('int *')
+        playlist_container = spotify.PlaylistContainer(
+            sp_playlistcontainer=sp_playlistcontainer)
+
+        result = playlist_container.is_loaded
+
+        lib_mock.sp_playlistcontainer_is_loaded.assert_called_once_with(
+            sp_playlistcontainer)
+        self.assertTrue(result)
+
 
 class PlaylistOfflineStatusTest(unittest.TestCase):
 

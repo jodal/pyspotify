@@ -470,6 +470,124 @@ class PlaylistContainerTest(unittest.TestCase):
             sp_playlistcontainer)
         self.assertEqual(result, 0)
 
+    def test_getitem(self, lib_mock):
+        lib_mock.sp_playlistcontainer_num_playlists.return_value = 1
+        sp_playlist = spotify.ffi.new('int *')
+        lib_mock.sp_playlistcontainer_playlist_type.return_value = int(
+            spotify.PlaylistType.PLAYLIST)
+        lib_mock.sp_playlistcontainer_playlist.return_value = sp_playlist
+        sp_playlistcontainer = spotify.ffi.new('int *')
+        playlist_container = spotify.PlaylistContainer(
+            sp_playlistcontainer=sp_playlistcontainer)
+
+        result = playlist_container[0]
+
+        lib_mock.sp_playlistcontainer_playlist.assert_called_with(
+            sp_playlistcontainer, 0)
+        lib_mock.sp_playlist_add_ref.assert_called_with(sp_playlist)
+        self.assertIsInstance(result, spotify.Playlist)
+        self.assertEqual(result._sp_playlist, sp_playlist)
+
+    def test_getitem_with_folder(self, lib_mock):
+        folder_name = 'foobar'
+
+        def func(sp_playlistcontainer, index, buffer_, buffer_size):
+            # -1 to keep a char free for \0 terminating the string
+            length = min(len(folder_name), buffer_size - 1)
+            # Due to Python 3 treating bytes as an array of ints, we have to
+            # encode and copy chars one by one.
+            for i in range(length):
+                buffer_[i] = folder_name[i].encode('utf-8')
+            return len(folder_name)
+
+        lib_mock.sp_session_remembered_user.side_effect = func
+
+        lib_mock.sp_playlistcontainer_num_playlists.return_value = 3
+        lib_mock.sp_playlistcontainer_playlist_type.side_effect = [
+            int(spotify.PlaylistType.START_FOLDER),
+            int(spotify.PlaylistType.PLAYLIST),
+            int(spotify.PlaylistType.END_FOLDER)]
+        sp_playlist = spotify.ffi.new('int *')
+        lib_mock.sp_playlistcontainer_playlist.return_value = sp_playlist
+        lib_mock.sp_playlistcontainer_playlist_folder_id.side_effect = [
+            1001, 1002]
+        lib_mock.sp_playlistcontainer_playlist_folder_name.side_effect = func
+        sp_playlistcontainer = spotify.ffi.new('int *')
+        playlist_container = spotify.PlaylistContainer(
+            sp_playlistcontainer=sp_playlistcontainer)
+
+        result = playlist_container[0]
+
+        lib_mock.sp_playlistcontainer_playlist_type.assert_called_with(
+            sp_playlistcontainer, 0)
+        lib_mock.sp_playlistcontainer_playlist_folder_id.assert_called_with(
+            sp_playlistcontainer, 0)
+        self.assertIsInstance(result, spotify.PlaylistFolder)
+        self.assertEqual(result.id, 1001)
+        self.assertEqual(result.name, 'foobar')
+        self.assertEqual(result.type, spotify.PlaylistType.START_FOLDER)
+
+        result = playlist_container[1]
+
+        lib_mock.sp_playlistcontainer_playlist_type.assert_called_with(
+            sp_playlistcontainer, 1)
+        lib_mock.sp_playlistcontainer_playlist.assert_called_with(
+            sp_playlistcontainer, 1)
+        lib_mock.sp_playlist_add_ref.assert_called_with(sp_playlist)
+        self.assertIsInstance(result, spotify.Playlist)
+        self.assertEqual(result._sp_playlist, sp_playlist)
+
+        result = playlist_container[2]
+
+        lib_mock.sp_playlistcontainer_playlist_type.assert_called_with(
+            sp_playlistcontainer, 2)
+        lib_mock.sp_playlistcontainer_playlist_folder_id.assert_called_with(
+            sp_playlistcontainer, 2)
+        self.assertIsInstance(result, spotify.PlaylistFolder)
+        self.assertEqual(result.id, 1002)
+        #self.assertEqual(result.name, '')  # Needs better mock impl
+        self.assertEqual(result.type, spotify.PlaylistType.END_FOLDER)
+
+    def test_getitem_raises_error_on_unknown_playlist_type(self, lib_mock):
+        lib_mock.sp_playlistcontainer_num_playlists.return_value = 1
+        lib_mock.sp_playlistcontainer_playlist_type.return_value = int(
+            spotify.PlaylistType.PLACEHOLDER)
+        sp_playlistcontainer = spotify.ffi.new('int *')
+        playlist_container = spotify.PlaylistContainer(
+            sp_playlistcontainer=sp_playlistcontainer)
+
+        self.assertRaises(RuntimeError, playlist_container.__getitem__, 0)
+
+    def test_getitem_raises_index_error_on_negative_index(self, lib_mock):
+        lib_mock.sp_playlistcontainer_num_playlists.return_value = 1
+        sp_playlist = spotify.ffi.new('int *')
+        lib_mock.sp_playlistcontainer_playlist.return_value = sp_playlist
+        sp_playlistcontainer = spotify.ffi.new('int *')
+        playlist_container = spotify.PlaylistContainer(
+            sp_playlistcontainer=sp_playlistcontainer)
+
+        self.assertRaises(IndexError, playlist_container.__getitem__, -1)
+
+    def test_getitem_raises_index_error_on_too_high_index(self, lib_mock):
+        lib_mock.sp_playlistcontainer_num_playlists.return_value = 1
+        sp_playlist = spotify.ffi.new('int *')
+        lib_mock.sp_playlistcontainer_playlist.return_value = sp_playlist
+        sp_playlistcontainer = spotify.ffi.new('int *')
+        playlist_container = spotify.PlaylistContainer(
+            sp_playlistcontainer=sp_playlistcontainer)
+
+        self.assertRaises(IndexError, playlist_container.__getitem__, 1)
+
+    def test_getitem_raises_type_error_on_non_integral_index(self, lib_mock):
+        lib_mock.sp_playlistcontainer_num_playlists.return_value = 1
+        sp_playlist = spotify.ffi.new('int *')
+        lib_mock.sp_playlistcontainer_playlist.return_value = sp_playlist
+        sp_playlistcontainer = spotify.ffi.new('int *')
+        playlist_container = spotify.PlaylistContainer(
+            sp_playlistcontainer=sp_playlistcontainer)
+
+        self.assertRaises(TypeError, playlist_container.__getitem__, 'abc')
+
     @mock.patch('spotify.User', spec=spotify.User)
     def test_owner(self, user_mock, lib_mock):
         user_mock.return_value = mock.sentinel.user

@@ -233,11 +233,33 @@ class PlaylistContainer(object):
             return 0
         return length
 
-    # TODO playlist/folder collection, using:
-    # - playlist
-    # - playlist_type
-    # - playlist_folder_name
-    # - playlist_folder_id
+    def __getitem__(self, key):
+        if not isinstance(key, int):
+            raise TypeError(
+                'list indices must be integers, not %s' %
+                key.__class__.__name__)
+        if not 0 <= key < self.__len__():
+            raise IndexError('list index out of range')
+
+        playlist_type = PlaylistType(lib.sp_playlistcontainer_playlist_type(
+            self._sp_playlistcontainer, key))
+
+        if playlist_type is PlaylistType.PLAYLIST:
+            sp_playlist = lib.sp_playlistcontainer_playlist(
+                self._sp_playlistcontainer, key)
+            return Playlist(sp_playlist=sp_playlist, add_ref=True)
+        elif playlist_type in (
+                PlaylistType.START_FOLDER, PlaylistType.END_FOLDER):
+            return PlaylistFolder(
+                id=lib.sp_playlistcontainer_playlist_folder_id(
+                    self._sp_playlistcontainer, key),
+                name=utils.get_with_fixed_buffer(
+                    100,
+                    lib.sp_playlistcontainer_playlist_folder_name,
+                    self._sp_playlistcontainer, key),
+                type=playlist_type)
+        else:
+            raise RuntimeError('Unknown playlist type: %r' % playlist_type)
 
     # TODO add_new_playlist(name)
     # TODO add_playlist(link_or_playlist)

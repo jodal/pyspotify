@@ -53,6 +53,13 @@ def make_enum(lib_prefix, enum_prefix=''):
     return wrapper
 
 
+def get_with_fixed_buffer(buffer_length, func, *args):
+    func = functools.partial(func, *args)
+    buffer_ = ffi.new('char[%d]' % buffer_length)
+    func(buffer_, buffer_length)
+    return to_unicode(buffer_)
+
+
 def get_with_growing_buffer(func, *args):
     func = functools.partial(func, *args)
     actual_length = 10

@@ -954,12 +954,12 @@ class SessionTest(unittest.TestCase):
         self.assertIsNone(result)
 
     @mock.patch('spotify.playlist.lib', spec=spotify.lib)
-    def test_published_container_for_user(self, playlist_lib_mock, lib_mock):
+    def test_published_playlists_for_user(self, playlist_lib_mock, lib_mock):
         func_mock = lib_mock.sp_session_publishedcontainer_for_user_create
         func_mock.return_value = spotify.ffi.new('sp_playlistcontainer **')
         session = self.create_session(lib_mock)
 
-        result = session.published_container_for_user('alice')
+        result = session.published_playlists_for_user('alice')
 
         func_mock.assert_called_with(session._sp_session, b'alice')
         self.assertIsInstance(result, spotify.PlaylistContainer)
@@ -971,23 +971,23 @@ class SessionTest(unittest.TestCase):
             playlist_lib_mock.sp_playlistcontainer_add_ref.call_count, 0)
 
     @mock.patch('spotify.playlist.lib', spec=spotify.lib)
-    def test_published_container_for_current_user(
+    def test_published_playlists_for_current_user(
             self, playlist_lib_mock, lib_mock):
         func_mock = lib_mock.sp_session_publishedcontainer_for_user_create
         func_mock.return_value = spotify.ffi.new('sp_playlistcontainer **')
         session = self.create_session(lib_mock)
 
-        result = session.published_container_for_user()
+        result = session.published_playlists_for_user()
 
         func_mock.assert_called_with(session._sp_session, spotify.ffi.NULL)
         self.assertIsInstance(result, spotify.PlaylistContainer)
 
-    def test_published_container_if_not_logged_in(self, lib_mock):
+    def test_published_playlists_if_not_logged_in(self, lib_mock):
         func_mock = lib_mock.sp_session_publishedcontainer_for_user_create
         func_mock.return_value = spotify.ffi.NULL
         session = self.create_session(lib_mock)
 
-        result = session.published_container_for_user('alice')
+        result = session.published_playlists_for_user('alice')
 
         func_mock.assert_called_with(session._sp_session, b'alice')
         self.assertIsNone(result)

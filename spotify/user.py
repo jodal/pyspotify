@@ -71,10 +71,10 @@ class User(object):
         return spotify.session_instance.starred_for_user(self.canonical_name)
 
     @property
-    def published_container(self):
+    def published_playlists(self):
         """The :class:`PlaylistContainer` of playlists published by the
         user."""
         if spotify.session_instance is None:
             return None
-        return spotify.session_instance.published_container_for_user(
+        return spotify.session_instance.published_playlists_for_user(
             self.canonical_name)

@@ -146,26 +146,26 @@ class UserTest(unittest.TestCase):
         self.assertIsNone(result)
 
     @mock.patch('spotify.session_instance', spec=spotify.Session)
-    def test_published_container(self, session_mock, lib_mock):
-        session_mock.published_container_for_user.return_value = (
+    def test_published_playlists(self, session_mock, lib_mock):
+        session_mock.published_playlists_for_user.return_value = (
             mock.sentinel.playlist_container)
         lib_mock.sp_user_canonical_name.return_value = spotify.ffi.new(
             'char[]', b'alice')
         sp_user = spotify.ffi.new('int *')
         user = spotify.User(sp_user=sp_user)
 
-        result = user.published_container
+        result = user.published_playlists
 
-        session_mock.published_container_for_user.assert_called_with('alice')
+        session_mock.published_playlists_for_user.assert_called_with('alice')
         self.assertEqual(result, mock.sentinel.playlist_container)
 
-    def test_published_container_if_no_session(self, lib_mock):
+    def test_published_playlists_if_no_session(self, lib_mock):
         spotify.session_instance = None
         lib_mock.sp_user_canonical_name.return_value = spotify.ffi.new(
             'char[]', b'alice')
         sp_user = spotify.ffi.new('int *')
         user = spotify.User(sp_user=sp_user)
 
-        result = user.published_container
+        result = user.published_playlists
 
         self.assertIsNone(result)

@@ -891,7 +891,7 @@ class Session(object):
             return None
         return spotify.Playlist(sp_playlist=sp_playlist, add_ref=False)
 
-    def published_container_for_user(self, canonical_username=None):
+    def published_playlists_for_user(self, canonical_username=None):
         """The :class:`PlaylistContainer` of published playlists for the user
         with ``canonical_username``.
 

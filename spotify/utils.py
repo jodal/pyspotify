@@ -1,6 +1,7 @@
 from __future__ import unicode_literals
 
 import collections
+import functools
 import pprint
 import sys
 import time
@@ -52,13 +53,14 @@ def make_enum(lib_prefix, enum_prefix=''):
     return wrapper
 
 
-def get_with_growing_buffer(func, obj):
+def get_with_growing_buffer(func, *args):
+    func = functools.partial(func, *args)
     actual_length = 10
     buffer_length = actual_length
     while actual_length >= buffer_length:
         buffer_length = actual_length + 1
         buffer_ = ffi.new('char[%d]' % buffer_length)
-        actual_length = func(obj, buffer_, buffer_length)
+        actual_length = func(buffer_, buffer_length)
     if actual_length == -1:
         return None
     return to_unicode(buffer_)

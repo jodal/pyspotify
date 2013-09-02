@@ -44,7 +44,12 @@ class Playlist(object):
         self._sp_playlist = ffi.gc(sp_playlist, lib.sp_playlist_release)
 
     def __repr__(self):
-        return 'spotify.Playlist(%r)' % self.link.uri
+        if not self.is_loaded:
+            return 'spotify.Playlist(<not loaded>)'
+        try:
+            return 'spotify.Playlist(%r)' % self.link.uri
+        except ValueError as exc:
+            return 'spotify.Playlist(<error: %s>)' % exc
 
     @property
     def is_loaded(self):

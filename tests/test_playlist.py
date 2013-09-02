@@ -63,6 +63,7 @@ class PlaylistTest(unittest.TestCase):
 
     @mock.patch('spotify.Link', spec=spotify.Link)
     def test_repr(self, link_mock, lib_mock):
+        lib_mock.sp_playlist_is_loaded.return_value = 1
         link_instance_mock = link_mock.return_value
         link_instance_mock.uri = 'foo'
         sp_playlist = spotify.ffi.new('int *')
@@ -71,6 +72,27 @@ class PlaylistTest(unittest.TestCase):
         result = repr(playlist)
 
         self.assertEqual(result, 'spotify.Playlist(%r)' % 'foo')
+
+    @mock.patch('spotify.Link', spec=spotify.Link)
+    def test_repr_if_unloaded(self, link_mock, lib_mock):
+        lib_mock.sp_playlist_is_loaded.return_value = 0
+        sp_playlist = spotify.ffi.new('int *')
+        playlist = spotify.Playlist(sp_playlist=sp_playlist)
+
+        result = repr(playlist)
+
+        self.assertEqual(result, 'spotify.Playlist(<not loaded>)')
+
+    @mock.patch('spotify.Link', spec=spotify.Link)
+    def test_repr_if_link_creation_fails(self, link_mock, lib_mock):
+        lib_mock.sp_playlist_is_loaded.return_value = 1
+        link_mock.side_effect = ValueError('error message')
+        sp_playlist = spotify.ffi.new('int *')
+        playlist = spotify.Playlist(sp_playlist=sp_playlist)
+
+        result = repr(playlist)
+
+        self.assertEqual(result, 'spotify.Playlist(<error: error message>)')
 
     def test_is_loaded(self, lib_mock):
         lib_mock.sp_playlist_is_loaded.return_value = 1

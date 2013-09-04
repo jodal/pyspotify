@@ -7,7 +7,7 @@ import os
 import threading
 import time
 
-from spotify import ArtistBrowser, Link, ToplistBrowser, SpotifyError
+from spotify import ArtistBrowser, Link, Playlist, ToplistBrowser, SpotifyError
 from spotify.audiosink import import_audio_sink
 from spotify.manager import (
     SpotifySessionManager, SpotifyPlaylistManager, SpotifyContainerManager)
@@ -51,7 +51,8 @@ class JukeboxUI(cmd.Cmd, threading.Thread):
             i = -1
             for i, p in enumerate(self.jukebox.ctr):
                 if p.is_loaded():
-                    if Link.from_playlist(p).type() == Link.LINK_STARRED:
+                    if (isinstance(p, Playlist) and
+                        Link.from_playlist(p).type() == Link.LINK_STARRED):
                         name = "Starred by %s" % p.owner()
                     else:
                         name = p.name()

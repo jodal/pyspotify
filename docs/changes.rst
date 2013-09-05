@@ -8,6 +8,14 @@ Changes
 v1.12 (UNRELEASED)
 ==================
 
+**New features**
+
+- Added methods for marking playlists for offline use:
+  :meth:`~spotify.Playlist.get_offline_status`,
+  :meth:`~spotify.Playlist.set_offline_mode`, and
+  :meth:`~spotify.Playlist.get_offline_download_completed`. Contributed by
+  Alexandre Petitjean.
+
 **Other changes**
 
 - For developers: In *pyspotify* 1.7 we split out our mock version of

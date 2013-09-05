@@ -267,7 +267,25 @@ class PlaylistContainer(object):
         else:
             raise RuntimeError('Unknown playlist type: %r' % playlist_type)
 
-    # TODO add_new_playlist(name)
+    def add_new_playlist(self, name):
+        """Add an empty playlist at the end of the container.
+
+        The playlist name must not be space-only or shorter than 256 chars.
+
+        Returns the new playlist.
+        """
+        if len(name) > 255:
+            raise ValueError('Playlist name must be shorter than 256 chars')
+        if len(name.replace(' ', '')) == 0:
+            # XXX Spotify seems to accept tab-only names
+            raise ValueError('Playlist name cannot be space-only')
+        name = ffi.new('char[]', utils.to_bytes(name))
+        sp_playlist = lib.sp_playlistcontainer_add_new_playlist(
+            self._sp_playlistcontainer, name)
+        if sp_playlist == ffi.NULL:
+            raise ValueError('Playlist creation failed')
+        return Playlist(sp_playlist=sp_playlist, add_ref=True)
+
     # TODO add_playlist(link_or_playlist)
     # TODO add_folder(name)
     # TODO remove_playlist(index) / __delitem__(index)

@@ -604,6 +604,53 @@ class PlaylistContainerTest(unittest.TestCase):
 
         self.assertRaises(TypeError, playlist_container.__getitem__, 'abc')
 
+    def test_add_new_playlist(self, lib_mock):
+        sp_playlist = spotify.ffi.new('int *')
+        lib_mock.sp_playlistcontainer_add_new_playlist.return_value = (
+            sp_playlist)
+        sp_playlistcontainer = spotify.ffi.new('int *')
+        playlist_container = spotify.PlaylistContainer(
+            sp_playlistcontainer=sp_playlistcontainer)
+
+        result = playlist_container.add_new_playlist('foo bar')
+
+        lib_mock.sp_playlistcontainer_add_new_playlist.assert_called_with(
+            sp_playlistcontainer, mock.ANY)
+        self.assertEqual(
+            spotify.ffi.string(
+                lib_mock.sp_playlistcontainer_add_new_playlist
+                .call_args[0][1]),
+            b'foo bar')
+        self.assertIsInstance(result, spotify.Playlist)
+        self.assertEqual(result._sp_playlist, sp_playlist)
+        lib_mock.sp_playlist_add_ref.assert_called_with(sp_playlist)
+
+    def test_add_new_playlist_fails_if_name_is_space_only(self, lib_mock):
+        sp_playlistcontainer = spotify.ffi.new('int *')
+        playlist_container = spotify.PlaylistContainer(
+            sp_playlistcontainer=sp_playlistcontainer)
+
+        self.assertRaises(
+            ValueError, playlist_container.add_new_playlist, '   ')
+
+    def test_add_new_playlist_fails_if_name_is_too_long(self, lib_mock):
+        sp_playlistcontainer = spotify.ffi.new('int *')
+        playlist_container = spotify.PlaylistContainer(
+            sp_playlistcontainer=sp_playlistcontainer)
+
+        self.assertRaises(
+            ValueError, playlist_container.add_new_playlist, 'x' * 300)
+
+    def test_add_new_playlist_fails_if_operation_fails(self, lib_mock):
+        lib_mock.sp_playlistcontainer_add_new_playlist.return_value = (
+            spotify.ffi.NULL)
+        sp_playlistcontainer = spotify.ffi.new('int *')
+        playlist_container = spotify.PlaylistContainer(
+            sp_playlistcontainer=sp_playlistcontainer)
+
+        self.assertRaises(
+            ValueError, playlist_container.add_new_playlist, 'foo bar')
+
     @mock.patch('spotify.User', spec=spotify.User)
     def test_owner(self, user_mock, lib_mock):
         user_mock.return_value = mock.sentinel.user

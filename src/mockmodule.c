@@ -300,7 +300,7 @@ mock_playlist(PyObject *self, PyObject *args, PyObject *kwds)
     PyObject *py_tracks, *py_subscribers=NULL;
     sp_subscribers *subscribers;
     char **names;
-    int i, num_subscribers=0, num_tracks, offline_download_completed=1, count;
+    int i, num_subscribers=0, num_tracks, offline_download_completed=0, count;
     byte *image=NULL;
     bool is_loaded=1, is_collaborative=0, has_pending_changes=0, is_in_ram=0;
     sp_playlist_offline_status offline_status = SP_PLAYLIST_OFFLINE_STATUS_NO;

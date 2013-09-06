@@ -349,7 +349,14 @@ class PlaylistContainer(object):
         spotify.Error.maybe_raise(lib.sp_playlistcontainer_remove_playlist(
             self._sp_playlistcontainer, index))
 
-    # TODO move_playlist(old_index, new_index, dry_run=False)
+    def move_playlist(self, from_index, to_index, dry_run=False):
+        """Move playlist at ``from_index`` to ``to_index``.
+
+        If ``dry_run`` is :class:`True` the move isn't actually done. It is
+        only checked if the move is possible.
+        """
+        spotify.Error.maybe_raise(lib.sp_playlistcontainer_move_playlist(
+            self._sp_playlistcontainer, from_index, to_index, int(dry_run)))
 
     @property
     def owner(self):

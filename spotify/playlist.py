@@ -208,6 +208,10 @@ class PlaylistContainer(object):
     The playlist container can be accessed as a regular Python collection to
     work with the playlists::
 
+        >>> import spotify
+        >>> session = spotify.Session()
+        # Login, etc.
+        >>> container = session.playlists
         >>> container.is_loaded
         False
         >>> container.load()

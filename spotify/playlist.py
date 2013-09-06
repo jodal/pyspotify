@@ -294,6 +294,7 @@ class PlaylistContainer(object):
 
         Returns the new playlist.
         """
+        # TODO Add index kwarg and move the playlist if it is specified
         if len(name) > 255:
             raise ValueError('Playlist name must be shorter than 256 chars')
         if len(name.replace(' ', '')) == 0:
@@ -315,6 +316,7 @@ class PlaylistContainer(object):
         Returns the added playlist, or :class:`None` if the playlist already
         existed in the container.
         """
+        # TODO Add index kwarg and move the playlist if it is specified
         if isinstance(playlist, spotify.Link):
             link = playlist
         elif isinstance(playlist, spotify.Playlist):
@@ -329,7 +331,18 @@ class PlaylistContainer(object):
         else:
             return Playlist(sp_playlist=sp_playlist, add_ref=True)
 
-    # TODO add_folder(name)
+    def add_folder(self, name, index=None):
+        """Add a playlist folder at the given index.
+
+        If the index isn't specified, the folder is added at the end of the
+        container.
+        """
+        if index is None:
+            index = len(self)
+        name = ffi.new('char[]', utils.to_bytes(name))
+        spotify.Error.maybe_raise(lib.sp_playlistcontainer_add_folder(
+            self._sp_playlistcontainer, index, name))
+
     # TODO remove_playlist(index) / __delitem__(index)
     # TODO move_playlist(old_index, new_index, dry_run=False)
 

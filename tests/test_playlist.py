@@ -722,6 +722,50 @@ class PlaylistContainerTest(unittest.TestCase):
 
         self.assertRaises(ValueError, playlist_container.add_playlist, None)
 
+    def test_add_folder(self, lib_mock):
+        lib_mock.sp_playlistcontainer_add_folder.return_value = int(
+            spotify.ErrorType.OK)
+        sp_playlistcontainer = spotify.ffi.new('int *')
+        playlist_container = spotify.PlaylistContainer(
+            sp_playlistcontainer=sp_playlistcontainer)
+
+        playlist_container.add_folder('foo bar', index=3)
+
+        lib_mock.sp_playlistcontainer_add_folder.assert_called_with(
+            sp_playlistcontainer, 3, mock.ANY)
+        self.assertEqual(
+            spotify.ffi.string(
+                lib_mock.sp_playlistcontainer_add_folder.call_args[0][2]),
+            b'foo bar')
+
+    def test_add_folder_without_index_adds_to_end(self, lib_mock):
+        lib_mock.sp_playlistcontainer_num_playlists.return_value = 7
+        lib_mock.sp_playlistcontainer_add_folder.return_value = int(
+            spotify.ErrorType.OK)
+        sp_playlistcontainer = spotify.ffi.new('int *')
+        playlist_container = spotify.PlaylistContainer(
+            sp_playlistcontainer=sp_playlistcontainer)
+
+        playlist_container.add_folder('foo bar')
+
+        lib_mock.sp_playlistcontainer_add_folder.assert_called_with(
+            sp_playlistcontainer, 7, mock.ANY)
+        self.assertEqual(
+            spotify.ffi.string(
+                lib_mock.sp_playlistcontainer_add_folder.call_args[0][2]),
+            b'foo bar')
+
+    def test_add_folder_out_of_range_fails(self, lib_mock):
+        lib_mock.sp_playlistcontainer_add_folder.return_value = int(
+            spotify.ErrorType.INDEX_OUT_OF_RANGE)
+
+        sp_playlistcontainer = spotify.ffi.new('int *')
+        playlist_container = spotify.PlaylistContainer(
+            sp_playlistcontainer=sp_playlistcontainer)
+
+        self.assertRaises(
+            spotify.Error, playlist_container.add_folder, 'foo bar', index=3)
+
     @mock.patch('spotify.User', spec=spotify.User)
     def test_owner(self, user_mock, lib_mock):
         user_mock.return_value = mock.sentinel.user

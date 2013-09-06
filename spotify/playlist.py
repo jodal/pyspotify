@@ -286,7 +286,29 @@ class PlaylistContainer(object):
             raise ValueError('Playlist creation failed')
         return Playlist(sp_playlist=sp_playlist, add_ref=True)
 
-    # TODO add_playlist(link_or_playlist)
+    def add_playlist(self, playlist):
+        """Add an existing playlist to the end of the playlist container.
+
+        The playlist can either be a :class:`~spotify.Playlist`, or a
+        :class:`~spotify.Link` linking to a playlist.
+
+        Returns the added playlist, or :class:`None` if the playlist already
+        existed in the container.
+        """
+        if isinstance(playlist, spotify.Link):
+            link = playlist
+        elif isinstance(playlist, spotify.Playlist):
+            link = playlist.link
+        else:
+            raise ValueError(
+                'Argument must be Link or Playlist, got %s' % type(playlist))
+        sp_playlist = lib.sp_playlistcontainer_add_playlist(
+            self._sp_playlistcontainer, link._sp_link)
+        if sp_playlist == ffi.NULL:
+            return None
+        else:
+            return Playlist(sp_playlist=sp_playlist, add_ref=True)
+
     # TODO add_folder(name)
     # TODO remove_playlist(index) / __delitem__(index)
     # TODO move_playlist(old_index, new_index, dry_run=False)

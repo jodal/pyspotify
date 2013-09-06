@@ -203,7 +203,27 @@ class Playlist(object):
 
 
 class PlaylistContainer(object):
-    """A Spotify playlist container."""
+    """A Spotify playlist container.
+
+    The playlist container can be accessed as a regular Python collection to
+    work with the playlists::
+
+        >>> container.is_loaded
+        False
+        >>> container.load()
+        [Playlist(u'spotify:user:jodal:playlist:6xkJysqhkj9uwufFbUb8sP'),
+         Playlist(u'spotify:user:jodal:playlist:0agJjPcOhHnstLIQunJHxo'),
+         PlaylistFolder(id=8027491506140518932L, name=u'Shared playlists',
+            type=<PlaylistType.START_FOLDER: 1>),
+         Playlist(u'spotify:user:p3.no:playlist:7DkMndS2KNVQuf2fOpMt10'),
+         PlaylistFolder(id=8027491506140518932L, name=u'',
+            type=<PlaylistType.END_FOLDER: 2>)]
+        >>> container[0]
+        Playlist(u'spotify:user:jodal:playlist:6xkJysqhkj9uwufFbUb8sP')
+
+    As you can see, a playlist container can contain a mix of
+    :class:`~spotify.Playlist` and :class:`~spotify.PlaylistFolder` objects.
+    """
 
     def __init__(self, sp_playlistcontainer, add_ref=True):
         if add_ref:

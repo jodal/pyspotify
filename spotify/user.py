@@ -32,7 +32,7 @@ class User(object):
         self._sp_user = ffi.gc(sp_user, lib.sp_user_release)
 
     def __repr__(self):
-        return 'spotify.User(%r)' % self.link.uri
+        return 'User(%r)' % self.link.uri
 
     @property
     def canonical_name(self):

@@ -239,7 +239,7 @@ class LinkTest(unittest.TestCase):
 
         result = repr(link)
 
-        self.assertEqual(result, 'spotify.Link(%r)' % string)
+        self.assertEqual(result, 'Link(%r)' % string)
 
     def test_str(self, lib_mock):
         sp_link = spotify.ffi.new('int *')

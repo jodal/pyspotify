@@ -72,7 +72,7 @@ class ImageTest(unittest.TestCase):
 
         result = repr(image)
 
-        self.assertEqual(result, 'spotify.Image(%r)' % 'foo')
+        self.assertEqual(result, 'Image(%r)' % 'foo')
 
     def test_load_event_is_unset_by_default(self, lib_mock):
         sp_image = spotify.ffi.new('int *')

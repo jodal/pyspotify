@@ -86,7 +86,7 @@ class TrackTest(unittest.TestCase):
 
         result = repr(track)
 
-        self.assertEqual(result, 'spotify.Track(%r)' % 'foo')
+        self.assertEqual(result, 'Track(%r)' % 'foo')
 
     def test_is_loaded(self, lib_mock):
         lib_mock.sp_track_is_loaded.return_value = 1

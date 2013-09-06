@@ -37,7 +37,7 @@ class Track(object):
         self._sp_track = ffi.gc(sp_track, lib.sp_track_release)
 
     def __repr__(self):
-        return 'spotify.Track(%r)' % self.link.uri
+        return 'Track(%r)' % self.link.uri
 
     @property
     def is_loaded(self):

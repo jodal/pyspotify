@@ -45,11 +45,11 @@ class Playlist(object):
 
     def __repr__(self):
         if not self.is_loaded:
-            return 'spotify.Playlist(<not loaded>)'
+            return 'Playlist(<not loaded>)'
         try:
-            return 'spotify.Playlist(%r)' % self.link.uri
+            return 'Playlist(%r)' % self.link.uri
         except ValueError as exc:
-            return 'spotify.Playlist(<error: %s>)' % exc
+            return 'Playlist(<error: %s>)' % exc
 
     @property
     def is_loaded(self):

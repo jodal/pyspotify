@@ -33,7 +33,7 @@ class Album(object):
         self._sp_album = ffi.gc(sp_album, lib.sp_album_release)
 
     def __repr__(self):
-        return 'spotify.Album(%r)' % self.link.uri
+        return 'Album(%r)' % self.link.uri
 
     @property
     def is_loaded(self):

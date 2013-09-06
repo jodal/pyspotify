@@ -72,7 +72,7 @@ class ArtistTest(unittest.TestCase):
 
         result = repr(artist)
 
-        self.assertEqual(result, 'spotify.Artist(%r)' % 'foo')
+        self.assertEqual(result, 'Artist(%r)' % 'foo')
 
     def test_name(self, lib_mock):
         lib_mock.sp_artist_name.return_value = spotify.ffi.new(

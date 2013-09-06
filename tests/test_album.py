@@ -70,7 +70,7 @@ class AlbumTest(unittest.TestCase):
 
         result = repr(album)
 
-        self.assertEqual(result, 'spotify.Album(%r)' % 'foo')
+        self.assertEqual(result, 'Album(%r)' % 'foo')
 
     def test_is_loaded(self, lib_mock):
         lib_mock.sp_album_is_loaded.return_value = 1

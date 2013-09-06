@@ -67,7 +67,7 @@ class UserTest(unittest.TestCase):
 
         result = repr(user)
 
-        self.assertEqual(result, 'spotify.User(%r)' % 'foo')
+        self.assertEqual(result, 'User(%r)' % 'foo')
 
     def test_canonical_name(self, lib_mock):
         lib_mock.sp_user_canonical_name.return_value = spotify.ffi.new(

@@ -118,7 +118,7 @@ class SearchTest(unittest.TestCase):
 
         result = repr(search)
 
-        self.assertEqual(result, 'spotify.Search(%r)' % 'foo')
+        self.assertEqual(result, 'Search(%r)' % 'foo')
 
     def test_is_loaded(self, lib_mock):
         lib_mock.sp_search_is_loaded.return_value = 1

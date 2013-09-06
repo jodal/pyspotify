@@ -86,7 +86,7 @@ class Link(object):
         self._sp_link = ffi.gc(sp_link, lib.sp_link_release)
 
     def __repr__(self):
-        return 'spotify.Link(%r)' % self.uri
+        return 'Link(%r)' % self.uri
 
     def __str__(self):
         return self.uri

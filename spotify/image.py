@@ -45,7 +45,7 @@ class Image(object):
         self.load_event = threading.Event()
 
     def __repr__(self):
-        return 'spotify.Image(%r)' % self.link.uri
+        return 'Image(%r)' % self.link.uri
 
     load_event = None
     """:class:`threading.Event` that is set when the image is loaded."""

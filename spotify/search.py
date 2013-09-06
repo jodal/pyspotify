@@ -77,7 +77,7 @@ class Search(object):
     """:class:`threading.Event` that is set when the search is completed."""
 
     def __repr__(self):
-        return 'spotify.Search(%r)' % self.link.uri
+        return 'Search(%r)' % self.link.uri
 
     @property
     def is_loaded(self):

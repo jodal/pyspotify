@@ -42,7 +42,9 @@ class Link(object):
 
         # TODO Add support for creating link from a sp_artistbrowse instance
 
-        if isinstance(value, spotify.Track):
+        if isinstance(value, ffi.CData):
+            sp_link = value
+        elif isinstance(value, spotify.Track):
             sp_link = lib.sp_link_create_from_track(value._sp_track, offset)
         elif isinstance(value, spotify.Album):
             if image_size is not None:

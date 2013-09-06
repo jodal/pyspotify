@@ -27,6 +27,13 @@ class LinkTest(unittest.TestCase):
 
         self.assertRaises(RuntimeError, spotify.Link, 'spotify:track:foo')
 
+    def test_create_from_sp_link(self, lib_mock):
+        sp_link = spotify.ffi.new('int *')
+
+        result = spotify.Link(sp_link)
+
+        self.assertEqual(result._sp_link, sp_link)
+
     def test_create_from_string(self, lib_mock):
         sp_link = spotify.ffi.new('int *')
         lib_mock.sp_link_create_from_string.return_value = sp_link

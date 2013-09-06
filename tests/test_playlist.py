@@ -766,6 +766,28 @@ class PlaylistContainerTest(unittest.TestCase):
         self.assertRaises(
             spotify.Error, playlist_container.add_folder, 'foo bar', index=3)
 
+    def test_remove_playlist(self, lib_mock):
+        lib_mock.sp_playlistcontainer_remove_playlist.return_value = int(
+            spotify.ErrorType.OK)
+        sp_playlistcontainer = spotify.ffi.new('int *')
+        playlist_container = spotify.PlaylistContainer(
+            sp_playlistcontainer=sp_playlistcontainer)
+
+        playlist_container.remove_playlist(5)
+
+        lib_mock.sp_playlistcontainer_remove_playlist.assert_called_with(
+            sp_playlistcontainer, 5)
+
+    def test_remove_playlist_out_of_range_fails(self, lib_mock):
+        lib_mock.sp_playlistcontainer_remove_playlist.return_value = int(
+            spotify.ErrorType.INDEX_OUT_OF_RANGE)
+        sp_playlistcontainer = spotify.ffi.new('int *')
+        playlist_container = spotify.PlaylistContainer(
+            sp_playlistcontainer=sp_playlistcontainer)
+
+        self.assertRaises(
+            spotify.Error, playlist_container.remove_playlist, 3)
+
     @mock.patch('spotify.User', spec=spotify.User)
     def test_owner(self, user_mock, lib_mock):
         user_mock.return_value = mock.sentinel.user

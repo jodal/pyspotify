@@ -343,7 +343,12 @@ class PlaylistContainer(object):
         spotify.Error.maybe_raise(lib.sp_playlistcontainer_add_folder(
             self._sp_playlistcontainer, index, name))
 
-    # TODO remove_playlist(index) / __delitem__(index)
+    def remove_playlist(self, index):
+        """Remove playlist at the given index from the container."""
+        # TODO Make available through __delitem__(index)
+        spotify.Error.maybe_raise(lib.sp_playlistcontainer_remove_playlist(
+            self._sp_playlistcontainer, index))
+
     # TODO move_playlist(old_index, new_index, dry_run=False)
 
     @property

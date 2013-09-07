@@ -12,6 +12,7 @@ __all__ = [
     'PlaylistContainer',
     'PlaylistFolder',
     'PlaylistOfflineStatus',
+    'PlaylistTrack',
     'PlaylistType',
 ]
 
@@ -84,6 +85,36 @@ class Playlist(object):
                 lambda sp_playlist, key:
                 spotify.Track(
                     sp_track=lib.sp_playlist_track(sp_playlist, key))))
+
+    @property
+    def tracks_with_metadata(self):
+        """The playlist's tracks with metadata specific to the playlist.
+
+        Will always return an empty list if the search isn't loaded.
+        """
+        if not self.is_loaded:
+            return []
+        lib.sp_playlist_add_ref(self._sp_playlist)
+        return utils.Sequence(
+            sp_obj=ffi.gc(self._sp_playlist, lib.sp_playlist_release),
+            len_func=lib.sp_playlist_num_tracks,
+            getitem_func=self._build_playlist_track)
+
+    def _build_playlist_track(self, sp_playlist, index):
+        track = spotify.Track(
+            sp_track=lib.sp_playlist_track(sp_playlist, index))
+        create_time = lib.sp_playlist_track_create_time(sp_playlist, index)
+        creator = spotify.User(
+            sp_user=lib.sp_playlist_track_creator(sp_playlist, index))
+        seen = bool(lib.sp_playlist_track_seen(sp_playlist, index))
+        message = lib.sp_playlist_track_message(sp_playlist, index)
+        if message == ffi.NULL:
+            message = None
+        else:
+            message = utils.to_unicode(message)
+        return PlaylistTrack(track, create_time, creator, seen, message)
+
+    # TODO track_set_seen()
 
     @property
     def name(self):
@@ -398,6 +429,13 @@ class PlaylistFolder(collections.namedtuple(
 
 @utils.make_enum('SP_PLAYLIST_OFFLINE_STATUS_')
 class PlaylistOfflineStatus(utils.IntEnum):
+    pass
+
+
+class PlaylistTrack(collections.namedtuple(
+        'PlaylistTrack',
+        ['track', 'create_time', 'creator', 'seen', 'message'])):
+    """A playlist track with metadata specific to the playlist."""
     pass
 
 

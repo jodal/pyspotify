@@ -113,6 +113,49 @@ class PlaylistTest(unittest.TestCase):
 
         load_mock.assert_called_with(playlist, timeout=10)
 
+    @mock.patch('spotify.track.lib', spec=spotify.lib)
+    def test_tracks(self, track_lib_mock, lib_mock):
+        sp_track = spotify.ffi.cast('sp_track *', spotify.ffi.new('int *'))
+        lib_mock.sp_playlist_num_tracks.return_value = 1
+        lib_mock.sp_playlist_track.return_value = sp_track
+        sp_playlist = spotify.ffi.new('int *')
+        playlist = spotify.Playlist(sp_playlist=sp_playlist)
+
+        self.assertEqual(lib_mock.sp_playlist_add_ref.call_count, 1)
+        result = playlist.tracks
+        self.assertEqual(lib_mock.sp_playlist_add_ref.call_count, 2)
+
+        self.assertEqual(len(result), 1)
+        lib_mock.sp_playlist_num_tracks.assert_called_with(sp_playlist)
+
+        item = result[0]
+        self.assertIsInstance(item, spotify.Track)
+        self.assertEqual(item._sp_track, sp_track)
+        self.assertEqual(lib_mock.sp_playlist_track.call_count, 1)
+        lib_mock.sp_playlist_track.assert_called_with(sp_playlist, 0)
+        track_lib_mock.sp_track_add_ref.assert_called_with(sp_track)
+
+    def test_tracks_if_no_tracks(self, lib_mock):
+        lib_mock.sp_playlist_num_tracks.return_value = 0
+        sp_playlist = spotify.ffi.new('int *')
+        playlist = spotify.Playlist(sp_playlist=sp_playlist)
+
+        result = playlist.tracks
+
+        self.assertEqual(len(result), 0)
+        lib_mock.sp_playlist_num_tracks.assert_called_with(sp_playlist)
+        self.assertEqual(lib_mock.sp_playlist_track.call_count, 0)
+
+    def test_tracks_if_unloaded(self, lib_mock):
+        lib_mock.sp_playlist_is_loaded.return_value = 0
+        sp_playlist = spotify.ffi.new('int *')
+        playlist = spotify.Playlist(sp_playlist=sp_playlist)
+
+        result = playlist.tracks
+
+        lib_mock.sp_playlist_is_loaded.assert_called_with(sp_playlist)
+        self.assertEqual(len(result), 0)
+
     def test_name(self, lib_mock):
         lib_mock.sp_playlist_name.return_value = spotify.ffi.new(
             'char[]', b'Foo Bar Baz')

@@ -68,7 +68,22 @@ class Playlist(object):
     # TODO add_callbacks()
     # TODO remove_callbacks()
 
-    # TODO tracks collection
+    @property
+    def tracks(self):
+        """The playlist's tracks.
+
+        Will always return an empty list if the search isn't loaded.
+        """
+        if not self.is_loaded:
+            return []
+        lib.sp_playlist_add_ref(self._sp_playlist)
+        return utils.Sequence(
+            sp_obj=ffi.gc(self._sp_playlist, lib.sp_playlist_release),
+            len_func=lib.sp_playlist_num_tracks,
+            getitem_func=(
+                lambda sp_playlist, key:
+                spotify.Track(
+                    sp_track=lib.sp_playlist_track(sp_playlist, key))))
 
     @property
     def name(self):

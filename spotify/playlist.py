@@ -350,6 +350,8 @@ class PlaylistContainer(object):
     def remove_playlist(self, index):
         """Remove playlist at the given index from the container."""
         # TODO Make available through __delitem__(index)
+        # TODO If removing a PlaylistFolder, make sure to remove the other end
+        # of the folder as well
         spotify.Error.maybe_raise(lib.sp_playlistcontainer_remove_playlist(
             self._sp_playlistcontainer, index))
 

@@ -15,7 +15,7 @@ install:
   - "pip install flake8 tox"
 
 script:
-  - "flake8 $(find . -iname '*.py')"
+  - "flake8 $(find * -iname '*.py')"
   - "tox -e $TOX_ENV"
 
 notifications:

@@ -513,6 +513,31 @@ class PlaylistContainerTest(unittest.TestCase):
         self.assertIsInstance(result, spotify.Playlist)
         self.assertEqual(result._sp_playlist, sp_playlist)
 
+    def test_getitem_with_slice(self, lib_mock):
+        lib_mock.sp_playlistcontainer_num_playlists.return_value = 3
+        sp_playlist = spotify.ffi.new('int *')
+        lib_mock.sp_playlistcontainer_playlist_type.side_effect = [
+            int(spotify.PlaylistType.PLAYLIST),
+            int(spotify.PlaylistType.PLAYLIST),
+            int(spotify.PlaylistType.PLAYLIST)]
+        lib_mock.sp_playlistcontainer_playlist.side_effect = [
+            sp_playlist, sp_playlist, sp_playlist]
+        sp_playlistcontainer = spotify.ffi.new('int *')
+        playlist_container = spotify.PlaylistContainer(
+            sp_playlistcontainer=sp_playlistcontainer)
+
+        result = playlist_container[0:2]
+
+        # Entire collection of length 3 is created as a list
+        self.assertEqual(lib_mock.sp_playlistcontainer_playlist.call_count, 3)
+        self.assertEqual(lib_mock.sp_playlist_add_ref.call_count, 3)
+
+        # Only a subslice of length 2 is returned
+        self.assertIsInstance(result, list)
+        self.assertEqual(len(result), 2)
+        self.assertEqual(result[0]._sp_playlist, sp_playlist)
+        self.assertEqual(result[1]._sp_playlist, sp_playlist)
+
     def test_getitem_with_folder(self, lib_mock):
         folder_name = 'foobar'
 

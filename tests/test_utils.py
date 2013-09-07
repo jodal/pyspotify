@@ -79,6 +79,28 @@ class SequenceTest(unittest.TestCase):
         self.assertEqual(result, mock.sentinel.item_one)
         getitem_func.assert_called_with(sp_search, 0)
 
+    def test_getitem_with_slice(self, lib_mock):
+        sp_search = spotify.ffi.new('int *')
+
+        getitem_func = mock.Mock()
+        getitem_func.side_effect = [
+            mock.sentinel.item_one,
+            mock.sentinel.item_two,
+            mock.sentinel.item_three,
+        ]
+        seq = utils.Sequence(sp_search, lambda x: 3, getitem_func)
+
+        result = seq[0:2]
+
+        # Entire collection of length 3 is created as a list
+        self.assertEqual(getitem_func.call_count, 3)
+
+        # Only a subslice of length 2 is returned
+        self.assertIsInstance(result, list)
+        self.assertEqual(len(result), 2)
+        self.assertEqual(result[0], mock.sentinel.item_one)
+        self.assertEqual(result[1], mock.sentinel.item_two)
+
     def test_getitem_raises_index_error_on_negative_index(self, lib_mock):
         sp_search = spotify.ffi.new('int *')
 

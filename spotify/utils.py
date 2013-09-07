@@ -123,9 +123,11 @@ class Sequence(collections.Sequence):
         return self._len_func(self._sp_obj)
 
     def __getitem__(self, key):
+        if isinstance(key, slice):
+            return list(self).__getitem__(key)
         if not isinstance(key, int):
             raise TypeError(
-                'list indices must be integers, not %s' %
+                'list indices must be int or slice, not %s' %
                 key.__class__.__name__)
         if not 0 <= key < self.__len__():
             raise IndexError('list index out of range')

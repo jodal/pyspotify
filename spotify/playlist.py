@@ -98,23 +98,8 @@ class Playlist(object):
         return utils.Sequence(
             sp_obj=ffi.gc(self._sp_playlist, lib.sp_playlist_release),
             len_func=lib.sp_playlist_num_tracks,
-            getitem_func=self._build_playlist_track)
-
-    def _build_playlist_track(self, sp_playlist, index):
-        track = spotify.Track(
-            sp_track=lib.sp_playlist_track(sp_playlist, index))
-        create_time = lib.sp_playlist_track_create_time(sp_playlist, index)
-        creator = spotify.User(
-            sp_user=lib.sp_playlist_track_creator(sp_playlist, index))
-        seen = bool(lib.sp_playlist_track_seen(sp_playlist, index))
-        message = lib.sp_playlist_track_message(sp_playlist, index)
-        if message == ffi.NULL:
-            message = None
-        else:
-            message = utils.to_unicode(message)
-        return PlaylistTrack(track, create_time, creator, seen, message)
-
-    # TODO track_set_seen()
+            getitem_func=(
+                lambda sp_playlist, key: PlaylistTrack(sp_playlist, key)))
 
     @property
     def name(self):
@@ -432,11 +417,52 @@ class PlaylistOfflineStatus(utils.IntEnum):
     pass
 
 
-class PlaylistTrack(collections.namedtuple(
-        'PlaylistTrack',
-        ['track', 'create_time', 'creator', 'seen', 'message'])):
-    """A playlist track with metadata specific to the playlist."""
-    pass
+class PlaylistTrack(object):
+    """A playlist track with metadata specific to the playlist.
+
+    Use :attr:`~spotify.Playlist.tracks_with_metadata` to get a list of
+    :class:`PlaylistTrack`.
+    """
+
+    def __init__(self, sp_playlist, index):
+        lib.sp_playlist_add_ref(sp_playlist)
+        self._sp_playlist = ffi.gc(sp_playlist, lib.sp_playlist_release)
+        self._index = index
+
+    @property
+    def track(self):
+        """The :class:`~spotify.Track`."""
+        return spotify.Track(
+            sp_track=lib.sp_playlist_track(self._sp_playlist, self._index))
+
+    @property
+    def create_time(self):
+        """When the track was added to the playlist, as seconds since Unix
+        epoch.
+        """
+        return lib.sp_playlist_track_create_time(
+            self._sp_playlist, self._index)
+
+    @property
+    def creator(self):
+        """The :class:`~spotify.User` that added the track to the playlist."""
+        return spotify.User(sp_user=lib.sp_playlist_track_creator(
+            self._sp_playlist, self._index))
+
+    @property
+    def seen(self):
+        """Whether the track is marked as seen or not."""
+        return bool(lib.sp_playlist_track_seen(self._sp_playlist, self._index))
+
+    # TODO track_set_seen()
+
+    @property
+    def message(self):
+        """A message attached to the track. Typically used in the inbox."""
+        message = lib.sp_playlist_track_message(self._sp_playlist, self._index)
+        if message == ffi.NULL:
+            return None
+        return utils.to_unicode(message)
 
 
 @utils.make_enum('SP_PLAYLIST_TYPE_')

@@ -295,17 +295,6 @@ Playlists
     :no-inherited-members:
 
 .. autoclass:: PlaylistTrack
-   :no-inherited-members:
-
-   .. autoattribute:: track
-
-   .. autoattribute:: create_time
-
-   .. autoattribute:: creator
-
-   .. autoattribute:: seen
-
-   .. autoattribute:: message
 
 .. autoclass:: PlaylistType
     :no-inherited-members:

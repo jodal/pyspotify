@@ -685,8 +685,6 @@ class PlaylistContainerTest(unittest.TestCase):
                 buffer_[i] = folder_name[i].encode('utf-8')
             return len(folder_name)
 
-        lib_mock.sp_session_remembered_user.side_effect = func
-
         lib_mock.sp_playlistcontainer_num_playlists.return_value = 3
         lib_mock.sp_playlistcontainer_playlist_type.side_effect = [
             int(spotify.PlaylistType.START_FOLDER),

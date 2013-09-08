@@ -449,12 +449,15 @@ class PlaylistTrack(object):
         return spotify.User(sp_user=lib.sp_playlist_track_creator(
             self._sp_playlist, self._index))
 
-    @property
-    def seen(self):
-        """Whether the track is marked as seen or not."""
+    def is_seen(self):
         return bool(lib.sp_playlist_track_seen(self._sp_playlist, self._index))
 
-    # TODO track_set_seen()
+    def set_seen(self, value):
+        spotify.Error.maybe_raise(lib.sp_playlist_track_set_seen(
+            self._sp_playlist, self._index, int(value)))
+
+    seen = property(is_seen, set_seen)
+    """Whether the track is marked as seen or not."""
 
     @property
     def message(self):

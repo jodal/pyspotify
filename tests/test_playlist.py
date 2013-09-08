@@ -1018,7 +1018,7 @@ class PlaylistTrackTest(unittest.TestCase):
         self.assertIsInstance(result, spotify.User)
         self.assertEqual(result._sp_user, sp_user)
 
-    def test_seen(self, lib_mock):
+    def test_is_seen(self, lib_mock):
         lib_mock.sp_playlist_track_seen.return_value = 0
         sp_playlist = spotify.ffi.new('int *')
         playlist_track = spotify.PlaylistTrack(sp_playlist, 0)
@@ -1027,6 +1027,26 @@ class PlaylistTrackTest(unittest.TestCase):
 
         lib_mock.sp_playlist_track_seen.assert_called_with(sp_playlist, 0)
         self.assertEqual(result, False)
+
+    def test_set_seen(self, lib_mock):
+        lib_mock.sp_playlist_track_set_seen.return_value = int(
+            spotify.ErrorType.OK)
+        sp_playlist = spotify.ffi.new('int *')
+        playlist_track = spotify.PlaylistTrack(sp_playlist, 0)
+
+        playlist_track.seen = True
+
+        lib_mock.sp_playlist_track_set_seen.assert_called_with(
+            sp_playlist, 0, 1)
+
+    def test_set_seen_fails_if_error(self, lib_mock):
+        lib_mock.sp_playlist_track_set_seen.return_value = int(
+            spotify.ErrorType.BAD_API_VERSION)
+        sp_playlist = spotify.ffi.new('int *')
+        playlist_track = spotify.PlaylistTrack(sp_playlist, 0)
+
+        self.assertRaises(
+            spotify.Error, setattr, playlist_track, 'seen', True)
 
     def test_message(self, lib_mock):
         lib_mock.sp_playlist_track_message.return_value = spotify.ffi.new(

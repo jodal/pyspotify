@@ -180,6 +180,10 @@ class Playlist(object):
         """
         return bool(lib.sp_playlist_has_pending_changes(self._sp_playlist))
 
+    # TODO add_tracks()
+    # TODO remove_tracks()
+    # TODO reorder_tracks()
+
     # TODO subscribers collection
 
     def is_in_ram(self):

@@ -180,7 +180,21 @@ class Playlist(object):
         """
         return bool(lib.sp_playlist_has_pending_changes(self._sp_playlist))
 
-    # TODO add_tracks()
+    def add_tracks(self, tracks, position=None):
+        """Add the given tracks to playlist at the given position.
+
+        ``tracks`` can either be a single :class:`~spotify.Track` or a list of
+        :class:`~spotify.Track` objects. If ``position`` isn't specified, the
+        tracks are added to the end of the playlist.
+        """
+        if isinstance(tracks, spotify.Track):
+            tracks = [tracks]
+        if position is None:
+            position = len(self.tracks)
+        lib.sp_playlist_add_tracks(
+            self._sp_playlist, [t._sp_track for t in tracks], len(tracks),
+            position, spotify.session_instance._sp_session)
+
     # TODO remove_tracks()
     # TODO reorder_tracks()
 

@@ -195,7 +195,18 @@ class Playlist(object):
             self._sp_playlist, [t._sp_track for t in tracks], len(tracks),
             position, spotify.session_instance._sp_session)
 
-    # TODO remove_tracks()
+    def remove_tracks(self, tracks):
+        """Remove the given tracks from the playlist.
+
+        ``tracks`` can be a single :class:`~spotify.Track` or a list of
+        :class:`~spotify.Track` objects.
+        """
+        if isinstance(tracks, spotify.Track):
+            tracks = [tracks]
+        tracks = list(set(tracks))  # Remove duplicates
+        spotify.Error.maybe_raise(lib.sp_playlist_remove_tracks(
+            self._sp_playlist, [t._sp_track for t in tracks], len(tracks)))
+
     # TODO reorder_tracks()
 
     # TODO subscribers collection

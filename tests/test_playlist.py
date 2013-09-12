@@ -433,6 +433,61 @@ class PlaylistTest(unittest.TestCase):
         lib_mock.sp_playlist_add_tracks.assert_called_with(
             sp_playlist, [sp_track], 1, 7, session._sp_session)
 
+    @mock.patch('spotify.track.lib', spec=spotify.lib)
+    def test_remove_tracks(self, track_lib_mock, lib_mock):
+        lib_mock.sp_playlist_remove_tracks.return_value = int(
+            spotify.ErrorType.OK)
+        sp_track1 = spotify.ffi.new('int *')
+        track1 = spotify.Track(sp_track=sp_track1)
+        sp_track2 = spotify.ffi.new('int *')
+        track2 = spotify.Track(sp_track=sp_track2)
+        sp_playlist = spotify.ffi.new('int *')
+        playlist = spotify.Playlist(sp_playlist=sp_playlist)
+
+        playlist.remove_tracks([track1, track2])
+
+        lib_mock.sp_playlist_remove_tracks.assert_called_with(
+            sp_playlist, [sp_track1, sp_track2], 2)
+
+    @mock.patch('spotify.track.lib', spec=spotify.lib)
+    def test_remove_tracks_with_a_single_track(self, track_lib_mock, lib_mock):
+        lib_mock.sp_playlist_remove_tracks.return_value = int(
+            spotify.ErrorType.OK)
+        sp_track = spotify.ffi.new('int *')
+        track = spotify.Track(sp_track=sp_track)
+        sp_playlist = spotify.ffi.new('int *')
+        playlist = spotify.Playlist(sp_playlist=sp_playlist)
+
+        playlist.remove_tracks(track)
+
+        lib_mock.sp_playlist_remove_tracks.assert_called_with(
+            sp_playlist, [sp_track], 1)
+
+    @mock.patch('spotify.track.lib', spec=spotify.lib)
+    def test_remove_tracks_with_duplicates(self, track_lib_mock, lib_mock):
+        lib_mock.sp_playlist_remove_tracks.return_value = int(
+            spotify.ErrorType.OK)
+        sp_track = spotify.ffi.new('int *')
+        track = spotify.Track(sp_track=sp_track)
+        sp_playlist = spotify.ffi.new('int *')
+        playlist = spotify.Playlist(sp_playlist=sp_playlist)
+
+        playlist.remove_tracks([track, track])
+
+        lib_mock.sp_playlist_remove_tracks.assert_called_with(
+            sp_playlist, [sp_track], 1)
+
+    @mock.patch('spotify.track.lib', spec=spotify.lib)
+    def test_remove_tracks_fails_if_error(self, track_lib_mock, lib_mock):
+        lib_mock.sp_playlist_remove_tracks.return_value = int(
+            spotify.ErrorType.PERMISSION_DENIED)
+        sp_track = spotify.ffi.new('int *')
+        track = spotify.Track(sp_track=sp_track)
+        sp_playlist = spotify.ffi.new('int *')
+        playlist = spotify.Playlist(sp_playlist=sp_playlist)
+
+        self.assertRaises(spotify.Error, playlist.remove_tracks, track)
+
     def test_is_in_ram(self, lib_mock):
         session = self.create_session(lib_mock)
         lib_mock.sp_playlist_is_in_ram.return_value = 1

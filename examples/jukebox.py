@@ -12,7 +12,7 @@ from spotify.audiosink import import_audio_sink
 from spotify.manager import (
     SpotifySessionManager, SpotifyPlaylistManager, SpotifyContainerManager)
 
-AudioSink = import_audio_sink()
+selected_sink = ()
 container_loaded = threading.Event()
 
 
@@ -393,23 +393,29 @@ class JukeboxContainerManager(SpotifyContainerManager):
         container_loaded.set()
 
     def playlist_added(self, c, p, i, u):
-        print 'Container: playlist "%s" added.' % p.name()
+        print "Container: playlist \"%s\" added." % p.name()
 
     def playlist_moved(self, c, p, oi, ni, u):
-        print 'Container: playlist "%s" moved.' % p.name()
+        print "Container: playlist \"%s\" moved." % p.name()
 
     def playlist_removed(self, c, p, i, u):
-        print 'Container: playlist "%s" removed.' % p.name()
+        print "Container: playlist \"%s\" removed." % p.name()
 
 
 class Jukebox(SpotifySessionManager):
     queued = False
     playlist = 2
     track = 0
-    appkey_file = os.path.join(os.path.dirname(__file__), 'spotify_appkey.key')
 
     def __init__(self, *a, **kw):
         SpotifySessionManager.__init__(self, *a, **kw)
+
+        try:
+            AudioSink = import_audio_sink(selected_sink)
+        except ImportError:
+            print "Selected audiosink failed to be imported, please try a different one"
+            sys.exit(1)
+
         self.audio = AudioSink(backend=self)
         self.ui = JukeboxUI(self)
         self.ctr = None
@@ -508,7 +514,14 @@ class Jukebox(SpotifySessionManager):
         self.audio.stop()
 
     def music_delivery_safe(self, *args, **kwargs):
-        return self.audio.music_delivery(*args, **kwargs)
+        try:
+            return self.audio.music_delivery(*args, **kwargs)
+        except IOError as e:
+            # TODO: Find way to terminate nicely, perhaps set a flag?
+            print e
+            print "Selected audio sink not functional - please try a different one"
+            print "The program will now get stuck, sorry! Try CTRL-Z and 'kill %1'"
+            return 0
 
     def next(self):
         self.stop()
@@ -596,14 +609,43 @@ class Jukebox(SpotifySessionManager):
         shell.interact()
 
 if __name__ == '__main__':
-    import optparse
-    op = optparse.OptionParser(version="%prog 0.1")
-    op.add_option("-u", "--username", help="Spotify username")
-    op.add_option("-p", "--password", help="Spotify password")
-    op.add_option(
-        "-v", "--verbose", help="Show debug information",
-        dest="verbose", action="store_true")
-    (options, args) = op.parse_args()
+    import argparse
+    import sys
+
+    audiosinks = {
+        'alsa': (('spotify.audiosink.gstreamer', 'GstreamerSink'),),
+        'oss': (('spotify.audiosink.oss', 'OssSink'),),
+        'portaudio': (('spotify.audiosink.portaudio', 'PortAudioSink'),),
+        'gstreamer': (('spotify.audiosink.gstreamer', 'GstreamerSink'),)
+    }
+
+    try:
+        # session.py will automagically try to load 'spotify_appkey.key' so this
+        # is just a test to catch this error early
+        appkey_file = os.path.join(os.path.dirname(__file__), 'spotify_appkey.key')
+        open(appkey_file).read()
+    except IOError:
+        print """ERROR: 'spotify_appkey.key' not present
+
+The file is needed to run """ + __file__ + """ example script
+Please go to https://developer.spotify.com/technologies/libspotify/keys/ and download
+the binary key and move it to the directory with the example code"""
+        sys.exit(-1)
+
+    parser = argparse.ArgumentParser(description='Example python code to show how to use pyspotify')
+    parser.add_argument('-a', '--audiosink', metavar='audiosink', help='Select audiosink.',
+        required=False, choices=['alsa', 'oss', 'portaudio', 'gstreamer'])
+    parser.add_argument('-u', '--username', metavar='username', help='Spotify username', required=False)
+    parser.add_argument('-p', '--password', metavar='password', help='Spotify password', required=False)
+    parser.add_argument('-v', '--verbose', action='store_true', help='Show debug information')
+    parser.add_argument('--version', action='version', version='%(prog)s 0.2')
+    options = parser.parse_args()
+
+    if options.audiosink is None:
+        selected_sink = audiosinks['gstreamer']
+    else:
+        selected_sink = audiosinks[options.audiosink]
+
     if options.verbose:
         logging.basicConfig(level=logging.DEBUG)
     session_m = Jukebox(options.username, options.password, True)

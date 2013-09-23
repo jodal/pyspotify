@@ -36,6 +36,20 @@ class JukeboxUI(cmd.Cmd, threading.Thread):
         finally:
             self.do_quit(None)
 
+    def validate_playlist(self, playlist):
+        if playlist < 0 or playlist > len(self.jukebox.ctr):
+            print """Invalid playlist, must be between 0 and %d""" % (len(self.jukebox.ctr) + 1),
+            return False
+        else:
+            return True
+
+    def validate_track(self, playlist, track):
+        if track < 0 or track > (len(self.jukebox.ctr[playlist]) - 1):
+            print "Invalid track, must be between 0 and %d " % len(self.jukebox.ctr[playlist])
+            return False
+        else:
+            return True
+
     def do_logout(self, line):
         """Logout and store username/password credentials"""
         self.jukebox.session.logout()
@@ -71,8 +85,7 @@ class JukeboxUI(cmd.Cmd, threading.Thread):
             except ValueError:
                 print "that's not a number!"
                 return
-            if p < 0 or p > len(self.jukebox.ctr):
-                print "That's out of range!"
+            if not self.validate_playlist(p):
                 return
             if p < len(self.jukebox.ctr):
                 playlist = self.jukebox.ctr[p]
@@ -100,32 +113,35 @@ class JukeboxUI(cmd.Cmd, threading.Thread):
         play [track_link]  - Play track_link
         play [playlist]  - Play all tracks from playlist
         play [playlist track]  - Play track from playlist"""
-        if not line:
-            self.jukebox.play()
-            return
-        try:
-            if line.startswith("spotify:"):
-                # spotify url
-                l = Link.from_string(line)
-                if not l.type() == Link.LINK_TRACK:
-                    print "You can only play tracks!"
-                    return
-                self.jukebox.load_track(l.as_track())
-            else:
-                try:
-                    playlist, track = map(int, line.split(' ', 1))
-                    self.jukebox.load(playlist, track)
-                except ValueError:
-                    try:
-                        playlist = int(line)
-                        self.jukebox.load_playlist(playlist)
-                    except ValueError:
-                        print("Usage: play [track_link] | "
-                              "[playlist] [track] | [playlist]")
+        if line:
+            try:
+                if line.startswith("spotify:"):
+                    # spotify url
+                    l = Link.from_string(line)
+                    if not l.type() == Link.LINK_TRACK:
+                        print "You can only play tracks!"
                         return
-        except SpotifyError as e:
-            print "Unable to load track:", e
-            return
+                    self.jukebox.load_track(l.as_track())
+                else:
+                    try:
+                        playlist, track = map(int, line.split(' ', 1))
+                        if not self.validate_playlist(playlist) or not self.validate_track(playlist, track):
+                            return
+
+                        self.jukebox.load(playlist, track)
+                    except ValueError:
+                        try:
+                            playlist = int(line)
+                            if not self.validate_playlist(playlist):
+                                return
+                            self.jukebox.load_playlist(playlist)
+                        except ValueError:
+                            print("Usage: play [track_link] | "
+                                  "[playlist] [track] | [playlist]")
+                            return
+            except SpotifyError as e:
+                print "Unable to load track:", e
+                return
         self.jukebox.play()
 
     def do_browse(self, line):
@@ -183,15 +199,20 @@ class JukeboxUI(cmd.Cmd, threading.Thread):
         queue - print queue
         queue [playlist track]  - queue 'track' from 'playlist' (both should be >=0)"""
         if not line:
-            for playlist, track in self.jukebox._queue:
-                print playlist, track
-            return
-        try:
-            playlist, track = map(int, line.split(' ', 1))
-        except ValueError:
-            print "Usage: play playlist track"
-            return
-        self.jukebox.queue(playlist, track)
+            if self.jukebox._queue:
+                for playlist, track in self.jukebox._queue:
+                    print playlist, track
+            else:
+                print "Queue empty"
+        else:
+            try:
+                playlist, track = map(int, line.split(' ', 1))
+                if not self.validate_playlist(playlist) or not self.validate_track(playlist, track):
+                    return
+                self.jukebox.queue(playlist, track)
+            except ValueError:
+                print "Usage: queue playlist track"
+                return
 
     def do_stop(self, line):
         """Stop playback"""
@@ -220,8 +241,7 @@ class JukeboxUI(cmd.Cmd, threading.Thread):
             except ValueError:
                 print "That's not a number!"
                 return
-            if p < 0 or p >= len(self.jukebox.ctr):
-                print "That's out of range!"
+            if not validate_playlist(p):
                 return
             self.jukebox.watch(self.jukebox.ctr[p])
 
@@ -333,8 +353,7 @@ class JukeboxUI(cmd.Cmd, threading.Thread):
             except ValueError:
                 print "that's not a number!"
                 return
-            if p < 0 or p + c > len(self.jukebox.ctr):
-                print "That's out of range!"
+            if not validate_playlist(p):
                 return
             for i in range(p + c - 1, p - 1, -1):
                 if self.jukebox.ctr[i].is_loaded():
@@ -491,11 +510,12 @@ class Jukebox(SpotifySessionManager):
         if self.playing:
             self._queue.append((playlist, track))
         else:
-            print 'Loading %s', track.name()
             self.load(playlist, track)
             self.play()
 
     def play(self):
+        if self.playing:
+            return
         self.audio.start()
         self.session.play(1)
         print "Playing"

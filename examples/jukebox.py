@@ -7,7 +7,7 @@ import os
 import threading
 import time
 
-from spotify import ArtistBrowser, Link, Playlist, ToplistBrowser, SpotifyError
+from spotify import ArtistBrowser, Link, Album, Playlist, ToplistBrowser, SpotifyError
 from spotify.audiosink import import_audio_sink
 from spotify.manager import (
     SpotifySessionManager, SpotifyPlaylistManager, SpotifyContainerManager)
@@ -37,16 +37,20 @@ class JukeboxUI(cmd.Cmd, threading.Thread):
             self.do_quit(None)
 
     def do_logout(self, line):
+        """Logout and store username/password credentials"""
         self.jukebox.session.logout()
 
     def do_quit(self, line):
+        """"Quit jukebox without saving credentials (use logout to save them)"""
         self.jukebox.stop()
         self.jukebox.disconnect()
         print "Goodbye!"
         return True
 
     def do_list(self, line):
-        """ List the playlists, or the contents of a playlist """
+        """Usage: list [playlist]
+        list  - List all playlists
+        list [playlist]  - List tracks in playlist"""
         if not line:
             i = -1
             for i, p in enumerate(self.jukebox.ctr):
@@ -56,10 +60,10 @@ class JukeboxUI(cmd.Cmd, threading.Thread):
                         name = "Starred by %s" % p.owner()
                     else:
                         name = p.name()
-                    print "%3d %s" % (i, name)
+                    print "%3d %-20s (%d tracks)" % (i, name, len(p))
                 else:
                     print "%3d %s" % (i, "loading...")
-            print "%3d Starred tracks" % (i + 1,)
+            print "%3d Starred tracks       (%d tracks)" % (i + 1, len(self.jukebox.starred))
 
         else:
             try:
@@ -70,11 +74,11 @@ class JukeboxUI(cmd.Cmd, threading.Thread):
             if p < 0 or p > len(self.jukebox.ctr):
                 print "That's out of range!"
                 return
-            print "Listing playlist #%d" % p
             if p < len(self.jukebox.ctr):
                 playlist = self.jukebox.ctr[p]
             else:
                 playlist = self.jukebox.starred
+            print "Listing playlist #%d (%s)" % (p, playlist.name())
             for i, t in enumerate(playlist):
                 if t.is_loaded():
                     print "%3d %s - %s [%s]" % (
@@ -91,6 +95,11 @@ class JukeboxUI(cmd.Cmd, threading.Thread):
         return duration
 
     def do_play(self, line):
+        """Usage: play [track_link] | [playlist track] | [playlist]
+        play  - Resume playback
+        play [track_link]  - Play track_link
+        play [playlist]  - Play all tracks from playlist
+        play [playlist track]  - Play track from playlist"""
         if not line:
             self.jukebox.play()
             return
@@ -120,8 +129,9 @@ class JukeboxUI(cmd.Cmd, threading.Thread):
         self.jukebox.play()
 
     def do_browse(self, line):
+        """Usage: browse spotify:<URI>  - browse album or artist URI"""
         if not line or not line.startswith("spotify:"):
-            print "Invalid id provided"
+            print "Usage: browse spotify:<URI>  - browse album or artist URI"
             return
         l = Link.from_string(line)
         if not l.type() in [Link.LINK_ALBUM, Link.LINK_ARTIST]:
@@ -129,7 +139,7 @@ class JukeboxUI(cmd.Cmd, threading.Thread):
             return
 
         def browse_finished(browser, userdata):
-            print "Browse finished, %s" % (userdata)
+            pass
 
         self.jukebox.browse(l, browse_finished)
 
@@ -147,23 +157,16 @@ class JukeboxUI(cmd.Cmd, threading.Thread):
             "Tracks not shown"
 
     def do_search(self, line):
+        """Usage: search [needle]
+        search  - print search status
+        search [needle]  - search for needle"""
         if not line:
             if self.results is False:
                 print "No search is in progress"
             elif self.results is None:
                 print "Searching is in progress"
             else:
-                print "Artists:"
-                for a in self.results.artists():
-                    print "    ", Link.from_artist(a), a.name()
-                print "Albums:"
-                for a in self.results.albums():
-                    print "    ", Link.from_album(a), a.name()
-                print "Tracks:"
-                for a in self.results.tracks():
-                    print "    ", Link.from_track(a, 0), a.name()
-                print "%d tracks not shown" % (
-                    self.results.total_tracks() - len(self.results.tracks()))
+                self.print_search_results()
         else:
             line = line.decode('utf-8')
             self.results = None
@@ -176,6 +179,9 @@ class JukeboxUI(cmd.Cmd, threading.Thread):
             self.jukebox.search(line, search_finished)
 
     def do_queue(self, line):
+        """Usage: queue [playlist track]
+        queue - print queue
+        queue [playlist track]  - queue 'track' from 'playlist' (both should be >=0)"""
         if not line:
             for playlist, track in self.jukebox._queue:
                 print playlist, track
@@ -188,22 +194,26 @@ class JukeboxUI(cmd.Cmd, threading.Thread):
         self.jukebox.queue(playlist, track)
 
     def do_stop(self, line):
+        """Stop playback"""
         self.jukebox.stop()
 
     def do_pause(self, line):
+        """Pause playback"""
         self.jukebox.pause()
 
     def do_next(self, line):
+        """Next track in queue"""
         self.jukebox.next()
 
     def emptyline(self):
         pass
 
     def do_watch(self, line):
+        """Usage: watch [playlist]  - enable notifications for tracks added, moved
+        or removed from the playlist."""
         if not line:
-            print """Usage: watch [playlist]
-You will be notified when tracks are added, moved or removed from the
-playlist."""
+            print """Usage: watch [playlist]  - enable notifications for tracks added, moved
+            or removed from the playlist."""
         else:
             try:
                 p = int(line)
@@ -216,6 +226,7 @@ playlist."""
             self.jukebox.watch(self.jukebox.ctr[p])
 
     def do_unwatch(self, line):
+        """Usage: unwatch [playlist]  - disable notifications on playlist"""
         if not line:
             print "Usage: unwatch [playlist]"
         else:
@@ -224,12 +235,12 @@ playlist."""
             except ValueError:
                 print "That's not a number!"
                 return
-            if p < 0 or p >= len(self.jukebox.ctr):
-                print "That's out of range!"
+            if not validate_playlist(p):
                 return
             self.jukebox.watch(self.jukebox.ctr[p], True)
 
     def do_get_offline_status(self, line):
+        """Usage: get_offline_status [playlist]"""
         if not line:
             print "Usage: get_offline_status [playlist]"
         else:
@@ -238,12 +249,12 @@ playlist."""
             except ValueError:
                 print "That's not a number!"
                 return
-            if p < 0 or p >= len(self.jukebox.ctr):
-                print "That's out of range!"
+            if not validate_playlist(p):
                 return
             self.jukebox.get_offline_status(self.jukebox.ctr[p])
 
     def do_set_offline_on(self, line):
+        """Usage: set_offline_on [playlist]"""
         if not line:
             print "Usage: set_offline_on [playlist]"
         else:
@@ -252,26 +263,26 @@ playlist."""
             except ValueError:
                 print "That's not a number!"
                 return
-            if p < 0 or p >= len(self.jukebox.ctr):
-                print "That's out of range!"
+            if not validate_playlist(p):
                 return
             self.jukebox.set_offline_mode(self.jukebox.ctr[p], True)
 
     def do_set_offline_off(self, line):
+        """Usage: set_offline_off [playlist]  - remove playlist from offline cache"""
         if not line:
-            print "Usage: set_offline_off [playlist]"
+            print "Usage: set_offline_off [playlist]  - remove playlist from offline cache"
         else:
             try:
                 p = int(line)
             except ValueError:
                 print "That's not a number!"
                 return
-            if p < 0 or p >= len(self.jukebox.ctr):
-                print "That's out of range!"
+            if not validate_playlist(p):
                 return
             self.jukebox.set_offline_mode(self.jukebox.ctr[p], False)
 
     def do_get_offline_download_completed(self, line):
+        """Usage: set_offline_off [playlist]"""
         if not line:
             print "Usage: set_offline_off [playlist]"
         else:
@@ -280,13 +291,13 @@ playlist."""
             except ValueError:
                 print "That's not a number!"
                 return
-            if p < 0 or p >= len(self.jukebox.ctr):
-                print "That's out of range!"
+            if not validate_playlist(p):
                 return
             self.jukebox.get_offline_download_completed(self.jukebox.ctr[p])
 
     def do_toplist(self, line):
-        usage = "Usage: toplist (albums|artists|tracks) (GB|FR|..|all|current)"
+        """Usage: toplist (albums|artists|tracks) (GB|FR|..|all|current)"""
+        usage = """Usage: toplist (albums|artists|tracks) (GB|FR|..|all|current)"""
         if not line:
             print usage
         else:
@@ -297,9 +308,11 @@ playlist."""
                 self.jukebox.toplist(*args)
 
     def do_shell(self, line):
+        """Drop into a python shell for debugging"""
         self.jukebox.shell()
 
     def do_add_new_playlist(self, line):
+        """Usage: add_new_playlist <name>"""
         if not line:
             print "Usage: add_new_playlist <name>"
         else:
@@ -307,6 +320,7 @@ playlist."""
                 line.decode('utf-8'))
 
     def do_remove_playlist(self, line):
+        """Usage: remove_playlist <index> [<count>]"""
         if not line:
             print "Usage: remove_playlist <index> [<count>]"
         else:
@@ -330,8 +344,10 @@ playlist."""
                 c = c-1
 
     def do_add_to_playlist(self, line):
-        usage = "Usage: add_to_playlist <playlist_index> <insert_point>" + \
-                " <search_result_indecies>"
+        """Usage: add_to_playlist <playlist_index> <insert_point>
+                <search_result_indecies>  - add search results to playlist"""
+        usage = """Usage: add_to_playlist <playlist_index> <insert_point>
+                <search_result_indecies>  - add search results to playlist"""
         if not line:
             print usage
             return
@@ -360,16 +376,16 @@ playlist."""
 
 class JukeboxPlaylistManager(SpotifyPlaylistManager):
     def tracks_added(self, p, t, i, u):
-        print 'Tracks added to playlist %s' % p.name()
+        print "Tracks added to playlist %s" % p.name()
 
     def tracks_moved(self, p, t, i, u):
-        print 'Tracks moved in playlist %s' % p.name()
+        print "Tracks moved in playlist %s" % p.name()
 
     def tracks_removed(self, p, t, u):
-        print 'Tracks removed from playlist %s' % p.name()
+        print "Tracks removed from playlist %s" % p.name()
 
     def playlist_renamed(self, p, u):
-        print 'Playlist renamed to %s' % p.name()
+        print "Playlist renamed to %s" % p.name()
 
 
 class JukeboxContainerManager(SpotifyContainerManager):
@@ -501,27 +517,51 @@ class Jukebox(SpotifySessionManager):
             self.load(*t)
             self.play()
         else:
+            print "Queue empty, stopping playback"
             self.stop()
 
     def end_of_track(self, sess):
+        print "Track end"
         self.audio.end_of_track()
 
     def search(self, *args, **kwargs):
         self.session.search(*args, **kwargs)
+
+    def get_album_type(self, album):
+        album_type = {
+            Album.ALBUM: "Album",
+            Album.SINGLE: "Single",
+            Album.COMPILATION: "Compilation",
+            Album.UNKNOWN: "(?)"
+        }
+        return album_type[album.type()]
 
     def browse(self, link, callback):
         if link.type() == link.LINK_ALBUM:
             browser = self.session.browse_album(link.as_album(), callback)
             while not browser.is_loaded():
                 time.sleep(0.1)
+            print "Tracks: ({count})".format(count=len(browser))
             for track in browser:
-                print track.name()
+                print "  {name:<20} | {link}  ".format(link=Link.from_track(track), name=track.name())
+
         if link.type() == link.LINK_ARTIST:
             browser = ArtistBrowser(link.as_artist())
             while not browser.is_loaded():
                 time.sleep(0.1)
-            for album in browser:
-                print album.name()
+            print "=== Top 10 tracks:"
+            for i, track in enumerate(browser.tophit_tracks()):
+                if i >= 10:
+                    break
+                print "{0:>3d} {name:<25} ({duration}) {link})".format(i + 1, link=Link.from_track(track), name=track.name(), duration=self.ui.pretty_duration(track.duration()))
+            print "=== Albums:"
+            print " Name            | Year | Tracks | Type        | Spotify URI"
+            print "--------------------------------------------------------------------------------"
+            for album in browser.albums():
+                album_browser = self.session.browse_album(album, callback)
+                while not album_browser.is_loaded():
+                    time.sleep(0.1)
+                print " {name:<15} | {year} | {count:<6d} | {type:<11} | {link}".format(link=Link.from_album(album), name=album.name(), count=len(album_browser), year=album.year(), type=self.get_album_type(album))
 
     def watch(self, p, unwatch=False):
         if not unwatch:
@@ -537,7 +577,7 @@ class Jukebox(SpotifySessionManager):
 
         def callback(tb, ud):
             for i in xrange(len(tb)):
-                print '%3d: %s' % (i+1, tb[i].name())
+                print "%3d: %s" % (i+1, tb[i].name())
 
         ToplistBrowser(tl_type, tl_region, callback)
 

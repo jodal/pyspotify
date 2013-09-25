@@ -6,6 +6,7 @@ import logging
 import os
 import threading
 import time
+import signal
 
 from spotify import ArtistBrowser, Link, Album, Playlist, ToplistBrowser, \
     SpotifyError
@@ -554,6 +555,7 @@ class Jukebox(SpotifySessionManager):
                   "one")
             print("The program will now get stuck, sorry! Try CTRL-Z and"
                   "'kill %1'")
+            os.kill(os.getpid(), signal.SIGINT)
             return 0
 
     def next(self):
@@ -651,6 +653,14 @@ Spotify URI")
         shell = code.InteractiveConsole(globals())
         shell.interact()
 
+    def kill(self, signum, frame):
+        print("KILL1:", signum, frame)
+        self.stop()
+        print("KILL2:", signum, frame)
+        self.disconnect()
+        print("KILL3:", signum, frame)
+        sys.exit(1)
+
 if __name__ == '__main__':
     import argparse
     import sys
@@ -674,7 +684,7 @@ if __name__ == '__main__':
 The file is needed to run """ + __file__ + """ example script
 Please go to https://developer.spotify.com/technologies/libspotify/keys/ and
 download the binary key and move it to the directory with the example code""")
-        sys.exit(-1)
+        sys.exit(1)
 
     parser = argparse.ArgumentParser(description='Example code showing how '
                                      'to use pyspotify')
@@ -698,4 +708,5 @@ download the binary key and move it to the directory with the example code""")
     if options.verbose:
         logging.basicConfig(level=logging.DEBUG)
     session_m = Jukebox(options.username, options.password, True)
+    signal.signal(signal.SIGINT, session_m.kill)
     session_m.connect()

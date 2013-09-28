@@ -168,13 +168,13 @@ class JukeboxUI(cmd.Cmd, threading.Thread):
     def print_search_results(self):
         print('Artists:')
         for a in self.results.artists():
-            print('    ', Link.from_artist(a), a.name())
+            print('    {} {}'.format(Link.from_artist(a), a.name()))
         print('Albums:')
         for a in self.results.albums():
-            print('    ', Link.from_album(a), a.name())
+            print('    {} {}'.format(Link.from_album(a), a.name()))
         print('Tracks:')
         for a in self.results.tracks():
-            print('    ', Link.from_track(a), a.name())
+            print('    {} {}'.format(Link.from_track(a), a.name()))
         print(self.results.total_tracks() - len(self.results.tracks()),
               'Tracks not shown')
 
@@ -449,9 +449,17 @@ class Jukebox(SpotifySessionManager):
         self.ctr = None
         self.playing = False
         self._queue = []
+        self.logfile = open('log.txt', 'w', 0)
         self.playlist_manager = JukeboxPlaylistManager()
         self.container_manager = JukeboxContainerManager()
         print('Logging in, please wait...')
+
+    def write_log(self, logstring):
+        self.logfile.write(logstring)
+
+    def close_log(self):
+        if not self.logfile.closed:
+            self.logfile.close()
 
     def logged_in(self, session, error):
         if error:
@@ -465,7 +473,18 @@ class Jukebox(SpotifySessionManager):
             self.ui.start()
 
     def logged_out(self, session):
+        self.close_log()
         print('Logged out!')
+
+    def play_token_lost(self, session):
+        print('Same account used elsewhere, stopping playback')
+        self.stop()
+
+    def credentials_blob_updated(self, session, blob):
+        self.write_log('Credentials blob updated: {}\n'.format(blob))
+
+    def log_message(self, session, logmessage):
+        self.write_log('Spotify log: {}'.format(logmessage))
 
     def load_track(self, track):
         print('Loading track...')
@@ -503,8 +522,9 @@ class Jukebox(SpotifySessionManager):
             pl = self.starred
         print('Loading playlist "{}"'.format(pl.name()))
         if len(pl):
-            print('Loading {} from "{}"'.format((pl[0].name(), pl.name())))
+            print('Loading "{}" from "{}"'.format(pl[0].name(), pl.name()))
             self.session.load(pl[0])
+        print("Queueing remaining {} tracks".format(len(pl) - 1))
         for i, track in enumerate(pl):
             if i == 0:
                 continue

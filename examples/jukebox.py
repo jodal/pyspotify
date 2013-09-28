@@ -490,7 +490,9 @@ class Jukebox(SpotifySessionManager):
             pl = self.starred
         spot_track = pl[track]
         self.session.load(spot_track)
-        print('Loading {} from {}'.format(spot_track.name(), pl.name()))
+        print('Loading "{} - {}"" from {}'.format(spot_track.artists()[0],
+                                                  spot_track.name(),
+                                                  pl.name()))
 
     def load_playlist(self, playlist):
         if self.playing:
@@ -520,20 +522,20 @@ class Jukebox(SpotifySessionManager):
             return
         self.audio.start()
         self.session.play(1)
-        print('Playing')
         self.playing = True
+        print('Playing')
 
     def pause(self):
-        self.session.play(0)
-        print('Pausing')
         self.playing = False
+        self.session.play(0)
         self.audio.pause()
+        print('Pausing')
 
     def stop(self):
-        self.session.play(0)
-        print('Stopping')
         self.playing = False
+        self.session.play(0)
         self.audio.stop()
+        print('Stopping')
 
     def music_delivery_safe(self, *args, **kwargs):
         try:

@@ -481,10 +481,18 @@ class Jukebox(SpotifySessionManager):
         self.stop()
 
     def credentials_blob_updated(self, session, blob):
+        with open('spotify_cred_blob.txt', 'w') as cred_file:
+            cred_file.write(blob)
         self.write_log('Credentials blob updated: {}\n'.format(blob))
 
     def log_message(self, session, logmessage):
-        self.write_log('Spotify log: {}'.format(logmessage))
+        self.write_log('Spotify: {}'.format(logmessage))
+
+    def connection_error(self, session, logmessage):
+        self.write_log('Error: {}'.format(logmessage))
+
+    def message_to_user(self, session, logmessage):
+        self.write_log('User: {}'.format(logmessage))
 
     def load_track(self, track):
         print('Loading track...')
@@ -574,6 +582,8 @@ class Jukebox(SpotifySessionManager):
         self.stop()
         if self._queue:
             t = self._queue.pop(0)
+            print('Queue popped: {} - in queue: {}'.format(t,
+                                                           len(self._queue)))
             self.load(*t)
             self.play()
         else:
@@ -665,17 +675,14 @@ Spotify URI')
         shell = code.InteractiveConsole(globals())
         shell.interact()
 
-    def kill(self, signum, frame):
-        print('KILL1:', signum, frame)
-        self.stop()
-        print('KILL2:', signum, frame)
-        self.disconnect()
-        print('KILL3:', signum, frame)
-        sys.exit(1)
-
 if __name__ == '__main__':
     import argparse
     import sys
+
+    appkey_available = False
+    user_arg_required = False
+    pass_arg_required = False
+    blob = ''
 
     audiosinks = {
         'alsa': (('spotify.audiosink.gstreamer', 'GstreamerSink'),),
@@ -687,38 +694,53 @@ if __name__ == '__main__':
     try:
         # session.py will automagically try to load 'spotify_appkey.key' so
         # this is just a test to catch this error early
-        appkey_file = os.path.join(os.path.dirname(__file__),
-                                   'spotify_appkey.key')
-        open(appkey_file).read()
+        if b'appkey_good' not in open('spotify_appkey.key').read():
+            print("We have a non-dummy appkey!")
+            appkey_available = True
     except IOError:
         print("""ERROR: 'spotify_appkey.key' not present
 
 The file is needed to run """ + __file__ + """ example script
 Please go to https://developer.spotify.com/technologies/libspotify/keys/ and
 download the binary key and move it to the directory with the example code""")
-        sys.exit(1)
+
+        with open('spotify_cred_blob.txt') as cred_file:
+            blob = cred_file.read()
+            print("blob: {}".format(blob))
+
+#        sys.exit(1)
 
     parser = argparse.ArgumentParser(description='Example code showing how '
                                      'to use pyspotify')
     parser.add_argument('-a', '--audiosink', metavar='audiosink',
                         help='Select audiosink.', required=False,
                         choices=audiosinks.keys())
-    parser.add_argument('-u', '--username', metavar='username',
-                        help='Spotify username', required=False)
-    parser.add_argument('-p', '--password', metavar='password',
-                        help='Spotify password', required=False)
+    parser.add_argument('-r', '--remember-me', action='store_true',
+                        help='Save login details')
     parser.add_argument('-v', '--verbose', action='store_true',
                         help='Show debug information')
     parser.add_argument('--version', action='version', version='%(prog)s 0.2')
+
+    if appkey_available is False:
+        user_arg_required = True
+        if blob is '':
+            pass_arg_required = True
+
+    parser.add_argument('-u', '--username', metavar='username',
+                        help='Spotify username', required=user_arg_required)
+    parser.add_argument('-p', '--password', metavar='password',
+                        help='Spotify password', required=pass_arg_required)
     options = parser.parse_args()
 
     if options.audiosink is None:
-        selected_sink = audiosinks['gstreamer']
+        selected_sink = audiosinks['alsa']
     else:
         selected_sink = audiosinks[options.audiosink]
 
     if options.verbose:
         logging.basicConfig(level=logging.DEBUG)
-    session_m = Jukebox(options.username, options.password, True)
-    signal.signal(signal.SIGINT, session_m.kill)
+    session_m = Jukebox(username=options.username,
+                        password=options.password,
+                        remember_me=False,
+                        login_blob=blob)
     session_m.connect()

@@ -6,6 +6,7 @@ env:
   - TOX_ENV=py33
   # TODO Activate when Travis has PyPy 2.x
   #- TOX_ENV=pypy
+  - TOX_ENV=docs
 
 install:
   - "wget -O - http://apt.mopidy.com/mopidy.gpg | sudo apt-key add -"

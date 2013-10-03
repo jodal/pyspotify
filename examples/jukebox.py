@@ -61,6 +61,7 @@ class JukeboxUI(cmd.Cmd, threading.Thread):
     def do_quit(self, line):
         """"Quit jukebox without saving credentials (use logout to"""
         """save them)"""
+        self.do_logout(None)
         self.jukebox.stop()
         self.jukebox.disconnect()
         print('Goodbye!')
@@ -77,9 +78,10 @@ class JukeboxUI(cmd.Cmd, threading.Thread):
                     if (isinstance(p, Playlist) and
                             Link.from_playlist(p).type() == Link.LINK_STARRED):
                         name = "Starred by {}".format(p.owner())
+                        print('{:>3d} {:<20}'.format(i, name))
                     else:
                         name = p.name()
-                    print('{:>3d} {:>20} ({} tracks)'.format(i, name, len(p)))
+                        print('{:>3d} {:<20} ({} tracks)'.format(i, name, len(p)))
                 else:
                     print('{:>3d} loading...'.format(i))
             s = '{:>3d} Starred tracks       ({} tracks)'
@@ -109,7 +111,7 @@ class JukeboxUI(cmd.Cmd, threading.Thread):
         seconds = milliseconds // 1000
         minutes = seconds // 60
         seconds = seconds % 60
-        duration = '%02d:%02d' % (minutes, seconds)
+        duration = '{:02d}:{:02d}'.format(minutes, seconds)
         return duration
 
     def do_play(self, line):
@@ -423,10 +425,10 @@ class JukeboxContainerManager(SpotifyContainerManager):
         container_loaded.set()
 
     def playlist_added(self, c, p, i, u):
-        print('Container: playlist "%s" added.'.format(p.name()))
+        print('Container: playlist "{}" added.'.format(p.name()))
 
     def playlist_moved(self, c, p, oi, ni, u):
-        print('Container: playlist "%s" moved.'.format(p.name()))
+        print('Container: playlist "{}" moved.'.format(p.name()))
 
     def playlist_removed(self, c, p, i, u):
         print('Container: playlist "{}" removed.'.format(p.name()))
@@ -517,7 +519,7 @@ class Jukebox(SpotifySessionManager):
             pl = self.starred
         spot_track = pl[track]
         self.session.load(spot_track)
-        print('Loading "{} - {}"" from {}'.format(spot_track.artists()[0],
+        print('Loading "{} - {}" from {}'.format(spot_track.artists()[0],
                                                   spot_track.name(),
                                                   pl.name()))
 
@@ -573,17 +575,12 @@ class Jukebox(SpotifySessionManager):
             print(e)
             print('Selected audio sink not functional - please try a different'
                   'one')
-            print('The program will now get stuck, sorry! Try CTRL-Z and'
-                  '"kill %1"')
-            os.kill(os.getpid(), signal.SIGINT)
             return 0
 
     def next(self):
         self.stop()
         if self._queue:
             t = self._queue.pop(0)
-            print('Queue popped: {} - in queue: {}'.format(t,
-                                                           len(self._queue)))
             self.load(*t)
             self.play()
         else:
@@ -700,15 +697,15 @@ if __name__ == '__main__':
     except IOError:
         print("""ERROR: 'spotify_appkey.key' not present
 
-The file is needed to run """ + __file__ + """ example script
+The file is needed to run this example script
 Please go to https://developer.spotify.com/technologies/libspotify/keys/ and
 download the binary key and move it to the directory with the example code""")
 
+        # Longer term, allow user to login with username+blob
         with open('spotify_cred_blob.txt') as cred_file:
             blob = cred_file.read()
             print("blob: {}".format(blob))
-
-#        sys.exit(1)
+        sys.exit(1)
 
     parser = argparse.ArgumentParser(description='Example code showing how '
                                      'to use pyspotify')

@@ -447,7 +447,11 @@ class PlaylistTest(unittest.TestCase):
         playlist.remove_tracks([track1, track2])
 
         lib_mock.sp_playlist_remove_tracks.assert_called_with(
-            sp_playlist, [sp_track1, sp_track2], 2)
+            sp_playlist, mock.ANY, 2)
+        self.assertIn(
+            sp_track1, lib_mock.sp_playlist_remove_tracks.call_args[0][1])
+        self.assertIn(
+            sp_track2, lib_mock.sp_playlist_remove_tracks.call_args[0][1])
 
     @mock.patch('spotify.track.lib', spec=spotify.lib)
     def test_remove_tracks_with_a_single_track(self, track_lib_mock, lib_mock):

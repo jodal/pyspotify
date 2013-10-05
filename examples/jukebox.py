@@ -5,10 +5,8 @@ from __future__ import unicode_literals
 
 import cmd
 import logging
-import os
 import threading
 import time
-import signal
 
 from spotify import ArtistBrowser, Link, Album, Playlist, ToplistBrowser, \
     SpotifyError
@@ -59,8 +57,8 @@ class JukeboxUI(cmd.Cmd, threading.Thread):
         self.jukebox.session.logout()
 
     def do_quit(self, line):
-        """"Quit jukebox without saving credentials (use logout to"""
-        """save them)"""
+        """"Quit jukebox without saving credentials (use logout to
+        save them)"""
         self.do_logout(None)
         self.jukebox.stop()
         self.jukebox.disconnect()
@@ -81,7 +79,8 @@ class JukeboxUI(cmd.Cmd, threading.Thread):
                         print('{:>3d} {:<20}'.format(i, name))
                     else:
                         name = p.name()
-                        print('{:>3d} {:<20} ({} tracks)'.format(i, name, len(p)))
+                        print('{:>3d} {:<20} ({} tracks)'.format(i, name,
+                              len(p)))
                 else:
                     print('{:>3d} loading...'.format(i))
             s = '{:>3d} Starred tracks       ({} tracks)'
@@ -145,7 +144,7 @@ class JukeboxUI(cmd.Cmd, threading.Thread):
                             self.jukebox.load_playlist(playlist)
                         except ValueError:
                             print('Usage: play [track_link] | '
-                                  '[playlist] [track] | [playlist]')
+                                  '[playlist track] | [playlist]')
                             return
             except SpotifyError as e:
                 print('Unable to load track:', e)
@@ -204,7 +203,8 @@ class JukeboxUI(cmd.Cmd, threading.Thread):
 
     def do_queue(self, line):
         """Usage: queue [playlist track]
-        queue - print queue
+        queue  - print queue
+        queue clear  - clear queue
         queue [playlist track]  - queue 'track' from 'playlist' \
 (both should be >=0)"""
         if not line:
@@ -214,15 +214,19 @@ class JukeboxUI(cmd.Cmd, threading.Thread):
             else:
                 print('Queue empty')
         else:
-            try:
-                playlist, track = map(int, line.split(' ', 1))
-                if (not self.validate_playlist(playlist) or
-                        not self.validate_track(playlist, track)):
+            if line == "clear":
+                self.jukebox._queue = []
+                print('Queue cleared')
+            else:
+                try:
+                    playlist, track = map(int, line.split(' ', 1))
+                    if (not self.validate_playlist(playlist) or
+                            not self.validate_track(playlist, track)):
+                        return
+                    self.jukebox.queue(playlist, track)
+                except ValueError:
+                    print('Usage: queue playlist track')
                     return
-                self.jukebox.queue(playlist, track)
-            except ValueError:
-                print('Usage: queue playlist track')
-                return
 
     def do_stop(self, line):
         """Stop playback"""
@@ -518,10 +522,14 @@ class Jukebox(SpotifySessionManager):
         elif playlist == len(self.ctr):
             pl = self.starred
         spot_track = pl[track]
-        self.session.load(spot_track)
-        print('Loading "{} - {}" from {}'.format(spot_track.artists()[0],
-                                                  spot_track.name(),
-                                                  pl.name()))
+        try:
+            self.session.load(spot_track)
+            print('Loading "{} - {}" from {}'.format(spot_track.artists()[0],
+                                                     spot_track.name(),
+                                                     pl.name()))
+        except SpotifyError as e:
+            print('Unable to load track: {}'.format(e))
+            print('Skipping track - continue playing')
 
     def load_playlist(self, playlist):
         if self.playing:
@@ -677,8 +685,6 @@ if __name__ == '__main__':
     import sys
 
     appkey_available = False
-    user_arg_required = False
-    pass_arg_required = False
     blob = ''
 
     audiosinks = {
@@ -692,7 +698,7 @@ if __name__ == '__main__':
         # session.py will automagically try to load 'spotify_appkey.key' so
         # this is just a test to catch this error early
         if b'appkey_good' not in open('spotify_appkey.key').read():
-            print("We have a non-dummy appkey!")
+            print("Appkey present...")
             appkey_available = True
     except IOError:
         print("""ERROR: 'spotify_appkey.key' not present
@@ -700,12 +706,16 @@ if __name__ == '__main__':
 The file is needed to run this example script
 Please go to https://developer.spotify.com/technologies/libspotify/keys/ and
 download the binary key and move it to the directory with the example code""")
+        sys.exit(1)
 
-        # Longer term, allow user to login with username+blob
+    try:
+        # Allow user to login with username+blob
         with open('spotify_cred_blob.txt') as cred_file:
             blob = cred_file.read()
-            print("blob: {}".format(blob))
-        sys.exit(1)
+    except IOError:
+        print("""Info: 'spotify_cred_blob.txt' not present
+            Must have previously used "-r" (see help) or must have
+            username+password or username+credentials blob""")
 
     parser = argparse.ArgumentParser(description='Example code showing how '
                                      'to use pyspotify')
@@ -718,15 +728,10 @@ download the binary key and move it to the directory with the example code""")
                         help='Show debug information')
     parser.add_argument('--version', action='version', version='%(prog)s 0.2')
 
-    if appkey_available is False:
-        user_arg_required = True
-        if blob is '':
-            pass_arg_required = True
-
     parser.add_argument('-u', '--username', metavar='username',
-                        help='Spotify username', required=user_arg_required)
+                        help='Spotify username', required=False)
     parser.add_argument('-p', '--password', metavar='password',
-                        help='Spotify password', required=pass_arg_required)
+                        help='Spotify password', required=False)
     options = parser.parse_args()
 
     if options.audiosink is None:
@@ -738,6 +743,6 @@ download the binary key and move it to the directory with the example code""")
         logging.basicConfig(level=logging.DEBUG)
     session_m = Jukebox(username=options.username,
                         password=options.password,
-                        remember_me=False,
+                        remember_me=True,
                         login_blob=blob)
     session_m.connect()

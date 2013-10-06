@@ -30,10 +30,10 @@ v1.12 (UNRELEASED)
   Alternatively, you can use ``fab test`` to build *pyspotify* and run the
   tests.
 
-- Jukebox example code cleaned up.
-  Has better error handling, and you can select audio sink
-  Changed to argparse (requires Python >=2.7)
-  Please use '-?' to get more information.
+- Jukebox example code cleaned up. It now has better error handling and you
+  can select the audio sink to use. Changed to using argparse (requires
+  Python >= 2.7). Please use the ``-?`` command line option to get more
+  information.
 
 v1.11 (2013-07-01)
 ==================

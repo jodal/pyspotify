@@ -20,7 +20,7 @@ script:
   - "tox -e $TOX_ENV"
 
 after_success:
-  - "if [ $TOXENV == 'py27' ]; then pip install coveralls; coveralls; fi"
+  - "if [ $TOX_ENV == 'py27' ]; then pip install coveralls; coveralls; fi"
 
 notifications:
   irc:

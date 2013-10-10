@@ -2,8 +2,17 @@
 pyspotify
 =========
 
+.. image:: https://pypip.in/v/pyspotify/badge.png
+    :target: https://crate.io/packages/pyspotify/
+    :alt: Latest PyPI version
+
+.. image:: https://pypip.in/d/pyspotify/badge.png
+    :target: https://crate.io/packages/pyspotify/
+    :alt: Number of PyPI downloads
+
 .. image:: https://travis-ci.org/mopidy/pyspotify.png?branch=develop
     :target: https://travis-ci.org/mopidy/pyspotify
+    :alt: Travis CI build status
 
 pyspotify provides a Python interface to `Spotify's <http://www.spotify.com/>`_
 online music streaming service.

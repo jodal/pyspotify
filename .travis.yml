@@ -19,6 +19,9 @@ install:
 script:
   - "tox -e $TOX_ENV"
 
+after_success:
+  - "if [ $TOXENV == 'py27' ]; then pip install coveralls; coveralls; fi"
+
 notifications:
   irc:
     channels:

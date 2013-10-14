@@ -23,6 +23,12 @@ else:
 
 
 class IntEnum(int):
+    """An enum type for values mapping to integers.
+
+    Tries to stay as close as possible to the enum type specified in
+    :pep:`435`, to be included in Python 3.4.
+    """
+
     def __new__(cls, value):
         if not hasattr(cls, '_values'):
             cls._values = {}
@@ -44,6 +50,14 @@ class IntEnum(int):
 
 
 def make_enum(lib_prefix, enum_prefix=''):
+    """Class decorator for automatically adding enum values.
+
+    The values are read directly from the :attr:`spotify.lib` CFFI wrapper
+    around libspotify. All values starting with ``lib_prefix`` are added. The
+    ``lib_prefix`` is stripped from the name. Optionally, ``enum_prefix`` can
+    be specified to add a prefix to all the names.
+    """
+
     def wrapper(cls):
         for attr in dir(lib):
             if attr.startswith(lib_prefix):
@@ -54,6 +68,13 @@ def make_enum(lib_prefix, enum_prefix=''):
 
 
 def get_with_fixed_buffer(buffer_length, func, *args):
+    """Get a unicode string from a C function that takes a fixed-size buffer.
+
+    The C function ``func`` is called with any arguments given in ``args``, a
+    buffer of the given ``buffer_length``, and ``buffer_length``.
+
+    Returns the buffer's value decoded from UTF-8 to a unicode string.
+    """
     func = functools.partial(func, *args)
     buffer_ = ffi.new('char[%d]' % buffer_length)
     func(buffer_, buffer_length)
@@ -61,6 +82,17 @@ def get_with_fixed_buffer(buffer_length, func, *args):
 
 
 def get_with_growing_buffer(func, *args):
+    """Get a unicode string from a C function that returns the buffer size
+    needed to return the full string.
+
+    The C function ``func`` is called with any arguments given in ``args``, a
+    buffer of fixed size, and the buffer size. If the C function returns a
+    size that is larger than the buffer already filled, the C function is
+    called again with a buffer large enough to get the full string from the C
+    function.
+
+    Returns the buffer's value decoded from UTF-8 to a unicode string.
+    """
     func = functools.partial(func, *args)
     actual_length = 10
     buffer_length = actual_length
@@ -140,6 +172,10 @@ class Sequence(collections.Sequence):
 
 
 def to_bytes(value):
+    """Converts bytes, unicode, and C char arrays to bytes.
+
+    Unicode strings are encoded to UTF-8.
+    """
     if isinstance(value, text_type):
         return value.encode('utf-8')
     elif isinstance(value, ffi.CData):
@@ -151,6 +187,10 @@ def to_bytes(value):
 
 
 def to_unicode(value):
+    """Converts bytes, unicode, and C char arrays to unicode strings.
+
+    Bytes and C char arrays are decoded from UTF-8.
+    """
     if isinstance(value, ffi.CData):
         return ffi.string(value).decode('utf-8')
     elif isinstance(value, binary_type):
@@ -162,6 +202,9 @@ def to_unicode(value):
 
 
 def to_char_or_null(value):
+    """Converts bytes, unicode, and C char arrays to C char arrays, and
+    :class:`None` to C NULL values.
+    """
     if value is None:
         return ffi.NULL
     else:
@@ -169,10 +212,12 @@ def to_char_or_null(value):
 
 
 def to_country(code):
+    """Converts libspotify country codes to unicode strings."""
     return to_unicode(chr(code >> 8) + chr(code & 0xff))
 
 
 def to_country_code(country):
+    """Converts unicode strings to libspotify country codes."""
     country = to_unicode(country)
     if len(country) != 2:
         raise ValueError('Must be exactly two chars')

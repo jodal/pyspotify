@@ -3,3 +3,25 @@ from __future__ import unicode_literals
 import cffi
 
 cffi.verifier.cleanup_tmpdir()
+
+
+def buffer_writer(string):
+    """Creates a function that takes a ``buffer`` and ``buffer_size`` as the
+    two last arguments and writes the given ``string`` to ``buffer``.
+    """
+
+    def func(*args):
+        assert len(args) >= 2
+        buffer_, buffer_size = args[-2:]
+
+        # -1 to keep a char free for \0 terminating the string
+        length = min(len(string), buffer_size - 1)
+
+        # Due to Python 3 treating bytes as an array of ints, we have to
+        # encode and copy chars one by one.
+        for i in range(length):
+            buffer_[i] = string[i].encode('utf-8')
+
+        return len(string)
+
+    return func

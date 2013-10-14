@@ -5,6 +5,7 @@ import mock
 import unittest
 
 import spotify
+import tests
 
 
 @mock.patch('spotify.playlist.lib', spec=spotify.lib)
@@ -730,15 +731,6 @@ class PlaylistContainerTest(unittest.TestCase):
     def test_getitem_with_folder(self, lib_mock):
         folder_name = 'foobar'
 
-        def func(sp_playlistcontainer, index, buffer_, buffer_size):
-            # -1 to keep a char free for \0 terminating the string
-            length = min(len(folder_name), buffer_size - 1)
-            # Due to Python 3 treating bytes as an array of ints, we have to
-            # encode and copy chars one by one.
-            for i in range(length):
-                buffer_[i] = folder_name[i].encode('utf-8')
-            return len(folder_name)
-
         lib_mock.sp_playlistcontainer_num_playlists.return_value = 3
         lib_mock.sp_playlistcontainer_playlist_type.side_effect = [
             int(spotify.PlaylistType.START_FOLDER),
@@ -748,7 +740,8 @@ class PlaylistContainerTest(unittest.TestCase):
         lib_mock.sp_playlistcontainer_playlist.return_value = sp_playlist
         lib_mock.sp_playlistcontainer_playlist_folder_id.side_effect = [
             1001, 1002]
-        lib_mock.sp_playlistcontainer_playlist_folder_name.side_effect = func
+        lib_mock.sp_playlistcontainer_playlist_folder_name.side_effect = (
+            tests.buffer_writer(folder_name))
         sp_playlistcontainer = spotify.ffi.new('int *')
         playlist_container = spotify.PlaylistContainer(
             sp_playlistcontainer=sp_playlistcontainer)

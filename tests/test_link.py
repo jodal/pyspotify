@@ -5,6 +5,7 @@ import mock
 import unittest
 
 import spotify
+import tests
 
 
 @mock.patch('spotify.link.lib', spec=spotify.lib)
@@ -225,16 +226,7 @@ class LinkTest(unittest.TestCase):
         lib_mock.sp_link_create_from_string.return_value = sp_link
         string = 'foo'
 
-        def func(sp_link, buffer_, buffer_size):
-            # -1 to keep a char free for \0 terminating the string
-            length = min(len(string), buffer_size - 1)
-            # Due to Python 3 treating bytes as an array of ints, we have to
-            # encode and copy chars one by one.
-            for i in range(length):
-                buffer_[i] = string[i].encode('utf-8')
-            return len(string)
-
-        lib_mock.sp_link_as_string.side_effect = func
+        lib_mock.sp_link_as_string.side_effect = tests.buffer_writer(string)
         link = spotify.Link(string)
 
         result = repr(link)
@@ -246,16 +238,7 @@ class LinkTest(unittest.TestCase):
         lib_mock.sp_link_create_from_string.return_value = sp_link
         string = 'foo'
 
-        def func(sp_link, buffer_, buffer_size):
-            # -1 to keep a char free for \0 terminating the string
-            length = min(len(string), buffer_size - 1)
-            # Due to Python 3 treating bytes as an array of ints, we have to
-            # encode and copy chars one by one.
-            for i in range(length):
-                buffer_[i] = string[i].encode('utf-8')
-            return len(string)
-
-        lib_mock.sp_link_as_string.side_effect = func
+        lib_mock.sp_link_as_string.side_effect = tests.buffer_writer(string)
         link = spotify.Link(string)
 
         self.assertEqual(str(link), link.uri)
@@ -265,16 +248,7 @@ class LinkTest(unittest.TestCase):
         lib_mock.sp_link_create_from_string.return_value = sp_link
         string = 'foo' * 100
 
-        def func(sp_link, buffer_, buffer_size):
-            # -1 to keep a char free for \0 terminating the string
-            length = min(len(string), buffer_size - 1)
-            # Due to Python 3 treating bytes as an array of ints, we have to
-            # encode and copy chars one by one.
-            for i in range(length):
-                buffer_[i] = string[i].encode('utf-8')
-            return len(string)
-
-        lib_mock.sp_link_as_string.side_effect = func
+        lib_mock.sp_link_as_string.side_effect = tests.buffer_writer(string)
         link = spotify.Link(string)
 
         result = link.uri

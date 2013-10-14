@@ -10,3 +10,4 @@ Table of contents
     api
     changelog
     authors
+    contributing

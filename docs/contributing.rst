@@ -38,3 +38,24 @@ Development setup
    For a complete test suite run, using all the Python implementations::
 
        tox
+
+
+Conventions
+===========
+
+The following are conventions used in the API or implementation of pyspotify.
+
+
+Properties vs getters/setters
+-----------------------------
+
+In many cases libspotify exposes pairs of related functions, typically a getter
+and a setter function. In those cases, pyspotify exposes both the getter and
+setter as methods, as well as a more Pythonic property that can both be read
+and written to.
+
+For example, the libspotify functions ``sp_playlist_is_in_ram()`` and
+``sp_playlist_set_in_ram()`` is available as the methods
+:meth:`~spotify.Playlist.is_in_ram`` and :meth:`~spotify.Playlist.set_in_ram`,
+as well as the property :attr:`~spotify.Playlist.in_ram`. The docstring for all
+three is attached to the property.

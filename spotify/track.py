@@ -287,12 +287,9 @@ class LocalTrack(Track):
     """
 
     def __init__(self, artist=None, title=None, album=None, length=None):
-        convert = lambda value: ffi.NULL if value is None else ffi.new(
-            'char[]', utils.to_bytes(value))
-
-        artist = convert(artist)
-        title = convert(title)
-        album = convert(album)
+        artist = utils.to_char_or_null(artist)
+        title = utils.to_char_or_null(title)
+        album = utils.to_char_or_null(album)
         if length is None:
             length = -1
 

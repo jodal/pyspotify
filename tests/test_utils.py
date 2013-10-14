@@ -166,6 +166,24 @@ class ToUnicodeTest(unittest.TestCase):
         self.assertRaises(ValueError, utils.to_unicode, 123)
 
 
+class ToCharOrNull(unittest.TestCase):
+
+    def test_none_becomes_null(self):
+        self.assertEqual(utils.to_char_or_null(None), spotify.ffi.NULL)
+
+    def test_bytes_becomes_char(self):
+        result = utils.to_char_or_null(b'abc')
+
+        self.assertIsInstance(result, spotify.ffi.CData)
+        self.assertEqual(spotify.ffi.string(result), b'abc')
+
+    def test_unicode_becomes_char(self):
+        result = utils.to_char_or_null('æøå')
+
+        self.assertIsInstance(result, spotify.ffi.CData)
+        self.assertEqual(spotify.ffi.string(result).decode('utf-8'), 'æøå')
+
+
 class ToCountryCode(unittest.TestCase):
 
     def test_unicode_to_country_code(self):

@@ -159,6 +159,13 @@ def to_unicode(value):
         raise ValueError('Value must be text, bytes, or char[]')
 
 
+def to_char_or_null(value):
+    if value is None:
+        return ffi.NULL
+    else:
+        return ffi.new('char[]', to_bytes(value))
+
+
 def to_country(code):
     return to_unicode(chr(code >> 8) + chr(code & 0xff))
 

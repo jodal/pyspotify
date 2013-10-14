@@ -623,9 +623,6 @@ class SessionConfig(object):
     def make_sp_session_config(self):
         """Internal method."""
 
-        convert = lambda value: ffi.NULL if value is None else ffi.new(
-            'char[]', utils.to_bytes(value))
-
         cache_location = ffi.new('char[]', utils.to_bytes(self.cache_location))
         settings_location = ffi.new(
             'char[]', utils.to_bytes(self.settings_location))
@@ -633,13 +630,13 @@ class SessionConfig(object):
         application_key = ffi.new('char[]', application_key_bytes)
         user_agent = ffi.new('char[]', utils.to_bytes(self.user_agent))
         callbacks = self.get_callbacks()
-        device_id = convert(self.device_id)
-        proxy = convert(self.proxy)
-        proxy_username = convert(self.proxy_username)
-        proxy_password = convert(self.proxy_password)
+        device_id = utils.to_char_or_null(self.device_id)
+        proxy = utils.to_char_or_null(self.proxy)
+        proxy_username = utils.to_char_or_null(self.proxy_username)
+        proxy_password = utils.to_char_or_null(self.proxy_password)
         # XXX See explanation above
-        #ca_certs_filename = convert(self.ca_certs_filename)
-        tracefile = convert(self.tracefile)
+        #ca_certs_filename = utils.to_char_or_null(self.ca_certs_filename)
+        tracefile = utils.to_char_or_null(self.tracefile)
 
         sp_session_config = ffi.new('sp_session_config *', {
             'api_version': self.api_version,

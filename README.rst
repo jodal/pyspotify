@@ -18,49 +18,37 @@ pyspotify
    :target: https://coveralls.io/r/jodal/pyspotify?branch=pyspotify2
    :alt: Test coverage
 
-Python wrapper for libspotify, second edition
+pyspotify 2.x is a new Python wrapper for `libspotify
+<https://developer.spotify.com/technologies/libspotify/>`__.
 
-This is a new Python wrapper for `libspotify
-<https://developer.spotify.com/technologies/libspotify/>`__ based on `CFFI
-<http://cffi.readthedocs.org/>`__ instead of a CPython C extension like
-pyspotify 1.x was. This makes pyspotify work on CPython 3 as well as PyPy 2.
+pyspotify 1.x was largely implemented in C as a CPython C extension, working
+only with CPython 2.6 and 2.7. It has some tests, but the test suite is far
+from complete. It did never provide the full libspotify API.
+
+pyspotify 2.x is based on `CFFI <http://cffi.readthedocs.org/>`__ and
+implemented purely in Python. This makes pyspotify 2.x run on both CPython 2.7,
+3.2, 3.3, as well as on PyPy. The library has full test coverage, and the tests
+are run on all the targeted Python versions for every commit. pyspotify 2.x
+will provide Python bindings for the full libspotify API from the very first
+release.
 
 
-Development setup
+Development plans
 =================
 
-1. Make sure you have the following Python versions installed:
+This library is still under development. An alpha release to PyPI is planned as
+soon as the the bindings to libspotify are complete. After the first alpha
+release, focus will be on cross-functional aspects such as improved thread
+safety and helpers for audio playback.
 
-   - CPython 2.7
-   - CPython 3.2
-   - CPython 3.3
-   - PyPy 2
-
-2. Install Python, libffi, and libspotify development files. On Ubuntu with
-   apt.mopidy.com in your APT sources::
-
-       sudo apt-get install python-all-dev python3-all-dev libffi-dev libspotify-dev
-
-3. Create and activate a virtualenv::
-
-       virtualenv ve
-       source ve/bin/activate
-
-4. Install development dependencies::
-
-       pip install cffi mock nose tox
-
-5. Quick test suite run, using the virtualenv's Python version::
-
-       nosetests
-
-6. Slower test suite run, using all the Python implementations::
-
-       tox
+See ``docs/contributing.rst`` for how to setup the development environment and
+run tests.
 
 
-Development status
-==================
+Development milestones
+======================
+
+- 2013-10-14: Playlist subsystem *almost* complete.
 
 - 2013-06-21: Search subsystem complete.
 

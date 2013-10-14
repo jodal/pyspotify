@@ -134,13 +134,15 @@ class Search(object):
         spotify.Error.maybe_raise(self.error)
         if not self.is_loaded:
             return []
+
+        def get_track(sp_search, key):
+            return spotify.Track(sp_track=lib.sp_search_track(sp_search, key))
+
         lib.sp_search_add_ref(self._sp_search)
         return utils.Sequence(
             sp_obj=ffi.gc(self._sp_search, lib.sp_search_release),
             len_func=lib.sp_search_num_tracks,
-            getitem_func=(
-                lambda sp_search, key:
-                spotify.Track(sp_track=lib.sp_search_track(sp_search, key))))
+            getitem_func=get_track)
 
     @property
     def track_total(self):
@@ -162,13 +164,15 @@ class Search(object):
         spotify.Error.maybe_raise(self.error)
         if not self.is_loaded:
             return []
+
+        def get_album(sp_search, key):
+            return spotify.Album(sp_album=lib.sp_search_album(sp_search, key))
+
         lib.sp_search_add_ref(self._sp_search)
         return utils.Sequence(
             sp_obj=ffi.gc(self._sp_search, lib.sp_search_release),
             len_func=lib.sp_search_num_albums,
-            getitem_func=(
-                lambda sp_search, key:
-                spotify.Album(sp_album=lib.sp_search_album(sp_search, key))))
+            getitem_func=get_album)
 
     @property
     def album_total(self):
@@ -190,14 +194,16 @@ class Search(object):
         spotify.Error.maybe_raise(self.error)
         if not self.is_loaded:
             return []
+
+        def get_artist(sp_search, key):
+            return spotify.Artist(
+                sp_artist=lib.sp_search_artist(sp_search, key))
+
         lib.sp_search_add_ref(self._sp_search)
         return utils.Sequence(
             sp_obj=ffi.gc(self._sp_search, lib.sp_search_release),
             len_func=lib.sp_search_num_artists,
-            getitem_func=(
-                lambda sp_search, key:
-                spotify.Artist(
-                    sp_artist=lib.sp_search_artist(sp_search, key))))
+            getitem_func=get_artist)
 
     @property
     def artist_total(self):

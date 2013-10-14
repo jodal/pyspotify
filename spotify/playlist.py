@@ -77,14 +77,16 @@ class Playlist(object):
         """
         if not self.is_loaded:
             return []
+
+        def get_track(sp_playlist, key):
+            return spotify.Track(
+                sp_track=lib.sp_playlist_track(sp_playlist, key))
+
         lib.sp_playlist_add_ref(self._sp_playlist)
         return utils.Sequence(
             sp_obj=ffi.gc(self._sp_playlist, lib.sp_playlist_release),
             len_func=lib.sp_playlist_num_tracks,
-            getitem_func=(
-                lambda sp_playlist, key:
-                spotify.Track(
-                    sp_track=lib.sp_playlist_track(sp_playlist, key))))
+            getitem_func=get_track)
 
     @property
     def tracks_with_metadata(self):
@@ -94,12 +96,12 @@ class Playlist(object):
         """
         if not self.is_loaded:
             return []
+
         lib.sp_playlist_add_ref(self._sp_playlist)
         return utils.Sequence(
             sp_obj=ffi.gc(self._sp_playlist, lib.sp_playlist_release),
             len_func=lib.sp_playlist_num_tracks,
-            getitem_func=(
-                lambda sp_playlist, key: PlaylistTrack(sp_playlist, key)))
+            getitem_func=PlaylistTrack)
 
     @property
     def name(self):

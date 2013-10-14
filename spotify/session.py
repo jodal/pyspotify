@@ -561,7 +561,7 @@ class SessionConfig(object):
     initially_unload_playlists = False
     """Avoid loading playlists into RAM on startup.
 
-    See :meth:`Playlist.is_in_ram` for more details.
+    See :meth:`Playlist.in_ram` for more details.
     """
 
     device_id = None

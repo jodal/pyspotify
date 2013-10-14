@@ -843,22 +843,22 @@ class SessionTest(unittest.TestCase):
         self.assertRaises(spotify.Error, session.process_events)
 
     @mock.patch('spotify.playlist.lib', spec=spotify.lib)
-    def test_playlists(self, playlist_lib_mock, lib_mock):
+    def test_playlist_container(self, playlist_lib_mock, lib_mock):
         lib_mock.sp_session_playlistcontainer.return_value = (
             spotify.ffi.new('sp_playlistcontainer **'))
         session = self.create_session(lib_mock)
 
-        result = session.playlists
+        result = session.playlist_container
 
         lib_mock.sp_session_playlistcontainer.assert_called_with(
             session._sp_session)
         self.assertIsInstance(result, spotify.PlaylistContainer)
 
-    def test_playlists_if_not_logged_in(self, lib_mock):
+    def test_playlist_container_if_not_logged_in(self, lib_mock):
         lib_mock.sp_session_playlistcontainer.return_value = spotify.ffi.NULL
         session = self.create_session(lib_mock)
 
-        result = session.playlists
+        result = session.playlist_container
 
         lib_mock.sp_session_playlistcontainer.assert_called_with(
             session._sp_session)

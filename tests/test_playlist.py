@@ -862,6 +862,18 @@ class PlaylistContainerTest(unittest.TestCase):
         self.assertRaises(
             ValueError, playlist_container.add_new_playlist, '   ')
 
+        # Spotify seems to accept e.g. tab-only names, but it doesn't make any
+        # sense to allow it, so we disallow names with all combinations of just
+        # whitespace.
+        self.assertRaises(
+            ValueError, playlist_container.add_new_playlist, '\t\t')
+        self.assertRaises(
+            ValueError, playlist_container.add_new_playlist, '\r\r')
+        self.assertRaises(
+            ValueError, playlist_container.add_new_playlist, '\n\n')
+        self.assertRaises(
+            ValueError, playlist_container.add_new_playlist, ' \t\r\n')
+
     def test_add_new_playlist_fails_if_name_is_too_long(self, lib_mock):
         sp_playlistcontainer = spotify.ffi.new('int *')
         playlist_container = spotify.PlaylistContainer(

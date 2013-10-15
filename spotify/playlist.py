@@ -2,6 +2,7 @@ from __future__ import unicode_literals
 
 import collections
 import pprint
+import re
 
 import spotify
 from spotify import ffi, lib, utils
@@ -372,8 +373,7 @@ class PlaylistContainer(collections.Sequence):
         # TODO Add index kwarg and move the playlist if it is specified
         if len(name) > 255:
             raise ValueError('Playlist name must be shorter than 256 chars')
-        if len(name.replace(' ', '')) == 0:
-            # XXX Spotify seems to accept tab-only names
+        if len(re.sub('\s+', '', name)) == 0:
             raise ValueError('Playlist name cannot be space-only')
         name = ffi.new('char[]', utils.to_bytes(name))
         sp_playlist = lib.sp_playlistcontainer_add_new_playlist(

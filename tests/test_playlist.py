@@ -952,7 +952,7 @@ class PlaylistContainerTest(unittest.TestCase):
         playlist_container = spotify.PlaylistContainer(
             sp_playlistcontainer=sp_playlistcontainer)
 
-        self.assertRaises(ValueError, playlist_container.add_playlist, None)
+        self.assertRaises(TypeError, playlist_container.add_playlist, None)
 
     def test_add_folder(self, lib_mock):
         lib_mock.sp_playlistcontainer_add_folder.return_value = int(

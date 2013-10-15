@@ -398,7 +398,7 @@ class PlaylistContainer(collections.Sequence):
         elif isinstance(playlist, spotify.Playlist):
             link = playlist.link
         else:
-            raise ValueError(
+            raise TypeError(
                 'Argument must be Link or Playlist, got %s' % type(playlist))
         sp_playlist = lib.sp_playlistcontainer_add_playlist(
             self._sp_playlistcontainer, link._sp_link)

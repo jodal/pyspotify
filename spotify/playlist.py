@@ -1,6 +1,7 @@
 from __future__ import unicode_literals
 
 import collections
+import pprint
 
 import spotify
 from spotify import ffi, lib, utils
@@ -303,7 +304,8 @@ class PlaylistContainer(collections.Sequence):
             sp_playlistcontainer, lib.sp_playlistcontainer_release)
 
     def __repr__(self):
-        return '<spotify.PlaylistContainer owned by %s>' % self.owner.link.uri
+        return '<spotify.PlaylistContainer owned by %s: %s>' % (
+            self.owner.link.uri, pprint.pformat(list(self)))
 
     @property
     def is_loaded(self):

@@ -270,7 +270,7 @@ class Playlist(object):
         return spotify.Link(self)
 
 
-class PlaylistContainer(object):
+class PlaylistContainer(collections.Sequence):
     """A Spotify playlist container.
 
     The playlist container can be accessed as a regular Python collection to
@@ -433,6 +433,8 @@ class PlaylistContainer(object):
         """
         spotify.Error.maybe_raise(lib.sp_playlistcontainer_move_playlist(
             self._sp_playlistcontainer, from_index, to_index, int(dry_run)))
+
+    # TODO Add __setitem__, __delitem__, insert, and subclass MutableSequence
 
     @property
     def owner(self):

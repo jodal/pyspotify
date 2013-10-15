@@ -1,5 +1,6 @@
 from __future__ import unicode_literals
 
+import collections
 import gc
 import mock
 import unittest
@@ -817,6 +818,13 @@ class PlaylistContainerTest(unittest.TestCase):
             sp_playlistcontainer=sp_playlistcontainer)
 
         self.assertRaises(TypeError, playlist_container.__getitem__, 'abc')
+
+    def test_is_a_sequence(self, lib_mock):
+        sp_playlistcontainer = spotify.ffi.new('int *')
+        playlist_container = spotify.PlaylistContainer(
+            sp_playlistcontainer=sp_playlistcontainer)
+
+        self.assertIsInstance(playlist_container, collections.Sequence)
 
     def test_add_new_playlist(self, lib_mock):
         sp_playlist = spotify.ffi.new('int *')

@@ -379,6 +379,7 @@ class PlaylistContainer(collections.Sequence):
         sp_playlist = lib.sp_playlistcontainer_add_new_playlist(
             self._sp_playlistcontainer, name)
         if sp_playlist == ffi.NULL:
+            # TODO Use a more fitting exception type
             raise ValueError('Playlist creation failed')
         return Playlist(sp_playlist=sp_playlist, add_ref=True)
 

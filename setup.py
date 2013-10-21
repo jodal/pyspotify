@@ -98,11 +98,20 @@ mock_src_files = [
     'libmockspotify/util.c',
 ]
 
+if 'darwin' in sys.platform:
+    spotify_library_config = {
+        'extra_link_args': ['-framework', 'libspotify']
+    }
+else:
+    spotify_library_config = {
+        'libraries': ['spotify']
+    }
+
 spotify_ext = Extension(
     'spotify._spotify',
     ['src/module.c'] + common_src_files,
     include_dirs=['src'],
-    libraries=['spotify'])
+    **spotify_library_config)
 
 mockspotify_ext = Extension(
     'spotify._mockspotify',

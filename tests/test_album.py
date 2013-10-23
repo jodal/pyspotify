@@ -57,7 +57,7 @@ class AlbumTest(unittest.TestCase):
 
         album = spotify.Album(sp_album=sp_album)
         album = None  # noqa
-        gc.collect()  # Needed for PyPy
+        [gc.collect() for _ in range(5)]  # Needed for PyPy
 
         lib_mock.sp_album_release.assert_called_with(sp_album)
 

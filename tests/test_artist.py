@@ -59,7 +59,7 @@ class ArtistTest(unittest.TestCase):
 
         artist = spotify.Artist(sp_artist=sp_artist)
         artist = None  # noqa
-        gc.collect()  # Needed for PyPy
+        [gc.collect() for _ in range(5)]  # Needed for PyPy
 
         lib_mock.sp_artist_release.assert_called_with(sp_artist)
 

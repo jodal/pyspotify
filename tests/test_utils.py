@@ -51,7 +51,7 @@ class SequenceTest(unittest.TestCase):
 
         seq = utils.Sequence(sp_search, None, None)
         seq = None  # noqa
-        gc.collect()  # Needed for PyPy
+        [gc.collect() for _ in range(5)]  # Needed for PyPy
 
         self.assertEqual(lib_mock.sp_search_release.call_count, 0)
 

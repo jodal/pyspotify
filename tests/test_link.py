@@ -217,7 +217,7 @@ class LinkTest(unittest.TestCase):
 
         link = spotify.Link('spotify:track:foo')
         link = None  # noqa
-        gc.collect()  # Needed for PyPy
+        [gc.collect() for _ in range(5)]  # Needed for PyPy
 
         lib_mock.sp_link_release.assert_called_with(sp_link)
 

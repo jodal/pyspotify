@@ -59,7 +59,7 @@ class ImageTest(unittest.TestCase):
 
         image = spotify.Image(sp_image=sp_image)
         image = None  # noqa
-        gc.collect()  # Needed for PyPy
+        [gc.collect() for _ in range(5)]  # Needed for PyPy
 
         lib_mock.sp_image_release.assert_called_with(sp_image)
 

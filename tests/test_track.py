@@ -73,7 +73,7 @@ class TrackTest(unittest.TestCase):
 
         track = spotify.Track(sp_track=sp_track)
         track = None  # noqa
-        gc.collect()  # Needed for PyPy
+        [gc.collect() for _ in range(5)]  # Needed for PyPy
 
         lib_mock.sp_track_release.assert_called_with(sp_track)
 

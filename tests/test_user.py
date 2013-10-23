@@ -54,7 +54,7 @@ class UserTest(unittest.TestCase):
 
         user = spotify.User(sp_user=sp_user)
         user = None  # noqa
-        gc.collect()  # Needed for PyPy
+        [gc.collect() for _ in range(5)]  # Needed for PyPy
 
         lib_mock.sp_user_release.assert_called_with(sp_user)
 

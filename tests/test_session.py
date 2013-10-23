@@ -611,7 +611,7 @@ class SessionTest(unittest.TestCase):
         session = spotify.Session(config=config)
         session = None  # noqa
         spotify.session_instance = None
-        gc.collect()  # Needed for PyPy
+        [gc.collect() for _ in range(5)]  # Needed for PyPy
 
         lib_mock.sp_session_release.assert_called_with(sp_session)
 

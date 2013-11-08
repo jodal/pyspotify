@@ -97,8 +97,9 @@ class Link(object):
                         'Failed to get link from Spotify playlist')
             elif isinstance(obj, spotify.User):
                 sp_link = lib.sp_link_create_from_user(obj._sp_user)
-            elif isinstance(obj, spotify.Image):
-                sp_link = lib.sp_link_create_from_image(obj._sp_image)
+            else:
+                self._sp_link = obj.link._sp_link
+                return
 
             self._sp_link = ffi.gc(sp_link, lib.sp_link_release)
 

@@ -143,7 +143,8 @@ class Image(object):
     @property
     def link(self):
         """A :class:`Link` to the image."""
-        return spotify.Link(self)
+        return spotify.Link(
+            sp_link=lib.sp_link_create_from_image(self._sp_image))
 
 
 @ffi.callback('void(sp_image *, void *)')

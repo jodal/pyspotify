@@ -204,15 +204,16 @@ class LinkTest(unittest.TestCase):
 
     @mock.patch('spotify.image.lib', spec=spotify.lib)
     def test_create_from_image(self, image_lib_mock, lib_mock):
-        sp_link = spotify.ffi.new('int *')
-        lib_mock.sp_link_create_from_image.return_value = sp_link
         sp_image = spotify.ffi.new('int *')
         image = spotify.Image(sp_image=sp_image)
+        sp_link = spotify.ffi.new('int *')
+        image_lib_mock.sp_link_create_from_image.return_value = sp_link
 
         link = spotify.Link(obj=image)
 
         self.assertEqual(link._sp_link, sp_link)
-        lib_mock.sp_link_create_from_image.assert_called_once_with(sp_image)
+        image_lib_mock.sp_link_create_from_image.assert_called_once_with(
+            sp_image)
 
     def test_releases_sp_link_when_link_dies(self, lib_mock):
         sp_link = spotify.ffi.new('int *')

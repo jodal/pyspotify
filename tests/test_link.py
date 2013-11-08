@@ -28,14 +28,17 @@ class LinkTest(unittest.TestCase):
 
         self.assertRaises(RuntimeError, spotify.Link, 'spotify:track:foo')
 
+    def test_create_without_uri_or_obj_or_sp_link_fails(self, lib_mock):
+        self.assertRaises(AssertionError, spotify.Link)
+
     def test_create_from_sp_link(self, lib_mock):
         sp_link = spotify.ffi.new('int *')
 
-        result = spotify.Link(sp_link)
+        result = spotify.Link(sp_link=sp_link)
 
         self.assertEqual(result._sp_link, sp_link)
 
-    def test_create_from_string(self, lib_mock):
+    def test_create_from_uri(self, lib_mock):
         sp_link = spotify.ffi.new('int *')
         lib_mock.sp_link_create_from_string.return_value = sp_link
 
@@ -60,7 +63,7 @@ class LinkTest(unittest.TestCase):
         sp_track = spotify.ffi.new('int *')
         track = spotify.Track(sp_track=sp_track)
 
-        link = spotify.Link(track)
+        link = spotify.Link(obj=track)
 
         self.assertEqual(link._sp_link, sp_link)
         lib_mock.sp_link_create_from_track.assert_called_once_with(
@@ -73,7 +76,7 @@ class LinkTest(unittest.TestCase):
         sp_track = spotify.ffi.new('int *')
         track = spotify.Track(sp_track=sp_track)
 
-        link = spotify.Link(track, offset=90)
+        link = spotify.Link(obj=track, offset=90)
 
         self.assertEqual(link._sp_link, sp_link)
         lib_mock.sp_link_create_from_track.assert_called_once_with(
@@ -86,7 +89,7 @@ class LinkTest(unittest.TestCase):
         sp_album = spotify.ffi.new('int *')
         album = spotify.Album(sp_album=sp_album)
 
-        link = spotify.Link(album)
+        link = spotify.Link(obj=album)
 
         self.assertEqual(link._sp_link, sp_link)
         lib_mock.sp_link_create_from_album.assert_called_once_with(sp_album)
@@ -98,7 +101,7 @@ class LinkTest(unittest.TestCase):
         sp_album = spotify.ffi.new('int *')
         album = spotify.Album(sp_album=sp_album)
 
-        link = spotify.Link(album, image_size=spotify.ImageSize.NORMAL)
+        link = spotify.Link(obj=album, image_size=spotify.ImageSize.NORMAL)
 
         self.assertEqual(link._sp_link, sp_link)
         lib_mock.sp_link_create_from_album_cover.assert_called_once_with(
@@ -111,7 +114,7 @@ class LinkTest(unittest.TestCase):
         sp_artist = spotify.ffi.new('int *')
         artist = spotify.Artist(sp_artist=sp_artist)
 
-        link = spotify.Link(artist)
+        link = spotify.Link(obj=artist)
 
         self.assertEqual(link._sp_link, sp_link)
         lib_mock.sp_link_create_from_artist.assert_called_once_with(sp_artist)
@@ -123,7 +126,7 @@ class LinkTest(unittest.TestCase):
         sp_artist = spotify.ffi.new('int *')
         artist = spotify.Artist(sp_artist=sp_artist)
 
-        link = spotify.Link(artist, image_size=spotify.ImageSize.NORMAL)
+        link = spotify.Link(obj=artist, image_size=spotify.ImageSize.NORMAL)
 
         self.assertEqual(link._sp_link, sp_link)
         lib_mock.sp_link_create_from_artist_portrait.assert_called_once_with(
@@ -140,7 +143,7 @@ class LinkTest(unittest.TestCase):
         sp_search = spotify.ffi.new('int *')
         search_result = spotify.Search(sp_search=sp_search)
 
-        link = spotify.Link(search_result)
+        link = spotify.Link(obj=search_result)
 
         self.assertEqual(link._sp_link, sp_link)
         lib_mock.sp_link_create_from_search.assert_called_once_with(sp_search)
@@ -153,7 +156,7 @@ class LinkTest(unittest.TestCase):
         sp_playlist = spotify.ffi.new('int *')
         playlist = spotify.Playlist(sp_playlist=sp_playlist)
 
-        link = spotify.Link(playlist)
+        link = spotify.Link(obj=playlist)
 
         self.assertEqual(link._sp_link, sp_link)
         lib_mock.sp_link_create_from_playlist.assert_called_with(
@@ -167,7 +170,7 @@ class LinkTest(unittest.TestCase):
         sp_playlist = spotify.ffi.new('int *')
         playlist = spotify.Playlist(sp_playlist=sp_playlist)
 
-        self.assertRaises(ValueError, spotify.Link, playlist)
+        self.assertRaises(ValueError, spotify.Link, obj=playlist)
 
         # Condition is checked before link creation is tried
         self.assertEqual(lib_mock.sp_link_create_from_playlist.call_count, 0)
@@ -180,7 +183,7 @@ class LinkTest(unittest.TestCase):
         sp_playlist = spotify.ffi.new('int *')
         playlist = spotify.Playlist(sp_playlist=sp_playlist)
 
-        self.assertRaises(ValueError, spotify.Link, playlist)
+        self.assertRaises(ValueError, spotify.Link, obj=playlist)
 
         # Condition is checked only if link creation returns NULL
         lib_mock.sp_link_create_from_playlist.assert_called_with(sp_playlist)
@@ -194,7 +197,7 @@ class LinkTest(unittest.TestCase):
         sp_user = spotify.ffi.new('int *')
         user = spotify.User(sp_user=sp_user)
 
-        link = spotify.Link(user)
+        link = spotify.Link(obj=user)
 
         self.assertEqual(link._sp_link, sp_link)
         lib_mock.sp_link_create_from_user.assert_called_once_with(sp_user)
@@ -206,7 +209,7 @@ class LinkTest(unittest.TestCase):
         sp_image = spotify.ffi.new('int *')
         image = spotify.Image(sp_image=sp_image)
 
-        link = spotify.Link(image)
+        link = spotify.Link(obj=image)
 
         self.assertEqual(link._sp_link, sp_link)
         lib_mock.sp_link_create_from_image.assert_called_once_with(sp_image)

@@ -895,7 +895,7 @@ class PlaylistContainerTest(unittest.TestCase):
     def test_add_playlist_from_link(self, lib_mock):
         self.create_session(lib_mock)
         sp_link = spotify.ffi.new('int *')
-        link = spotify.Link(sp_link)
+        link = spotify.Link(sp_link=sp_link)
         sp_playlist = spotify.ffi.new('int *')
         lib_mock.sp_playlistcontainer_add_playlist.return_value = sp_playlist
         sp_playlistcontainer = spotify.ffi.new('int *')
@@ -913,7 +913,7 @@ class PlaylistContainerTest(unittest.TestCase):
     def test_add_playlist_from_playlist(self, lib_mock):
         self.create_session(lib_mock)
         sp_link = spotify.ffi.new('int *')
-        link = spotify.Link(sp_link)
+        link = spotify.Link(sp_link=sp_link)
         existing_playlist = mock.Mock(spec=spotify.Playlist)
         existing_playlist.link = link
         added_sp_playlist = spotify.ffi.new('int *')
@@ -934,7 +934,7 @@ class PlaylistContainerTest(unittest.TestCase):
     def test_add_playlist_already_in_the_container(self, lib_mock):
         self.create_session(lib_mock)
         sp_link = spotify.ffi.new('int *')
-        link = spotify.Link(sp_link)
+        link = spotify.Link(sp_link=sp_link)
         lib_mock.sp_playlistcontainer_add_playlist.return_value = (
             spotify.ffi.NULL)
         sp_playlistcontainer = spotify.ffi.new('int *')

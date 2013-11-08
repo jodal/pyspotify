@@ -15,14 +15,19 @@ class Link(object):
 
     You must create a :class:`Session` before you can create links.
 
-    ``value`` can either be a string containing a Spotify URI on the form
-    ``spotify:...``, or a :class:`Track`, :class:`Album`, :class:`Artist`,
-    :class:`Search`, :class:`Playlist`, :class:`User`, or :class:`Image`.
+    A link can be created from one of the following:
 
-    If ``value`` is a :class:`Track`, ``offset`` will be used as the position
+    ``uri``:
+        A string containing a Spotify URI on the form ``spotify:...``.
+
+    ``obj``:
+        One of :class:`Track`, :class:`Album`, :class:`Artist`,
+        :class:`Search`, :class:`Playlist`, :class:`User`, or :class:`Image`.
+
+    If ``obj`` is a :class:`Track`, ``offset`` will be used as the position
     in milliseconds into the track to link to.
 
-    If ``value`` is an :class:`Album` or an :class:`Artist` and ``image_size``
+    If ``obj`` is an :class:`Album` or an :class:`Artist` and ``image_size``
     is an :class:`ImageSize`, then the link will point to an album cover or
     artist portrait.
 
@@ -39,54 +44,63 @@ class Link(object):
         'spotify:track:2Foc5Q5nqNiosCNqttzHof'
     """
 
-    def __init__(self, value, offset=0, image_size=None):
+    def __init__(
+            self, uri=None, obj=None, sp_link=None,
+            offset=0, image_size=None):
+
+        assert uri or obj or sp_link, 'uri, obj, or sp_link is required'
+
         if spotify.session_instance is None:
             raise RuntimeError('Session must be initialized to create links')
 
         # TODO Add support for creating link from a sp_artistbrowse instance
 
-        if isinstance(value, ffi.CData):
-            sp_link = value
-        elif isinstance(value, spotify.Track):
-            sp_link = lib.sp_link_create_from_track(value._sp_track, offset)
-        elif isinstance(value, spotify.Album):
-            if image_size is not None:
-                sp_link = lib.sp_link_create_from_album_cover(
-                    value._sp_album, image_size)
-            else:
-                sp_link = lib.sp_link_create_from_album(value._sp_album)
-        elif isinstance(value, spotify.Artist):
-            if image_size is not None:
-                sp_link = lib.sp_link_create_from_artist_portrait(
-                    value._sp_artist, image_size)
-            else:
-                sp_link = lib.sp_link_create_from_artist(value._sp_artist)
-        elif isinstance(value, spotify.Search):
-            sp_link = lib.sp_link_create_from_search(value._sp_search)
-        elif isinstance(value, spotify.Playlist):
-            if not value.is_loaded:
-                raise ValueError(
-                    'The playlist must be loaded to create a link')
-            sp_link = lib.sp_link_create_from_playlist(value._sp_playlist)
-            if sp_link == ffi.NULL:
-                if not value.in_ram:
-                    raise ValueError(
-                        'The playlist must have been in RAM to create a link')
-                # TODO Figure out why we can still get NULL here even if the
-                # playlist is both loaded and in RAM.
-                raise ValueError('Failed to get link from Spotify playlist')
-        elif isinstance(value, spotify.User):
-            sp_link = lib.sp_link_create_from_user(value._sp_user)
-        elif isinstance(value, spotify.Image):
-            sp_link = lib.sp_link_create_from_image(value._sp_image)
-        else:
+        if sp_link:
+            self._sp_link = ffi.gc(sp_link, lib.sp_link_release)
+        elif uri:
             sp_link = lib.sp_link_create_from_string(
-                ffi.new('char[]', utils.to_bytes(value)))
+                ffi.new('char[]', utils.to_bytes(uri)))
             if sp_link == ffi.NULL:
                 raise ValueError(
-                    'Failed to get link from Spotify URI: %r' % value)
+                    'Failed to get link from Spotify URI: %r' % uri)
+            self._sp_link = ffi.gc(sp_link, lib.sp_link_release)
+        elif obj:
+            if isinstance(obj, spotify.Track):
+                sp_link = lib.sp_link_create_from_track(obj._sp_track, offset)
+            elif isinstance(obj, spotify.Album):
+                if image_size is not None:
+                    sp_link = lib.sp_link_create_from_album_cover(
+                        obj._sp_album, image_size)
+                else:
+                    sp_link = lib.sp_link_create_from_album(obj._sp_album)
+            elif isinstance(obj, spotify.Artist):
+                if image_size is not None:
+                    sp_link = lib.sp_link_create_from_artist_portrait(
+                        obj._sp_artist, image_size)
+                else:
+                    sp_link = lib.sp_link_create_from_artist(obj._sp_artist)
+            elif isinstance(obj, spotify.Search):
+                sp_link = lib.sp_link_create_from_search(obj._sp_search)
+            elif isinstance(obj, spotify.Playlist):
+                if not obj.is_loaded:
+                    raise ValueError(
+                        'The playlist must be loaded to create a link')
+                sp_link = lib.sp_link_create_from_playlist(obj._sp_playlist)
+                if sp_link == ffi.NULL:
+                    if not obj.in_ram:
+                        raise ValueError(
+                            'The playlist must have been in RAM to create '
+                            'a link')
+                    # TODO Figure out why we can still get NULL here even if
+                    # the playlist is both loaded and in RAM.
+                    raise ValueError(
+                        'Failed to get link from Spotify playlist')
+            elif isinstance(obj, spotify.User):
+                sp_link = lib.sp_link_create_from_user(obj._sp_user)
+            elif isinstance(obj, spotify.Image):
+                sp_link = lib.sp_link_create_from_image(obj._sp_image)
 
-        self._sp_link = ffi.gc(sp_link, lib.sp_link_release)
+            self._sp_link = ffi.gc(sp_link, lib.sp_link_release)
 
     def __repr__(self):
         return 'Link(%r)' % self.uri

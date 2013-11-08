@@ -26,13 +26,16 @@ class Link(object):
     is an :class:`ImageSize`, then the link will point to an album cover or
     artist portrait.
 
-    To get the URI from the link object, use it as a string::
+    To get the URI from the link object, use it as a string or look at the
+    :attr:`uri` attribute::
 
         >>> link = spotify.Link('spotify:track:2Foc5Q5nqNiosCNqttzHof')
         >>> str(link)
         'spotify:track:2Foc5Q5nqNiosCNqttzHof'
         >>> track = link.as_track()
         >>> str(track.link)
+        'spotify:track:2Foc5Q5nqNiosCNqttzHof'
+        >>> track.link.uri
         'spotify:track:2Foc5Q5nqNiosCNqttzHof'
     """
 

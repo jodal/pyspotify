@@ -1029,6 +1029,34 @@ class PlaylistContainerTest(unittest.TestCase):
         self.assertRaises(
             spotify.Error, playlist_container.add_folder, 'foo bar', index=3)
 
+    def test_add_folder_fails_if_name_is_space_only(self, lib_mock):
+        sp_playlistcontainer = spotify.ffi.new('int *')
+        playlist_container = spotify.PlaylistContainer(
+            sp_playlistcontainer=sp_playlistcontainer)
+
+        self.assertRaises(
+            ValueError, playlist_container.add_folder, '   ')
+
+        # Spotify seems to accept e.g. tab-only names, but it doesn't make any
+        # sense to allow it, so we disallow names with all combinations of just
+        # whitespace.
+        self.assertRaises(
+            ValueError, playlist_container.add_folder, '\t\t')
+        self.assertRaises(
+            ValueError, playlist_container.add_folder, '\r\r')
+        self.assertRaises(
+            ValueError, playlist_container.add_folder, '\n\n')
+        self.assertRaises(
+            ValueError, playlist_container.add_folder, ' \t\r\n')
+
+    def test_add_folder_fails_if_name_is_too_long(self, lib_mock):
+        sp_playlistcontainer = spotify.ffi.new('int *')
+        playlist_container = spotify.PlaylistContainer(
+            sp_playlistcontainer=sp_playlistcontainer)
+
+        self.assertRaises(
+            ValueError, playlist_container.add_folder, 'x' * 300)
+
     def test_remove_playlist(self, lib_mock):
         lib_mock.sp_playlistcontainer_remove_playlist.return_value = int(
             spotify.ErrorType.OK)

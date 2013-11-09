@@ -384,10 +384,7 @@ class PlaylistContainer(collections.Sequence):
         Returns the new playlist.
         """
         # TODO Add index kwarg and move the playlist if it is specified
-        if len(name) > 255:
-            raise ValueError('Playlist name must be shorter than 256 chars')
-        if len(re.sub('\s+', '', name)) == 0:
-            raise ValueError('Playlist name cannot be space-only')
+        self._validate_name(name)
         name = ffi.new('char[]', utils.to_bytes(name))
         sp_playlist = lib.sp_playlistcontainer_add_new_playlist(
             self._sp_playlistcontainer, name)
@@ -423,14 +420,24 @@ class PlaylistContainer(collections.Sequence):
     def add_folder(self, name, index=None):
         """Add a playlist folder at the given index.
 
+        The playlist folder name must not be space-only or shorter than 256
+        chars.
+
         If the index isn't specified, the folder is added at the end of the
         container.
         """
+        self._validate_name(name)
         if index is None:
             index = len(self)
         name = ffi.new('char[]', utils.to_bytes(name))
         spotify.Error.maybe_raise(lib.sp_playlistcontainer_add_folder(
             self._sp_playlistcontainer, index, name))
+
+    def _validate_name(self, name):
+        if len(name) > 255:
+            raise ValueError('Playlist name must be shorter than 256 chars')
+        if len(re.sub('\s+', '', name)) == 0:
+            raise ValueError('Playlist name cannot be space-only')
 
     def remove_playlist(self, index):
         """Remove playlist at the given index from the container."""

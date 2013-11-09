@@ -379,7 +379,7 @@ class PlaylistContainer(collections.Sequence):
     def add_new_playlist(self, name):
         """Add an empty playlist at the end of the container.
 
-        The playlist name must not be space-only or shorter than 256 chars.
+        The playlist name must not be space-only or longer than 255 chars.
 
         Returns the new playlist.
         """
@@ -420,7 +420,7 @@ class PlaylistContainer(collections.Sequence):
     def add_folder(self, name, index=None):
         """Add a playlist folder at the given index.
 
-        The playlist folder name must not be space-only or shorter than 256
+        The playlist folder name must not be space-only or longer than 255
         chars.
 
         If the index isn't specified, the folder is added at the end of the
@@ -435,7 +435,7 @@ class PlaylistContainer(collections.Sequence):
 
     def _validate_name(self, name):
         if len(name) > 255:
-            raise ValueError('Playlist name must be shorter than 256 chars')
+            raise ValueError('Playlist name cannot be longer than 255 chars')
         if len(re.sub('\s+', '', name)) == 0:
             raise ValueError('Playlist name cannot be space-only')
 

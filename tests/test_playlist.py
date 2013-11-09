@@ -601,6 +601,35 @@ class PlaylistTest(unittest.TestCase):
         link_mock.assert_called_once_with(sp_link=sp_link)
         self.assertEqual(result, mock.sentinel.link)
 
+    @mock.patch('spotify.Link', spec=spotify.Link)
+    def test_link_fails_if_playlist_not_loaded(
+            self, lik_mock, lib_mock):
+        lib_mock.sp_playlist_is_loaded.return_value = 0
+        lib_mock.sp_link_create_from_playlist.return_value = spotify.ffi.NULL
+        sp_playlist = spotify.ffi.new('int *')
+        playlist = spotify.Playlist(sp_playlist=sp_playlist)
+
+        self.assertRaises(ValueError, getattr, playlist, 'link')
+
+        # Condition is checked before link creation is tried
+        self.assertEqual(lib_mock.sp_link_create_from_playlist.call_count, 0)
+
+    @mock.patch('spotify.Link', spec=spotify.Link)
+    def test_link_may_fail_if_playlist_has_not_been_in_ram(
+            self, link_mock, lib_mock):
+        self.create_session(lib_mock)
+        lib_mock.sp_playlist_is_loaded.return_value = 1
+        lib_mock.sp_link_create_from_playlist.return_value = spotify.ffi.NULL
+        sp_playlist = spotify.ffi.new('int *')
+        playlist = spotify.Playlist(sp_playlist=sp_playlist)
+
+        self.assertRaises(ValueError, getattr, playlist, 'link')
+
+        # Condition is checked only if link creation returns NULL
+        lib_mock.sp_link_create_from_playlist.assert_called_with(sp_playlist)
+        lib_mock.sp_playlist_is_in_ram.assert_called_with(
+            mock.sentinel.sp_session, sp_playlist)
+
 
 @mock.patch('spotify.playlist.lib', spec=spotify.lib)
 class PlaylistContainerTest(unittest.TestCase):

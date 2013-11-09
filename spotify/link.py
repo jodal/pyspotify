@@ -13,49 +13,41 @@ __all__ = [
 class Link(object):
     """A Spotify object link.
 
-    You must create a :class:`Session` before you can create links.
+    A link can be created from a string containing a Spotify URI on the form
+    ``spotify:...``. You can also get links from the ``link`` attribute on most
+    objects, e.g. :attr:`~spotify.Track.link`.
 
-    A link can be created from one of the following:
-
-    ``uri``:
-        A string containing a Spotify URI on the form ``spotify:...``.
-
-    ``obj``:
-        One of :class:`Track`, :class:`Album`, :class:`Artist`,
-        :class:`Search`, :class:`Playlist`, :class:`User`, or :class:`Image`.
-
-    To get the URI from the link object, use it as a string or look at the
-    :attr:`uri` attribute::
+    To get the URI from the link object you can use the :attr:`uri` attribute,
+    or simply use the link as a string::
 
         >>> link = spotify.Link('spotify:track:2Foc5Q5nqNiosCNqttzHof')
+        >>> link
+        Link('spotify:track:2Foc5Q5nqNiosCNqttzHof')
+        >>> link.uri
+        'spotify:track:2Foc5Q5nqNiosCNqttzHof'
         >>> str(link)
         'spotify:track:2Foc5Q5nqNiosCNqttzHof'
         >>> track = link.as_track()
-        >>> str(track.link)
-        'spotify:track:2Foc5Q5nqNiosCNqttzHof'
-        >>> track.link.uri
-        'spotify:track:2Foc5Q5nqNiosCNqttzHof'
+        >>> track.link
+        Link('spotify:track:2Foc5Q5nqNiosCNqttzHof')
+
+    You must create a :class:`Session` before you can create links.
     """
 
-    def __init__(self, uri=None, obj=None, sp_link=None):
-        assert uri or obj or sp_link, 'uri, obj, or sp_link is required'
+    def __init__(self, uri=None, sp_link=None):
+        assert uri or sp_link, 'uri or sp_link is required'
 
         if spotify.session_instance is None:
             raise RuntimeError('Session must be initialized to create links')
 
-        # TODO Add support for creating link from a sp_artistbrowse instance
-
-        if sp_link:
-            self._sp_link = ffi.gc(sp_link, lib.sp_link_release)
-        elif uri:
+        if uri is not None:
             sp_link = lib.sp_link_create_from_string(
                 ffi.new('char[]', utils.to_bytes(uri)))
             if sp_link == ffi.NULL:
                 raise ValueError(
                     'Failed to get link from Spotify URI: %r' % uri)
-            self._sp_link = ffi.gc(sp_link, lib.sp_link_release)
-        elif obj:
-            self._sp_link = obj.link._sp_link
+
+        self._sp_link = ffi.gc(sp_link, lib.sp_link_release)
 
     def __repr__(self):
         return 'Link(%r)' % self.uri

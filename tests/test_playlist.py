@@ -590,13 +590,15 @@ class PlaylistTest(unittest.TestCase):
 
     @mock.patch('spotify.Link', spec=spotify.Link)
     def test_link_creates_link_to_playlist(self, link_mock, lib_mock):
-        link_mock.return_value = mock.sentinel.link
         sp_playlist = spotify.ffi.new('int *')
         playlist = spotify.Playlist(sp_playlist=sp_playlist)
+        sp_link = spotify.ffi.new('int *')
+        lib_mock.sp_link_create_from_playlist.return_value = sp_link
+        link_mock.return_value = mock.sentinel.link
 
         result = playlist.link
 
-        link_mock.assert_called_once_with(playlist)
+        link_mock.assert_called_once_with(sp_link=sp_link)
         self.assertEqual(result, mock.sentinel.link)
 
 

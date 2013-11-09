@@ -268,7 +268,18 @@ class Playlist(object):
     @property
     def link(self):
         """A :class:`Link` to the playlist."""
-        return spotify.Link(self)
+        # TODO Replace ValueError with proper exception type
+        if not self.is_loaded:
+            raise ValueError('The playlist must be loaded to create a link')
+        sp_link = lib.sp_link_create_from_playlist(self._sp_playlist)
+        if sp_link == ffi.NULL:
+            if not self.in_ram:
+                raise ValueError(
+                    'The playlist must have been in RAM to create a link')
+            # TODO Figure out why we can still get NULL here even if
+            # the playlist is both loaded and in RAM.
+            raise ValueError('Failed to get link from Spotify playlist')
+        return spotify.Link(sp_link=sp_link)
 
 
 class PlaylistContainer(collections.Sequence):

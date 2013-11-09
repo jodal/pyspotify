@@ -81,20 +81,6 @@ class Link(object):
                     sp_link = lib.sp_link_create_from_artist(obj._sp_artist)
             elif isinstance(obj, spotify.Search):
                 sp_link = lib.sp_link_create_from_search(obj._sp_search)
-            elif isinstance(obj, spotify.Playlist):
-                if not obj.is_loaded:
-                    raise ValueError(
-                        'The playlist must be loaded to create a link')
-                sp_link = lib.sp_link_create_from_playlist(obj._sp_playlist)
-                if sp_link == ffi.NULL:
-                    if not obj.in_ram:
-                        raise ValueError(
-                            'The playlist must have been in RAM to create '
-                            'a link')
-                    # TODO Figure out why we can still get NULL here even if
-                    # the playlist is both loaded and in RAM.
-                    raise ValueError(
-                        'Failed to get link from Spotify playlist')
             else:
                 self._sp_link = obj.link._sp_link
                 return

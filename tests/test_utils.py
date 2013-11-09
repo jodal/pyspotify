@@ -39,28 +39,41 @@ class IntEnumTest(unittest.TestCase):
 @mock.patch('spotify.search.lib', spec=spotify.lib)
 class SequenceTest(unittest.TestCase):
 
-    def test_does_not_add_ref_to_sp_obj_when_created(self, lib_mock):
+    def test_adds_ref_to_sp_obj_when_created(self, lib_mock):
         sp_search = spotify.ffi.new('int *')
+        utils.Sequence(
+            sp_obj=sp_search,
+            add_ref_func=lib_mock.sp_search_add_ref,
+            release_func=lib_mock.sp_search_release,
+            len_func=None,
+            getitem_func=None)
 
-        utils.Sequence(sp_search, None, None)
+        self.assertEqual(lib_mock.sp_search_add_ref.call_count, 1)
 
-        self.assertEqual(lib_mock.sp_search_add_ref.call_count, 0)
-
-    def test_does_not_release_sp_search_when_search_dies(self, lib_mock):
+    def test_releases_sp_obj_when_sequence_dies(self, lib_mock):
         sp_search = spotify.ffi.new('int *')
+        seq = utils.Sequence(
+            sp_obj=sp_search,
+            add_ref_func=lib_mock.sp_search_add_ref,
+            release_func=lib_mock.sp_search_release,
+            len_func=None,
+            getitem_func=None)
 
-        seq = utils.Sequence(sp_search, None, None)
         seq = None  # noqa
         [gc.collect() for _ in range(5)]  # Needed for PyPy
 
-        self.assertEqual(lib_mock.sp_search_release.call_count, 0)
+        self.assertEqual(lib_mock.sp_search_release.call_count, 1)
 
     def test_len_calls_len_func(self, lib_mock):
         sp_search = spotify.ffi.new('int *')
-
         len_func = mock.Mock()
         len_func.return_value = 0
-        seq = utils.Sequence(sp_search, len_func, None)
+        seq = utils.Sequence(
+            sp_obj=sp_search,
+            add_ref_func=lib_mock.sp_search_add_ref,
+            release_func=lib_mock.sp_search_release,
+            len_func=len_func,
+            getitem_func=None)
 
         result = len(seq)
 
@@ -69,10 +82,14 @@ class SequenceTest(unittest.TestCase):
 
     def test_getitem_calls_getitem_func(self, lib_mock):
         sp_search = spotify.ffi.new('int *')
-
         getitem_func = mock.Mock()
         getitem_func.return_value = mock.sentinel.item_one
-        seq = utils.Sequence(sp_search, lambda x: 1, getitem_func)
+        seq = utils.Sequence(
+            sp_obj=sp_search,
+            add_ref_func=lib_mock.sp_search_add_ref,
+            release_func=lib_mock.sp_search_release,
+            len_func=lambda x: 1,
+            getitem_func=getitem_func)
 
         result = seq[0]
 
@@ -81,14 +98,18 @@ class SequenceTest(unittest.TestCase):
 
     def test_getitem_with_slice(self, lib_mock):
         sp_search = spotify.ffi.new('int *')
-
         getitem_func = mock.Mock()
         getitem_func.side_effect = [
             mock.sentinel.item_one,
             mock.sentinel.item_two,
             mock.sentinel.item_three,
         ]
-        seq = utils.Sequence(sp_search, lambda x: 3, getitem_func)
+        seq = utils.Sequence(
+            sp_obj=sp_search,
+            add_ref_func=lib_mock.sp_search_add_ref,
+            release_func=lib_mock.sp_search_release,
+            len_func=lambda x: 3,
+            getitem_func=getitem_func)
 
         result = seq[0:2]
 
@@ -103,28 +124,45 @@ class SequenceTest(unittest.TestCase):
 
     def test_getitem_raises_index_error_on_negative_index(self, lib_mock):
         sp_search = spotify.ffi.new('int *')
-
-        seq = utils.Sequence(sp_search, lambda x: 1, None)
+        seq = utils.Sequence(
+            sp_obj=sp_search,
+            add_ref_func=lib_mock.sp_search_add_ref,
+            release_func=lib_mock.sp_search_release,
+            len_func=lambda x: 1,
+            getitem_func=None)
 
         self.assertRaises(IndexError, seq.__getitem__, -1)
 
     def test_getitem_raises_index_error_on_too_high_index(self, lib_mock):
         sp_search = spotify.ffi.new('int *')
-
-        seq = utils.Sequence(sp_search, lambda x: 1, None)
+        seq = utils.Sequence(
+            sp_obj=sp_search,
+            add_ref_func=lib_mock.sp_search_add_ref,
+            release_func=lib_mock.sp_search_release,
+            len_func=lambda x: 1,
+            getitem_func=None)
 
         self.assertRaises(IndexError, seq.__getitem__, 1)
 
     def test_getitem_raises_type_error_on_non_integral_index(self, lib_mock):
         sp_search = spotify.ffi.new('int *')
-
-        seq = utils.Sequence(sp_search, lambda x: 1, None)
+        seq = utils.Sequence(
+            sp_obj=sp_search,
+            add_ref_func=lib_mock.sp_search_add_ref,
+            release_func=lib_mock.sp_search_release,
+            len_func=lambda x: 1,
+            getitem_func=None)
 
         self.assertRaises(TypeError, seq.__getitem__, 'abc')
 
     def test_repr(self, lib_mock):
         sp_search = spotify.ffi.new('int *')
-        seq = utils.Sequence(sp_search, lambda s: 1, lambda s, i: 123)
+        seq = utils.Sequence(
+            sp_obj=sp_search,
+            add_ref_func=lib_mock.sp_search_add_ref,
+            release_func=lib_mock.sp_search_release,
+            len_func=lambda x: 1,
+            getitem_func=lambda s, i: 123)
 
         result = repr(seq)
 

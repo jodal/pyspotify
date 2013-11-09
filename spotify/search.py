@@ -138,9 +138,10 @@ class Search(object):
         def get_track(sp_search, key):
             return spotify.Track(sp_track=lib.sp_search_track(sp_search, key))
 
-        lib.sp_search_add_ref(self._sp_search)
         return utils.Sequence(
-            sp_obj=ffi.gc(self._sp_search, lib.sp_search_release),
+            sp_obj=self._sp_search,
+            add_ref_func=lib.sp_search_add_ref,
+            release_func=lib.sp_search_release,
             len_func=lib.sp_search_num_tracks,
             getitem_func=get_track)
 
@@ -168,9 +169,10 @@ class Search(object):
         def get_album(sp_search, key):
             return spotify.Album(sp_album=lib.sp_search_album(sp_search, key))
 
-        lib.sp_search_add_ref(self._sp_search)
         return utils.Sequence(
-            sp_obj=ffi.gc(self._sp_search, lib.sp_search_release),
+            sp_obj=self._sp_search,
+            add_ref_func=lib.sp_search_add_ref,
+            release_func=lib.sp_search_release,
             len_func=lib.sp_search_num_albums,
             getitem_func=get_album)
 
@@ -199,9 +201,10 @@ class Search(object):
             return spotify.Artist(
                 sp_artist=lib.sp_search_artist(sp_search, key))
 
-        lib.sp_search_add_ref(self._sp_search)
         return utils.Sequence(
-            sp_obj=ffi.gc(self._sp_search, lib.sp_search_release),
+            sp_obj=self._sp_search,
+            add_ref_func=lib.sp_search_add_ref,
+            release_func=lib.sp_search_release,
             len_func=lib.sp_search_num_artists,
             getitem_func=get_artist)
 
@@ -237,9 +240,10 @@ class Search(object):
                 image_uri=utils.to_unicode(
                     lib.sp_search_playlist_image_uri(self._sp_search, key)))
 
-        lib.sp_search_add_ref(self._sp_search)
         return utils.Sequence(
-            sp_obj=ffi.gc(self._sp_search, lib.sp_search_release),
+            sp_obj=self._sp_search,
+            add_ref_func=lib.sp_search_add_ref,
+            release_func=lib.sp_search_release,
             len_func=lib.sp_search_num_playlists,
             getitem_func=getitem)
 

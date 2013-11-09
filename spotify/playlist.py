@@ -83,9 +83,10 @@ class Playlist(object):
             return spotify.Track(
                 sp_track=lib.sp_playlist_track(sp_playlist, key))
 
-        lib.sp_playlist_add_ref(self._sp_playlist)
         return utils.Sequence(
-            sp_obj=ffi.gc(self._sp_playlist, lib.sp_playlist_release),
+            sp_obj=self._sp_playlist,
+            add_ref_func=lib.sp_playlist_add_ref,
+            release_func=lib.sp_playlist_release,
             len_func=lib.sp_playlist_num_tracks,
             getitem_func=get_track)
 
@@ -98,9 +99,10 @@ class Playlist(object):
         if not self.is_loaded:
             return []
 
-        lib.sp_playlist_add_ref(self._sp_playlist)
         return utils.Sequence(
-            sp_obj=ffi.gc(self._sp_playlist, lib.sp_playlist_release),
+            sp_obj=self._sp_playlist,
+            add_ref_func=lib.sp_playlist_add_ref,
+            release_func=lib.sp_playlist_release,
             len_func=lib.sp_playlist_num_tracks,
             getitem_func=PlaylistTrack)
 

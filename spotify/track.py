@@ -201,9 +201,10 @@ class Track(object):
             return spotify.Artist(
                 sp_artist=lib.sp_track_artist(sp_track, key))
 
-        lib.sp_track_add_ref(self._sp_track)
         return utils.Sequence(
-            sp_obj=ffi.gc(self._sp_track, lib.sp_track_release),
+            sp_obj=self._sp_track,
+            add_ref_func=lib.sp_track_add_ref,
+            release_func=lib.sp_track_release,
             len_func=lib.sp_track_num_artists,
             getitem_func=get_artist)
 

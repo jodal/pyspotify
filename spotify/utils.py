@@ -148,8 +148,11 @@ class Sequence(collections.Sequence):
     when the ``sp_obj`` object is GC-ed.
     """
 
-    def __init__(self, sp_obj, len_func, getitem_func):
-        self._sp_obj = sp_obj
+    def __init__(
+            self, sp_obj, add_ref_func, release_func, len_func, getitem_func):
+
+        add_ref_func(sp_obj)
+        self._sp_obj = ffi.gc(sp_obj, release_func)
         self._len_func = len_func
         self._getitem_func = getitem_func
 

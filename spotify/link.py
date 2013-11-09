@@ -73,12 +73,6 @@ class Link(object):
                         obj._sp_album, image_size)
                 else:
                     sp_link = lib.sp_link_create_from_album(obj._sp_album)
-            elif isinstance(obj, spotify.Artist):
-                if image_size is not None:
-                    sp_link = lib.sp_link_create_from_artist_portrait(
-                        obj._sp_artist, image_size)
-                else:
-                    sp_link = lib.sp_link_create_from_artist(obj._sp_artist)
             else:
                 self._sp_link = obj.link._sp_link
                 return

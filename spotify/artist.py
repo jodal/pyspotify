@@ -77,7 +77,23 @@ class Artist(object):
             spotify.session_instance._sp_session, portrait_id)
         return spotify.Image(sp_image=sp_image, add_ref=False)
 
+    def portrait_link(self, image_size=None):
+        """A :class:`Link` to the artist's portrait.
+
+        ``image_size`` is an :class:`ImageSize` value, by default
+        :attr:`ImageSize.NORMAL`.
+
+        This is equivalent with ``artist.portrait.link``, except that this
+        method does not need to create the artist portrait image object to
+        create a link to it.
+        """
+        if image_size is None:
+            image_size = spotify.ImageSize.NORMAL
+        return spotify.Link(sp_link=lib.sp_link_create_from_artist_portrait(
+            self._sp_artist, image_size))
+
     @property
     def link(self):
         """A :class:`Link` to the artist."""
-        return spotify.Link(self)
+        return spotify.Link(
+            sp_link=lib.sp_link_create_from_artist(self._sp_artist))

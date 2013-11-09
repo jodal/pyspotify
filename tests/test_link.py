@@ -109,28 +109,16 @@ class LinkTest(unittest.TestCase):
 
     @mock.patch('spotify.artist.lib', spec=spotify.lib)
     def test_create_from_artist(self, artist_lib_mock, lib_mock):
-        sp_link = spotify.ffi.new('int *')
-        lib_mock.sp_link_create_from_artist.return_value = sp_link
         sp_artist = spotify.ffi.new('int *')
         artist = spotify.Artist(sp_artist=sp_artist)
+        sp_link = spotify.ffi.new('int *')
+        artist_lib_mock.sp_link_create_from_artist.return_value = sp_link
 
         link = spotify.Link(obj=artist)
 
         self.assertEqual(link._sp_link, sp_link)
-        lib_mock.sp_link_create_from_artist.assert_called_once_with(sp_artist)
-
-    @mock.patch('spotify.artist.lib', spec=spotify.lib)
-    def test_create_from_artist_portrait(self, artist_lib_mock, lib_mock):
-        sp_link = spotify.ffi.new('int *')
-        lib_mock.sp_link_create_from_artist_portrait.return_value = sp_link
-        sp_artist = spotify.ffi.new('int *')
-        artist = spotify.Artist(sp_artist=sp_artist)
-
-        link = spotify.Link(obj=artist, image_size=spotify.ImageSize.NORMAL)
-
-        self.assertEqual(link._sp_link, sp_link)
-        lib_mock.sp_link_create_from_artist_portrait.assert_called_once_with(
-            sp_artist, spotify.ImageSize.NORMAL)
+        artist_lib_mock.sp_link_create_from_artist.assert_called_once_with(
+            sp_artist)
 
     @unittest.SkipTest
     def test_create_from_artistbrowse_portrait(self):

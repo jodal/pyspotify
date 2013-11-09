@@ -79,8 +79,6 @@ class Link(object):
                         obj._sp_artist, image_size)
                 else:
                     sp_link = lib.sp_link_create_from_artist(obj._sp_artist)
-            elif isinstance(obj, spotify.Search):
-                sp_link = lib.sp_link_create_from_search(obj._sp_search)
             else:
                 self._sp_link = obj.link._sp_link
                 return

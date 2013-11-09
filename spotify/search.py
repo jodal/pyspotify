@@ -285,7 +285,8 @@ class Search(object):
     @property
     def link(self):
         """A :class:`Link` to the search."""
-        return spotify.Link(self)
+        return spotify.Link(
+            sp_link=lib.sp_link_create_from_search(self._sp_search))
 
 
 @ffi.callback('void(sp_search *, void *)')

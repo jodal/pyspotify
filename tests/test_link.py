@@ -138,15 +138,16 @@ class LinkTest(unittest.TestCase):
 
     @mock.patch('spotify.search.lib', spec=spotify.lib)
     def test_create_from_search(self, search_lib_mock, lib_mock):
-        sp_link = spotify.ffi.new('int *')
-        lib_mock.sp_link_create_from_search.return_value = sp_link
         sp_search = spotify.ffi.new('int *')
         search_result = spotify.Search(sp_search=sp_search)
+        sp_link = spotify.ffi.new('int *')
+        search_lib_mock.sp_link_create_from_search.return_value = sp_link
 
         link = spotify.Link(obj=search_result)
 
         self.assertEqual(link._sp_link, sp_link)
-        lib_mock.sp_link_create_from_search.assert_called_once_with(sp_search)
+        search_lib_mock.sp_link_create_from_search.assert_called_once_with(
+            sp_search)
 
     @mock.patch('spotify.playlist.lib', spec=spotify.lib)
     def test_create_from_playlist(self, playlist_lib_mock, lib_mock):

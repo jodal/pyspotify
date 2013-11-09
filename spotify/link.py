@@ -24,9 +24,6 @@ class Link(object):
         One of :class:`Track`, :class:`Album`, :class:`Artist`,
         :class:`Search`, :class:`Playlist`, :class:`User`, or :class:`Image`.
 
-    If ``obj`` is a :class:`Track`, ``offset`` will be used as the position
-    in milliseconds into the track to link to.
-
     To get the URI from the link object, use it as a string or look at the
     :attr:`uri` attribute::
 
@@ -40,7 +37,7 @@ class Link(object):
         'spotify:track:2Foc5Q5nqNiosCNqttzHof'
     """
 
-    def __init__(self, uri=None, obj=None, sp_link=None, offset=0):
+    def __init__(self, uri=None, obj=None, sp_link=None):
         assert uri or obj or sp_link, 'uri, obj, or sp_link is required'
 
         if spotify.session_instance is None:
@@ -58,13 +55,7 @@ class Link(object):
                     'Failed to get link from Spotify URI: %r' % uri)
             self._sp_link = ffi.gc(sp_link, lib.sp_link_release)
         elif obj:
-            if isinstance(obj, spotify.Track):
-                sp_link = lib.sp_link_create_from_track(obj._sp_track, offset)
-            else:
-                self._sp_link = obj.link._sp_link
-                return
-
-            self._sp_link = ffi.gc(sp_link, lib.sp_link_release)
+            self._sp_link = obj.link._sp_link
 
     def __repr__(self):
         return 'Link(%r)' % self.uri

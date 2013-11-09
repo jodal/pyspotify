@@ -1,10 +1,10 @@
 from __future__ import unicode_literals
 
-import gc
 import mock
 import unittest
 
 import spotify
+import tests
 
 
 @mock.patch('spotify.search.lib', spec=spotify.lib)
@@ -77,7 +77,7 @@ class SearchTest(unittest.TestCase):
         result = spotify.Search('alice', callback=callback)
         complete_event = result.complete_event
         result = None  # noqa
-        [gc.collect() for _ in range(5)]  # Needed for PyPy
+        tests.gc_collect()
 
         search_complete_cb = lib_mock.sp_search_create.call_args[0][11]
         userdata = lib_mock.sp_search_create.call_args[0][12]
@@ -99,7 +99,7 @@ class SearchTest(unittest.TestCase):
 
         search = spotify.Search(sp_search=sp_search)
         search = None  # noqa
-        [gc.collect() for _ in range(5)]  # Needed for PyPy
+        tests.gc_collect()
 
         lib_mock.sp_search_release.assert_called_with(sp_search)
 

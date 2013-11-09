@@ -1,7 +1,6 @@
 from __future__ import unicode_literals
 
 import collections
-import gc
 import mock
 import unittest
 
@@ -59,7 +58,7 @@ class PlaylistTest(unittest.TestCase):
 
         playlist = spotify.Playlist(sp_playlist=sp_playlist)
         playlist = None  # noqa
-        [gc.collect() for _ in range(5)]  # Needed for PyPy
+        tests.gc_collect()
 
         lib_mock.sp_playlist_release.assert_called_with(sp_playlist)
 
@@ -656,7 +655,7 @@ class PlaylistContainerTest(unittest.TestCase):
 
         playlist_container = spotify.PlaylistContainer(sp_playlistcontainer)
         playlist_container = None  # noqa
-        [gc.collect() for _ in range(5)]  # Needed for PyPy
+        tests.gc_collect()
 
         lib_mock.sp_playlistcontainer_release.assert_called_with(
             sp_playlistcontainer)

@@ -1,11 +1,11 @@
 from __future__ import unicode_literals
 
-import gc
 import mock
 import unittest
 
 import spotify
 from spotify import utils
+import tests
 
 
 @mock.patch('spotify.image.lib', spec=spotify.lib)
@@ -59,7 +59,7 @@ class ImageTest(unittest.TestCase):
 
         image = spotify.Image(sp_image=sp_image)
         image = None  # noqa
-        [gc.collect() for _ in range(5)]  # Needed for PyPy
+        tests.gc_collect()
 
         lib_mock.sp_image_release.assert_called_with(sp_image)
 

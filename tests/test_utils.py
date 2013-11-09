@@ -2,12 +2,12 @@
 
 from __future__ import unicode_literals
 
-import gc
 import mock
 import unittest
 
 import spotify
 from spotify import utils
+import tests
 
 
 class IntEnumTest(unittest.TestCase):
@@ -60,7 +60,7 @@ class SequenceTest(unittest.TestCase):
             getitem_func=None)
 
         seq = None  # noqa
-        [gc.collect() for _ in range(5)]  # Needed for PyPy
+        tests.gc_collect()
 
         self.assertEqual(lib_mock.sp_search_release.call_count, 1)
 

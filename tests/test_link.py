@@ -1,6 +1,5 @@
 from __future__ import unicode_literals
 
-import gc
 import mock
 import unittest
 
@@ -62,7 +61,7 @@ class LinkTest(unittest.TestCase):
 
         link = spotify.Link('spotify:track:foo')
         link = None  # noqa
-        [gc.collect() for _ in range(5)]  # Needed for PyPy
+        tests.gc_collect()
 
         lib_mock.sp_link_release.assert_called_with(sp_link)
 

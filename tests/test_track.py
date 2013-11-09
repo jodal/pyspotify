@@ -1,10 +1,10 @@
 from __future__ import unicode_literals
 
-import gc
 import mock
 import unittest
 
 import spotify
+import tests
 
 
 @mock.patch('spotify.track.lib', spec=spotify.lib)
@@ -73,7 +73,7 @@ class TrackTest(unittest.TestCase):
 
         track = spotify.Track(sp_track=sp_track)
         track = None  # noqa
-        [gc.collect() for _ in range(5)]  # Needed for PyPy
+        tests.gc_collect()
 
         lib_mock.sp_track_release.assert_called_with(sp_track)
 

@@ -95,8 +95,6 @@ class Link(object):
                     # the playlist is both loaded and in RAM.
                     raise ValueError(
                         'Failed to get link from Spotify playlist')
-            elif isinstance(obj, spotify.User):
-                sp_link = lib.sp_link_create_from_user(obj._sp_user)
             else:
                 self._sp_link = obj.link._sp_link
                 return

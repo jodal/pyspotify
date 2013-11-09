@@ -112,13 +112,15 @@ class UserTest(unittest.TestCase):
 
     @mock.patch('spotify.Link', spec=spotify.Link)
     def test_link_creates_link_to_user(self, link_mock, lib_mock):
-        link_mock.return_value = mock.sentinel.link
         sp_user = spotify.ffi.new('int *')
         user = spotify.User(sp_user=sp_user)
+        sp_link = spotify.ffi.new('int *')
+        lib_mock.sp_link_create_from_user.return_value = sp_link
+        link_mock.return_value = mock.sentinel.link
 
         result = user.link
 
-        link_mock.assert_called_once_with(user)
+        link_mock.assert_called_once_with(sp_link=sp_link)
         self.assertEqual(result, mock.sentinel.link)
 
     @mock.patch('spotify.session_instance', spec=spotify.Session)

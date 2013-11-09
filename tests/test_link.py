@@ -192,15 +192,15 @@ class LinkTest(unittest.TestCase):
 
     @mock.patch('spotify.user.lib', spec=spotify.lib)
     def test_create_from_user(self, user_lib_mock, lib_mock):
-        sp_link = spotify.ffi.new('int *')
-        lib_mock.sp_link_create_from_user.return_value = sp_link
         sp_user = spotify.ffi.new('int *')
         user = spotify.User(sp_user=sp_user)
+        sp_link = spotify.ffi.new('int *')
+        user_lib_mock.sp_link_create_from_user.return_value = sp_link
 
         link = spotify.Link(obj=user)
 
         self.assertEqual(link._sp_link, sp_link)
-        lib_mock.sp_link_create_from_user.assert_called_once_with(sp_user)
+        user_lib_mock.sp_link_create_from_user.assert_called_once_with(sp_user)
 
     @mock.patch('spotify.image.lib', spec=spotify.lib)
     def test_create_from_image(self, image_lib_mock, lib_mock):

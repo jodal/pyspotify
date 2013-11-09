@@ -173,6 +173,21 @@ class AlbumTest(unittest.TestCase):
             sp_album, int(spotify.ImageSize.NORMAL))
         self.assertIsNone(result)
 
+    @mock.patch('spotify.Link', spec=spotify.Link)
+    def test_cover_link_creates_link_to_cover(self, link_mock, lib_mock):
+        sp_album = spotify.ffi.new('int *')
+        album = spotify.Album(sp_album=sp_album)
+        sp_link = spotify.ffi.new('int *')
+        lib_mock.sp_link_create_from_album_cover.return_value = sp_link
+        link_mock.return_value = mock.sentinel.link
+
+        result = album.cover_link(spotify.ImageSize.NORMAL)
+
+        lib_mock.sp_link_create_from_album_cover.assert_called_once_with(
+            sp_album, spotify.ImageSize.NORMAL)
+        link_mock.assert_called_once_with(sp_link=sp_link)
+        self.assertEqual(result, mock.sentinel.link)
+
     def test_name(self, lib_mock):
         lib_mock.sp_album_name.return_value = spotify.ffi.new(
             'char[]', b'Foo Bar Baz')
@@ -236,13 +251,15 @@ class AlbumTest(unittest.TestCase):
 
     @mock.patch('spotify.Link', spec=spotify.Link)
     def test_link_creates_link_to_album(self, link_mock, lib_mock):
-        link_mock.return_value = mock.sentinel.link
         sp_album = spotify.ffi.new('int *')
         album = spotify.Album(sp_album=sp_album)
+        sp_link = spotify.ffi.new('int *')
+        lib_mock.sp_link_create_from_album.return_value = sp_link
+        link_mock.return_value = mock.sentinel.link
 
         result = album.link
 
-        link_mock.assert_called_once_with(album)
+        link_mock.assert_called_once_with(sp_link=sp_link)
         self.assertEqual(result, mock.sentinel.link)
 
 

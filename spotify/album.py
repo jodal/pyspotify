@@ -88,6 +88,21 @@ class Album(object):
             spotify.session_instance._sp_session, cover_id)
         return spotify.Image(sp_image=sp_image, add_ref=False)
 
+    def cover_link(self, image_size=None):
+        """A :class:`Link` to the album's cover.
+
+        ``image_size`` is an :class:`ImageSize` value, by default
+        :attr:`ImageSize.NORMAL`.
+
+        This is equivalent with ``album.cover.link``, except that this method
+        does not need to create the album cover image object to create a link
+        to it.
+        """
+        if image_size is not None:
+            image_size = spotify.ImageSize.NORMAL
+        return spotify.Link(sp_link=lib.sp_link_create_from_album_cover(
+            self._sp_album, image_size))
+
     @property
     def name(self):
         """The album's name.
@@ -120,7 +135,8 @@ class Album(object):
     @property
     def link(self):
         """A :class:`Link` to the album."""
-        return spotify.Link(self)
+        return spotify.Link(
+            sp_link=lib.sp_link_create_from_album(self._sp_album))
 
 
 @utils.make_enum('SP_ALBUMTYPE_')

@@ -27,10 +27,6 @@ class Link(object):
     If ``obj`` is a :class:`Track`, ``offset`` will be used as the position
     in milliseconds into the track to link to.
 
-    If ``obj`` is an :class:`Album` or an :class:`Artist` and ``image_size``
-    is an :class:`ImageSize`, then the link will point to an album cover or
-    artist portrait.
-
     To get the URI from the link object, use it as a string or look at the
     :attr:`uri` attribute::
 
@@ -44,10 +40,7 @@ class Link(object):
         'spotify:track:2Foc5Q5nqNiosCNqttzHof'
     """
 
-    def __init__(
-            self, uri=None, obj=None, sp_link=None,
-            offset=0, image_size=None):
-
+    def __init__(self, uri=None, obj=None, sp_link=None, offset=0):
         assert uri or obj or sp_link, 'uri, obj, or sp_link is required'
 
         if spotify.session_instance is None:
@@ -67,12 +60,6 @@ class Link(object):
         elif obj:
             if isinstance(obj, spotify.Track):
                 sp_link = lib.sp_link_create_from_track(obj._sp_track, offset)
-            elif isinstance(obj, spotify.Album):
-                if image_size is not None:
-                    sp_link = lib.sp_link_create_from_album_cover(
-                        obj._sp_album, image_size)
-                else:
-                    sp_link = lib.sp_link_create_from_album(obj._sp_album)
             else:
                 self._sp_link = obj.link._sp_link
                 return

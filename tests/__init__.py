@@ -37,6 +37,6 @@ def gc_collect():
         # objects are not finalized before the next major GC collection.
         # Currently, the best way we have to ensure a major GC collection has
         # run is to call gc.collect() a number of times.
-        [gc.collect() for _ in range(5)]
+        [gc.collect() for _ in range(10)]
     else:
         gc.collect()

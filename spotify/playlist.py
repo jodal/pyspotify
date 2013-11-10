@@ -249,8 +249,7 @@ class Playlist(object):
 
     @property
     def offline_status(self):
-        """The playlist's :class:`PlaylistOfflineStatus`.
-        """
+        """The playlist's :class:`PlaylistOfflineStatus`."""
         # TODO Check behavior when not loaded
         return PlaylistOfflineStatus(lib.sp_playlist_get_offline_status(
             spotify.session_instance._sp_session, self._sp_playlist))
@@ -259,8 +258,8 @@ class Playlist(object):
     def offline_download_completed(self):
         """The download progress for an offline playlist.
 
-        A number in the range 0-100. Always 0 if :attr:`offline_status` isn't
-        :attr:`PlaylistOfflineStatus.DOWNLOADING`.
+        A number in the range 0-100. Always :class:`None` if
+        :attr:`offline_status` isn't :attr:`PlaylistOfflineStatus.DOWNLOADING`.
         """
         if self.offline_status != PlaylistOfflineStatus.DOWNLOADING:
             return None

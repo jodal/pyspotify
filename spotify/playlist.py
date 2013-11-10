@@ -491,6 +491,8 @@ class PlaylistTrack(object):
         self._sp_playlist = ffi.gc(sp_playlist, lib.sp_playlist_release)
         self._index = index
 
+    # TODO Add useful __repr__
+
     @property
     def track(self):
         """The :class:`~spotify.Track`."""

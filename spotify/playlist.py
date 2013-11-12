@@ -229,6 +229,17 @@ class Playlist(object):
 
     # TODO subscribers collection
 
+    def update_subscribers(self):
+        """Request an update of the :attr:`num_subscribers` and
+        :attr:`subscribers` collection.
+
+        The ``subscribers_changed`` callback will be called when the subscriber
+        data has been updated.
+        """
+        # TODO Link subscribers_changed in docstring to callback docs
+        spotify.Error.maybe_raise(lib.sp_playlist_update_subscribers(
+            spotify.session_instance._sp_session, self._sp_playlist))
+
     def is_in_ram(self):
         return bool(lib.sp_playlist_is_in_ram(
             spotify.session_instance._sp_session, self._sp_playlist))

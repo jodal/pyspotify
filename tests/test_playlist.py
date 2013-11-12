@@ -503,6 +503,27 @@ class PlaylistTest(unittest.TestCase):
         lib_mock.sp_playlist_num_subscribers.assert_called_with(sp_playlist)
         self.assertEqual(result, 7)
 
+    def test_update_subscribers(self, lib_mock):
+        session = self.create_session(lib_mock)
+        lib_mock.sp_playlist_update_subscribers.return_value = int(
+            spotify.ErrorType.OK)
+        sp_playlist = spotify.ffi.new('int *')
+        playlist = spotify.Playlist(sp_playlist=sp_playlist)
+
+        playlist.update_subscribers()
+
+        lib_mock.sp_playlist_update_subscribers.assert_called_with(
+            session._sp_session, sp_playlist)
+
+    def test_update_subscribers_fails_if_error(self, lib_mock):
+        self.create_session(lib_mock)
+        lib_mock.sp_playlist_update_subscribers.return_value = int(
+            spotify.ErrorType.BAD_API_VERSION)
+        sp_playlist = spotify.ffi.new('int *')
+        playlist = spotify.Playlist(sp_playlist=sp_playlist)
+
+        self.assertRaises(spotify.Error, playlist.update_subscribers)
+
     def test_is_in_ram(self, lib_mock):
         session = self.create_session(lib_mock)
         lib_mock.sp_playlist_is_in_ram.return_value = 1

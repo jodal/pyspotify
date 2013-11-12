@@ -227,7 +227,26 @@ class Playlist(object):
         # TODO Link subscribers_changed in docstring to callback docs
         return lib.sp_playlist_num_subscribers(self._sp_playlist)
 
-    # TODO subscribers collection
+    @property
+    def subscribers(self):
+        """The canonical usernames of up to 500 of the subscribers of the
+        playlist.
+
+        May be empty until you call :meth:`update_subscribers` and the
+        ``subscribers_changed`` callback is called.
+        """
+        # TODO Link subscribers_changed in docstring to callback docs
+        sp_subscribers = ffi.gc(
+            lib.sp_playlist_subscribers(self._sp_playlist),
+            lib.sp_playlist_subscribers_free)
+        # The ``subscribers`` field is ``char *[1]`` according to the struct,
+        # so we must cast it to ``char **`` to be able to access more than the
+        # first subscriber.
+        subscribers = ffi.cast('char **', sp_subscribers.subscribers)
+        usernames = []
+        for i in range(sp_subscribers.count):
+            usernames.append(utils.to_unicode(subscribers[i]))
+        return usernames
 
     def update_subscribers(self):
         """Request an update of the :attr:`num_subscribers` and

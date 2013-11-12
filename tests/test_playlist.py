@@ -503,6 +503,23 @@ class PlaylistTest(unittest.TestCase):
         lib_mock.sp_playlist_num_subscribers.assert_called_with(sp_playlist)
         self.assertEqual(result, 7)
 
+    def test_subscribers(self, lib_mock):
+        sp_subscribers = spotify.ffi.new('sp_subscribers *')
+        sp_subscribers.count = 1
+        user_alice = spotify.ffi.new('char[]', b'alice')
+        sp_subscribers.subscribers = [user_alice]
+        lib_mock.sp_playlist_subscribers.return_value = sp_subscribers
+        sp_playlist = spotify.ffi.new('int *')
+        playlist = spotify.Playlist(sp_playlist=sp_playlist)
+
+        result = playlist.subscribers
+
+        lib_mock.sp_playlist_subscribers.assert_called_with(sp_playlist)
+        tests.gc_collect()
+        lib_mock.sp_playlist_subscribers_free.assert_called_with(
+            sp_subscribers)
+        self.assertEqual(result, ['alice'])
+
     def test_update_subscribers(self, lib_mock):
         session = self.create_session(lib_mock)
         lib_mock.sp_playlist_update_subscribers.return_value = int(

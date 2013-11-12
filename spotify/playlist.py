@@ -214,6 +214,19 @@ class Playlist(object):
 
     # TODO reorder_tracks()
 
+    @property
+    def num_subscribers(self):
+        """The number of subscribers to the playlist.
+
+        The number can be higher than the length of the :attr:`subscribers`
+        collection, especially if the playlist got many subscribers.
+
+        May be zero until you call :meth:`update_subscribers` and the
+        ``subscribers_changed`` callback is called.
+        """
+        # TODO Link subscribers_changed in docstring to callback docs
+        return lib.sp_playlist_num_subscribers(self._sp_playlist)
+
     # TODO subscribers collection
 
     def is_in_ram(self):

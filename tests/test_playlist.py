@@ -493,6 +493,16 @@ class PlaylistTest(unittest.TestCase):
 
         self.assertRaises(spotify.Error, playlist.remove_tracks, track)
 
+    def test_num_subscribers(self, lib_mock):
+        lib_mock.sp_playlist_num_subscribers.return_value = 7
+        sp_playlist = spotify.ffi.new('int *')
+        playlist = spotify.Playlist(sp_playlist=sp_playlist)
+
+        result = playlist.num_subscribers
+
+        lib_mock.sp_playlist_num_subscribers.assert_called_with(sp_playlist)
+        self.assertEqual(result, 7)
+
     def test_is_in_ram(self, lib_mock):
         session = self.create_session(lib_mock)
         lib_mock.sp_playlist_is_in_ram.return_value = 1

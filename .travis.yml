@@ -4,8 +4,7 @@ env:
   - TOX_ENV=py27
   - TOX_ENV=py32
   - TOX_ENV=py33
-  # TODO Activate when Travis has PyPy 2.x
-  #- TOX_ENV=pypy
+  - TOX_ENV=pypy
   - TOX_ENV=docs
   - TOX_ENV=flake8
 

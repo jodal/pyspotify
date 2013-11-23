@@ -4,6 +4,7 @@
 
 from __future__ import unicode_literals
 
+import mock
 import os
 import sys
 
@@ -11,6 +12,20 @@ import sys
 # -- Workarounds to have autodoc generate API docs ----------------------------
 
 sys.path.insert(0, os.path.abspath('..'))
+
+
+cffi = mock.Mock()
+ffi = cffi.FFI.return_value
+ffi.CData = bytes
+lib = ffi.verify.return_value
+lib.sp_error_message.return_value = ''
+
+with open('sp-constants.csv') as fh:
+    for line in fh.readlines():
+        key, value = line.split(',', 1)
+        setattr(lib, key, value)
+
+sys.modules['cffi'] = cffi
 
 
 # -- General configuration ----------------------------------------------------

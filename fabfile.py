@@ -53,3 +53,14 @@ def update_authors():
     # Keep authors in the order of appearance and use awk to filter out dupes
     local(
         "git log --format='- %aN <%aE>' --reverse | awk '!x[$0]++' > AUTHORS")
+
+
+@task
+def update_sp_constants():
+    import spotify
+    constants = [
+        '%s,%s\n' % (attr, getattr(spotify.lib, attr))
+        for attr in dir(spotify.lib)
+        if attr.startswith('SP_')]
+    with open('docs/sp-constants.csv', 'w+') as fh:
+        fh.writelines(constants)

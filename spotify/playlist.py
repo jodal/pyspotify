@@ -264,7 +264,7 @@ class Playlist(object):
         return usernames
 
     def update_subscribers(self):
-        """Request an update of the :attr:`num_subscribers` and
+        """Request an update of :attr:`num_subscribers` and the
         :attr:`subscribers` collection.
 
         The ``subscribers_changed`` callback will be called when the subscriber

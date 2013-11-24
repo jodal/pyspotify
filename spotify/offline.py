@@ -7,7 +7,13 @@ __all__ = [
 
 
 class OfflineSyncStatus(object):
-    """A Spotify offline sync status."""
+    """A Spotify offline sync status object.
+
+    You'll never need to create an instance of this class yourself. You'll find
+    it ready for use as the :attr:`~spotify.Offline.sync_status` attribute on
+    the :attr:`~spotify.Session.offline` attribute on the
+    :class:`~spotify.Session` instance.
+    """
 
     def __init__(self, sp_offline_sync_status):
         self._sp_offline_sync_status = sp_offline_sync_status

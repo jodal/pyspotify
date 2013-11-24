@@ -30,7 +30,12 @@ class SampleType(utils.IntEnum):
 
 
 class AudioFormat(object):
-    """A Spotify audio format."""
+    """A Spotify audio format object.
+
+    You'll never need to create an instance of this class yourself, but you'll
+    get :class:`AudioFormat` objects as the ``audio_format`` argument to the
+    :attr:`~spotify.SessionCallbacks.music_delivery` callback.
+    """
 
     def __init__(self, sp_audioformat):
         self._sp_audioformat = sp_audioformat

@@ -1100,6 +1100,8 @@ class Player(object):
 
         This will cause audio data to be passed to the
         :attr:`~SessionCallbacks.music_delivery` callback.
+
+        If ``play`` is set to :class:`False`, playback will be paused.
         """
         spotify.Error.maybe_raise(lib.sp_session_player_play(
             self._session._sp_session, play))

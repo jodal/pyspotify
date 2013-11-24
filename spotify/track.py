@@ -112,7 +112,7 @@ class Track(object):
 
         Will always return :class:`None` if the track isn't loaded.
 
-        See :meth:`playable`.
+        See :attr:`playable`.
         """
         if spotify.session_instance is None:
             raise RuntimeError('Session must be initialized')
@@ -128,7 +128,7 @@ class Track(object):
 
         Will always return :class:`None` if the track isn't loaded.
 
-        See :meth:`is_autolinked`.
+        See :attr:`is_autolinked`.
         """
         if spotify.session_instance is None:
             raise RuntimeError('Session must be initialized')

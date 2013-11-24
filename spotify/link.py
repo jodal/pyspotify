@@ -15,7 +15,7 @@ class Link(object):
 
     A link can be created from a string containing a Spotify URI on the form
     ``spotify:...``. You can also get links from the ``link`` attribute on most
-    objects, e.g. :attr:`~spotify.Track.link`.
+    objects, e.g. :attr:`Track.link`.
 
     To get the URI from the link object you can use the :attr:`uri` attribute,
     or simply use the link as a string::

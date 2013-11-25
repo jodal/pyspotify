@@ -37,7 +37,7 @@ class Playlist(object):
         if uri is not None:
             playlist = spotify.Link(uri).as_playlist()
             if playlist is None:
-                raise ValueError(
+                raise spotify.Error(
                     'Failed to get playlist from Spotify URI: %r' % uri)
             sp_playlist = playlist._sp_playlist
             add_ref = True
@@ -50,7 +50,7 @@ class Playlist(object):
             return 'Playlist(<not loaded>)'
         try:
             return 'Playlist(%r)' % self.link.uri
-        except ValueError as exc:
+        except spotify.Error as exc:
             return 'Playlist(<error: %s>)' % exc
 
     @property
@@ -327,17 +327,16 @@ class Playlist(object):
     @property
     def link(self):
         """A :class:`Link` to the playlist."""
-        # TODO Replace ValueError with proper exception type
         if not self.is_loaded:
-            raise ValueError('The playlist must be loaded to create a link')
+            raise spotify.Error('The playlist must be loaded to create a link')
         sp_link = lib.sp_link_create_from_playlist(self._sp_playlist)
         if sp_link == ffi.NULL:
             if not self.in_ram:
-                raise ValueError(
+                raise spotify.Error(
                     'The playlist must have been in RAM to create a link')
             # TODO Figure out why we can still get NULL here even if
             # the playlist is both loaded and in RAM.
-            raise ValueError('Failed to get link from Spotify playlist')
+            raise spotify.Error('Failed to get link from Spotify playlist')
         return spotify.Link(sp_link=sp_link)
 
 
@@ -446,8 +445,7 @@ class PlaylistContainer(collections.Sequence):
         sp_playlist = lib.sp_playlistcontainer_add_new_playlist(
             self._sp_playlistcontainer, name)
         if sp_playlist == ffi.NULL:
-            # TODO Use a more fitting exception type
-            raise ValueError('Playlist creation failed')
+            raise spotify.Error('Playlist creation failed')
         return Playlist(sp_playlist=sp_playlist, add_ref=True)
 
     def add_playlist(self, playlist):

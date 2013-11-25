@@ -44,7 +44,7 @@ class PlaylistTest(unittest.TestCase):
         link_instance_mock.as_playlist.return_value = None
         uri = 'spotify:playlist:foo'
 
-        self.assertRaises(ValueError, spotify.Playlist, uri)
+        self.assertRaises(spotify.Error, spotify.Playlist, uri)
 
     def test_adds_ref_to_sp_playlist_when_created(self, lib_mock):
         sp_playlist = spotify.ffi.new('int *')
@@ -87,7 +87,7 @@ class PlaylistTest(unittest.TestCase):
     @mock.patch('spotify.Link', spec=spotify.Link)
     def test_repr_if_link_creation_fails(self, link_mock, lib_mock):
         lib_mock.sp_playlist_is_loaded.return_value = 1
-        link_mock.side_effect = ValueError('error message')
+        link_mock.side_effect = spotify.Error('error message')
         sp_playlist = spotify.ffi.new('int *')
         playlist = spotify.Playlist(sp_playlist=sp_playlist)
 
@@ -716,7 +716,7 @@ class PlaylistTest(unittest.TestCase):
         sp_playlist = spotify.ffi.new('int *')
         playlist = spotify.Playlist(sp_playlist=sp_playlist)
 
-        self.assertRaises(ValueError, getattr, playlist, 'link')
+        self.assertRaises(spotify.Error, getattr, playlist, 'link')
 
         # Condition is checked before link creation is tried
         self.assertEqual(lib_mock.sp_link_create_from_playlist.call_count, 0)
@@ -730,7 +730,7 @@ class PlaylistTest(unittest.TestCase):
         sp_playlist = spotify.ffi.new('int *')
         playlist = spotify.Playlist(sp_playlist=sp_playlist)
 
-        self.assertRaises(ValueError, getattr, playlist, 'link')
+        self.assertRaises(spotify.Error, getattr, playlist, 'link')
 
         # Condition is checked only if link creation returns NULL
         lib_mock.sp_link_create_from_playlist.assert_called_with(sp_playlist)
@@ -1028,7 +1028,7 @@ class PlaylistContainerTest(unittest.TestCase):
             sp_playlistcontainer=sp_playlistcontainer)
 
         self.assertRaises(
-            ValueError, playlist_container.add_new_playlist, 'foo bar')
+            spotify.Error, playlist_container.add_new_playlist, 'foo bar')
 
     def test_add_playlist_from_link(self, lib_mock):
         self.create_session(lib_mock)

@@ -877,6 +877,9 @@ class Session(object):
         """Post a ``message`` and one or more ``tracks`` to the inbox of the
         user with the given ``canonical_username``.
 
+        ``tracks`` can be a single :class:`~spotify.Track` or a list of
+        :class:`~spotify.Track` objects.
+
         Returns an :class:`InboxPostResult` that can be used to check if the
         request completed successfully.
 

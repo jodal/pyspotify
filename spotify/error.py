@@ -16,7 +16,7 @@ class Error(Exception):
 
     @classmethod
     def maybe_raise(cls, error_type, ignores=None):
-        """Raise an :exc:`Error` unless the ``error_type`` is
+        """Raise an :exc:`LibError` unless the ``error_type`` is
         :attr:`ErrorType.OK` or in the ``ignores`` list of error types.
 
         Internal method.

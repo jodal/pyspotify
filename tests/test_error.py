@@ -79,15 +79,15 @@ class ErrorTypeTest(unittest.TestCase):
 
 class TimeoutTest(unittest.TestCase):
 
-    def test_error_is_an_exception(self):
+    def test_is_an_error(self):
         error = spotify.Timeout(0.5)
-        self.assertIsInstance(error, Exception)
+        self.assertIsInstance(error, spotify.Error)
 
-    def test_error_has_useful_repr(self):
+    def test_has_useful_repr(self):
         error = spotify.Timeout(0.5)
         self.assertIn('Operation did not complete in 0.500s', repr(error))
 
-    def test_error_has_useful_string_representation(self):
+    def test_has_useful_string_representation(self):
         error = spotify.Timeout(0.5)
         self.assertEqual('%s' % error, 'Operation did not complete in 0.500s')
         self.assertIsInstance('%s' % error, utils.text_type)

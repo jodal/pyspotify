@@ -54,7 +54,7 @@ for attr in dir(lib):
         setattr(LibError, name, LibError(error_no))
 
 
-class Timeout(Exception):
+class Timeout(Error):
     """Exception raised by an operation not completing within the given
     timeout."""
 

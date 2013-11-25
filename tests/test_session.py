@@ -34,7 +34,7 @@ class SessionCallbacksTest(unittest.TestCase):
         self.callbacks._logged_in(self._sp_session, self._sp_error)
 
         self.callbacks.logged_in.assert_called_once_with(
-            spotify.session_instance, spotify.Error(self._sp_error))
+            spotify.session_instance, spotify.LibError(self._sp_error))
 
     def test_logged_in_without_session(self):
         spotify.session_instance = None
@@ -82,7 +82,7 @@ class SessionCallbacksTest(unittest.TestCase):
         self.callbacks._connection_error(self._sp_session, self._sp_error)
 
         self.callbacks.connection_error.assert_called_once_with(
-            spotify.session_instance, spotify.Error(self._sp_error))
+            spotify.session_instance, spotify.LibError(self._sp_error))
 
     def test_connection_error_without_session(self):
         spotify.session_instance = None
@@ -235,7 +235,7 @@ class SessionCallbacksTest(unittest.TestCase):
         self.callbacks._streaming_error(self._sp_session, self._sp_error)
 
         self.callbacks.streaming_error.assert_called_once_with(
-            spotify.session_instance, spotify.Error(self._sp_error))
+            spotify.session_instance, spotify.LibError(self._sp_error))
 
     def test_streaming_error_without_session(self):
         spotify.session_instance = None
@@ -373,7 +373,7 @@ class SessionCallbacksTest(unittest.TestCase):
         self.callbacks._scrobble_error(self._sp_session, self._sp_error)
 
         self.callbacks.scrobble_error.assert_called_once_with(
-            spotify.session_instance, spotify.Error(self._sp_error))
+            spotify.session_instance, spotify.LibError(self._sp_error))
 
     def test_scrobble_error_without_session(self):
         spotify.session_instance = None

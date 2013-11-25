@@ -331,9 +331,10 @@ class SessionCallbacks(object):
         if sp_error == spotify.ErrorType.OK:
             logger.info('Logged in')
         else:
-            logger.error('Login error: %s', spotify.Error(sp_error))
+            logger.error('Login error: %s', spotify.LibError(sp_error))
         if self.logged_in is not None:
-            self.logged_in(spotify.session_instance, spotify.Error(sp_error))
+            self.logged_in(
+                spotify.session_instance, spotify.LibError(sp_error))
 
     def _logged_out(self, sp_session):
         if not spotify.session_instance:
@@ -352,7 +353,7 @@ class SessionCallbacks(object):
     def _connection_error(self, sp_session, sp_error):
         if not spotify.session_instance:
             return
-        error = spotify.Error(sp_error)
+        error = spotify.LibError(sp_error)
         logger.error('Connection error: %s', error)
         if self.connection_error is not None:
             self.connection_error(spotify.session_instance, error)
@@ -412,7 +413,7 @@ class SessionCallbacks(object):
     def _streaming_error(self, sp_session, sp_error):
         if not spotify.session_instance:
             return
-        error = spotify.Error(sp_error)
+        error = spotify.LibError(sp_error)
         logger.error('Streaming error: %s', error)
         if self.streaming_error is not None:
             self.streaming_error(spotify.session_instance, error)
@@ -472,7 +473,7 @@ class SessionCallbacks(object):
     def _scrobble_error(self, sp_session, sp_error):
         if not spotify.session_instance:
             return
-        error = spotify.Error(sp_error)
+        error = spotify.LibError(sp_error)
         logger.error('Scrobble error: %s', error)
         if self.scrobble_error is not None:
             self.scrobble_error(spotify.session_instance, error)

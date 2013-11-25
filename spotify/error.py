@@ -6,23 +6,13 @@ from spotify import lib, utils
 __all__ = [
     'Error',
     'ErrorType',
+    'LibError',
     'Timeout',
 ]
 
 
 class Error(Exception):
     """A Spotify error."""
-
-    def __init__(self, error_type):
-        self.error_type = error_type
-        message = utils.to_unicode(lib.sp_error_message(error_type))
-        super(Error, self).__init__(message)
-
-    def __eq__(self, other):
-        return self.error_type == other.error_type
-
-    def __ne__(self, other):
-        return not self.__eq__(other)
 
     @classmethod
     def maybe_raise(cls, error_type, ignores=None):
@@ -34,18 +24,34 @@ class Error(Exception):
         ignores = set(ignores or [])
         ignores.add(ErrorType.OK)
         if error_type not in ignores:
-            raise Error(error_type)
-
-
-for attr in dir(lib):
-    if attr.startswith('SP_ERROR_'):
-        setattr(
-            Error, attr.replace('SP_ERROR_', ''), Error(getattr(lib, attr)))
+            raise LibError(error_type)
 
 
 @utils.make_enum('SP_ERROR_')
 class ErrorType(utils.IntEnum):
     pass
+
+
+class LibError(Error):
+    """A libspotify error."""
+
+    def __init__(self, error_type):
+        self.error_type = error_type
+        message = utils.to_unicode(lib.sp_error_message(error_type))
+        super(Error, self).__init__(message)
+
+    def __eq__(self, other):
+        return self.error_type == getattr(other, 'error_type', None)
+
+    def __ne__(self, other):
+        return not self.__eq__(other)
+
+
+for attr in dir(lib):
+    if attr.startswith('SP_ERROR_'):
+        name = attr.replace('SP_ERROR_', '')
+        error_no = getattr(lib, attr)
+        setattr(LibError, name, LibError(error_no))
 
 
 class Timeout(Exception):

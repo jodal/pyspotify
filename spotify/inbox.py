@@ -10,9 +10,7 @@ __all__ = [
 
 
 class InboxPostResult(object):
-    """The result object from an inbox post request."""
-
-    # TODO Link to the inbox post method
+    """The result object returned by :meth:`Session.inbox_post_tracks`."""
 
     def __init__(self, sp_inbox):
         lib.sp_inbox_add_ref(sp_inbox)

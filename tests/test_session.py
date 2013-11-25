@@ -890,6 +890,61 @@ class SessionTest(unittest.TestCase):
             session._sp_session)
         self.assertIsNone(result)
 
+    @mock.patch('spotify.track.lib', spec=spotify.lib)
+    @mock.patch('spotify.inbox.lib', spec=spotify.lib)
+    def test_inbox_post_tracks(self, inbox_lib_mock, track_lib_mock, lib_mock):
+        session = self.create_session(lib_mock)
+        sp_track1 = spotify.ffi.new('int *')
+        track1 = spotify.Track(sp_track=sp_track1)
+        sp_track2 = spotify.ffi.new('int *')
+        track2 = spotify.Track(sp_track=sp_track2)
+        sp_inbox = spotify.ffi.new('int *')
+        lib_mock.sp_inbox_post_tracks.return_value = sp_inbox
+
+        result = session.inbox_post_tracks('alice', [track1, track2], '♥')
+
+        lib_mock.sp_inbox_post_tracks.assert_called_with(
+            session._sp_session, b'alice', mock.ANY, 2, b'\xe2\x99\xa5',
+            spotify.ffi.NULL, spotify.ffi.NULL)
+        self.assertIn(
+            sp_track1, lib_mock.sp_inbox_post_tracks.call_args[0][2])
+        self.assertIn(
+            sp_track2, lib_mock.sp_inbox_post_tracks.call_args[0][2])
+        self.assertIsInstance(result, spotify.InboxPostResult)
+        self.assertEqual(result._sp_inbox, sp_inbox)
+
+    @mock.patch('spotify.track.lib', spec=spotify.lib)
+    @mock.patch('spotify.inbox.lib', spec=spotify.lib)
+    def test_inbox_post_tracks_with_single_track(
+            self, inbox_lib_mock, track_lib_mock, lib_mock):
+        session = self.create_session(lib_mock)
+        sp_track1 = spotify.ffi.new('int *')
+        track1 = spotify.Track(sp_track=sp_track1)
+        sp_inbox = spotify.ffi.new('int *')
+        lib_mock.sp_inbox_post_tracks.return_value = sp_inbox
+
+        result = session.inbox_post_tracks('alice', track1, '♥')
+
+        lib_mock.sp_inbox_post_tracks.assert_called_with(
+            session._sp_session, b'alice', mock.ANY, 1, b'\xe2\x99\xa5',
+            spotify.ffi.NULL, spotify.ffi.NULL)
+        self.assertIn(
+            sp_track1, lib_mock.sp_inbox_post_tracks.call_args[0][2])
+        self.assertIsInstance(result, spotify.InboxPostResult)
+        self.assertEqual(result._sp_inbox, sp_inbox)
+
+    @mock.patch('spotify.track.lib', spec=spotify.lib)
+    def test_inbox_post_tracks_fails_to_init(self, track_lib_mock, lib_mock):
+        session = self.create_session(lib_mock)
+        sp_track1 = spotify.ffi.new('int *')
+        track1 = spotify.Track(sp_track=sp_track1)
+        sp_track2 = spotify.ffi.new('int *')
+        track2 = spotify.Track(sp_track=sp_track2)
+        lib_mock.sp_inbox_post_tracks.return_value = spotify.ffi.NULL
+
+        with self.assertRaises(spotify.Error):
+            session.inbox_post_tracks('alice', [track1, track2], 'Enjoy!')
+
     @mock.patch('spotify.playlist.lib', spec=spotify.lib)
     def test_starred(self, playlist_lib_mock, lib_mock):
         lib_mock.sp_session_starred_create.return_value = (

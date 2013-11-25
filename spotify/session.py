@@ -872,6 +872,28 @@ class Session(object):
             return None
         return spotify.Playlist(sp_playlist=sp_playlist, add_ref=False)
 
+    def inbox_post_tracks(
+            self, canonical_username, tracks, message, callback=None):
+        """Post a ``message`` and one or more ``tracks`` to the inbox of the
+        user with the given ``canonical_username``.
+
+        Returns an :class:`InboxPostResult` that can be used to check if the
+        request completed successfully.
+
+        If callback isn't :class:`None`, it is called with an
+        :class:`InboxPostResult` instance when the request has completed.
+        """
+        # TODO inboxpost_complete_cb callback
+        if isinstance(tracks, spotify.Track):
+            tracks = [tracks]
+        sp_inbox = lib.sp_inbox_post_tracks(
+            self._sp_session, utils.to_bytes(canonical_username),
+            [t._sp_track for t in tracks], len(tracks),
+            utils.to_bytes(message), ffi.NULL, ffi.NULL)
+        if sp_inbox == ffi.NULL:
+            raise spotify.Error('Inbox post request failed to initialize')
+        return spotify.InboxPostResult(sp_inbox)
+
     @property
     def starred(self):
         """The starred :class:`Playlist` for the currently logged in user."""

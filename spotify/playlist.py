@@ -213,7 +213,21 @@ class Playlist(object):
         spotify.Error.maybe_raise(lib.sp_playlist_remove_tracks(
             self._sp_playlist, [t._sp_track for t in tracks], len(tracks)))
 
-    # TODO reorder_tracks()
+    def reorder_tracks(self, tracks, new_position):
+        """Move the given ``tracks`` to a ``new_position`` in the playlist.
+
+        ``tracks`` can be a single :class:`~spotify.Track` or a list of
+        :class:`~spotify.Track` objects.
+
+        ``new_position`` must be equal to or lower than the current playlist
+        length.
+        """
+        if isinstance(tracks, spotify.Track):
+            tracks = [tracks]
+        tracks = list(set(tracks))  # Remove duplicates
+        spotify.Error.maybe_raise(lib.sp_playlist_reorder_tracks(
+            self._sp_playlist, [t._sp_track for t in tracks], len(tracks),
+            new_position))
 
     @property
     def num_subscribers(self):

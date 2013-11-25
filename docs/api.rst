@@ -319,4 +319,4 @@ TODO: Implement
 Inbox
 =====
 
-TODO: Implement
+.. autoclass:: InboxPostResult

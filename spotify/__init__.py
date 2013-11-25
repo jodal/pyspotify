@@ -50,6 +50,7 @@ from spotify.audio import *  # noqa
 from spotify.connection import *  # noqa
 from spotify.error import *  # noqa
 from spotify.image import *  # noqa
+from spotify.inbox import *  # noqa
 from spotify.link import *  # noqa
 from spotify.offline import *  # noqa
 from spotify.playlist import *  # noqa

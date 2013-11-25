@@ -92,7 +92,8 @@ class Playlist(object):
 
     @property
     def tracks_with_metadata(self):
-        """The playlist's tracks with metadata specific to the playlist.
+        """The playlist's tracks, with metadata specific to the playlist as a
+        a list of :class:`~spotify.PlaylistTrack` objects.
 
         Will always return an empty list if the search isn't loaded.
         """

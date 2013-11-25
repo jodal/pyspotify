@@ -505,6 +505,7 @@ class PlaylistContainer(collections.Sequence):
 
     @property
     def owner(self):
+        """The :class:`User` object for the owner of the playlist container."""
         sp_user = lib.sp_playlistcontainer_owner(self._sp_playlistcontainer)
         return spotify.User(sp_user=sp_user)
 

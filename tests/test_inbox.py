@@ -152,6 +152,9 @@ class InboxPostResultTest(unittest.TestCase):
         with self.assertRaises(spotify.Error):
             spotify.InboxPostResult('alice', [track1, track2], 'Enjoy!')
 
+    def test_repr(self, lib_mock):
+        pass  # TODO
+
     def test_error(self, lib_mock):
         lib_mock.sp_inbox_error.return_value = int(
             spotify.ErrorType.INBOX_IS_FULL)

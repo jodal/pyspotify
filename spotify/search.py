@@ -3,7 +3,6 @@ from __future__ import unicode_literals
 import collections
 import logging
 import threading
-import uuid
 
 import spotify
 from spotify import ffi, lib, utils
@@ -51,14 +50,16 @@ class Search(object):
 
         self.complete_event = threading.Event()
 
+        self._callback_handles = set()
+
         if sp_search is None:
             query = ffi.new('char[]', utils.to_bytes(query))
 
-            key = utils.to_bytes(uuid.uuid4().hex)
-            assert key not in spotify.callback_dict
-            userdata = ffi.new('char[32]', key)
-
-            spotify.callback_dict[key] = (callback, self)
+            handle = ffi.new_handle((callback, self))
+            # TODO Think through the life cycle of the handle object. Can it
+            # happen that we GC the search and handle object, and then later
+            # the callback is called?
+            self._callback_handles.add(handle)
 
             sp_search = lib.sp_search_create(
                 spotify.session_instance._sp_session, query,
@@ -66,7 +67,7 @@ class Search(object):
                 album_offset, album_count,
                 artist_offset, artist_count,
                 playlist_offset, playlist_count,
-                int(search_type), _search_complete_callback, userdata)
+                int(search_type), _search_complete_callback, handle)
             add_ref = False
 
         if add_ref:
@@ -294,19 +295,13 @@ class Search(object):
 
 
 @ffi.callback('void(sp_search *, void *)')
-def _search_complete_callback(sp_search, userdata):
+def _search_complete_callback(sp_search, handle):
     logger.debug('search_complete_callback called')
-    if userdata is ffi.NULL:
+    if handle is ffi.NULL:
         logger.warning('search_complete_callback called without userdata')
         return
-    key = ffi.string(ffi.cast('char[32]', userdata))
-    value = spotify.callback_dict.pop(key, None)
-    if value is None:
-        logger.warning(
-            'search_complete_callback key %r not in callback_dict: %r',
-            key, spotify.callback_dict.keys())
-        return
-    (callback, search_result) = value
+    (callback, search_result) = ffi.from_handle(handle)
+    search_result._callback_handles.remove(handle)
     search_result.complete_event.set()
     if callback is not None:
         callback(search_result)

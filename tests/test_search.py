@@ -79,6 +79,9 @@ class SearchTest(unittest.TestCase):
         result = None  # noqa
         tests.gc_collect()
 
+        # FIXME The mock keeps the handle/userdata alive, thus the search
+        # result is kept alive, and this test doesn't test what it is intended
+        # to test.
         search_complete_cb = lib_mock.sp_search_create.call_args[0][11]
         userdata = lib_mock.sp_search_create.call_args[0][12]
         search_complete_cb(sp_search, userdata)

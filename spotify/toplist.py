@@ -82,8 +82,20 @@ class Toplist(object):
     completed.
     """
 
-    # TODO is_loaded
-    # TODO load()
+    @property
+    def is_loaded(self):
+        """Whether the toplist's data is loaded yet."""
+        return bool(lib.sp_toplistbrowse_is_loaded(self._sp_toplistbrowse))
+
+    def load(self, timeout=None):
+        """Block until the user's data is loaded.
+
+        :param timeout: seconds before giving up and raising an exception
+        :type timeout: float
+        :returns: self
+        """
+        return utils.load(self, timeout=timeout)
+
     # TODO error
     # TODO artists collection
     # TODO albums collection

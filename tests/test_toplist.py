@@ -129,6 +129,26 @@ class ToplistTest(unittest.TestCase):
     def test_repr(self, lib_mock):
         pass  # TODO
 
+    def test_is_loaded(self, lib_mock):
+        lib_mock.sp_toplistbrowse_is_loaded.return_value = 1
+        sp_toplistbrowse = spotify.ffi.new('int *')
+        toplist = spotify.Toplist(sp_toplistbrowse=sp_toplistbrowse)
+
+        result = toplist.is_loaded
+
+        lib_mock.sp_toplistbrowse_is_loaded.assert_called_once_with(
+            sp_toplistbrowse)
+        self.assertTrue(result)
+
+    @mock.patch('spotify.utils.load')
+    def test_load(self, load_mock, lib_mock):
+        sp_toplistbrowse = spotify.ffi.new('int *')
+        toplist = spotify.Toplist(sp_toplistbrowse=sp_toplistbrowse)
+
+        toplist.load(10)
+
+        load_mock.assert_called_with(toplist, timeout=10)
+
 
 class ToplistRegionTest(unittest.TestCase):
 

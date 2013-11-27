@@ -315,6 +315,9 @@ Toplists
 
 TODO: Implement
 
+.. autoclass:: ToplistRegion
+    :no-inherited-members:
+
 .. autoclass:: ToplistType
     :no-inherited-members:
 

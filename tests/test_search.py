@@ -9,6 +9,7 @@ import tests
 
 @mock.patch('spotify.search.lib', spec=spotify.lib)
 class SearchTest(unittest.TestCase):
+
     def create_session(self, lib_mock):
         session = mock.sentinel.session
         session._sp_session = mock.sentinel.sp_session

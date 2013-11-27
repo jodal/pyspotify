@@ -886,16 +886,8 @@ class Session(object):
         If callback isn't :class:`None`, it is called with an
         :class:`InboxPostResult` instance when the request has completed.
         """
-        # TODO inboxpost_complete_cb callback
-        if isinstance(tracks, spotify.Track):
-            tracks = [tracks]
-        sp_inbox = lib.sp_inbox_post_tracks(
-            self._sp_session, utils.to_bytes(canonical_username),
-            [t._sp_track for t in tracks], len(tracks),
-            utils.to_bytes(message), ffi.NULL, ffi.NULL)
-        if sp_inbox == ffi.NULL:
-            raise spotify.Error('Inbox post request failed to initialize')
-        return spotify.InboxPostResult(sp_inbox)
+        return spotify.InboxPostResult(
+            canonical_username, tracks, message, callback)
 
     @property
     def starred(self):

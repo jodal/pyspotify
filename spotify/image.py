@@ -3,7 +3,6 @@ from __future__ import unicode_literals
 import base64
 import logging
 import threading
-import uuid
 
 import spotify
 from spotify import ffi, lib, utils
@@ -43,6 +42,7 @@ class Image(object):
             lib.sp_image_add_ref(sp_image)
         self._sp_image = ffi.gc(sp_image, lib.sp_image_release)
         self.load_event = threading.Event()
+        self._callback_handles = set()
 
     def __repr__(self):
         return 'Image(%r)' % self.link.uri
@@ -53,31 +53,28 @@ class Image(object):
     def add_load_callback(self, callback):
         """Add callback to be called when the image data has loaded.
 
-        Returns a callback ID that can be used to remove the callback again.
+        Returns a callback handle that can be used to remove the callback
+        again.
 
         Callbacks added after the image is loaded is called immediately.
         """
         # FIXME Currently, callbacks added before load doesn't seem to be
         # called at all, while callbacks added after load is called
         # immediately.
-        key = utils.to_bytes(uuid.uuid4().hex)
-        assert key not in spotify.callback_dict
-        # TODO This dict entry will survive forever if the Image object is
-        # GC-ed without the callback being removed first. Reorganize so that
-        # all callback registrations disappears with the Image object.
-        spotify.callback_dict[key] = (callback, self)
-        userdata = ffi.new('char[32]', key)
+        handle = ffi.new_handle((callback, self))
+        # TODO Think through the life cycle of the handle object. Can it happen
+        # that we GC the image and handle object, and then later the callback
+        # is called?
+        self._callback_handles.add(handle)
         spotify.Error.maybe_raise(lib.sp_image_add_load_callback(
-            self._sp_image, _image_load_callback, userdata))
-        return key
+            self._sp_image, _image_load_callback, handle))
+        return handle
 
-    def remove_load_callback(self, callback_id):
+    def remove_load_callback(self, handle):
         """Remove a callback which was added with :meth:`add_load_callback`."""
-        if spotify.callback_dict.pop(callback_id, None) is None:
-            raise ValueError('No callback with id %r found' % callback_id)
-        userdata = ffi.new('char[32]', callback_id)
+        self._callback_handles.remove(handle)
         spotify.Error.maybe_raise(lib.sp_image_remove_load_callback(
-            self._sp_image, _image_load_callback, userdata))
+            self._sp_image, _image_load_callback, handle))
 
     @property
     def is_loaded(self):
@@ -148,19 +145,13 @@ class Image(object):
 
 
 @ffi.callback('void(sp_image *, void *)')
-def _image_load_callback(sp_image, userdata):
+def _image_load_callback(sp_image, handle):
     logger.debug('image_load_callback called')
-    if userdata is ffi.NULL:
+    if handle is ffi.NULL:
         logger.warning('image_load_callback called without userdata')
         return
-    key = ffi.string(ffi.cast('char[32]', userdata))
-    value = spotify.callback_dict.get(key, None)
-    if value is None:
-        logger.warning(
-            'image_load_callback key %r not in callback_dict: %r',
-            key, spotify.callback_dict.keys())
-        return
-    (callback, image) = value
+    (callback, image) = ffi.from_handle(handle)
+    image._callback_handles.remove(handle)
     if callback is not None:
         callback(image)
 

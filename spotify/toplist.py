@@ -21,17 +21,16 @@ class Toplist(object):
     most popular worldwide or in a specific region.
 
     ``type`` is a :class:`ToplistType` instance that specifies the type of
-    toplist to get.
+    toplist to create.
 
     ``region`` is either a :class:`ToplistRegion` instance, or a 2-letter ISO
-    3166-1 country code as a unicode string, that specified for what
-    geographical region the toplist is for.
+    3166-1 country code as a unicode string, that specifies the geographical
+    region to create a toplist for.
 
     If ``region`` is :attr:`ToplistRegion.USER` and ``canonical_username``
-    isn't specified, the region of the current user will be used.
-
-    If ``region`` is :attr:`ToplistRegion.USER` and ``canonical_username``
-    is specified, the region of the specified user will be used.
+    isn't specified, the region of the current user will be used. If
+    ``canonical_username`` is specified, the region of the specified user will
+    be used instead.
 
     If ``callback`` isn't :class:`None`, it is expected to be a callable that
     accepts a single argument, a :class:`Toplist` instance, when the toplist

@@ -49,7 +49,6 @@ class Search(object):
         self.search_type = search_type
 
         self.complete_event = threading.Event()
-
         self._callback_handles = set()
 
         if sp_search is None:

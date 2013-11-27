@@ -48,7 +48,7 @@ run tests.
 Development milestones
 ======================
 
-- 2013-11-25: Inbox subsystem complete, except the callback.
+- 2013-11-27: Inbox subsystem complete.
 
 - 2013-10-14: Playlist subsystem *almost* complete.
 

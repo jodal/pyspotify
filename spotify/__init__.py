@@ -34,11 +34,6 @@ lib = ffi.verify(
 # further details, refer to the CFFI docs.
 weak_key_dict = weakref.WeakKeyDictionary()
 
-# Mapping between simple keys, like ints and bytestrings that can be passed as
-# userdata through C context, and Python objects used to call the corresponding
-# callback functions in Python context.
-callback_dict = {}
-
 # Reference to the spotify.Session instance. Used to enforce that one and only
 # one session exists in each process.
 session_instance = None

@@ -78,7 +78,7 @@ class Toplist(object):
             sp_toplistbrowse, lib.sp_toplistbrowse_release)
 
     complete_event = None
-    """:class:`threading.Event` that is set when the inbox post is
+    """:class:`threading.Event` that is set when the toplist request is
     completed.
     """
 

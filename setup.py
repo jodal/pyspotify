@@ -35,6 +35,6 @@ setup(
     ext_package='spotify',
     ext_modules=ext_modules,
     install_requires=[
-        'cffi >= 0.6',
+        'cffi >= 0.7',
     ]
 )

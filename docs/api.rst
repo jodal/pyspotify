@@ -315,6 +315,9 @@ Toplists
 
 TODO: Implement
 
+.. autoclass:: ToplistType
+    :no-inherited-members:
+
 
 Inbox
 =====

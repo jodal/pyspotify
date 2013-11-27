@@ -52,5 +52,6 @@ from spotify.playlist import *  # noqa
 from spotify.search import *  # noqa
 from spotify.session import *  # noqa
 from spotify.social import *  # noqa
+from spotify.toplist import *  # noqa
 from spotify.track import *  # noqa
 from spotify.user import *  # noqa

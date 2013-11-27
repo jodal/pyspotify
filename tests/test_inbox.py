@@ -50,12 +50,18 @@ class InboxPostResultTest(unittest.TestCase):
         result = spotify.InboxPostResult('alice', [track1, track2], '♥')
 
         lib_mock.sp_inbox_post_tracks.assert_called_with(
-            session._sp_session, b'alice', mock.ANY, 2, b'\xe2\x99\xa5',
+            session._sp_session, mock.ANY, mock.ANY, 2, mock.ANY,
             mock.ANY, mock.ANY)
+        self.assertEqual(
+            spotify.ffi.string(lib_mock.sp_inbox_post_tracks.call_args[0][1]),
+            b'alice')
         self.assertIn(
             sp_track1, lib_mock.sp_inbox_post_tracks.call_args[0][2])
         self.assertIn(
             sp_track2, lib_mock.sp_inbox_post_tracks.call_args[0][2])
+        self.assertEqual(
+            spotify.ffi.string(lib_mock.sp_inbox_post_tracks.call_args[0][4]),
+            b'\xe2\x99\xa5')
         self.assertIsInstance(result, spotify.InboxPostResult)
         self.assertEqual(result._sp_inbox, sp_inbox)
 
@@ -73,10 +79,10 @@ class InboxPostResultTest(unittest.TestCase):
         sp_inbox = spotify.ffi.cast('sp_inbox *', spotify.ffi.new('int *'))
         lib_mock.sp_inbox_post_tracks.return_value = sp_inbox
 
-        result = spotify.InboxPostResult('alice', track1, '♥')
+        result = spotify.InboxPostResult('alice', track1, 'Enjoy!')
 
         lib_mock.sp_inbox_post_tracks.assert_called_with(
-            session._sp_session, b'alice', mock.ANY, 1, b'\xe2\x99\xa5',
+            session._sp_session, mock.ANY, mock.ANY, 1, mock.ANY,
             mock.ANY, mock.ANY)
         self.assertIn(
             sp_track1, lib_mock.sp_inbox_post_tracks.call_args[0][2])

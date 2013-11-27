@@ -28,8 +28,13 @@ class InboxPostResult(object):
         self._callback_handles = set()
 
         if sp_inbox is None:
+            canonical_username = ffi.new(
+                'char[]', utils.to_bytes(canonical_username))
+
             if isinstance(tracks, spotify.Track):
                 tracks = [tracks]
+
+            message = ffi.new('char[]', utils.to_bytes(message))
 
             handle = ffi.new_handle((callback, self))
             # TODO Think through the life cycle of the handle object. Can it
@@ -38,10 +43,9 @@ class InboxPostResult(object):
             self._callback_handles.add(handle)
 
             sp_inbox = lib.sp_inbox_post_tracks(
-                spotify.session_instance._sp_session,
-                utils.to_bytes(canonical_username),
+                spotify.session_instance._sp_session, canonical_username,
                 [t._sp_track for t in tracks], len(tracks),
-                utils.to_bytes(message), _inboxpost_complete_callback, handle)
+                message, _inboxpost_complete_callback, handle)
 
             if sp_inbox == ffi.NULL:
                 raise spotify.Error('Inbox post request failed to initialize')

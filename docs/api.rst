@@ -313,7 +313,7 @@ Users
 Toplists
 ========
 
-TODO: Implement
+.. autoclass:: Toplist
 
 .. autoclass:: ToplistRegion
     :no-inherited-members:

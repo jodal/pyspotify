@@ -41,7 +41,7 @@ class Toplist(object):
             self, type=None, region=None, canonical_username=None,
             callback=None, sp_toplistbrowse=None, add_ref=True):
 
-        assert (type and region) or sp_toplistbrowse, \
+        assert (type is not None and region is not None) or sp_toplistbrowse, \
             'type and region, or sp_toplistbrowse, is required'
 
         self.complete_event = threading.Event()

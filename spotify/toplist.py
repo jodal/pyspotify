@@ -104,10 +104,22 @@ class Toplist(object):
         return spotify.ErrorType(
             lib.sp_toplistbrowse_error(self._sp_toplistbrowse))
 
+    @property
+    def backend_request_duration(self):
+        """The time in ms that was spent waiting for the Spotify backend to
+        create the toplist.
+
+        Returns ``-1`` if the request was served from local cache. Returns
+        :class:`None` if the toplist isn't loaded yet.
+        """
+        if not self.is_loaded:
+            return None
+        return lib.sp_toplistbrowse_backend_request_duration(
+            self._sp_toplistbrowse)
+
     # TODO artists collection
     # TODO albums collection
     # TODO tracks collection
-    # TODO backend_request_duration
 
 
 @ffi.callback('void(sp_toplistbrowse *, void *)')

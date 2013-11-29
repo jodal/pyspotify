@@ -161,6 +161,30 @@ class ToplistTest(unittest.TestCase):
             sp_toplistbrowse)
         self.assertIs(result, spotify.ErrorType.OTHER_PERMANENT)
 
+    def test_backend_request_duration(self, lib_mock):
+        lib_mock.sp_toplistbrowse_backend_request_duration.return_value = 137
+        sp_toplistbrowse = spotify.ffi.new('int *')
+        toplist = spotify.Toplist(sp_toplistbrowse=sp_toplistbrowse)
+
+        result = toplist.backend_request_duration
+
+        lib_mock.sp_toplistbrowse_backend_request_duration.assert_called_with(
+            sp_toplistbrowse)
+        self.assertEqual(result, 137)
+
+    def test_backend_request_duration_when_not_loaded(self, lib_mock):
+        lib_mock.sp_toplistbrowse_is_loaded.return_value = 0
+        sp_toplistbrowse = spotify.ffi.new('int *')
+        toplist = spotify.Toplist(sp_toplistbrowse=sp_toplistbrowse)
+
+        result = toplist.backend_request_duration
+
+        lib_mock.sp_toplistbrowse_is_loaded.assert_called_with(
+            sp_toplistbrowse)
+        self.assertEqual(
+            lib_mock.sp_toplistbrowse_backend_request_duration.call_count, 0)
+        self.assertIsNone(result)
+
 
 class ToplistRegionTest(unittest.TestCase):
 

@@ -297,6 +297,59 @@ class ToplistTest(unittest.TestCase):
     def test_albums_fails_if_error(self, lib_mock):
         self.assert_fails_if_error(lib_mock, lambda s: s.albums)
 
+    @mock.patch('spotify.artist.lib', spec=spotify.lib)
+    def test_artists(self, artist_lib_mock, lib_mock):
+        lib_mock.sp_toplistbrowse_error.return_value = spotify.ErrorType.OK
+        sp_artist = spotify.ffi.cast('sp_artist *', spotify.ffi.new('int *'))
+        lib_mock.sp_toplistbrowse_num_artists.return_value = 1
+        lib_mock.sp_toplistbrowse_artist.return_value = sp_artist
+        sp_toplistbrowse = spotify.ffi.new('int *')
+        toplist = spotify.Toplist(sp_toplistbrowse=sp_toplistbrowse)
+
+        self.assertEqual(lib_mock.sp_toplistbrowse_add_ref.call_count, 1)
+        result = toplist.artists
+        self.assertEqual(lib_mock.sp_toplistbrowse_add_ref.call_count, 2)
+
+        self.assertEqual(len(result), 1)
+        lib_mock.sp_toplistbrowse_num_artists.assert_called_with(
+            sp_toplistbrowse)
+
+        item = result[0]
+        self.assertIsInstance(item, spotify.Artist)
+        self.assertEqual(item._sp_artist, sp_artist)
+        self.assertEqual(lib_mock.sp_toplistbrowse_artist.call_count, 1)
+        lib_mock.sp_toplistbrowse_artist.assert_called_with(
+            sp_toplistbrowse, 0)
+        artist_lib_mock.sp_artist_add_ref.assert_called_with(sp_artist)
+
+    def test_artists_if_no_artists(self, lib_mock):
+        lib_mock.sp_toplistbrowse_error.return_value = spotify.ErrorType.OK
+        lib_mock.sp_toplistbrowse_num_artists.return_value = 0
+        sp_toplistbrowse = spotify.ffi.new('int *')
+        toplist = spotify.Toplist(sp_toplistbrowse=sp_toplistbrowse)
+
+        result = toplist.artists
+
+        self.assertEqual(len(result), 0)
+        lib_mock.sp_toplistbrowse_num_artists.assert_called_with(
+            sp_toplistbrowse)
+        self.assertEqual(lib_mock.sp_toplistbrowse_artist.call_count, 0)
+
+    def test_artists_if_unloaded(self, lib_mock):
+        lib_mock.sp_toplistbrowse_error.return_value = spotify.ErrorType.OK
+        lib_mock.sp_toplistbrowse_is_loaded.return_value = 0
+        sp_toplistbrowse = spotify.ffi.new('int *')
+        toplist = spotify.Toplist(sp_toplistbrowse=sp_toplistbrowse)
+
+        result = toplist.artists
+
+        lib_mock.sp_toplistbrowse_is_loaded.assert_called_with(
+            sp_toplistbrowse)
+        self.assertEqual(len(result), 0)
+
+    def test_artists_fails_if_error(self, lib_mock):
+        self.assert_fails_if_error(lib_mock, lambda s: s.artists)
+
 
 class ToplistRegionTest(unittest.TestCase):
 

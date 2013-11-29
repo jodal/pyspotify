@@ -159,7 +159,26 @@ class Toplist(object):
             len_func=lib.sp_toplistbrowse_num_albums,
             getitem_func=get_album)
 
-    # TODO artists collection
+    @property
+    def artists(self):
+        """The artists in the toplist.
+
+        Will always return an empty list if the toplist isn't loaded.
+        """
+        spotify.Error.maybe_raise(self.error)
+        if not self.is_loaded:
+            return []
+
+        def get_artist(sp_toplistbrowse, key):
+            return spotify.Artist(
+                sp_artist=lib.sp_toplistbrowse_artist(sp_toplistbrowse, key))
+
+        return utils.Sequence(
+            sp_obj=self._sp_toplistbrowse,
+            add_ref_func=lib.sp_toplistbrowse_add_ref,
+            release_func=lib.sp_toplistbrowse_release,
+            len_func=lib.sp_toplistbrowse_num_artists,
+            getitem_func=get_artist)
 
 
 @ffi.callback('void(sp_toplistbrowse *, void *)')

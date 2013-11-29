@@ -48,6 +48,8 @@ run tests.
 Development milestones
 ======================
 
+- 2013-11-29: Toplist subsystem complete.
+
 - 2013-11-27: Inbox subsystem complete.
 
 - 2013-10-14: Playlist subsystem *almost* complete.

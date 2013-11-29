@@ -149,6 +149,18 @@ class ToplistTest(unittest.TestCase):
 
         load_mock.assert_called_with(toplist, timeout=10)
 
+    def test_error(self, lib_mock):
+        lib_mock.sp_toplistbrowse_error.return_value = int(
+            spotify.ErrorType.OTHER_PERMANENT)
+        sp_toplistbrowse = spotify.ffi.new('int *')
+        toplist = spotify.Toplist(sp_toplistbrowse=sp_toplistbrowse)
+
+        result = toplist.error
+
+        lib_mock.sp_toplistbrowse_error.assert_called_once_with(
+            sp_toplistbrowse)
+        self.assertIs(result, spotify.ErrorType.OTHER_PERMANENT)
+
 
 class ToplistRegionTest(unittest.TestCase):
 

@@ -95,7 +95,15 @@ class Toplist(object):
         """
         return utils.load(self, timeout=timeout)
 
-    # TODO error
+    @property
+    def error(self):
+        """An :class:`ErrorType` associated with the toplist.
+
+        Check to see if there was problems creating the toplist.
+        """
+        return spotify.ErrorType(
+            lib.sp_toplistbrowse_error(self._sp_toplistbrowse))
+
     # TODO artists collection
     # TODO albums collection
     # TODO tracks collection

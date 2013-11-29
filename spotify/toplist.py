@@ -44,6 +44,10 @@ class Toplist(object):
         assert (type is not None and region is not None) or sp_toplistbrowse, \
             'type and region, or sp_toplistbrowse, is required'
 
+        self.type = type
+        self.region = region
+        self.canonical_username = canonical_username
+
         self.complete_event = threading.Event()
         self._callback_handles = set()
 
@@ -80,6 +84,10 @@ class Toplist(object):
     """:class:`threading.Event` that is set when the toplist request is
     completed.
     """
+
+    def __repr__(self):
+        return 'Toplist(type=%r, region=%r, canonical_username=%r)' % (
+            self.type, self.region, self.canonical_username)
 
     @property
     def is_loaded(self):

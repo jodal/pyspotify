@@ -135,7 +135,17 @@ class ToplistTest(unittest.TestCase):
         lib_mock.sp_toplistbrowse_release.assert_called_with(sp_toplistbrowse)
 
     def test_repr(self, lib_mock):
-        pass  # TODO
+        sp_toplistbrowse = spotify.ffi.new('int *')
+        lib_mock.sp_toplistbrowse_create.return_value = sp_toplistbrowse
+        toplist = spotify.Toplist(
+            type=spotify.ToplistType.TRACKS, region='NO')
+
+        result = repr(toplist)
+
+        self.assertEqual(
+            result,
+            "Toplist(type=<ToplistType.TRACKS: 2>, region=u'NO', "
+            "canonical_username=None)")
 
     def test_is_loaded(self, lib_mock):
         lib_mock.sp_toplistbrowse_is_loaded.return_value = 1

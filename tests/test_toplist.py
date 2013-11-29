@@ -144,8 +144,8 @@ class ToplistTest(unittest.TestCase):
 
         self.assertEqual(
             result,
-            "Toplist(type=<ToplistType.TRACKS: 2>, region=u'NO', "
-            "canonical_username=None)")
+            "Toplist(type=<ToplistType.TRACKS: 2>, region=%r, "
+            "canonical_username=None)" % 'NO')
 
     def test_is_loaded(self, lib_mock):
         lib_mock.sp_toplistbrowse_is_loaded.return_value = 1

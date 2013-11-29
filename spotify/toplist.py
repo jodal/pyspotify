@@ -117,9 +117,29 @@ class Toplist(object):
         return lib.sp_toplistbrowse_backend_request_duration(
             self._sp_toplistbrowse)
 
+    @property
+    def tracks(self):
+        """The tracks in the toplist.
+
+        Will always return an empty list if the toplist isn't loaded.
+        """
+        spotify.Error.maybe_raise(self.error)
+        if not self.is_loaded:
+            return []
+
+        def get_track(sp_toplistbrowse, key):
+            return spotify.Track(
+                sp_track=lib.sp_toplistbrowse_track(sp_toplistbrowse, key))
+
+        return utils.Sequence(
+            sp_obj=self._sp_toplistbrowse,
+            add_ref_func=lib.sp_toplistbrowse_add_ref,
+            release_func=lib.sp_toplistbrowse_release,
+            len_func=lib.sp_toplistbrowse_num_tracks,
+            getitem_func=get_track)
+
     # TODO artists collection
     # TODO albums collection
-    # TODO tracks collection
 
 
 @ffi.callback('void(sp_toplistbrowse *, void *)')

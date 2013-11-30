@@ -18,6 +18,9 @@ class InboxPostResultTest(unittest.TestCase):
         spotify.session_instance = session
         return session
 
+    def tearDown(self):
+        spotify.session_instance = None
+
     def test_create_without_user_and_tracks_or_sp_inbox_fails(self, lib_mock):
         self.assertRaises(AssertionError, spotify.InboxPostResult)
 

@@ -263,6 +263,101 @@ class AlbumTest(unittest.TestCase):
         self.assertEqual(result, mock.sentinel.link)
 
 
+@mock.patch('spotify.album.lib', spec=spotify.lib)
+class AlbumBrowserTest(unittest.TestCase):
+
+    def create_session(self, lib_mock):
+        session = mock.sentinel.session
+        session._sp_session = mock.sentinel.sp_session
+        spotify.session_instance = session
+        return session
+
+    def tearDown(self):
+        spotify.session_instance = None
+
+    def test_create_without_album_or_sp_albumbrowse_fails(self, lib_mock):
+        self.assertRaises(AssertionError, spotify.AlbumBrowser)
+
+    def test_create_from_album(self, lib_mock):
+        session = self.create_session(lib_mock)
+        sp_album = spotify.ffi.new('int *')
+        album = spotify.Album(sp_album=sp_album)
+        sp_albumbrowse = spotify.ffi.new('int *')
+        lib_mock.sp_albumbrowse_create.return_value = sp_albumbrowse
+
+        result = album.browse()
+
+        lib_mock.sp_albumbrowse_create.assert_called_with(
+            session._sp_session, sp_album, mock.ANY, mock.ANY)
+        # TODO Assert on callback stuff
+        self.assertIsInstance(result, spotify.AlbumBrowser)
+
+    @unittest.skip(
+        'FIXME Makes test_releases_sp_albumbrowse_when_album_dies fail')
+    def test_create_from_album_with_callback(self, lib_mock):
+        session = self.create_session(lib_mock)
+        sp_album = spotify.ffi.new('int *')
+        album = spotify.Album(sp_album=sp_album)
+        sp_albumbrowse = spotify.ffi.cast(
+            'sp_albumbrowse *', spotify.ffi.new('int *'))
+        lib_mock.sp_albumbrowse_create.return_value = sp_albumbrowse
+        callback = mock.Mock()
+
+        result = album.browse(callback)
+
+        lib_mock.sp_albumbrowse_create.assert_called_with(
+            session._sp_session, sp_album, mock.ANY, mock.ANY)
+        albumbrowse_complete_cb = (
+            lib_mock.sp_albumbrowse_create.call_args[0][2])
+        userdata = lib_mock.sp_albumbrowse_create.call_args[0][3]
+        albumbrowse_complete_cb(sp_albumbrowse, userdata)
+
+        result.complete_event.wait(3)
+        callback.assert_called_with(result)
+
+    def test_browser_is_gone_before_callback_is_called(self, lib_mock):
+        self.create_session(lib_mock)
+        sp_album = spotify.ffi.new('int *')
+        album = spotify.Album(sp_album=sp_album)
+        sp_albumbrowse = spotify.ffi.cast(
+            'sp_albumbrowse *', spotify.ffi.new('int *'))
+        lib_mock.sp_albumbrowse_create.return_value = sp_albumbrowse
+        callback = mock.Mock()
+
+        result = spotify.AlbumBrowser(album=album, callback=callback)
+        complete_event = result.complete_event
+        result = None  # noqa
+        tests.gc_collect()
+
+        # FIXME The mock keeps the handle/userdata alive, thus the album is
+        # kept alive, and this test doesn't test what it is intended to test.
+        albumbrowse_complete_cb = (
+            lib_mock.sp_albumbrowse_create.call_args[0][2])
+        userdata = lib_mock.sp_albumbrowse_create.call_args[0][3]
+        albumbrowse_complete_cb(sp_albumbrowse, userdata)
+
+        complete_event.wait(3)
+        self.assertEqual(callback.call_count, 1)
+        self.assertEqual(
+            callback.call_args[0][0]._sp_albumbrowse, sp_albumbrowse)
+
+    def test_adds_ref_to_sp_albumbrowse_when_created(self, lib_mock):
+        sp_albumbrowse = spotify.ffi.new('int *')
+
+        spotify.AlbumBrowser(sp_albumbrowse=sp_albumbrowse)
+
+        lib_mock.sp_albumbrowse_add_ref.assert_called_with(sp_albumbrowse)
+
+    def test_releases_sp_albumbrowse_when_album_dies(self, lib_mock):
+        sp_albumbrowse = spotify.ffi.new('int *')
+
+        browser = spotify.AlbumBrowser(sp_albumbrowse=sp_albumbrowse)
+        browser = None  # noqa
+        tests.gc_collect()
+
+        lib_mock.sp_albumbrowse_release.assert_called_with(sp_albumbrowse)
+
+
 class AlbumTypeTest(unittest.TestCase):
 
     def test_has_constants(self):

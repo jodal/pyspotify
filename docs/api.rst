@@ -223,10 +223,10 @@ Albums
 
 .. autoclass:: Album
 
+.. autoclass:: AlbumBrowser
+
 .. autoclass:: AlbumType
     :no-inherited-members:
-
-TODO: Album browsing
 
 
 Artists

@@ -1,13 +1,19 @@
 from __future__ import unicode_literals
 
+import logging
+import threading
+
 import spotify
 from spotify import ffi, lib, utils
 
 
 __all__ = [
     'Album',
+    'AlbumBrowser',
     'AlbumType',
 ]
+
+logger = logging.getLogger(__name__)
 
 
 class Album(object):
@@ -137,6 +143,87 @@ class Album(object):
         """A :class:`Link` to the album."""
         return spotify.Link(
             sp_link=lib.sp_link_create_from_album(self._sp_album))
+
+    def browse(self, callback=None):
+        """Get an :class:`AlbumBrowser` for the album.
+
+        If ``callback`` isn't :class:`None`, it is expected to be a callable
+        that accepts a single argument, an :class:`AlbumBrowser` instance, when
+        the browser is done loading.
+
+        Can be created without the album being loaded.
+        """
+        return spotify.AlbumBrowser(album=self, callback=callback)
+
+
+class AlbumBrowser(object):
+    """An album browser for a Spotify album.
+
+    You can get an album browser from any :class:`Album` instance by calling
+    :meth:`Album.browse`::
+
+        >>> album = spotify.Album('spotify:album:6wXDbHLesy6zWqQawAa91d')
+        >>> browser = album.browse()
+        >>> browser.load()
+        >>> len(browser.tracks)
+        7
+    """
+
+    def __init__(
+            self, album=None, callback=None,
+            sp_albumbrowse=None, add_ref=True):
+
+        assert album or sp_albumbrowse, 'album or sp_albumbrowse is required'
+
+        self.complete_event = threading.Event()
+        self._callback_handles = set()
+
+        if sp_albumbrowse is None:
+            handle = ffi.new_handle((callback, self))
+            # TODO Think through the life cycle of the handle object. Can it
+            # happen that we GC the browser and handle object, and then later
+            # the callback is called?
+            self._callback_handles.add(handle)
+
+            sp_albumbrowse = lib.sp_albumbrowse_create(
+                spotify.session_instance._sp_session, album._sp_album,
+                _albumbrowse_complete_callback, handle)
+            add_ref = False
+
+        if add_ref:
+            lib.sp_albumbrowse_add_ref(sp_albumbrowse)
+        self._sp_albumbrowse = ffi.gc(
+            sp_albumbrowse, lib.sp_albumbrowse_release)
+
+    complete_event = None
+    """:class:`threading.Event` that is set when the album browser is loaded.
+    """
+
+    # TODO __repr__()
+    # TODO is_loaded
+    # TODO load()
+    # TODO error
+    # TODO backend_request_duration
+
+    # TODO album
+    # TODO artist
+    # TODO copyrights collection
+    # TODO tracks collection
+    # TODO review
+
+
+@ffi.callback('void(sp_albumbrowse *, void *)')
+def _albumbrowse_complete_callback(sp_albumbrowse, handle):
+    logger.debug('albumbrowse_complete_callback called')
+    if handle is ffi.NULL:
+        logger.warning(
+            'albumbrowse_complete_callback called without userdata')
+        return
+    (callback, album_browser) = ffi.from_handle(handle)
+    album_browser._callback_handles.remove(handle)
+    album_browser.complete_event.set()
+    if callback is not None:
+        callback(album_browser)
 
 
 @utils.make_enum('SP_ALBUMTYPE_')

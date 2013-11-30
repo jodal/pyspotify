@@ -35,6 +35,18 @@ class Toplist(object):
     If ``callback`` isn't :class:`None`, it is expected to be a callable that
     accepts a single argument, a :class:`Toplist` instance, when the toplist
     request completes.
+
+    Example::
+
+        >>> toplist = spotify.Toplist(
+        ...     type=spotify.ToplistType.TRACKS, region='US')
+        >>> toplist.load()
+        >>> len(toplist.tracks)
+        100
+        >>> len(toplist.artists)
+        0
+        >>> toplist.tracks[0]
+        Track(u'spotify:track:2dLLR6qlu5UJ5gk0dKz0h3')
     """
 
     def __init__(

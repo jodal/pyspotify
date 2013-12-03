@@ -12,7 +12,7 @@ libspotify docs for further details.
 
 .. attribute:: __version__
 
-    pyspotify's :pep:`396` version number.
+    pyspotify's version number in the :pep:`386` format.
 
     ::
 

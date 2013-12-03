@@ -199,13 +199,20 @@ class AlbumBrowser(object):
     """:class:`threading.Event` that is set when the album browser is loaded.
     """
 
-    # TODO __repr__()
+    def __repr__(self):
+        return 'AlbumBrowser(%r)' % self.album.link.uri
+
     # TODO is_loaded
     # TODO load()
     # TODO error
     # TODO backend_request_duration
 
-    # TODO album
+    @property
+    def album(self):
+        """Get the :class:`Album` the browser is for."""
+        # TODO Check behavior when not loaded
+        return Album(sp_album=lib.sp_albumbrowse_album(self._sp_albumbrowse))
+
     # TODO artist
     # TODO copyrights collection
     # TODO tracks collection

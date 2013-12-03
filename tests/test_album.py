@@ -357,6 +357,30 @@ class AlbumBrowserTest(unittest.TestCase):
 
         lib_mock.sp_albumbrowse_release.assert_called_with(sp_albumbrowse)
 
+    @mock.patch('spotify.Link', spec=spotify.Link)
+    def test_repr(self, link_mock, lib_mock):
+        sp_albumbrowse = spotify.ffi.new('int *')
+        browser = spotify.AlbumBrowser(sp_albumbrowse=sp_albumbrowse)
+        sp_album = spotify.ffi.new('int *')
+        lib_mock.sp_albumbrowse_album.return_value = sp_album
+        link_instance_mock = link_mock.return_value
+        link_instance_mock.uri = 'foo'
+
+        result = repr(browser)
+
+        self.assertEqual(result, 'AlbumBrowser(%r)' % 'foo')
+
+    def test_album(self, lib_mock):
+        sp_albumbrowse = spotify.ffi.new('int *')
+        browser = spotify.AlbumBrowser(sp_albumbrowse=sp_albumbrowse)
+        sp_album = spotify.ffi.new('int *')
+        lib_mock.sp_albumbrowse_album.return_value = sp_album
+
+        result = browser.album
+
+        self.assertIsInstance(result, spotify.Album)
+        self.assertEqual(result._sp_album, sp_album)
+
 
 class AlbumTypeTest(unittest.TestCase):
 

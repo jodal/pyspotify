@@ -401,6 +401,29 @@ class AlbumBrowserTest(unittest.TestCase):
         lib_mock.sp_albumbrowse_error.assert_called_once_with(sp_albumbrowse)
         self.assertIs(result, spotify.ErrorType.OTHER_PERMANENT)
 
+    def test_backend_request_duration(self, lib_mock):
+        lib_mock.sp_albumbrowse_backend_request_duration.return_value = 137
+        sp_albumbrowse = spotify.ffi.new('int *')
+        browser = spotify.AlbumBrowser(sp_albumbrowse=sp_albumbrowse)
+
+        result = browser.backend_request_duration
+
+        lib_mock.sp_albumbrowse_backend_request_duration.assert_called_with(
+            sp_albumbrowse)
+        self.assertEqual(result, 137)
+
+    def test_backend_request_duration_when_not_loaded(self, lib_mock):
+        lib_mock.sp_albumbrowse_is_loaded.return_value = 0
+        sp_albumbrowse = spotify.ffi.new('int *')
+        browser = spotify.AlbumBrowser(sp_albumbrowse=sp_albumbrowse)
+
+        result = browser.backend_request_duration
+
+        lib_mock.sp_albumbrowse_is_loaded.assert_called_with(sp_albumbrowse)
+        self.assertEqual(
+            lib_mock.sp_albumbrowse_backend_request_duration.call_count, 0)
+        self.assertIsNone(result)
+
     def test_album(self, lib_mock):
         sp_albumbrowse = spotify.ffi.new('int *')
         browser = spotify.AlbumBrowser(sp_albumbrowse=sp_albumbrowse)

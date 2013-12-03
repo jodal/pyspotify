@@ -225,7 +225,18 @@ class AlbumBrowser(object):
         return spotify.ErrorType(
             lib.sp_albumbrowse_error(self._sp_albumbrowse))
 
-    # TODO backend_request_duration
+    @property
+    def backend_request_duration(self):
+        """The time in ms that was spent waiting for the Spotify backend to
+        create the album browser.
+
+        Returns ``-1`` if the request was served from local cache. Returns
+        :class:`None` if the album browser isn't loaded yet.
+        """
+        if not self.is_loaded:
+            return None
+        return lib.sp_albumbrowse_backend_request_duration(
+            self._sp_albumbrowse)
 
     @property
     def album(self):

@@ -370,6 +370,26 @@ class AlbumBrowserTest(unittest.TestCase):
 
         self.assertEqual(result, 'AlbumBrowser(%r)' % 'foo')
 
+    def test_is_loaded(self, lib_mock):
+        lib_mock.sp_albumbrowse_is_loaded.return_value = 1
+        sp_albumbrowse = spotify.ffi.new('int *')
+        browser = spotify.AlbumBrowser(sp_albumbrowse=sp_albumbrowse)
+
+        result = browser.is_loaded
+
+        lib_mock.sp_albumbrowse_is_loaded.assert_called_once_with(
+            sp_albumbrowse)
+        self.assertTrue(result)
+
+    @mock.patch('spotify.utils.load')
+    def test_load(self, load_mock, lib_mock):
+        sp_albumbrowse = spotify.ffi.new('int *')
+        browser = spotify.AlbumBrowser(sp_albumbrowse=sp_albumbrowse)
+
+        browser.load(10)
+
+        load_mock.assert_called_with(browser, timeout=10)
+
     def test_album(self, lib_mock):
         sp_albumbrowse = spotify.ffi.new('int *')
         browser = spotify.AlbumBrowser(sp_albumbrowse=sp_albumbrowse)

@@ -390,6 +390,17 @@ class AlbumBrowserTest(unittest.TestCase):
 
         load_mock.assert_called_with(browser, timeout=10)
 
+    def test_error(self, lib_mock):
+        lib_mock.sp_albumbrowse_error.return_value = int(
+            spotify.ErrorType.OTHER_PERMANENT)
+        sp_albumbrowse = spotify.ffi.new('int *')
+        browser = spotify.AlbumBrowser(sp_albumbrowse=sp_albumbrowse)
+
+        result = browser.error
+
+        lib_mock.sp_albumbrowse_error.assert_called_once_with(sp_albumbrowse)
+        self.assertIs(result, spotify.ErrorType.OTHER_PERMANENT)
+
     def test_album(self, lib_mock):
         sp_albumbrowse = spotify.ffi.new('int *')
         browser = spotify.AlbumBrowser(sp_albumbrowse=sp_albumbrowse)

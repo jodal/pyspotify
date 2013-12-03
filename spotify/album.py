@@ -216,7 +216,15 @@ class AlbumBrowser(object):
         """
         return utils.load(self, timeout=timeout)
 
-    # TODO error
+    @property
+    def error(self):
+        """An :class:`ErrorType` associated with the album browser.
+
+        Check to see if there was problems creating the album browser.
+        """
+        return spotify.ErrorType(
+            lib.sp_albumbrowse_error(self._sp_albumbrowse))
+
     # TODO backend_request_duration
 
     @property

@@ -244,7 +244,13 @@ class AlbumBrowser(object):
         # TODO Check behavior when not loaded
         return Album(sp_album=lib.sp_albumbrowse_album(self._sp_albumbrowse))
 
-    # TODO artist
+    @property
+    def artist(self):
+        """The :class:`Artist` of the album."""
+        # TODO Check behavior when not loaded
+        return spotify.Artist(
+            sp_artist=lib.sp_albumbrowse_artist(self._sp_albumbrowse))
+
     # TODO copyrights collection
     # TODO tracks collection
     # TODO review

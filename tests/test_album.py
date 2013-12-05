@@ -436,6 +436,18 @@ class AlbumBrowserTest(unittest.TestCase):
         self.assertIsInstance(result, spotify.Album)
         self.assertEqual(result._sp_album, sp_album)
 
+    @mock.patch('spotify.artist.lib', spec=spotify.lib)
+    def test_artist(self, artist_lib_mock, lib_mock):
+        sp_albumbrowse = spotify.ffi.new('int *')
+        browser = spotify.AlbumBrowser(sp_albumbrowse=sp_albumbrowse)
+        sp_artist = spotify.ffi.new('int *')
+        lib_mock.sp_albumbrowse_artist.return_value = sp_artist
+
+        result = browser.artist
+
+        self.assertIsInstance(result, spotify.Artist)
+        self.assertEqual(result._sp_artist, sp_artist)
+
 
 class AlbumTypeTest(unittest.TestCase):
 

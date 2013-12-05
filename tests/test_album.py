@@ -4,6 +4,7 @@ import mock
 import unittest
 
 import spotify
+from spotify import utils
 import tests
 
 
@@ -447,6 +448,17 @@ class AlbumBrowserTest(unittest.TestCase):
 
         self.assertIsInstance(result, spotify.Artist)
         self.assertEqual(result._sp_artist, sp_artist)
+
+    def test_review(self, lib_mock):
+        sp_albumbrowse = spotify.ffi.new('int *')
+        browser = spotify.AlbumBrowser(sp_albumbrowse=sp_albumbrowse)
+        review = spotify.ffi.new('char[]', b'A nice album')
+        lib_mock.sp_albumbrowse_review.return_value = review
+
+        result = browser.review
+
+        self.assertIsInstance(result, utils.text_type)
+        self.assertEqual(result, 'A nice album')
 
 
 class AlbumTypeTest(unittest.TestCase):

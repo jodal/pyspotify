@@ -253,7 +253,13 @@ class AlbumBrowser(object):
 
     # TODO copyrights collection
     # TODO tracks collection
-    # TODO review
+
+    @property
+    def review(self):
+        """A review of the album."""
+        # TODO Check behavior when not loaded
+        return utils.to_unicode(
+            lib.sp_albumbrowse_review(self._sp_albumbrowse))
 
 
 @ffi.callback('void(sp_albumbrowse *, void *)')

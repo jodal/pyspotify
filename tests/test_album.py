@@ -437,6 +437,16 @@ class AlbumBrowserTest(unittest.TestCase):
         self.assertIsInstance(result, spotify.Album)
         self.assertEqual(result._sp_album, sp_album)
 
+    def test_album_when_not_loaded(self, lib_mock):
+        sp_albumbrowse = spotify.ffi.new('int *')
+        browser = spotify.AlbumBrowser(sp_albumbrowse=sp_albumbrowse)
+        lib_mock.sp_albumbrowse_album.return_value = spotify.ffi.NULL
+
+        result = browser.album
+
+        lib_mock.sp_albumbrowse_album.assert_called_with(sp_albumbrowse)
+        self.assertIsNone(result)
+
     @mock.patch('spotify.artist.lib', spec=spotify.lib)
     def test_artist(self, artist_lib_mock, lib_mock):
         sp_albumbrowse = spotify.ffi.new('int *')
@@ -448,6 +458,16 @@ class AlbumBrowserTest(unittest.TestCase):
 
         self.assertIsInstance(result, spotify.Artist)
         self.assertEqual(result._sp_artist, sp_artist)
+
+    def test_artist_when_not_loaded(self, lib_mock):
+        sp_albumbrowse = spotify.ffi.new('int *')
+        browser = spotify.AlbumBrowser(sp_albumbrowse=sp_albumbrowse)
+        lib_mock.sp_albumbrowse_artist.return_value = spotify.ffi.NULL
+
+        result = browser.artist
+
+        lib_mock.sp_albumbrowse_artist.assert_called_with(sp_albumbrowse)
+        self.assertIsNone(result)
 
     def test_copyrights(self, lib_mock):
         copyright = spotify.ffi.new('char[]', b'Apple Records 1973')

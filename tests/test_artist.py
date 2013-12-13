@@ -357,6 +357,16 @@ class ArtistBrowserTest(unittest.TestCase):
         self.assertIsInstance(result, spotify.Artist)
         self.assertEqual(result._sp_artist, sp_artist)
 
+    def test_artist_when_not_loaded(self, lib_mock):
+        sp_artistbrowse = spotify.ffi.new('int *')
+        browser = spotify.ArtistBrowser(sp_artistbrowse=sp_artistbrowse)
+        lib_mock.sp_artistbrowse_artist.return_value = spotify.ffi.NULL
+
+        result = browser.artist
+
+        lib_mock.sp_artistbrowse_artist.assert_called_with(sp_artistbrowse)
+        self.assertIsNone(result)
+
     @mock.patch('spotify.image.lib', spec=spotify.lib)
     def test_portraits(self, image_lib_mock, lib_mock):
         image_id = spotify.ffi.new('char[]', b'image-id')

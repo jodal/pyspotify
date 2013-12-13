@@ -238,16 +238,25 @@ class AlbumBrowser(object):
 
     @property
     def album(self):
-        """Get the :class:`Album` the browser is for."""
-        # TODO Check behavior when not loaded
-        return Album(sp_album=lib.sp_albumbrowse_album(self._sp_albumbrowse))
+        """Get the :class:`Album` the browser is for.
+
+        Will always return :class:`None` if the album isn't loaded.
+        """
+        sp_album = lib.sp_albumbrowse_album(self._sp_albumbrowse)
+        if sp_album is ffi.NULL:
+            return None
+        return Album(sp_album=sp_album)
 
     @property
     def artist(self):
-        """The :class:`Artist` of the album."""
-        # TODO Check behavior when not loaded
-        return spotify.Artist(
-            sp_artist=lib.sp_albumbrowse_artist(self._sp_albumbrowse))
+        """The :class:`Artist` of the album.
+
+        Will always return :class:`None` if the album isn't loaded.
+        """
+        sp_artist = lib.sp_albumbrowse_artist(self._sp_albumbrowse)
+        if sp_artist is ffi.NULL:
+            return None
+        return spotify.Artist(sp_artist=sp_artist)
 
     @property
     def copyrights(self):
@@ -291,8 +300,10 @@ class AlbumBrowser(object):
 
     @property
     def review(self):
-        """A review of the album."""
-        # TODO Check behavior when not loaded
+        """A review of the album.
+
+        Will always return an empty string if the album browser isn't loaded.
+        """
         return utils.to_unicode(
             lib.sp_albumbrowse_review(self._sp_albumbrowse))
 

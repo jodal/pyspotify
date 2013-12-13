@@ -206,10 +206,14 @@ class ArtistBrowser(object):
 
     @property
     def artist(self):
-        """Get the :class:`Artist` the browser is for."""
-        # TODO Check behavior when not loaded
-        return Artist(
-            sp_artist=lib.sp_artistbrowse_artist(self._sp_artistbrowse))
+        """Get the :class:`Artist` the browser is for.
+
+        Will always return :class:`None` if the artist browser isn't loaded.
+        """
+        sp_artist = lib.sp_artistbrowse_artist(self._sp_artistbrowse)
+        if sp_artist is ffi.NULL:
+            return None
+        return Artist(sp_artist=sp_artist)
 
     @property
     def portraits(self):
@@ -323,8 +327,10 @@ class ArtistBrowser(object):
 
     @property
     def biography(self):
-        """A biography of the artist."""
-        # TODO Check behavior when not loaded
+        """A biography of the artist.
+
+        Will always return an empty string if the artist browser isn't loaded.
+        """
         return utils.to_unicode(
             lib.sp_artistbrowse_biography(self._sp_artistbrowse))
 

@@ -52,8 +52,9 @@ support yet, you'll find what you need to use it from Python here.
         >>> spotify.ffi.string(msg)
         'No error'
 
-    Will always reflect the contents of the ``spotify/api.processed.h`` file in
-    the pyspotify distribution. To update the API:
+    :attr:`spotify.lib` will always reflect the contents of the
+    ``spotify/api.processed.h`` file in the pyspotify distribution. To update
+    the API:
 
     #. Update the file ``spotify/api.h`` with the latest header file from
        libspotify.

@@ -252,7 +252,26 @@ class AlbumBrowser(object):
             sp_artist=lib.sp_albumbrowse_artist(self._sp_albumbrowse))
 
     # TODO copyrights collection
-    # TODO tracks collection
+
+    @property
+    def tracks(self):
+        """The album's tracks.
+
+        Will always return an empty list if the album browser isn't loaded.
+        """
+        if not self.is_loaded:
+            return []
+
+        def get_track(sp_albumbrowse, key):
+            return spotify.Track(
+                sp_track=lib.sp_albumbrowse_track(sp_albumbrowse, key))
+
+        return utils.Sequence(
+            sp_obj=self._sp_albumbrowse,
+            add_ref_func=lib.sp_albumbrowse_add_ref,
+            release_func=lib.sp_albumbrowse_release,
+            len_func=lib.sp_albumbrowse_num_tracks,
+            getitem_func=get_track)
 
     @property
     def review(self):

@@ -449,6 +449,49 @@ class AlbumBrowserTest(unittest.TestCase):
         self.assertIsInstance(result, spotify.Artist)
         self.assertEqual(result._sp_artist, sp_artist)
 
+    @mock.patch('spotify.track.lib', spec=spotify.lib)
+    def test_tracks(self, track_lib_mock, lib_mock):
+        sp_track = spotify.ffi.cast('sp_track *', spotify.ffi.new('int *'))
+        lib_mock.sp_albumbrowse_num_tracks.return_value = 1
+        lib_mock.sp_albumbrowse_track.return_value = sp_track
+        sp_albumbrowse = spotify.ffi.new('int *')
+        browser = spotify.AlbumBrowser(sp_albumbrowse=sp_albumbrowse)
+
+        self.assertEqual(lib_mock.sp_albumbrowse_add_ref.call_count, 1)
+        result = browser.tracks
+        self.assertEqual(lib_mock.sp_albumbrowse_add_ref.call_count, 2)
+
+        self.assertEqual(len(result), 1)
+        lib_mock.sp_albumbrowse_num_tracks.assert_called_with(sp_albumbrowse)
+
+        item = result[0]
+        self.assertIsInstance(item, spotify.Track)
+        self.assertEqual(item._sp_track, sp_track)
+        self.assertEqual(lib_mock.sp_albumbrowse_track.call_count, 1)
+        lib_mock.sp_albumbrowse_track.assert_called_with(sp_albumbrowse, 0)
+        track_lib_mock.sp_track_add_ref.assert_called_with(sp_track)
+
+    def test_tracks_if_no_tracks(self, lib_mock):
+        lib_mock.sp_albumbrowse_num_tracks.return_value = 0
+        sp_albumbrowse = spotify.ffi.new('int *')
+        browser = spotify.AlbumBrowser(sp_albumbrowse=sp_albumbrowse)
+
+        result = browser.tracks
+
+        self.assertEqual(len(result), 0)
+        lib_mock.sp_albumbrowse_num_tracks.assert_called_with(sp_albumbrowse)
+        self.assertEqual(lib_mock.sp_albumbrowse_track.call_count, 0)
+
+    def test_tracks_if_unloaded(self, lib_mock):
+        lib_mock.sp_albumbrowse_is_loaded.return_value = 0
+        sp_albumbrowse = spotify.ffi.new('int *')
+        browser = spotify.AlbumBrowser(sp_albumbrowse=sp_albumbrowse)
+
+        result = browser.tracks
+
+        lib_mock.sp_albumbrowse_is_loaded.assert_called_with(sp_albumbrowse)
+        self.assertEqual(len(result), 0)
+
     def test_review(self, lib_mock):
         sp_albumbrowse = spotify.ffi.new('int *')
         browser = spotify.AlbumBrowser(sp_albumbrowse=sp_albumbrowse)

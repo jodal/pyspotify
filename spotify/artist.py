@@ -260,7 +260,29 @@ class ArtistBrowser(object):
             len_func=lib.sp_artistbrowse_num_tophit_tracks,
             getitem_func=get_track)
 
-    # TODO Add albums collection
+    @property
+    def albums(self):
+        """The artist's albums.
+
+        Will be an empty list if the browser was created with a ``type`` of
+        :attr:`ArtistBrowserType.NO_ALBUMS`.
+
+        Will always return an empty list if the artist browser isn't loaded.
+        """
+        if not self.is_loaded:
+            return []
+
+        def get_album(sp_artistbrowse, key):
+            return spotify.Album(
+                sp_album=lib.sp_artistbrowse_album(sp_artistbrowse, key))
+
+        return utils.Sequence(
+            sp_obj=self._sp_artistbrowse,
+            add_ref_func=lib.sp_artistbrowse_add_ref,
+            release_func=lib.sp_artistbrowse_release,
+            len_func=lib.sp_artistbrowse_num_albums,
+            getitem_func=get_album)
+
     # TODO Add similar_artists collection
 
     @property

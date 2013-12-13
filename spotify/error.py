@@ -12,7 +12,10 @@ __all__ = [
 
 
 class Error(Exception):
-    """A Spotify error."""
+    """A Spotify error.
+
+    This is the superclass of all custom exceptions raised by pyspotify.
+    """
 
     @classmethod
     def maybe_raise(cls, error_type, ignores=None):
@@ -33,7 +36,16 @@ class ErrorType(utils.IntEnum):
 
 
 class LibError(Error):
-    """A libspotify error."""
+    """A libspotify error.
+
+    Where many libspotify functions return error codes that must be checked
+    after each and every function call, pyspotify raises the
+    :exc:`LibError` exception instead. This helps you to not accidentally
+    swallow and hide errors when using pyspotify.
+    """
+
+    error_type = None
+    """The :class:`ErrorType` of the error."""
 
     def __init__(self, error_type):
         self.error_type = error_type

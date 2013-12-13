@@ -126,11 +126,6 @@ single lock.
 Error handling
 ==============
 
-Where many libspotify functions return error codes that must be checked after
-each and every function call, pyspotify raises the :exc:`spotify.Error`
-exception instead. This helps you to not accidentally swallow and hide errors
-when using pyspotify.
-
 .. autoexception:: Error
     :no-undoc-members:
     :no-inherited-members:

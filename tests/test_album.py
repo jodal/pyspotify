@@ -449,6 +449,49 @@ class AlbumBrowserTest(unittest.TestCase):
         self.assertIsInstance(result, spotify.Artist)
         self.assertEqual(result._sp_artist, sp_artist)
 
+    def test_copyrights(self, lib_mock):
+        copyright = spotify.ffi.new('char[]', b'Apple Records 1973')
+        lib_mock.sp_albumbrowse_num_copyrights.return_value = 1
+        lib_mock.sp_albumbrowse_copyright.return_value = copyright
+        sp_albumbrowse = spotify.ffi.new('int *')
+        browser = spotify.AlbumBrowser(sp_albumbrowse=sp_albumbrowse)
+
+        self.assertEqual(lib_mock.sp_albumbrowse_add_ref.call_count, 1)
+        result = browser.copyrights
+        self.assertEqual(lib_mock.sp_albumbrowse_add_ref.call_count, 2)
+
+        self.assertEqual(len(result), 1)
+        lib_mock.sp_albumbrowse_num_copyrights.assert_called_with(
+            sp_albumbrowse)
+
+        item = result[0]
+        self.assertIsInstance(item, utils.text_type)
+        self.assertEqual(item, 'Apple Records 1973')
+        self.assertEqual(lib_mock.sp_albumbrowse_copyright.call_count, 1)
+        lib_mock.sp_albumbrowse_copyright.assert_called_with(sp_albumbrowse, 0)
+
+    def test_copyrights_if_no_copyrights(self, lib_mock):
+        lib_mock.sp_albumbrowse_num_copyrights.return_value = 0
+        sp_albumbrowse = spotify.ffi.new('int *')
+        browser = spotify.AlbumBrowser(sp_albumbrowse=sp_albumbrowse)
+
+        result = browser.copyrights
+
+        self.assertEqual(len(result), 0)
+        lib_mock.sp_albumbrowse_num_copyrights.assert_called_with(
+            sp_albumbrowse)
+        self.assertEqual(lib_mock.sp_albumbrowse_copyright.call_count, 0)
+
+    def test_copyrights_if_unloaded(self, lib_mock):
+        lib_mock.sp_albumbrowse_is_loaded.return_value = 0
+        sp_albumbrowse = spotify.ffi.new('int *')
+        browser = spotify.AlbumBrowser(sp_albumbrowse=sp_albumbrowse)
+
+        result = browser.copyrights
+
+        lib_mock.sp_albumbrowse_is_loaded.assert_called_with(sp_albumbrowse)
+        self.assertEqual(len(result), 0)
+
     @mock.patch('spotify.track.lib', spec=spotify.lib)
     def test_tracks(self, track_lib_mock, lib_mock):
         sp_track = spotify.ffi.cast('sp_track *', spotify.ffi.new('int *'))

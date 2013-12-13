@@ -6,6 +6,7 @@ from spotify import ffi, lib, utils
 
 __all__ = [
     'Artist',
+    'ArtistBrowserType',
 ]
 
 
@@ -97,3 +98,8 @@ class Artist(object):
         """A :class:`Link` to the artist."""
         return spotify.Link(
             sp_link=lib.sp_link_create_from_artist(self._sp_artist))
+
+
+@utils.make_enum('SP_ARTISTBROWSE_')
+class ArtistBrowserType(utils.IntEnum):
+    pass

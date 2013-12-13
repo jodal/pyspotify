@@ -232,6 +232,9 @@ Artists
 
 TODO: Artist browsing
 
+.. autoclass:: ArtistBrowserType
+    :no-inherited-members:
+
 
 Images
 ======

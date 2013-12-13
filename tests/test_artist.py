@@ -178,3 +178,11 @@ class ArtistTest(unittest.TestCase):
 
         link_mock.assert_called_once_with(sp_link=sp_link)
         self.assertEqual(result, mock.sentinel.link)
+
+
+class ArtistBrowserTypeTest(unittest.TestCase):
+
+    def test_has_constants(self):
+        self.assertEqual(spotify.ArtistBrowserType.FULL, 0)
+        self.assertEqual(spotify.ArtistBrowserType.NO_TRACKS, 1)
+        self.assertEqual(spotify.ArtistBrowserType.NO_ALBUMS, 2)

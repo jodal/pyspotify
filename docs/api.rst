@@ -230,7 +230,7 @@ Artists
 
 .. autoclass:: Artist
 
-TODO: Artist browsing
+.. autoclass:: ArtistBrowser
 
 .. autoclass:: ArtistBrowserType
     :no-inherited-members:

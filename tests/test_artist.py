@@ -489,6 +489,52 @@ class ArtistBrowserTest(unittest.TestCase):
         lib_mock.sp_artistbrowse_is_loaded.assert_called_with(sp_artistbrowse)
         self.assertEqual(len(result), 0)
 
+    def test_similar_artists(self, lib_mock):
+        sp_artist = spotify.ffi.cast('sp_artist *', spotify.ffi.new('int *'))
+        lib_mock.sp_artistbrowse_num_similar_artists.return_value = 1
+        lib_mock.sp_artistbrowse_similar_artist.return_value = sp_artist
+        sp_artistbrowse = spotify.ffi.new('int *')
+        browser = spotify.ArtistBrowser(sp_artistbrowse=sp_artistbrowse)
+
+        self.assertEqual(lib_mock.sp_artistbrowse_add_ref.call_count, 1)
+        result = browser.similar_artists
+        self.assertEqual(lib_mock.sp_artistbrowse_add_ref.call_count, 2)
+
+        self.assertEqual(len(result), 1)
+        lib_mock.sp_artistbrowse_num_similar_artists.assert_called_with(
+            sp_artistbrowse)
+
+        item = result[0]
+        self.assertIsInstance(item, spotify.Artist)
+        self.assertEqual(item._sp_artist, sp_artist)
+        self.assertEqual(
+            lib_mock.sp_artistbrowse_similar_artist.call_count, 1)
+        lib_mock.sp_artistbrowse_similar_artist.assert_called_with(
+            sp_artistbrowse, 0)
+        lib_mock.sp_artist_add_ref.assert_called_with(sp_artist)
+
+    def test_similar_artists_if_no_artists(self, lib_mock):
+        lib_mock.sp_artistbrowse_num_similar_artists.return_value = 0
+        sp_artistbrowse = spotify.ffi.new('int *')
+        browser = spotify.ArtistBrowser(sp_artistbrowse=sp_artistbrowse)
+
+        result = browser.similar_artists
+
+        self.assertEqual(len(result), 0)
+        lib_mock.sp_artistbrowse_num_similar_artists.assert_called_with(
+            sp_artistbrowse)
+        self.assertEqual(lib_mock.sp_artistbrowse_similar_artist.call_count, 0)
+
+    def test_similar_artists_if_unloaded(self, lib_mock):
+        lib_mock.sp_artistbrowse_is_loaded.return_value = 0
+        sp_artistbrowse = spotify.ffi.new('int *')
+        browser = spotify.ArtistBrowser(sp_artistbrowse=sp_artistbrowse)
+
+        result = browser.similar_artists
+
+        lib_mock.sp_artistbrowse_is_loaded.assert_called_with(sp_artistbrowse)
+        self.assertEqual(len(result), 0)
+
     def test_biography(self, lib_mock):
         sp_artistbrowse = spotify.ffi.new('int *')
         browser = spotify.ArtistBrowser(sp_artistbrowse=sp_artistbrowse)

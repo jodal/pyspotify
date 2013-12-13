@@ -283,7 +283,26 @@ class ArtistBrowser(object):
             len_func=lib.sp_artistbrowse_num_albums,
             getitem_func=get_album)
 
-    # TODO Add similar_artists collection
+    @property
+    def similar_artists(self):
+        """The artist's similar artists.
+
+        Will always return an empty list if the artist browser isn't loaded.
+        """
+        if not self.is_loaded:
+            return []
+
+        def get_artist(sp_artistbrowse, key):
+            return spotify.Artist(
+                sp_artist=lib.sp_artistbrowse_similar_artist(
+                    sp_artistbrowse, key))
+
+        return utils.Sequence(
+            sp_obj=self._sp_artistbrowse,
+            add_ref_func=lib.sp_artistbrowse_add_ref,
+            release_func=lib.sp_artistbrowse_release,
+            len_func=lib.sp_artistbrowse_num_similar_artists,
+            getitem_func=get_artist)
 
     @property
     def biography(self):

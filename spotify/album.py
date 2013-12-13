@@ -53,8 +53,6 @@ class Album(object):
         :type timeout: float
         :returns: self
         """
-        # TODO Need to send a browse request for the object to be populated
-        # with data
         return utils.load(self, timeout=timeout)
 
     @property

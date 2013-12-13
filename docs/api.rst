@@ -5,9 +5,9 @@ pyspotify API
 .. module:: spotify
 
 The pyspotify API follows the `libspotify
-<https://developer.spotify.com/technologies/libspotify/>`__ API as closely as
-possible. Thus, you can refer to the similarly named functions in the
-libspotify docs for further details.
+<https://developer.spotify.com/technologies/libspotify/>`__ API closely. Thus,
+you can refer to the similarly named functions in the libspotify docs for
+further details.
 
 
 .. attribute:: __version__

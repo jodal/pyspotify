@@ -357,6 +357,58 @@ class ArtistBrowserTest(unittest.TestCase):
         self.assertIsInstance(result, spotify.Artist)
         self.assertEqual(result._sp_artist, sp_artist)
 
+    @mock.patch('spotify.image.lib', spec=spotify.lib)
+    def test_portraits(self, image_lib_mock, lib_mock):
+        image_id = spotify.ffi.new('char[]', b'image-id')
+        lib_mock.sp_artistbrowse_num_portraits.return_value = 1
+        lib_mock.sp_artistbrowse_portrait.return_value = image_id
+        sp_image = spotify.ffi.new('int *')
+        lib_mock.sp_image_create.return_value = sp_image
+        sp_artistbrowse = spotify.ffi.new('int *')
+        browser = spotify.ArtistBrowser(sp_artistbrowse=sp_artistbrowse)
+
+        self.assertEqual(lib_mock.sp_artistbrowse_add_ref.call_count, 1)
+        result = browser.portraits
+        self.assertEqual(lib_mock.sp_artistbrowse_add_ref.call_count, 2)
+
+        self.assertEqual(len(result), 1)
+        lib_mock.sp_artistbrowse_num_portraits.assert_called_with(
+            sp_artistbrowse)
+
+        item = result[0]
+        self.assertIsInstance(item, spotify.Image)
+        self.assertEqual(item._sp_image, sp_image)
+        self.assertEqual(lib_mock.sp_artistbrowse_portrait.call_count, 1)
+        lib_mock.sp_artistbrowse_portrait.assert_called_with(
+            sp_artistbrowse, 0)
+
+        # Since we *created* the sp_image, we already have a refcount of 1 and
+        # shouldn't increase the refcount when wrapping this sp_image in an
+        # Image object
+        self.assertEqual(image_lib_mock.sp_image_add_ref.call_count, 0)
+
+    def test_portraits_if_no_portraits(self, lib_mock):
+        lib_mock.sp_artistbrowse_num_portraits.return_value = 0
+        sp_artistbrowse = spotify.ffi.new('int *')
+        browser = spotify.ArtistBrowser(sp_artistbrowse=sp_artistbrowse)
+
+        result = browser.portraits
+
+        self.assertEqual(len(result), 0)
+        lib_mock.sp_artistbrowse_num_portraits.assert_called_with(
+            sp_artistbrowse)
+        self.assertEqual(lib_mock.sp_artistbrowse_portrait.call_count, 0)
+
+    def test_portraits_if_unloaded(self, lib_mock):
+        lib_mock.sp_artistbrowse_is_loaded.return_value = 0
+        sp_artistbrowse = spotify.ffi.new('int *')
+        browser = spotify.ArtistBrowser(sp_artistbrowse=sp_artistbrowse)
+
+        result = browser.portraits
+
+        lib_mock.sp_artistbrowse_is_loaded.assert_called_with(sp_artistbrowse)
+        self.assertEqual(len(result), 0)
+
     @mock.patch('spotify.track.lib', spec=spotify.lib)
     def test_tracks(self, track_lib_mock, lib_mock):
         sp_track = spotify.ffi.cast('sp_track *', spotify.ffi.new('int *'))

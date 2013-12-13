@@ -48,6 +48,8 @@ run tests.
 Development milestones
 ======================
 
+- 2013-12-13: Artist browsing complete.
+
 - 2013-12-13: Album browsing complete.
 
 - 2013-11-29: Toplist subsystem complete.

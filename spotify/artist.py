@@ -213,7 +213,26 @@ class ArtistBrowser(object):
         return Artist(
             sp_artist=lib.sp_artistbrowse_artist(self._sp_artistbrowse))
 
-    # TODO Add portraits collection
+    @property
+    def portraits(self):
+        """The artist's portraits.
+
+        Will always return an empty list if the artist browser isn't loaded.
+        """
+        if not self.is_loaded:
+            return []
+
+        def get_image(sp_artistbrowse, key):
+            image_id = lib.sp_artistbrowse_portrait(sp_artistbrowse, key)
+            sp_image = lib.sp_image_create(image_id)
+            return spotify.Image(sp_image=sp_image, add_ref=False)
+
+        return utils.Sequence(
+            sp_obj=self._sp_artistbrowse,
+            add_ref_func=lib.sp_artistbrowse_add_ref,
+            release_func=lib.sp_artistbrowse_release,
+            len_func=lib.sp_artistbrowse_num_portraits,
+            getitem_func=get_image)
 
     @property
     def tracks(self):

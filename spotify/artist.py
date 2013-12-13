@@ -239,7 +239,27 @@ class ArtistBrowser(object):
             len_func=lib.sp_artistbrowse_num_tracks,
             getitem_func=get_track)
 
-    # TODO Add tophit_tracks collection
+    @property
+    def tophit_tracks(self):
+        """The artist's top hit tracks.
+
+        Will always return an empty list if the artist browser isn't loaded.
+        """
+        if not self.is_loaded:
+            return []
+
+        def get_track(sp_artistbrowse, key):
+            return spotify.Track(
+                sp_track=lib.sp_artistbrowse_tophit_track(
+                    sp_artistbrowse, key))
+
+        return utils.Sequence(
+            sp_obj=self._sp_artistbrowse,
+            add_ref_func=lib.sp_artistbrowse_add_ref,
+            release_func=lib.sp_artistbrowse_release,
+            len_func=lib.sp_artistbrowse_num_tophit_tracks,
+            getitem_func=get_track)
+
     # TODO Add albums collection
     # TODO Add similar_artists collection
 

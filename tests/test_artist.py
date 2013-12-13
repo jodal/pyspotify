@@ -400,6 +400,52 @@ class ArtistBrowserTest(unittest.TestCase):
         lib_mock.sp_artistbrowse_is_loaded.assert_called_with(sp_artistbrowse)
         self.assertEqual(len(result), 0)
 
+    @mock.patch('spotify.track.lib', spec=spotify.lib)
+    def test_tophit_tracks(self, track_lib_mock, lib_mock):
+        sp_track = spotify.ffi.cast('sp_track *', spotify.ffi.new('int *'))
+        lib_mock.sp_artistbrowse_num_tophit_tracks.return_value = 1
+        lib_mock.sp_artistbrowse_tophit_track.return_value = sp_track
+        sp_artistbrowse = spotify.ffi.new('int *')
+        browser = spotify.ArtistBrowser(sp_artistbrowse=sp_artistbrowse)
+
+        self.assertEqual(lib_mock.sp_artistbrowse_add_ref.call_count, 1)
+        result = browser.tophit_tracks
+        self.assertEqual(lib_mock.sp_artistbrowse_add_ref.call_count, 2)
+
+        self.assertEqual(len(result), 1)
+        lib_mock.sp_artistbrowse_num_tophit_tracks.assert_called_with(
+            sp_artistbrowse)
+
+        item = result[0]
+        self.assertIsInstance(item, spotify.Track)
+        self.assertEqual(item._sp_track, sp_track)
+        self.assertEqual(lib_mock.sp_artistbrowse_tophit_track.call_count, 1)
+        lib_mock.sp_artistbrowse_tophit_track.assert_called_with(
+            sp_artistbrowse, 0)
+        track_lib_mock.sp_track_add_ref.assert_called_with(sp_track)
+
+    def test_tophit_tracks_if_no_tracks(self, lib_mock):
+        lib_mock.sp_artistbrowse_num_tophit_tracks.return_value = 0
+        sp_artistbrowse = spotify.ffi.new('int *')
+        browser = spotify.ArtistBrowser(sp_artistbrowse=sp_artistbrowse)
+
+        result = browser.tophit_tracks
+
+        self.assertEqual(len(result), 0)
+        lib_mock.sp_artistbrowse_num_tophit_tracks.assert_called_with(
+            sp_artistbrowse)
+        self.assertEqual(lib_mock.sp_artistbrowse_track.call_count, 0)
+
+    def test_tophit_tracks_if_unloaded(self, lib_mock):
+        lib_mock.sp_artistbrowse_is_loaded.return_value = 0
+        sp_artistbrowse = spotify.ffi.new('int *')
+        browser = spotify.ArtistBrowser(sp_artistbrowse=sp_artistbrowse)
+
+        result = browser.tophit_tracks
+
+        lib_mock.sp_artistbrowse_is_loaded.assert_called_with(sp_artistbrowse)
+        self.assertEqual(len(result), 0)
+
     def test_biography(self, lib_mock):
         sp_artistbrowse = spotify.ffi.new('int *')
         browser = spotify.ArtistBrowser(sp_artistbrowse=sp_artistbrowse)

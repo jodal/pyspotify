@@ -6,7 +6,14 @@ from __future__ import unicode_literals
 
 import mock
 import os
+import re
 import sys
+
+
+def get_version(filename):
+    init_py = open(filename).read()
+    metadata = dict(re.findall("__([a-z]+)__ = '([^']+)'", init_py))
+    return metadata['version']
 
 
 # -- Workarounds to have autodoc generate API docs ----------------------------
@@ -44,7 +51,7 @@ master_doc = 'index'
 project = u'pyspotify'
 copyright = u'2013, Stein Magnus Jodal and contributors'
 
-release = '2.0.0a1.dev0'
+release = get_version('../spotify/__init__.py')
 version = '.'.join(release.split('.')[:2])
 
 exclude_patterns = ['_build']

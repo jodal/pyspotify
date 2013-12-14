@@ -1165,11 +1165,16 @@ class PlaylistContainerTest(unittest.TestCase):
             ValueError, playlist_container.add_folder, 'x' * 300)
 
     def test_remove_playlist(self, lib_mock):
-        lib_mock.sp_playlistcontainer_remove_playlist.return_value = int(
-            spotify.ErrorType.OK)
         sp_playlistcontainer = spotify.ffi.new('int *')
         playlist_container = spotify.PlaylistContainer(
             sp_playlistcontainer=sp_playlistcontainer)
+        lib_mock.sp_playlistcontainer_num_playlists.return_value = 9
+        sp_playlist = spotify.ffi.new('int *')
+        lib_mock.sp_playlistcontainer_playlist.return_value = sp_playlist
+        lib_mock.sp_playlistcontainer_playlist_type.return_value = int(
+            spotify.PlaylistType.PLAYLIST)
+        lib_mock.sp_playlistcontainer_remove_playlist.return_value = int(
+            spotify.ErrorType.OK)
 
         playlist_container.remove_playlist(5)
 
@@ -1177,14 +1182,107 @@ class PlaylistContainerTest(unittest.TestCase):
             sp_playlistcontainer, 5)
 
     def test_remove_playlist_out_of_range_fails(self, lib_mock):
-        lib_mock.sp_playlistcontainer_remove_playlist.return_value = int(
-            spotify.ErrorType.INDEX_OUT_OF_RANGE)
         sp_playlistcontainer = spotify.ffi.new('int *')
         playlist_container = spotify.PlaylistContainer(
             sp_playlistcontainer=sp_playlistcontainer)
+        lib_mock.sp_playlistcontainer_num_playlists.return_value = 9
+        sp_playlist = spotify.ffi.new('int *')
+        lib_mock.sp_playlistcontainer_playlist.return_value = sp_playlist
+        lib_mock.sp_playlistcontainer_playlist_type.return_value = int(
+            spotify.PlaylistType.PLAYLIST)
+        lib_mock.sp_playlistcontainer_remove_playlist.return_value = int(
+            spotify.ErrorType.INDEX_OUT_OF_RANGE)
 
         self.assertRaises(
             spotify.Error, playlist_container.remove_playlist, 3)
+
+    def test_remove_start_folder_removes_end_folder_too(self, lib_mock):
+        sp_playlistcontainer = spotify.ffi.new('int *')
+        playlist_container = spotify.PlaylistContainer(
+            sp_playlistcontainer=sp_playlistcontainer)
+        lib_mock.sp_playlistcontainer_num_playlists.return_value = 3
+        sp_playlist = spotify.ffi.new('int *')
+        lib_mock.sp_playlistcontainer_playlist.return_value = sp_playlist
+        lib_mock.sp_playlistcontainer_playlist_type.side_effect = [
+            int(spotify.PlaylistType.START_FOLDER),
+            int(spotify.PlaylistType.PLAYLIST),
+            int(spotify.PlaylistType.END_FOLDER),
+        ]
+        lib_mock.sp_playlistcontainer_playlist_folder_id.side_effect = [
+            173, 173]
+        playlist_container._find_folder_indexes = lambda *a: [0, 2]
+        lib_mock.sp_playlistcontainer_remove_playlist.return_value = int(
+            spotify.ErrorType.OK)
+
+        playlist_container.remove_playlist(0)
+
+        lib_mock.sp_playlistcontainer_playlist_type.assert_called_with(
+            sp_playlistcontainer, 0)
+        lib_mock.sp_playlistcontainer_playlist_folder_id.assert_called_with(
+            sp_playlistcontainer, 0)
+        lib_mock.sp_playlistcontainer_remove_playlist.assert_has_calls([
+            mock.call(sp_playlistcontainer, 2),
+            mock.call(sp_playlistcontainer, 0),
+        ], any_order=False)
+
+    def test_remove_end_folder_removes_start_folder_too(self, lib_mock):
+        sp_playlistcontainer = spotify.ffi.new('int *')
+        playlist_container = spotify.PlaylistContainer(
+            sp_playlistcontainer=sp_playlistcontainer)
+        lib_mock.sp_playlistcontainer_num_playlists.return_value = 3
+        sp_playlist = spotify.ffi.new('int *')
+        lib_mock.sp_playlistcontainer_playlist.return_value = sp_playlist
+        lib_mock.sp_playlistcontainer_playlist_type.side_effect = [
+            int(spotify.PlaylistType.START_FOLDER),
+            int(spotify.PlaylistType.PLAYLIST),
+            int(spotify.PlaylistType.END_FOLDER),
+        ]
+        lib_mock.sp_playlistcontainer_playlist_folder_id.side_effect = [
+            173, 173]
+        playlist_container._find_folder_indexes = lambda *a: [0, 2]
+        lib_mock.sp_playlistcontainer_remove_playlist.return_value = int(
+            spotify.ErrorType.OK)
+
+        playlist_container.remove_playlist(2)
+
+        lib_mock.sp_playlistcontainer_playlist_type.assert_called_with(
+            sp_playlistcontainer, 2)
+        lib_mock.sp_playlistcontainer_playlist_folder_id.assert_called_with(
+            sp_playlistcontainer, 2)
+        lib_mock.sp_playlistcontainer_remove_playlist.assert_has_calls([
+            mock.call(sp_playlistcontainer, 2),
+            mock.call(sp_playlistcontainer, 0),
+        ], any_order=False)
+
+    def test_remove_folder_with_everything_in_it(self, lib_mock):
+        sp_playlistcontainer = spotify.ffi.new('int *')
+        playlist_container = spotify.PlaylistContainer(
+            sp_playlistcontainer=sp_playlistcontainer)
+        lib_mock.sp_playlistcontainer_num_playlists.return_value = 3
+        sp_playlist = spotify.ffi.new('int *')
+        lib_mock.sp_playlistcontainer_playlist.return_value = sp_playlist
+        lib_mock.sp_playlistcontainer_playlist_type.side_effect = [
+            int(spotify.PlaylistType.START_FOLDER),
+            int(spotify.PlaylistType.PLAYLIST),
+            int(spotify.PlaylistType.END_FOLDER),
+        ]
+        lib_mock.sp_playlistcontainer_playlist_folder_id.side_effect = [
+            173, 173]
+        playlist_container._find_folder_indexes = lambda *a: [0, 1, 2]
+        lib_mock.sp_playlistcontainer_remove_playlist.return_value = int(
+            spotify.ErrorType.OK)
+
+        playlist_container.remove_playlist(0, recursive=True)
+
+        lib_mock.sp_playlistcontainer_playlist_type.assert_called_with(
+            sp_playlistcontainer, 0)
+        lib_mock.sp_playlistcontainer_playlist_folder_id.assert_called_with(
+            sp_playlistcontainer, 0)
+        lib_mock.sp_playlistcontainer_remove_playlist.assert_has_calls([
+            mock.call(sp_playlistcontainer, 2),
+            mock.call(sp_playlistcontainer, 1),
+            mock.call(sp_playlistcontainer, 0),
+        ], any_order=False)
 
     def test_move_playlist(self, lib_mock):
         lib_mock.sp_playlistcontainer_move_playlist.return_value = int(

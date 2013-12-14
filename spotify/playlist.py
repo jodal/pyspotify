@@ -493,15 +493,41 @@ class PlaylistContainer(collections.Sequence):
         if len(re.sub('\s+', '', name)) == 0:
             raise ValueError('Playlist name cannot be space-only')
 
-    def remove_playlist(self, index):
-        """Remove playlist at the given index from the container."""
+    def remove_playlist(self, index, recursive=False):
+        """Remove playlist at the given index from the container.
+
+        If the item at the given ``index`` is the start or the end of a
+        playlist folder, the other end is also removed.
+
+        If the item is a folder start or end, a the other end of the folder is
+        found, and ``recursive`` is :class:`False`, only the folder itself is
+        removed, while its content is moved one level up the folder hierarchy.
+        If ``recursive`` is :class:`True`, the contents of the folder is
+        removed as well.
+        """
         # TODO Make available through __delitem__(index)
-        # TODO If removing a PlaylistFolder, make sure to remove the other end
-        # of the folder as well
-        # TODO Add `recursive` flag for removing playlist folder *and* its
-        # contents
-        spotify.Error.maybe_raise(lib.sp_playlistcontainer_remove_playlist(
-            self._sp_playlistcontainer, index))
+        item = self[index]
+        if isinstance(item, PlaylistFolder):
+            indexes = self._find_folder_indexes(item.id, recursive)
+        else:
+            indexes = [index]
+        for i in reversed(sorted(indexes)):
+            spotify.Error.maybe_raise(
+                lib.sp_playlistcontainer_remove_playlist(
+                    self._sp_playlistcontainer, i))
+
+    def _find_folder_indexes(self, folder_id, recursive):
+        # FIXME Has been manually tested. Need unit tests.
+        indexes = []
+        for i, item in enumerate(self):
+            if isinstance(item, PlaylistFolder) and item.id == folder_id:
+                indexes.append(i)
+        assert len(indexes) <= 2, (
+            'Found more than 2 items with the same playlist folder ID')
+        if recursive and len(indexes) == 2:
+            start, end = indexes
+            indexes = list(range(start, end + 1))
+        return indexes
 
     def move_playlist(self, from_index, to_index, dry_run=False):
         """Move playlist at ``from_index`` to ``to_index``.

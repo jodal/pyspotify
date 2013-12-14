@@ -308,7 +308,6 @@ class Playlist(object):
     @property
     def offline_status(self):
         """The playlist's :class:`PlaylistOfflineStatus`."""
-        # TODO Check behavior when not loaded
         return PlaylistOfflineStatus(lib.sp_playlist_get_offline_status(
             spotify.session_instance._sp_session, self._sp_playlist))
 

@@ -200,7 +200,8 @@ class ArtistBrowserTest(unittest.TestCase):
         session = self.create_session(lib_mock)
         sp_artist = spotify.ffi.new('int *')
         artist = spotify.Artist(sp_artist=sp_artist)
-        sp_artistbrowse = spotify.ffi.new('int *')
+        sp_artistbrowse = spotify.ffi.cast(
+            'sp_artistbrowse *', spotify.ffi.new('int *'))
         lib_mock.sp_artistbrowse_create.return_value = sp_artistbrowse
 
         result = artist.browse()
@@ -208,8 +209,14 @@ class ArtistBrowserTest(unittest.TestCase):
         lib_mock.sp_artistbrowse_create.assert_called_with(
             session._sp_session, sp_artist,
             int(spotify.ArtistBrowserType.FULL), mock.ANY, mock.ANY)
-        # TODO Assert on callback stuff
         self.assertIsInstance(result, spotify.ArtistBrowser)
+
+        artistbrowse_complete_cb = (
+            lib_mock.sp_artistbrowse_create.call_args[0][3])
+        userdata = lib_mock.sp_artistbrowse_create.call_args[0][4]
+        self.assertFalse(result.complete_event.is_set())
+        artistbrowse_complete_cb(sp_artistbrowse, userdata)
+        self.assertTrue(result.complete_event.is_set())
 
     def test_create_from_artist_with_type_and_callback(self, lib_mock):
         session = self.create_session(lib_mock)

@@ -283,15 +283,22 @@ class AlbumBrowserTest(unittest.TestCase):
         session = self.create_session(lib_mock)
         sp_album = spotify.ffi.new('int *')
         album = spotify.Album(sp_album=sp_album)
-        sp_albumbrowse = spotify.ffi.new('int *')
+        sp_albumbrowse = spotify.ffi.cast(
+            'sp_albumbrowse *', spotify.ffi.new('int *'))
         lib_mock.sp_albumbrowse_create.return_value = sp_albumbrowse
 
         result = album.browse()
 
         lib_mock.sp_albumbrowse_create.assert_called_with(
             session._sp_session, sp_album, mock.ANY, mock.ANY)
-        # TODO Assert on callback stuff
         self.assertIsInstance(result, spotify.AlbumBrowser)
+
+        albumbrowse_complete_cb = (
+            lib_mock.sp_albumbrowse_create.call_args[0][2])
+        userdata = lib_mock.sp_albumbrowse_create.call_args[0][3]
+        self.assertFalse(result.complete_event.is_set())
+        albumbrowse_complete_cb(sp_albumbrowse, userdata)
+        self.assertTrue(result.complete_event.is_set())
 
     def test_create_from_album_with_callback(self, lib_mock):
         session = self.create_session(lib_mock)

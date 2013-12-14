@@ -186,7 +186,7 @@ class AlbumTest(unittest.TestCase):
 
         lib_mock.sp_link_create_from_album_cover.assert_called_once_with(
             sp_album, spotify.ImageSize.NORMAL)
-        link_mock.assert_called_once_with(sp_link=sp_link)
+        link_mock.assert_called_once_with(sp_link=sp_link, add_ref=False)
         self.assertEqual(result, mock.sentinel.link)
 
     def test_name(self, lib_mock):
@@ -260,7 +260,7 @@ class AlbumTest(unittest.TestCase):
 
         result = album.link
 
-        link_mock.assert_called_once_with(sp_link=sp_link)
+        link_mock.assert_called_once_with(sp_link=sp_link, add_ref=False)
         self.assertEqual(result, mock.sentinel.link)
 
 

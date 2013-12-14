@@ -34,7 +34,7 @@ class Link(object):
     You must create a :class:`Session` before you can create links.
     """
 
-    def __init__(self, uri=None, sp_link=None):
+    def __init__(self, uri=None, sp_link=None, add_ref=True):
         assert uri or sp_link, 'uri or sp_link is required'
 
         if spotify.session_instance is None:
@@ -47,6 +47,8 @@ class Link(object):
                 raise ValueError(
                     'Failed to get link from Spotify URI: %r' % uri)
 
+        if add_ref:
+            lib.sp_link_add_ref(sp_link)
         self._sp_link = ffi.gc(sp_link, lib.sp_link_release)
 
     def __repr__(self):

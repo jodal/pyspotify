@@ -20,15 +20,18 @@ class User(object):
         u'jodal'
     """
 
-    def __init__(self, uri=None, sp_user=None):
+    def __init__(self, uri=None, sp_user=None, add_ref=True):
         assert uri or sp_user, 'uri or sp_user is required'
+
         if uri is not None:
             user = spotify.Link(uri).as_user()
             if user is None:
                 raise ValueError(
                     'Failed to get user from Spotify URI: %r' % uri)
             sp_user = user._sp_user
-        lib.sp_user_add_ref(sp_user)
+
+        if add_ref:
+            lib.sp_user_add_ref(sp_user)
         self._sp_user = ffi.gc(sp_user, lib.sp_user_release)
 
     def __repr__(self):

@@ -27,15 +27,18 @@ class Artist(object):
         u'Rob Dougan'
     """
 
-    def __init__(self, uri=None, sp_artist=None):
+    def __init__(self, uri=None, sp_artist=None, add_ref=True):
         assert uri or sp_artist, 'uri or sp_artist is required'
+
         if uri is not None:
             artist = spotify.Link(uri).as_artist()
             if artist is None:
                 raise ValueError(
                     'Failed to get artist from Spotify URI: %r' % uri)
             sp_artist = artist._sp_artist
-        lib.sp_artist_add_ref(sp_artist)
+
+        if add_ref:
+            lib.sp_artist_add_ref(sp_artist)
         self._sp_artist = ffi.gc(sp_artist, lib.sp_artist_release)
 
     def __repr__(self):
@@ -94,14 +97,15 @@ class Artist(object):
         """
         if image_size is None:
             image_size = spotify.ImageSize.NORMAL
-        return spotify.Link(sp_link=lib.sp_link_create_from_artist_portrait(
-            self._sp_artist, image_size))
+        sp_link = lib.sp_link_create_from_artist_portrait(
+            self._sp_artist, image_size)
+        return spotify.Link(sp_link=sp_link, add_ref=False)
 
     @property
     def link(self):
         """A :class:`Link` to the artist."""
-        return spotify.Link(
-            sp_link=lib.sp_link_create_from_artist(self._sp_artist))
+        sp_link = lib.sp_link_create_from_artist(self._sp_artist)
+        return spotify.Link(sp_link=sp_link, add_ref=False)
 
     def browse(self, type=None, callback=None):
         """Get an :class:`ArtistBrowser` for the artist.

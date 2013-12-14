@@ -337,7 +337,7 @@ class Playlist(object):
             # TODO Figure out why we can still get NULL here even if
             # the playlist is both loaded and in RAM.
             raise spotify.Error('Failed to get link from Spotify playlist')
-        return spotify.Link(sp_link=sp_link)
+        return spotify.Link(sp_link=sp_link, add_ref=False)
 
 
 class PlaylistContainer(collections.Sequence):

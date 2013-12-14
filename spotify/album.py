@@ -27,15 +27,18 @@ class Album(object):
         u'Forward / Return'
     """
 
-    def __init__(self, uri=None, sp_album=None):
+    def __init__(self, uri=None, sp_album=None, add_ref=True):
         assert uri or sp_album, 'uri or sp_album is required'
+
         if uri is not None:
             album = spotify.Link(uri).as_album()
             if album is None:
                 raise ValueError(
                     'Failed to get album from Spotify URI: %r' % uri)
             sp_album = album._sp_album
-        lib.sp_album_add_ref(sp_album)
+
+        if add_ref:
+            lib.sp_album_add_ref(sp_album)
         self._sp_album = ffi.gc(sp_album, lib.sp_album_release)
 
     def __repr__(self):
@@ -104,8 +107,9 @@ class Album(object):
         """
         if image_size is not None:
             image_size = spotify.ImageSize.NORMAL
-        return spotify.Link(sp_link=lib.sp_link_create_from_album_cover(
-            self._sp_album, image_size))
+        sp_link = lib.sp_link_create_from_album_cover(
+            self._sp_album, image_size)
+        return spotify.Link(sp_link=sp_link, add_ref=False)
 
     @property
     def name(self):
@@ -139,8 +143,8 @@ class Album(object):
     @property
     def link(self):
         """A :class:`Link` to the album."""
-        return spotify.Link(
-            sp_link=lib.sp_link_create_from_album(self._sp_album))
+        sp_link = lib.sp_link_create_from_album(self._sp_album)
+        return spotify.Link(sp_link=sp_link, add_ref=False)
 
     def browse(self, callback=None):
         """Get an :class:`AlbumBrowser` for the album.

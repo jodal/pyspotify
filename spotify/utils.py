@@ -26,7 +26,7 @@ class IntEnum(int):
     """An enum type for values mapping to integers.
 
     Tries to stay as close as possible to the enum type specified in
-    :pep:`435`, to be included in Python 3.4.
+    :pep:`435` and introduced in Python 3.4.
     """
 
     def __new__(cls, value):

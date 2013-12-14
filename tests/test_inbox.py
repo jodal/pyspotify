@@ -156,7 +156,17 @@ class InboxPostResultTest(unittest.TestCase):
             spotify.InboxPostResult('alice', [track1, track2], 'Enjoy!')
 
     def test_repr(self, lib_mock):
-        pass  # TODO
+        sp_inbox = spotify.ffi.new('int *')
+        inbox_post_result = spotify.InboxPostResult(sp_inbox=sp_inbox)
+
+        self.assertEqual(repr(inbox_post_result), '<InboxPostResult: pending>')
+
+        inbox_post_result.complete_event.set()
+        lib_mock.sp_inbox_error.return_value = int(
+            spotify.ErrorType.INBOX_IS_FULL)
+
+        self.assertEqual(
+            repr(inbox_post_result), '<InboxPostResult: INBOX_IS_FULL>')
 
     def test_error(self, lib_mock):
         lib_mock.sp_inbox_error.return_value = int(

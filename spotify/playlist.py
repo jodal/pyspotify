@@ -497,13 +497,10 @@ class PlaylistContainer(collections.Sequence):
         """Remove playlist at the given index from the container.
 
         If the item at the given ``index`` is the start or the end of a
-        playlist folder, the other end is also removed.
-
-        If the item is a folder start or end, a the other end of the folder is
-        found, and ``recursive`` is :class:`False`, only the folder itself is
-        removed, while its content is moved one level up the folder hierarchy.
-        If ``recursive`` is :class:`True`, the contents of the folder is
-        removed as well.
+        playlist folder, and the other end of the folder is found, it is also
+        removed. The folder content is kept, but is moved one level up the
+        folder hierarchy. If ``recursive`` is :class:`True`, the folder content
+        is removed as well.
         """
         # TODO Make available through __delitem__(index)
         item = self[index]

@@ -1284,6 +1284,82 @@ class PlaylistContainerTest(unittest.TestCase):
             mock.call(sp_playlistcontainer, 0),
         ], any_order=False)
 
+    def test_find_folder_indexes(self, lib_mock):
+        sp_playlist = spotify.ffi.new('int *')
+        playlist = spotify.Playlist(sp_playlist=sp_playlist)
+        playlists = [
+            spotify.PlaylistFolder(
+                173, 'foo', spotify.PlaylistType.START_FOLDER),
+            playlist,
+            spotify.PlaylistFolder(
+                173, '', spotify.PlaylistType.END_FOLDER),
+        ]
+
+        result = spotify.PlaylistContainer._find_folder_indexes(
+            playlists, 173, recursive=False)
+
+        self.assertEqual(result, [0, 2])
+
+    def test_find_folder_indexes_with_unknown_id(self, lib_mock):
+        sp_playlist = spotify.ffi.new('int *')
+        playlist = spotify.Playlist(sp_playlist=sp_playlist)
+        playlists = [
+            spotify.PlaylistFolder(
+                173, 'foo', spotify.PlaylistType.START_FOLDER),
+            playlist,
+            spotify.PlaylistFolder(
+                173, '', spotify.PlaylistType.END_FOLDER),
+        ]
+
+        result = spotify.PlaylistContainer._find_folder_indexes(
+            playlists, 174, recursive=False)
+
+        self.assertEqual(result, [])
+
+    def test_find_folder_indexes_recursive(self, lib_mock):
+        sp_playlist = spotify.ffi.new('int *')
+        playlist = spotify.Playlist(sp_playlist=sp_playlist)
+        playlists = [
+            spotify.PlaylistFolder(
+                173, 'foo', spotify.PlaylistType.START_FOLDER),
+            playlist,
+            spotify.PlaylistFolder(
+                173, '', spotify.PlaylistType.END_FOLDER),
+        ]
+
+        result = spotify.PlaylistContainer._find_folder_indexes(
+            playlists, 173, recursive=True)
+
+        self.assertEqual(result, [0, 1, 2])
+
+    def test_find_folder_indexes_without_end(self, lib_mock):
+        sp_playlist = spotify.ffi.new('int *')
+        playlist = spotify.Playlist(sp_playlist=sp_playlist)
+        playlists = [
+            spotify.PlaylistFolder(
+                173, 'foo', spotify.PlaylistType.START_FOLDER),
+            playlist,
+        ]
+
+        result = spotify.PlaylistContainer._find_folder_indexes(
+            playlists, 173, recursive=True)
+
+        self.assertEqual(result, [0])
+
+    def test_find_folder_indexes_without_start(self, lib_mock):
+        sp_playlist = spotify.ffi.new('int *')
+        playlist = spotify.Playlist(sp_playlist=sp_playlist)
+        playlists = [
+            playlist,
+            spotify.PlaylistFolder(
+                173, '', spotify.PlaylistType.END_FOLDER),
+        ]
+
+        result = spotify.PlaylistContainer._find_folder_indexes(
+            playlists, 173, recursive=True)
+
+        self.assertEqual(result, [1])
+
     def test_move_playlist(self, lib_mock):
         lib_mock.sp_playlistcontainer_move_playlist.return_value = int(
             spotify.ErrorType.OK)

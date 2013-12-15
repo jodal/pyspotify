@@ -508,7 +508,7 @@ class PlaylistContainer(collections.Sequence):
         # TODO Make available through __delitem__(index)
         item = self[index]
         if isinstance(item, PlaylistFolder):
-            indexes = self._find_folder_indexes(item.id, recursive)
+            indexes = self._find_folder_indexes(self, item.id, recursive)
         else:
             indexes = [index]
         for i in reversed(sorted(indexes)):
@@ -516,10 +516,10 @@ class PlaylistContainer(collections.Sequence):
                 lib.sp_playlistcontainer_remove_playlist(
                     self._sp_playlistcontainer, i))
 
-    def _find_folder_indexes(self, folder_id, recursive):
-        # FIXME Has been manually tested. Need unit tests.
+    @staticmethod
+    def _find_folder_indexes(container, folder_id, recursive):
         indexes = []
-        for i, item in enumerate(self):
+        for i, item in enumerate(container):
             if isinstance(item, PlaylistFolder) and item.id == folder_id:
                 indexes.append(i)
         assert len(indexes) <= 2, (

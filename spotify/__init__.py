@@ -1,7 +1,9 @@
 from __future__ import unicode_literals
 
+import functools
 import logging
 import os
+import threading
 import weakref
 
 import cffi
@@ -15,6 +17,28 @@ __version__ = '2.0.0a1'
 logging.getLogger('spotify').addHandler(logging.NullHandler())
 
 
+# Global reentrant lock to be held whenever libspotify functions are called or
+# libspotify owned data is worked on. This is the heart of pyspotify's thread
+# safety.
+_lock = threading.RLock()
+
+
+def threadsafe(f):
+    """Acquires the global lock while calling the wrapped function."""
+    @functools.wraps(f)
+    def wrapper(*args, **kwargs):
+        with _lock:
+            return f(*args, **kwargs)
+    return wrapper
+
+
+def _make_callables_threadsafe(obj):
+    for name in dir(obj):
+        attr = getattr(obj, name)
+        if callable(attr):
+            setattr(obj, name, threadsafe(attr))
+
+
 _header_file = os.path.join(os.path.dirname(__file__), 'api.processed.h')
 _header = open(_header_file).read()
 _header += '#define SPOTIFY_API_VERSION ...\n'
@@ -24,6 +48,7 @@ lib = ffi.verify(
     '#include "libspotify/api.h"',
     libraries=[str('spotify')],
     ext_package='spotify')
+_make_callables_threadsafe(lib)
 
 
 # Mapping between keys and objects that should be kept alive as long as the key

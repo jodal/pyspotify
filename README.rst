@@ -68,10 +68,6 @@ Alpha 2: More consistent API
 Alpha 3: Threadsafety
 ---------------------
 
-- Ensure we never call libspotify from two different threads at the same time.
-  We can't assume that the CPython GIL will ensure this for us, as we target
-  non-CPython interpreters like PyPy.
-
 - Ensure we never call libspotify from another thread while a method is still
   working on the data returned by the previous libspotify call. This will
   require review of all code and the addition of a decorator to the methods
@@ -120,6 +116,10 @@ Final release
 
 Development milestones
 ======================
+
+- 2013-12-16: Ensure we never call libspotify from two different threads at the
+  same time. We can't assume that the CPython GIL will ensure this for us, as
+  we target non-CPython interpreters like PyPy.
 
 - 2013-12-13: Artist browsing complete.
 

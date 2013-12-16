@@ -23,6 +23,9 @@ class Track(object):
         u'Get Lucky'
     """
 
+    # TODO Review all maybe_raise() calls to check if they should ignore
+    # ErrorType.IS_LOADING
+
     def __init__(self, uri=None, sp_track=None, add_ref=True):
         assert uri or sp_track, 'uri or sp_track is required'
         if uri is not None:

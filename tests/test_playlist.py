@@ -1075,6 +1075,8 @@ class PlaylistContainerTest(unittest.TestCase):
         self.assertIsInstance(result, spotify.Playlist)
         self.assertEqual(result._sp_playlist, sp_playlist)
         lib_mock.sp_playlist_add_ref.assert_called_with(sp_playlist)
+        self.assertEqual(
+            lib_mock.sp_playlistcontainer_move_playlist.call_count, 0)
 
     def test_add_playlist_from_playlist(self, lib_mock):
         self.create_session(lib_mock)
@@ -1096,6 +1098,31 @@ class PlaylistContainerTest(unittest.TestCase):
         self.assertIsInstance(result, spotify.Playlist)
         self.assertEqual(result._sp_playlist, added_sp_playlist)
         lib_mock.sp_playlist_add_ref.assert_called_with(added_sp_playlist)
+        self.assertEqual(
+            lib_mock.sp_playlistcontainer_move_playlist.call_count, 0)
+
+    def test_add_playlist_at_given_index(self, lib_mock):
+        self.create_session(lib_mock)
+        sp_link = spotify.ffi.new('int *')
+        link = spotify.Link(sp_link=sp_link, add_ref=False)
+        sp_playlist = spotify.ffi.new('int *')
+        lib_mock.sp_playlistcontainer_add_playlist.return_value = sp_playlist
+        sp_playlistcontainer = spotify.ffi.new('int *')
+        playlist_container = spotify.PlaylistContainer(
+            sp_playlistcontainer=sp_playlistcontainer)
+        lib_mock.sp_playlistcontainer_num_playlists.return_value = 100
+        lib_mock.sp_playlistcontainer_move_playlist.return_value = int(
+            spotify.ErrorType.OK)
+
+        result = playlist_container.add_playlist(link, index=7)
+
+        lib_mock.sp_playlistcontainer_add_playlist.assert_called_with(
+            sp_playlistcontainer, sp_link)
+        self.assertIsInstance(result, spotify.Playlist)
+        self.assertEqual(result._sp_playlist, sp_playlist)
+        lib_mock.sp_playlist_add_ref.assert_called_with(sp_playlist)
+        lib_mock.sp_playlistcontainer_move_playlist.assert_called_with(
+            sp_playlistcontainer, 99, 7, 0)
 
     def test_add_playlist_already_in_the_container(self, lib_mock):
         self.create_session(lib_mock)
@@ -1112,6 +1139,8 @@ class PlaylistContainerTest(unittest.TestCase):
         lib_mock.sp_playlistcontainer_add_playlist.assert_called_with(
             sp_playlistcontainer, sp_link)
         self.assertIsNone(result)
+        self.assertEqual(
+            lib_mock.sp_playlistcontainer_move_playlist.call_count, 0)
 
     def test_add_playlist_from_unknown_type_fails(self, lib_mock):
         sp_playlistcontainer = spotify.ffi.new('int *')

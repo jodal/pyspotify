@@ -452,16 +452,20 @@ class PlaylistContainer(collections.Sequence):
             self.move_playlist(len(self) - 1, index)
         return playlist
 
-    def add_playlist(self, playlist):
-        """Add an existing playlist to the end of the playlist container.
+    def add_playlist(self, playlist, index=None):
+        """Add an existing ``playlist`` to the playlist container at the given
+        ``index``.
 
         The playlist can either be a :class:`~spotify.Playlist`, or a
         :class:`~spotify.Link` linking to a playlist.
 
+        If the ``index`` isn't specified, the playlist is added at the end of
+        the container.
+
         Returns the added playlist, or :class:`None` if the playlist already
-        existed in the container.
+        existed in the container. If the playlist already exists, it will not
+        be moved to the given ``index``.
         """
-        # TODO Add index kwarg and move the playlist if it is specified
         if isinstance(playlist, spotify.Link):
             link = playlist
         elif isinstance(playlist, spotify.Playlist):
@@ -473,8 +477,10 @@ class PlaylistContainer(collections.Sequence):
             self._sp_playlistcontainer, link._sp_link)
         if sp_playlist == ffi.NULL:
             return None
-        else:
-            return Playlist(sp_playlist=sp_playlist, add_ref=True)
+        playlist = Playlist(sp_playlist=sp_playlist, add_ref=True)
+        if index is not None:
+            self.move_playlist(len(self) - 1, index)
+        return playlist
 
     def add_folder(self, name, index=None):
         """Add a playlist folder with ``name`` at the given ``index``.

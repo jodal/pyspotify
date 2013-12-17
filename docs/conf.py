@@ -26,6 +26,7 @@ ffi = cffi.FFI.return_value
 ffi.CData = bytes
 lib = ffi.verify.return_value
 lib.sp_error_message.return_value = ''
+lib.sp_error_message.__name__ = b'sp_error_message'
 
 with open('sp-constants.csv') as fh:
     for line in fh.readlines():

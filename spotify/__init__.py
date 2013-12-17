@@ -47,9 +47,8 @@ lib = ffi.verify(
     ext_package='spotify')
 
 for name in dir(lib):
-    attr = getattr(lib, name)
-    if callable(attr):
-        setattr(lib, name, serialized(attr))
+    if name.startswith('sp_') and callable(getattr(lib, name)):
+        setattr(lib, name, serialized(getattr(lib, name)))
 
 
 # Mapping between keys and objects that should be kept alive as long as the key

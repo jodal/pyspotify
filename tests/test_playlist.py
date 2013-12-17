@@ -971,13 +971,13 @@ class PlaylistContainerTest(unittest.TestCase):
 
         self.assertIsInstance(playlist_container, collections.Sequence)
 
-    def test_add_new_playlist(self, lib_mock):
-        sp_playlist = spotify.ffi.new('int *')
-        lib_mock.sp_playlistcontainer_add_new_playlist.return_value = (
-            sp_playlist)
+    def test_add_new_playlist_to_end_of_container(self, lib_mock):
         sp_playlistcontainer = spotify.ffi.new('int *')
         playlist_container = spotify.PlaylistContainer(
             sp_playlistcontainer=sp_playlistcontainer)
+        sp_playlist = spotify.ffi.new('int *')
+        lib_mock.sp_playlistcontainer_add_new_playlist.return_value = (
+            sp_playlist)
 
         result = playlist_container.add_new_playlist('foo bar')
 
@@ -991,6 +991,34 @@ class PlaylistContainerTest(unittest.TestCase):
         self.assertIsInstance(result, spotify.Playlist)
         self.assertEqual(result._sp_playlist, sp_playlist)
         lib_mock.sp_playlist_add_ref.assert_called_with(sp_playlist)
+        self.assertEqual(
+            lib_mock.sp_playlistcontainer_move_playlist.call_count, 0)
+
+    def test_add_new_playlist_at_given_index(self, lib_mock):
+        sp_playlistcontainer = spotify.ffi.new('int *')
+        playlist_container = spotify.PlaylistContainer(
+            sp_playlistcontainer=sp_playlistcontainer)
+        sp_playlist = spotify.ffi.new('int *')
+        lib_mock.sp_playlistcontainer_add_new_playlist.return_value = (
+            sp_playlist)
+        lib_mock.sp_playlistcontainer_num_playlists.return_value = 100
+        lib_mock.sp_playlistcontainer_move_playlist.return_value = int(
+            spotify.ErrorType.OK)
+
+        result = playlist_container.add_new_playlist('foo bar', index=7)
+
+        lib_mock.sp_playlistcontainer_add_new_playlist.assert_called_with(
+            sp_playlistcontainer, mock.ANY)
+        self.assertEqual(
+            spotify.ffi.string(
+                lib_mock.sp_playlistcontainer_add_new_playlist
+                .call_args[0][1]),
+            b'foo bar')
+        self.assertIsInstance(result, spotify.Playlist)
+        self.assertEqual(result._sp_playlist, sp_playlist)
+        lib_mock.sp_playlist_add_ref.assert_called_with(sp_playlist)
+        lib_mock.sp_playlistcontainer_move_playlist.assert_called_with(
+            sp_playlistcontainer, 99, 7, 0)
 
     def test_add_new_playlist_fails_if_name_is_space_only(self, lib_mock):
         sp_playlistcontainer = spotify.ffi.new('int *')

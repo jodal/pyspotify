@@ -431,21 +431,26 @@ class PlaylistContainer(collections.Sequence):
         else:
             raise RuntimeError('Unknown playlist type: %r' % playlist_type)
 
-    def add_new_playlist(self, name):
-        """Add an empty playlist at the end of the container.
+    def add_new_playlist(self, name, index=None):
+        """Add an empty playlist with ``name`` at the given ``index``.
 
         The playlist name must not be space-only or longer than 255 chars.
 
+        If the ``index`` isn't specified, the new playlist is added at the end
+        of the container.
+
         Returns the new playlist.
         """
-        # TODO Add index kwarg and move the playlist if it is specified
         self._validate_name(name)
         name = ffi.new('char[]', utils.to_bytes(name))
         sp_playlist = lib.sp_playlistcontainer_add_new_playlist(
             self._sp_playlistcontainer, name)
         if sp_playlist == ffi.NULL:
             raise spotify.Error('Playlist creation failed')
-        return Playlist(sp_playlist=sp_playlist, add_ref=True)
+        playlist = Playlist(sp_playlist=sp_playlist, add_ref=True)
+        if index is not None:
+            self.move_playlist(len(self) - 1, index)
+        return playlist
 
     def add_playlist(self, playlist):
         """Add an existing playlist to the end of the playlist container.
@@ -472,12 +477,12 @@ class PlaylistContainer(collections.Sequence):
             return Playlist(sp_playlist=sp_playlist, add_ref=True)
 
     def add_folder(self, name, index=None):
-        """Add a playlist folder at the given index.
+        """Add a playlist folder with ``name`` at the given ``index``.
 
         The playlist folder name must not be space-only or longer than 255
         chars.
 
-        If the index isn't specified, the folder is added at the end of the
+        If the ``index`` isn't specified, the folder is added at the end of the
         container.
         """
         self._validate_name(name)

@@ -431,6 +431,20 @@ class PlaylistContainer(collections.Sequence):
         else:
             raise RuntimeError('Unknown playlist type: %r' % playlist_type)
 
+    def __delitem__(self, key):
+        if isinstance(key, slice):
+            for i in reversed(range(*key.indices(len(self)))):
+                self.remove_playlist(i)
+            return
+        if not isinstance(key, int):
+            raise TypeError(
+                'list indices must be int or slice, not %s' %
+                key.__class__.__name__)
+        if not 0 <= key < self.__len__():
+            raise IndexError('list index out of range')
+
+        self.remove_playlist(key)
+
     def add_new_playlist(self, name, index=None):
         """Add an empty playlist with ``name`` at the given ``index``.
 
@@ -512,8 +526,12 @@ class PlaylistContainer(collections.Sequence):
         removed. The folder content is kept, but is moved one level up the
         folder hierarchy. If ``recursive`` is :class:`True`, the folder content
         is removed as well.
+
+        Using ``del playlist_container[3]`` is equivalent to
+        ``playlist_container.remove_playlist(3)``. Similarly, ``del
+        playlist_container[0:2]`` is equivalent to calling this method with
+        indexes ``0`` and ``1``.
         """
-        # TODO Make available through __delitem__(index)
         item = self[index]
         if isinstance(item, PlaylistFolder):
             indexes = self._find_folder_indexes(self, item.id, recursive)
@@ -546,7 +564,7 @@ class PlaylistContainer(collections.Sequence):
         spotify.Error.maybe_raise(lib.sp_playlistcontainer_move_playlist(
             self._sp_playlistcontainer, from_index, to_index, int(dry_run)))
 
-    # TODO Add __setitem__, __delitem__, insert, and subclass MutableSequence
+    # TODO Add __setitem__, insert, and subclass MutableSequence
 
     @property
     def owner(self):

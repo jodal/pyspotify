@@ -23,8 +23,11 @@ logging.getLogger('spotify').addHandler(logging.NullHandler())
 _lock = threading.RLock()
 
 
-def threadsafe(f):
-    """Acquires the global lock while calling the wrapped function."""
+def serialized(f):
+    """Acquires the global lock while calling the wrapped function.
+
+    Internal function.
+    """
     @functools.wraps(f)
     def wrapper(*args, **kwargs):
         with _lock:
@@ -32,23 +35,21 @@ def threadsafe(f):
     return wrapper
 
 
-def _make_callables_threadsafe(obj):
-    for name in dir(obj):
-        attr = getattr(obj, name)
-        if callable(attr):
-            setattr(obj, name, threadsafe(attr))
-
-
 _header_file = os.path.join(os.path.dirname(__file__), 'api.processed.h')
 _header = open(_header_file).read()
 _header += '#define SPOTIFY_API_VERSION ...\n'
+
 ffi = cffi.FFI()
 ffi.cdef(_header)
 lib = ffi.verify(
     '#include "libspotify/api.h"',
     libraries=[str('spotify')],
     ext_package='spotify')
-_make_callables_threadsafe(lib)
+
+for name in dir(lib):
+    attr = getattr(lib, name)
+    if callable(attr):
+        setattr(lib, name, serialized(attr))
 
 
 # Mapping between keys and objects that should be kept alive as long as the key
@@ -58,6 +59,7 @@ _make_callables_threadsafe(lib)
 # causing objects associated to the key to be garbage collected as well. For
 # further details, refer to the CFFI docs.
 weak_key_dict = weakref.WeakKeyDictionary()
+
 
 # Reference to the spotify.Session instance. Used to enforce that one and only
 # one session exists in each process.

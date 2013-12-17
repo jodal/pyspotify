@@ -433,7 +433,9 @@ class PlaylistContainer(collections.Sequence):
 
     def __delitem__(self, key):
         if isinstance(key, slice):
-            for i in reversed(range(*key.indices(len(self)))):
+            start, stop, step = key.indices(len(self))
+            indexes = range(start, stop, step)
+            for i in reversed(sorted(indexes)):
                 self.remove_playlist(i)
             return
         if not isinstance(key, int):
@@ -442,7 +444,6 @@ class PlaylistContainer(collections.Sequence):
                 key.__class__.__name__)
         if not 0 <= key < self.__len__():
             raise IndexError('list index out of range')
-
         self.remove_playlist(key)
 
     def add_new_playlist(self, name, index=None):

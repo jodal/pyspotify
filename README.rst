@@ -10,12 +10,12 @@ pyspotify
     :target: https://crate.io/packages/pyspotify/
     :alt: Number of PyPI downloads
 
-.. image:: https://travis-ci.org/jodal/pyspotify.png?branch=pyspotify2
-    :target: https://travis-ci.org/jodal/pyspotify
+.. image:: https://travis-ci.org/mopidy/pyspotify.png?branch=v2.x/develop
+    :target: https://travis-ci.org/mopidy/pyspotify
     :alt: Travis CI build status
 
-.. image:: https://coveralls.io/repos/jodal/pyspotify/badge.png?branch=pyspotify2
-   :target: https://coveralls.io/r/jodal/pyspotify?branch=pyspotify2
+.. image:: https://coveralls.io/repos/mopidy/pyspotify/badge.png?branch=v2.x/develop
+   :target: https://coveralls.io/r/mopidy/pyspotify?branch=v2.x/develop
    :alt: Test coverage
 
 pyspotify 2.x is a new Python wrapper for `libspotify

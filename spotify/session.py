@@ -611,9 +611,9 @@ class SessionConfig(object):
         """Internal method."""
         if self.application_key is None:
             with open(self.application_key_filename, 'rb') as fh:
-                return fh.read()
-        else:
-            return self.application_key
+                self.application_key = fh.read()
+        assert len(self.application_key) == 321, 'Invalid application key'
+        return self.application_key
 
     def get_callbacks(self):
         """Internal method."""

@@ -459,25 +459,30 @@ class SessionConfigTest(unittest.TestCase):
         self.assertIsNone(self.config.tracefile)
 
     def test_get_application_key_prefers_the_key_attr(self):
-        self.config.application_key = b'secret key from attr'
+        self.config.application_key = b'\x02' * 321
 
         self.assertEqual(
-            self.config.get_application_key(), b'secret key from attr')
+            self.config.get_application_key(), b'\x02' * 321)
 
     def test_get_application_key_can_load_key_from_file(self):
         self.config.application_key = None
         self.config.application_key_filename = tempfile.mkstemp()[1]
 
         with open(self.config.application_key_filename, 'wb') as f:
-            f.write(b'secret key from file')
+            f.write(b'\x03' * 321)
 
         self.assertEqual(
-            self.config.get_application_key(), b'secret key from file')
+            self.config.get_application_key(), b'\x03' * 321)
 
     def test_get_application_key_fails_if_no_key_found(self):
         self.config.application_key_filename = '/nonexistant'
 
         self.assertRaises(EnvironmentError, self.config.get_application_key)
+
+    def test_get_application_key_fails_if_invalid_key(self):
+        self.config.application_key = 'way too short key'
+
+        self.assertRaises(AssertionError, self.config.get_application_key)
 
     def test_get_callbacks_prefers_the_key_attr(self):
         self.config.callbacks = mock.sentinel.my_callbacks
@@ -496,20 +501,20 @@ class SessionConfigTest(unittest.TestCase):
         self.assertIsInstance(self.config.callbacks, spotify.SessionCallbacks)
 
     def test_make_sp_session_config_returns_a_c_object(self):
-        self.config.application_key = b''
+        self.config.application_key = b'\x01' * 321
 
         self.assertIsInstance(
             self.config.make_sp_session_config(), spotify.ffi.CData)
 
     def test_application_key_size_is_calculated_correctly(self):
-        self.config.application_key = b'123'
+        self.config.application_key = b'\x01' * 321
 
         sp_session_config = self.config.make_sp_session_config()
 
-        self.assertEqual(sp_session_config.application_key_size, 3)
+        self.assertEqual(sp_session_config.application_key_size, 321)
 
     def test_make_sp_session_config_encodes_unicode_as_utf8(self):
-        self.config.application_key = b''
+        self.config.application_key = b'\x01' * 321
         self.config.device_id = 'æ device_id'
         self.config.proxy = 'æ proxy'
         self.config.proxy_username = 'æ proxy_username'
@@ -541,7 +546,7 @@ class SessionConfigTest(unittest.TestCase):
             b'\xc3\xa6 tracefile')
 
     def test_weak_key_dict_keeps_struct_parts_alive(self):
-        self.config.application_key = b''
+        self.config.application_key = b'\x01' * 321
 
         sp_session_config = self.config.make_sp_session_config()
 
@@ -555,7 +560,7 @@ class SessionTest(unittest.TestCase):
     def create_session(self, lib_mock):
         lib_mock.sp_session_create.return_value = spotify.ErrorType.OK
         config = spotify.SessionConfig()
-        config.application_key = b'secret'
+        config.application_key = b'\x01' * 321
         return spotify.Session(config=config)
 
     def tearDown(self):
@@ -579,7 +584,7 @@ class SessionTest(unittest.TestCase):
     def test_adds_callbacks_to_config_if_provided(self, lib_mock):
         lib_mock.sp_session_create.return_value = spotify.ErrorType.OK
         config = spotify.SessionConfig()
-        config.application_key = b'secret'
+        config.application_key = b'\x01' * 321
         callbacks = spotify.SessionCallbacks()
 
         self.assertIsNone(config.callbacks)
@@ -592,7 +597,7 @@ class SessionTest(unittest.TestCase):
         lib_mock.sp_session_create.return_value = (
             spotify.ErrorType.BAD_API_VERSION)
         config = spotify.SessionConfig()
-        config.application_key = b'secret'
+        config.application_key = b'\x01' * 321
 
         self.assertRaises(spotify.Error, spotify.Session, config=config)
 
@@ -605,7 +610,7 @@ class SessionTest(unittest.TestCase):
 
         lib_mock.sp_session_create.side_effect = func
         config = spotify.SessionConfig()
-        config.application_key = b'secret'
+        config.application_key = b'\x01' * 321
 
         session = spotify.Session(config=config)
         session = None  # noqa
@@ -1105,7 +1110,7 @@ class OfflineTest(unittest.TestCase):
     def create_session(self, lib_mock):
         lib_mock.sp_session_create.return_value = spotify.ErrorType.OK
         config = spotify.SessionConfig()
-        config.application_key = b'secret'
+        config.application_key = b'\x01' * 321
         return spotify.Session(config=config)
 
     def tearDown(self):
@@ -1227,7 +1232,7 @@ class PlayerTest(unittest.TestCase):
     def create_session(self, lib_mock):
         lib_mock.sp_session_create.return_value = spotify.ErrorType.OK
         config = spotify.SessionConfig()
-        config.application_key = b'secret'
+        config.application_key = b'\x01' * 321
         return spotify.Session(config=config)
 
     def tearDown(self):
@@ -1341,7 +1346,7 @@ class SocialTest(unittest.TestCase):
     def create_session(self, lib_mock):
         lib_mock.sp_session_create.return_value = spotify.ErrorType.OK
         config = spotify.SessionConfig()
-        config.application_key = b'secret'
+        config.application_key = b'\x01' * 321
         return spotify.Session(config=config)
 
     def tearDown(self):

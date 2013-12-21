@@ -3,11 +3,11 @@ pyspotify
 *********
 
 .. image:: https://pypip.in/v/pyspotify/badge.png
-    :target: https://crate.io/packages/pyspotify/
+    :target: https://pypi.python.org/pypi/pyspotify/
     :alt: Latest PyPI version
 
 .. image:: https://pypip.in/d/pyspotify/badge.png
-    :target: https://crate.io/packages/pyspotify/
+    :target: https://pypi.python.org/pypi/pyspotify/
     :alt: Number of PyPI downloads
 
 .. image:: https://travis-ci.org/mopidy/pyspotify.png?branch=v2.x/develop

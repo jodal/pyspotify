@@ -365,7 +365,15 @@ class PlaylistContainer(collections.MutableSequence):
     As you can see, a playlist container can contain a mix of
     :class:`~spotify.Playlist` and :class:`~spotify.PlaylistFolder` objects.
 
-    The container supports destructive operations as well.
+    The container supports operations that changes the container as well.
+
+    To add a playlist you can use :meth:`append` or :meth:`insert` with either
+    the name of a new playlist or an existing playlist object. For example::
+
+        >>> playlist = spotify.Playlist(
+        ...     'spotify:user:fiat500c:playlist:54k50VZdvtnIPt4d8RBCmZ')
+        >>> container.insert(3, playlist)
+        >>> container.append('New empty playlist')
 
     To remove a playlist or folder you can use :meth:`remove_playlist`, or::
 
@@ -375,13 +383,11 @@ class PlaylistContainer(collections.MutableSequence):
     the given name you can use :meth:`remove_playlist` and
     :meth:`add_new_playlist`, or::
 
-        >>> container[0] = 'My new empty playlist'
+        >>> container[0] = 'My other new empty playlist'
 
     To replace an existing playlist or folder with an existing playlist you can
     :use :meth:`remove_playlist` and :meth:`add_playlist`, or::
 
-        >>> playlist = spotify.Playlist(
-        ...     'spotify:user:fiat500c:playlist:54k50VZdvtnIPt4d8RBCmZ')
         >>> container[0] = playlist
     """
 

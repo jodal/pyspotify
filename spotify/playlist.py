@@ -505,11 +505,6 @@ class PlaylistContainer(collections.MutableSequence):
             raise IndexError('list index out of range')
         self.remove_playlist(key)
 
-    def insert(self, index, value):
-        # Required by collections.MutableSequence
-
-        self[index:index] = [value]
-
     def add_new_playlist(self, name, index=None):
         """Add an empty playlist with ``name`` at the given ``index``.
 
@@ -637,6 +632,11 @@ class PlaylistContainer(collections.MutableSequence):
 
     # TODO get_unseen_tracks()
     # TODO clear_unseen_tracks()
+
+    def insert(self, index, value):
+        # Required by collections.MutableSequence
+
+        self[index:index] = [value]
 
 
 class PlaylistFolder(collections.namedtuple(

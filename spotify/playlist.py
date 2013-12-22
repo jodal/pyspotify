@@ -364,6 +364,12 @@ class PlaylistContainer(collections.Sequence):
 
     As you can see, a playlist container can contain a mix of
     :class:`~spotify.Playlist` and :class:`~spotify.PlaylistFolder` objects.
+
+    The container supports destructive operations as well.
+
+    To remove a playlist or folder you can use :meth:`remove_playlist`, or::
+
+        >>> del container[0]
     """
 
     def __init__(self, sp_playlistcontainer, add_ref=True):

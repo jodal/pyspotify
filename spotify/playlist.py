@@ -370,6 +370,19 @@ class PlaylistContainer(collections.Sequence):
     To remove a playlist or folder you can use :meth:`remove_playlist`, or::
 
         >>> del container[0]
+
+    To replace an existing playlist or folder with a new empty playlist with
+    the given name you can use :meth:`remove_playlist` and
+    :meth:`add_new_playlist`, or::
+
+        >>> container[0] = 'My new empty playlist'
+
+    To replace an existing playlist or folder with an existing playlist you can
+    :use :meth:`remove_playlist` and :meth:`add_playlist`, or::
+
+        >>> playlist = spotify.Playlist(
+        ...     'spotify:user:fiat500c:playlist:54k50VZdvtnIPt4d8RBCmZ')
+        >>> container[0] = playlist
     """
 
     def __init__(self, sp_playlistcontainer, add_ref=True):
@@ -436,6 +449,32 @@ class PlaylistContainer(collections.Sequence):
                 type=playlist_type)
         else:
             raise RuntimeError('Unknown playlist type: %r' % playlist_type)
+
+    def __setitem__(self, key, value):
+        if not isinstance(key, (int, slice)):
+            raise TypeError(
+                'list indices must be int or slice, not %s' %
+                key.__class__.__name__)
+        if isinstance(key, slice):
+            if not isinstance(value, collections.Iterable):
+                raise TypeError('can only assign an iterable')
+        if isinstance(key, int):
+            if not 0 <= key < self.__len__():
+                raise IndexError('list index out of range')
+            key = slice(key, key + 1)
+            value = [value]
+
+        # In case playlist creation fails, we create before we remove any
+        # playlists.
+        for i, val in enumerate(value, key.start):
+            if isinstance(val, Playlist):
+                self.add_playlist(val, index=i)
+            else:
+                self.add_new_playlist(val, index=i)
+
+        # Adjust for the new playlist at position key.start.
+        key = slice(key.start + len(value), key.stop + len(value), key.step)
+        del self[key]
 
     def __delitem__(self, key):
         if isinstance(key, slice):
@@ -571,7 +610,7 @@ class PlaylistContainer(collections.Sequence):
         spotify.Error.maybe_raise(lib.sp_playlistcontainer_move_playlist(
             self._sp_playlistcontainer, from_index, to_index, int(dry_run)))
 
-    # TODO Add __setitem__, insert, and subclass MutableSequence
+    # TODO Add insert, and subclass MutableSequence
 
     @property
     def owner(self):

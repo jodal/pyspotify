@@ -964,6 +964,108 @@ class PlaylistContainerTest(unittest.TestCase):
 
         self.assertRaises(TypeError, playlist_container.__getitem__, 'abc')
 
+    def test_setitem_with_playlist_name(self, lib_mock):
+        sp_playlistcontainer = spotify.ffi.new('int *')
+        playlist_container = spotify.PlaylistContainer(
+            sp_playlistcontainer=sp_playlistcontainer)
+        playlist_container.__len__ = mock.Mock(return_value=5)
+        playlist_container.remove_playlist = mock.Mock()
+        playlist_container.add_new_playlist = mock.Mock()
+
+        playlist_container[0] = 'New playlist'
+
+        playlist_container.add_new_playlist.assert_called_with(
+            'New playlist', index=0)
+        playlist_container.remove_playlist.assert_called_with(1)
+
+    def test_setitem_with_existing_playlist(self, lib_mock):
+        sp_playlist = spotify.ffi.new('int *')
+        playlist = spotify.Playlist(sp_playlist=sp_playlist)
+        sp_playlistcontainer = spotify.ffi.new('int *')
+        playlist_container = spotify.PlaylistContainer(
+            sp_playlistcontainer=sp_playlistcontainer)
+        playlist_container.__len__ = mock.Mock(return_value=5)
+        playlist_container.remove_playlist = mock.Mock()
+        playlist_container.add_playlist = mock.Mock()
+
+        playlist_container[0] = playlist
+
+        playlist_container.add_playlist.assert_called_with(playlist, index=0)
+        playlist_container.remove_playlist.assert_called_with(1)
+
+    def test_setitem_with_slice(self, lib_mock):
+        sp_playlist = spotify.ffi.new('int *')
+        playlist = spotify.Playlist(sp_playlist=sp_playlist)
+        sp_playlistcontainer = spotify.ffi.new('int *')
+        playlist_container = spotify.PlaylistContainer(
+            sp_playlistcontainer=sp_playlistcontainer)
+        playlist_container.__len__ = mock.Mock(return_value=5)
+        playlist_container.remove_playlist = mock.Mock()
+        playlist_container.add_new_playlist = mock.Mock()
+        playlist_container.add_playlist = mock.Mock()
+
+        playlist_container[0:2] = ['New playlist', playlist]
+
+        playlist_container.add_new_playlist.assert_called_with(
+            'New playlist', index=0)
+        playlist_container.add_playlist.assert_called_with(playlist, index=1)
+        playlist_container.remove_playlist.assert_has_calls(
+            [mock.call(3), mock.call(2)], any_order=False)
+
+    def test_setittem_with_slice_and_noniterable_value_fails(self, lib_mock):
+        sp_playlist = spotify.ffi.new('int *')
+        playlist = spotify.Playlist(sp_playlist=sp_playlist)
+        sp_playlistcontainer = spotify.ffi.new('int *')
+        playlist_container = spotify.PlaylistContainer(
+            sp_playlistcontainer=sp_playlistcontainer)
+        playlist_container.__len__ = mock.Mock(return_value=3)
+        playlist_container.remove_playlist = mock.Mock()
+        playlist_container.add_new_playlist = mock.Mock()
+
+        with self.assertRaises(TypeError):
+            playlist_container[0:2] = playlist
+
+    def test_setitem_raises_error_on_unknown_playlist_type(self, lib_mock):
+        sp_playlistcontainer = spotify.ffi.new('int *')
+        playlist_container = spotify.PlaylistContainer(
+            sp_playlistcontainer=sp_playlistcontainer)
+        playlist_container.__len__ = mock.Mock(return_value=1)
+        playlist_container.remove_playlist = mock.Mock()
+        playlist_container.add_new_playlist = mock.Mock(side_effect=ValueError)
+
+        with self.assertRaises(ValueError):
+            playlist_container[0] = False
+
+        playlist_container.add_new_playlist.assert_called_with(False, index=0)
+        self.assertEqual(playlist_container.remove_playlist.call_count, 0)
+
+    def test_setitem_raises_index_error_on_negative_index(self, lib_mock):
+        sp_playlistcontainer = spotify.ffi.new('int *')
+        playlist_container = spotify.PlaylistContainer(
+            sp_playlistcontainer=sp_playlistcontainer)
+        playlist_container.__len__ = mock.Mock(return_value=1)
+
+        with self.assertRaises(IndexError):
+            playlist_container[-1] = None
+
+    def test_setitem_raises_index_error_on_too_high_index(self, lib_mock):
+        sp_playlistcontainer = spotify.ffi.new('int *')
+        playlist_container = spotify.PlaylistContainer(
+            sp_playlistcontainer=sp_playlistcontainer)
+        playlist_container.__len__ = mock.Mock(return_value=1)
+
+        with self.assertRaises(IndexError):
+            playlist_container[1] = None
+
+    def test_setitem_raises_type_error_on_non_integral_index(self, lib_mock):
+        sp_playlistcontainer = spotify.ffi.new('int *')
+        playlist_container = spotify.PlaylistContainer(
+            sp_playlistcontainer=sp_playlistcontainer)
+        playlist_container.__len__ = mock.Mock(return_value=1)
+
+        with self.assertRaises(TypeError):
+            playlist_container['abc'] = None
+
     def test_delitem(self, lib_mock):
         sp_playlistcontainer = spotify.ffi.new('int *')
         playlist_container = spotify.PlaylistContainer(

@@ -531,7 +531,7 @@ class PlaylistContainer(collections.Sequence):
         Using ``del playlist_container[3]`` is equivalent to
         ``playlist_container.remove_playlist(3)``. Similarly, ``del
         playlist_container[0:2]`` is equivalent to calling this method with
-        indexes ``0`` and ``1``.
+        indexes ``1`` and ``0``.
         """
         item = self[index]
         if isinstance(item, PlaylistFolder):

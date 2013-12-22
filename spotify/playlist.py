@@ -491,6 +491,9 @@ class PlaylistContainer(collections.Sequence):
             raise IndexError('list index out of range')
         self.remove_playlist(key)
 
+    def insert(self, index, value):
+        self[index:index] = [value]
+
     def add_new_playlist(self, name, index=None):
         """Add an empty playlist with ``name`` at the given ``index``.
 
@@ -610,7 +613,7 @@ class PlaylistContainer(collections.Sequence):
         spotify.Error.maybe_raise(lib.sp_playlistcontainer_move_playlist(
             self._sp_playlistcontainer, from_index, to_index, int(dry_run)))
 
-    # TODO Add insert, and subclass MutableSequence
+    # TODO Subclass MutableSequence
 
     @property
     def owner(self):

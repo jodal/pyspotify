@@ -1117,6 +1117,33 @@ class PlaylistContainerTest(unittest.TestCase):
         with self.assertRaises(TypeError):
             del playlist_container['abc']
 
+    def test_insert_with_playlist_name(self, lib_mock):
+        sp_playlistcontainer = spotify.ffi.new('int *')
+        playlist_container = spotify.PlaylistContainer(
+            sp_playlistcontainer=sp_playlistcontainer)
+        playlist_container.__len__ = mock.Mock(return_value=5)
+        playlist_container.remove_playlist = mock.Mock()
+        playlist_container.add_new_playlist = mock.Mock()
+
+        playlist_container.insert(3, 'New playlist')
+
+        playlist_container.add_new_playlist.assert_called_with(
+            'New playlist', index=3)
+
+    def test_insert_with_existing_playlist(self, lib_mock):
+        sp_playlist = spotify.ffi.new('int *')
+        playlist = spotify.Playlist(sp_playlist=sp_playlist)
+        sp_playlistcontainer = spotify.ffi.new('int *')
+        playlist_container = spotify.PlaylistContainer(
+            sp_playlistcontainer=sp_playlistcontainer)
+        playlist_container.__len__ = mock.Mock(return_value=5)
+        playlist_container.remove_playlist = mock.Mock()
+        playlist_container.add_playlist = mock.Mock()
+
+        playlist_container.insert(3, playlist)
+
+        playlist_container.add_playlist.assert_called_with(playlist, index=3)
+
     def test_is_a_sequence(self, lib_mock):
         sp_playlistcontainer = spotify.ffi.new('int *')
         playlist_container = spotify.PlaylistContainer(

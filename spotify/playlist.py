@@ -433,7 +433,7 @@ class PlaylistContainer(collections.Sequence):
 
     def __delitem__(self, key):
         if isinstance(key, slice):
-            start, stop, step = key.indices(len(self))
+            start, stop, step = key.indices(self.__len__())
             indexes = range(start, stop, step)
             for i in reversed(sorted(indexes)):
                 self.remove_playlist(i)
@@ -464,7 +464,7 @@ class PlaylistContainer(collections.Sequence):
             raise spotify.Error('Playlist creation failed')
         playlist = Playlist(sp_playlist=sp_playlist, add_ref=True)
         if index is not None:
-            self.move_playlist(len(self) - 1, index)
+            self.move_playlist(self.__len__() - 1, index)
         return playlist
 
     def add_playlist(self, playlist, index=None):
@@ -494,7 +494,7 @@ class PlaylistContainer(collections.Sequence):
             return None
         playlist = Playlist(sp_playlist=sp_playlist, add_ref=True)
         if index is not None:
-            self.move_playlist(len(self) - 1, index)
+            self.move_playlist(self.__len__() - 1, index)
         return playlist
 
     def add_folder(self, name, index=None):
@@ -508,7 +508,7 @@ class PlaylistContainer(collections.Sequence):
         """
         self._validate_name(name)
         if index is None:
-            index = len(self)
+            index = self.__len__()
         name = ffi.new('char[]', utils.to_bytes(name))
         spotify.Error.maybe_raise(lib.sp_playlistcontainer_add_folder(
             self._sp_playlistcontainer, index, name))

@@ -1070,110 +1070,52 @@ class PlaylistContainerTest(unittest.TestCase):
         sp_playlistcontainer = spotify.ffi.new('int *')
         playlist_container = spotify.PlaylistContainer(
             sp_playlistcontainer=sp_playlistcontainer)
-        lib_mock.sp_playlistcontainer_num_playlists.return_value = 1
-        sp_playlist = spotify.ffi.new('int *')
-        lib_mock.sp_playlistcontainer_playlist.return_value = sp_playlist
-        lib_mock.sp_playlistcontainer_playlist_type.return_value = int(
-            spotify.PlaylistType.PLAYLIST)
-        lib_mock.sp_playlistcontainer_remove_playlist.return_value = int(
-            spotify.ErrorType.OK)
+        playlist_container.__len__ = mock.Mock(return_value=1)
+        playlist_container.remove_playlist = mock.Mock()
 
         del playlist_container[0]
 
-        lib_mock.sp_playlistcontainer_remove_playlist.assert_called_with(
-            sp_playlistcontainer, 0)
+        playlist_container.remove_playlist.assert_called_with(0)
 
     def test_delitem_with_slice(self, lib_mock):
         sp_playlistcontainer = spotify.ffi.new('int *')
         playlist_container = spotify.PlaylistContainer(
             sp_playlistcontainer=sp_playlistcontainer)
-        lib_mock.sp_playlistcontainer_num_playlists.return_value = 3
-        sp_playlist = spotify.ffi.new('int *')
-        lib_mock.sp_playlistcontainer_playlist_type.side_effect = [
-            int(spotify.PlaylistType.PLAYLIST),
-            int(spotify.PlaylistType.PLAYLIST),
-            int(spotify.PlaylistType.PLAYLIST)]
-        lib_mock.sp_playlistcontainer_playlist.side_effect = [
-            sp_playlist, sp_playlist, sp_playlist]
-        lib_mock.sp_playlistcontainer_remove_playlist.return_value = int(
-            spotify.ErrorType.OK)
+        playlist_container.__len__ = mock.Mock(return_value=3)
+        playlist_container.remove_playlist = mock.Mock()
 
         del playlist_container[0:2]
 
         # Delete items in reverse order, so the indexes doesn't change
-        lib_mock.sp_playlistcontainer_remove_playlist.assert_has_calls([
-            mock.call(sp_playlistcontainer, 1),
-            mock.call(sp_playlistcontainer, 0),
-        ], any_order=False)
-
-    def test_delitem_with_folder(self, lib_mock):
-        folder_name = 'foobar'
-
-        sp_playlistcontainer = spotify.ffi.new('int *')
-        playlist_container = spotify.PlaylistContainer(
-            sp_playlistcontainer=sp_playlistcontainer)
-        lib_mock.sp_playlistcontainer_num_playlists.return_value = 3
-        lib_mock.sp_playlistcontainer_playlist_type.side_effect = [
-            int(spotify.PlaylistType.START_FOLDER),
-            int(spotify.PlaylistType.PLAYLIST),
-            int(spotify.PlaylistType.END_FOLDER)]
-        sp_playlist = spotify.ffi.new('int *')
-        lib_mock.sp_playlistcontainer_playlist.return_value = sp_playlist
-        lib_mock.sp_playlistcontainer_playlist_folder_id.side_effect = [
-            1001, 1001]
-        lib_mock.sp_playlistcontainer_playlist_folder_name.side_effect = (
-            tests.buffer_writer(folder_name))
-        playlist_container._find_folder_indexes = lambda *a: [0, 2]
-        lib_mock.sp_playlistcontainer_remove_playlist.return_value = int(
-            spotify.ErrorType.OK)
-
-        del playlist_container[0]
-
-        # Both folder start and folder end is deleted
-        lib_mock.sp_playlistcontainer_remove_playlist.assert_has_calls([
-            mock.call(sp_playlistcontainer, 2),
-            mock.call(sp_playlistcontainer, 0),
-        ], any_order=False)
-
-    def test_delitem_raises_error_on_unknown_playlist_type(self, lib_mock):
-        lib_mock.sp_playlistcontainer_num_playlists.return_value = 1
-        lib_mock.sp_playlistcontainer_playlist_type.return_value = int(
-            spotify.PlaylistType.PLACEHOLDER)
-        sp_playlistcontainer = spotify.ffi.new('int *')
-        playlist_container = spotify.PlaylistContainer(
-            sp_playlistcontainer=sp_playlistcontainer)
-
-        self.assertRaises(RuntimeError, playlist_container.__delitem__, 0)
+        playlist_container.remove_playlist.assert_has_calls(
+            [mock.call(1), mock.call(0)], any_order=False)
 
     def test_delitem_raises_index_error_on_negative_index(self, lib_mock):
-        lib_mock.sp_playlistcontainer_num_playlists.return_value = 1
-        sp_playlist = spotify.ffi.new('int *')
-        lib_mock.sp_playlistcontainer_playlist.return_value = sp_playlist
         sp_playlistcontainer = spotify.ffi.new('int *')
         playlist_container = spotify.PlaylistContainer(
             sp_playlistcontainer=sp_playlistcontainer)
+        playlist_container.__len__ = mock.Mock(return_value=1)
 
-        self.assertRaises(IndexError, playlist_container.__delitem__, -1)
+        with self.assertRaises(IndexError):
+            del playlist_container[-1]
 
     def test_delitem_raises_index_error_on_too_high_index(self, lib_mock):
-        lib_mock.sp_playlistcontainer_num_playlists.return_value = 1
-        sp_playlist = spotify.ffi.new('int *')
-        lib_mock.sp_playlistcontainer_playlist.return_value = sp_playlist
         sp_playlistcontainer = spotify.ffi.new('int *')
         playlist_container = spotify.PlaylistContainer(
             sp_playlistcontainer=sp_playlistcontainer)
+        playlist_container.__len__ = mock.Mock(return_value=1)
 
-        self.assertRaises(IndexError, playlist_container.__delitem__, 1)
+        with self.assertRaises(IndexError):
+            del playlist_container[1]
 
     def test_delitem_raises_type_error_on_non_integral_index(self, lib_mock):
-        lib_mock.sp_playlistcontainer_num_playlists.return_value = 1
-        sp_playlist = spotify.ffi.new('int *')
-        lib_mock.sp_playlistcontainer_playlist.return_value = sp_playlist
         sp_playlistcontainer = spotify.ffi.new('int *')
         playlist_container = spotify.PlaylistContainer(
             sp_playlistcontainer=sp_playlistcontainer)
+        playlist_container.__len__ = mock.Mock(return_value=1)
 
-        self.assertRaises(TypeError, playlist_container.__delitem__, 'abc')
+        with self.assertRaises(TypeError):
+            del playlist_container['abc']
 
     def test_is_a_sequence(self, lib_mock):
         sp_playlistcontainer = spotify.ffi.new('int *')

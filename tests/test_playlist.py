@@ -1151,6 +1151,13 @@ class PlaylistContainerTest(unittest.TestCase):
 
         self.assertIsInstance(playlist_container, collections.Sequence)
 
+    def test_is_a_mutable_sequence(self, lib_mock):
+        sp_playlistcontainer = spotify.ffi.new('int *')
+        playlist_container = spotify.PlaylistContainer(
+            sp_playlistcontainer=sp_playlistcontainer)
+
+        self.assertIsInstance(playlist_container, collections.MutableSequence)
+
     def test_add_new_playlist_to_end_of_container(self, lib_mock):
         sp_playlistcontainer = spotify.ffi.new('int *')
         playlist_container = spotify.PlaylistContainer(

@@ -339,7 +339,7 @@ class Playlist(object):
         return spotify.Link(sp_link=sp_link, add_ref=False)
 
 
-class PlaylistContainer(collections.Sequence):
+class PlaylistContainer(collections.MutableSequence):
     """A Spotify playlist container.
 
     The playlist container can be accessed as a regular Python collection to
@@ -414,6 +414,8 @@ class PlaylistContainer(collections.Sequence):
     # TODO remove_callbacks()
 
     def __len__(self):
+        # Required by collections.Sequence
+
         length = lib.sp_playlistcontainer_num_playlists(
             self._sp_playlistcontainer)
         if length == -1:
@@ -421,6 +423,8 @@ class PlaylistContainer(collections.Sequence):
         return length
 
     def __getitem__(self, key):
+        # Required by collections.Sequence
+
         if isinstance(key, slice):
             return list(self).__getitem__(key)
         if not isinstance(key, int):
@@ -451,6 +455,8 @@ class PlaylistContainer(collections.Sequence):
             raise RuntimeError('Unknown playlist type: %r' % playlist_type)
 
     def __setitem__(self, key, value):
+        # Required by collections.MutableSequence
+
         if not isinstance(key, (int, slice)):
             raise TypeError(
                 'list indices must be int or slice, not %s' %
@@ -477,6 +483,8 @@ class PlaylistContainer(collections.Sequence):
         del self[key]
 
     def __delitem__(self, key):
+        # Required by collections.MutableSequence
+
         if isinstance(key, slice):
             start, stop, step = key.indices(self.__len__())
             indexes = range(start, stop, step)
@@ -492,6 +500,8 @@ class PlaylistContainer(collections.Sequence):
         self.remove_playlist(key)
 
     def insert(self, index, value):
+        # Required by collections.MutableSequence
+
         self[index:index] = [value]
 
     def add_new_playlist(self, name, index=None):
@@ -612,8 +622,6 @@ class PlaylistContainer(collections.Sequence):
         """
         spotify.Error.maybe_raise(lib.sp_playlistcontainer_move_playlist(
             self._sp_playlistcontainer, from_index, to_index, int(dry_run)))
-
-    # TODO Subclass MutableSequence
 
     @property
     def owner(self):

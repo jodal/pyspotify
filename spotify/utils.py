@@ -76,7 +76,7 @@ def get_with_fixed_buffer(buffer_length, func, *args):
     Returns the buffer's value decoded from UTF-8 to a unicode string.
     """
     func = functools.partial(func, *args)
-    buffer_ = ffi.new('char[%d]' % buffer_length)
+    buffer_ = ffi.new('char[]', buffer_length)
     func(buffer_, buffer_length)
     return to_unicode(buffer_)
 
@@ -98,7 +98,7 @@ def get_with_growing_buffer(func, *args):
     buffer_length = actual_length
     while actual_length >= buffer_length:
         buffer_length = actual_length + 1
-        buffer_ = ffi.new('char[%d]' % buffer_length)
+        buffer_ = ffi.new('char[]', buffer_length)
         actual_length = func(buffer_, buffer_length)
     if actual_length == -1:
         return None

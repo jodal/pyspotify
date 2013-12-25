@@ -631,7 +631,13 @@ class PlaylistContainer(collections.MutableSequence):
         return spotify.User(sp_user=sp_user)
 
     # TODO get_unseen_tracks()
-    # TODO clear_unseen_tracks()
+
+    def clear_unseen_tracks(self, playlist):
+        """Clears unseen tracks from the given ``playlist``."""
+        result = lib.sp_playlistcontainer_clear_unseen_tracks(
+            self._sp_playlistcontainer, playlist._sp_playlist)
+        if result == -1:
+            raise spotify.Error('Failed clearing unseen tracks')
 
     def insert(self, index, value):
         # Required by collections.MutableSequence

@@ -1654,6 +1654,30 @@ class PlaylistContainerTest(unittest.TestCase):
         user_mock.assert_called_with(sp_user=sp_user)
         self.assertEqual(result, mock.sentinel.user)
 
+    def test_clear_unseen_tracks(self, lib_mock):
+        sp_playlistcontainer = spotify.ffi.new('int *')
+        playlist_container = spotify.PlaylistContainer(
+            sp_playlistcontainer=sp_playlistcontainer)
+        sp_playlist = spotify.ffi.new('int *')
+        playlist = spotify.Playlist(sp_playlist=sp_playlist)
+        lib_mock.sp_playlistcontainer_clear_unseen_tracks.return_value = 0
+
+        playlist_container.clear_unseen_tracks(playlist)
+
+        lib_mock.sp_playlistcontainer_clear_unseen_tracks.assert_called_with(
+            sp_playlistcontainer, sp_playlist)
+
+    def test_clear_unseen_tracks_raises_error_on_failure(self, lib_mock):
+        sp_playlistcontainer = spotify.ffi.new('int *')
+        playlist_container = spotify.PlaylistContainer(
+            sp_playlistcontainer=sp_playlistcontainer)
+        sp_playlist = spotify.ffi.new('int *')
+        playlist = spotify.Playlist(sp_playlist=sp_playlist)
+        lib_mock.sp_playlistcontainer_clear_unseen_tracks.return_value = -1
+
+        with self.assertRaises(spotify.Error):
+            playlist_container.clear_unseen_tracks(playlist)
+
 
 class PlaylistFolderTest(unittest.TestCase):
 

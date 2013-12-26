@@ -302,6 +302,8 @@ Playlists
 .. autoclass:: PlaylistType
     :no-inherited-members:
 
+.. autoclass:: PlaylistUnseenTracks
+
 
 Users
 =====

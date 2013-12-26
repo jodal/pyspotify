@@ -95,9 +95,10 @@ class Search(object):
     def load(self, timeout=None):
         """Block until the search's data is loaded.
 
-        :param timeout: seconds before giving up and raising an exception
-        :type timeout: float
-        :returns: self
+        After ``timeout`` seconds with no results :exc:`~spotify.Timeout` is
+        raised. If ``timeout`` is :class:`None` the default timeout is used.
+
+        The method returns ``self`` to allow for chaining of calls.
         """
         # TODO Replace with self.complete_event.wait(timeout) when we have a
         # thread that takes care of all ``process_events()`` calls for us.

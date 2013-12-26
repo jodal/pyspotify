@@ -52,9 +52,10 @@ class Album(object):
     def load(self, timeout=None):
         """Block until the album's data is loaded.
 
-        :param timeout: seconds before giving up and raising an exception
-        :type timeout: float
-        :returns: self
+        After ``timeout`` seconds with no results :exc:`~spotify.Timeout` is
+        raised. If ``timeout`` is :class:`None` the default timeout is used.
+
+        The method returns ``self`` to allow for chaining of calls.
         """
         return utils.load(self, timeout=timeout)
 
@@ -212,9 +213,10 @@ class AlbumBrowser(object):
     def load(self, timeout=None):
         """Block until the album browser's data is loaded.
 
-        :param timeout: seconds before giving up and raising an exception
-        :type timeout: float
-        :returns: self
+        After ``timeout`` seconds with no results :exc:`~spotify.Timeout` is
+        raised. If ``timeout`` is :class:`None` the default timeout is used.
+
+        The method returns ``self`` to allow for chaining of calls.
         """
         return utils.load(self, timeout=timeout)
 

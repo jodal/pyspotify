@@ -36,6 +36,80 @@ class IntEnumTest(unittest.TestCase):
         self.assertIsNot(self.Foo(1), self.Foo.baz)
 
 
+class ObservableTest(unittest.TestCase):
+
+    def test_callback_receives_event_args(self):
+        callback_mock = mock.Mock()
+        observable = utils.Observable()
+        observable.on('some_event', callback_mock)
+
+        observable.emit('some_event', 'abc', 'def')
+
+        callback_mock.assert_called_with('abc', 'def')
+
+    def test_callback_receives_both_user_and_event_args(self):
+        callback_mock = mock.Mock()
+        observable = utils.Observable()
+
+        observable.on('some_event', callback_mock, 1, 2, 3)
+        observable.emit('some_event', 'abc')
+
+        callback_mock.assert_called_with('abc', 1, 2, 3)
+
+    def test_multiple_callbacks_for_same_event(self):
+        callback_mock1 = mock.Mock()
+        callback_mock2 = mock.Mock()
+        observable = utils.Observable()
+
+        observable.on('some_event', callback_mock1, 1, 2, 3)
+        observable.on('some_event', callback_mock2, 4, 5)
+        observable.emit('some_event', 'abc')
+
+        callback_mock1.assert_called_with('abc', 1, 2, 3)
+        callback_mock2.assert_called_with('abc', 4, 5)
+
+    def test_removing_a_callback(self):
+        callback_mock1 = mock.Mock()
+        callback_mock2 = mock.Mock()
+        observable = utils.Observable()
+
+        observable.on('some_event', callback_mock1, 123)
+        observable.on('some_event', callback_mock1, 456)
+        observable.on('some_event', callback_mock2, 78)
+        observable.off('some_event', callback_mock1)
+        observable.emit('some_event')
+
+        self.assertEqual(callback_mock1.call_count, 0)
+        callback_mock2.assert_called_with(78)
+
+    def test_removing_all_callbacks_for_an_event(self):
+        callback_mock1 = mock.Mock()
+        callback_mock2 = mock.Mock()
+        observable = utils.Observable()
+
+        observable.on('some_event', callback_mock1)
+        observable.on('some_event', callback_mock2)
+        observable.off('some_event')
+        observable.emit('some_event')
+
+        self.assertEqual(callback_mock1.call_count, 0)
+        self.assertEqual(callback_mock2.call_count, 0)
+
+    def test_removing_all_callbacks_for_all_events(self):
+        callback_mock1 = mock.Mock()
+        callback_mock2 = mock.Mock()
+        observable = utils.Observable()
+
+        observable.on('some_event', callback_mock1)
+        observable.on('another_event', callback_mock2)
+        observable.off()
+        observable.emit('some_event')
+        observable.emit('another_event')
+
+        self.assertEqual(callback_mock1.call_count, 0)
+        self.assertEqual(callback_mock2.call_count, 0)
+
+
 @mock.patch('spotify.search.lib', spec=spotify.lib)
 class SequenceTest(unittest.TestCase):
 

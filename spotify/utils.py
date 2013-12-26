@@ -140,6 +140,59 @@ def load(obj, timeout=None):
     return obj
 
 
+class Observable(object):
+    """Helper class which implements a basic event emitter."""
+
+    def __init__(self):
+        self._observers = collections.defaultdict(list)
+
+    def on(self, event, callback, *user_args):
+        """Register a ``callback`` to be called on ``event``.
+
+        The callback will be called with any extra arguments passed to
+        :meth:`emit` first, and then the extra arguments passed to :meth:`on`
+        last.
+        """
+        self._observers[event].append(_Observer(callback, user_args))
+
+    def off(self, event=None, callback=None):
+        """Remove a ``callback`` that was to be called on ``event``.
+
+        If ``callback`` is :class:`None`, all callbacks for the given ``event``
+        will be removed.
+
+        If ``event`` is :class:`None`, all callbacks for all events on this
+        object will be removed.
+        """
+        if event is None:
+            events = self._observers.keys()
+        else:
+            events = [event]
+        for event in events:
+            if callback is None:
+                self._observers[event] = []
+            else:
+                self._observers[event] = [
+                    observer
+                    for observer in self._observers[event]
+                    if observer.callback is not callback]
+
+    def emit(self, event, *event_args):
+        """Call the registered callbacks for ``event``.
+
+        The callbacks will be called with any extra arguments passed to
+        :meth:`emit` first, and then the extra arguments passed to :meth:`on`
+        """
+        for observable in self._observers[event]:
+            args = list(event_args) + list(observable.user_args)
+            observable.callback(*args)
+
+
+class _Observer(collections.namedtuple(
+        'Observer', ['callback', 'user_args'])):
+    """An observer of events from an :class:`Observable`"""
+
+
 class Sequence(collections.Sequence):
     """Helper class for making sequences from a length and getitem function.
 

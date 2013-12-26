@@ -32,7 +32,8 @@ class LoadableTest(unittest.TestCase):
         spotify.session_instance = None
         foo = Foo()
 
-        self.assertRaises(RuntimeError, foo.load)
+        with self.assertRaises(RuntimeError):
+            foo.load()
 
     def test_load_raises_error_if_not_logged_in(
             self, is_loaded_mock, session_mock, time_mock):
@@ -40,7 +41,8 @@ class LoadableTest(unittest.TestCase):
         spotify.session_instance.user = None
         foo = Foo()
 
-        self.assertRaises(RuntimeError, foo.load)
+        with self.assertRaises(RuntimeError):
+            foo.load()
 
     def test_load_raises_error_when_timeout_is_reached(
             self, is_loaded_mock, session_mock, time_mock):
@@ -48,7 +50,8 @@ class LoadableTest(unittest.TestCase):
         time_mock.time.side_effect = time.time
         foo = Foo()
 
-        self.assertRaises(spotify.Timeout, foo.load, timeout=0)
+        with self.assertRaises(spotify.Timeout):
+            foo.load(timeout=0)
 
     def test_load_processes_events_until_loaded(
             self, is_loaded_mock, session_mock, time_mock):
@@ -67,7 +70,9 @@ class LoadableTest(unittest.TestCase):
 
         foo = Foo()
         foo.error = spotify.ErrorType.OTHER_PERMANENT
-        self.assertRaises(spotify.Error, foo.load)
+
+        with self.assertRaises(spotify.Error):
+            foo.load()
 
         self.assertEqual(session_mock.process_events.call_count, 1)
         self.assertEqual(time_mock.sleep.call_count, 0)
@@ -78,7 +83,9 @@ class LoadableTest(unittest.TestCase):
 
         foo = Foo()
         foo.error = spotify.ErrorType.OTHER_PERMANENT
-        self.assertRaises(spotify.Error, foo.load)
+
+        with self.assertRaises(spotify.Error):
+            foo.load()
 
     def test_load_does_not_abort_on_is_loading_error(
             self, is_loaded_mock, session_mock, time_mock):

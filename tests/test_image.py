@@ -20,7 +20,8 @@ class ImageTest(unittest.TestCase):
         spotify.session_instance = None
 
     def test_create_without_uri_or_sp_image_fails(self, lib_mock):
-        self.assertRaises(AssertionError, spotify.Image)
+        with self.assertRaises(AssertionError):
+            spotify.Image()
 
     @mock.patch('spotify.Link', spec=spotify.Link)
     def test_create_from_uri(self, link_mock, lib_mock):
@@ -44,7 +45,8 @@ class ImageTest(unittest.TestCase):
         link_instance_mock.as_image.return_value = None
         uri = 'spotify:image:foo'
 
-        self.assertRaises(ValueError, spotify.Image, uri)
+        with self.assertRaises(ValueError):
+            spotify.Image(uri)
 
     def test_adds_ref_to_sp_image_when_created(self, lib_mock):
         sp_image = spotify.ffi.new('int *')
@@ -125,7 +127,8 @@ class ImageTest(unittest.TestCase):
         sp_image = spotify.ffi.new('int *')
         image = spotify.Image(sp_image=sp_image)
 
-        self.assertRaises(spotify.Error, image.add_load_callback, None)
+        with self.assertRaises(spotify.Error):
+            image.add_load_callback(None)
 
     def test_remove_load_callback_fails_if_error(self, lib_mock):
         lib_mock.sp_image_add_load_callback.return_value = int(
@@ -136,14 +139,15 @@ class ImageTest(unittest.TestCase):
         image = spotify.Image(sp_image=sp_image)
         callback_id = image.add_load_callback(None)
 
-        self.assertRaises(
-            spotify.Error, image.remove_load_callback, callback_id)
+        with self.assertRaises(spotify.Error):
+            image.remove_load_callback(callback_id)
 
     def test_remove_load_callback_fails_if_unknown_callback(self, lib_mock):
         sp_image = spotify.ffi.new('int *')
         image = spotify.Image(sp_image=sp_image)
 
-        self.assertRaises(LookupError, image.remove_load_callback, b'foo')
+        with self.assertRaises(LookupError):
+            image.remove_load_callback(b'foo')
 
     def test_is_loaded(self, lib_mock):
         lib_mock.sp_image_is_loaded.return_value = 1
@@ -255,7 +259,8 @@ class ImageTest(unittest.TestCase):
             return_value=spotify.ImageFormat.UNKNOWN)
         image.__dict__['data'] = mock.Mock(return_value=b'01234\x006789')
 
-        self.assertRaises(ValueError, lambda: image.data_uri)
+        with self.assertRaises(ValueError):
+            image.data_uri
 
     @mock.patch('spotify.Link', spec=spotify.Link)
     def test_link_creates_link_to_image(self, link_mock, lib_mock):

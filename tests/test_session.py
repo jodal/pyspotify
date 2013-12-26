@@ -477,12 +477,14 @@ class SessionConfigTest(unittest.TestCase):
     def test_get_application_key_fails_if_no_key_found(self):
         self.config.application_key_filename = '/nonexistant'
 
-        self.assertRaises(EnvironmentError, self.config.get_application_key)
+        with self.assertRaises(EnvironmentError):
+            self.config.get_application_key()
 
     def test_get_application_key_fails_if_invalid_key(self):
         self.config.application_key = 'way too short key'
 
-        self.assertRaises(AssertionError, self.config.get_application_key)
+        with self.assertRaises(AssertionError):
+            self.config.get_application_key()
 
     def test_get_callbacks_prefers_the_key_attr(self):
         self.config.callbacks = mock.sentinel.my_callbacks
@@ -569,7 +571,8 @@ class SessionTest(unittest.TestCase):
     def test_raises_error_if_a_session_already_exists(self, lib_mock):
         self.create_session(lib_mock)
 
-        self.assertRaises(RuntimeError, self.create_session, lib_mock)
+        with self.assertRaises(RuntimeError):
+            self.create_session(lib_mock)
 
     @mock.patch('spotify.session.SessionConfig', spec=spotify.SessionConfig)
     def test_creates_config_if_none_provided(self, config_cls_mock, lib_mock):
@@ -599,7 +602,8 @@ class SessionTest(unittest.TestCase):
         config = spotify.SessionConfig()
         config.application_key = b'\x01' * 321
 
-        self.assertRaises(spotify.Error, spotify.Session, config=config)
+        with self.assertRaises(spotify.Error):
+            spotify.Session(config=config)
 
     def test_releases_sp_session_when_session_dies(self, lib_mock):
         sp_session = spotify.ffi.NULL
@@ -634,7 +638,8 @@ class SessionTest(unittest.TestCase):
         lib_mock.sp_session_login.return_value = spotify.ErrorType.OK
         session = self.create_session(lib_mock)
 
-        self.assertRaises(AttributeError, session.login, 'alice')
+        with self.assertRaises(AttributeError):
+            session.login('alice')
 
     def test_login_with_password(self, lib_mock):
         lib_mock.sp_session_login.return_value = spotify.ErrorType.OK
@@ -682,7 +687,8 @@ class SessionTest(unittest.TestCase):
         lib_mock.sp_session_login.return_value = spotify.ErrorType.NO_SUCH_USER
         session = self.create_session(lib_mock)
 
-        self.assertRaises(spotify.Error, session.login, 'alice', 'secret')
+        with self.assertRaises(spotify.Error):
+            session.login('alice', 'secret')
 
     def test_relogin(self, lib_mock):
         lib_mock.sp_session_relogin.return_value = spotify.ErrorType.OK
@@ -698,7 +704,8 @@ class SessionTest(unittest.TestCase):
             spotify.ErrorType.NO_CREDENTIALS)
         session = self.create_session(lib_mock)
 
-        self.assertRaises(spotify.Error, session.relogin)
+        with self.assertRaises(spotify.Error):
+            session.relogin()
 
     def test_remembered_user_name_grows_buffer_to_fit_username(self, lib_mock):
         username = 'alice' * 100
@@ -746,7 +753,8 @@ class SessionTest(unittest.TestCase):
             spotify.ErrorType.BAD_API_VERSION)
         session = self.create_session(lib_mock)
 
-        self.assertRaises(spotify.Error, session.forget_me)
+        with self.assertRaises(spotify.Error):
+            session.forget_me()
 
     @mock.patch('spotify.user.lib', spec=spotify.lib)
     def test_user(self, user_lib_mock, lib_mock):
@@ -781,7 +789,8 @@ class SessionTest(unittest.TestCase):
             spotify.ErrorType.BAD_API_VERSION)
         session = self.create_session(lib_mock)
 
-        self.assertRaises(spotify.Error, session.logout)
+        with self.assertRaises(spotify.Error):
+            session.logout()
 
     def test_flush_caches(self, lib_mock):
         lib_mock.sp_session_flush_caches.return_value = spotify.ErrorType.OK
@@ -797,7 +806,8 @@ class SessionTest(unittest.TestCase):
             spotify.ErrorType.BAD_API_VERSION)
         session = self.create_session(lib_mock)
 
-        self.assertRaises(spotify.Error, session.flush_caches)
+        with self.assertRaises(spotify.Error):
+            session.flush_caches()
 
     def test_connection_state(self, lib_mock):
         lib_mock.sp_session_connectionstate.return_value = int(
@@ -824,7 +834,8 @@ class SessionTest(unittest.TestCase):
             spotify.ErrorType.BAD_API_VERSION)
         session = self.create_session(lib_mock)
 
-        self.assertRaises(spotify.Error, session.set_cache_size, 100)
+        with self.assertRaises(spotify.Error):
+            session.set_cache_size(100)
 
     def test_process_events_returns_ms_to_next_timeout(self, lib_mock):
         def func(sp_session, int_ptr):
@@ -844,7 +855,8 @@ class SessionTest(unittest.TestCase):
             spotify.ErrorType.BAD_API_VERSION)
         session = self.create_session(lib_mock)
 
-        self.assertRaises(spotify.Error, session.process_events)
+        with self.assertRaises(spotify.Error):
+            session.process_events()
 
     @mock.patch('spotify.playlist.lib', spec=spotify.lib)
     def test_playlist_container(self, playlist_lib_mock, lib_mock):
@@ -1018,7 +1030,8 @@ class SessionTest(unittest.TestCase):
             spotify.ErrorType.INVALID_ARGUMENT)
         session = self.create_session(lib_mock)
 
-        self.assertRaises(spotify.Error, session.preferred_bitrate, 17)
+        with self.assertRaises(spotify.Error):
+            session.preferred_bitrate(17)
 
     def test_preferred_offline_bitrate(self, lib_mock):
         lib_mock.sp_session_preferred_offline_bitrate.return_value = (
@@ -1046,7 +1059,8 @@ class SessionTest(unittest.TestCase):
             spotify.ErrorType.INVALID_ARGUMENT)
         session = self.create_session(lib_mock)
 
-        self.assertRaises(spotify.Error, session.preferred_offline_bitrate, 17)
+        with self.assertRaises(spotify.Error):
+            session.preferred_offline_bitrate(17)
 
     def test_get_volume_normalization(self, lib_mock):
         lib_mock.sp_session_get_volume_normalization.return_value = 0
@@ -1073,8 +1087,8 @@ class SessionTest(unittest.TestCase):
             spotify.ErrorType.BAD_API_VERSION)
         session = self.create_session(lib_mock)
 
-        self.assertRaises(
-            spotify.Error, setattr, session, 'volume_normalization', True)
+        with self.assertRaises(spotify.Error):
+            session.volume_normalization = True
 
     def test_user_country(self, lib_mock):
         lib_mock.sp_session_user_country.return_value = (
@@ -1132,10 +1146,9 @@ class OfflineTest(unittest.TestCase):
             spotify.ErrorType.BAD_API_VERSION)
         session = self.create_session(lib_mock)
 
-        self.assertRaises(
-            spotify.Error,
-            session.offline.set_connection_type,
-            spotify.ConnectionType.UNKNOWN)
+        with self.assertRaises(spotify.Error):
+            session.offline.set_connection_type(
+                spotify.ConnectionType.UNKNOWN)
 
     def test_set_connection_rules(self, lib_mock):
         lib_mock.sp_session_set_connection_rules.return_value = (
@@ -1166,10 +1179,9 @@ class OfflineTest(unittest.TestCase):
             spotify.ErrorType.BAD_API_VERSION)
         session = self.create_session(lib_mock)
 
-        self.assertRaises(
-            spotify.Error,
-            session.offline.set_connection_rules,
-            spotify.ConnectionRule.NETWORK)
+        with self.assertRaises(spotify.Error):
+            session.offline.set_connection_rules(
+                spotify.ConnectionRule.NETWORK)
 
     def test_offline_tracks_to_sync(self, lib_mock):
         lib_mock.sp_offline_tracks_to_sync.return_value = 17
@@ -1258,7 +1270,8 @@ class PlayerTest(unittest.TestCase):
         sp_track = spotify.ffi.new('int *')
         track = spotify.Track(sp_track=sp_track)
 
-        self.assertRaises(spotify.Error, session.player.load, track)
+        with self.assertRaises(spotify.Error):
+            session.player.load(track)
 
     def test_player_seek(self, lib_mock):
         lib_mock.sp_session_player_seek.return_value = spotify.ErrorType.OK
@@ -1274,7 +1287,8 @@ class PlayerTest(unittest.TestCase):
             spotify.ErrorType.BAD_API_VERSION)
         session = self.create_session(lib_mock)
 
-        self.assertRaises(spotify.Error, session.player.seek, 45000)
+        with self.assertRaises(spotify.Error):
+            session.player.seek(45000)
 
     def test_player_play(self, lib_mock):
         lib_mock.sp_session_player_play.return_value = spotify.ErrorType.OK
@@ -1299,7 +1313,8 @@ class PlayerTest(unittest.TestCase):
             spotify.ErrorType.BAD_API_VERSION)
         session = self.create_session(lib_mock)
 
-        self.assertRaises(spotify.Error, session.player.play, True)
+        with self.assertRaises(spotify.Error):
+            session.player.play(True)
 
     def test_player_unload(self, lib_mock):
         lib_mock.sp_session_player_unload.return_value = spotify.ErrorType.OK
@@ -1315,7 +1330,8 @@ class PlayerTest(unittest.TestCase):
             spotify.ErrorType.BAD_API_VERSION)
         session = self.create_session(lib_mock)
 
-        self.assertRaises(spotify.Error, session.player.unload)
+        with self.assertRaises(spotify.Error):
+            session.player.unload()
 
     @mock.patch('spotify.track.lib', spec=spotify.lib)
     def test_player_prefetch(self, track_lib_mock, lib_mock):
@@ -1337,7 +1353,8 @@ class PlayerTest(unittest.TestCase):
         sp_track = spotify.ffi.new('int *')
         track = spotify.Track(sp_track=sp_track)
 
-        self.assertRaises(spotify.Error, session.player.prefetch, track)
+        with self.assertRaises(spotify.Error):
+            session.player.prefetch(track)
 
 
 @mock.patch('spotify.session.lib', spec=spotify.lib)
@@ -1377,8 +1394,8 @@ class SocialTest(unittest.TestCase):
             spotify.ErrorType.BAD_API_VERSION)
         session = self.create_session(lib_mock)
 
-        self.assertRaises(
-            spotify.Error, setattr, session.social, 'private_session', True)
+        with self.assertRaises(spotify.Error):
+            session.social.private_session = True
 
     def test_is_scrobbling(self, lib_mock):
 
@@ -1401,9 +1418,8 @@ class SocialTest(unittest.TestCase):
             spotify.ErrorType.BAD_API_VERSION)
         session = self.create_session(lib_mock)
 
-        self.assertRaises(
-            spotify.Error,
-            session.social.is_scrobbling, spotify.SocialProvider.SPOTIFY)
+        with self.assertRaises(spotify.Error):
+            session.social.is_scrobbling(spotify.SocialProvider.SPOTIFY)
 
     def test_set_scrobbling(self, lib_mock):
         lib_mock.sp_session_set_scrobbling.return_value = spotify.ErrorType.OK
@@ -1423,11 +1439,10 @@ class SocialTest(unittest.TestCase):
             spotify.ErrorType.BAD_API_VERSION)
         session = self.create_session(lib_mock)
 
-        self.assertRaises(
-            spotify.Error,
-            session.social.set_scrobbling,
-            spotify.SocialProvider.SPOTIFY,
-            spotify.ScrobblingState.USE_GLOBAL_SETTING)
+        with self.assertRaises(spotify.Error):
+            session.social.set_scrobbling(
+                spotify.SocialProvider.SPOTIFY,
+                spotify.ScrobblingState.USE_GLOBAL_SETTING)
 
     def test_is_scrobbling_possible(self, lib_mock):
 
@@ -1450,10 +1465,9 @@ class SocialTest(unittest.TestCase):
             spotify.ErrorType.BAD_API_VERSION)
         session = self.create_session(lib_mock)
 
-        self.assertRaises(
-            spotify.Error,
-            session.social.is_scrobbling_possible,
-            spotify.SocialProvider.FACEBOOK)
+        with self.assertRaises(spotify.Error):
+            session.social.is_scrobbling_possible(
+                spotify.SocialProvider.FACEBOOK)
 
     def test_set_social_credentials(self, lib_mock):
         lib_mock.sp_session_set_social_credentials.return_value = (
@@ -1480,7 +1494,6 @@ class SocialTest(unittest.TestCase):
             spotify.ErrorType.BAD_API_VERSION)
         session = self.create_session(lib_mock)
 
-        self.assertRaises(
-            spotify.Error,
-            session.social.set_social_credentials,
-            spotify.SocialProvider.LASTFM, 'alice', 'secret')
+        with self.assertRaises(spotify.Error):
+            session.social.set_social_credentials(
+                spotify.SocialProvider.LASTFM, 'alice', 'secret')

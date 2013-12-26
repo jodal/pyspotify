@@ -459,7 +459,7 @@ class PlaylistContainer(collections.MutableSequence):
                     self._sp_playlistcontainer, key),
                 type=playlist_type)
         else:
-            raise RuntimeError('Unknown playlist type: %r' % playlist_type)
+            raise spotify.Error('Unknown playlist type: %r' % playlist_type)
 
     def __setitem__(self, key, value):
         # Required by collections.MutableSequence

@@ -24,7 +24,8 @@ class TrackTest(unittest.TestCase):
         sp_track = spotify.ffi.new('int *')
         track = spotify.Track(sp_track=sp_track)
 
-        self.assertRaises(RuntimeError, func, track)
+        with self.assertRaises(RuntimeError):
+            func(track)
 
     def assert_fails_if_error(self, lib_mock, func):
         self.create_session(lib_mock)
@@ -33,10 +34,12 @@ class TrackTest(unittest.TestCase):
         sp_track = spotify.ffi.new('int *')
         track = spotify.Track(sp_track=sp_track)
 
-        self.assertRaises(spotify.Error, func, track)
+        with self.assertRaises(spotify.Error):
+            func(track)
 
     def test_create_without_uri_or_sp_track_fails(self, lib_mock):
-        self.assertRaises(AssertionError, spotify.Track)
+        with self.assertRaises(AssertionError):
+            spotify.Track()
 
     @mock.patch('spotify.Link', spec=spotify.Link)
     def test_create_from_uri(self, link_mock, lib_mock):
@@ -59,7 +62,8 @@ class TrackTest(unittest.TestCase):
         link_instance_mock.as_track.return_value = None
         uri = 'spotify:track:foo'
 
-        self.assertRaises(ValueError, spotify.Track, uri)
+        with self.assertRaises(ValueError):
+            spotify.Track(uri)
 
     def test_adds_ref_to_sp_track_when_created(self, lib_mock):
         sp_track = spotify.ffi.new('int *')
@@ -147,7 +151,8 @@ class TrackTest(unittest.TestCase):
         sp_track = spotify.ffi.new('int *')
         track = spotify.Track(sp_track=sp_track)
 
-        self.assertRaises(spotify.Error, lambda: track.offline_status)
+        with self.assertRaises(spotify.Error):
+            track.offline_status
 
     def test_availability(self, lib_mock):
         session = self.create_session(lib_mock)
@@ -350,7 +355,8 @@ class TrackTest(unittest.TestCase):
         sp_track = spotify.ffi.cast('sp_track *', spotify.ffi.new('int *'))
         track = spotify.Track(sp_track=sp_track)
 
-        self.assertRaises(spotify.Error, track.set_starred)
+        with self.assertRaises(spotify.Error):
+            track.set_starred()
 
     def test_set_starred_fails_if_no_session(self, lib_mock):
         self.assert_fails_if_no_session(lib_mock, lambda t: t.set_starred())

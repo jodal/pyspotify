@@ -21,7 +21,8 @@ class AlbumTest(unittest.TestCase):
         spotify.session_instance = None
 
     def test_create_without_uri_or_sp_album_fails(self, lib_mock):
-        self.assertRaises(AssertionError, spotify.Album)
+        with self.assertRaises(AssertionError):
+            spotify.Album()
 
     @mock.patch('spotify.Link', spec=spotify.Link)
     def test_create_from_uri(self, link_mock, lib_mock):
@@ -44,7 +45,8 @@ class AlbumTest(unittest.TestCase):
         link_instance_mock.as_album.return_value = None
         uri = 'spotify:album:foo'
 
-        self.assertRaises(ValueError, spotify.Album, uri)
+        with self.assertRaises(ValueError):
+            spotify.Album(uri)
 
     def test_adds_ref_to_sp_album_when_created(self, lib_mock):
         sp_album = spotify.ffi.new('int *')
@@ -277,7 +279,8 @@ class AlbumBrowserTest(unittest.TestCase):
         spotify.session_instance = None
 
     def test_create_without_album_or_sp_albumbrowse_fails(self, lib_mock):
-        self.assertRaises(AssertionError, spotify.AlbumBrowser)
+        with self.assertRaises(AssertionError):
+            spotify.AlbumBrowser()
 
     def test_create_from_album(self, lib_mock):
         session = self.create_session(lib_mock)

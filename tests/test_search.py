@@ -25,10 +25,12 @@ class SearchTest(unittest.TestCase):
         sp_search = spotify.ffi.new('int *')
         search = spotify.Search(sp_search=sp_search)
 
-        self.assertRaises(spotify.Error, func, search)
+        with self.assertRaises(spotify.Error):
+            func(search)
 
     def test_create_without_query_or_sp_search_fails(self, lib_mock):
-        self.assertRaises(AssertionError, spotify.Search)
+        with self.assertRaises(AssertionError):
+            spotify.Search()
 
     def test_search(self, lib_mock):
         session = self.create_session(lib_mock)

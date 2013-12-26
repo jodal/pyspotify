@@ -53,7 +53,8 @@ class AudioFormatTest(unittest.TestCase):
     def test_frame_size_fails_if_sample_type_is_unknown(self):
         self._sp_audioformat.sample_type = 666
 
-        self.assertRaises(ValueError, self.audio_format.frame_size)
+        with self.assertRaises(ValueError):
+            self.audio_format.frame_size()
 
 
 class BitrateTest(unittest.TestCase):

@@ -25,10 +25,12 @@ class LinkTest(unittest.TestCase):
     def test_raises_error_if_session_doesnt_exist(self, lib_mock):
         spotify.session_instance = None
 
-        self.assertRaises(RuntimeError, spotify.Link, 'spotify:track:foo')
+        with self.assertRaises(RuntimeError):
+            spotify.Link('spotify:track:foo')
 
     def test_create_without_uri_or_obj_or_sp_link_fails(self, lib_mock):
-        self.assertRaises(AssertionError, spotify.Link)
+        with self.assertRaises(AssertionError):
+            spotify.Link()
 
     def test_create_from_sp_link(self, lib_mock):
         sp_link = spotify.ffi.new('int *')
@@ -53,7 +55,8 @@ class LinkTest(unittest.TestCase):
     def test_raises_error_if_string_isnt_parseable(self, lib_mock):
         lib_mock.sp_link_create_from_string.return_value = spotify.ffi.NULL
 
-        self.assertRaises(ValueError, spotify.Link, 'invalid link string')
+        with self.assertRaises(ValueError):
+            spotify.Link('invalid link string')
 
     def test_releases_sp_link_when_link_dies(self, lib_mock):
         sp_link = spotify.ffi.new('int *')

@@ -17,7 +17,8 @@ class UserTest(unittest.TestCase):
         return session
 
     def test_create_without_uri_or_sp_user_fails(self, lib_mock):
-        self.assertRaises(AssertionError, spotify.User)
+        with self.assertRaises(AssertionError):
+            spotify.User()
 
     @mock.patch('spotify.Link', spec=spotify.Link)
     def test_create_from_uri(self, link_mock, lib_mock):
@@ -40,7 +41,8 @@ class UserTest(unittest.TestCase):
         link_instance_mock.as_user.return_value = None
         uri = 'spotify:user:foo'
 
-        self.assertRaises(ValueError, spotify.User, uri)
+        with self.assertRaises(ValueError):
+            spotify.User(uri)
 
     def test_adds_ref_to_sp_user_when_created(self, lib_mock):
         sp_user = spotify.ffi.new('int *')

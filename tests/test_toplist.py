@@ -25,11 +25,13 @@ class ToplistTest(unittest.TestCase):
         sp_toplistbrowse = spotify.ffi.new('int *')
         toplist = spotify.Toplist(sp_toplistbrowse=sp_toplistbrowse)
 
-        self.assertRaises(spotify.Error, func, toplist)
+        with self.assertRaises(spotify.Error):
+            func(toplist)
 
     def test_create_without_type_or_region_or_sp_toplistbrowse_fails(
             self, lib_mock):
-        self.assertRaises(AssertionError, spotify.Toplist)
+        with self.assertRaises(AssertionError):
+            spotify.Toplist()
 
     def test_create_from_type_and_current_user_region(self, lib_mock):
         session = self.create_session(lib_mock)

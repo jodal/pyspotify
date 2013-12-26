@@ -13,9 +13,8 @@ class ErrorTest(unittest.TestCase):
         self.assertIsInstance(error, Exception)
 
     def test_maybe_raise(self):
-        self.assertRaises(
-            spotify.LibError,
-            spotify.Error.maybe_raise, spotify.ErrorType.BAD_API_VERSION)
+        with self.assertRaises(spotify.LibError):
+            spotify.Error.maybe_raise(spotify.ErrorType.BAD_API_VERSION)
 
     def test_maybe_raise_does_not_raise_if_ok(self):
         spotify.Error.maybe_raise(spotify.ErrorType.OK)

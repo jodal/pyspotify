@@ -131,7 +131,8 @@ class SequenceTest(unittest.TestCase):
             len_func=lambda x: 1,
             getitem_func=None)
 
-        self.assertRaises(IndexError, seq.__getitem__, -1)
+        with self.assertRaises(IndexError):
+            seq[-1]
 
     def test_getitem_raises_index_error_on_too_high_index(self, lib_mock):
         sp_search = spotify.ffi.new('int *')
@@ -142,7 +143,8 @@ class SequenceTest(unittest.TestCase):
             len_func=lambda x: 1,
             getitem_func=None)
 
-        self.assertRaises(IndexError, seq.__getitem__, 1)
+        with self.assertRaises(IndexError):
+            seq[1]
 
     def test_getitem_raises_type_error_on_non_integral_index(self, lib_mock):
         sp_search = spotify.ffi.new('int *')
@@ -153,7 +155,8 @@ class SequenceTest(unittest.TestCase):
             len_func=lambda x: 1,
             getitem_func=None)
 
-        self.assertRaises(TypeError, seq.__getitem__, 'abc')
+        with self.assertRaises(TypeError):
+            seq['abc']
 
     def test_repr(self, lib_mock):
         sp_search = spotify.ffi.new('int *')
@@ -183,8 +186,11 @@ class ToBytesTest(unittest.TestCase):
         self.assertEqual(utils.to_bytes(cdata), 'æøå'.encode('utf-8'))
 
     def test_anything_else_to_bytes_fails(self):
-        self.assertRaises(ValueError, utils.to_bytes, [])
-        self.assertRaises(ValueError, utils.to_bytes, 123)
+        with self.assertRaises(ValueError):
+            utils.to_bytes([])
+
+        with self.assertRaises(ValueError):
+            utils.to_bytes(123)
 
 
 class ToUnicodeTest(unittest.TestCase):
@@ -200,8 +206,11 @@ class ToUnicodeTest(unittest.TestCase):
         self.assertEqual(utils.to_unicode(cdata), 'æøå')
 
     def test_anything_else_to_unicode_fails(self):
-        self.assertRaises(ValueError, utils.to_unicode, [])
-        self.assertRaises(ValueError, utils.to_unicode, 123)
+        with self.assertRaises(ValueError):
+            utils.to_unicode([])
+
+        with self.assertRaises(ValueError):
+            utils.to_unicode(123)
 
 
 class ToCharOrNull(unittest.TestCase):
@@ -233,10 +242,12 @@ class ToCountryCode(unittest.TestCase):
         self.assertEqual(utils.to_country_code(b'SE'), 21317)
 
     def test_fails_if_not_exactly_two_chars(self):
-        self.assertRaises(ValueError, utils.to_country_code, 'NOR')
+        with self.assertRaises(ValueError):
+            utils.to_country_code('NOR')
 
     def test_fails_if_not_in_uppercase(self):
-        self.assertRaises(ValueError, utils.to_country_code, 'no')
+        with self.assertRaises(ValueError):
+            utils.to_country_code('no')
 
 
 class ToCountry(unittest.TestCase):

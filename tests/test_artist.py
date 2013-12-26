@@ -21,7 +21,8 @@ class ArtistTest(unittest.TestCase):
         spotify.session_instance = None
 
     def test_create_without_uri_or_sp_artist_fails(self, lib_mock):
-        self.assertRaises(AssertionError, spotify.Artist)
+        with self.assertRaises(AssertionError):
+            spotify.Artist()
 
     @mock.patch('spotify.Link', spec=spotify.Link)
     def test_create_from_uri(self, link_mock, lib_mock):
@@ -46,7 +47,8 @@ class ArtistTest(unittest.TestCase):
         lib_mock.sp_link_as_artist.return_value = spotify.ffi.NULL
         uri = 'spotify:artist:foo'
 
-        self.assertRaises(ValueError, spotify.Artist, uri)
+        with self.assertRaises(ValueError):
+            spotify.Artist(uri)
 
     def test_adds_ref_to_sp_artist_when_created(self, lib_mock):
         sp_artist = spotify.ffi.new('int *')
@@ -194,7 +196,8 @@ class ArtistBrowserTest(unittest.TestCase):
         spotify.session_instance = None
 
     def test_create_without_artist_or_sp_artistbrowse_fails(self, lib_mock):
-        self.assertRaises(AssertionError, spotify.ArtistBrowser)
+        with self.assertRaises(AssertionError):
+            spotify.ArtistBrowser()
 
     def test_create_from_artist(self, lib_mock):
         session = self.create_session(lib_mock)

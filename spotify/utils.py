@@ -152,6 +152,9 @@ class Observable(object):
         The callback will be called with any extra arguments passed to
         :meth:`emit` first, and then the extra arguments passed to :meth:`on`
         last.
+
+        If the callback function returns :class:`False`, it is removed and will
+        not be called the next time the ``event`` is emitted.
         """
         self._observers[event].append(_Observer(callback, user_args))
 
@@ -185,7 +188,9 @@ class Observable(object):
         """
         for observable in self._observers[event]:
             args = list(event_args) + list(observable.user_args)
-            observable.callback(*args)
+            result = observable.callback(*args)
+            if result is False:
+                self.off(event, observable.callback)
 
 
 class _Observer(collections.namedtuple(

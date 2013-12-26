@@ -109,6 +109,19 @@ class ObservableTest(unittest.TestCase):
         self.assertEqual(callback_mock1.call_count, 0)
         self.assertEqual(callback_mock2.call_count, 0)
 
+    def test_callback_returning_false_is_removed(self):
+        callback_mock1 = mock.Mock(return_value=False)
+        callback_mock2 = mock.Mock()
+        observable = utils.Observable()
+
+        observable.on('some_event', callback_mock1)
+        observable.on('some_event', callback_mock2)
+        observable.emit('some_event')
+        observable.emit('some_event')
+
+        self.assertEqual(callback_mock1.call_count, 1)
+        self.assertEqual(callback_mock2.call_count, 2)
+
 
 @mock.patch('spotify.search.lib', spec=spotify.lib)
 class SequenceTest(unittest.TestCase):

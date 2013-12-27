@@ -286,7 +286,7 @@ A search returns lists of matching artists, albums, tracks, and playlists::
      u'Kwanzaa Posse feat. Massive Attack',
      u'Massive Attack Vs. Mad Professor']
 
-Only the first 20 items in each list is returned by default::
+Only the first 20 items in each list are returned by default::
 
     >>> len(search.artists)
     5
@@ -339,6 +339,6 @@ TODO
 Thread safety
 =============
 
-TODO: Explain that libspotify isn't threadsafe. You must either use a single
+TODO: Explain that libspotify isn't thread safe. You must either use a single
 thread to call pyspotify methods, or protect all pyspotify API usage with a
 single lock.

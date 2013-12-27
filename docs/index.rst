@@ -1,6 +1,9 @@
 .. include:: ../README.rst
 
 
+Still in development
+====================
+
 .. warning::
 
    This is the documentation of pyspotify 2.x which is still under heavy

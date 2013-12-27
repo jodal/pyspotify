@@ -35,4 +35,5 @@ About
 
     authors
     changelog
+    plans
     contributing

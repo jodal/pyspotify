@@ -11,14 +11,28 @@ Still in development
    stable release <http://pyspotify.mopidy.com/>`__.
 
 
-Table of contents
-=================
+User's guide
+============
 
 .. toctree::
 
     installation
     quickstart
+
+
+API reference
+=============
+
+.. toctree::
+
     api
-    changelog
+
+
+About
+=====
+
+.. toctree::
+
     authors
+    changelog
     contributing

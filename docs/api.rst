@@ -1,6 +1,6 @@
-*************
-pyspotify API
-*************
+***
+API
+***
 
 .. module:: spotify
 

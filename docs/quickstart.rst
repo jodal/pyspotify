@@ -214,7 +214,7 @@ are in place with data as well::
      Track(u'spotify:track:7HYOVVLd5XnfY4yyV5Neke'),
      Track(u'spotify:track:2YfVXi6dTux0x8KkWeZdd3'),
      Track(u'spotify:track:6HPKugiH3p0pUJBNgUQoou')]
-    >>> [(t.index, t.name, t.duration // 1000) for track in browser.tracks]
+    >>> [(t.index, t.name, t.duration // 1000) for t in browser.tracks]
     [(1, u'Evil Beauty', 228),
      (2, u'City Lights', 299),
      (3, u'A Reach For Glory', 254),

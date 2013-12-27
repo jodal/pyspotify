@@ -1,5 +1,6 @@
 from __future__ import unicode_literals
 
+from distutils.version import StrictVersion
 import functools
 import logging
 import os
@@ -7,6 +8,11 @@ import threading
 import weakref
 
 import cffi
+
+
+if StrictVersion(cffi.__version__) < StrictVersion('0.7'):
+    raise RuntimeError(
+        'pyspotify requires cffi >= 0.7, but found %s' % cffi.__version__)
 
 
 __version__ = '2.0.0a1'

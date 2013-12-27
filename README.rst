@@ -19,7 +19,7 @@ a contributor with the interest and knowledge to maintain it.
 - `Source code <https://github.com/mopidy/pyspotify>`_
 - `Issue tracker <https://github.com/mopidy/pyspotify/issues>`_
 - `CI server <https://travis-ci.org/mopidy/pyspotify>`_
-- `Download development snapshot <https://github.com/mopidy/pyspotify/archive/v2.x/develop.tar.gz#egg=mopidy-dev>`_
+- `Download development snapshot <https://github.com/mopidy/pyspotify/archive/v2.x/develop.tar.gz#egg=pyspotify-dev>`_
 - IRC: ``#mopidy`` at `irc.freenode.net <http://freenode.net/>`_
 - Mailing list: `mopidy@googlegroups.com <https://groups.google.com/forum/?fromgroups=#!forum/mopidy>`_
 

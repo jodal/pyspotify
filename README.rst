@@ -9,7 +9,7 @@ With pyspotify you can access music metadata, search in Spotify's library of
 20+ million tracks, manage your Spotify playlists, and play music from
 Spotify. All from your own Python applications.
 
-pyspotify use cffi to make a pure Python wrapper around the official
+pyspotify use CFFI to make a pure Python wrapper around the official
 `libspotify <https://developer.spotify.com/technologies/libspotify/>`__
 library. It works on CPython 2.7 and 3.2+, as well as PyPy 2.1+. It is known
 to work on Linux and OS X. Windows support should be possible, but is awaiting

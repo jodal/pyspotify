@@ -69,60 +69,6 @@ support yet, you'll find what you need to use it from Python here.
     #. Commit both header files so that they are distributed with pyspotify.
 
 
-Logging
-=======
-
-pyspotify uses Python's standard :mod:`logging` module for logging. All log
-records emitted by pyspotify are issued to the logger named "spotify", or a
-sublogger of it.
-
-Out of the box, pyspotify is set up with :class:`logging.NullHandler` as the
-only log record handler. This is the recommended approach for logging in
-libraries, so that the application developer using the library will have full
-control over how the log records from the library will be exposed to the
-application's users. In other words, if you want to see the log records from
-pyspotify anywhere, you need to add a useful handler to the root logger or the
-logger named "spotify" to get any log output from pyspotify. The defaults
-provided by :meth:`logging.basicConfig` is enough to get debug log statements
-out of pyspotify::
-
-    import logging
-    logging.basicConfig(level=logging.DEBUG)
-
-If your application is already using :mod:`logging`, and you want debug log
-output from your own application, but not from pyspotify, you can ignore debug
-log messages from pyspotify by increasing the threshold on the "spotify" logger
-to "info" level or higher::
-
-    import logging
-    logging.basicConfig(level=logging.DEBUG)
-    logging.getLogger('spotify').setLevel(logging.INFO)
-
-For more details on how to use :mod:`logging`, please refer to the Python
-standard library documentation.
-
-
-Text encoding
-=============
-
-libspotify encodes all text as UTF-8. pyspotify converts the UTF-8 bytestrings
-to Unicode strings before returning them to you, so you don't have to be
-worried about text encoding.
-
-Similarly, pyspotify will convert any string you give it from Unicode to UTF-8
-encoded bytestrings before passing them on to libspotify. The only exception is
-file system paths, which is passed directly to libspotify. This is in case you
-have a file system which doesn't use UTF-8 encoding for file names.
-
-
-Thread safety
-=============
-
-TODO: Explain that libspotify isn't threadsafe. You must either use a single
-thread to call pyspotify methods, or protect all pyspotify API usage with a
-single lock.
-
-
 Error handling
 ==============
 

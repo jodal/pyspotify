@@ -497,9 +497,9 @@ class SessionConfig(object):
 
         >>> import spotify
         >>> config = spotify.SessionConfig()
-        >>> config.user_agent = 'My Spotify client'
+        >>> config.user_agent = 'My awesome Spotify client'
         >>> # Etc ...
-        >>> session = spotify.Session(config)
+        >>> session = spotify.Session(config=config)
     """
 
     api_version = lib.SPOTIFY_API_VERSION

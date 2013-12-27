@@ -6,7 +6,8 @@ Table of contents
 
 .. toctree::
 
-    tutorial
+    installation
+    quickstart
     api
     changelog
     authors

@@ -268,7 +268,60 @@ inspect the result yourself::
 Searching
 =========
 
-TODO
+If you don't have the URI to a Spotify object, another way to get started is
+to :meth:`~spotify.Session.search`::
+
+    >>> search = session.search('massive attack')
+    >>> search.load()
+    Search(u'spotify:search:massive+attack')
+
+A search returns lists of matching artists, albums, tracks, and playlists::
+
+    >>> (search.artist_total, search.album_total, search.track_total, track.playlist_total)
+    (5, 50, 564, 125)
+    >>> search.artists[0].load().name
+    u'Massive Attack'
+    >>> [a.load().name for a in search.artists[:3]]
+    [u'Massive Attack',
+     u'Kwanzaa Posse feat. Massive Attack',
+     u'Massive Attack Vs. Mad Professor']
+
+Only the first 20 items in each list is returned by default::
+
+    >>> len(search.artists)
+    5
+    >>> len(search.tracks)
+    20
+
+The :class:`~spotify.Search` object can help you with getting
+:meth:`~spotify.Search.more` results from the same query::
+
+    >>> search2 = search.more().load()
+    >>> len(search2.artists)
+    0
+    >>> len(search2.tracks)
+    20
+    >>> search.track_offset
+    0
+    >>> search.tracks[0]
+    Track(u'spotify:track:67Hna13dNDkZvBpTXRIaOJ')
+    >>> search2.track_offset
+    20
+    >>> search2.tracks[0]
+    Track(u'spotify:track:3kKVqFF4pv4EXeQe428zl2')
+
+You can also do searches where Spotify tries to figure out what you
+mean based on popularity, etc. instead of exact token matches::
+
+    >>> search = session.search('mas').load()
+    Search(u'spotify:search:mas')
+    >>> search.artists[0].load().name
+    u'X-Mas Allstars'
+
+    >>> search = session.search('mas', search_type=spotify.SearchType.SUGGEST).load()
+    Search(u'spotify:search:mas')
+    >>> search.artists[0].load().name
+    u'Massive Attack'
 
 
 Playlist management

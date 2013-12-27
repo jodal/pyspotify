@@ -22,6 +22,7 @@ sys.path.insert(0, os.path.abspath('..'))
 
 
 cffi = mock.Mock()
+cffi.__version__ = '0.8.1'
 ffi = cffi.FFI.return_value
 ffi.CData = bytes
 lib = ffi.verify.return_value

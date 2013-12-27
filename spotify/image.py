@@ -21,7 +21,7 @@ class Image(object):
     """A Spotify image.
 
     You can get images from :meth:`Album.cover`, :meth:`Artist.portrait`, or
-    you can create a :class:`Track` yourself from a Spotify URI::
+    you can create an :class:`Image` yourself from a Spotify URI::
 
         >>> image = spotify.Image(
         ... 'spotify:image:a0bdcbe11b5cd126968e519b5ed1050b0e8183d0')

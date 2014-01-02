@@ -373,6 +373,7 @@ class AlbumBrowserTest(unittest.TestCase):
     def test_repr(self, link_mock, lib_mock):
         sp_albumbrowse = spotify.ffi.new('int *')
         browser = spotify.AlbumBrowser(sp_albumbrowse=sp_albumbrowse)
+        lib_mock.sp_albumbrowse_is_loaded.return_value = 1
         sp_album = spotify.ffi.new('int *')
         lib_mock.sp_albumbrowse_album.return_value = sp_album
         link_instance_mock = link_mock.return_value
@@ -381,6 +382,15 @@ class AlbumBrowserTest(unittest.TestCase):
         result = repr(browser)
 
         self.assertEqual(result, 'AlbumBrowser(%r)' % 'foo')
+
+    def test_repr_if_unloaded(self, lib_mock):
+        sp_albumbrowse = spotify.ffi.new('int *')
+        browser = spotify.AlbumBrowser(sp_albumbrowse=sp_albumbrowse)
+        lib_mock.sp_albumbrowse_is_loaded.return_value = 0
+
+        result = repr(browser)
+
+        self.assertEqual(result, 'AlbumBrowser(<not loaded>)')
 
     def test_is_loaded(self, lib_mock):
         lib_mock.sp_albumbrowse_is_loaded.return_value = 1

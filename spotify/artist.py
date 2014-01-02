@@ -171,7 +171,10 @@ class ArtistBrowser(object):
     """
 
     def __repr__(self):
-        return 'ArtistBrowser(%r)' % self.artist.link.uri
+        if self.is_loaded:
+            return 'ArtistBrowser(%r)' % self.artist.link.uri
+        else:
+            return 'ArtistBrowser(<not loaded>)'
 
     @property
     def is_loaded(self):

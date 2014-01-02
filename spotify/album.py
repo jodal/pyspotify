@@ -203,7 +203,10 @@ class AlbumBrowser(object):
     """
 
     def __repr__(self):
-        return 'AlbumBrowser(%r)' % self.album.link.uri
+        if self.is_loaded:
+            return 'AlbumBrowser(%r)' % self.album.link.uri
+        else:
+            return 'AlbumBrowser(<not loaded>)'
 
     @property
     def is_loaded(self):

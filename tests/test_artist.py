@@ -293,6 +293,7 @@ class ArtistBrowserTest(unittest.TestCase):
     def test_repr(self, link_mock, lib_mock):
         sp_artistbrowse = spotify.ffi.new('int *')
         browser = spotify.ArtistBrowser(sp_artistbrowse=sp_artistbrowse)
+        lib_mock.sp_artistbrowse_is_loaded.return_value = 1
         sp_artist = spotify.ffi.new('int *')
         lib_mock.sp_artistbrowse_artist.return_value = sp_artist
         link_instance_mock = link_mock.return_value
@@ -301,6 +302,15 @@ class ArtistBrowserTest(unittest.TestCase):
         result = repr(browser)
 
         self.assertEqual(result, 'ArtistBrowser(%r)' % 'foo')
+
+    def test_repr_if_unloaded(self, lib_mock):
+        sp_artistbrowse = spotify.ffi.new('int *')
+        browser = spotify.ArtistBrowser(sp_artistbrowse=sp_artistbrowse)
+        lib_mock.sp_artistbrowse_is_loaded.return_value = 0
+
+        result = repr(browser)
+
+        self.assertEqual(result, 'ArtistBrowser(<not loaded>)')
 
     def test_is_loaded(self, lib_mock):
         lib_mock.sp_artistbrowse_is_loaded.return_value = 1

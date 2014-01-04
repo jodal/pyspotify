@@ -50,8 +50,8 @@ templates_path = ['_templates']
 source_suffix = '.rst'
 master_doc = 'index'
 
-project = u'pyspotify'
-copyright = u'2013, Stein Magnus Jodal and contributors'
+project = 'pyspotify'
+copyright = '2013-2014, Stein Magnus Jodal and contributors'
 
 release = get_version('../spotify/__init__.py')
 version = '.'.join(release.split('.')[:2])

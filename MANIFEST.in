@@ -1,10 +1,21 @@
+include *.py
 include *.rst
+include .coveragerc
+include .travis.yml
+include AUTHORS
 include LICENSE
 include MANIFEST.in
-include spotify/api.h
-include spotify/api.processed.h
+include tox.ini
 
 recursive-include docs *
 prune docs/_build
 
+recursive-include examples *.py
+prune examples/tmp
+
+include spotify/api.h
+include spotify/api.processed.h
+
 recursive-include tests *.py
+
+global-exclude __pycache__/*

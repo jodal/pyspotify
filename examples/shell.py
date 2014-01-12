@@ -203,8 +203,8 @@ class SpotifyLoop(threading.Thread):
             return
         self.logger.info(
             '%d tracks, %d albums, %d artists, and %d playlists found.',
-            result.total_tracks, result.total_albums,
-            result.total_artists, result.total_playlists)
+            result.track_total, result.album_total,
+            result.artist_total, result.playlist_total)
         self.logger.info('Top tracks:')
         for track in result.tracks:
             self.logger.info(

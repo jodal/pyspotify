@@ -682,10 +682,15 @@ class SessionConfig(object):
 class Session(object):
     """The Spotify session.
 
-    You can only have one session instance per process.
-
     If no ``config`` is provided, the default config is used. If no
     ``callbacks`` is provided, no callbacks are hooked up initially.
+
+    .. warning::
+
+        You can only have one :class:`Session` instance per process. This is a
+        libspotify limitation. If you create a second :class:`Session` instance
+        in the same process pyspotify will raise a :exc:`RuntimeError` with the
+        message "Session has already been initialized".
 
     :param config: the session config
     :type config: :class:`SessionConfig` or :class:`None`

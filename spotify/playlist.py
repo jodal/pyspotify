@@ -350,7 +350,7 @@ class PlaylistContainer(collections.MutableSequence):
         >>> import spotify
         >>> session = spotify.Session()
         # Login, etc.
-        >>> container = session.playlists
+        >>> container = session.playlist_container
         >>> container.is_loaded
         False
         >>> container.load()

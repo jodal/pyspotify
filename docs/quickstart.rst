@@ -100,8 +100,7 @@ documentation.
 
 The :meth:`~spotify.Session.login` method is asynchronous, so we must ask the
 session to :meth:`~spotify.Session.process_events` until the login has
-succeeded or failed at which point the
-:attr:`~spotify.SessionCallbacks.logged_in` callback will be called::
+succeeded or failed::
 
     >>> session.user is None
     True
@@ -109,7 +108,27 @@ succeeded or failed at which point the
     >>> session.user
     User(u'spotify:user:alice')
 
-TODO: Waiting for the login to complete should be easier.
+Here we called :meth:`~spotify.Session.process_events` only once, which may
+not be enough. A more robust solution is to call it repeatedly until the
+:attr:`~spotify.SessionEvent.LOGGED_IN` event is emitted on the
+:class:`~spotify.Session` object::
+
+    >>> session.user is None
+    True
+    >>> import threading
+    >>> logged_in_event = threading.Event()
+    >>> def logged_in_listener(*args):
+    ...     logged_in_event.set()
+    ...
+    >>> session.on(spotify.SessionEvent.LOGGED_IN, logged_in_listener)
+    >>> while not logged_in_event.wait(0.1):
+    ...     session.process_events()
+    ...
+    >>> session.user
+    User(u'spotify:user:alice')
+
+TODO: Waiting for the login to complete should be easier with the help of an
+event loop for processing events in the background.
 
 
 Logging

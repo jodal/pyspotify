@@ -13,24 +13,17 @@ for audio playback.
 v2.0.0a1: 100% complete bindings
 ================================
 
-- Complete the playlist subsystem. Mostly need to decide on a pretty way to
-  register callbacks, if we should allow multiple callbacks per event, etc.
+- Redo all callbacks to follow the same pattern as used for session events.
 
-
-v2.0.0a2: More consistent API
-=============================
-
-- Redo all other callbacks to follow the same pattern as used for playlists.
+- Add support for playlist events and playlist container events.
 
 - Get rid of a lot of properties or getter/setter pairs. The API doesn't feel
   consistent enough as is.
 
-- Update jukebox example to work again.
-
-- Write first draft of the tutorial.
+- Complete first draft of the tutorial.
 
 
-v2.0.0a3: Thread safety
+v2.0.0a2: Thread safety
 =======================
 
 - Ensure we never call libspotify from another thread while a method is still

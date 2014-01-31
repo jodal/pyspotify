@@ -10,6 +10,9 @@ around libspotify instead of a CPython C extension.
 
 **Development milestones**
 
+- 2014-01-31: Redesign session event listening to a model supporting multiple
+  listeners per event, with a nicer API for registering listeners.
+
 - 2013-12-16: Ensure we never call libspotify from two different threads at the
   same time. We can't assume that the CPython GIL will ensure this for us, as
   we target non-CPython interpreters like PyPy.

@@ -74,6 +74,10 @@ class EventEmitter(object):
             if result is False:
                 self.off(event, listener.callback)
 
+    def num_listeners(self, event):
+        """Return the number of listeners for ``event``."""
+        return len(self._listeners[event])
+
 
 class _Listener(collections.namedtuple(
         'Listener', ['callback', 'user_args'])):

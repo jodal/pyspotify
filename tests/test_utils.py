@@ -96,6 +96,20 @@ class EventEmitterTest(unittest.TestCase):
         self.assertEqual(listener_mock1.call_count, 1)
         self.assertEqual(listener_mock2.call_count, 2)
 
+    def test_num_listeners_returns_number_of_listeners_for_event(self):
+        listener_mock1 = mock.Mock()
+        listener_mock2 = mock.Mock()
+        emitter = utils.EventEmitter()
+
+        self.assertEqual(emitter.num_listeners('unknown_event'), 0)
+
+        emitter.on('some_event', listener_mock1)
+        self.assertEqual(emitter.num_listeners('some_event'), 1)
+
+        emitter.on('another_event', listener_mock1)
+        emitter.on('another_event', listener_mock2)
+        self.assertEqual(emitter.num_listeners('another_event'), 2)
+
 
 class IntEnumTest(unittest.TestCase):
 

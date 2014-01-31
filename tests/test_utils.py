@@ -110,6 +110,33 @@ class EventEmitterTest(unittest.TestCase):
         emitter.on('another_event', listener_mock2)
         self.assertEqual(emitter.num_listeners('another_event'), 2)
 
+    def test_call_fails_if_zero_listeners_for_event(self):
+        emitter = utils.EventEmitter()
+
+        with self.assertRaises(AssertionError):
+            emitter.call('some_event')
+
+    def test_call_fails_if_multiple_listeners_for_event(self):
+        listener_mock1 = mock.Mock()
+        listener_mock2 = mock.Mock()
+        emitter = utils.EventEmitter()
+
+        emitter.on('some_event', listener_mock1)
+        emitter.on('some_event', listener_mock2)
+
+        with self.assertRaises(AssertionError):
+            emitter.call('some_event')
+
+    def test_call_calls_and_returns_result_of_a_single_listener(self):
+        listener_mock = mock.Mock()
+        emitter = utils.EventEmitter()
+
+        emitter.on('some_event', listener_mock, 1, 2, 3)
+        result = emitter.call('some_event', 'abc')
+
+        listener_mock.assert_called_with('abc', 1, 2, 3)
+        self.assertEqual(result, listener_mock.return_value)
+
 
 class IntEnumTest(unittest.TestCase):
 

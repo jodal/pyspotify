@@ -78,6 +78,19 @@ class EventEmitter(object):
         """Return the number of listeners for ``event``."""
         return len(self._listeners[event])
 
+    def call(self, event, *event_args):
+        """Call the single registered listener for ``event``.
+
+        Raises :exc:`AssertionError` if there is none or multiple listeners for
+        ``event``. Returns the listener's return value on success.
+        """
+        assert self.num_listeners(event) == 1, (
+            'Expected exactly 1 event listener, found %d listeners' %
+            self.num_listeners(event))
+        listener = self._listeners[event][0]
+        args = list(event_args) + list(listener.user_args)
+        return listener.callback(*args)
+
 
 class _Listener(collections.namedtuple(
         'Listener', ['callback', 'user_args'])):

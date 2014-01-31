@@ -91,11 +91,11 @@ Error handling
 Sessions
 ========
 
-.. autoclass:: SessionCallbacks
-
 .. autoclass:: SessionConfig
 
 .. autoclass:: Session
+
+.. autoclass:: SessionEvent
 
 .. autoclass:: spotify.session.Player
 

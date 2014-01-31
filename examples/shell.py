@@ -117,12 +117,12 @@ class SpotifyLoop(threading.Thread):
         super(SpotifyLoop, self).__init__()
         self.spotify_queue = spotify_queue
 
-        session_callbacks = spotify.SessionCallbacks()
-        session_callbacks.logged_in = logged_in
-        session_callbacks.logged_out = logged_out
-        session_callbacks.notify_main_thread = notify_main_thread
+        self.session = spotify.Session()
 
-        self.session = spotify.Session(callbacks=session_callbacks)
+        self.session.on(spotify.SessionEvent.LOGGED_IN, logged_in)
+        self.session.on(spotify.SessionEvent.LOGGED_OUT, logged_out)
+        self.session.on(
+            spotify.SessionEvent.NOTIFY_MAIN_THREAD, notify_main_thread)
 
     def run(self):
         self.logger.debug('Spotify event loop started')

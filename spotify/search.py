@@ -132,7 +132,8 @@ class Search(object):
 
         Will always return an empty list if the search isn't loaded.
         """
-        spotify.Error.maybe_raise(self.error)
+        spotify.Error.maybe_raise(
+            self.error, ignores=[spotify.ErrorType.IS_LOADING])
         if not self.is_loaded:
             return []
 
@@ -163,7 +164,8 @@ class Search(object):
 
         Will always return an empty list if the search isn't loaded.
         """
-        spotify.Error.maybe_raise(self.error)
+        spotify.Error.maybe_raise(
+            self.error, ignores=[spotify.ErrorType.IS_LOADING])
         if not self.is_loaded:
             return []
 
@@ -194,7 +196,8 @@ class Search(object):
 
         Will always return an empty list if the search isn't loaded.
         """
-        spotify.Error.maybe_raise(self.error)
+        spotify.Error.maybe_raise(
+            self.error, ignores=[spotify.ErrorType.IS_LOADING])
         if not self.is_loaded:
             return []
 
@@ -228,7 +231,8 @@ class Search(object):
 
         Will always return an empty list if the search isn't loaded.
         """
-        spotify.Error.maybe_raise(self.error)
+        spotify.Error.maybe_raise(
+            self.error, ignores=[spotify.ErrorType.IS_LOADING])
         if not self.is_loaded:
             return []
 

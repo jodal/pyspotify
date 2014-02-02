@@ -29,6 +29,22 @@ logging.getLogger('spotify').addHandler(logging.NullHandler())
 _lock = threading.RLock()
 
 
+# Mapping between keys and objects that should be kept alive as long as the key
+# is alive. May be used to keep objects alive when there isn't a more
+# convenient place to keep a reference to it. The keys are weakrefs, so entries
+# disappear from the dict when the key is garbage collected, potentially
+# causing objects associated to the key to be garbage collected as well. For
+# further details, refer to the CFFI docs.
+#
+# TODO: Try to get rid of all use of this.
+weak_key_dict = weakref.WeakKeyDictionary()
+
+
+# Reference to the spotify.Session instance. Used to enforce that one and only
+# one session exists in each process.
+session_instance = None
+
+
 def serialized(f):
     """Acquires the global lock while calling the wrapped function.
 
@@ -41,34 +57,39 @@ def serialized(f):
     return wrapper
 
 
-_header_file = os.path.join(os.path.dirname(__file__), 'api.processed.h')
-_header = open(_header_file).read()
-_header += '#define SPOTIFY_API_VERSION ...\n'
+def serialize_access_to_library(lib):
+    """Modify CFFI library to serialize all calls to library functions.
 
-ffi = cffi.FFI()
-ffi.cdef(_header)
-lib = ffi.verify(
-    '#include "libspotify/api.h"',
-    libraries=[str('spotify')],
-    ext_package='spotify')
-
-for name in dir(lib):
-    if name.startswith('sp_') and callable(getattr(lib, name)):
-        setattr(lib, name, serialized(getattr(lib, name)))
+    Internal function.
+    """
+    for name in dir(lib):
+        if name.startswith('sp_') and callable(getattr(lib, name)):
+            setattr(lib, name, serialized(getattr(lib, name)))
 
 
-# Mapping between keys and objects that should be kept alive as long as the key
-# is alive. May be used to keep objects alive when there isn't a more
-# convenient place to keep a reference to it. The keys are weakrefs, so entries
-# disappear from the dict when the key is garbage collected, potentially
-# causing objects associated to the key to be garbage collected as well. For
-# further details, refer to the CFFI docs.
-weak_key_dict = weakref.WeakKeyDictionary()
+def build_ffi():
+    """Build CFFI instance with knowledge of all libspotify types and a library
+    object which wraps libspotify for use from Python.
+
+    Internal function.
+    """
+    header_file = os.path.join(os.path.dirname(__file__), 'api.processed.h')
+    header = open(header_file).read()
+    header += '#define SPOTIFY_API_VERSION ...\n'
+
+    ffi = cffi.FFI()
+    ffi.cdef(header)
+    lib = ffi.verify(
+        '#include "libspotify/api.h"',
+        libraries=[str('spotify')],
+        ext_package='spotify')
+
+    serialize_access_to_library(lib)
+
+    return ffi, lib
 
 
-# Reference to the spotify.Session instance. Used to enforce that one and only
-# one session exists in each process.
-session_instance = None
+ffi, lib = build_ffi()
 
 
 from spotify.album import *  # noqa

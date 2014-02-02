@@ -117,7 +117,7 @@ not be enough. A more robust solution is to call it repeatedly until the
     True
     >>> import threading
     >>> logged_in_event = threading.Event()
-    >>> def logged_in_listener(*args):
+    >>> def logged_in_listener(session, error_type):
     ...     logged_in_event.set()
     ...
     >>> session.on(spotify.SessionEvent.LOGGED_IN, logged_in_listener)

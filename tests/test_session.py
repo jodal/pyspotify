@@ -7,7 +7,7 @@ import tempfile
 import unittest
 
 import spotify
-from spotify.session import _SessionCallbacks as SessionCallbacks
+from spotify.session import _SessionCallbacks
 import tests
 
 
@@ -1088,7 +1088,7 @@ class SessionCallbacksTest(unittest.TestCase):
         session = self.create_session(lib_mock)
         session.on(spotify.SessionEvent.LOGGED_IN, callback)
 
-        SessionCallbacks.logged_in(
+        _SessionCallbacks.logged_in(
             session._sp_session, int(spotify.ErrorType.BAD_API_VERSION))
 
         callback.assert_called_once_with(
@@ -1099,7 +1099,7 @@ class SessionCallbacksTest(unittest.TestCase):
         session = self.create_session(lib_mock)
         session.on(spotify.SessionEvent.LOGGED_OUT, callback)
 
-        SessionCallbacks.logged_out(session._sp_session)
+        _SessionCallbacks.logged_out(session._sp_session)
 
         callback.assert_called_once_with(session)
 
@@ -1108,7 +1108,7 @@ class SessionCallbacksTest(unittest.TestCase):
         session = self.create_session(lib_mock)
         session.on(spotify.SessionEvent.METADATA_UPDATED, callback)
 
-        SessionCallbacks.metadata_updated(session._sp_session)
+        _SessionCallbacks.metadata_updated(session._sp_session)
 
         callback.assert_called_once_with(session)
 
@@ -1117,7 +1117,7 @@ class SessionCallbacksTest(unittest.TestCase):
         session = self.create_session(lib_mock)
         session.on(spotify.SessionEvent.CONNECTION_ERROR, callback)
 
-        SessionCallbacks.connection_error(
+        _SessionCallbacks.connection_error(
             session._sp_session, int(spotify.ErrorType.OK))
 
         callback.assert_called_once_with(session, spotify.ErrorType.OK)
@@ -1128,7 +1128,7 @@ class SessionCallbacksTest(unittest.TestCase):
         session.on(spotify.SessionEvent.MESSAGE_TO_USER, callback)
         data = spotify.ffi.new('char[]', b'a log message\n')
 
-        SessionCallbacks.message_to_user(session._sp_session, data)
+        _SessionCallbacks.message_to_user(session._sp_session, data)
 
         callback.assert_called_once_with(session, 'a log message')
 
@@ -1137,7 +1137,7 @@ class SessionCallbacksTest(unittest.TestCase):
         session = self.create_session(lib_mock)
         session.on(spotify.SessionEvent.NOTIFY_MAIN_THREAD, callback)
 
-        SessionCallbacks.notify_main_thread(session._sp_session)
+        _SessionCallbacks.notify_main_thread(session._sp_session)
 
         callback.assert_called_once_with(session)
 
@@ -1157,7 +1157,7 @@ class SessionCallbacksTest(unittest.TestCase):
         session = self.create_session(lib_mock)
         session.on('music_delivery', callback)
 
-        result = SessionCallbacks.music_delivery(
+        result = _SessionCallbacks.music_delivery(
             session._sp_session, sp_audioformat, frames_void_ptr, num_frames)
 
         callback.assert_called_once_with(
@@ -1175,7 +1175,7 @@ class SessionCallbacksTest(unittest.TestCase):
         frames = spotify.ffi.new('char[]', 0)
         frames_void_ptr = spotify.ffi.cast('void *', frames)
 
-        result = SessionCallbacks.music_delivery(
+        result = _SessionCallbacks.music_delivery(
             session._sp_session, sp_audioformat, frames_void_ptr, num_frames)
 
         self.assertEqual(result, 0)
@@ -1185,7 +1185,7 @@ class SessionCallbacksTest(unittest.TestCase):
         session = self.create_session(lib_mock)
         session.on(spotify.SessionEvent.PLAY_TOKEN_LOST, callback)
 
-        SessionCallbacks.play_token_lost(session._sp_session)
+        _SessionCallbacks.play_token_lost(session._sp_session)
 
         callback.assert_called_once_with(session)
 
@@ -1195,7 +1195,7 @@ class SessionCallbacksTest(unittest.TestCase):
         session.on(spotify.SessionEvent.LOG_MESSAGE, callback)
         data = spotify.ffi.new('char[]', b'a log message\n')
 
-        SessionCallbacks.log_message(session._sp_session, data)
+        _SessionCallbacks.log_message(session._sp_session, data)
 
         callback.assert_called_once_with(session, 'a log message')
 
@@ -1204,7 +1204,7 @@ class SessionCallbacksTest(unittest.TestCase):
         session = self.create_session(lib_mock)
         session.on(spotify.SessionEvent.END_OF_TRACK, callback)
 
-        SessionCallbacks.end_of_track(session._sp_session)
+        _SessionCallbacks.end_of_track(session._sp_session)
 
         callback.assert_called_once_with(session)
 
@@ -1213,7 +1213,7 @@ class SessionCallbacksTest(unittest.TestCase):
         session = self.create_session(lib_mock)
         session.on(spotify.SessionEvent.STREAMING_ERROR, callback)
 
-        SessionCallbacks.streaming_error(
+        _SessionCallbacks.streaming_error(
             session._sp_session, int(spotify.ErrorType.NO_STREAM_AVAILABLE))
 
         callback.assert_called_once_with(
@@ -1224,7 +1224,7 @@ class SessionCallbacksTest(unittest.TestCase):
         session = self.create_session(lib_mock)
         session.on(spotify.SessionEvent.USER_INFO_UPDATED, callback)
 
-        SessionCallbacks.user_info_updated(session._sp_session)
+        _SessionCallbacks.user_info_updated(session._sp_session)
 
         callback.assert_called_once_with(session)
 
@@ -1233,7 +1233,7 @@ class SessionCallbacksTest(unittest.TestCase):
         session = self.create_session(lib_mock)
         session.on(spotify.SessionEvent.START_PLAYBACK, callback)
 
-        SessionCallbacks.start_playback(session._sp_session)
+        _SessionCallbacks.start_playback(session._sp_session)
 
         callback.assert_called_once_with(session)
 
@@ -1242,7 +1242,7 @@ class SessionCallbacksTest(unittest.TestCase):
         session = self.create_session(lib_mock)
         session.on(spotify.SessionEvent.STOP_PLAYBACK, callback)
 
-        SessionCallbacks.stop_playback(session._sp_session)
+        _SessionCallbacks.stop_playback(session._sp_session)
 
         callback.assert_called_once_with(session)
 
@@ -1253,7 +1253,7 @@ class SessionCallbacksTest(unittest.TestCase):
         session.on(spotify.SessionEvent.GET_AUDIO_BUFFER_STATS, callback)
         sp_audio_buffer_stats = spotify.ffi.new('sp_audio_buffer_stats *')
 
-        SessionCallbacks.get_audio_buffer_stats(
+        _SessionCallbacks.get_audio_buffer_stats(
             session._sp_session, sp_audio_buffer_stats)
 
         callback.assert_called_once_with(session)
@@ -1265,7 +1265,7 @@ class SessionCallbacksTest(unittest.TestCase):
         session = self.create_session(lib_mock)
         session.on(spotify.SessionEvent.OFFLINE_STATUS_UPDATED, callback)
 
-        SessionCallbacks.offline_status_updated(session._sp_session)
+        _SessionCallbacks.offline_status_updated(session._sp_session)
 
         callback.assert_called_once_with(session)
 
@@ -1275,7 +1275,7 @@ class SessionCallbacksTest(unittest.TestCase):
         session.on(spotify.SessionEvent.CREDENTIALS_BLOB_UPDATED, callback)
         data = spotify.ffi.new('char[]', b'a credentials blob')
 
-        SessionCallbacks.credentials_blob_updated(
+        _SessionCallbacks.credentials_blob_updated(
             session._sp_session, data)
 
         callback.assert_called_once_with(session, b'a credentials blob')
@@ -1285,7 +1285,7 @@ class SessionCallbacksTest(unittest.TestCase):
         session = self.create_session(lib_mock)
         session.on(spotify.SessionEvent.CONNECTION_STATE_UPDATED, callback)
 
-        SessionCallbacks.connection_state_updated(session._sp_session)
+        _SessionCallbacks.connection_state_updated(session._sp_session)
 
         callback.assert_called_once_with(session)
 
@@ -1294,7 +1294,7 @@ class SessionCallbacksTest(unittest.TestCase):
         session = self.create_session(lib_mock)
         session.on(spotify.SessionEvent.SCROBBLE_ERROR, callback)
 
-        SessionCallbacks.scrobble_error(
+        _SessionCallbacks.scrobble_error(
             session._sp_session, int(spotify.ErrorType.LASTFM_AUTH_ERROR))
 
         callback.assert_called_once_with(
@@ -1305,7 +1305,7 @@ class SessionCallbacksTest(unittest.TestCase):
         session = self.create_session(lib_mock)
         session.on(spotify.SessionEvent.PRIVATE_SESSION_MODE_CHANGED, callback)
 
-        SessionCallbacks.private_session_mode_changed(
+        _SessionCallbacks.private_session_mode_changed(
             session._sp_session, 1)
 
         callback.assert_called_once_with(session, True)

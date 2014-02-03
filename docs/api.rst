@@ -231,6 +231,8 @@ Playlists
 
 .. autoclass:: PlaylistContainer
 
+.. autoclass:: PlaylistContainerEvent
+
 .. autoclass:: PlaylistFolder
    :no-inherited-members:
 

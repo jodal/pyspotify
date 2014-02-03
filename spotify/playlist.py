@@ -11,6 +11,7 @@ from spotify import ffi, lib, utils
 __all__ = [
     'Playlist',
     'PlaylistContainer',
+    'PlaylistContainerEvent',
     'PlaylistFolder',
     'PlaylistOfflineStatus',
     'PlaylistTrack',
@@ -655,6 +656,75 @@ class PlaylistContainer(collections.MutableSequence):
         # Required by collections.MutableSequence
 
         self[index:index] = [value]
+
+
+class PlaylistContainerEvent(object):
+    """Playlist container events.
+
+    Using :class:`PlaylistContainer` objects, you can register listener
+    functions to be called when various events occurs in the playlist
+    container. This class enumerates the available events and the arguments
+    your listener functions will be called with.
+
+    Example usage::
+
+        import spotify
+
+        def container_loaded(playlist_container):
+            print('Playlist container loaded')
+
+        session = spotify.Session()
+        # Login, etc...
+
+        session.playlist_container.on(
+            spotify.PlaylistContainerEvent.CONTAINER_LOADED, container_loaded)
+
+    All events will cause debug log statements to be emitted, even if no
+    listeners are registered. Thus, there is no need to register listener
+    functions just to log that they're called.
+    """
+
+    PLAYLIST_ADDED = 'playlist_added'
+    """Called when a playlist is added to the container.
+
+    :param playlist_container: the playlist container
+    :type playlist_container: :class:`PlaylistContainer`
+    :param playlist: the added playlist
+    :type playlist: :class:`Playlist`
+    :param position: the position the playlist was added at
+    :type position: int
+    """
+
+    PLAYLIST_REMOVED = 'playlist_removed'
+    """Called when a playlist is removed from the container.
+
+    :param playlist_container: the playlist container
+    :type playlist_container: :class:`PlaylistContainer`
+    :param playlist: the removed playlist
+    :type playlist: :class:`Playlist`
+    :param position: the position the playlist was removed from
+    :type position: int
+    """
+
+    PLAYLIST_MOVED = 'playlist_moved'
+    """Called when a playlist is moved in the container.
+
+    :param playlist_container: the playlist container
+    :type playlist_container: :class:`PlaylistContainer`
+    :param playlist: the moved playlist
+    :type playlist: :class:`Playlist`
+    :param position: the position the playlist was moved from
+    :type position: int
+    :param new_position: the position the playlist was moved to
+    :type new_position: int
+    """
+
+    CONTAINER_LOADED = 'container_loaded'
+    """Called when the playlist container is loaded.
+
+    :param playlist_container: the playlist container
+    :type playlist_container: :class:`PlaylistContainer`
+    """
 
 
 class PlaylistFolder(collections.namedtuple(

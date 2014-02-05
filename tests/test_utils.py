@@ -321,6 +321,21 @@ class ToBytesTest(unittest.TestCase):
             utils.to_bytes(123)
 
 
+class ToBytesOrNoneTest(unittest.TestCase):
+
+    def test_null_becomes_none(self):
+        self.assertEqual(utils.to_bytes_or_none(spotify.ffi.NULL), None)
+
+    def test_char_becomes_bytes(self):
+        result = utils.to_bytes_or_none(spotify.ffi.new('char[]', b'abc'))
+
+        self.assertEqual(result, b'abc')
+
+    def test_anything_else_fails(self):
+        with self.assertRaises(ValueError):
+            utils.to_bytes_or_none(b'abc')
+
+
 class ToUnicodeTest(unittest.TestCase):
 
     def test_unicode_to_unicode_is_passed_through(self):
@@ -339,6 +354,22 @@ class ToUnicodeTest(unittest.TestCase):
 
         with self.assertRaises(ValueError):
             utils.to_unicode(123)
+
+
+class ToUnicodeOrNoneTest(unittest.TestCase):
+
+    def test_null_becomes_none(self):
+        self.assertEqual(utils.to_unicode_or_none(spotify.ffi.NULL), None)
+
+    def test_char_becomes_bytes(self):
+        result = utils.to_unicode_or_none(
+            spotify.ffi.new('char[]', 'æøå'.encode('utf-8')))
+
+        self.assertEqual(result, 'æøå')
+
+    def test_anything_else_fails(self):
+        with self.assertRaises(ValueError):
+            utils.to_unicode_or_none('æøå')
 
 
 class ToCharOrNull(unittest.TestCase):

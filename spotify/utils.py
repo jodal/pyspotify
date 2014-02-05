@@ -265,6 +265,16 @@ def to_bytes(value):
         raise ValueError('Value must be text, bytes, or char[]')
 
 
+def to_bytes_or_none(value):
+    """Converts C char arrays to bytes and C NULL values to None."""
+    if value == ffi.NULL:
+        return None
+    elif isinstance(value, ffi.CData):
+        return ffi.string(value)
+    else:
+        raise ValueError('Value must be char[] or NULL')
+
+
 def to_unicode(value):
     """Converts bytes, unicode, and C char arrays to unicode strings.
 
@@ -278,6 +288,19 @@ def to_unicode(value):
         return value
     else:
         raise ValueError('Value must be text, bytes, or char[]')
+
+
+def to_unicode_or_none(value):
+    """Converts C char arrays to unicode and C NULL values to None.
+
+    C char arrays are decoded from UTF-8.
+    """
+    if value == ffi.NULL:
+        return None
+    elif isinstance(value, ffi.CData):
+        return ffi.string(value).decode('utf-8')
+    else:
+        raise ValueError('Value must be char[] or NULL')
 
 
 def to_char_or_null(value):

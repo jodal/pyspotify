@@ -33,7 +33,7 @@ class Session(utils.EventEmitter):
         message "Session has already been initialized".
 
     :param config: the session config
-    :type config: :class:`SessionConfig` or :class:`None`
+    :type config: :class:`Config` or :class:`None`
     """
 
     def __init__(self, config=None):
@@ -45,7 +45,7 @@ class Session(utils.EventEmitter):
         if config is not None:
             self.config = config
         else:
-            self.config = spotify.SessionConfig()
+            self.config = spotify.Config()
 
         if self.config.application_key is None:
             self.config.load_application_key_file()
@@ -63,7 +63,7 @@ class Session(utils.EventEmitter):
         spotify.session_instance = self
 
     config = None
-    """A :class:`SessionConfig` instance with the current configuration.
+    """A :class:`Config` instance with the current configuration.
 
     Changing the attributes of this object will have no effect once the session
     has been created.

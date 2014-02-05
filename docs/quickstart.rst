@@ -27,9 +27,8 @@ Application keys can be obtained automatically and free of charge from Spotify.
 #. If you place the application key in the same directory as your application's
    main Python file, pyspotify will automatically find it and use it. If you
    want to keep the application key in another location, you'll need to set
-   :attr:`~spotify.SessionConfig.application_key` or
-   :attr:`~spotify.SessionConfig.application_key_filename` in your session
-   config.
+   :attr:`~spotify.Config.application_key` or
+   :attr:`~spotify.Config.application_key_filename` in your session config.
 
 
 Creating a session
@@ -45,10 +44,10 @@ default config::
 
 All config must be done before the session is created. Thus, if you need to
 change any config to something else than the default, you must create a
-:class:`~spotify.SessionConfig` object first, and then pass it to the session::
+:class:`~spotify.Config` object first, and then pass it to the session::
 
     >>> import spotify
-    >>> config = spotify.SessionConfig()
+    >>> config = spotify.Config()
     >>> config.user_agent = 'My awesome Spotify client'
     >>> config.tracefile = b'/tmp/libspotify-trace.log'
     >>> session = spotify.Session(config=config)
@@ -63,8 +62,8 @@ worried about text encoding.
 
 Similarly, pyspotify will convert any string you give it from Unicode to UTF-8
 encoded bytestrings before passing them on to libspotify. The only exception is
-file system paths, like :attr:`~spotify.SessionConfig.tracefile` above, which
-is passed directly to libspotify. This is in case you have a file system which
+file system paths, like :attr:`~spotify.Config.tracefile` above, which is
+passed directly to libspotify. This is in case you have a file system which
 doesn't use UTF-8 encoding for file names.
 
 

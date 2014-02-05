@@ -5,17 +5,17 @@ from spotify import lib, ffi, utils
 from spotify.session import _SessionCallbacks
 
 __all__ = [
-    'SessionConfig',
+    'Config',
 ]
 
 
-class SessionConfig(object):
+class Config(object):
     """The session config.
 
     Create an instance and assign to its attributes to configure. Then use the
     config object to create a session::
 
-        >>> config = spotify.SessionConfig()
+        >>> config = spotify.Config()
         >>> config.user_agent = 'My awesome Spotify client'
         >>> # Etc ...
         >>> session = spotify.Session(config=config)

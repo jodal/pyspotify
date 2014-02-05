@@ -293,10 +293,10 @@ class Playlist(object):
     playlist must *have been* in RAM for other metadata to be available.
 
     By default, playlists are kept in RAM unless
-    :attr:`~spotify.SessionConfig.initially_unload_playlists` is set to
-    :class:`True` before creating the :class:`~spotify.Session`. If the
-    playlists are initially unloaded, set :attr:`in_ram` to :class:`True` to
-    have a playlist loaded into RAM.
+    :attr:`~spotify.Config.initially_unload_playlists` is set to :class:`True`
+    before creating the :class:`~spotify.Session`. If the playlists are
+    initially unloaded, set :attr:`in_ram` to :class:`True` to have a playlist
+    loaded into RAM.
     """
 
     def set_offline_mode(self, offline=True):

@@ -88,10 +88,14 @@ Error handling
     :no-inherited-members:
 
 
+Configuration
+=============
+
+.. autoclass:: Config
+
+
 Sessions
 ========
-
-.. autoclass:: SessionConfig
 
 .. autoclass:: Session
 

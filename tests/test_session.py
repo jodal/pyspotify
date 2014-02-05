@@ -15,7 +15,7 @@ class SessionTest(unittest.TestCase):
 
     def create_session(self, lib_mock):
         lib_mock.sp_session_create.return_value = spotify.ErrorType.OK
-        config = spotify.SessionConfig()
+        config = spotify.Config()
         config.application_key = b'\x01' * 321
         return spotify.Session(config=config)
 
@@ -28,7 +28,7 @@ class SessionTest(unittest.TestCase):
         with self.assertRaises(RuntimeError):
             self.create_session(lib_mock)
 
-    @mock.patch('spotify.SessionConfig')
+    @mock.patch('spotify.Config')
     def test_creates_config_if_none_provided(self, config_cls_mock, lib_mock):
         lib_mock.sp_session_create.return_value = spotify.ErrorType.OK
 
@@ -37,7 +37,7 @@ class SessionTest(unittest.TestCase):
         config_cls_mock.assert_called_once_with()
         self.assertEqual(session.config, config_cls_mock.return_value)
 
-    @mock.patch('spotify.SessionConfig')
+    @mock.patch('spotify.Config')
     def test_tries_to_load_application_key_if_none_provided(
             self, config_cls_mock, lib_mock):
         lib_mock.sp_session_create.return_value = spotify.ErrorType.OK
@@ -51,7 +51,7 @@ class SessionTest(unittest.TestCase):
     def test_raises_error_if_not_ok(self, lib_mock):
         lib_mock.sp_session_create.return_value = (
             spotify.ErrorType.BAD_API_VERSION)
-        config = spotify.SessionConfig()
+        config = spotify.Config()
         config.application_key = b'\x01' * 321
 
         with self.assertRaises(spotify.Error):
@@ -65,7 +65,7 @@ class SessionTest(unittest.TestCase):
             return spotify.ErrorType.OK
 
         lib_mock.sp_session_create.side_effect = func
-        config = spotify.SessionConfig()
+        config = spotify.Config()
         config.application_key = b'\x01' * 321
 
         session = spotify.Session(config=config)
@@ -564,7 +564,7 @@ class OfflineTest(unittest.TestCase):
 
     def create_session(self, lib_mock):
         lib_mock.sp_session_create.return_value = spotify.ErrorType.OK
-        config = spotify.SessionConfig()
+        config = spotify.Config()
         config.application_key = b'\x01' * 321
         return spotify.Session(config=config)
 
@@ -684,7 +684,7 @@ class PlayerTest(unittest.TestCase):
 
     def create_session(self, lib_mock):
         lib_mock.sp_session_create.return_value = spotify.ErrorType.OK
-        config = spotify.SessionConfig()
+        config = spotify.Config()
         config.application_key = b'\x01' * 321
         return spotify.Session(config=config)
 
@@ -803,7 +803,7 @@ class SocialTest(unittest.TestCase):
 
     def create_session(self, lib_mock):
         lib_mock.sp_session_create.return_value = spotify.ErrorType.OK
-        config = spotify.SessionConfig()
+        config = spotify.Config()
         config.application_key = b'\x01' * 321
         return spotify.Session(config=config)
 
@@ -945,7 +945,7 @@ class SessionCallbacksTest(unittest.TestCase):
 
     def create_session(self, lib_mock):
         lib_mock.sp_session_create.return_value = spotify.ErrorType.OK
-        config = spotify.SessionConfig()
+        config = spotify.Config()
         config.application_key = b'\x01' * 321
         return spotify.Session(config=config)
 

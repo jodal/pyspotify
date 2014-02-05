@@ -9,9 +9,9 @@ import unittest
 import spotify
 
 
-class SessionConfigTest(unittest.TestCase):
+class ConfigTest(unittest.TestCase):
     def setUp(self):
-        self.config = spotify.SessionConfig()
+        self.config = spotify.Config()
 
     def test_api_version(self):
         self.config.api_version = 71

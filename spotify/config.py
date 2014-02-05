@@ -40,8 +40,8 @@ class Config(object):
     def api_version(self):
         """The API version of the libspotify we're using.
 
-        You should not need to change this. It is read from
-        :attr:`spotify.lib.SPOTIFY_API_VERSION`.
+        You should not need to change this. It defaults to the value provided
+        by libspotify through :attr:`spotify.lib.SPOTIFY_API_VERSION`.
         """
         return self._sp_session_config.api_version
 
@@ -52,6 +52,8 @@ class Config(object):
     @property
     def cache_location(self):
         """A location for libspotify to cache files.
+
+        Defaults to ``tmp`` in the current working directory.
 
         Must be a bytestring. Cannot be shared with other Spotify apps. Can
         only be used by one session at the time. Optimally, you should use a
@@ -67,6 +69,8 @@ class Config(object):
     @property
     def settings_location(self):
         """A location for libspotify to save settings.
+
+        Defaults to ``tmp`` in the current working directory.
 
         Must be a bytestring. Cannot be shared with other Spotify apps. Can
         only be used by one session at the time. Optimally, you should use a
@@ -120,7 +124,10 @@ class Config(object):
 
     @property
     def user_agent(self):
-        """A string with the name of your client."""
+        """A string with the name of your client.
+
+        Defaults to ``pyspotify 2.x.y``.
+        """
         return utils.to_unicode_or_none(self._sp_session_config.user_agent)
 
     @user_agent.setter
@@ -130,7 +137,10 @@ class Config(object):
 
     @property
     def compress_playlists(self):
-        """Compress local copy of playlists, reduces disk space usage."""
+        """Compress local copy of playlists, reduces disk space usage.
+
+        Defaults to :class:`False`.
+        """
         return bool(self._sp_session_config.compress_playlists)
 
     @compress_playlists.setter
@@ -140,6 +150,8 @@ class Config(object):
     @property
     def dont_save_metadata_for_playlists(self):
         """Don't save metadata for local copies of playlists.
+
+        Defaults to :class:`False`.
 
         Reduces disk space usage at the expense of needing to request metadata
         from Spotify backend when loading list.
@@ -154,6 +166,8 @@ class Config(object):
     def initially_unload_playlists(self):
         """Avoid loading playlists into RAM on startup.
 
+        Defaults to :class:`False`.
+
         See :meth:`Playlist.in_ram` for more details.
         """
         return bool(self._sp_session_config.initially_unload_playlists)
@@ -165,6 +179,8 @@ class Config(object):
     @property
     def device_id(self):
         """Device ID for offline synchronization and logging purposes.
+
+        Defaults to :class:`None`.
 
         The Device ID must be unique to the particular device instance, i.e. no
         two units must supply the same Device ID. The Device ID must not change
@@ -182,6 +198,8 @@ class Config(object):
     def proxy(self):
         """URL to the proxy server that should be used.
 
+        Defaults to :class:`None`.
+
         The format is protocol://host:port where protocol is
         http/https/socks4/socks5.
         """
@@ -194,7 +212,10 @@ class Config(object):
 
     @property
     def proxy_username(self):
-        """Username to authenticate with proxy server."""
+        """Username to authenticate with proxy server.
+
+        Defaults to :class:`None`.
+        """
         return utils.to_unicode_or_none(self._sp_session_config.proxy_username)
 
     @proxy_username.setter
@@ -204,7 +225,10 @@ class Config(object):
 
     @property
     def proxy_password(self):
-        """Password to authenticate with proxy server."""
+        """Password to authenticate with proxy server.
+
+        Defaults to :class:`None`.
+        """
         return utils.to_unicode_or_none(self._sp_session_config.proxy_password)
 
     @proxy_password.setter
@@ -217,12 +241,12 @@ class Config(object):
         """Path to a file containing the root CA certificates that the peer
         should be verified with.
 
+        Defaults to :class:`None`. Must be a bytestring otherwise.
+
         The file must be a concatenation of all certificates in PEM format.
         Provided with libspotify is a sample PEM file in the ``examples/``
         dir. It is recommended that the application export a similar file
         from the local certificate store.
-
-        Must be a bytestring.
 
         .. warning:
             libspotify 12.1.51 for OS X does not have this field. Thus,
@@ -245,7 +269,7 @@ class Config(object):
     def tracefile(self):
         """Path to API trace file.
 
-        Must be a bytestring.
+        Defaults to :class:`None`. Must be a bytestring otherwise.
         """
         return utils.to_bytes_or_none(self._sp_session_config.tracefile)
 

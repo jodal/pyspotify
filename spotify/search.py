@@ -301,7 +301,7 @@ class Search(object):
 @ffi.callback('void(sp_search *, void *)')
 def _search_complete_callback(sp_search, handle):
     logger.debug('search_complete_callback called')
-    if handle is ffi.NULL:
+    if handle == ffi.NULL:
         logger.warning('search_complete_callback called without userdata')
         return
     (callback, search_result) = ffi.from_handle(handle)

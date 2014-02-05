@@ -205,7 +205,7 @@ class Toplist(object):
 @ffi.callback('void(sp_toplistbrowse *, void *)')
 def _toplistbrowse_complete_callback(sp_toplistbrowse, handle):
     logger.debug('toplistbrowse_complete_callback called')
-    if handle is ffi.NULL:
+    if handle == ffi.NULL:
         logger.warning(
             'toplistbrowse_complete_callback called without userdata')
         return

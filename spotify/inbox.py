@@ -77,7 +77,7 @@ class InboxPostResult(object):
 @ffi.callback('void(sp_inbox *, void *)')
 def _inboxpost_complete_callback(sp_inbox, handle):
     logger.debug('inboxpost_complete_callback called')
-    if handle is ffi.NULL:
+    if handle == ffi.NULL:
         logger.warning('inboxpost_complete_callback called without userdata')
         return
     (callback, inbox_post_result) = ffi.from_handle(handle)

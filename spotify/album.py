@@ -252,7 +252,7 @@ class AlbumBrowser(object):
         Will always return :class:`None` if the album isn't loaded.
         """
         sp_album = lib.sp_albumbrowse_album(self._sp_albumbrowse)
-        if sp_album is ffi.NULL:
+        if sp_album == ffi.NULL:
             return None
         return Album(sp_album=sp_album)
 
@@ -263,7 +263,7 @@ class AlbumBrowser(object):
         Will always return :class:`None` if the album isn't loaded.
         """
         sp_artist = lib.sp_albumbrowse_artist(self._sp_albumbrowse)
-        if sp_artist is ffi.NULL:
+        if sp_artist == ffi.NULL:
             return None
         return spotify.Artist(sp_artist=sp_artist)
 
@@ -320,7 +320,7 @@ class AlbumBrowser(object):
 @ffi.callback('void(sp_albumbrowse *, void *)')
 def _albumbrowse_complete_callback(sp_albumbrowse, handle):
     logger.debug('albumbrowse_complete_callback called')
-    if handle is ffi.NULL:
+    if handle == ffi.NULL:
         logger.warning(
             'albumbrowse_complete_callback called without userdata')
         return

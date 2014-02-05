@@ -220,7 +220,7 @@ class ArtistBrowser(object):
         Will always return :class:`None` if the artist browser isn't loaded.
         """
         sp_artist = lib.sp_artistbrowse_artist(self._sp_artistbrowse)
-        if sp_artist is ffi.NULL:
+        if sp_artist == ffi.NULL:
             return None
         return Artist(sp_artist=sp_artist)
 
@@ -347,7 +347,7 @@ class ArtistBrowser(object):
 @ffi.callback('void(sp_artistbrowse *, void *)')
 def _artistbrowse_complete_callback(sp_artistbrowse, handle):
     logger.debug('artistbrowse_complete_callback called')
-    if handle is ffi.NULL:
+    if handle == ffi.NULL:
         logger.warning(
             'artistbrowse_complete_callback called without userdata')
         return

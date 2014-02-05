@@ -148,7 +148,7 @@ class Image(object):
 @ffi.callback('void(sp_image *, void *)')
 def _image_load_callback(sp_image, handle):
     logger.debug('image_load_callback called')
-    if handle is ffi.NULL:
+    if handle == ffi.NULL:
         logger.warning('image_load_callback called without userdata')
         return
     (callback, image) = ffi.from_handle(handle)

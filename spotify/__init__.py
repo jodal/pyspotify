@@ -83,6 +83,7 @@ ffi, lib = build_ffi()
 from spotify.album import *  # noqa
 from spotify.artist import *  # noqa
 from spotify.audio import *  # noqa
+from spotify.config import *  # noqa
 from spotify.connection import *  # noqa
 from spotify.error import *  # noqa
 from spotify.image import *  # noqa

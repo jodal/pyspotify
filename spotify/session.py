@@ -29,131 +29,8 @@ class SessionConfig(object):
         >>> session = spotify.Session(config=config)
     """
 
-    api_version = lib.SPOTIFY_API_VERSION
-    """The API version of the libspotify we're using.
-
-    You should not need to change this. It is read from
-    :attr:`spotify.lib.SPOTIFY_API_VERSION`.
-    """
-
-    cache_location = b'tmp'
-    """A location for libspotify to cache files.
-
-    Must be a bytestring. Cannot be shared with other Spotify apps. Can only be
-    used by one session at the time. Optimally, you should use a lock file or
-    similar to ensure this.
-    """
-
-    settings_location = b'tmp'
-    """A location for libspotify to save settings.
-
-    Must be a bytestring. Cannot be shared with other Spotify apps. Can only be
-    used by one session at the time. Optimally, you should use a lock file or
-    similar to ensure this.
-    """
-
-    application_key = None
-    """Your libspotify application key.
-
-    Must be a bytestring. Alternatively, you can set
-    :attr:`application_key_filename`, and pyspotify will read the file and use
-    it instead of :attr:`application_key`.
-    """
-
-    application_key_filename = b'spotify_appkey.key'
-    """Path to your libspotify application key file.
-
-    This is an alternative to :attr:`application_key`. The file must be a
-    binary key file, not the C code key file that can be compiled into an
-    application.
-    """
-
-    user_agent = 'pyspotify'
-    """A string with the name of your client."""
-
-    compress_playlists = False
-    """Compress local copy of playlists, reduces disk space usage."""
-
-    dont_save_metadata_for_playlists = False
-    """Don't save metadata for local copies of playlists.
-
-    Reduces disk space usage at the expense of needing to request metadata from
-    Spotify backend when loading list."""
-
-    initially_unload_playlists = False
-    """Avoid loading playlists into RAM on startup.
-
-    See :meth:`Playlist.in_ram` for more details.
-    """
-
-    device_id = None
-    """Device ID for offline synchronization and logging purposes.
-
-    The Device ID must be unique to the particular device instance, i.e. no two
-    units must supply the same Device ID. The Device ID must not change between
-    sessions or power cycles. Good examples is the device's MAC address or
-    unique serial number.
-    """
-
-    proxy = None
-    """URL to the proxy server that should be used.
-
-    The format is protocol://host:port where protocol is
-    http/https/socks4/socks5.
-    """
-
-    proxy_username = None
-    """Username to authenticate with proxy server."""
-
-    proxy_password = None
-    """Password to authenticate with proxy server."""
-
-    # XXX libspotify 12.1.51 for Darwin does not have this field, so we remove
-    # it for now to be able to run the same code on Linux and OS X.
-    #ca_certs_filename = None
-    """Path to a file containing the root CA certificates that the peer should
-    be verified with.
-
-    The file must be a concatenation of all certificates in PEM format.
-    Provided with libspotify is a sample PEM file in the ``examples/`` dir. It
-    is recommended that the application export a similar file from the local
-    certificate store.
-
-    Must be a bytestring.
-    """
-
-    tracefile = None
-    """Path to API trace file.
-
-    Must be a bytestring.
-    """
-
-    def get_application_key(self):
-        """Internal method."""
-        if self.application_key is None:
-            with open(self.application_key_filename, 'rb') as fh:
-                self.application_key = fh.read()
-        assert len(self.application_key) == 321, 'Invalid application key'
-        return self.application_key
-
-    def make_sp_session_config(self):
-        """Internal method."""
-
-        cache_location = ffi.new('char[]', utils.to_bytes(self.cache_location))
-        settings_location = ffi.new(
-            'char[]', utils.to_bytes(self.settings_location))
-        application_key_bytes = self.get_application_key()
-        application_key = ffi.new('char[]', application_key_bytes)
-        user_agent = ffi.new('char[]', utils.to_bytes(self.user_agent))
-        device_id = utils.to_char_or_null(self.device_id)
-        proxy = utils.to_char_or_null(self.proxy)
-        proxy_username = utils.to_char_or_null(self.proxy_username)
-        proxy_password = utils.to_char_or_null(self.proxy_password)
-        # XXX See explanation above
-        #ca_certs_filename = utils.to_char_or_null(self.ca_certs_filename)
-        tracefile = utils.to_char_or_null(self.tracefile)
-
-        sp_session_callbacks = ffi.new('sp_session_callbacks *', {
+    def __init__(self):
+        self._sp_session_callbacks = ffi.new('sp_session_callbacks *', {
             'logged_in': _SessionCallbacks.logged_in,
             'logged_out': _SessionCallbacks.logged_out,
             'metadata_updated': _SessionCallbacks.metadata_updated,
@@ -181,44 +58,230 @@ class SessionConfig(object):
                 _SessionCallbacks.private_session_mode_changed),
         })
 
-        sp_session_config = ffi.new('sp_session_config *', {
-            'api_version': self.api_version,
-            'cache_location': cache_location,
-            'settings_location': settings_location,
-            'application_key': ffi.cast('void *', application_key),
-            'application_key_size': len(application_key_bytes),
-            'user_agent': user_agent,
-            'callbacks': sp_session_callbacks,
-            'compress_playlists': bool(self.compress_playlists),
-            'dont_save_metadata_for_playlists': bool(
-                self.dont_save_metadata_for_playlists),
-            'initially_unload_playlists': bool(
-                self.initially_unload_playlists),
-            'device_id': device_id,
-            'proxy': proxy,
-            'proxy_username': proxy_username,
-            'proxy_password': proxy_password,
-            # XXX See explanation above
-            #'ca_certs_filename': ca_certs_filename,
-            'tracefile': tracefile,
+        self._sp_session_config = ffi.new('sp_session_config *', {
+            'callbacks': self._sp_session_callbacks,
         })
 
-        spotify.weak_key_dict[sp_session_config] = [
-            cache_location,
-            settings_location,
-            application_key,
-            user_agent,
-            sp_session_callbacks,
-            device_id,
-            proxy,
-            proxy_username,
-            proxy_password,
-            # XXX See explanation above
-            #ca_certs_filename,
-            tracefile,
-        ]
+        # Defaults
+        self.api_version = lib.SPOTIFY_API_VERSION
+        self.cache_location = b'tmp'
+        self.settings_location = b'tmp'
+        self.user_agent = 'pyspotify %s' % spotify.__version__
+        self.compress_playlists = False
+        self.dont_save_metadata_for_playlists = False
+        self.initially_unload_playlists = False
 
-        return sp_session_config
+    @property
+    def api_version(self):
+        """The API version of the libspotify we're using.
+
+        You should not need to change this. It is read from
+        :attr:`spotify.lib.SPOTIFY_API_VERSION`.
+        """
+        return self._sp_session_config.api_version
+
+    @api_version.setter
+    def api_version(self, value):
+        self._sp_session_config.api_version = value
+
+    @property
+    def cache_location(self):
+        """A location for libspotify to cache files.
+
+        Must be a bytestring. Cannot be shared with other Spotify apps. Can
+        only be used by one session at the time. Optimally, you should use a
+        lock file or similar to ensure this.
+        """
+        return utils.to_bytes_or_none(self._sp_session_config.cache_location)
+
+    @cache_location.setter
+    def cache_location(self, value):
+        self._cache_location = utils.to_char_or_null(value)
+        self._sp_session_config.cache_location = self._cache_location
+
+    @property
+    def settings_location(self):
+        """A location for libspotify to save settings.
+
+        Must be a bytestring. Cannot be shared with other Spotify apps. Can
+        only be used by one session at the time. Optimally, you should use a
+        lock file or similar to ensure this.
+        """
+        return utils.to_bytes_or_none(
+            self._sp_session_config.settings_location)
+
+    @settings_location.setter
+    def settings_location(self, value):
+        self._settings_location = utils.to_char_or_null(value)
+        self._sp_session_config.settings_location = self._settings_location
+
+    @property
+    def application_key(self):
+        """Your libspotify application key.
+
+        Must be a bytestring. Alternatively, you can set
+        :attr:`application_key_filename`, and pyspotify will read the file and
+        use it instead of :attr:`application_key`.
+        """
+        return utils.to_bytes_or_none(
+            ffi.cast('char *', self._sp_session_config.application_key))
+
+    @application_key.setter
+    def application_key(self, value):
+        if value is None:
+            size = 0
+        else:
+            size = len(value)
+        assert size in (0, 321), (
+            'Invalid application key; expected 321 bytes, got %d bytes' % size)
+
+        self._application_key = utils.to_char_or_null(value)
+        self._sp_session_config.application_key = ffi.cast(
+            'void *', self._application_key)
+        self._sp_session_config.application_key_size = size
+
+    def load_application_key_file(self, filename=b'spotify_appkey.key'):
+        """Load your libspotify application key file.
+
+        If called without arguments, it tries to read ``spotify_appkey.key``
+        from the current working directory.
+
+        This is an alternative to setting :attr:`application_key` yourself. The
+        file must be a binary key file, not the C code key file that can be
+        compiled into an application.
+        """
+        with open(filename, 'rb') as fh:
+            self.application_key = fh.read()
+
+    @property
+    def user_agent(self):
+        """A string with the name of your client."""
+        return utils.to_unicode_or_none(self._sp_session_config.user_agent)
+
+    @user_agent.setter
+    def user_agent(self, value):
+        self._user_agent = utils.to_char_or_null(value)
+        self._sp_session_config.user_agent = self._user_agent
+
+    @property
+    def compress_playlists(self):
+        """Compress local copy of playlists, reduces disk space usage."""
+        return bool(self._sp_session_config.compress_playlists)
+
+    @compress_playlists.setter
+    def compress_playlists(self, value):
+        self._sp_session_config.compress_playlists = bool(value)
+
+    @property
+    def dont_save_metadata_for_playlists(self):
+        """Don't save metadata for local copies of playlists.
+
+        Reduces disk space usage at the expense of needing to request metadata
+        from Spotify backend when loading list.
+        """
+        return bool(self._sp_session_config.dont_save_metadata_for_playlists)
+
+    @dont_save_metadata_for_playlists.setter
+    def dont_save_metadata_for_playlists(self, value):
+        self._sp_session_config.dont_save_metadata_for_playlists = bool(value)
+
+    @property
+    def initially_unload_playlists(self):
+        """Avoid loading playlists into RAM on startup.
+
+        See :meth:`Playlist.in_ram` for more details.
+        """
+        return bool(self._sp_session_config.initially_unload_playlists)
+
+    @initially_unload_playlists.setter
+    def initially_unload_playlists(self, value):
+        self._sp_session_config.initially_unload_playlists = bool(value)
+
+    @property
+    def device_id(self):
+        """Device ID for offline synchronization and logging purposes.
+
+        The Device ID must be unique to the particular device instance, i.e. no
+        two units must supply the same Device ID. The Device ID must not change
+        between sessions or power cycles. Good examples is the device's MAC
+        address or unique serial number.
+        """
+        return utils.to_unicode_or_none(self._sp_session_config.device_id)
+
+    @device_id.setter
+    def device_id(self, value):
+        self._device_id = utils.to_char_or_null(value)
+        self._sp_session_config.device_id = self._device_id
+
+    @property
+    def proxy(self):
+        """URL to the proxy server that should be used.
+
+        The format is protocol://host:port where protocol is
+        http/https/socks4/socks5.
+        """
+        return utils.to_unicode_or_none(self._sp_session_config.proxy)
+
+    @proxy.setter
+    def proxy(self, value):
+        self._proxy = utils.to_char_or_null(value)
+        self._sp_session_config.proxy = self._proxy
+
+    @property
+    def proxy_username(self):
+        """Username to authenticate with proxy server."""
+        return utils.to_unicode_or_none(self._sp_session_config.proxy_username)
+
+    @proxy_username.setter
+    def proxy_username(self, value):
+        self._proxy_username = utils.to_char_or_null(value)
+        self._sp_session_config.proxy_username = self._proxy_username
+
+    @property
+    def proxy_password(self):
+        """Password to authenticate with proxy server."""
+        return utils.to_unicode_or_none(self._sp_session_config.proxy_password)
+
+    @proxy_password.setter
+    def proxy_password(self, value):
+        self._proxy_password = utils.to_char_or_null(value)
+        self._sp_session_config.proxy_password = self._proxy_password
+
+    # XXX libspotify 12.1.51 for Darwin does not have this field, so we remove
+    # it to be able to run the same code on Linux and OS X.
+    #
+    #@property
+    #def ca_certs_filename(self):
+    #    """Path to a file containing the root CA certificates that the peer
+    #    should be verified with.
+    #
+    #    The file must be a concatenation of all certificates in PEM format.
+    #    Provided with libspotify is a sample PEM file in the ``examples/``
+    #    dir. It is recommended that the application export a similar file
+    #    from the local certificate store.
+    #
+    #    Must be a bytestring.
+    #    """
+    #    return utils.to_bytes_or_none(
+    #        self._sp_session_config.ca_certs_filename)
+    #
+    #@ca_certs_filename.setter
+    #def ca_certs_filename(self, value):
+    #    self._ca_certs_filename = utils.to_char_or_null(value)
+    #    self._sp_session_config.ca_certs_filename = self._ca_certs_filename
+
+    @property
+    def tracefile(self):
+        """Path to API trace file.
+
+        Must be a bytestring.
+        """
+        return utils.to_bytes_or_none(self._sp_session_config.tracefile)
+
+    @tracefile.setter
+    def tracefile(self, value):
+        self._tracefile = utils.to_char_or_null(value)
+        self._sp_session_config.tracefile = self._tracefile
 
 
 class Session(utils.EventEmitter):
@@ -247,23 +310,32 @@ class Session(utils.EventEmitter):
         if spotify.session_instance is not None:
             raise RuntimeError('Session has already been initialized')
 
-        if config is None:
-            config = SessionConfig()
+        if config is not None:
+            self.config = config
+        else:
+            self.config = SessionConfig()
 
-        sp_session_config = config.make_sp_session_config()
+        if self.config.application_key is None:
+            self.config.load_application_key_file()
+
         sp_session_ptr = ffi.new('sp_session **')
 
         spotify.Error.maybe_raise(lib.sp_session_create(
-            sp_session_config, sp_session_ptr))
+            self.config._sp_session_config, sp_session_ptr))
 
         self._sp_session = ffi.gc(sp_session_ptr[0], lib.sp_session_release)
-
-        spotify.weak_key_dict[self._sp_session] = [sp_session_config]
 
         self.offline = Offline(self)
         self.player = Player(self)
         self.social = Social(self)
         spotify.session_instance = self
+
+    config = None
+    """A :class:`SessionConfig` instance with the current configuration.
+
+    Changing the attributes of this object will have no effect once the session
+    has been created.
+    """
 
     offline = None
     """An :class:`~spotify.session.Offline` instance for controlling offline

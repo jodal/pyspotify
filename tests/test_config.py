@@ -202,12 +202,12 @@ class ConfigTest(unittest.TestCase):
     #    self.assertIsNone(self.config.ca_certs_filename)
 
     def test_tracefile(self):
-        self.config.tracefile = '123abc'
+        self.config.tracefile = b'123abc'
 
         self.assertEqual(
             spotify.ffi.string(self.config._sp_session_config.tracefile),
             b'123abc')
-        self.assertEqual(self.config.tracefile, '123abc')
+        self.assertEqual(self.config.tracefile, b'123abc')
 
     def test_tracefile_defaults_to_none(self):
         self.assertIsNone(self.config.tracefile)
@@ -218,8 +218,8 @@ class ConfigTest(unittest.TestCase):
         self.config.proxy_username = 'æ proxy_username'
         self.config.proxy_password = 'æ proxy_password'
         # XXX See explanation in session.py
-        #self.config.ca_certs_filename = b'æ ca_certs_filename'
-        self.config.tracefile = b'æ tracefile'
+        #self.config.ca_certs_filename = b'æ ca_certs_filename'.encode('utf-8')
+        self.config.tracefile = 'æ tracefile'.encode('utf-8')
 
         self.assertEqual(
             spotify.ffi.string(self.config._sp_session_config.device_id),

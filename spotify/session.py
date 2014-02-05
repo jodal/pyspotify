@@ -65,8 +65,8 @@ class Session(utils.EventEmitter):
     config = None
     """A :class:`Config` instance with the current configuration.
 
-    Changing the attributes of this object will have no effect once the session
-    has been created.
+    Once the session has been created, changing the attributes of this object
+    will generally have no effect.
     """
 
     offline = None

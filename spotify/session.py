@@ -30,34 +30,7 @@ class SessionConfig(object):
     """
 
     def __init__(self):
-        self._sp_session_callbacks = ffi.new('sp_session_callbacks *', {
-            'logged_in': _SessionCallbacks.logged_in,
-            'logged_out': _SessionCallbacks.logged_out,
-            'metadata_updated': _SessionCallbacks.metadata_updated,
-            'connection_error': _SessionCallbacks.connection_error,
-            'message_to_user': _SessionCallbacks.message_to_user,
-            'notify_main_thread': _SessionCallbacks.notify_main_thread,
-            'music_delivery': _SessionCallbacks.music_delivery,
-            'play_token_lost': _SessionCallbacks.play_token_lost,
-            'log_message': _SessionCallbacks.log_message,
-            'end_of_track': _SessionCallbacks.end_of_track,
-            'streaming_error': _SessionCallbacks.streaming_error,
-            'userinfo_updated': _SessionCallbacks.user_info_updated,
-            'start_playback': _SessionCallbacks.start_playback,
-            'stop_playback': _SessionCallbacks.stop_playback,
-            'get_audio_buffer_stats': (
-                _SessionCallbacks.get_audio_buffer_stats),
-            'offline_status_updated': (
-                _SessionCallbacks.offline_status_updated),
-            'credentials_blob_updated': (
-                _SessionCallbacks.credentials_blob_updated),
-            'connectionstate_updated': (
-                _SessionCallbacks.connection_state_updated),
-            'scrobble_error': _SessionCallbacks.scrobble_error,
-            'private_session_mode_changed': (
-                _SessionCallbacks.private_session_mode_changed),
-        })
-
+        self._sp_session_callbacks = _SessionCallbacks.get_struct()
         self._sp_session_config = ffi.new('sp_session_config *', {
             'callbacks': self._sp_session_callbacks,
         })
@@ -1049,6 +1022,31 @@ class SessionEvent(object):
 
 class _SessionCallbacks(object):
     """Internal class."""
+
+    @classmethod
+    def get_struct(cls):
+        return ffi.new('sp_session_callbacks *', {
+            'logged_in': cls.logged_in,
+            'logged_out': cls.logged_out,
+            'metadata_updated': cls.metadata_updated,
+            'connection_error': cls.connection_error,
+            'message_to_user': cls.message_to_user,
+            'notify_main_thread': cls.notify_main_thread,
+            'music_delivery': cls.music_delivery,
+            'play_token_lost': cls.play_token_lost,
+            'log_message': cls.log_message,
+            'end_of_track': cls.end_of_track,
+            'streaming_error': cls.streaming_error,
+            'userinfo_updated': cls.user_info_updated,
+            'start_playback': cls.start_playback,
+            'stop_playback': cls.stop_playback,
+            'get_audio_buffer_stats': cls.get_audio_buffer_stats,
+            'offline_status_updated': cls.offline_status_updated,
+            'credentials_blob_updated': cls.credentials_blob_updated,
+            'connectionstate_updated': cls.connection_state_updated,
+            'scrobble_error': cls.scrobble_error,
+            'private_session_mode_changed': cls.private_session_mode_changed,
+        })
 
     @staticmethod
     @ffi.callback('void(sp_session *, sp_error)')

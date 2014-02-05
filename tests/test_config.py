@@ -187,19 +187,19 @@ class ConfigTest(unittest.TestCase):
     def test_proxy_password_defaults_to_none(self):
         self.assertIsNone(self.config.proxy_password)
 
-    # XXX See explanation in session.py
-    #
-    #def test_ca_certs_filename(self):
-    #    self.config.ca_certs_filename = b'ca.crt'
-    #
-    #    self.assertEqual(
-    #        spotify.ffi.string(
-    #            self.config._sp_session_config.ca_certs_filename),
-    #        b'ca.crt')
-    #    self.assertEqual(self.config.ca_certs_filename, b'ca.crt')
-    #
-    #def test_ca_certs_filename_defaults_none(self):
-    #    self.assertIsNone(self.config.ca_certs_filename)
+    @unittest.skip('XXX Waiting for ca_certs_filename on OS X')
+    def test_ca_certs_filename(self):
+        self.config.ca_certs_filename = b'ca.crt'
+
+        self.assertEqual(
+            spotify.ffi.string(
+                self.config._sp_session_config.ca_certs_filename),
+            b'ca.crt')
+        self.assertEqual(self.config.ca_certs_filename, b'ca.crt')
+
+    @unittest.skip('XXX Waiting for ca_certs_filename on OS X')
+    def test_ca_certs_filename_defaults_to_none(self):
+        self.assertIsNone(self.config.ca_certs_filename)
 
     def test_tracefile(self):
         self.config.tracefile = b'123abc'
@@ -217,7 +217,7 @@ class ConfigTest(unittest.TestCase):
         self.config.proxy = 'æ proxy'
         self.config.proxy_username = 'æ proxy_username'
         self.config.proxy_password = 'æ proxy_password'
-        # XXX See explanation in session.py
+        # XXX Waiting for ca_certs_filename on OS X
         #self.config.ca_certs_filename = b'æ ca_certs_filename'.encode('utf-8')
         self.config.tracefile = 'æ tracefile'.encode('utf-8')
 

@@ -5,7 +5,6 @@ import functools
 import logging
 import os
 import threading
-import weakref
 
 import cffi
 
@@ -27,17 +26,6 @@ logging.getLogger('spotify').addHandler(logging.NullHandler())
 # libspotify owned data is worked on. This is the heart of pyspotify's thread
 # safety.
 _lock = threading.RLock()
-
-
-# Mapping between keys and objects that should be kept alive as long as the key
-# is alive. May be used to keep objects alive when there isn't a more
-# convenient place to keep a reference to it. The keys are weakrefs, so entries
-# disappear from the dict when the key is garbage collected, potentially
-# causing objects associated to the key to be garbage collected as well. For
-# further details, refer to the CFFI docs.
-#
-# TODO: Try to get rid of all use of this.
-weak_key_dict = weakref.WeakKeyDictionary()
 
 
 # Reference to the spotify.Session instance. Used to enforce that one and only

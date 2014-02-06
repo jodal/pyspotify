@@ -248,9 +248,9 @@ class Config(object):
         dir. It is recommended that the application export a similar file
         from the local certificate store.
 
-        .. warning:
+        .. warning::
             libspotify 12.1.51 for OS X does not have this field. Thus,
-            pyspotify have currently made this field a no-op so that the same
+            this field is currently a no-op in pyspotify so that the same
             code can run on both Linux and OS X.
         """
         # XXX Waiting for ca_certs_filename on OS X

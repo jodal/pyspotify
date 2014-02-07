@@ -74,9 +74,15 @@ class EventEmitter(object):
             if result is False:
                 self.off(event, listener.callback)
 
-    def num_listeners(self, event):
-        """Return the number of listeners for ``event``."""
-        return len(self._listeners[event])
+    def num_listeners(self, event=None):
+        """Return the number of listeners for ``event``.
+
+        Return the total number of listeners if ``event`` is :class:`None`.
+        """
+        if event is not None:
+            return len(self._listeners[event])
+        else:
+            return sum([len(l) for l in self._listeners.values()])
 
     def call(self, event, *event_args):
         """Call the single registered listener for ``event``.

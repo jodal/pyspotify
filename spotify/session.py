@@ -57,10 +57,23 @@ class Session(utils.EventEmitter):
 
         self._sp_session = ffi.gc(sp_session_ptr[0], lib.sp_session_release)
 
+        self._emitters = {}
+
         self.offline = Offline(self)
         self.player = Player(self)
         self.social = Social(self)
         spotify.session_instance = self
+
+    _emitters = None
+    """A mapping from sp_* objects to their corresponding Python instances.
+
+    When a Python instance has attached event listeners, we must keep the
+    Python instance alive. We must also return the same Python instance instead
+    of creating new ones so that the set of event listeners can be modified.
+    This is achieved by maintaining this mapping.
+
+    Internal attribute.
+    """
 
     config = None
     """A :class:`Config` instance with the current configuration.

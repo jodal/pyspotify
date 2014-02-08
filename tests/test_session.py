@@ -301,8 +301,8 @@ class SessionTest(unittest.TestCase):
 
     @mock.patch('spotify.playlist.lib', spec=spotify.lib)
     def test_playlist_container(self, playlist_lib_mock, lib_mock):
-        lib_mock.sp_session_playlistcontainer.return_value = (
-            spotify.ffi.new('sp_playlistcontainer **'))
+        lib_mock.sp_session_playlistcontainer.return_value = spotify.ffi.new(
+            'int *')
         session = self.create_session(lib_mock)
 
         result = session.playlist_container
@@ -420,7 +420,7 @@ class SessionTest(unittest.TestCase):
     @mock.patch('spotify.playlist.lib', spec=spotify.lib)
     def test_published_playlists_for_user(self, playlist_lib_mock, lib_mock):
         func_mock = lib_mock.sp_session_publishedcontainer_for_user_create
-        func_mock.return_value = spotify.ffi.new('sp_playlistcontainer **')
+        func_mock.return_value = spotify.ffi.new('int *')
         session = self.create_session(lib_mock)
 
         result = session.published_playlists_for_user('alice')
@@ -438,7 +438,7 @@ class SessionTest(unittest.TestCase):
     def test_published_playlists_for_current_user(
             self, playlist_lib_mock, lib_mock):
         func_mock = lib_mock.sp_session_publishedcontainer_for_user_create
-        func_mock.return_value = spotify.ffi.new('sp_playlistcontainer **')
+        func_mock.return_value = spotify.ffi.new('int *')
         session = self.create_session(lib_mock)
 
         result = session.published_playlists_for_user()

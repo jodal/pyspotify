@@ -1811,9 +1811,25 @@ class PlaylistContainerCallbacksTest(unittest.TestCase):
         self.assertIsInstance(playlist, spotify.Playlist)
         self.assertEqual(playlist._sp_playlist, sp_playlist)
 
-    @unittest.skip('TODO')
     def test_playlist_moved_callback(self, lib_mock):
-        pass
+        self.create_session(lib_mock)
+        callback = mock.Mock()
+        sp_playlist = spotify.ffi.cast(
+            'sp_playlist *', spotify.ffi.new('int *'))
+        sp_playlistcontainer = spotify.ffi.cast(
+            'sp_playlistcontainer *', spotify.ffi.new('int *'))
+        playlist_container = spotify.PlaylistContainer(
+            sp_playlistcontainer=sp_playlistcontainer)
+        playlist_container.on(
+            spotify.PlaylistContainerEvent.PLAYLIST_MOVED, callback)
+
+        _PlaylistContainerCallbacks.playlist_moved(
+            sp_playlistcontainer, sp_playlist, 7, 13, spotify.ffi.NULL)
+
+        callback.assert_called_once_with(playlist_container, mock.ANY, 7, 13)
+        playlist = callback.call_args[0][1]
+        self.assertIsInstance(playlist, spotify.Playlist)
+        self.assertEqual(playlist._sp_playlist, sp_playlist)
 
     @unittest.skip('TODO')
     def test_container_loaded_callback(self, lib_mock):

@@ -765,7 +765,7 @@ class _PlaylistContainerCallbacks(object):
             'sp_playlistcontainer_callbacks *', {
                 'playlist_added': cls.playlist_added,
                 'playlist_removed': cls.playlist_removed,
-                'playlist_moved': ffi.NULL,
+                'playlist_moved': cls.playlist_moved,
                 'container_loaded': ffi.NULL,
             })
 
@@ -799,6 +799,25 @@ class _PlaylistContainerCallbacks(object):
         playlist_container.emit(
             PlaylistContainerEvent.PLAYLIST_REMOVED, playlist_container,
             Playlist(sp_playlist=sp_playlist, add_ref=True), position)
+
+    @staticmethod
+    @ffi.callback(
+        'void(sp_playlistcontainer *pc, sp_playlist *playlist, int position, '
+        'int new_position, void *userdata)')
+    def playlist_moved(
+            sp_playlistcontainer, sp_playlist, position, new_position,
+            userdata):
+        playlist_container = spotify.session_instance._emitters.get(
+            sp_playlistcontainer)
+        if playlist_container is None:
+            logger.debug('Playlist moved, but no matching container found')
+            return
+        logger.debug(
+            'Playlist moved from position %d to %d', position, new_position)
+        playlist_container.emit(
+            PlaylistContainerEvent.PLAYLIST_MOVED, playlist_container,
+            Playlist(sp_playlist=sp_playlist, add_ref=True),
+            position, new_position)
 
 
 class PlaylistFolder(collections.namedtuple(

@@ -753,29 +753,32 @@ class PlaylistContainerTest(unittest.TestCase):
     def create_session(self, lib_mock):
         session = mock.sentinel.session
         session._sp_session = mock.sentinel.sp_session
+        session._emitters = {}
         spotify.session_instance = session
         return session
 
     def tearDown(self):
         spotify.session_instance = None
 
-    def test_adds_ref_to_sp_playlistcontainer_when_created(self, lib_mock):
-        sp_playlistcontainer = spotify.ffi.new('int *')
-
-        spotify.PlaylistContainer(sp_playlistcontainer)
-
-        lib_mock.sp_playlistcontainer_add_ref.assert_called_with(
-            sp_playlistcontainer)
-
-    def test_releases_sp_playlistcontainer_when_container_dies(self, lib_mock):
+    def test_life_cycle(self, lib_mock):
         sp_playlistcontainer = spotify.ffi.new('int *')
 
         playlist_container = spotify.PlaylistContainer(sp_playlistcontainer)
+
+        lib_mock.sp_playlistcontainer_add_ref.assert_called_with(
+            sp_playlistcontainer)
+        lib_mock.sp_playlistcontainer_add_callbacks.assert_called_with(
+            sp_playlistcontainer, mock.ANY, mock.ANY)
+
         playlist_container = None  # noqa
         tests.gc_collect()
 
-        lib_mock.sp_playlistcontainer_release.assert_called_with(
-            sp_playlistcontainer)
+        lib_mock.sp_playlistcontainer_remove_callbacks.assert_called_with(
+            sp_playlistcontainer, mock.ANY, mock.ANY)
+        # FIXME Won't be called because lib_mock has references to the
+        # sp_playlistcontainer object, and it thus won't be GC-ed.
+        #lib_mock.sp_playlistcontainer_release.assert_called_with(
+        #    sp_playlistcontainer)
 
     @mock.patch('spotify.User', spec=spotify.User)
     @mock.patch('spotify.Link', spec=spotify.Link)
@@ -1704,6 +1707,54 @@ class PlaylistContainerTest(unittest.TestCase):
 
         with self.assertRaises(spotify.Error):
             playlist_container.clear_unseen_tracks(playlist)
+
+    def test_first_on_call_adds_ref_to_obj_on_session(self, lib_mock):
+        session = self.create_session(lib_mock)
+        sp_playlistcontainer = spotify.ffi.new('int *')
+        playlist_container = spotify.PlaylistContainer(
+            sp_playlistcontainer=sp_playlistcontainer)
+
+        playlist_container.on(
+            spotify.PlaylistContainerEvent.PLAYLIST_ADDED, lambda *args: None)
+
+        self.assertIn(sp_playlistcontainer, session._emitters)
+        self.assertEqual(
+            session._emitters[sp_playlistcontainer], playlist_container)
+
+    def test_last_off_call_removes_ref_to_obj_from_session(self, lib_mock):
+        session = self.create_session(lib_mock)
+        sp_playlistcontainer = spotify.ffi.new('int *')
+        playlist_container = spotify.PlaylistContainer(
+            sp_playlistcontainer=sp_playlistcontainer)
+
+        playlist_container.on(
+            spotify.PlaylistContainerEvent.PLAYLIST_ADDED, lambda *args: None)
+        playlist_container.off(
+            spotify.PlaylistContainerEvent.PLAYLIST_ADDED)
+
+        self.assertNotIn(sp_playlistcontainer, session._emitters)
+
+    def test_other_off_calls_keeps_ref_to_obj_on_session(self, lib_mock):
+        session = self.create_session(lib_mock)
+        sp_playlistcontainer = spotify.ffi.new('int *')
+        playlist_container = spotify.PlaylistContainer(
+            sp_playlistcontainer=sp_playlistcontainer)
+
+        playlist_container.on(
+            spotify.PlaylistContainerEvent.PLAYLIST_ADDED, lambda *args: None)
+        playlist_container.on(
+            spotify.PlaylistContainerEvent.PLAYLIST_MOVED, lambda *args: None)
+        playlist_container.off(
+            spotify.PlaylistContainerEvent.PLAYLIST_ADDED)
+
+        self.assertIn(sp_playlistcontainer, session._emitters)
+        self.assertEqual(
+            session._emitters[sp_playlistcontainer], playlist_container)
+
+        playlist_container.off(
+            spotify.PlaylistContainerEvent.PLAYLIST_MOVED)
+
+        self.assertNotIn(sp_playlistcontainer, session._emitters)
 
 
 class PlaylistFolderTest(unittest.TestCase):

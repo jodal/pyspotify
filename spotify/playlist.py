@@ -342,7 +342,7 @@ class Playlist(object):
         return spotify.Link(sp_link=sp_link, add_ref=False)
 
 
-class PlaylistContainer(collections.MutableSequence):
+class PlaylistContainer(collections.MutableSequence, utils.EventEmitter):
     """A Spotify playlist container.
 
     The playlist container can be accessed as a regular Python collection to
@@ -395,10 +395,23 @@ class PlaylistContainer(collections.MutableSequence):
     """
 
     def __init__(self, sp_playlistcontainer, add_ref=True):
+        super(PlaylistContainer, self).__init__()
+
         if add_ref:
             lib.sp_playlistcontainer_add_ref(sp_playlistcontainer)
         self._sp_playlistcontainer = ffi.gc(
             sp_playlistcontainer, lib.sp_playlistcontainer_release)
+
+        self._sp_playlistcontainer_callbacks = (
+            _PlaylistContainerCallbacks.get_struct())
+        lib.sp_playlistcontainer_add_callbacks(
+            self._sp_playlistcontainer, self._sp_playlistcontainer_callbacks,
+            ffi.NULL)
+
+    def __del__(self):
+        lib.sp_playlistcontainer_remove_callbacks(
+            self._sp_playlistcontainer, self._sp_playlistcontainer_callbacks,
+            ffi.NULL)
 
     def __repr__(self):
         return '<spotify.PlaylistContainer owned by %s: %s>' % (
@@ -419,9 +432,6 @@ class PlaylistContainer(collections.MutableSequence):
         The method returns ``self`` to allow for chaining of calls.
         """
         return utils.load(self, timeout=timeout)
-
-    # TODO add_callbacks()
-    # TODO remove_callbacks()
 
     def __len__(self):
         # Required by collections.Sequence
@@ -657,6 +667,22 @@ class PlaylistContainer(collections.MutableSequence):
 
         self[index:index] = [value]
 
+    def on(self, event, listener, *user_args):
+        if (self._sp_playlistcontainer not in
+                spotify.session_instance._emitters):
+            spotify.session_instance._emitters[self._sp_playlistcontainer] = (
+                self)
+        super(PlaylistContainer, self).on(event, listener, *user_args)
+    on.__doc__ = utils.EventEmitter.on.__doc__
+
+    def off(self, event=None, listener=None):
+        super(PlaylistContainer, self).off(event, listener)
+        if (self.num_listeners() == 0 and
+                self._sp_playlistcontainer in
+                spotify.session_instance._emitters):
+            del spotify.session_instance._emitters[self._sp_playlistcontainer]
+    off.__doc__ = utils.EventEmitter.off.__doc__
+
 
 class PlaylistContainerEvent(object):
     """Playlist container events.
@@ -725,6 +751,20 @@ class PlaylistContainerEvent(object):
     :param playlist_container: the playlist container
     :type playlist_container: :class:`PlaylistContainer`
     """
+
+
+class _PlaylistContainerCallbacks(object):
+    """Internal class."""
+
+    @classmethod
+    def get_struct(cls):
+        return ffi.new(
+            'sp_playlistcontainer_callbacks *', {
+                'playlist_added': ffi.NULL,
+                'playlist_removed': ffi.NULL,
+                'playlist_moved': ffi.NULL,
+                'container_loaded': ffi.NULL,
+            })
 
 
 class PlaylistFolder(collections.namedtuple(

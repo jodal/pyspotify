@@ -10,6 +10,8 @@ around libspotify instead of a CPython C extension.
 
 **Development milestones**
 
+- 2014-02-08: Playlist container callbacks complete.
+
 - 2014-01-31: Redesign session event listening to a model supporting multiple
   listeners per event, with a nicer API for registering listeners.
 

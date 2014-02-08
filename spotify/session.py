@@ -216,7 +216,12 @@ class Session(utils.EventEmitter):
             self._sp_session)
         if sp_playlistcontainer == ffi.NULL:
             return None
-        return spotify.PlaylistContainer(sp_playlistcontainer)
+        playlist_container = spotify.session_instance._emitters.get(
+            sp_playlistcontainer)
+        if playlist_container is not None:
+            return playlist_container
+        else:
+            return spotify.PlaylistContainer(sp_playlistcontainer)
 
     @property
     def inbox(self):

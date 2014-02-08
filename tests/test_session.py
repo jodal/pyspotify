@@ -311,6 +311,23 @@ class SessionTest(unittest.TestCase):
             session._sp_session)
         self.assertIsInstance(result, spotify.PlaylistContainer)
 
+    @mock.patch('spotify.playlist.lib', spec=spotify.lib)
+    def test_playlist_container_if_already_listened_to(
+            self, playlist_lib_mock, lib_mock):
+        lib_mock.sp_session_playlistcontainer.return_value = spotify.ffi.new(
+            'int *')
+        session = self.create_session(lib_mock)
+
+        result1 = session.playlist_container
+        result1.on(
+            spotify.PlaylistContainerEvent.PLAYLIST_ADDED, lambda *args: None)
+        result2 = session.playlist_container
+
+        result1.off()
+
+        self.assertIsInstance(result1, spotify.PlaylistContainer)
+        self.assertIs(result1, result2)
+
     def test_playlist_container_if_not_logged_in(self, lib_mock):
         lib_mock.sp_session_playlistcontainer.return_value = spotify.ffi.NULL
         session = self.create_session(lib_mock)

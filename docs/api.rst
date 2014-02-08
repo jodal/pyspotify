@@ -59,10 +59,10 @@ support yet, you'll find what you need to use it from Python here.
     #. Update the file ``spotify/api.h`` with the latest header file from
        libspotify.
 
-    #. Run the Fabric task ``preprocess_header`` defined in
-       ``fabfile.py`` by running::
+    #. Run the Invoke task ``preprocess_header`` defined in
+       ``tasks.py`` by running::
 
-           fab preprocess_header
+           invoke preprocess_header
 
        The task will update the ``spotify/api.processed.h`` file.
 

@@ -1,6 +1,7 @@
 from __future__ import unicode_literals
 
 import collections
+import logging
 import pprint
 import re
 
@@ -18,6 +19,8 @@ __all__ = [
     'PlaylistType',
     'PlaylistUnseenTracks',
 ]
+
+logger = logging.getLogger(__name__)
 
 
 class Playlist(object):
@@ -760,11 +763,26 @@ class _PlaylistContainerCallbacks(object):
     def get_struct(cls):
         return ffi.new(
             'sp_playlistcontainer_callbacks *', {
-                'playlist_added': ffi.NULL,
+                'playlist_added': cls.playlist_added,
                 'playlist_removed': ffi.NULL,
                 'playlist_moved': ffi.NULL,
                 'container_loaded': ffi.NULL,
             })
+
+    @staticmethod
+    @ffi.callback(
+        'void(sp_playlistcontainer *pc, sp_playlist *playlist, int position, '
+        'void *userdata)')
+    def playlist_added(sp_playlistcontainer, sp_playlist, position, userdata):
+        playlist_container = spotify.session_instance._emitters.get(
+            sp_playlistcontainer)
+        if playlist_container is None:
+            logger.debug('Playlist added, but no matching container found')
+            return
+        logger.debug('Playlist added at position %d', position)
+        playlist_container.emit(
+            PlaylistContainerEvent.PLAYLIST_ADDED, playlist_container,
+            Playlist(sp_playlist=sp_playlist, add_ref=True), position)
 
 
 class PlaylistFolder(collections.namedtuple(

@@ -3,6 +3,7 @@ from __future__ import unicode_literals
 import collections
 import mock
 import unittest
+import weakref
 
 import spotify
 from spotify.playlist import _PlaylistContainerCallbacks
@@ -14,6 +15,7 @@ class PlaylistTest(unittest.TestCase):
 
     def create_session(self, lib_mock):
         session = mock.sentinel.session
+        session._cache = weakref.WeakValueDictionary()
         session._sp_session = mock.sentinel.sp_session
         spotify.session_instance = session
         return session
@@ -64,6 +66,16 @@ class PlaylistTest(unittest.TestCase):
         tests.gc_collect()
 
         lib_mock.sp_playlist_release.assert_called_with(sp_playlist)
+
+    def test_cached_playlist(self, lib_mock):
+        self.create_session(lib_mock)
+        sp_playlist = spotify.ffi.new('int *')
+
+        result1 = spotify.Playlist._cached(sp_playlist)
+        result2 = spotify.Playlist._cached(sp_playlist)
+
+        self.assertIsInstance(result1, spotify.Playlist)
+        self.assertIs(result1, result2)
 
     @mock.patch('spotify.Link', spec=spotify.Link)
     def test_repr(self, link_mock, lib_mock):
@@ -755,6 +767,7 @@ class PlaylistContainerTest(unittest.TestCase):
         session = mock.sentinel.session
         session._sp_session = mock.sentinel.sp_session
         session._emitters = {}
+        session._cache = weakref.WeakValueDictionary()
         spotify.session_instance = session
         return session
 
@@ -780,6 +793,16 @@ class PlaylistContainerTest(unittest.TestCase):
         # sp_playlistcontainer object, and it thus won't be GC-ed.
         #lib_mock.sp_playlistcontainer_release.assert_called_with(
         #    sp_playlistcontainer)
+
+    def test_cached_container(self, lib_mock):
+        self.create_session(lib_mock)
+        sp_playlistcontainer = spotify.ffi.new('int *')
+
+        result1 = spotify.PlaylistContainer._cached(sp_playlistcontainer)
+        result2 = spotify.PlaylistContainer._cached(sp_playlistcontainer)
+
+        self.assertIsInstance(result1, spotify.PlaylistContainer)
+        self.assertIs(result1, result2)
 
     @mock.patch('spotify.User', spec=spotify.User)
     @mock.patch('spotify.Link', spec=spotify.Link)

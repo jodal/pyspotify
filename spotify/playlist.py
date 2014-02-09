@@ -37,6 +37,22 @@ class Playlist(object):
         u'500C feelgood playlist'
     """
 
+    @classmethod
+    def _cached(cls, sp_playlist, add_ref=True):
+        """
+        Get :class:`Playlist` instance for the given ``sp_playlist``. If
+        it already exists, it is retrieved from cache.
+
+        Internal method.
+        """
+        if spotify.session_instance is None:
+            return Playlist(sp_playlist=sp_playlist, add_ref=add_ref)
+        if sp_playlist in spotify.session_instance._cache:
+            return spotify.session_instance._cache[sp_playlist]
+        playlist = Playlist(sp_playlist=sp_playlist, add_ref=add_ref)
+        spotify.session_instance._cache[sp_playlist] = playlist
+        return playlist
+
     def __init__(self, uri=None, sp_playlist=None, add_ref=True):
         assert uri or sp_playlist, 'uri or sp_playlist is required'
         if uri is not None:
@@ -396,6 +412,26 @@ class PlaylistContainer(collections.MutableSequence, utils.EventEmitter):
 
         >>> container[0] = playlist
     """
+
+    @classmethod
+    def _cached(cls, sp_playlistcontainer, add_ref=True):
+        """
+        Get :class:`PlaylistContainer` instance for the given
+        ``sp_playlistcontainer``. If it already exists, it is retrieved from
+        cache.
+
+        Internal method.
+        """
+        if spotify.session_instance is None:
+            return PlaylistContainer(
+                sp_playlistcontainer=sp_playlistcontainer, add_ref=add_ref)
+        if sp_playlistcontainer in spotify.session_instance._cache:
+            return spotify.session_instance._cache[sp_playlistcontainer]
+        playlist_container = PlaylistContainer(
+            sp_playlistcontainer=sp_playlistcontainer, add_ref=add_ref)
+        spotify.session_instance._cache[sp_playlistcontainer] = (
+            playlist_container)
+        return playlist_container
 
     def __init__(self, sp_playlistcontainer, add_ref=True):
         super(PlaylistContainer, self).__init__()

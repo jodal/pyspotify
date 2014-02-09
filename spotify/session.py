@@ -3,6 +3,7 @@ from __future__ import unicode_literals
 import functools
 import logging
 import operator
+import weakref
 
 import spotify
 from spotify import ffi, lib, utils
@@ -57,12 +58,23 @@ class Session(utils.EventEmitter):
 
         self._sp_session = ffi.gc(sp_session_ptr[0], lib.sp_session_release)
 
+        self._cache = weakref.WeakValueDictionary()
         self._emitters = {}
 
         self.offline = Offline(self)
         self.player = Player(self)
         self.social = Social(self)
         spotify.session_instance = self
+
+    _cache = None
+    """A mapping from sp_* objects to their corresponding Python instances.
+
+    The ``_cached`` helper contructors on wrapper objects use this cache for
+    finding and returning existing alive wrapper objects for the sp_* object is
+    about to create a wrapper for.
+
+    Internal attribute.
+    """
 
     _emitters = None
     """A mapping from sp_* objects to their corresponding Python instances.

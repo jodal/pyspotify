@@ -24,7 +24,7 @@ __all__ = [
 logger = logging.getLogger(__name__)
 
 
-class Playlist(object):
+class Playlist(utils.EventEmitter):
     """A Spotify playlist.
 
     You can get playlists from the :attr:`~Session.playlist_container`,
@@ -55,6 +55,8 @@ class Playlist(object):
         return playlist
 
     def __init__(self, uri=None, sp_playlist=None, add_ref=True):
+        super(Playlist, self).__init__()
+
         assert uri or sp_playlist, 'uri or sp_playlist is required'
         if uri is not None:
             playlist = spotify.Link(uri).as_playlist()
@@ -66,6 +68,16 @@ class Playlist(object):
         if add_ref:
             lib.sp_playlist_add_ref(sp_playlist)
         self._sp_playlist = ffi.gc(sp_playlist, lib.sp_playlist_release)
+
+        self._sp_playlist_callbacks = _PlaylistCallbacks.get_struct()
+        lib.sp_playlist_add_callbacks(
+            self._sp_playlist, self._sp_playlist_callbacks, ffi.NULL)
+
+    def __del__(self):
+        if not hasattr(self, '_sp_playlist'):
+            return
+        lib.sp_playlist_remove_callbacks(
+            self._sp_playlist, self._sp_playlist_callbacks, ffi.NULL)
 
     def __repr__(self):
         if not self.is_loaded:
@@ -89,9 +101,6 @@ class Playlist(object):
         The method returns ``self`` to allow for chaining of calls.
         """
         return utils.load(self, timeout=timeout)
-
-    # TODO add_callbacks()
-    # TODO remove_callbacks()
 
     @property
     def tracks(self):
@@ -361,6 +370,19 @@ class Playlist(object):
             raise spotify.Error('Failed to get link from Spotify playlist')
         return spotify.Link(sp_link=sp_link, add_ref=False)
 
+    def on(self, event, listener, *user_args):
+        if self not in spotify.session_instance._emitters:
+            spotify.session_instance._emitters.append(self)
+        super(Playlist, self).on(event, listener, *user_args)
+    on.__doc__ = utils.EventEmitter.on.__doc__
+
+    def off(self, event=None, listener=None):
+        super(Playlist, self).off(event, listener)
+        if (self.num_listeners() == 0 and
+                self in spotify.session_instance._emitters):
+            spotify.session_instance._emitters.remove(self)
+    off.__doc__ = utils.EventEmitter.off.__doc__
+
 
 class PlaylistEvent(object):
     """Playlist events.
@@ -434,6 +456,14 @@ class PlaylistEvent(object):
 
     SUBSCRIBERS_CHANGED = 'subscribers_changed'
     """TODO"""
+
+
+class _PlaylistCallbacks(object):
+
+    @classmethod
+    def get_struct(cls):
+        return ffi.new('sp_playlist_callbacks *', {
+        })
 
 
 class PlaylistContainer(collections.MutableSequence, utils.EventEmitter):

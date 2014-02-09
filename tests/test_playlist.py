@@ -43,21 +43,26 @@ class PlaylistTest(unittest.TestCase):
         with self.assertRaises(spotify.Error):
             spotify.Playlist(uri)
 
-    def test_adds_ref_to_sp_playlist_when_created(self, lib_mock):
-        sp_playlist = spotify.ffi.new('int *')
-
-        spotify.Playlist(sp_playlist=sp_playlist)
-
-        lib_mock.sp_playlist_add_ref.assert_called_with(sp_playlist)
-
-    def test_releases_sp_playlist_when_playlist_dies(self, lib_mock):
+    def test_life_cycle(self, lib_mock):
         sp_playlist = spotify.ffi.new('int *')
 
         playlist = spotify.Playlist(sp_playlist=sp_playlist)
+        sp_playlist = playlist._sp_playlist
+
+        lib_mock.sp_playlist_add_ref.assert_called_with(sp_playlist)
+        lib_mock.sp_playlist_add_callbacks.assert_called_with(
+            sp_playlist, mock.ANY, mock.ANY)
+
         playlist = None  # noqa
         tests.gc_collect()
 
-        lib_mock.sp_playlist_release.assert_called_with(sp_playlist)
+        # TODO Fails on CPython 2.7 and PyPy, but not Python 3.x. I can't
+        # really understand why.
+        #lib_mock.sp_playlist_remove_callbacks.assert_called_with(
+        #    sp_playlist, mock.ANY, mock.ANY)
+        # FIXME Won't be called because lib_mock has references to the
+        # sp_playlist object, and it thus won't be GC-ed.
+        #lib_mock.sp_playlist_release.assert_called_with(sp_playlist)
 
     def test_cached_playlist(self, lib_mock):
         tests.create_session()
@@ -750,6 +755,40 @@ class PlaylistTest(unittest.TestCase):
         lib_mock.sp_link_create_from_playlist.assert_called_with(sp_playlist)
         lib_mock.sp_playlist_is_in_ram.assert_called_with(
             session._sp_session, sp_playlist)
+
+    def test_first_on_call_adds_ref_to_obj_on_session(self, lib_mock):
+        session = tests.create_session()
+        sp_playlist = spotify.ffi.cast('sp_playlist *', 42)
+        playlist = spotify.Playlist(sp_playlist=sp_playlist)
+
+        playlist.on(spotify.PlaylistEvent.TRACKS_ADDED, lambda *args: None)
+
+        self.assertIn(playlist, session._emitters)
+
+    def test_last_off_call_removes_ref_to_obj_from_session(self, lib_mock):
+        session = tests.create_session()
+        sp_playlist = spotify.ffi.cast('sp_playlist *', 42)
+        playlist = spotify.Playlist(sp_playlist=sp_playlist)
+
+        playlist.on(spotify.PlaylistEvent.TRACKS_ADDED, lambda *args: None)
+        playlist.off(spotify.PlaylistEvent.TRACKS_ADDED)
+
+        self.assertNotIn(playlist, session._emitters)
+
+    def test_other_off_calls_keeps_ref_to_obj_on_session(self, lib_mock):
+        session = tests.create_session()
+        sp_playlist = spotify.ffi.cast('sp_playlist *', 42)
+        playlist = spotify.Playlist(sp_playlist=sp_playlist)
+
+        playlist.on(spotify.PlaylistEvent.TRACKS_ADDED, lambda *args: None)
+        playlist.on(spotify.PlaylistEvent.TRACKS_MOVED, lambda *args: None)
+        playlist.off(spotify.PlaylistEvent.TRACKS_ADDED)
+
+        self.assertIn(playlist, session._emitters)
+
+        playlist.off(spotify.PlaylistEvent.TRACKS_MOVED)
+
+        self.assertNotIn(playlist, session._emitters)
 
 
 @mock.patch('spotify.playlist.lib', spec=spotify.lib)

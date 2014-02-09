@@ -11,6 +11,7 @@ from spotify import ffi, lib, utils
 
 __all__ = [
     'Playlist',
+    'PlaylistEvent',
     'PlaylistContainer',
     'PlaylistContainerEvent',
     'PlaylistFolder',
@@ -359,6 +360,80 @@ class Playlist(object):
             # the playlist is both loaded and in RAM.
             raise spotify.Error('Failed to get link from Spotify playlist')
         return spotify.Link(sp_link=sp_link, add_ref=False)
+
+
+class PlaylistEvent(object):
+    """Playlist events.
+
+    Using :class:`Playlist` objects, you can register listener functions to be
+    called when various events occurs in the playlist. This class enumerates
+    the available events and the arguments your listener functions will be
+    called with.
+
+    Example usage::
+
+        import spotify
+
+        def tracks_added(playlist, tracks, position):
+            print('Tracks added to playlist')
+
+        session = spotify.Session()
+        # Login, etc...
+
+        playlist = session.playlist_container[0]
+        playlist.on(spotify.PlaylistEvent.TRACKS_ADDED, tracks_added)
+
+    All events will cause debug log statements to be emitted, even if no
+    listeners are registered. Thus, there is no need to register listener
+    functions just to log that they're called.
+    """
+
+    TRACKS_ADDED = 'tracks_added'
+    """Called when tracks are added to the playlist.
+
+    :param playlist: the added playlist
+    :type playlist: :class:`Playlist`
+    :param tracks: the added tracks
+    :type tracks: list of :class:`Track`
+    :param position: the position the playlist was added at
+    :type position: int
+    """
+
+    TRACKS_REMOVED = 'tracks_removed'
+    """TODO"""
+
+    TRACKS_MOVED = 'tracks_moved'
+    """TODO"""
+
+    PLAYLIST_RENAMED = 'playlist_renamed'
+    """TODO"""
+
+    PLAYLIST_STATE_CHANGED = 'playlist_state_changed'
+    """TODO"""
+
+    PLAYLIST_UPDATE_IN_PROGRESS = 'playlist_update_in_progress'
+    """TODO"""
+
+    PLAYLIST_METADATA_UPDATED = 'playlist_metadata_updated'
+    """TODO"""
+
+    TRACK_CREATED_CHANGED = 'track_created_changed'
+    """TODO"""
+
+    TRACK_SEEN_CHANGED = 'track_seen_changed'
+    """TODO"""
+
+    DESCRIPTION_CHANGED = 'description_changed'
+    """TODO"""
+
+    IMAGE_CHANGED = 'image_changed'
+    """TODO"""
+
+    TRACK_MESSAGE_CHANGED = 'track_message_changed'
+    """TODO"""
+
+    SUBSCRIBERS_CHANGED = 'subscribers_changed'
+    """TODO"""
 
 
 class PlaylistContainer(collections.MutableSequence, utils.EventEmitter):

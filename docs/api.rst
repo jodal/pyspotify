@@ -233,6 +233,8 @@ Playlists
 
 .. autoclass:: Playlist
 
+.. autoclass:: PlaylistEvent
+
 .. autoclass:: PlaylistContainer
 
 .. autoclass:: PlaylistContainerEvent

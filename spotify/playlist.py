@@ -46,7 +46,7 @@ class Playlist(object):
         Internal method.
         """
         if spotify.session_instance is None:
-            return Playlist(sp_playlist=sp_playlist, add_ref=add_ref)
+            raise RuntimeError('Session must be initialized to cache objects')
         if sp_playlist in spotify.session_instance._cache:
             return spotify.session_instance._cache[sp_playlist]
         playlist = Playlist(sp_playlist=sp_playlist, add_ref=add_ref)
@@ -423,8 +423,7 @@ class PlaylistContainer(collections.MutableSequence, utils.EventEmitter):
         Internal method.
         """
         if spotify.session_instance is None:
-            return PlaylistContainer(
-                sp_playlistcontainer=sp_playlistcontainer, add_ref=add_ref)
+            raise RuntimeError('Session must be initialized to cache objects')
         if sp_playlistcontainer in spotify.session_instance._cache:
             return spotify.session_instance._cache[sp_playlistcontainer]
         playlist_container = PlaylistContainer(

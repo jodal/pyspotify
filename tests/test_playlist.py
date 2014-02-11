@@ -868,6 +868,7 @@ class PlaylistContainerTest(unittest.TestCase):
         self.assertEqual(result, 0)
 
     def test_getitem(self, lib_mock):
+        self.create_session(lib_mock)
         lib_mock.sp_playlistcontainer_num_playlists.return_value = 1
         sp_playlist = spotify.ffi.new('int *')
         lib_mock.sp_playlistcontainer_playlist_type.return_value = int(
@@ -886,14 +887,18 @@ class PlaylistContainerTest(unittest.TestCase):
         self.assertEqual(result._sp_playlist, sp_playlist)
 
     def test_getitem_with_slice(self, lib_mock):
+        self.create_session(lib_mock)
         lib_mock.sp_playlistcontainer_num_playlists.return_value = 3
-        sp_playlist = spotify.ffi.new('int *')
         lib_mock.sp_playlistcontainer_playlist_type.side_effect = [
             int(spotify.PlaylistType.PLAYLIST),
             int(spotify.PlaylistType.PLAYLIST),
             int(spotify.PlaylistType.PLAYLIST)]
+        sp_playlist1 = spotify.ffi.new('int *')
+        sp_playlist2 = spotify.ffi.new('int *')
+        sp_playlist3 = spotify.ffi.new('int *')
         lib_mock.sp_playlistcontainer_playlist.side_effect = [
-            sp_playlist, sp_playlist, sp_playlist]
+            sp_playlist1, sp_playlist2, sp_playlist3
+        ]
         sp_playlistcontainer = spotify.ffi.new('int *')
         playlist_container = spotify.PlaylistContainer(
             sp_playlistcontainer=sp_playlistcontainer)
@@ -907,12 +912,13 @@ class PlaylistContainerTest(unittest.TestCase):
         # Only a subslice of length 2 is returned
         self.assertIsInstance(result, list)
         self.assertEqual(len(result), 2)
-        self.assertEqual(result[0]._sp_playlist, sp_playlist)
-        self.assertEqual(result[1]._sp_playlist, sp_playlist)
+        self.assertEqual(result[0]._sp_playlist, sp_playlist1)
+        self.assertEqual(result[1]._sp_playlist, sp_playlist2)
 
     def test_getitem_with_folder(self, lib_mock):
         folder_name = 'foobar'
 
+        self.create_session(lib_mock)
         lib_mock.sp_playlistcontainer_num_playlists.return_value = 3
         lib_mock.sp_playlistcontainer_playlist_type.side_effect = [
             int(spotify.PlaylistType.START_FOLDER),
@@ -1199,6 +1205,7 @@ class PlaylistContainerTest(unittest.TestCase):
         self.assertIsInstance(playlist_container, collections.MutableSequence)
 
     def test_add_new_playlist_to_end_of_container(self, lib_mock):
+        self.create_session(lib_mock)
         sp_playlistcontainer = spotify.ffi.new('int *')
         playlist_container = spotify.PlaylistContainer(
             sp_playlistcontainer=sp_playlistcontainer)
@@ -1222,6 +1229,7 @@ class PlaylistContainerTest(unittest.TestCase):
             lib_mock.sp_playlistcontainer_move_playlist.call_count, 0)
 
     def test_add_new_playlist_at_given_index(self, lib_mock):
+        self.create_session(lib_mock)
         sp_playlistcontainer = spotify.ffi.new('int *')
         playlist_container = spotify.PlaylistContainer(
             sp_playlistcontainer=sp_playlistcontainer)
@@ -1450,6 +1458,7 @@ class PlaylistContainerTest(unittest.TestCase):
             playlist_container.add_folder('x' * 300)
 
     def test_remove_playlist(self, lib_mock):
+        self.create_session(lib_mock)
         sp_playlistcontainer = spotify.ffi.new('int *')
         playlist_container = spotify.PlaylistContainer(
             sp_playlistcontainer=sp_playlistcontainer)
@@ -1467,6 +1476,7 @@ class PlaylistContainerTest(unittest.TestCase):
             sp_playlistcontainer, 5)
 
     def test_remove_playlist_out_of_range_fails(self, lib_mock):
+        self.create_session(lib_mock)
         sp_playlistcontainer = spotify.ffi.new('int *')
         playlist_container = spotify.PlaylistContainer(
             sp_playlistcontainer=sp_playlistcontainer)
@@ -2006,6 +2016,16 @@ class PlaylistUnseenTracksTest(unittest.TestCase):
     # TODO Test that the collection releases sp_playlistcontainer and
     # sp_playlist when no longer referenced.
 
+    def create_session(self, lib_mock):
+        session = mock.sentinel.session
+        session._cache = weakref.WeakValueDictionary()
+        session._sp_session = mock.sentinel.sp_session
+        spotify.session_instance = session
+        return session
+
+    def tearDown(self):
+        spotify.session_instance = None
+
     @mock.patch('spotify.track.lib', spec=spotify.lib)
     def test_normal_usage(self, track_lib_mock, lib_mock):
         sp_playlistcontainer = spotify.ffi.new('int *')
@@ -2064,6 +2084,7 @@ class PlaylistUnseenTracksTest(unittest.TestCase):
 
     @mock.patch('spotify.track.lib', spec=spotify.lib)
     def test_getitem_with_slice(self, track_lib_mock, lib_mock):
+        self.create_session(lib_mock)
         sp_playlistcontainer = spotify.ffi.new('int *')
         sp_playlist = spotify.ffi.new('int *')
 

@@ -707,19 +707,16 @@ class PlaylistContainer(collections.MutableSequence, utils.EventEmitter):
         self[index:index] = [value]
 
     def on(self, event, listener, *user_args):
-        if (self._sp_playlistcontainer not in
-                spotify.session_instance._emitters):
-            spotify.session_instance._emitters[self._sp_playlistcontainer] = (
-                self)
+        if self not in spotify.session_instance._emitters:
+            spotify.session_instance._emitters.append(self)
         super(PlaylistContainer, self).on(event, listener, *user_args)
     on.__doc__ = utils.EventEmitter.on.__doc__
 
     def off(self, event=None, listener=None):
         super(PlaylistContainer, self).off(event, listener)
         if (self.num_listeners() == 0 and
-                self._sp_playlistcontainer in
-                spotify.session_instance._emitters):
-            del spotify.session_instance._emitters[self._sp_playlistcontainer]
+                self in spotify.session_instance._emitters):
+            spotify.session_instance._emitters.remove(self)
     off.__doc__ = utils.EventEmitter.off.__doc__
 
 
@@ -810,15 +807,13 @@ class _PlaylistContainerCallbacks(object):
         'void(sp_playlistcontainer *pc, sp_playlist *playlist, int position, '
         'void *userdata)')
     def playlist_added(sp_playlistcontainer, sp_playlist, position, userdata):
-        playlist_container = spotify.session_instance._emitters.get(
-            sp_playlistcontainer)
-        if playlist_container is None:
-            logger.debug('Playlist added, but no matching container found')
-            return
         logger.debug('Playlist added at position %d', position)
+        playlist_container = PlaylistContainer._cached(
+            sp_playlistcontainer=sp_playlistcontainer, add_ref=True)
+        playlist = Playlist._cached(sp_playlist, add_ref=True)
         playlist_container.emit(
-            PlaylistContainerEvent.PLAYLIST_ADDED, playlist_container,
-            Playlist._cached(sp_playlist, add_ref=True), position)
+            PlaylistContainerEvent.PLAYLIST_ADDED,
+            playlist_container, playlist, position)
 
     @staticmethod
     @ffi.callback(
@@ -826,15 +821,13 @@ class _PlaylistContainerCallbacks(object):
         'void *userdata)')
     def playlist_removed(
             sp_playlistcontainer, sp_playlist, position, userdata):
-        playlist_container = spotify.session_instance._emitters.get(
-            sp_playlistcontainer)
-        if playlist_container is None:
-            logger.debug('Playlist removed, but no matching container found')
-            return
         logger.debug('Playlist removed at position %d', position)
+        playlist_container = PlaylistContainer._cached(
+            sp_playlistcontainer=sp_playlistcontainer, add_ref=True)
+        playlist = Playlist._cached(sp_playlist, add_ref=True)
         playlist_container.emit(
-            PlaylistContainerEvent.PLAYLIST_REMOVED, playlist_container,
-            Playlist._cached(sp_playlist, add_ref=True), position)
+            PlaylistContainerEvent.PLAYLIST_REMOVED,
+            playlist_container, playlist, position)
 
     @staticmethod
     @ffi.callback(
@@ -843,28 +836,22 @@ class _PlaylistContainerCallbacks(object):
     def playlist_moved(
             sp_playlistcontainer, sp_playlist, position, new_position,
             userdata):
-        playlist_container = spotify.session_instance._emitters.get(
-            sp_playlistcontainer)
-        if playlist_container is None:
-            logger.debug('Playlist moved, but no matching container found')
-            return
         logger.debug(
             'Playlist moved from position %d to %d', position, new_position)
+        playlist_container = PlaylistContainer._cached(
+            sp_playlistcontainer=sp_playlistcontainer, add_ref=True)
+        playlist = Playlist._cached(sp_playlist, add_ref=True)
         playlist_container.emit(
-            PlaylistContainerEvent.PLAYLIST_MOVED, playlist_container,
-            Playlist._cached(sp_playlist, add_ref=True),
-            position, new_position)
+            PlaylistContainerEvent.PLAYLIST_MOVED,
+            playlist_container, playlist, position, new_position)
 
     @staticmethod
     @ffi.callback(
         'void(sp_playlistcontainer *pc, void *userdata)')
     def container_loaded(sp_playlistcontainer, userdata):
-        playlist_container = spotify.session_instance._emitters.get(
-            sp_playlistcontainer)
-        if playlist_container is None:
-            logger.debug('Container loaded, but no matching container found')
-            return
-        logger.debug('Container loaded')
+        logger.debug('Playlist container loaded')
+        playlist_container = PlaylistContainer._cached(
+            sp_playlistcontainer=sp_playlistcontainer, add_ref=True)
         playlist_container.emit(
             PlaylistContainerEvent.CONTAINER_LOADED, playlist_container)
 

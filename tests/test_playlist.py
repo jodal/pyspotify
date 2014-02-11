@@ -1726,7 +1726,7 @@ class PlaylistContainerTest(unittest.TestCase):
         with self.assertRaises(spotify.Error):
             playlist_container.clear_unseen_tracks(playlist)
 
-    def test_first_on_call_adds_ref_to_obj_on_session(self, lib_mock):
+    def test_first_on_call_adds_obj_emitters_list(self, lib_mock):
         session = tests.create_session()
         sp_playlistcontainer = spotify.ffi.new('int *')
         playlist_container = spotify.PlaylistContainer(
@@ -1735,13 +1735,11 @@ class PlaylistContainerTest(unittest.TestCase):
         playlist_container.on(
             spotify.PlaylistContainerEvent.PLAYLIST_ADDED, lambda *args: None)
 
-        self.assertIn(sp_playlistcontainer, session._emitters)
-        self.assertEqual(
-            session._emitters[sp_playlistcontainer], playlist_container)
+        self.assertIn(playlist_container, session._emitters)
 
         playlist_container.off()
 
-    def test_last_off_call_removes_ref_to_obj_from_session(self, lib_mock):
+    def test_last_off_call_removes_obj_from_emitters_list(self, lib_mock):
         session = tests.create_session()
         sp_playlistcontainer = spotify.ffi.new('int *')
         playlist_container = spotify.PlaylistContainer(
@@ -1752,9 +1750,9 @@ class PlaylistContainerTest(unittest.TestCase):
         playlist_container.off(
             spotify.PlaylistContainerEvent.PLAYLIST_ADDED)
 
-        self.assertNotIn(sp_playlistcontainer, session._emitters)
+        self.assertNotIn(playlist_container, session._emitters)
 
-    def test_other_off_calls_keeps_ref_to_obj_on_session(self, lib_mock):
+    def test_other_off_calls_keeps_obj_in_emitters_list(self, lib_mock):
         session = tests.create_session()
         sp_playlistcontainer = spotify.ffi.new('int *')
         playlist_container = spotify.PlaylistContainer(
@@ -1767,14 +1765,12 @@ class PlaylistContainerTest(unittest.TestCase):
         playlist_container.off(
             spotify.PlaylistContainerEvent.PLAYLIST_ADDED)
 
-        self.assertIn(sp_playlistcontainer, session._emitters)
-        self.assertEqual(
-            session._emitters[sp_playlistcontainer], playlist_container)
+        self.assertIn(playlist_container, session._emitters)
 
         playlist_container.off(
             spotify.PlaylistContainerEvent.PLAYLIST_MOVED)
 
-        self.assertNotIn(sp_playlistcontainer, session._emitters)
+        self.assertNotIn(playlist_container, session._emitters)
 
 
 @mock.patch('spotify.playlist.lib', spec=spotify.lib)
@@ -1786,11 +1782,9 @@ class PlaylistContainerCallbacksTest(unittest.TestCase):
     def test_playlist_added_callback(self, lib_mock):
         tests.create_session()
         callback = mock.Mock()
-        sp_playlist = spotify.ffi.cast(
-            'sp_playlist *', spotify.ffi.new('int *'))
-        sp_playlistcontainer = spotify.ffi.cast(
-            'sp_playlistcontainer *', spotify.ffi.new('int *'))
-        playlist_container = spotify.PlaylistContainer(
+        sp_playlist = spotify.ffi.cast('sp_playlist *', 42)
+        sp_playlistcontainer = spotify.ffi.cast('sp_playlistcontainer *', 43)
+        playlist_container = spotify.PlaylistContainer._cached(
             sp_playlistcontainer=sp_playlistcontainer)
         playlist_container.on(
             spotify.PlaylistContainerEvent.PLAYLIST_ADDED, callback)
@@ -1806,11 +1800,9 @@ class PlaylistContainerCallbacksTest(unittest.TestCase):
     def test_playlist_removed_callback(self, lib_mock):
         tests.create_session()
         callback = mock.Mock()
-        sp_playlist = spotify.ffi.cast(
-            'sp_playlist *', spotify.ffi.new('int *'))
-        sp_playlistcontainer = spotify.ffi.cast(
-            'sp_playlistcontainer *', spotify.ffi.new('int *'))
-        playlist_container = spotify.PlaylistContainer(
+        sp_playlist = spotify.ffi.cast('sp_playlist *', 42)
+        sp_playlistcontainer = spotify.ffi.cast('sp_playlistcontainer *', 43)
+        playlist_container = spotify.PlaylistContainer._cached(
             sp_playlistcontainer=sp_playlistcontainer)
         playlist_container.on(
             spotify.PlaylistContainerEvent.PLAYLIST_REMOVED, callback)
@@ -1826,11 +1818,9 @@ class PlaylistContainerCallbacksTest(unittest.TestCase):
     def test_playlist_moved_callback(self, lib_mock):
         tests.create_session()
         callback = mock.Mock()
-        sp_playlist = spotify.ffi.cast(
-            'sp_playlist *', spotify.ffi.new('int *'))
-        sp_playlistcontainer = spotify.ffi.cast(
-            'sp_playlistcontainer *', spotify.ffi.new('int *'))
-        playlist_container = spotify.PlaylistContainer(
+        sp_playlist = spotify.ffi.cast('sp_playlist *', 42)
+        sp_playlistcontainer = spotify.ffi.cast('sp_playlistcontainer *', 43)
+        playlist_container = spotify.PlaylistContainer._cached(
             sp_playlistcontainer=sp_playlistcontainer)
         playlist_container.on(
             spotify.PlaylistContainerEvent.PLAYLIST_MOVED, callback)
@@ -1846,9 +1836,8 @@ class PlaylistContainerCallbacksTest(unittest.TestCase):
     def test_container_loaded_callback(self, lib_mock):
         tests.create_session()
         callback = mock.Mock()
-        sp_playlistcontainer = spotify.ffi.cast(
-            'sp_playlistcontainer *', spotify.ffi.new('int *'))
-        playlist_container = spotify.PlaylistContainer(
+        sp_playlistcontainer = spotify.ffi.cast('sp_playlistcontainer *', 43)
+        playlist_container = spotify.PlaylistContainer._cached(
             sp_playlistcontainer=sp_playlistcontainer)
         playlist_container.on(
             spotify.PlaylistContainerEvent.CONTAINER_LOADED, callback)

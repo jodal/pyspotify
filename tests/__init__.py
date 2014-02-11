@@ -39,7 +39,7 @@ def create_session():
     """Creates a :class:`spotify.Session` mock for testing."""
     session = mock.Mock()
     session._cache = weakref.WeakValueDictionary()
-    session._emitters = {}
+    session._emitters = []
     spotify.session_instance = session
     return session
 

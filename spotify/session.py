@@ -59,7 +59,7 @@ class Session(utils.EventEmitter):
         self._sp_session = ffi.gc(sp_session_ptr[0], lib.sp_session_release)
 
         self._cache = weakref.WeakValueDictionary()
-        self._emitters = {}
+        self._emitters = []
 
         self.offline = Offline(self)
         self.player = Player(self)
@@ -73,16 +73,23 @@ class Session(utils.EventEmitter):
     finding and returning existing alive wrapper objects for the sp_* object is
     about to create a wrapper for.
 
+    The cache *does not* keep objects alive. It's only a means for looking up
+    the objects if they are kept alive somewhere else in the application.
+
     Internal attribute.
     """
 
     _emitters = None
-    """A mapping from sp_* objects to their corresponding Python instances.
+    """A list of event emitters with attached listeners.
 
-    When a Python instance has attached event listeners, we must keep the
-    Python instance alive. We must also return the same Python instance instead
-    of creating new ones so that the set of event listeners can be modified.
-    This is achieved by maintaining this mapping.
+    When an event emitter has attached event listeners, we must keep the
+    emitter alive for as long as the listeners are attached. This is achieved
+    by adding them to this list.
+
+    When creating wrapper objects around sp_* objects we must also return the
+    existing wrapper objects instead of creating new ones so that the set of
+    event listeners on the wrapper object can be modified. This is achieved
+    with a combination of this list and the :attr:`_cache` mapping.
 
     Internal attribute.
     """

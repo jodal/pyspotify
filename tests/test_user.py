@@ -10,12 +10,6 @@ import tests
 @mock.patch('spotify.user.lib', spec=spotify.lib)
 class UserTest(unittest.TestCase):
 
-    def create_session(self, lib_mock):
-        session = mock.sentinel.session
-        session._sp_session = mock.sentinel.sp_session
-        spotify.session_instance = session
-        return session
-
     def test_create_without_uri_or_sp_user_fails(self, lib_mock):
         with self.assertRaises(AssertionError):
             spotify.User()

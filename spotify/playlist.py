@@ -499,7 +499,8 @@ class PlaylistContainer(collections.MutableSequence, utils.EventEmitter):
         if playlist_type is PlaylistType.PLAYLIST:
             sp_playlist = lib.sp_playlistcontainer_playlist(
                 self._sp_playlistcontainer, key)
-            return Playlist(sp_playlist=sp_playlist, add_ref=True)
+            return Playlist._cached(
+                sp_playlist=sp_playlist, add_ref=True)
         elif playlist_type in (
                 PlaylistType.START_FOLDER, PlaylistType.END_FOLDER):
             return PlaylistFolder(
@@ -574,7 +575,7 @@ class PlaylistContainer(collections.MutableSequence, utils.EventEmitter):
             self._sp_playlistcontainer, name)
         if sp_playlist == ffi.NULL:
             raise spotify.Error('Playlist creation failed')
-        playlist = Playlist(sp_playlist=sp_playlist, add_ref=True)
+        playlist = Playlist._cached(sp_playlist=sp_playlist, add_ref=True)
         if index is not None:
             self.move_playlist(self.__len__() - 1, index)
         return playlist
@@ -604,7 +605,7 @@ class PlaylistContainer(collections.MutableSequence, utils.EventEmitter):
             self._sp_playlistcontainer, link._sp_link)
         if sp_playlist == ffi.NULL:
             return None
-        playlist = Playlist(sp_playlist=sp_playlist, add_ref=True)
+        playlist = Playlist._cached(sp_playlist=sp_playlist, add_ref=True)
         if index is not None:
             self.move_playlist(self.__len__() - 1, index)
         return playlist
@@ -818,7 +819,7 @@ class _PlaylistContainerCallbacks(object):
         logger.debug('Playlist added at position %d', position)
         playlist_container.emit(
             PlaylistContainerEvent.PLAYLIST_ADDED, playlist_container,
-            Playlist(sp_playlist=sp_playlist, add_ref=True), position)
+            Playlist._cached(sp_playlist, add_ref=True), position)
 
     @staticmethod
     @ffi.callback(
@@ -834,7 +835,7 @@ class _PlaylistContainerCallbacks(object):
         logger.debug('Playlist removed at position %d', position)
         playlist_container.emit(
             PlaylistContainerEvent.PLAYLIST_REMOVED, playlist_container,
-            Playlist(sp_playlist=sp_playlist, add_ref=True), position)
+            Playlist._cached(sp_playlist, add_ref=True), position)
 
     @staticmethod
     @ffi.callback(
@@ -852,7 +853,7 @@ class _PlaylistContainerCallbacks(object):
             'Playlist moved from position %d to %d', position, new_position)
         playlist_container.emit(
             PlaylistContainerEvent.PLAYLIST_MOVED, playlist_container,
-            Playlist(sp_playlist=sp_playlist, add_ref=True),
+            Playlist._cached(sp_playlist, add_ref=True),
             position, new_position)
 
     @staticmethod

@@ -99,7 +99,8 @@ class Link(object):
         sp_playlist = lib.sp_playlist_create(
             spotify.session_instance._sp_session, self._sp_link)
         if sp_playlist:
-            return spotify.Playlist(sp_playlist=sp_playlist, add_ref=False)
+            return spotify.Playlist._cached(
+                sp_playlist=sp_playlist, add_ref=False)
 
     def as_user(self):
         """Make an :class:`User` from the link."""

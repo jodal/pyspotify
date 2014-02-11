@@ -2,6 +2,7 @@ from __future__ import unicode_literals
 
 import mock
 import unittest
+import weakref
 
 import spotify
 import tests
@@ -12,6 +13,7 @@ class LinkTest(unittest.TestCase):
 
     def create_session(self, lib_mock):
         session = mock.sentinel.session
+        session._cache = weakref.WeakValueDictionary()
         session._sp_session = mock.sentinel.sp_session
         spotify.session_instance = session
         return session

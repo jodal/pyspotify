@@ -2,7 +2,6 @@ from __future__ import unicode_literals
 
 import mock
 import unittest
-import weakref
 
 import spotify
 import tests
@@ -10,13 +9,6 @@ import tests
 
 @mock.patch('spotify.link.lib', spec=spotify.lib)
 class LinkTest(unittest.TestCase):
-
-    def create_session(self, lib_mock):
-        session = mock.sentinel.session
-        session._cache = weakref.WeakValueDictionary()
-        session._sp_session = mock.sentinel.sp_session
-        spotify.session_instance = session
-        return session
 
     def setUp(self):
         spotify.session_instance = mock.sentinel.session
@@ -220,7 +212,7 @@ class LinkTest(unittest.TestCase):
 
     @mock.patch('spotify.playlist.lib', spec=spotify.lib)
     def test_as_playlist(self, playlist_lib_mock, lib_mock):
-        session = self.create_session(lib_mock)
+        session = tests.create_session()
         sp_link = spotify.ffi.new('int *')
         lib_mock.sp_link_create_from_string.return_value = sp_link
         lib_mock.sp_link_type.return_value = spotify.LinkType.PLAYLIST
@@ -274,7 +266,7 @@ class LinkTest(unittest.TestCase):
 
     @mock.patch('spotify.image.lib', spec=spotify.lib)
     def test_as_image(self, image_lib_mock, lib_mock):
-        session = self.create_session(lib_mock)
+        session = tests.create_session()
         sp_link = spotify.ffi.new('int *')
         lib_mock.sp_link_create_from_string.return_value = sp_link
         lib_mock.sp_link_type.return_value = spotify.LinkType.IMAGE

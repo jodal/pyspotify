@@ -10,12 +10,6 @@ import tests
 @mock.patch('spotify.search.lib', spec=spotify.lib)
 class SearchTest(unittest.TestCase):
 
-    def create_session(self, lib_mock):
-        session = mock.sentinel.session
-        session._sp_session = mock.sentinel.sp_session
-        spotify.session_instance = session
-        return session
-
     def tearDown(self):
         spotify.session_instance = None
 
@@ -33,7 +27,7 @@ class SearchTest(unittest.TestCase):
             spotify.Search()
 
     def test_search(self, lib_mock):
-        session = self.create_session(lib_mock)
+        session = tests.create_session()
         sp_search = spotify.ffi.cast('sp_search *', spotify.ffi.new('int *'))
         lib_mock.sp_search_create.return_value = sp_search
 
@@ -56,7 +50,7 @@ class SearchTest(unittest.TestCase):
         self.assertTrue(result.complete_event.wait(3))
 
     def test_search_with_callback(self, lib_mock):
-        self.create_session(lib_mock)
+        tests.create_session()
         sp_search = spotify.ffi.cast('sp_search *', spotify.ffi.new('int *'))
         lib_mock.sp_search_create.return_value = sp_search
         callback = mock.Mock()
@@ -72,7 +66,7 @@ class SearchTest(unittest.TestCase):
 
     def test_search_where_result_is_gone_before_callback_is_called(
             self, lib_mock):
-        self.create_session(lib_mock)
+        tests.create_session()
         sp_search = spotify.ffi.cast('sp_search *', spotify.ffi.new('int *'))
         lib_mock.sp_search_create.return_value = sp_search
         callback = mock.Mock()
@@ -479,7 +473,7 @@ class SearchTest(unittest.TestCase):
         self.assertEqual(result, spotify.SearchType.STANDARD)
 
     def test_more(self, lib_mock):
-        session = self.create_session(lib_mock)
+        session = tests.create_session()
         sp_search1 = spotify.ffi.cast('sp_search *', spotify.ffi.new('int *'))
         sp_search2 = spotify.ffi.cast('sp_search *', spotify.ffi.new('int *'))
         lib_mock.sp_search_create.side_effect = [sp_search1, sp_search2]

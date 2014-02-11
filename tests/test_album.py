@@ -11,12 +11,6 @@ import tests
 @mock.patch('spotify.album.lib', spec=spotify.lib)
 class AlbumTest(unittest.TestCase):
 
-    def create_session(self, lib_mock):
-        session = mock.sentinel.session
-        session._sp_session = mock.sentinel.sp_session
-        spotify.session_instance = session
-        return session
-
     def tearDown(self):
         spotify.session_instance = None
 
@@ -141,7 +135,7 @@ class AlbumTest(unittest.TestCase):
 
     @mock.patch('spotify.image.lib', spec=spotify.lib)
     def test_cover(self, image_lib_mock, lib_mock):
-        session = self.create_session(lib_mock)
+        session = tests.create_session()
         sp_image_id = spotify.ffi.new('char[]', b'cover-id')
         lib_mock.sp_album_cover.return_value = sp_image_id
         sp_image = spotify.ffi.new('int *')
@@ -269,12 +263,6 @@ class AlbumTest(unittest.TestCase):
 @mock.patch('spotify.album.lib', spec=spotify.lib)
 class AlbumBrowserTest(unittest.TestCase):
 
-    def create_session(self, lib_mock):
-        session = mock.sentinel.session
-        session._sp_session = mock.sentinel.sp_session
-        spotify.session_instance = session
-        return session
-
     def tearDown(self):
         spotify.session_instance = None
 
@@ -283,7 +271,7 @@ class AlbumBrowserTest(unittest.TestCase):
             spotify.AlbumBrowser()
 
     def test_create_from_album(self, lib_mock):
-        session = self.create_session(lib_mock)
+        session = tests.create_session()
         sp_album = spotify.ffi.new('int *')
         album = spotify.Album(sp_album=sp_album)
         sp_albumbrowse = spotify.ffi.cast(
@@ -304,7 +292,7 @@ class AlbumBrowserTest(unittest.TestCase):
         self.assertTrue(result.complete_event.is_set())
 
     def test_create_from_album_with_callback(self, lib_mock):
-        session = self.create_session(lib_mock)
+        session = tests.create_session()
         sp_album = spotify.ffi.new('int *')
         album = spotify.Album(sp_album=sp_album)
         sp_albumbrowse = spotify.ffi.cast(
@@ -325,7 +313,7 @@ class AlbumBrowserTest(unittest.TestCase):
         callback.assert_called_with(result)
 
     def test_browser_is_gone_before_callback_is_called(self, lib_mock):
-        self.create_session(lib_mock)
+        tests.create_session()
         sp_album = spotify.ffi.new('int *')
         album = spotify.Album(sp_album=sp_album)
         sp_albumbrowse = spotify.ffi.cast(

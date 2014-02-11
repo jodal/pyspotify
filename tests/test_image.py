@@ -10,15 +10,6 @@ import tests
 @mock.patch('spotify.image.lib', spec=spotify.lib)
 class ImageTest(unittest.TestCase):
 
-    def create_session(self, lib_mock):
-        session = mock.sentinel.session
-        session._sp_session = mock.sentinel.sp_session
-        spotify.session_instance = session
-        return session
-
-    def tearDown(self):
-        spotify.session_instance = None
-
     def test_create_without_uri_or_sp_image_fails(self, lib_mock):
         with self.assertRaises(AssertionError):
             spotify.Image()

@@ -10,12 +10,6 @@ import tests
 @mock.patch('spotify.track.lib', spec=spotify.lib)
 class TrackTest(unittest.TestCase):
 
-    def create_session(self, lib_mock):
-        session = mock.sentinel.session
-        session._sp_session = mock.sentinel.sp_session
-        spotify.session_instance = session
-        return session
-
     def tearDown(self):
         spotify.session_instance = None
 
@@ -28,7 +22,7 @@ class TrackTest(unittest.TestCase):
             func(track)
 
     def assert_fails_if_error(self, lib_mock, func):
-        self.create_session(lib_mock)
+        tests.create_session()
         lib_mock.sp_track_error.return_value = (
             spotify.ErrorType.BAD_API_VERSION)
         sp_track = spotify.ffi.new('int *')
@@ -155,7 +149,7 @@ class TrackTest(unittest.TestCase):
             track.offline_status
 
     def test_availability(self, lib_mock):
-        session = self.create_session(lib_mock)
+        session = tests.create_session()
         lib_mock.sp_track_error.return_value = spotify.ErrorType.OK
         lib_mock.sp_track_get_availability.return_value = 1
         sp_track = spotify.ffi.new('int *')
@@ -168,7 +162,7 @@ class TrackTest(unittest.TestCase):
         self.assertIs(result, spotify.TrackAvailability.AVAILABLE)
 
     def test_availability_is_none_if_unloaded(self, lib_mock):
-        self.create_session(lib_mock)
+        tests.create_session()
         lib_mock.sp_track_error.return_value = spotify.ErrorType.IS_LOADING
         lib_mock.sp_track_is_loaded.return_value = 0
         sp_track = spotify.ffi.new('int *')
@@ -186,7 +180,7 @@ class TrackTest(unittest.TestCase):
         self.assert_fails_if_error(lib_mock, lambda t: t.availability)
 
     def test_is_local(self, lib_mock):
-        session = self.create_session(lib_mock)
+        session = tests.create_session()
         lib_mock.sp_track_error.return_value = spotify.ErrorType.OK
         lib_mock.sp_track_is_local.return_value = 1
         sp_track = spotify.ffi.new('int *')
@@ -199,7 +193,7 @@ class TrackTest(unittest.TestCase):
         self.assertTrue(result)
 
     def test_is_local_is_none_if_unloaded(self, lib_mock):
-        self.create_session(lib_mock)
+        tests.create_session()
         lib_mock.sp_track_error.return_value = spotify.ErrorType.OK
         lib_mock.sp_track_is_loaded.return_value = 0
         sp_track = spotify.ffi.new('int *')
@@ -217,7 +211,7 @@ class TrackTest(unittest.TestCase):
         self.assert_fails_if_error(lib_mock, lambda t: t.is_local)
 
     def test_is_autolinked(self, lib_mock):
-        session = self.create_session(lib_mock)
+        session = tests.create_session()
         lib_mock.sp_track_error.return_value = spotify.ErrorType.OK
         lib_mock.sp_track_is_autolinked.return_value = 1
         sp_track = spotify.ffi.new('int *')
@@ -230,7 +224,7 @@ class TrackTest(unittest.TestCase):
         self.assertTrue(result)
 
     def test_is_autolinked_is_none_if_unloaded(self, lib_mock):
-        self.create_session(lib_mock)
+        tests.create_session()
         lib_mock.sp_track_error.return_value = spotify.ErrorType.OK
         lib_mock.sp_track_is_loaded.return_value = 0
         sp_track = spotify.ffi.new('int *')
@@ -248,7 +242,7 @@ class TrackTest(unittest.TestCase):
         self.assert_fails_if_error(lib_mock, lambda t: t.is_autolinked)
 
     def test_playable(self, lib_mock):
-        session = self.create_session(lib_mock)
+        session = tests.create_session()
         lib_mock.sp_track_error.return_value = spotify.ErrorType.OK
         sp_track_playable = spotify.ffi.new('int *')
         lib_mock.sp_track_get_playable.return_value = sp_track_playable
@@ -264,7 +258,7 @@ class TrackTest(unittest.TestCase):
         self.assertEqual(result._sp_track, sp_track_playable)
 
     def test_playable_is_none_if_unloaded(self, lib_mock):
-        self.create_session(lib_mock)
+        tests.create_session()
         lib_mock.sp_track_error.return_value = spotify.ErrorType.IS_LOADING
         lib_mock.sp_track_is_loaded.return_value = 0
         sp_track = spotify.ffi.new('int *')
@@ -307,7 +301,7 @@ class TrackTest(unittest.TestCase):
         self.assert_fails_if_error(lib_mock, lambda t: t.is_placeholder)
 
     def test_is_starred(self, lib_mock):
-        session = self.create_session(lib_mock)
+        session = tests.create_session()
         lib_mock.sp_track_error.return_value = spotify.ErrorType.OK
         lib_mock.sp_track_is_starred.return_value = 1
         sp_track = spotify.ffi.new('int *')
@@ -320,7 +314,7 @@ class TrackTest(unittest.TestCase):
         self.assertTrue(result)
 
     def test_is_starred_is_none_if_unloaded(self, lib_mock):
-        self.create_session(lib_mock)
+        tests.create_session()
         lib_mock.sp_track_error.return_value = spotify.ErrorType.OK
         lib_mock.sp_track_is_loaded.return_value = 0
         sp_track = spotify.ffi.new('int *')
@@ -338,7 +332,7 @@ class TrackTest(unittest.TestCase):
         self.assert_fails_if_error(lib_mock, lambda t: t.starred)
 
     def test_set_starred(self, lib_mock):
-        session = self.create_session(lib_mock)
+        session = tests.create_session()
         lib_mock.sp_track_set_starred.return_value = spotify.ErrorType.OK
         sp_track = spotify.ffi.cast('sp_track *', spotify.ffi.new('int *'))
         track = spotify.Track(sp_track=sp_track)
@@ -349,7 +343,7 @@ class TrackTest(unittest.TestCase):
             session._sp_session, mock.ANY, 1, 1)
 
     def test_set_starred_fails_if_error(self, lib_mock):
-        self.create_session(lib_mock)
+        tests.create_session()
         lib_mock.sp_track_set_starred.return_value = (
             spotify.ErrorType.BAD_API_VERSION)
         sp_track = spotify.ffi.cast('sp_track *', spotify.ffi.new('int *'))

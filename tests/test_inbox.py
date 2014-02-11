@@ -12,12 +12,6 @@ import tests
 @mock.patch('spotify.inbox.lib', spec=spotify.lib)
 class InboxPostResultTest(unittest.TestCase):
 
-    def create_session(self, lib_mock):
-        session = mock.sentinel.session
-        session._sp_session = mock.sentinel.sp_session
-        spotify.session_instance = session
-        return session
-
     def tearDown(self):
         spotify.session_instance = None
 
@@ -43,7 +37,7 @@ class InboxPostResultTest(unittest.TestCase):
 
     @mock.patch('spotify.track.lib', spec=spotify.lib)
     def test_inbox_post_tracks(self, track_lib_mock, lib_mock):
-        session = self.create_session(lib_mock)
+        session = tests.create_session()
         sp_track1 = spotify.ffi.new('int *')
         track1 = spotify.Track(sp_track=sp_track1)
         sp_track2 = spotify.ffi.new('int *')
@@ -77,7 +71,7 @@ class InboxPostResultTest(unittest.TestCase):
 
     @mock.patch('spotify.track.lib', spec=spotify.lib)
     def test_inbox_post_with_single_track(self, track_lib_mock, lib_mock):
-        session = self.create_session(lib_mock)
+        session = tests.create_session()
         sp_track1 = spotify.ffi.new('int *')
         track1 = spotify.Track(sp_track=sp_track1)
         sp_inbox = spotify.ffi.cast('sp_inbox *', spotify.ffi.new('int *'))
@@ -95,7 +89,7 @@ class InboxPostResultTest(unittest.TestCase):
 
     @mock.patch('spotify.track.lib', spec=spotify.lib)
     def test_inbox_post_with_callback(self, track_lib_mock, lib_mock):
-        self.create_session(lib_mock)
+        tests.create_session()
         sp_track1 = spotify.ffi.new('int *')
         track1 = spotify.Track(sp_track=sp_track1)
         sp_track2 = spotify.ffi.new('int *')
@@ -118,7 +112,7 @@ class InboxPostResultTest(unittest.TestCase):
     def test_inbox_post_where_result_is_gone_before_callback_is_called(
             self, track_lib_mock, lib_mock):
 
-        self.create_session(lib_mock)
+        tests.create_session()
         sp_track1 = spotify.ffi.new('int *')
         track1 = spotify.Track(sp_track=sp_track1)
         sp_track2 = spotify.ffi.new('int *')
@@ -146,7 +140,7 @@ class InboxPostResultTest(unittest.TestCase):
 
     @mock.patch('spotify.track.lib', spec=spotify.lib)
     def test_fail_to_init_raises_error(self, track_lib_mock, lib_mock):
-        self.create_session(lib_mock)
+        tests.create_session()
         sp_track1 = spotify.ffi.new('int *')
         track1 = spotify.Track(sp_track=sp_track1)
         sp_track2 = spotify.ffi.new('int *')

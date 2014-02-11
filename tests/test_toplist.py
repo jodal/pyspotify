@@ -10,12 +10,6 @@ import tests
 @mock.patch('spotify.toplist.lib', spec=spotify.lib)
 class ToplistTest(unittest.TestCase):
 
-    def create_session(self, lib_mock):
-        session = mock.sentinel.session
-        session._sp_session = mock.sentinel.sp_session
-        spotify.session_instance = session
-        return session
-
     def tearDown(self):
         spotify.session_instance = None
 
@@ -34,7 +28,7 @@ class ToplistTest(unittest.TestCase):
             spotify.Toplist()
 
     def test_create_from_type_and_current_user_region(self, lib_mock):
-        session = self.create_session(lib_mock)
+        session = tests.create_session()
         sp_toplistbrowse = spotify.ffi.new('int *')
         lib_mock.sp_toplistbrowse_create.return_value = sp_toplistbrowse
 
@@ -49,7 +43,7 @@ class ToplistTest(unittest.TestCase):
         self.assertEqual(result._sp_toplistbrowse, sp_toplistbrowse)
 
     def test_create_from_type_and_specific_user_region(self, lib_mock):
-        session = self.create_session(lib_mock)
+        session = tests.create_session()
         sp_toplistbrowse = spotify.ffi.new('int *')
         lib_mock.sp_toplistbrowse_create.return_value = sp_toplistbrowse
 
@@ -66,7 +60,7 @@ class ToplistTest(unittest.TestCase):
             b'alice')
 
     def test_create_from_type_and_country(self, lib_mock):
-        session = self.create_session(lib_mock)
+        session = tests.create_session()
         sp_toplistbrowse = spotify.ffi.new('int *')
         lib_mock.sp_toplistbrowse_create.return_value = sp_toplistbrowse
 
@@ -78,7 +72,7 @@ class ToplistTest(unittest.TestCase):
             20047, spotify.ffi.NULL, mock.ANY, mock.ANY)
 
     def test_create_with_callback(self, lib_mock):
-        self.create_session(lib_mock)
+        tests.create_session()
         sp_toplistbrowse = spotify.ffi.cast(
             'sp_toplistbrowse *', spotify.ffi.new('int *'))
         lib_mock.sp_toplistbrowse_create.return_value = sp_toplistbrowse
@@ -97,7 +91,7 @@ class ToplistTest(unittest.TestCase):
         callback.assert_called_with(result)
 
     def test_toplist_is_gone_before_callback_is_called(self, lib_mock):
-        self.create_session(lib_mock)
+        tests.create_session()
         sp_toplistbrowse = spotify.ffi.cast(
             'sp_toplistbrowse *', spotify.ffi.new('int *'))
         lib_mock.sp_toplistbrowse_create.return_value = sp_toplistbrowse
@@ -140,7 +134,7 @@ class ToplistTest(unittest.TestCase):
         lib_mock.sp_toplistbrowse_release.assert_called_with(sp_toplistbrowse)
 
     def test_repr(self, lib_mock):
-        self.create_session(lib_mock)
+        tests.create_session()
         sp_toplistbrowse = spotify.ffi.new('int *')
         lib_mock.sp_toplistbrowse_create.return_value = sp_toplistbrowse
         toplist = spotify.Toplist(

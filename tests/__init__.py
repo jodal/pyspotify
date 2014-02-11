@@ -1,7 +1,9 @@
 from __future__ import unicode_literals
 
 import gc
+import mock
 import platform
+import weakref
 
 import cffi
 
@@ -31,6 +33,15 @@ def buffer_writer(string):
         return len(string)
 
     return func
+
+
+def create_session():
+    """Creates a :class:`spotify.Session` mock for testing."""
+    session = mock.Mock()
+    session._cache = weakref.WeakValueDictionary()
+    session._emitters = {}
+    spotify.session_instance = session
+    return session
 
 
 def gc_collect():

@@ -3,7 +3,6 @@ from __future__ import unicode_literals
 import collections
 import mock
 import unittest
-import weakref
 
 import spotify
 from spotify.playlist import _PlaylistContainerCallbacks
@@ -12,13 +11,6 @@ import tests
 
 @mock.patch('spotify.playlist.lib', spec=spotify.lib)
 class PlaylistTest(unittest.TestCase):
-
-    def create_session(self, lib_mock):
-        session = mock.sentinel.session
-        session._cache = weakref.WeakValueDictionary()
-        session._sp_session = mock.sentinel.sp_session
-        spotify.session_instance = session
-        return session
 
     def tearDown(self):
         spotify.session_instance = None
@@ -68,7 +60,7 @@ class PlaylistTest(unittest.TestCase):
         lib_mock.sp_playlist_release.assert_called_with(sp_playlist)
 
     def test_cached_playlist(self, lib_mock):
-        self.create_session(lib_mock)
+        tests.create_session()
         sp_playlist = spotify.ffi.new('int *')
 
         result1 = spotify.Playlist._cached(sp_playlist)
@@ -353,7 +345,7 @@ class PlaylistTest(unittest.TestCase):
 
     @mock.patch('spotify.image.lib', spec=spotify.lib)
     def test_image(self, image_lib_mock, lib_mock):
-        session = self.create_session(lib_mock)
+        session = tests.create_session()
         image_id = b'image-id'
 
         def func(sp_playlist, sp_image_id):
@@ -409,7 +401,7 @@ class PlaylistTest(unittest.TestCase):
 
     @mock.patch('spotify.track.lib', spec=spotify.lib)
     def test_add_tracks(self, track_lib_mock, lib_mock):
-        session = self.create_session(lib_mock)
+        session = tests.create_session()
         sp_track1 = spotify.ffi.new('int * ')
         track1 = spotify.Track(sp_track=sp_track1)
         sp_track2 = spotify.ffi.new('int * ')
@@ -424,7 +416,7 @@ class PlaylistTest(unittest.TestCase):
 
     @mock.patch('spotify.track.lib', spec=spotify.lib)
     def test_add_tracks_without_position(self, track_lib_mock, lib_mock):
-        session = self.create_session(lib_mock)
+        session = tests.create_session()
         lib_mock.sp_playlist_num_tracks.return_value = 10
         sp_track1 = spotify.ffi.new('int * ')
         track1 = spotify.Track(sp_track=sp_track1)
@@ -440,7 +432,7 @@ class PlaylistTest(unittest.TestCase):
 
     @mock.patch('spotify.track.lib', spec=spotify.lib)
     def test_add_tracks_with_a_single_track(self, track_lib_mock, lib_mock):
-        session = self.create_session(lib_mock)
+        session = tests.create_session()
         sp_track = spotify.ffi.new('int * ')
         track = spotify.Track(sp_track=sp_track)
         sp_playlist = spotify.ffi.new('int *')
@@ -600,7 +592,7 @@ class PlaylistTest(unittest.TestCase):
         self.assertEqual(result, ['alice'])
 
     def test_update_subscribers(self, lib_mock):
-        session = self.create_session(lib_mock)
+        session = tests.create_session()
         lib_mock.sp_playlist_update_subscribers.return_value = int(
             spotify.ErrorType.OK)
         sp_playlist = spotify.ffi.new('int *')
@@ -612,7 +604,7 @@ class PlaylistTest(unittest.TestCase):
             session._sp_session, sp_playlist)
 
     def test_update_subscribers_fails_if_error(self, lib_mock):
-        self.create_session(lib_mock)
+        tests.create_session()
         lib_mock.sp_playlist_update_subscribers.return_value = int(
             spotify.ErrorType.BAD_API_VERSION)
         sp_playlist = spotify.ffi.new('int *')
@@ -622,7 +614,7 @@ class PlaylistTest(unittest.TestCase):
             playlist.update_subscribers()
 
     def test_is_in_ram(self, lib_mock):
-        session = self.create_session(lib_mock)
+        session = tests.create_session()
         lib_mock.sp_playlist_is_in_ram.return_value = 1
         sp_playlist = spotify.ffi.new('int *')
         playlist = spotify.Playlist(sp_playlist=sp_playlist)
@@ -634,7 +626,7 @@ class PlaylistTest(unittest.TestCase):
         self.assertTrue(result)
 
     def test_set_in_ram(self, lib_mock):
-        session = self.create_session(lib_mock)
+        session = tests.create_session()
         lib_mock.sp_playlist_set_in_ram.return_value = int(
             spotify.ErrorType.OK)
         sp_playlist = spotify.ffi.new('int *')
@@ -646,7 +638,7 @@ class PlaylistTest(unittest.TestCase):
             session._sp_session, sp_playlist, 0)
 
     def test_set_in_ram_fails_if_error(self, lib_mock):
-        self.create_session(lib_mock)
+        tests.create_session()
         lib_mock.sp_playlist_set_in_ram.return_value = int(
             spotify.ErrorType.BAD_API_VERSION)
         sp_playlist = spotify.ffi.new('int *')
@@ -656,7 +648,7 @@ class PlaylistTest(unittest.TestCase):
             playlist.in_ram = False
 
     def test_set_offline_mode(self, lib_mock):
-        session = self.create_session(lib_mock)
+        session = tests.create_session()
         lib_mock.sp_playlist_set_offline_mode.return_value = int(
             spotify.ErrorType.OK)
         sp_playlist = spotify.ffi.new('int *')
@@ -668,7 +660,7 @@ class PlaylistTest(unittest.TestCase):
             session._sp_session, sp_playlist, 0)
 
     def test_set_offline_mode_fails_if_error(self, lib_mock):
-        self.create_session(lib_mock)
+        tests.create_session()
         lib_mock.sp_playlist_set_offline_mode.return_value = int(
             spotify.ErrorType.BAD_API_VERSION)
         sp_playlist = spotify.ffi.new('int *')
@@ -678,7 +670,7 @@ class PlaylistTest(unittest.TestCase):
             playlist.set_offline_mode(False)
 
     def test_offline_status(self, lib_mock):
-        session = self.create_session(lib_mock)
+        session = tests.create_session()
         lib_mock.sp_playlist_get_offline_status.return_value = 2
         sp_playlist = spotify.ffi.new('int *')
         playlist = spotify.Playlist(sp_playlist=sp_playlist)
@@ -690,7 +682,7 @@ class PlaylistTest(unittest.TestCase):
         self.assertIs(result, spotify.PlaylistOfflineStatus.DOWNLOADING)
 
     def test_offline_download_completed(self, lib_mock):
-        session = self.create_session(lib_mock)
+        session = tests.create_session()
         lib_mock.sp_playlist_get_offline_status.return_value = 2
         lib_mock.sp_playlist_get_offline_download_completed.return_value = 73
         sp_playlist = spotify.ffi.new('int *')
@@ -703,7 +695,7 @@ class PlaylistTest(unittest.TestCase):
         self.assertEqual(result, 73)
 
     def test_offline_download_completed_when_not_downloading(self, lib_mock):
-        self.create_session(lib_mock)
+        tests.create_session()
         lib_mock.sp_playlist_get_offline_status.return_value = 0
         lib_mock.sp_playlist_get_offline_download_completed.return_value = 0
         sp_playlist = spotify.ffi.new('int *')
@@ -745,7 +737,7 @@ class PlaylistTest(unittest.TestCase):
     @mock.patch('spotify.Link', spec=spotify.Link)
     def test_link_may_fail_if_playlist_has_not_been_in_ram(
             self, link_mock, lib_mock):
-        self.create_session(lib_mock)
+        session = tests.create_session()
         lib_mock.sp_playlist_is_loaded.return_value = 1
         lib_mock.sp_link_create_from_playlist.return_value = spotify.ffi.NULL
         sp_playlist = spotify.ffi.new('int *')
@@ -757,19 +749,11 @@ class PlaylistTest(unittest.TestCase):
         # Condition is checked only if link creation returns NULL
         lib_mock.sp_link_create_from_playlist.assert_called_with(sp_playlist)
         lib_mock.sp_playlist_is_in_ram.assert_called_with(
-            mock.sentinel.sp_session, sp_playlist)
+            session._sp_session, sp_playlist)
 
 
 @mock.patch('spotify.playlist.lib', spec=spotify.lib)
 class PlaylistContainerTest(unittest.TestCase):
-
-    def create_session(self, lib_mock):
-        session = mock.sentinel.session
-        session._sp_session = mock.sentinel.sp_session
-        session._emitters = {}
-        session._cache = weakref.WeakValueDictionary()
-        spotify.session_instance = session
-        return session
 
     def tearDown(self):
         spotify.session_instance = None
@@ -795,7 +779,7 @@ class PlaylistContainerTest(unittest.TestCase):
         #    sp_playlistcontainer)
 
     def test_cached_container(self, lib_mock):
-        self.create_session(lib_mock)
+        tests.create_session()
         sp_playlistcontainer = spotify.ffi.new('int *')
 
         result1 = spotify.PlaylistContainer._cached(sp_playlistcontainer)
@@ -868,7 +852,7 @@ class PlaylistContainerTest(unittest.TestCase):
         self.assertEqual(result, 0)
 
     def test_getitem(self, lib_mock):
-        self.create_session(lib_mock)
+        tests.create_session()
         lib_mock.sp_playlistcontainer_num_playlists.return_value = 1
         sp_playlist = spotify.ffi.new('int *')
         lib_mock.sp_playlistcontainer_playlist_type.return_value = int(
@@ -887,7 +871,7 @@ class PlaylistContainerTest(unittest.TestCase):
         self.assertEqual(result._sp_playlist, sp_playlist)
 
     def test_getitem_with_slice(self, lib_mock):
-        self.create_session(lib_mock)
+        tests.create_session()
         lib_mock.sp_playlistcontainer_num_playlists.return_value = 3
         lib_mock.sp_playlistcontainer_playlist_type.side_effect = [
             int(spotify.PlaylistType.PLAYLIST),
@@ -918,7 +902,7 @@ class PlaylistContainerTest(unittest.TestCase):
     def test_getitem_with_folder(self, lib_mock):
         folder_name = 'foobar'
 
-        self.create_session(lib_mock)
+        tests.create_session()
         lib_mock.sp_playlistcontainer_num_playlists.return_value = 3
         lib_mock.sp_playlistcontainer_playlist_type.side_effect = [
             int(spotify.PlaylistType.START_FOLDER),
@@ -1205,7 +1189,7 @@ class PlaylistContainerTest(unittest.TestCase):
         self.assertIsInstance(playlist_container, collections.MutableSequence)
 
     def test_add_new_playlist_to_end_of_container(self, lib_mock):
-        self.create_session(lib_mock)
+        tests.create_session()
         sp_playlistcontainer = spotify.ffi.new('int *')
         playlist_container = spotify.PlaylistContainer(
             sp_playlistcontainer=sp_playlistcontainer)
@@ -1229,7 +1213,7 @@ class PlaylistContainerTest(unittest.TestCase):
             lib_mock.sp_playlistcontainer_move_playlist.call_count, 0)
 
     def test_add_new_playlist_at_given_index(self, lib_mock):
-        self.create_session(lib_mock)
+        tests.create_session()
         sp_playlistcontainer = spotify.ffi.new('int *')
         playlist_container = spotify.PlaylistContainer(
             sp_playlistcontainer=sp_playlistcontainer)
@@ -1294,7 +1278,7 @@ class PlaylistContainerTest(unittest.TestCase):
             playlist_container.add_new_playlist('foo bar')
 
     def test_add_playlist_from_link(self, lib_mock):
-        self.create_session(lib_mock)
+        tests.create_session()
         sp_link = spotify.ffi.new('int *')
         link = spotify.Link(sp_link=sp_link, add_ref=False)
         sp_playlist = spotify.ffi.new('int *')
@@ -1314,7 +1298,7 @@ class PlaylistContainerTest(unittest.TestCase):
             lib_mock.sp_playlistcontainer_move_playlist.call_count, 0)
 
     def test_add_playlist_from_playlist(self, lib_mock):
-        self.create_session(lib_mock)
+        tests.create_session()
         sp_link = spotify.ffi.new('int *')
         link = spotify.Link(sp_link=sp_link, add_ref=False)
         existing_playlist = mock.Mock(spec=spotify.Playlist)
@@ -1337,7 +1321,7 @@ class PlaylistContainerTest(unittest.TestCase):
             lib_mock.sp_playlistcontainer_move_playlist.call_count, 0)
 
     def test_add_playlist_at_given_index(self, lib_mock):
-        self.create_session(lib_mock)
+        tests.create_session()
         sp_link = spotify.ffi.new('int *')
         link = spotify.Link(sp_link=sp_link, add_ref=False)
         sp_playlist = spotify.ffi.new('int *')
@@ -1360,7 +1344,7 @@ class PlaylistContainerTest(unittest.TestCase):
             sp_playlistcontainer, 99, 7, 0)
 
     def test_add_playlist_already_in_the_container(self, lib_mock):
-        self.create_session(lib_mock)
+        tests.create_session()
         sp_link = spotify.ffi.new('int *')
         link = spotify.Link(sp_link=sp_link, add_ref=False)
         lib_mock.sp_playlistcontainer_add_playlist.return_value = (
@@ -1458,7 +1442,7 @@ class PlaylistContainerTest(unittest.TestCase):
             playlist_container.add_folder('x' * 300)
 
     def test_remove_playlist(self, lib_mock):
-        self.create_session(lib_mock)
+        tests.create_session()
         sp_playlistcontainer = spotify.ffi.new('int *')
         playlist_container = spotify.PlaylistContainer(
             sp_playlistcontainer=sp_playlistcontainer)
@@ -1476,7 +1460,7 @@ class PlaylistContainerTest(unittest.TestCase):
             sp_playlistcontainer, 5)
 
     def test_remove_playlist_out_of_range_fails(self, lib_mock):
-        self.create_session(lib_mock)
+        tests.create_session()
         sp_playlistcontainer = spotify.ffi.new('int *')
         playlist_container = spotify.PlaylistContainer(
             sp_playlistcontainer=sp_playlistcontainer)
@@ -1743,7 +1727,7 @@ class PlaylistContainerTest(unittest.TestCase):
             playlist_container.clear_unseen_tracks(playlist)
 
     def test_first_on_call_adds_ref_to_obj_on_session(self, lib_mock):
-        session = self.create_session(lib_mock)
+        session = tests.create_session()
         sp_playlistcontainer = spotify.ffi.new('int *')
         playlist_container = spotify.PlaylistContainer(
             sp_playlistcontainer=sp_playlistcontainer)
@@ -1755,8 +1739,10 @@ class PlaylistContainerTest(unittest.TestCase):
         self.assertEqual(
             session._emitters[sp_playlistcontainer], playlist_container)
 
+        playlist_container.off()
+
     def test_last_off_call_removes_ref_to_obj_from_session(self, lib_mock):
-        session = self.create_session(lib_mock)
+        session = tests.create_session()
         sp_playlistcontainer = spotify.ffi.new('int *')
         playlist_container = spotify.PlaylistContainer(
             sp_playlistcontainer=sp_playlistcontainer)
@@ -1769,7 +1755,7 @@ class PlaylistContainerTest(unittest.TestCase):
         self.assertNotIn(sp_playlistcontainer, session._emitters)
 
     def test_other_off_calls_keeps_ref_to_obj_on_session(self, lib_mock):
-        session = self.create_session(lib_mock)
+        session = tests.create_session()
         sp_playlistcontainer = spotify.ffi.new('int *')
         playlist_container = spotify.PlaylistContainer(
             sp_playlistcontainer=sp_playlistcontainer)
@@ -1794,18 +1780,11 @@ class PlaylistContainerTest(unittest.TestCase):
 @mock.patch('spotify.playlist.lib', spec=spotify.lib)
 class PlaylistContainerCallbacksTest(unittest.TestCase):
 
-    def create_session(self, lib_mock):
-        session = mock.sentinel.session
-        session._sp_session = mock.sentinel.sp_session
-        session._emitters = {}
-        spotify.session_instance = session
-        return session
-
     def tearDown(self):
         spotify.session_instance = None
 
     def test_playlist_added_callback(self, lib_mock):
-        self.create_session(lib_mock)
+        tests.create_session()
         callback = mock.Mock()
         sp_playlist = spotify.ffi.cast(
             'sp_playlist *', spotify.ffi.new('int *'))
@@ -1825,7 +1804,7 @@ class PlaylistContainerCallbacksTest(unittest.TestCase):
         self.assertEqual(playlist._sp_playlist, sp_playlist)
 
     def test_playlist_removed_callback(self, lib_mock):
-        self.create_session(lib_mock)
+        tests.create_session()
         callback = mock.Mock()
         sp_playlist = spotify.ffi.cast(
             'sp_playlist *', spotify.ffi.new('int *'))
@@ -1845,7 +1824,7 @@ class PlaylistContainerCallbacksTest(unittest.TestCase):
         self.assertEqual(playlist._sp_playlist, sp_playlist)
 
     def test_playlist_moved_callback(self, lib_mock):
-        self.create_session(lib_mock)
+        tests.create_session()
         callback = mock.Mock()
         sp_playlist = spotify.ffi.cast(
             'sp_playlist *', spotify.ffi.new('int *'))
@@ -1865,7 +1844,7 @@ class PlaylistContainerCallbacksTest(unittest.TestCase):
         self.assertEqual(playlist._sp_playlist, sp_playlist)
 
     def test_container_loaded_callback(self, lib_mock):
-        self.create_session(lib_mock)
+        tests.create_session()
         callback = mock.Mock()
         sp_playlistcontainer = spotify.ffi.cast(
             'sp_playlistcontainer *', spotify.ffi.new('int *'))
@@ -2016,13 +1995,6 @@ class PlaylistUnseenTracksTest(unittest.TestCase):
     # TODO Test that the collection releases sp_playlistcontainer and
     # sp_playlist when no longer referenced.
 
-    def create_session(self, lib_mock):
-        session = mock.sentinel.session
-        session._cache = weakref.WeakValueDictionary()
-        session._sp_session = mock.sentinel.sp_session
-        spotify.session_instance = session
-        return session
-
     def tearDown(self):
         spotify.session_instance = None
 
@@ -2084,7 +2056,7 @@ class PlaylistUnseenTracksTest(unittest.TestCase):
 
     @mock.patch('spotify.track.lib', spec=spotify.lib)
     def test_getitem_with_slice(self, track_lib_mock, lib_mock):
-        self.create_session(lib_mock)
+        tests.create_session()
         sp_playlistcontainer = spotify.ffi.new('int *')
         sp_playlist = spotify.ffi.new('int *')
 

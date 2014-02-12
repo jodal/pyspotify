@@ -928,6 +928,20 @@ class PlaylistCallbacksTest(unittest.TestCase):
         self.assertEqual(user._sp_user, sp_user)
         user_lib_mock.sp_user_add_ref.assert_called_with(sp_user)
 
+    def test_track_seen_changed_callback(self, lib_mock):
+        tests.create_session()
+        callback = mock.Mock()
+        sp_playlist = spotify.ffi.cast('sp_playlist *', 42)
+        playlist = spotify.Playlist._cached(sp_playlist=sp_playlist)
+        playlist.on(spotify.PlaylistEvent.TRACK_SEEN_CHANGED, callback)
+        position = 7
+        seen = True
+
+        _PlaylistCallbacks.track_seen_changed(
+            sp_playlist, position, int(seen), spotify.ffi.NULL)
+
+        callback.assert_called_once_with(playlist, position, seen)
+
 
 @mock.patch('spotify.playlist.lib', spec=spotify.lib)
 class PlaylistContainerTest(unittest.TestCase):

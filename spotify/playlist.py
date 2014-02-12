@@ -560,6 +560,7 @@ class _PlaylistCallbacks(object):
             'playlist_update_in_progress': cls.playlist_update_in_progress,
             'playlist_metadata_updated': cls.playlist_metadata_updated,
             'track_created_changed': cls.track_created_changed,
+            'track_seen_changed': cls.track_seen_changed,
         })
 
     @staticmethod
@@ -637,7 +638,16 @@ class _PlaylistCallbacks(object):
             PlaylistEvent.TRACK_CREATED_CHANGED,
             playlist, int(position), user, int(when))
 
-    # TODO track_seen_changed
+    @staticmethod
+    @ffi.callback(
+        'void(sp_playlist *playlist, int position, bool seen, void *userdata)')
+    def track_seen_changed(sp_playlist, position, seen, userdata):
+        logger.debug('Playlist track seen changed')
+        playlist = Playlist._cached(sp_playlist, add_ref=True)
+        playlist.emit(
+            PlaylistEvent.TRACK_SEEN_CHANGED,
+            playlist, int(position), bool(seen))
+
     # TODO description_changed
     # TODO image_changed
     # TODO track_message_changed

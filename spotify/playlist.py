@@ -435,7 +435,7 @@ class PlaylistEvent(object):
 
     :param playlist: the playlist
     :type playlist: :class:`Playlist`
-    :param tracks: positions of the tracks that were removed
+    :param tracks: positions of the tracks that were moved
     :type tracks: list of ints
     :param position: the position in the playlist the tracks were moved to
     :type position: int

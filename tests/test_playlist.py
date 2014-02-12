@@ -841,6 +841,24 @@ class PlaylistCallbacksTest(unittest.TestCase):
         self.assertEqual(len(tracks), len(track_numbers))
         self.assertEqual(tracks[0], 43)
 
+    def test_tracks_moved_callback(self, lib_mock):
+        tests.create_session()
+        callback = mock.Mock()
+        sp_playlist = spotify.ffi.cast('sp_playlist *', 42)
+        playlist = spotify.Playlist._cached(sp_playlist=sp_playlist)
+        playlist.on(spotify.PlaylistEvent.TRACKS_MOVED, callback)
+        track_numbers = [43, 44, 45]
+        position = 7
+
+        _PlaylistCallbacks.tracks_moved(
+            sp_playlist, track_numbers, len(track_numbers), position,
+            spotify.ffi.NULL)
+
+        callback.assert_called_once_with(playlist, mock.ANY, position)
+        tracks = callback.call_args[0][1]
+        self.assertEqual(len(tracks), len(track_numbers))
+        self.assertEqual(tracks[0], 43)
+
     def test_playlist_renamed_callback(self, lib_mock):
         tests.create_session()
         callback = mock.Mock()

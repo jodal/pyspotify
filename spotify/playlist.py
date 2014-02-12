@@ -554,6 +554,7 @@ class _PlaylistCallbacks(object):
         return ffi.new('sp_playlist_callbacks *', {
             'tracks_added': cls.tracks_added,
             'tracks_removed': cls.tracks_removed,
+            'tracks_moved': cls.tracks_moved,
             'playlist_renamed': cls.playlist_renamed,
         })
 
@@ -567,7 +568,8 @@ class _PlaylistCallbacks(object):
         tracks = [
             spotify.Track(sp_track=sp_tracks[i], add_ref=True)
             for i in range(num_tracks)]
-        playlist.emit(PlaylistEvent.TRACKS_ADDED, playlist, tracks, position)
+        playlist.emit(
+            PlaylistEvent.TRACKS_ADDED, playlist, tracks, int(position))
 
     @staticmethod
     @ffi.callback(
@@ -579,7 +581,16 @@ class _PlaylistCallbacks(object):
         tracks = [int(tracks[i]) for i in range(num_tracks)]
         playlist.emit(PlaylistEvent.TRACKS_REMOVED, playlist, tracks)
 
-    # TODO tracks_moved
+    @staticmethod
+    @ffi.callback(
+        'void(sp_playlist *playlist, int *tracks, int num_tracks, '
+        'int position, void *userdata)')
+    def tracks_moved(sp_playlist, tracks, num_tracks, position, userdata):
+        logger.debug('Tracks moved within playlist')
+        playlist = Playlist._cached(sp_playlist, add_ref=True)
+        tracks = [int(tracks[i]) for i in range(num_tracks)]
+        playlist.emit(
+            PlaylistEvent.TRACKS_MOVED, playlist, tracks, int(position))
 
     @staticmethod
     @ffi.callback('void(sp_playlist *playlist, void *userdata)')

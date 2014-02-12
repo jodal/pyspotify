@@ -411,51 +411,140 @@ class PlaylistEvent(object):
     """
 
     TRACKS_ADDED = 'tracks_added'
-    """Called when tracks are added to the playlist.
+    """Called when one or more tracks have been added to the playlist.
 
     :param playlist: the added playlist
     :type playlist: :class:`Playlist`
     :param tracks: the added tracks
     :type tracks: list of :class:`Track`
-    :param position: the position the playlist was added at
+    :param position: the position in the playlist the tracks were added at
     :type position: int
     """
 
     TRACKS_REMOVED = 'tracks_removed'
-    """TODO"""
+    """Called when one or more tracks have been removed from the playlist.
+
+    :param playlist: the added playlist
+    :type playlist: :class:`Playlist`
+    :param tracks: positions of the tracks that were removed
+    :type tracks: list of ints
+    """
 
     TRACKS_MOVED = 'tracks_moved'
-    """TODO"""
+    """Called when one or more tracks have been moved within a playlist.
+
+    :param playlist: the added playlist
+    :type playlist: :class:`Playlist`
+    :param tracks: positions of the tracks that were removed
+    :type tracks: list of ints
+    :param position: the position in the playlist the tracks were moved to
+    :type position: int
+    """
 
     PLAYLIST_RENAMED = 'playlist_renamed'
-    """TODO"""
+    """Called when the playlist has been renamed.
+
+    :param playlist: the added playlist
+    :type playlist: :class:`Playlist`
+    """
 
     PLAYLIST_STATE_CHANGED = 'playlist_state_changed'
-    """TODO"""
+    """Called when the state changed for a playlist.
+
+    There are three states that trigger this callback:
+
+    - Collaboration for this playlist has been turned on or off. See
+      :meth:`Playlist.is_collaborative`.
+    - The playlist started having pending changes, or all pending changes have
+      now been committed. See :attr:`Playlist.has_pending_changes`.
+    - The playlist started loading, or finished loading. See
+      :attr:`Playlist.is_loaded`.
+
+    :param playlist: the added playlist
+    :type playlist: :class:`Playlist`
+    """
 
     PLAYLIST_UPDATE_IN_PROGRESS = 'playlist_update_in_progress'
-    """TODO"""
+    """Called when a playlist is updating or is done updating.
+
+    This is called before and after a series of changes are applied to the
+    playlist. It allows e.g. the user interface to defer updating until the
+    entire operation is complete.
+
+    :param playlist: the added playlist
+    :type playlist: :class:`Playlist`
+    :param done: if the update is completed
+    :type done: bool
+    """
 
     PLAYLIST_METADATA_UPDATED = 'playlist_metadata_updated'
-    """TODO"""
+    """Called when metadata for one or more tracks in the playlist have been
+    updated.
+
+    :param playlist: the added playlist
+    :type playlist: :class:`Playlist`
+    """
 
     TRACK_CREATED_CHANGED = 'track_created_changed'
-    """TODO"""
+    """Called when the create time and/or creator for a playlist entry changes.
+
+    :param playlist: the added playlist
+    :type playlist: :class:`Playlist`
+    :param position: the position of the entry in the playlist that was changed
+    :type position: int
+    :param user: the user that created the playlist entry
+    :type user: :class:`User`
+    :param time: the time the entry was created, in seconds since Unix epoch
+    :type time: int
+    """
 
     TRACK_SEEN_CHANGED = 'track_seen_changed'
-    """TODO"""
+    """Called when the seen attribute of a playlist entry changes.
+
+    :param playlist: the added playlist
+    :type playlist: :class:`Playlist`
+    :param position: the position of the entry in the playlist that was changed
+    :type position: int
+    :param seen: wether the entry is seen or not
+    :type seen: bool
+    """
 
     DESCRIPTION_CHANGED = 'description_changed'
-    """TODO"""
+    """Called when the playlist description has changed.
+
+    :param playlist: the added playlist
+    :type playlist: :class:`Playlist`
+    :param description: the new description
+    :type description: string
+    """
 
     IMAGE_CHANGED = 'image_changed'
-    """TODO"""
+    """Called when the playlist image has changed.
+
+    :param playlist: the added playlist
+    :type playlist: :class:`Playlist`
+    :param image: the new image
+    :type image: :class:`Image`
+    """
 
     TRACK_MESSAGE_CHANGED = 'track_message_changed'
-    """TODO"""
+    """Called when the message attribute of a playlist entry changes.
+
+    :param playlist: the added playlist
+    :type playlist: :class:`Playlist`
+    :param position: the position of the entry in the playlist that was changed
+    :type position: int
+    :param message: the new message
+    :type message: string
+    """
 
     SUBSCRIBERS_CHANGED = 'subscribers_changed'
-    """TODO"""
+    """Called when playlist subscribers changes, either the count or the
+    subscriber names.
+
+    :param playlist: the added playlist
+    :type playlist: :class:`Playlist`
+    """
 
 
 class _PlaylistCallbacks(object):

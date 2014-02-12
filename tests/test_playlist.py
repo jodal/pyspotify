@@ -882,6 +882,20 @@ class PlaylistCallbacksTest(unittest.TestCase):
 
         callback.assert_called_once_with(playlist)
 
+    def test_playlist_update_in_progress_callback(self, lib_mock):
+        tests.create_session()
+        callback = mock.Mock()
+        sp_playlist = spotify.ffi.cast('sp_playlist *', 42)
+        playlist = spotify.Playlist._cached(sp_playlist=sp_playlist)
+        playlist.on(
+            spotify.PlaylistEvent.PLAYLIST_UPDATE_IN_PROGRESS, callback)
+        done = True
+
+        _PlaylistCallbacks.playlist_update_in_progress(
+            sp_playlist, int(done), spotify.ffi.NULL)
+
+        callback.assert_called_once_with(playlist, done)
+
 
 @mock.patch('spotify.playlist.lib', spec=spotify.lib)
 class PlaylistContainerTest(unittest.TestCase):

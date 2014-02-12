@@ -552,10 +552,22 @@ class _PlaylistCallbacks(object):
     @classmethod
     def get_struct(cls):
         return ffi.new('sp_playlist_callbacks *', {
+            'tracks_added': cls.tracks_added,
             'playlist_renamed': cls.playlist_renamed,
         })
 
-    # TODO tracks_added
+    @staticmethod
+    @ffi.callback(
+        'void(sp_playlist *playlist, sp_track **tracks, int num_tracks, '
+        'int position, void *userdata)')
+    def tracks_added(sp_playlist, sp_tracks, num_tracks, position, userdata):
+        logger.debug('Tracks added to playlist')
+        playlist = Playlist._cached(sp_playlist, add_ref=True)
+        tracks = [
+            spotify.Track(sp_track=sp_tracks[i], add_ref=True)
+            for i in range(num_tracks)]
+        playlist.emit(PlaylistEvent.TRACKS_ADDED, playlist, tracks, position)
+
     # TODO tracks_removed
     # TODO tracks_moved
 

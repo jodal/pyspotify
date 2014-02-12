@@ -797,6 +797,34 @@ class PlaylistCallbacksTest(unittest.TestCase):
     def tearDown(self):
         spotify.session_instance = None
 
+    @mock.patch('spotify.track.lib', spec=spotify.lib)
+    def test_tracks_added_callback(self, track_lib_mock, lib_mock):
+        tests.create_session()
+        callback = mock.Mock()
+        sp_playlist = spotify.ffi.cast('sp_playlist *', 42)
+        playlist = spotify.Playlist._cached(sp_playlist=sp_playlist)
+        playlist.on(spotify.PlaylistEvent.TRACKS_ADDED, callback)
+        sp_tracks = [
+            spotify.ffi.cast('sp_track *', 43),
+            spotify.ffi.cast('sp_track *', 44),
+            spotify.ffi.cast('sp_track *', 45),
+        ]
+        position = 7
+
+        _PlaylistCallbacks.tracks_added(
+            sp_playlist, sp_tracks, len(sp_tracks), position, spotify.ffi.NULL)
+
+        callback.assert_called_once_with(playlist, mock.ANY, position)
+        tracks = callback.call_args[0][1]
+        self.assertEqual(len(tracks), len(sp_tracks))
+        self.assertIsInstance(tracks[0], spotify.Track)
+        self.assertEqual(tracks[0]._sp_track, sp_tracks[0])
+        track_lib_mock.sp_track_add_ref.assert_has_calls([
+            mock.call(sp_tracks[0]),
+            mock.call(sp_tracks[1]),
+            mock.call(sp_tracks[2]),
+        ])
+
     def test_playlist_renamed_callback(self, lib_mock):
         tests.create_session()
         callback = mock.Mock()

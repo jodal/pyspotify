@@ -556,6 +556,7 @@ class _PlaylistCallbacks(object):
             'tracks_removed': cls.tracks_removed,
             'tracks_moved': cls.tracks_moved,
             'playlist_renamed': cls.playlist_renamed,
+            'playlist_state_changed': cls.playlist_state_changed,
         })
 
     @staticmethod
@@ -599,7 +600,13 @@ class _PlaylistCallbacks(object):
         playlist = Playlist._cached(sp_playlist, add_ref=True)
         playlist.emit(PlaylistEvent.PLAYLIST_RENAMED, playlist)
 
-    # TODO playlist_state_changed
+    @staticmethod
+    @ffi.callback('void(sp_playlist *playlist, void *userdata)')
+    def playlist_state_changed(sp_playlist, userdata):
+        logger.debug('Playlist state changed')
+        playlist = Playlist._cached(sp_playlist, add_ref=True)
+        playlist.emit(PlaylistEvent.PLAYLIST_STATE_CHANGED, playlist)
+
     # TODO playlist_update_in_progress
     # TODO playlist_metadata_updated
     # TODO track_created_changed

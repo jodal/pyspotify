@@ -564,6 +564,7 @@ class _PlaylistCallbacks(object):
             'description_changed': cls.description_changed,
             'image_changed': cls.image_changed,
             'track_message_changed': cls.track_message_changed,
+            'subscribers_changed': cls.subscribers_changed,
         })
 
     @staticmethod
@@ -677,13 +678,18 @@ class _PlaylistCallbacks(object):
         'void(sp_playlist *playlist, int position, char *message, '
         'void *userdata)')
     def track_message_changed(sp_playlist, position, message, userdata):
-        logger.debug('Track message changed')
+        logger.debug('Playlist track message changed')
         playlist = Playlist._cached(sp_playlist, add_ref=True)
         playlist.emit(
             PlaylistEvent.TRACK_MESSAGE_CHANGED,
             playlist, int(position), utils.to_unicode(message))
 
-    # TODO subscribers_changed
+    @staticmethod
+    @ffi.callback('void(sp_playlist *playlist, void *userdata)')
+    def subscribers_changed(sp_playlist, userdata):
+        logger.debug('Playlist subscribers changed')
+        playlist = Playlist._cached(sp_playlist, add_ref=True)
+        playlist.emit(PlaylistEvent.SUBSCRIBERS_CHANGED, playlist)
 
 
 class PlaylistContainer(collections.MutableSequence, utils.EventEmitter):

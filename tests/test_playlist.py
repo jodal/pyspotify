@@ -5,7 +5,7 @@ import mock
 import unittest
 
 import spotify
-from spotify.playlist import _PlaylistContainerCallbacks
+from spotify.playlist import _PlaylistCallbacks, _PlaylistContainerCallbacks
 import tests
 
 
@@ -789,6 +789,24 @@ class PlaylistTest(unittest.TestCase):
         playlist.off(spotify.PlaylistEvent.TRACKS_MOVED)
 
         self.assertNotIn(playlist, session._emitters)
+
+
+@mock.patch('spotify.playlist.lib', spec=spotify.lib)
+class PlaylistCallbacksTest(unittest.TestCase):
+
+    def tearDown(self):
+        spotify.session_instance = None
+
+    def test_playlist_renamed_callback(self, lib_mock):
+        tests.create_session()
+        callback = mock.Mock()
+        sp_playlist = spotify.ffi.cast('sp_playlist *', 42)
+        playlist = spotify.Playlist._cached(sp_playlist=sp_playlist)
+        playlist.on(spotify.PlaylistEvent.PLAYLIST_RENAMED, callback)
+
+        _PlaylistCallbacks.playlist_renamed(sp_playlist, spotify.ffi.NULL)
+
+        callback.assert_called_once_with(playlist)
 
 
 @mock.patch('spotify.playlist.lib', spec=spotify.lib)

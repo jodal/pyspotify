@@ -463,7 +463,29 @@ class _PlaylistCallbacks(object):
     @classmethod
     def get_struct(cls):
         return ffi.new('sp_playlist_callbacks *', {
+            'playlist_renamed': cls.playlist_renamed,
         })
+
+    # TODO tracks_added
+    # TODO tracks_removed
+    # TODO tracks_moved
+
+    @staticmethod
+    @ffi.callback('void(sp_playlist *playlist, void *userdata)')
+    def playlist_renamed(sp_playlist, userdata):
+        logger.debug('Playlist renamed')
+        playlist = Playlist._cached(sp_playlist, add_ref=True)
+        playlist.emit(PlaylistEvent.PLAYLIST_RENAMED, playlist)
+
+    # TODO playlist_state_changed
+    # TODO playlist_update_in_progress
+    # TODO playlist_metadata_updated
+    # TODO track_created_changed
+    # TODO track_seen_changed
+    # TODO description_changed
+    # TODO image_changed
+    # TODO track_message_changed
+    # TODO subscribers_changed
 
 
 class PlaylistContainer(collections.MutableSequence, utils.EventEmitter):

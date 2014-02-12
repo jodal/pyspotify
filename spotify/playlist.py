@@ -559,6 +559,7 @@ class _PlaylistCallbacks(object):
             'playlist_state_changed': cls.playlist_state_changed,
             'playlist_update_in_progress': cls.playlist_update_in_progress,
             'playlist_metadata_updated': cls.playlist_metadata_updated,
+            'track_created_changed': cls.track_created_changed,
         })
 
     @staticmethod
@@ -624,7 +625,18 @@ class _PlaylistCallbacks(object):
         playlist = Playlist._cached(sp_playlist, add_ref=True)
         playlist.emit(PlaylistEvent.PLAYLIST_METADATA_UPDATED, playlist)
 
-    # TODO track_created_changed
+    @staticmethod
+    @ffi.callback(
+        'void(sp_playlist *playlist, int position, sp_user *user, '
+        'int when, void *userdata)')
+    def track_created_changed(sp_playlist, position, sp_user, when, userdata):
+        logger.debug('Playlist track created changed')
+        playlist = Playlist._cached(sp_playlist, add_ref=True)
+        user = spotify.User(sp_user=sp_user, add_ref=True)
+        playlist.emit(
+            PlaylistEvent.TRACK_CREATED_CHANGED,
+            playlist, int(position), user, int(when))
+
     # TODO track_seen_changed
     # TODO description_changed
     # TODO image_changed

@@ -553,6 +553,7 @@ class _PlaylistCallbacks(object):
     def get_struct(cls):
         return ffi.new('sp_playlist_callbacks *', {
             'tracks_added': cls.tracks_added,
+            'tracks_removed': cls.tracks_removed,
             'playlist_renamed': cls.playlist_renamed,
         })
 
@@ -568,7 +569,16 @@ class _PlaylistCallbacks(object):
             for i in range(num_tracks)]
         playlist.emit(PlaylistEvent.TRACKS_ADDED, playlist, tracks, position)
 
-    # TODO tracks_removed
+    @staticmethod
+    @ffi.callback(
+        'void(sp_playlist *playlist, int *tracks, int num_tracks, '
+        'void *userdata)')
+    def tracks_removed(sp_playlist, tracks, num_tracks, userdata):
+        logger.debug('Tracks removed from playlist')
+        playlist = Playlist._cached(sp_playlist, add_ref=True)
+        tracks = [int(tracks[i]) for i in range(num_tracks)]
+        playlist.emit(PlaylistEvent.TRACKS_REMOVED, playlist, tracks)
+
     # TODO tracks_moved
 
     @staticmethod

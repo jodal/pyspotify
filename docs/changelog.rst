@@ -10,6 +10,9 @@ around libspotify instead of a CPython C extension.
 
 **Development milestones**
 
+- 2014-02-13: Playlist callbacks complete. pyspotify 2.x now covers 100% of
+  the libspotify 12 API.
+
 - 2014-02-08: Playlist container callbacks complete.
 
 - 2014-01-31: Redesign session event listening to a model supporting multiple

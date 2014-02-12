@@ -13,10 +13,6 @@ for audio playback.
 v2.0.0a1: 100% complete bindings
 ================================
 
-- Redo all callbacks to follow the same pattern as used for session events.
-
-- Add support for playlist events and playlist container events.
-
 - Get rid of a lot of properties or getter/setter pairs. The API doesn't feel
   consistent enough as is.
 

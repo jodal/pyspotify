@@ -1,3 +1,5 @@
+# encoding: utf-8
+
 from __future__ import unicode_literals
 
 import collections
@@ -941,6 +943,20 @@ class PlaylistCallbacksTest(unittest.TestCase):
             sp_playlist, position, int(seen), spotify.ffi.NULL)
 
         callback.assert_called_once_with(playlist, position, seen)
+
+    def test_description_changed_callback(self, lib_mock):
+        tests.create_session()
+        callback = mock.Mock()
+        sp_playlist = spotify.ffi.cast('sp_playlist *', 42)
+        playlist = spotify.Playlist._cached(sp_playlist=sp_playlist)
+        playlist.on(spotify.PlaylistEvent.DESCRIPTION_CHANGED, callback)
+        description = 'foo bar æøå'
+        desc = spotify.ffi.new('char[]', description.encode('utf-8'))
+
+        _PlaylistCallbacks.description_changed(
+            sp_playlist, desc, spotify.ffi.NULL)
+
+        callback.assert_called_once_with(playlist, description)
 
 
 @mock.patch('spotify.playlist.lib', spec=spotify.lib)

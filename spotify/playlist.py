@@ -603,8 +603,7 @@ class PlaylistContainer(collections.MutableSequence, utils.EventEmitter):
         if playlist_type is PlaylistType.PLAYLIST:
             sp_playlist = lib.sp_playlistcontainer_playlist(
                 self._sp_playlistcontainer, key)
-            return Playlist._cached(
-                sp_playlist=sp_playlist, add_ref=True)
+            return Playlist._cached(sp_playlist, add_ref=True)
         elif playlist_type in (
                 PlaylistType.START_FOLDER, PlaylistType.END_FOLDER):
             return PlaylistFolder(
@@ -679,7 +678,7 @@ class PlaylistContainer(collections.MutableSequence, utils.EventEmitter):
             self._sp_playlistcontainer, name)
         if sp_playlist == ffi.NULL:
             raise spotify.Error('Playlist creation failed')
-        playlist = Playlist._cached(sp_playlist=sp_playlist, add_ref=True)
+        playlist = Playlist._cached(sp_playlist, add_ref=True)
         if index is not None:
             self.move_playlist(self.__len__() - 1, index)
         return playlist
@@ -709,7 +708,7 @@ class PlaylistContainer(collections.MutableSequence, utils.EventEmitter):
             self._sp_playlistcontainer, link._sp_link)
         if sp_playlist == ffi.NULL:
             return None
-        playlist = Playlist._cached(sp_playlist=sp_playlist, add_ref=True)
+        playlist = Playlist._cached(sp_playlist, add_ref=True)
         if index is not None:
             self.move_playlist(self.__len__() - 1, index)
         return playlist
@@ -899,13 +898,12 @@ class _PlaylistContainerCallbacks(object):
 
     @classmethod
     def get_struct(cls):
-        return ffi.new(
-            'sp_playlistcontainer_callbacks *', {
-                'playlist_added': cls.playlist_added,
-                'playlist_removed': cls.playlist_removed,
-                'playlist_moved': cls.playlist_moved,
-                'container_loaded': cls.container_loaded,
-            })
+        return ffi.new('sp_playlistcontainer_callbacks *', {
+            'playlist_added': cls.playlist_added,
+            'playlist_removed': cls.playlist_removed,
+            'playlist_moved': cls.playlist_moved,
+            'container_loaded': cls.container_loaded,
+        })
 
     @staticmethod
     @ffi.callback(
@@ -914,7 +912,7 @@ class _PlaylistContainerCallbacks(object):
     def playlist_added(sp_playlistcontainer, sp_playlist, position, userdata):
         logger.debug('Playlist added at position %d', position)
         playlist_container = PlaylistContainer._cached(
-            sp_playlistcontainer=sp_playlistcontainer, add_ref=True)
+            sp_playlistcontainer, add_ref=True)
         playlist = Playlist._cached(sp_playlist, add_ref=True)
         playlist_container.emit(
             PlaylistContainerEvent.PLAYLIST_ADDED,
@@ -928,7 +926,7 @@ class _PlaylistContainerCallbacks(object):
             sp_playlistcontainer, sp_playlist, position, userdata):
         logger.debug('Playlist removed at position %d', position)
         playlist_container = PlaylistContainer._cached(
-            sp_playlistcontainer=sp_playlistcontainer, add_ref=True)
+            sp_playlistcontainer, add_ref=True)
         playlist = Playlist._cached(sp_playlist, add_ref=True)
         playlist_container.emit(
             PlaylistContainerEvent.PLAYLIST_REMOVED,
@@ -944,7 +942,7 @@ class _PlaylistContainerCallbacks(object):
         logger.debug(
             'Playlist moved from position %d to %d', position, new_position)
         playlist_container = PlaylistContainer._cached(
-            sp_playlistcontainer=sp_playlistcontainer, add_ref=True)
+            sp_playlistcontainer, add_ref=True)
         playlist = Playlist._cached(sp_playlist, add_ref=True)
         playlist_container.emit(
             PlaylistContainerEvent.PLAYLIST_MOVED,
@@ -956,7 +954,7 @@ class _PlaylistContainerCallbacks(object):
     def container_loaded(sp_playlistcontainer, userdata):
         logger.debug('Playlist container loaded')
         playlist_container = PlaylistContainer._cached(
-            sp_playlistcontainer=sp_playlistcontainer, add_ref=True)
+            sp_playlistcontainer, add_ref=True)
         playlist_container.emit(
             PlaylistContainerEvent.CONTAINER_LOADED, playlist_container)
 

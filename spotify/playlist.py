@@ -562,6 +562,7 @@ class _PlaylistCallbacks(object):
             'track_created_changed': cls.track_created_changed,
             'track_seen_changed': cls.track_seen_changed,
             'description_changed': cls.description_changed,
+            'image_changed': cls.image_changed,
         })
 
     @staticmethod
@@ -659,7 +660,17 @@ class _PlaylistCallbacks(object):
             PlaylistEvent.DESCRIPTION_CHANGED,
             playlist, utils.to_unicode(desc))
 
-    # TODO image_changed
+    @staticmethod
+    @ffi.callback(
+        'void(sp_playlist *playlist, byte *image, void *userdata)')
+    def image_changed(sp_playlist, image_id, userdata):
+        logger.debug('Playlist image changed')
+        playlist = Playlist._cached(sp_playlist, add_ref=True)
+        sp_image = lib.sp_image_create(
+            spotify.session_instance._sp_session, image_id)
+        image = spotify.Image(sp_image=sp_image, add_ref=False)
+        playlist.emit(PlaylistEvent.IMAGE_CHANGED, playlist, image)
+
     # TODO track_message_changed
     # TODO subscribers_changed
 

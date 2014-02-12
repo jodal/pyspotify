@@ -958,6 +958,28 @@ class PlaylistCallbacksTest(unittest.TestCase):
 
         callback.assert_called_once_with(playlist, description)
 
+    @mock.patch('spotify.image.lib', spec=spotify.lib)
+    def test_image_changed_callback(self, image_lib_mock, lib_mock):
+        session = tests.create_session()
+        callback = mock.Mock()
+        sp_playlist = spotify.ffi.cast('sp_playlist *', 42)
+        playlist = spotify.Playlist._cached(sp_playlist=sp_playlist)
+        playlist.on(spotify.PlaylistEvent.IMAGE_CHANGED, callback)
+        image_id = spotify.ffi.new('char[]', b'image-id')
+        sp_image = spotify.ffi.cast('sp_image *', 43)
+        lib_mock.sp_image_create.return_value = sp_image
+
+        _PlaylistCallbacks.image_changed(
+            sp_playlist, image_id, spotify.ffi.NULL)
+
+        callback.assert_called_once_with(playlist, mock.ANY)
+        image = callback.call_args[0][1]
+        self.assertIsInstance(image, spotify.Image)
+        self.assertEqual(image._sp_image, sp_image)
+        lib_mock.sp_image_create.assert_called_once_with(
+            session._sp_session, image_id)
+        self.assertEqual(image_lib_mock.sp_image_add_ref.call_count, 0)
+
 
 @mock.patch('spotify.playlist.lib', spec=spotify.lib)
 class PlaylistContainerTest(unittest.TestCase):

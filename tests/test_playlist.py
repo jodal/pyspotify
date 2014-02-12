@@ -896,6 +896,18 @@ class PlaylistCallbacksTest(unittest.TestCase):
 
         callback.assert_called_once_with(playlist, done)
 
+    def test_playlist_metadata_updated_callback(self, lib_mock):
+        tests.create_session()
+        callback = mock.Mock()
+        sp_playlist = spotify.ffi.cast('sp_playlist *', 42)
+        playlist = spotify.Playlist._cached(sp_playlist=sp_playlist)
+        playlist.on(spotify.PlaylistEvent.PLAYLIST_METADATA_UPDATED, callback)
+
+        _PlaylistCallbacks.playlist_metadata_updated(
+            sp_playlist, spotify.ffi.NULL)
+
+        callback.assert_called_once_with(playlist)
+
 
 @mock.patch('spotify.playlist.lib', spec=spotify.lib)
 class PlaylistContainerTest(unittest.TestCase):

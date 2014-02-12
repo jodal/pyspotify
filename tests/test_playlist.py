@@ -980,6 +980,21 @@ class PlaylistCallbacksTest(unittest.TestCase):
             session._sp_session, image_id)
         self.assertEqual(image_lib_mock.sp_image_add_ref.call_count, 0)
 
+    def test_track_message_changed_callback(self, lib_mock):
+        tests.create_session()
+        callback = mock.Mock()
+        sp_playlist = spotify.ffi.cast('sp_playlist *', 42)
+        playlist = spotify.Playlist._cached(sp_playlist=sp_playlist)
+        playlist.on(spotify.PlaylistEvent.TRACK_MESSAGE_CHANGED, callback)
+        position = 7
+        message = 'foo bar æøå'
+        msg = spotify.ffi.new('char[]', message.encode('utf-8'))
+
+        _PlaylistCallbacks.track_message_changed(
+            sp_playlist, position, msg, spotify.ffi.NULL)
+
+        callback.assert_called_once_with(playlist, position, message)
+
 
 @mock.patch('spotify.playlist.lib', spec=spotify.lib)
 class PlaylistContainerTest(unittest.TestCase):

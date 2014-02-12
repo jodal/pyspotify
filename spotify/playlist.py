@@ -413,7 +413,7 @@ class PlaylistEvent(object):
     TRACKS_ADDED = 'tracks_added'
     """Called when one or more tracks have been added to the playlist.
 
-    :param playlist: the added playlist
+    :param playlist: the playlist
     :type playlist: :class:`Playlist`
     :param tracks: the added tracks
     :type tracks: list of :class:`Track`
@@ -424,7 +424,7 @@ class PlaylistEvent(object):
     TRACKS_REMOVED = 'tracks_removed'
     """Called when one or more tracks have been removed from the playlist.
 
-    :param playlist: the added playlist
+    :param playlist: the playlist
     :type playlist: :class:`Playlist`
     :param tracks: positions of the tracks that were removed
     :type tracks: list of ints
@@ -433,7 +433,7 @@ class PlaylistEvent(object):
     TRACKS_MOVED = 'tracks_moved'
     """Called when one or more tracks have been moved within a playlist.
 
-    :param playlist: the added playlist
+    :param playlist: the playlist
     :type playlist: :class:`Playlist`
     :param tracks: positions of the tracks that were removed
     :type tracks: list of ints
@@ -444,7 +444,7 @@ class PlaylistEvent(object):
     PLAYLIST_RENAMED = 'playlist_renamed'
     """Called when the playlist has been renamed.
 
-    :param playlist: the added playlist
+    :param playlist: the playlist
     :type playlist: :class:`Playlist`
     """
 
@@ -460,7 +460,7 @@ class PlaylistEvent(object):
     - The playlist started loading, or finished loading. See
       :attr:`Playlist.is_loaded`.
 
-    :param playlist: the added playlist
+    :param playlist: the playlist
     :type playlist: :class:`Playlist`
     """
 
@@ -471,7 +471,7 @@ class PlaylistEvent(object):
     playlist. It allows e.g. the user interface to defer updating until the
     entire operation is complete.
 
-    :param playlist: the added playlist
+    :param playlist: the playlist
     :type playlist: :class:`Playlist`
     :param done: if the update is completed
     :type done: bool
@@ -481,14 +481,14 @@ class PlaylistEvent(object):
     """Called when metadata for one or more tracks in the playlist have been
     updated.
 
-    :param playlist: the added playlist
+    :param playlist: the playlist
     :type playlist: :class:`Playlist`
     """
 
     TRACK_CREATED_CHANGED = 'track_created_changed'
     """Called when the create time and/or creator for a playlist entry changes.
 
-    :param playlist: the added playlist
+    :param playlist: the playlist
     :type playlist: :class:`Playlist`
     :param position: the position of the entry in the playlist that was changed
     :type position: int
@@ -501,7 +501,7 @@ class PlaylistEvent(object):
     TRACK_SEEN_CHANGED = 'track_seen_changed'
     """Called when the seen attribute of a playlist entry changes.
 
-    :param playlist: the added playlist
+    :param playlist: the playlist
     :type playlist: :class:`Playlist`
     :param position: the position of the entry in the playlist that was changed
     :type position: int
@@ -512,7 +512,7 @@ class PlaylistEvent(object):
     DESCRIPTION_CHANGED = 'description_changed'
     """Called when the playlist description has changed.
 
-    :param playlist: the added playlist
+    :param playlist: the playlist
     :type playlist: :class:`Playlist`
     :param description: the new description
     :type description: string
@@ -521,7 +521,7 @@ class PlaylistEvent(object):
     IMAGE_CHANGED = 'image_changed'
     """Called when the playlist image has changed.
 
-    :param playlist: the added playlist
+    :param playlist: the playlist
     :type playlist: :class:`Playlist`
     :param image: the new image
     :type image: :class:`Image`
@@ -530,7 +530,7 @@ class PlaylistEvent(object):
     TRACK_MESSAGE_CHANGED = 'track_message_changed'
     """Called when the message attribute of a playlist entry changes.
 
-    :param playlist: the added playlist
+    :param playlist: the playlist
     :type playlist: :class:`Playlist`
     :param position: the position of the entry in the playlist that was changed
     :type position: int
@@ -542,7 +542,7 @@ class PlaylistEvent(object):
     """Called when playlist subscribers changes, either the count or the
     subscriber names.
 
-    :param playlist: the added playlist
+    :param playlist: the playlist
     :type playlist: :class:`Playlist`
     """
 

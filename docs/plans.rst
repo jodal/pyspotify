@@ -13,8 +13,7 @@ for audio playback.
 v2.0.0a1: 100% complete bindings
 ================================
 
-- Get rid of a lot of properties or getter/setter pairs. The API doesn't feel
-  consistent enough as is.
+- Release!
 
 
 v2.0.0a2: Thread safety

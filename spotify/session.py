@@ -216,10 +216,10 @@ class Session(utils.EventEmitter):
         This method must be called for most callbacks to be called. Without
         calling this method, you'll only get the callbacks that are called from
         internal libspotify threads. When the
-        :attr:`~SessionCallbacks.notify_main_thread` callback is called (from
-        an internal libspotify thread), it's your job to make sure this method
-        is called (from the thread you use for accessing Spotify), so that
-        further callbacks can be triggered (from the same thread).
+        :attr:`~SessionEvent.NOTIFY_MAIN_THREAD` event is emitted (from an
+        internal libspotify thread), it's your job to make sure this method is
+        called (from the thread you use for accessing Spotify), so that further
+        callbacks can be triggered (from the same thread).
         """
         next_timeout = ffi.new('int *')
 
@@ -329,8 +329,8 @@ class Session(utils.EventEmitter):
     def user_country(self):
         """The country of the currently logged in user.
 
-        The :attr:`~SessionCallbacks.offline_status_updated` callback is called
-        when this changes.
+        The :attr:`~SessionEvent.OFFLINE_STATUS_UPDATED` event is emitted on
+        the session object when this changes.
         """
         return utils.to_country(lib.sp_session_user_country(self._sp_session))
 
@@ -391,8 +391,8 @@ class Offline(object):
     def set_connection_type(self, connection_type):
         """Set the :class:`ConnectionType`.
 
-        This is used together with :meth:`set_connection_rules` to control
-        offline syncing and network usage.
+        This is used together with :meth:`~Offline.set_connection_rules` to
+        control offline syncing and network usage.
         """
         spotify.Error.maybe_raise(lib.sp_session_set_connection_type(
             self._session._sp_session, connection_type))
@@ -400,8 +400,8 @@ class Offline(object):
     def set_connection_rules(self, *connection_rules):
         """Set one or more :class:`connection rules <ConnectionRule>`.
 
-        This is used together with :meth:`set_connection_type` to control
-        offline syncing and network usage.
+        This is used together with :meth:`~Offline.set_connection_type` to
+        control offline syncing and network usage.
 
         To remove all rules, simply call this method without any arguments.
         """
@@ -425,8 +425,8 @@ class Offline(object):
     def sync_status(self):
         """The :class:`OfflineSyncStatus` or :class:`None` if not syncing.
 
-        The :attr:`~SessionCallbacks.offline_status_updated` callback is called
-        when this is updated.
+        The :attr:`~SessionEvent.OFFLINE_STATUS_UPDATED` event is emitted on
+        the session object when this is updated.
         """
         sp_offline_sync_status = ffi.new('sp_offline_sync_status *')
         syncing = lib.sp_offline_sync_get_status(

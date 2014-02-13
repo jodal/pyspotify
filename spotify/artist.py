@@ -92,9 +92,9 @@ class Artist(object):
         ``image_size`` is an :class:`ImageSize` value, by default
         :attr:`ImageSize.NORMAL`.
 
-        This is equivalent with ``artist.portrait.link``, except that this
-        method does not need to create the artist portrait image object to
-        create a link to it.
+        This is equivalent with ``artist.portrait(image_size).link``, except
+        that this method does not need to create the artist portrait image
+        object to create a link to it.
         """
         if image_size is None:
             image_size = spotify.ImageSize.NORMAL

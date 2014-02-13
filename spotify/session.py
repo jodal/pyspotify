@@ -311,19 +311,18 @@ class Session(utils.EventEmitter):
         spotify.Error.maybe_raise(lib.sp_session_preferred_offline_bitrate(
             self._sp_session, bitrate, allow_resync))
 
-    def get_volume_normalization(self):
+    @property
+    def volume_normalization(self):
+        """Whether volume normalization is active or not.
+
+        Set to :class:`True` or :class:`False` to change.
+        """
         return bool(lib.sp_session_get_volume_normalization(self._sp_session))
 
-    def set_volume_normalization(self, value):
+    @volume_normalization.setter
+    def volume_normalization(self, value):
         spotify.Error.maybe_raise(lib.sp_session_set_volume_normalization(
             self._sp_session, value))
-
-    volume_normalization = property(
-        get_volume_normalization, set_volume_normalization)
-    """Whether volume normalization is active or not.
-
-    Set to :class:`True` or :class:`False` to change.
-    """
 
     @property
     def user_country(self):

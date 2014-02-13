@@ -626,7 +626,7 @@ class PlaylistTest(unittest.TestCase):
         sp_playlist = spotify.ffi.new('int *')
         playlist = spotify.Playlist(sp_playlist=sp_playlist)
 
-        result = playlist.in_ram
+        result = playlist.is_in_ram
 
         lib_mock.sp_playlist_is_in_ram.assert_called_with(
             session._sp_session, sp_playlist)
@@ -639,7 +639,7 @@ class PlaylistTest(unittest.TestCase):
         sp_playlist = spotify.ffi.new('int *')
         playlist = spotify.Playlist(sp_playlist=sp_playlist)
 
-        playlist.in_ram = False
+        playlist.set_in_ram(False)
 
         lib_mock.sp_playlist_set_in_ram.assert_called_with(
             session._sp_session, sp_playlist, 0)
@@ -652,7 +652,7 @@ class PlaylistTest(unittest.TestCase):
         playlist = spotify.Playlist(sp_playlist=sp_playlist)
 
         with self.assertRaises(spotify.Error):
-            playlist.in_ram = False
+            playlist.set_in_ram(False)
 
     def test_set_offline_mode(self, lib_mock):
         session = tests.create_session()

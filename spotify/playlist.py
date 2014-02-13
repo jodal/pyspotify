@@ -310,27 +310,30 @@ class Playlist(utils.EventEmitter):
         spotify.Error.maybe_raise(lib.sp_playlist_update_subscribers(
             spotify.session_instance._sp_session, self._sp_playlist))
 
+    @property
     def is_in_ram(self):
+        """Whether the playlist is in RAM, and not only on disk.
+
+        A playlist must *currently be* in RAM for tracks to be available. A
+        playlist must *have been* in RAM for other metadata to be available.
+
+        By default, playlists are kept in RAM unless
+        :attr:`~spotify.Config.initially_unload_playlists` is set to
+        :class:`True` before creating the :class:`~spotify.Session`. If the
+        playlists are initially unloaded, use :meth:`set_in_ram` to have a
+        playlist loaded into RAM.
+        """
         return bool(lib.sp_playlist_is_in_ram(
             spotify.session_instance._sp_session, self._sp_playlist))
 
-    def set_in_ram(self, value):
+    def set_in_ram(self, in_ram=True):
+        """Control whether or not to keep the playlist in RAM.
+
+        See :attr:`is_in_ram` for further details.
+        """
         spotify.Error.maybe_raise(lib.sp_playlist_set_in_ram(
             spotify.session_instance._sp_session, self._sp_playlist,
-            int(value)))
-
-    in_ram = property(is_in_ram, set_in_ram)
-    """Whether the playlist is in RAM, and not only on disk.
-
-    A playlist must *currently be* in RAM for tracks to be available. A
-    playlist must *have been* in RAM for other metadata to be available.
-
-    By default, playlists are kept in RAM unless
-    :attr:`~spotify.Config.initially_unload_playlists` is set to :class:`True`
-    before creating the :class:`~spotify.Session`. If the playlists are
-    initially unloaded, set :attr:`in_ram` to :class:`True` to have a playlist
-    loaded into RAM.
-    """
+            int(in_ram)))
 
     def set_offline_mode(self, offline=True):
         """Mark the playlist to be synchronized for offline playback.
@@ -366,7 +369,7 @@ class Playlist(utils.EventEmitter):
             raise spotify.Error('The playlist must be loaded to create a link')
         sp_link = lib.sp_link_create_from_playlist(self._sp_playlist)
         if sp_link == ffi.NULL:
-            if not self.in_ram:
+            if not self.is_in_ram:
                 raise spotify.Error(
                     'The playlist must have been in RAM to create a link')
             # TODO Figure out why we can still get NULL here even if

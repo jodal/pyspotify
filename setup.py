@@ -2,22 +2,25 @@ from __future__ import unicode_literals
 
 import re
 
+from distutils.command.build import build
 from setuptools import setup, find_packages
-
-try:
-    import spotify
-except ImportError:
-    # We're installing, so cffi isn't available yet
-    ext_modules = []
-else:
-    # We're building bdist, so cffi is available
-    ext_modules = [spotify.ffi.verifier.get_extension()]
 
 
 def get_version(filename):
     init_py = open(filename).read()
     metadata = dict(re.findall("__([a-z]+)__ = '([^']+)'", init_py))
     return metadata['version']
+
+
+class cffi_build(build):
+    """This is a shameful hack to ensure that cffi is present when we specify
+    ext_modules. We can't do this eagerly because setup_requires hasn't run
+    yet.
+    """
+    def finalize_options(self):
+        from spotify import ffi
+        self.distribution.ext_modules = [ffi.verifier.get_extension()]
+        build.finalize_options(self)
 
 
 setup(
@@ -30,11 +33,10 @@ setup(
     description='Python wrapper for libspotify',
     long_description=open('README.rst').read(),
     packages=find_packages(exclude=['tests', 'tests.*']),
-    zip_safe=False,
-    include_package_data=True,
     ext_package='spotify',
-    ext_modules=ext_modules,
-    install_requires=[
-        'cffi >= 0.7',
-    ]
+    include_package_data=True,
+    install_requires=['cffi >= 0.7'],
+    setup_requires=['cffi >= 0.7'],
+    zip_safe=False,
+    cmdclass={'build': cffi_build}
 )

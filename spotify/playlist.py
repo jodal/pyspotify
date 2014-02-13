@@ -115,6 +115,8 @@ class Playlist(utils.EventEmitter):
             return spotify.Track(
                 sp_track=lib.sp_playlist_track(sp_playlist, key))
 
+        # TODO Negative indexes
+        # TODO Adding and removing tracks as if this was a regular list
         return utils.Sequence(
             sp_obj=self._sp_playlist,
             add_ref_func=lib.sp_playlist_add_ref,

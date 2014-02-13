@@ -498,24 +498,23 @@ class Social(object):
     def __init__(self, session):
         self._session = session
 
-    def is_private_session(self):
+    @property
+    def private_session(self):
+        """Whether the session is private.
+
+        Set to :class:`True` or :class:`False` to change.
+        """
         return bool(
             lib.sp_session_is_private_session(self._session._sp_session))
 
-    def set_private_session(self, value):
+    @private_session.setter
+    def private_session(self, value):
         # TODO Segfaults unless we're logged in and have called
         # process_events() at least once afterwards. Need to identify the
         # relevant session callback, set a threading.Event from it, and check
         # here if that event is set before calling the sp_ function.
         spotify.Error.maybe_raise(lib.sp_session_set_private_session(
             self._session._sp_session, value))
-
-    private_session = property(
-        is_private_session, set_private_session)
-    """Whether the session is private.
-
-    Set to :class:`True` or :class:`False` to change.
-    """
 
     def is_scrobbling(self, social_provider):
         """Get the :class:`ScrobblingState` for the given

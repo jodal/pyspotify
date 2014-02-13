@@ -166,7 +166,14 @@ class Track(object):
             return None
         return bool(lib.sp_track_is_placeholder(self._sp_track))
 
-    def is_starred(self):
+    @property
+    def starred(self):
+        """Whether the track is starred by the current user.
+
+        Set to :class:`True` or :class:`False` to change.
+
+        Will always be :class:`None` if the track isn't loaded.
+        """
         if spotify.session_instance is None:
             raise RuntimeError('Session must be initialized')
         spotify.Error.maybe_raise(self.error)
@@ -175,21 +182,15 @@ class Track(object):
         return bool(lib.sp_track_is_starred(
             spotify.session_instance._sp_session, self._sp_track))
 
-    def set_starred(self, star=True):
+    @starred.setter
+    def starred(self, value):
         if spotify.session_instance is None:
             raise RuntimeError('Session must be initialized')
         tracks = ffi.new('sp_track *[]', 1)
         tracks[0] = self._sp_track
         spotify.Error.maybe_raise(lib.sp_track_set_starred(
-            spotify.session_instance._sp_session, tracks, len(tracks), star))
-
-    starred = property(is_starred, set_starred)
-    """Whether the track is starred by the current user.
-
-    Set to :class:`True` or :class:`False` to change.
-
-    Will always return :class:`None` if the track isn't loaded.
-    """
+            spotify.session_instance._sp_session, tracks, len(tracks),
+            bool(value)))
 
     @property
     def artists(self):

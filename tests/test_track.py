@@ -350,10 +350,12 @@ class TrackTest(unittest.TestCase):
         track = spotify.Track(sp_track=sp_track)
 
         with self.assertRaises(spotify.Error):
-            track.set_starred()
+            track.starred = True
 
     def test_set_starred_fails_if_no_session(self, lib_mock):
-        self.assert_fails_if_no_session(lib_mock, lambda t: t.set_starred())
+        def func(track):
+            track.starred = True
+        self.assert_fails_if_no_session(lib_mock, func)
 
     @mock.patch('spotify.artist.lib', spec=spotify.lib)
     def test_artists(self, artist_lib_mock, lib_mock):

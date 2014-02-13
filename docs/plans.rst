@@ -13,6 +13,8 @@ for audio playback.
 v2.0.0a1: 100% complete bindings
 ================================
 
+- Test installation in clean environments.
+
 - Release!
 
 
@@ -31,6 +33,10 @@ v2.0.0a2: Thread safety
 
 - Enforce that the same cache directory isn't used by multiple processes by
   maintaining a lock file or similar.
+
+- Consider whether we can get rid of the global session instance now, so we can
+  easily support multiple sessions in a single process if libspotify adds
+  support for it.
 
 
 v2.0.0b1: Seen real usage
@@ -56,10 +62,6 @@ v2.0.0b2: Bundled audio drivers
 
 v2.0.0: Final release
 =====================
-
-- Consider whether we can get rid of the global session instance now, so we can
-  easily support multiple sessions in a single process if libspotify adds
-  support for it.
 
 - Fix all remaining TODOs in code and tests.
 

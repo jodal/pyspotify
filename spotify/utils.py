@@ -77,7 +77,8 @@ class EventEmitter(object):
     def num_listeners(self, event=None):
         """Return the number of listeners for ``event``.
 
-        Return the total number of listeners if ``event`` is :class:`None`.
+        Return the total number of listeners for all events on this object if
+        ``event`` is :class:`None`.
         """
         if event is not None:
             return len(self._listeners[event])
@@ -86,6 +87,9 @@ class EventEmitter(object):
 
     def call(self, event, *event_args):
         """Call the single registered listener for ``event``.
+
+        The listener will be called with any extra arguments passed to
+        :meth:`call` first, and then the extra arguments passed to :meth:`on`
 
         Raises :exc:`AssertionError` if there is none or multiple listeners for
         ``event``. Returns the listener's return value on success.

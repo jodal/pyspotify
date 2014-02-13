@@ -15,6 +15,7 @@ User's guide
 ============
 
 .. toctree::
+    :maxdepth: 2
 
     installation
     quickstart
@@ -24,14 +25,16 @@ API reference
 =============
 
 .. toctree::
+    :maxdepth: 2
 
-    api
+    api/index
 
 
 About
 =====
 
 .. toctree::
+    :maxdepth: 2
 
     authors
     changelog

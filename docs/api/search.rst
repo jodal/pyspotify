@@ -9,11 +9,17 @@ Search
 .. autoclass:: SearchPlaylist
     :no-inherited-members:
 
-    .. autoattribute:: name
+    .. attribute:: name
 
-    .. autoattribute:: uri
+        The name of the playlist.
 
-    .. autoattribute:: image_uri
+    .. attribute:: uri
+
+        The URI of the playlist.
+
+    .. attribute:: image_uri
+
+        The URI of the playlist's image.
 
 .. autoclass:: SearchType
     :no-inherited-members:

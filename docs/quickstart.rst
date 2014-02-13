@@ -101,17 +101,19 @@ The :meth:`~spotify.Session.login` method is asynchronous, so we must ask the
 session to :meth:`~spotify.Session.process_events` until the login has
 succeeded or failed::
 
-    >>> session.user is None
-    True
+    >>> session.connection_state
+    <ConnectionState.OFFLINE: 4>
     >>> session.process_events()
-    >>> session.user
-    User(u'spotify:user:alice')
+    >>> session.connection_state
+    <ConnectionState.LOGGED_IN: 1>
 
 Here we called :meth:`~spotify.Session.process_events` only once, which may
 not be enough. A more robust solution is to call it repeatedly until the
 :attr:`~spotify.SessionEvent.LOGGED_IN` event is emitted on the
 :class:`~spotify.Session` object::
 
+    >>> session.connection_state
+    <ConnectionState.OFFLINE: 4>
     >>> session.user is None
     True
     >>> import threading
@@ -123,6 +125,8 @@ not be enough. A more robust solution is to call it repeatedly until the
     >>> while not logged_in_event.wait(0.1):
     ...     session.process_events()
     ...
+    >>> session.connection_state
+    <ConnectionState.LOGGED_IN: 1>
     >>> session.user
     User(u'spotify:user:alice')
 

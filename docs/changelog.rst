@@ -2,11 +2,33 @@
 Changelog
 *********
 
-v2.0.0a1 (UNRELEASED)
+v2.0.0a1 (2014-01-14)
 =====================
 
-Rewrite of pyspotify as a `CFFI <http://cffi.readthedocs.org/>`__ wrapper
-around libspotify instead of a CPython C extension.
+pyspotify 2.x is a full rewrite of pyspotify. While pyspotify 1.x is a
+CPython C extension, pyspotify 2.x uses `CFFI <http://cffi.readthedocs.org/>`__
+to wrap the libspotify C library. It works on CPython 2.7 and 3.2+, as well as
+PyPy 2.1+.
+
+This first alpha release of pyspotify 2.0.0 makes 100% of the libspotify
+12.1.51 API available from Python, going far beyond the API coverage of
+pyspotify 1.x.
+
+pyspotify 2.0.0a1 has an extensive test suite with 98% line coverage. All tests
+pass on all combinations of CPython 2.7, 3.2, 3.3, PyPy 2.2 running on Linux on
+i386, amd64, armel, and armhf. Mac OS X should work, but has not been tested
+recently.
+
+This release *does not* provide:
+
+- thread safety,
+
+- an event loop for regularly processing libspotify events, or
+
+- audio playback drivers.
+
+These features are planned for the upcoming prereleases, as outlined in
+:doc:`plans`.
 
 **Development milestones**
 

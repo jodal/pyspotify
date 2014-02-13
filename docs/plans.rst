@@ -4,18 +4,7 @@ Development plans
 
 pyspotify 2.x is a new Python wrapper for `libspotify
 <https://developer.spotify.com/technologies/libspotify/>`__. This library is
-still under active development. An alpha release to PyPI is planned as soon as
-the bindings to libspotify are complete. After the first alpha release, focus
-will be on cross-functional aspects such as improved thread safety and drivers
-for audio playback.
-
-
-v2.0.0a1: 100% complete bindings
-================================
-
-- Test installation in clean environments.
-
-- Release!
+still under active development.
 
 
 v2.0.0a2: Thread safety

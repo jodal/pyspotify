@@ -1188,7 +1188,7 @@ class _PlaylistContainerCallbacks(object):
 
 class PlaylistFolder(collections.namedtuple(
         'PlaylistFolder', ['id', 'name', 'type'])):
-    """A playlist folder."""
+    """An object marking the start or end of a playlist folder."""
     pass
 
 

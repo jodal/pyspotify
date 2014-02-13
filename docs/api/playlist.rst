@@ -15,11 +15,20 @@ Playlists
 .. autoclass:: PlaylistFolder
    :no-inherited-members:
 
-   .. autoattribute:: id
+   .. attribute:: id
 
-   .. autoattribute:: name
+       An opaque ID that matches the ID of the :class:`PlaylistFolder` object
+       at the other end of the folder.
 
-   .. autoattribute:: type
+   .. attribute:: name
+
+       Name of the playlist folder. This is an empty string for the
+       :attr:`~PlaylistType.END_FOLDER`.
+
+   .. attribute:: type
+
+       The :class:`PlaylistType` of the folder. Either
+       :attr:`~PlaylistType.START_FOLDER` or :attr:`~PlaylistType.END_FOLDER`.
 
 .. autoclass:: PlaylistOfflineStatus
     :no-inherited-members:

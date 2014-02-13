@@ -16,8 +16,6 @@ v2.0.0a1: 100% complete bindings
 - Get rid of a lot of properties or getter/setter pairs. The API doesn't feel
   consistent enough as is.
 
-- Complete first draft of the tutorial.
-
 
 v2.0.0a2: Thread safety
 =======================

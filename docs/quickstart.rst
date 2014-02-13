@@ -86,7 +86,7 @@ URIs::
 But that's mostly how far you get with a fresh session. To do more, you need to
 login to the Spotify service using a Spotify account with the Premium
 subscription. The free ad financed Spotify subscription will not work with
-libspotify.
+pyspotify or any other application using libspotify.
 
 ::
 
@@ -134,7 +134,7 @@ Logging
 =======
 
 pyspotify uses Python's standard :mod:`logging` module for logging. All log
-records emitted by pyspotify are issued to the logger named "spotify", or a
+records emitted by pyspotify are issued to the logger named ``spotify``, or a
 sublogger of it.
 
 Out of the box, pyspotify is set up with :class:`logging.NullHandler` as the
@@ -143,7 +143,7 @@ libraries, so that the application developer using the library will have full
 control over how the log records from the library will be exposed to the
 application's users. In other words, if you want to see the log records from
 pyspotify anywhere, you need to add a useful handler to the root logger or the
-logger named "spotify" to get any log output from pyspotify. The defaults
+logger named ``spotify`` to get any log output from pyspotify. The defaults
 provided by :meth:`logging.basicConfig` is enough to get debug log statements
 out of pyspotify::
 
@@ -345,18 +345,77 @@ mean based on popularity, etc. instead of exact token matches::
 Playlist management
 ===================
 
-TODO
+Another way to find some music is to use your Spotify
+:class:`~spotify.Playlist`, which can be found in
+:attr:`~spotify.Session.playlist_container`::
+
+    >>> len(session.playlist_container)
+    53
+    >>> playlist = session.playlist_container[0]
+    >>> playlist.load()
+    Playlist(u'spotify:user:jodal:playlist:5hBcGwxKlnzNnSrREQ4aUe')
+    >>> playlist.name
+    u'The Glitch Mob - Love Death Immortality'
+
+The :class:`~spotify.PlaylistContainer` object lets you add, remove, move and
+rename playlists as well as playlist folders. See the API docs for
+:class:`~spotify.PlaylistContainer` for more examples.
+
+::
+
+    >>> del session.playlist_container[0]
+    >>> len(session.playlist_container)
+    52
+    >>> session.playlist_container.insert(0, playlist)
+    >>> len(session.playlist_container)
+    53
+
+The :class:`~spotify.Playlist` objects let you add, remove and move tracks in
+a playlist, as well as turning on things like syncing of the playlist for
+offline playback::
+
+    >>> playlist.offline_status
+    <PlaylistOfflineStatus.NO: 0>
+    >>> playlist.set_offline_mode(True)
+    >>> playlist.offline_status
+    <PlaylistOfflineStatus.WAITING: 3>
+    >>> session.process_events()
+    # Probably needed multiple times, before syncing begins
+    >>> playlist.offline_status
+    <PlaylistOfflineStatus.DOWNLOADING: 2>
+    >>> playlist.offline_download_completed
+    20
+    # More process_events()
+    >>> offline.status
+    <PlaylistOfflineStatus.YES: 1>
+
+For more details, see the API docs for :class:`~spotify.Playlist`.
 
 
 Playing music
 =============
 
-TODO
+TODO: This section will be fleshed out when audio output helpers are added to
+pyspotify. For now, you'll have to move the raw PCM audio data from pyspotify
+to the audio device yourself. See :attr:`~spotify.SessionEvent.MUSIC_DELIVERY`
+to get started.
 
 
 Thread safety
 =============
 
-TODO: Explain that libspotify isn't thread safe. You must either use a single
-thread to call pyspotify methods, or protect all pyspotify API usage with a
-single lock.
+libspotify itself isn't thread safe. This means that you must take care to
+never call libspotify functions from two threads at the same time, and to
+finish your work with e.g. strings returned by libspotify functions before
+calling the next libspotify function.
+
+In other words, you'll need to use a single thread for all your use of
+libspotify, or protect all libspotify function calls with a single lock.
+
+pyspotify plans to improve on this so that you can use pyspotify from multiple
+threads without issues. Currently (2.0.0a1) pyspotify protect all
+libspotify function calls with a single lock, but that's it. In other words,
+pyspotify as of 2.0.0a1 is not to be considered any more thread safe than
+libspotify itself, and you need to take the same precautions as you would with
+libspotify: use a single thread for all pyspotify usage or protect all
+pyspotify usage with a single lock.

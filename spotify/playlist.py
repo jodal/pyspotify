@@ -269,9 +269,9 @@ class Playlist(utils.EventEmitter):
         collection, especially if the playlist got many subscribers.
 
         May be zero until you call :meth:`update_subscribers` and the
-        ``subscribers_changed`` callback is called.
+        :attr:`~PlaylistEvent.SUBSCRIBERS_CHANGED` event is emitted from the
+        playlist.
         """
-        # TODO Link subscribers_changed in docstring to callback docs
         return lib.sp_playlist_num_subscribers(self._sp_playlist)
 
     @property
@@ -280,9 +280,9 @@ class Playlist(utils.EventEmitter):
         playlist.
 
         May be empty until you call :meth:`update_subscribers` and the
-        ``subscribers_changed`` callback is called.
+        :attr:`~PlaylistEvent.SUBSCRIBERS_CHANGED` event is emitted from the
+        playlist.
         """
-        # TODO Link subscribers_changed in docstring to callback docs
         sp_subscribers = ffi.gc(
             lib.sp_playlist_subscribers(self._sp_playlist),
             lib.sp_playlist_subscribers_free)
@@ -299,10 +299,9 @@ class Playlist(utils.EventEmitter):
         """Request an update of :attr:`num_subscribers` and the
         :attr:`subscribers` collection.
 
-        The ``subscribers_changed`` callback will be called when the subscriber
-        data has been updated.
+        The :attr:`~PlaylistEvent.SUBSCRIBERS_CHANGED` event is emitted from
+        the playlist when the subscriber data has been updated.
         """
-        # TODO Link subscribers_changed in docstring to callback docs
         spotify.Error.maybe_raise(lib.sp_playlist_update_subscribers(
             spotify.session_instance._sp_session, self._sp_playlist))
 

@@ -71,7 +71,7 @@ install it run::
 
     The ``--pre`` argument to ``pip install`` is needed to make pip 1.5 or
     newer install pre-releases, like the alpha and beta releases of pyspotify
-    :2.x.
+    2.x.
 
 If this fails, then pyspotify probably isn't available prebuilt for your OS and
 architecture. In that case, you'll need a C compiler, Python development

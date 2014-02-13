@@ -1263,7 +1263,7 @@ class PlaylistUnseenTracks(collections.Sequence):
     Returned by :meth:`PlaylistContainer.get_unseen_tracks`.
     """
 
-    BATCH_SIZE = 100
+    _BATCH_SIZE = 100
 
     def __init__(self, sp_playlistcontainer, sp_playlist):
         lib.sp_playlistcontainer_add_ref(sp_playlistcontainer)
@@ -1279,7 +1279,7 @@ class PlaylistUnseenTracks(collections.Sequence):
 
     def _get_more_tracks(self):
         self._sp_tracks_len = min(
-            self._num_tracks, self._sp_tracks_len + self.BATCH_SIZE)
+            self._num_tracks, self._sp_tracks_len + self._BATCH_SIZE)
         self._sp_tracks = ffi.new('sp_track *[]', self._sp_tracks_len)
         self._num_tracks = lib.sp_playlistcontainer_get_unseen_tracks(
             self._sp_playlistcontainer, self._sp_playlist,

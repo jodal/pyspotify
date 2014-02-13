@@ -638,8 +638,9 @@ class SessionEvent(object):
 
     .. warning::
 
-        This function is called from an internal libspotify thread. You need
-        proper synchronization.
+        This event is emitted from an internal libspotify thread. Thus, your
+        event listener must not block, and must use proper synchronization
+        around anything it does.
 
     :param session: the current session
     :type session: :class:`Session`
@@ -659,8 +660,9 @@ class SessionEvent(object):
 
     .. warning::
 
-        This function is called from an internal libspotify thread. You need
-        proper synchronization.
+        This event is emitted from an internal libspotify thread. Thus, your
+        event listener must not block, and must use proper synchronization
+        around anything it does.
 
     :param session: the current session
     :type session: :class:`Session`
@@ -726,8 +728,9 @@ class SessionEvent(object):
 
     .. warning::
 
-        This function is called from an internal libspotify thread. You need
-        proper synchronization.
+        This event is emitted from an internal libspotify thread. Thus, your
+        event listener must not block, and must use proper synchronization
+        around anything it does.
 
     :param session: the current session
     :type session: :class:`Session`
@@ -741,8 +744,9 @@ class SessionEvent(object):
 
     .. warning::
 
-        This function is called from an internal libspotify thread. You need
-        proper synchronization.
+        This event is emitted from an internal libspotify thread. Thus, your
+        event listener must not block, and must use proper synchronization
+        around anything it does.
 
     :param session: the current session
     :type session: :class:`Session`
@@ -757,8 +761,9 @@ class SessionEvent(object):
 
     .. warning::
 
-        This function is called from an internal libspotify thread. You need
-        proper synchronization.
+        This event is emitted from an internal libspotify thread. Thus, your
+        event listener must not block, and must use proper synchronization
+        around anything it does.
 
     :param session: the current session
     :type session: :class:`Session`

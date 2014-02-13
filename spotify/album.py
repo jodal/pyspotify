@@ -102,9 +102,9 @@ class Album(object):
         ``image_size`` is an :class:`ImageSize` value, by default
         :attr:`ImageSize.NORMAL`.
 
-        This is equivalent with ``album.cover.link``, except that this method
-        does not need to create the album cover image object to create a link
-        to it.
+        This is equivalent with ``album.cover(image_size).link``, except that
+        this method does not need to create the album cover image object to
+        create a link to it.
         """
         if image_size is not None:
             image_size = spotify.ImageSize.NORMAL

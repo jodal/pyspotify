@@ -16,6 +16,10 @@ Development setup
    - CPython 3.3
    - PyPy 2
 
+   If you're on Ubuntu, the `Dead Snakes PPA
+   <https://launchpad.net/~fkrull/+archive/deadsnakes>`_ has packages of both
+   old and new Python versions.
+
 2. On Debian/Ubuntu, make sure you have `apt.mopidy.com
    <https://apt.mopidy.com/>`_ in your APT sources. Otherwise, install
    libspotify from source yourself.

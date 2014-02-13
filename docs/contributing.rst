@@ -102,3 +102,6 @@ Additional resources
 - `Mailing List <https://groups.google.com/forum/?fromgroups=#!forum/mopidy>`_
 
 - `GitHub documentation <https://help.github.com/>`_
+
+- `libspotify documentation
+  <https://developer.spotify.com/technologies/libspotify/>`_

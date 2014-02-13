@@ -27,26 +27,21 @@ apt.mopidy.com as a software repository on your system, and then run::
 Installing pyspotify
 ====================
 
-.. warning::
-
-   This section is mostly bogus until the first release of pyspotify 2 is
-   uploaded to PyPI. You should install from the Git repo for now.
-
 You can install pyspotify from PyPI. PyPI may have a pyspotify package
 precompiled for your OS and architecture available as a wheel package. To
 install it run::
 
-    pip install --use-wheel pyspotify
+    pip install pyspotify
 
-If pyspotify isn't available prebuilt for your OS and architecture, you'll
-need a C compiler, Python development headers and libffi development headers
-to build pyspotify. 
+If this fails, then pyspotify probably isn't available prebuilt for your OS and
+architecture. In that case, you'll need a C compiler, Python development
+headers and libffi development headers to build pyspotify.
 
 If you're on a Debian-based system, you can install these by running::
 
     sudo apt-get install build-essential python-dev python3-dev libffi-dev
 
-Then you can build pyspotify from source::
+Then you can install pyspotify from source::
 
     pip install pyspotify
 

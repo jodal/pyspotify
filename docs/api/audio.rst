@@ -7,9 +7,13 @@ Audio
 .. autoclass:: AudioBufferStats
     :no-inherited-members:
 
-    .. autoattribute:: samples
+    .. attribute:: samples
 
-    .. autoattribute:: stutter
+        Number of samples currently in the buffer.
+
+    .. attribute:: stutter
+
+        Number of stutters (audio dropouts) since the last query.
 
 .. autoclass:: AudioFormat
 

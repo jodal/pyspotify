@@ -43,6 +43,7 @@ needs_sphinx = '1.0'
 
 extensions = [
     'sphinx.ext.autodoc',
+    'sphinx.ext.intersphinx',
     'sphinx.ext.viewcode',
 ]
 
@@ -64,6 +65,10 @@ modindex_common_prefix = ['spotify.']
 
 autodoc_default_flags = ['members', 'undoc-members', 'inherited-members']
 autodoc_member_order = 'bysource'
+
+intersphinx_mapping = {
+    'python': ('http://docs.python.org/3', None),
+}
 
 
 # -- Options for HTML output --------------------------------------------------

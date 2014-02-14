@@ -34,11 +34,16 @@ setup(
     long_description=open('README.rst').read(),
     packages=find_packages(exclude=['tests', 'tests.*']),
     ext_package='spotify',
+    zip_safe=False,
     include_package_data=True,
     install_requires=['cffi >= 0.7'],
     setup_requires=['cffi >= 0.7'],
-    zip_safe=False,
     cmdclass={'build': cffi_build},
+    test_suite='nose.collector',
+    tests_require=[
+        'nose',
+        'mock >= 1.0',
+    ],
     classifiers=[
         'Development Status :: 3 - Alpha',
         'Intended Audience :: Developers',

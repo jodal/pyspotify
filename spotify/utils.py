@@ -94,6 +94,9 @@ class EventEmitter(object):
         Raises :exc:`AssertionError` if there is none or multiple listeners for
         ``event``. Returns the listener's return value on success.
         """
+        # XXX It would be a lot better for debugging if this error was raised
+        # when registering the second listener instead of when the event is
+        # emitted.
         assert self.num_listeners(event) == 1, (
             'Expected exactly 1 event listener, found %d listeners' %
             self.num_listeners(event))

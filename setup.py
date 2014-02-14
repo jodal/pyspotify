@@ -38,5 +38,18 @@ setup(
     install_requires=['cffi >= 0.7'],
     setup_requires=['cffi >= 0.7'],
     zip_safe=False,
-    cmdclass={'build': cffi_build}
+    cmdclass={'build': cffi_build},
+    classifiers=[
+        'Development Status :: 3 - Alpha',
+        'Intended Audience :: Developers',
+        'License :: OSI Approved :: Apache Software License',
+        'Programming Language :: Python :: 2',
+        'Programming Language :: Python :: 2.7',
+        'Programming Language :: Python :: 3',
+        'Programming Language :: Python :: 3.2',
+        'Programming Language :: Python :: 3.3',
+        'Programming Language :: Python :: Implementation :: CPython',
+        'Programming Language :: Python :: Implementation :: PyPy',
+        'Topic :: Software Development :: Libraries',
+    ],
 )

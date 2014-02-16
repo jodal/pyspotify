@@ -129,14 +129,14 @@ class Session(utils.EventEmitter):
         calling :meth:`relogin`.
         """
 
-        username = ffi.new('char[]', utils.to_bytes(username))
+        username = utils.to_char_or_null(username)
 
         if password is not None:
-            password = ffi.new('char[]', utils.to_bytes(password)) or ffi.NULL
+            password = utils.to_char_or_null(password)
             blob = ffi.NULL
         elif blob is not None:
             password = ffi.NULL
-            blob = ffi.new('char[]', utils.to_bytes(blob))
+            blob = utils.to_char_or_null(blob)
         else:
             raise AttributeError('password or blob is required to login')
 
@@ -545,8 +545,8 @@ class Social(object):
         :attr:`~SessionEvent.SCROBBLE_ERROR` event will be emitted on the
         :class:`Session` object.
         """
-        username = ffi.new('char[]', utils.to_bytes(username))
-        password = ffi.new('char[]', utils.to_bytes(password))
+        username = utils.to_char_or_null(username)
+        password = utils.to_char_or_null(password)
         spotify.Error.maybe_raise(lib.sp_session_set_social_credentials(
             self._session._sp_session, social_provider, username, password))
 

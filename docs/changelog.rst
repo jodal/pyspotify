@@ -2,6 +2,16 @@
 Changelog
 *********
 
+v2.0.0a2 (UNRELEASED)
+=====================
+
+Bug fixes
+---------
+
+- Remove multiple extra ``sp_link_add_ref()`` calls, potentially causing
+  memory leaks in libspotify.
+
+
 v2.0.0a1 (2014-01-14)
 =====================
 

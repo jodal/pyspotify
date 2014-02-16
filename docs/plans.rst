@@ -15,6 +15,8 @@ v2.0.0a2: Thread safety
   require review of all code and the addition of a decorator to the methods
   needing protection against other threads using libspotify while it executes.
 
+- Ensure we never edit shared data structures without holding the global lock.
+
 - React to ``notify_main_thread`` callbacks and do ``process_events()`` for us
   in a worker thread in the background. This will be a lot easier to implement
   if thread safety is in place first. This functionality should probably be

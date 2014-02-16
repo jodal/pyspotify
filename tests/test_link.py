@@ -45,6 +45,7 @@ class LinkTest(unittest.TestCase):
             spotify.ffi.string(
                 lib_mock.sp_link_create_from_string.call_args[0][0]),
             b'spotify:track:foo')
+        self.assertEqual(lib_mock.sp_link_add_ref.call_count, 0)
 
     def test_raises_error_if_string_isnt_parseable(self, lib_mock):
         lib_mock.sp_link_create_from_string.return_value = spotify.ffi.NULL

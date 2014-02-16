@@ -285,7 +285,8 @@ class Track(object):
         """A :class:`Link` to the track with an ``offset`` in milliseconds into
         the track."""
         return spotify.Link(
-            sp_link=lib.sp_link_create_from_track(self._sp_track, offset))
+            sp_link=lib.sp_link_create_from_track(self._sp_track, offset),
+            add_ref=False)
 
 
 class LocalTrack(Track):

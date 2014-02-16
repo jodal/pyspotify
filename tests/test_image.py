@@ -263,7 +263,7 @@ class ImageTest(unittest.TestCase):
 
         result = image.link
 
-        link_mock.assert_called_once_with(sp_link=sp_link)
+        link_mock.assert_called_once_with(sp_link=sp_link, add_ref=False)
         self.assertEqual(result, mock.sentinel.link)
 
 

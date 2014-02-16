@@ -66,7 +66,7 @@ class User(object):
     def link(self):
         """A :class:`Link` to the user."""
         return spotify.Link(
-            sp_link=lib.sp_link_create_from_user(self._sp_user))
+            sp_link=lib.sp_link_create_from_user(self._sp_user), add_ref=False)
 
     @property
     def starred(self):

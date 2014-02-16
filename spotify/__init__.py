@@ -1,25 +1,9 @@
 from __future__ import unicode_literals
 
-from distutils.version import StrictVersion
-import functools
-import logging
-import os
 import threading
-
-import cffi
-
-
-if StrictVersion(cffi.__version__) < StrictVersion('0.7'):
-    raise RuntimeError(
-        'pyspotify requires cffi >= 0.7, but found %s' % cffi.__version__)
 
 
 __version__ = '2.0.0a1'
-
-
-# Log to nowhere by default. For details, see:
-# http://docs.python.org/2/howto/logging.html#library-config
-logging.getLogger('spotify').addHandler(logging.NullHandler())
 
 
 # Global reentrant lock to be held whenever libspotify functions are called or
@@ -33,11 +17,28 @@ _lock = threading.RLock()
 session_instance = None
 
 
+def _setup_logging():
+    """Setup logging to log to nowhere by default.
+
+    For details, see:
+    http://docs.python.org/3/howto/logging.html#library-config
+
+    Internal function.
+    """
+    import logging
+
+    logger = logging.getLogger('spotify')
+    handler = logging.NullHandler()
+    logger.addHandler(handler)
+
+
 def serialized(f):
     """Acquires the global lock while calling the wrapped function.
 
     Internal function.
     """
+    import functools
+
     @functools.wraps(f)
     def wrapper(*args, **kwargs):
         with _lock:
@@ -45,7 +46,7 @@ def serialized(f):
     return wrapper
 
 
-def serialize_access_to_library(lib):
+def _serialize_access_to_library(lib):
     """Modify CFFI library to serialize all calls to library functions.
 
     Internal function.
@@ -55,12 +56,21 @@ def serialize_access_to_library(lib):
             setattr(lib, name, serialized(getattr(lib, name)))
 
 
-def build_ffi():
+def _build_ffi():
     """Build CFFI instance with knowledge of all libspotify types and a library
     object which wraps libspotify for use from Python.
 
     Internal function.
     """
+    from distutils.version import StrictVersion
+    import os
+
+    import cffi
+
+    if StrictVersion(cffi.__version__) < StrictVersion('0.7'):
+        raise RuntimeError(
+            'pyspotify requires cffi >= 0.7, but found %s' % cffi.__version__)
+
     header_file = os.path.join(os.path.dirname(__file__), 'api.processed.h')
     header = open(header_file).read()
     header += '#define SPOTIFY_API_VERSION ...\n'
@@ -72,12 +82,13 @@ def build_ffi():
         libraries=[str('spotify')],
         ext_package='spotify')
 
-    serialize_access_to_library(lib)
+    _serialize_access_to_library(lib)
 
     return ffi, lib
 
 
-ffi, lib = build_ffi()
+_setup_logging()
+ffi, lib = _build_ffi()
 
 
 from spotify.album import *  # noqa

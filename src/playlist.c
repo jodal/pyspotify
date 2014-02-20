@@ -161,38 +161,34 @@ Playlist_is_loaded(PyObject *self)
 static PyObject *
 Playlist_remove_tracks(PyObject *self, PyObject *args)
 {
-    PyObject *item, *py_indicies;
+    PyObject *item, *py_indices;
     sp_error error;
 
-    int *indices;
     int i, num_tracks, playlist_length;
 
-    if (!PyArg_ParseTuple(args, "O", &py_indicies))
+    if (!PyArg_ParseTuple(args, "O", &py_indices))
         return NULL;
-    if (!PySequence_Check(py_indicies)) {
+    if (!PySequence_Check(py_indices)) {
         PyErr_SetString(PyExc_TypeError, "expected sequence");
         return NULL;
     }
 
     playlist_length = sp_playlist_num_tracks(Playlist_SP_PLAYLIST(self));
 
-    num_tracks = (int)PySequence_Size(py_indicies);
-    /* TODO: could we use int *indices[num_tracks]; instead? */
-    indices = PyMem_New(int, num_tracks);
+    num_tracks = (int)PySequence_Size(py_indices);
+    int indices[num_tracks];
 
     for (i = 0; i < num_tracks; i++) {
-        item = PySequence_GetItem(py_indicies, i);
+        item = PySequence_GetItem(py_indices, i);
         indices[i] = (int)PyInt_AsLong(item);
         Py_DECREF(item);
 
         if (indices[i] == -1 && PyErr_Occurred() != NULL) {
-            PyMem_Free(indices);
             return NULL;
         }
 
         if (indices[i] < 0 || indices[i] > playlist_length) {
             PyErr_SetString(PyExc_IndexError, "specified track does not exist");
-            PyMem_Free(indices);
             return NULL;
         }
     }
@@ -202,7 +198,6 @@ Playlist_remove_tracks(PyObject *self, PyObject *args)
         Playlist_SP_PLAYLIST(self), indices, num_tracks);
     Py_END_ALLOW_THREADS;
 
-    PyMem_Free(indices);
     return none_or_raise_error(error);
 }
 

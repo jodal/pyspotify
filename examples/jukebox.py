@@ -406,6 +406,33 @@ class JukeboxUI(cmd.Cmd, threading.Thread):
                 self.jukebox.ctr[index].add_tracks(
                     insert, [tracks[int(i)] for i in args])
 
+    def do_remove_from_playlist(self, line):
+        """Usage: remove_from_playlist <playlist_index>
+           <track_index,track_index,...>"""
+        usage = """Usage: remove_from_playlist <playlist_index>
+                   <track_index,track_index,...>"""
+
+        if not line:
+            print(usage)
+            return
+        args = line.split(' ')
+        if len(args) < 2:
+            print(usage)
+        else:
+            index = int(args[0])
+            if not self.validate_playlist(index):
+                print("Invalid playlist index.")
+                return
+            track_indices = [int(i) for i in args[1].split(',')]
+            for i in track_indices:
+                if not self.validate_track(index, i):
+                    print("Invalid playlist index.")
+                    return
+                else:
+                    print("Removing Track Nr. " +
+                          str(i) + " from " + self.jukebox.ctr[index].name())
+            self.jukebox.ctr[index].remove_tracks(track_indices)
+
     do_ls = do_list
     do_EOF = do_quit
 

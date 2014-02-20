@@ -108,5 +108,3 @@ Mac OS X
 If you're on Mac OS X, you'll need to install X Code from the Mac App Store to
 get the pyspotify build dependencies. If you're using Homebrew, you already
 have X Code installed.
-
-TODO: Check if you need to install libffi headers, etc.

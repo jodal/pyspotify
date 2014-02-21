@@ -176,7 +176,7 @@ class Session(utils.EventEmitter):
         sp_user = lib.sp_session_user(self._sp_session)
         if sp_user == ffi.NULL:
             return None
-        return spotify.User(sp_user=sp_user)
+        return spotify.User(sp_user=sp_user, add_ref=True)
 
     def logout(self):
         """Log out the current user.
@@ -269,7 +269,7 @@ class Session(utils.EventEmitter):
         sp_playlist = lib.sp_session_starred_create(self._sp_session)
         if sp_playlist == ffi.NULL:
             return None
-        return spotify.Playlist._cached(sp_playlist=sp_playlist, add_ref=False)
+        return spotify.Playlist._cached(sp_playlist, add_ref=False)
 
     def starred_for_user(self, canonical_username):
         """The starred :class:`Playlist` for the user with
@@ -278,7 +278,7 @@ class Session(utils.EventEmitter):
             self._sp_session, utils.to_bytes(canonical_username))
         if sp_playlist == ffi.NULL:
             return None
-        return spotify.Playlist._cached(sp_playlist=sp_playlist, add_ref=False)
+        return spotify.Playlist._cached(sp_playlist, add_ref=False)
 
     def published_playlists_for_user(self, canonical_username=None):
         """The :class:`PlaylistContainer` of published playlists for the user

@@ -422,7 +422,7 @@ class TrackTest(unittest.TestCase):
     @mock.patch('spotify.album.lib', spec=spotify.lib)
     def test_album_if_unloaded(self, album_lib_mock, lib_mock):
         lib_mock.sp_track_error.return_value = spotify.ErrorType.OK
-        lib_mock.sp_track_album.return_value = 0
+        lib_mock.sp_track_album.return_value = spotify.ffi.NULL
         sp_track = spotify.ffi.new('int *')
         track = spotify.Track(sp_track=sp_track)
 

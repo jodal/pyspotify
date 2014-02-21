@@ -124,7 +124,7 @@ class AlbumTest(unittest.TestCase):
 
     @mock.patch('spotify.artist.lib', spec=spotify.lib)
     def test_artist_if_unloaded(self, artist_lib_mock, lib_mock):
-        lib_mock.sp_album_artist.return_value = 0
+        lib_mock.sp_album_artist.return_value = spotify.ffi.NULL
         sp_album = spotify.ffi.new('int *')
         album = spotify.Album(sp_album=sp_album)
 

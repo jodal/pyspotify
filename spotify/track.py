@@ -140,8 +140,10 @@ class Track(object):
             self.error, ignores=[spotify.ErrorType.IS_LOADING])
         if not self.is_loaded:
             return None
-        return Track(sp_track=lib.sp_track_get_playable(
-            spotify.session_instance._sp_session, self._sp_track))
+        return Track(
+            sp_track=lib.sp_track_get_playable(
+                spotify.session_instance._sp_session, self._sp_track),
+            add_ref=True)
 
     @property
     def is_placeholder(self):
@@ -204,7 +206,8 @@ class Track(object):
 
         def get_artist(sp_track, key):
             return spotify.Artist(
-                sp_artist=lib.sp_track_artist(sp_track, key))
+                sp_artist=lib.sp_track_artist(sp_track, key),
+                add_ref=True)
 
         return utils.Sequence(
             sp_obj=self._sp_track,
@@ -221,7 +224,9 @@ class Track(object):
         """
         spotify.Error.maybe_raise(self.error)
         sp_album = lib.sp_track_album(self._sp_track)
-        return spotify.Album(sp_album=sp_album) if sp_album else None
+        if sp_album == ffi.NULL:
+            return None
+        return spotify.Album(sp_album=sp_album, add_ref=True)
 
     @property
     def name(self):

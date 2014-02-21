@@ -113,7 +113,7 @@ class Playlist(utils.EventEmitter):
 
         def get_track(sp_playlist, key):
             return spotify.Track(
-                sp_track=lib.sp_playlist_track(sp_playlist, key))
+                sp_track=lib.sp_playlist_track(sp_playlist, key), add_ref=True)
 
         # TODO Negative indexes
         # TODO Adding and removing tracks as if this was a regular list
@@ -164,7 +164,8 @@ class Playlist(utils.EventEmitter):
     @property
     def owner(self):
         """The :class:`User` object for the owner of the playlist."""
-        return spotify.User(sp_user=lib.sp_playlist_owner(self._sp_playlist))
+        return spotify.User(
+            sp_user=lib.sp_playlist_owner(self._sp_playlist), add_ref=True)
 
     @property
     def collaborative(self):
@@ -1012,8 +1013,9 @@ class PlaylistContainer(collections.MutableSequence, utils.EventEmitter):
     @property
     def owner(self):
         """The :class:`User` object for the owner of the playlist container."""
-        sp_user = lib.sp_playlistcontainer_owner(self._sp_playlistcontainer)
-        return spotify.User(sp_user=sp_user)
+        return spotify.User(
+            sp_user=lib.sp_playlistcontainer_owner(self._sp_playlistcontainer),
+            add_ref=True)
 
     def get_unseen_tracks(self, playlist):
         """Get a list of unseen tracks in the given ``playlist``.
@@ -1216,7 +1218,8 @@ class PlaylistTrack(object):
     def track(self):
         """The :class:`~spotify.Track`."""
         return spotify.Track(
-            sp_track=lib.sp_playlist_track(self._sp_playlist, self._index))
+            sp_track=lib.sp_playlist_track(self._sp_playlist, self._index),
+            add_ref=True)
 
     @property
     def create_time(self):
@@ -1229,8 +1232,10 @@ class PlaylistTrack(object):
     @property
     def creator(self):
         """The :class:`~spotify.User` that added the track to the playlist."""
-        return spotify.User(sp_user=lib.sp_playlist_track_creator(
-            self._sp_playlist, self._index))
+        return spotify.User(
+            sp_user=lib.sp_playlist_track_creator(
+                self._sp_playlist, self._index),
+            add_ref=True)
 
     def is_seen(self):
         return bool(lib.sp_playlist_track_seen(self._sp_playlist, self._index))

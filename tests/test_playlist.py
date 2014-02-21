@@ -1941,7 +1941,7 @@ class PlaylistContainerTest(unittest.TestCase):
 
         lib_mock.sp_playlistcontainer_owner.assert_called_with(
             sp_playlistcontainer)
-        user_mock.assert_called_with(sp_user=sp_user)
+        user_mock.assert_called_with(sp_user=sp_user, add_ref=True)
         self.assertEqual(result, mock.sentinel.user)
 
     def test_get_unseen_tracks(self, lib_mock):

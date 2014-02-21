@@ -136,7 +136,9 @@ class Search(object):
             return []
 
         def get_track(sp_search, key):
-            return spotify.Track(sp_track=lib.sp_search_track(sp_search, key))
+            return spotify.Track(
+                sp_track=lib.sp_search_track(sp_search, key),
+                add_ref=True)
 
         return utils.Sequence(
             sp_obj=self._sp_search,
@@ -168,7 +170,9 @@ class Search(object):
             return []
 
         def get_album(sp_search, key):
-            return spotify.Album(sp_album=lib.sp_search_album(sp_search, key))
+            return spotify.Album(
+                sp_album=lib.sp_search_album(sp_search, key),
+                add_ref=True)
 
         return utils.Sequence(
             sp_obj=self._sp_search,
@@ -201,7 +205,8 @@ class Search(object):
 
         def get_artist(sp_search, key):
             return spotify.Artist(
-                sp_artist=lib.sp_search_artist(sp_search, key))
+                sp_artist=lib.sp_search_artist(sp_search, key),
+                add_ref=True)
 
         return utils.Sequence(
             sp_obj=self._sp_search,

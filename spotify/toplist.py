@@ -144,7 +144,8 @@ class Toplist(object):
 
         def get_track(sp_toplistbrowse, key):
             return spotify.Track(
-                sp_track=lib.sp_toplistbrowse_track(sp_toplistbrowse, key))
+                sp_track=lib.sp_toplistbrowse_track(sp_toplistbrowse, key),
+                add_ref=True)
 
         return utils.Sequence(
             sp_obj=self._sp_toplistbrowse,
@@ -165,7 +166,8 @@ class Toplist(object):
 
         def get_album(sp_toplistbrowse, key):
             return spotify.Album(
-                sp_album=lib.sp_toplistbrowse_album(sp_toplistbrowse, key))
+                sp_album=lib.sp_toplistbrowse_album(sp_toplistbrowse, key),
+                add_ref=True)
 
         return utils.Sequence(
             sp_obj=self._sp_toplistbrowse,
@@ -186,7 +188,8 @@ class Toplist(object):
 
         def get_artist(sp_toplistbrowse, key):
             return spotify.Artist(
-                sp_artist=lib.sp_toplistbrowse_artist(sp_toplistbrowse, key))
+                sp_artist=lib.sp_toplistbrowse_artist(sp_toplistbrowse, key),
+                add_ref=True)
 
         return utils.Sequence(
             sp_obj=self._sp_toplistbrowse,

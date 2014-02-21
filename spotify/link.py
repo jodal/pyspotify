@@ -70,27 +70,31 @@ class Link(object):
     def as_track(self):
         """Make a :class:`Track` from the link."""
         sp_track = lib.sp_link_as_track(self._sp_link)
-        if sp_track:
-            return spotify.Track(sp_track=sp_track)
+        if sp_track == ffi.NULL:
+            return None
+        return spotify.Track(sp_track=sp_track, add_ref=True)
 
     def as_track_offset(self):
         """Get the track offset in milliseconds from the link."""
         offset = ffi.new('int *')
         sp_track = lib.sp_link_as_track_and_offset(self._sp_link, offset)
-        if sp_track:
-            return offset[0]
+        if sp_track == ffi.NULL:
+            return None
+        return offset[0]
 
     def as_album(self):
         """Make an :class:`Album` from the link."""
         sp_album = lib.sp_link_as_album(self._sp_link)
-        if sp_album:
-            return spotify.Album(sp_album=sp_album)
+        if sp_album == ffi.NULL:
+            return None
+        return spotify.Album(sp_album=sp_album, add_ref=True)
 
     def as_artist(self):
         """Make an :class:`Artist` from the link."""
         sp_artist = lib.sp_link_as_artist(self._sp_link)
-        if sp_artist:
-            return spotify.Artist(sp_artist=sp_artist)
+        if sp_artist == ffi.NULL:
+            return None
+        return spotify.Artist(sp_artist=sp_artist, add_ref=True)
 
     def as_playlist(self):
         """Make a :class:`Playlist` from the link."""
@@ -98,15 +102,16 @@ class Link(object):
             return None
         sp_playlist = lib.sp_playlist_create(
             spotify.session_instance._sp_session, self._sp_link)
-        if sp_playlist:
-            return spotify.Playlist._cached(
-                sp_playlist=sp_playlist, add_ref=False)
+        if sp_playlist == ffi.NULL:
+            return None
+        return spotify.Playlist._cached(sp_playlist, add_ref=False)
 
     def as_user(self):
         """Make an :class:`User` from the link."""
         sp_user = lib.sp_link_as_user(self._sp_link)
-        if sp_user:
-            return spotify.User(sp_user=sp_user)
+        if sp_user == ffi.NULL:
+            return None
+        return spotify.User(sp_user=sp_user, add_ref=True)
 
     def as_image(self):
         """Make an :class:`Image` from the link."""
@@ -114,8 +119,9 @@ class Link(object):
             return None
         sp_image = lib.sp_image_create_from_link(
             spotify.session_instance._sp_session, self._sp_link)
-        if sp_image:
-            return spotify.Image(sp_image=sp_image, add_ref=False)
+        if sp_image == ffi.NULL:
+            return None
+        return spotify.Image(sp_image=sp_image, add_ref=False)
 
 
 @utils.make_enum('SP_LINKTYPE_')

@@ -76,7 +76,9 @@ class Album(object):
         Will always return :class:`None` if the album isn't loaded.
         """
         sp_artist = lib.sp_album_artist(self._sp_album)
-        return spotify.Artist(sp_artist=sp_artist) if sp_artist else None
+        if sp_artist == ffi.NULL:
+            return None
+        return spotify.Artist(sp_artist=sp_artist, add_ref=True)
 
     def cover(self, image_size=None):
         """The album's cover :class:`Image`.
@@ -254,7 +256,7 @@ class AlbumBrowser(object):
         sp_album = lib.sp_albumbrowse_album(self._sp_albumbrowse)
         if sp_album == ffi.NULL:
             return None
-        return Album(sp_album=sp_album)
+        return Album(sp_album=sp_album, add_ref=True)
 
     @property
     def artist(self):
@@ -265,7 +267,7 @@ class AlbumBrowser(object):
         sp_artist = lib.sp_albumbrowse_artist(self._sp_albumbrowse)
         if sp_artist == ffi.NULL:
             return None
-        return spotify.Artist(sp_artist=sp_artist)
+        return spotify.Artist(sp_artist=sp_artist, add_ref=True)
 
     @property
     def copyrights(self):
@@ -298,7 +300,8 @@ class AlbumBrowser(object):
 
         def get_track(sp_albumbrowse, key):
             return spotify.Track(
-                sp_track=lib.sp_albumbrowse_track(sp_albumbrowse, key))
+                sp_track=lib.sp_albumbrowse_track(sp_albumbrowse, key),
+                add_ref=True)
 
         return utils.Sequence(
             sp_obj=self._sp_albumbrowse,

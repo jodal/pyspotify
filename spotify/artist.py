@@ -222,7 +222,7 @@ class ArtistBrowser(object):
         sp_artist = lib.sp_artistbrowse_artist(self._sp_artistbrowse)
         if sp_artist == ffi.NULL:
             return None
-        return Artist(sp_artist=sp_artist)
+        return Artist(sp_artist=sp_artist, add_ref=True)
 
     @property
     def portraits(self):
@@ -260,7 +260,8 @@ class ArtistBrowser(object):
 
         def get_track(sp_artistbrowse, key):
             return spotify.Track(
-                sp_track=lib.sp_artistbrowse_track(sp_artistbrowse, key))
+                sp_track=lib.sp_artistbrowse_track(sp_artistbrowse, key),
+                add_ref=True)
 
         return utils.Sequence(
             sp_obj=self._sp_artistbrowse,
@@ -281,7 +282,8 @@ class ArtistBrowser(object):
         def get_track(sp_artistbrowse, key):
             return spotify.Track(
                 sp_track=lib.sp_artistbrowse_tophit_track(
-                    sp_artistbrowse, key))
+                    sp_artistbrowse, key),
+                add_ref=True)
 
         return utils.Sequence(
             sp_obj=self._sp_artistbrowse,
@@ -304,7 +306,8 @@ class ArtistBrowser(object):
 
         def get_album(sp_artistbrowse, key):
             return spotify.Album(
-                sp_album=lib.sp_artistbrowse_album(sp_artistbrowse, key))
+                sp_album=lib.sp_artistbrowse_album(sp_artistbrowse, key),
+                add_ref=True)
 
         return utils.Sequence(
             sp_obj=self._sp_artistbrowse,
@@ -325,7 +328,8 @@ class ArtistBrowser(object):
         def get_artist(sp_artistbrowse, key):
             return spotify.Artist(
                 sp_artist=lib.sp_artistbrowse_similar_artist(
-                    sp_artistbrowse, key))
+                    sp_artistbrowse, key),
+                add_ref=True)
 
         return utils.Sequence(
             sp_obj=self._sp_artistbrowse,

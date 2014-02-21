@@ -13,11 +13,21 @@ Feature: Thread safety
   while we are still working on the data returned by the previous libspotify
   call, which could make the data garbage.
 
+Other changes
+-------------
+
+- Running `python setup.py test` now runs the test suite.
+
+- The test suite now runs on Mac OS X, using CPython 2.7, 3.2, 3.3, and PyPy
+  2.2, on every push to GitHub.
+
 Bug fixes
 ---------
 
 - Remove multiple extra ``sp_link_add_ref()`` calls, potentially causing
   memory leaks in libspotify.
+
+- Add missing error check to :meth:`spotify.Playlist.add_tracks`.
 
 
 v2.0.0a1 (2014-01-14)

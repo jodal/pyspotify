@@ -16,7 +16,7 @@ Feature: Thread safety
 Other changes
 -------------
 
-- Running `python setup.py test` now runs the test suite.
+- Running ``python setup.py test`` now runs the test suite.
 
 - The test suite now runs on Mac OS X, using CPython 2.7, 3.2, 3.3, and PyPy
   2.2, on every push to GitHub.

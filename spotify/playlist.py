@@ -232,9 +232,9 @@ class Playlist(utils.EventEmitter):
             tracks = [tracks]
         if position is None:
             position = len(self.tracks)
-        lib.sp_playlist_add_tracks(
+        spotify.Error.maybe_raise(lib.sp_playlist_add_tracks(
             self._sp_playlist, [t._sp_track for t in tracks], len(tracks),
-            position, spotify.session_instance._sp_session)
+            position, spotify.session_instance._sp_session))
 
     def remove_tracks(self, tracks):
         """Remove the given tracks from the playlist.

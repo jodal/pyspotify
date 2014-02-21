@@ -409,6 +409,8 @@ class PlaylistTest(unittest.TestCase):
     @mock.patch('spotify.track.lib', spec=spotify.lib)
     def test_add_tracks(self, track_lib_mock, lib_mock):
         session = tests.create_session()
+        lib_mock.sp_playlist_add_tracks.return_value = int(
+            spotify.ErrorType.OK)
         sp_track1 = spotify.ffi.new('int * ')
         track1 = spotify.Track(sp_track=sp_track1)
         sp_track2 = spotify.ffi.new('int * ')
@@ -424,6 +426,8 @@ class PlaylistTest(unittest.TestCase):
     @mock.patch('spotify.track.lib', spec=spotify.lib)
     def test_add_tracks_without_position(self, track_lib_mock, lib_mock):
         session = tests.create_session()
+        lib_mock.sp_playlist_add_tracks.return_value = int(
+            spotify.ErrorType.OK)
         lib_mock.sp_playlist_num_tracks.return_value = 10
         sp_track1 = spotify.ffi.new('int * ')
         track1 = spotify.Track(sp_track=sp_track1)
@@ -440,6 +444,8 @@ class PlaylistTest(unittest.TestCase):
     @mock.patch('spotify.track.lib', spec=spotify.lib)
     def test_add_tracks_with_a_single_track(self, track_lib_mock, lib_mock):
         session = tests.create_session()
+        lib_mock.sp_playlist_add_tracks.return_value = int(
+            spotify.ErrorType.OK)
         sp_track = spotify.ffi.new('int * ')
         track = spotify.Track(sp_track=sp_track)
         sp_playlist = spotify.ffi.new('int *')
@@ -449,6 +455,16 @@ class PlaylistTest(unittest.TestCase):
 
         lib_mock.sp_playlist_add_tracks.assert_called_with(
             sp_playlist, [sp_track], 1, 7, session._sp_session)
+
+    def test_add_tracks_fails_if_error(self, lib_mock):
+        tests.create_session()
+        lib_mock.sp_playlist_add_tracks.return_value = int(
+            spotify.ErrorType.PERMISSION_DENIED)
+        sp_playlist = spotify.ffi.new('int *')
+        playlist = spotify.Playlist(sp_playlist=sp_playlist)
+
+        with self.assertRaises(spotify.Error):
+            playlist.add_tracks([])
 
     @mock.patch('spotify.track.lib', spec=spotify.lib)
     def test_remove_tracks(self, track_lib_mock, lib_mock):

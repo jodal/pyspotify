@@ -196,9 +196,7 @@ class Playlist(utils.EventEmitter):
         Will return :class:`None` if the description is unset.
         """
         description = lib.sp_playlist_get_description(self._sp_playlist)
-        if description == ffi.NULL:
-            return None
-        return utils.to_unicode(description)
+        return utils.to_unicode_or_none(description)
 
     @property
     def image(self):
@@ -1251,9 +1249,7 @@ class PlaylistTrack(object):
     def message(self):
         """A message attached to the track. Typically used in the inbox."""
         message = lib.sp_playlist_track_message(self._sp_playlist, self._index)
-        if message == ffi.NULL:
-            return None
-        return utils.to_unicode(message)
+        return utils.to_unicode_or_none(message)
 
 
 @utils.make_enum('SP_PLAYLIST_TYPE_')

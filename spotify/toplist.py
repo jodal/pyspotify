@@ -69,12 +69,6 @@ class Toplist(object):
             else:
                 region = utils.to_country_code(region)
 
-            if canonical_username is not None:
-                canonical_username = ffi.new(
-                    'char[]', utils.to_bytes(canonical_username))
-            else:
-                canonical_username = ffi.NULL
-
             handle = ffi.new_handle((callback, self))
             # TODO Think through the life cycle of the handle object. Can it
             # happen that we GC the search and handle object, and then later
@@ -83,7 +77,7 @@ class Toplist(object):
 
             sp_toplistbrowse = lib.sp_toplistbrowse_create(
                 spotify.session_instance._sp_session,
-                int(type), region, canonical_username,
+                int(type), region, utils.to_char_or_null(canonical_username),
                 _toplistbrowse_complete_callback, handle)
             add_ref = False
 

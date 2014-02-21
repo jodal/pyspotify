@@ -41,8 +41,7 @@ class Link(object):
             raise RuntimeError('Session must be initialized to create links')
 
         if uri is not None:
-            sp_link = lib.sp_link_create_from_string(
-                ffi.new('char[]', utils.to_bytes(uri)))
+            sp_link = lib.sp_link_create_from_string(utils.to_char(uri))
             add_ref = False
             if sp_link == ffi.NULL:
                 raise ValueError(

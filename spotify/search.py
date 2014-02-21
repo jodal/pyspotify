@@ -52,8 +52,6 @@ class Search(object):
         self._callback_handles = set()
 
         if sp_search is None:
-            query = ffi.new('char[]', utils.to_bytes(query))
-
             handle = ffi.new_handle((callback, self))
             # TODO Think through the life cycle of the handle object. Can it
             # happen that we GC the search and handle object, and then later
@@ -61,7 +59,7 @@ class Search(object):
             self._callback_handles.add(handle)
 
             sp_search = lib.sp_search_create(
-                spotify.session_instance._sp_session, query,
+                spotify.session_instance._sp_session, utils.to_char(query),
                 track_offset, track_count,
                 album_offset, album_count,
                 artist_offset, artist_count,

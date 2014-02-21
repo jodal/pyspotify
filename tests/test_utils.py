@@ -386,7 +386,29 @@ class ToUnicodeOrNoneTest(unittest.TestCase):
             utils.to_unicode_or_none('æøå')
 
 
-class ToCharOrNull(unittest.TestCase):
+class ToCharTest(unittest.TestCase):
+
+    def test_bytes_becomes_char(self):
+        result = utils.to_char(b'abc')
+
+        self.assertIsInstance(result, spotify.ffi.CData)
+        self.assertEqual(spotify.ffi.string(result), b'abc')
+
+    def test_unicode_becomes_char(self):
+        result = utils.to_char('æøå')
+
+        self.assertIsInstance(result, spotify.ffi.CData)
+        self.assertEqual(spotify.ffi.string(result).decode('utf-8'), 'æøå')
+
+    def test_anything_else_fails(self):
+        with self.assertRaises(ValueError):
+            utils.to_char(None)
+
+        with self.assertRaises(ValueError):
+            utils.to_char(123)
+
+
+class ToCharOrNullTest(unittest.TestCase):
 
     def test_none_becomes_null(self):
         self.assertEqual(utils.to_char_or_null(None), spotify.ffi.NULL)
@@ -403,8 +425,12 @@ class ToCharOrNull(unittest.TestCase):
         self.assertIsInstance(result, spotify.ffi.CData)
         self.assertEqual(spotify.ffi.string(result).decode('utf-8'), 'æøå')
 
+    def test_anything_else_fails(self):
+        with self.assertRaises(ValueError):
+            utils.to_char_or_null(123)
 
-class ToCountryCode(unittest.TestCase):
+
+class ToCountryCodeTest(unittest.TestCase):
 
     def test_unicode_to_country_code(self):
         self.assertEqual(utils.to_country_code('NO'), 20047)
@@ -423,7 +449,7 @@ class ToCountryCode(unittest.TestCase):
             utils.to_country_code('no')
 
 
-class ToCountry(unittest.TestCase):
+class ToCountryTest(unittest.TestCase):
 
     def test_to_country(self):
         self.assertEqual(utils.to_country(20047), 'NO')

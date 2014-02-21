@@ -316,6 +316,11 @@ def to_unicode_or_none(value):
         raise ValueError('Value must be char[] or NULL')
 
 
+def to_char(value):
+    """Converts bytes, unicode, and C char arrays to C char arrays.  """
+    return ffi.new('char[]', to_bytes(value))
+
+
 def to_char_or_null(value):
     """Converts bytes, unicode, and C char arrays to C char arrays, and
     :class:`None` to C NULL values.
@@ -323,7 +328,7 @@ def to_char_or_null(value):
     if value is None:
         return ffi.NULL
     else:
-        return ffi.new('char[]', to_bytes(value))
+        return to_char(value)
 
 
 def to_country(code):

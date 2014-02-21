@@ -28,13 +28,12 @@ class InboxPostResult(object):
         self._callback_handles = set()
 
         if sp_inbox is None:
-            canonical_username = ffi.new(
-                'char[]', utils.to_bytes(canonical_username))
+            canonical_username = utils.to_char(canonical_username)
 
             if isinstance(tracks, spotify.Track):
                 tracks = [tracks]
 
-            message = ffi.new('char[]', utils.to_bytes(message))
+            message = utils.to_char(message)
 
             handle = ffi.new_handle((callback, self))
             # TODO Think through the life cycle of the handle object. Can it

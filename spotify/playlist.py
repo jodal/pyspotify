@@ -158,9 +158,8 @@ class Playlist(utils.EventEmitter):
 
     def rename(self, new_name):
         """Rename the playlist."""
-        new_name = ffi.new('char[]', utils.to_bytes(new_name))
         spotify.Error.maybe_raise(
-            lib.sp_playlist_rename(self._sp_playlist, new_name))
+            lib.sp_playlist_rename(self._sp_playlist, utils.to_char(new_name)))
 
     @property
     def owner(self):
@@ -904,9 +903,8 @@ class PlaylistContainer(collections.MutableSequence, utils.EventEmitter):
         Returns the new playlist.
         """
         self._validate_name(name)
-        name = ffi.new('char[]', utils.to_bytes(name))
         sp_playlist = lib.sp_playlistcontainer_add_new_playlist(
-            self._sp_playlistcontainer, name)
+            self._sp_playlistcontainer, utils.to_char(name))
         if sp_playlist == ffi.NULL:
             raise spotify.Error('Playlist creation failed')
         playlist = Playlist._cached(sp_playlist, add_ref=True)
@@ -956,9 +954,8 @@ class PlaylistContainer(collections.MutableSequence, utils.EventEmitter):
         self._validate_name(name)
         if index is None:
             index = self.__len__()
-        name = ffi.new('char[]', utils.to_bytes(name))
         spotify.Error.maybe_raise(lib.sp_playlistcontainer_add_folder(
-            self._sp_playlistcontainer, index, name))
+            self._sp_playlistcontainer, index, utils.to_char(name)))
 
     def _validate_name(self, name):
         if len(name) > 255:

@@ -1,7 +1,7 @@
 from __future__ import unicode_literals
 
 import spotify
-from spotify import ffi, lib, utils
+from spotify import ffi, lib, serialized, utils
 
 
 __all__ = [
@@ -67,6 +67,7 @@ class Link(object):
         """The link's :class:`LinkType`."""
         return LinkType(lib.sp_link_type(self._sp_link))
 
+    @serialized
     def as_track(self):
         """Make a :class:`Track` from the link."""
         sp_track = lib.sp_link_as_track(self._sp_link)
@@ -82,6 +83,7 @@ class Link(object):
             return None
         return offset[0]
 
+    @serialized
     def as_album(self):
         """Make an :class:`Album` from the link."""
         sp_album = lib.sp_link_as_album(self._sp_link)
@@ -89,6 +91,7 @@ class Link(object):
             return None
         return spotify.Album(sp_album=sp_album, add_ref=True)
 
+    @serialized
     def as_artist(self):
         """Make an :class:`Artist` from the link."""
         sp_artist = lib.sp_link_as_artist(self._sp_link)
@@ -106,6 +109,7 @@ class Link(object):
             return None
         return spotify.Playlist._cached(sp_playlist, add_ref=False)
 
+    @serialized
     def as_user(self):
         """Make an :class:`User` from the link."""
         sp_user = lib.sp_link_as_user(self._sp_link)

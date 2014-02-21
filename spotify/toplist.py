@@ -4,7 +4,7 @@ import logging
 import threading
 
 import spotify
-from spotify import ffi, lib, utils
+from spotify import ffi, lib, serialized, utils
 
 
 __all__ = [
@@ -133,6 +133,7 @@ class Toplist(object):
             self._sp_toplistbrowse)
 
     @property
+    @serialized
     def tracks(self):
         """The tracks in the toplist.
 
@@ -142,6 +143,7 @@ class Toplist(object):
         if not self.is_loaded:
             return []
 
+        @serialized
         def get_track(sp_toplistbrowse, key):
             return spotify.Track(
                 sp_track=lib.sp_toplistbrowse_track(sp_toplistbrowse, key),
@@ -155,6 +157,7 @@ class Toplist(object):
             getitem_func=get_track)
 
     @property
+    @serialized
     def albums(self):
         """The albums in the toplist.
 
@@ -164,6 +167,7 @@ class Toplist(object):
         if not self.is_loaded:
             return []
 
+        @serialized
         def get_album(sp_toplistbrowse, key):
             return spotify.Album(
                 sp_album=lib.sp_toplistbrowse_album(sp_toplistbrowse, key),
@@ -177,6 +181,7 @@ class Toplist(object):
             getitem_func=get_album)
 
     @property
+    @serialized
     def artists(self):
         """The artists in the toplist.
 
@@ -186,6 +191,7 @@ class Toplist(object):
         if not self.is_loaded:
             return []
 
+        @serialized
         def get_artist(sp_toplistbrowse, key):
             return spotify.Artist(
                 sp_artist=lib.sp_toplistbrowse_artist(sp_toplistbrowse, key),

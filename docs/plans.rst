@@ -10,11 +10,6 @@ still under active development.
 v2.0.0a2: Thread safety
 =======================
 
-- Ensure we never call libspotify from another thread while a method is still
-  working on the data returned by the previous libspotify call. This will
-  require review of all code and the addition of a decorator to the methods
-  needing protection against other threads using libspotify while it executes.
-
 - Ensure we never edit shared data structures without holding the global lock.
 
 - React to ``notify_main_thread`` callbacks and do ``process_events()`` for us

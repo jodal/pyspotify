@@ -1,7 +1,7 @@
 from __future__ import unicode_literals
 
 import spotify
-from spotify import ffi, lib, utils
+from spotify import ffi, lib, serialized, utils
 
 
 __all__ = [
@@ -29,6 +29,7 @@ class User(object):
                 raise ValueError(
                     'Failed to get user from Spotify URI: %r' % uri)
             sp_user = user._sp_user
+            add_ref = True
 
         if add_ref:
             lib.sp_user_add_ref(sp_user)
@@ -38,11 +39,13 @@ class User(object):
         return 'User(%r)' % self.link.uri
 
     @property
+    @serialized
     def canonical_name(self):
         """The user's canonical username."""
         return utils.to_unicode(lib.sp_user_canonical_name(self._sp_user))
 
     @property
+    @serialized
     def display_name(self):
         """The user's displayable username."""
         return utils.to_unicode(lib.sp_user_display_name(self._sp_user))

@@ -5,6 +5,14 @@ Changelog
 v2.0.0a2 (UNRELEASED)
 =====================
 
+Feature: Thread safety
+----------------------
+
+- Hold the global lock while we are working with pointers returned by
+  libspotify. This ensures that we never call libspotify from another thread
+  while we are still working on the data returned by the previous libspotify
+  call, which could make the data garbage.
+
 Bug fixes
 ---------
 

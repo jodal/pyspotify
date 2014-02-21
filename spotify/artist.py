@@ -4,7 +4,7 @@ import logging
 import threading
 
 import spotify
-from spotify import ffi, lib, utils
+from spotify import ffi, lib, serialized, utils
 
 
 __all__ = [
@@ -45,6 +45,7 @@ class Artist(object):
         return 'Artist(%r)' % self.link.uri
 
     @property
+    @serialized
     def name(self):
         """The artist's name.
 
@@ -68,6 +69,7 @@ class Artist(object):
         """
         return utils.load(self, timeout=timeout)
 
+    @serialized
     def portrait(self, image_size=None):
         """The artist's portrait :class:`Image`.
 
@@ -214,6 +216,7 @@ class ArtistBrowser(object):
             self._sp_artistbrowse)
 
     @property
+    @serialized
     def artist(self):
         """Get the :class:`Artist` the browser is for.
 
@@ -225,6 +228,7 @@ class ArtistBrowser(object):
         return Artist(sp_artist=sp_artist, add_ref=True)
 
     @property
+    @serialized
     def portraits(self):
         """The artist's portraits.
 
@@ -233,6 +237,7 @@ class ArtistBrowser(object):
         if not self.is_loaded:
             return []
 
+        @serialized
         def get_image(sp_artistbrowse, key):
             image_id = lib.sp_artistbrowse_portrait(sp_artistbrowse, key)
             sp_image = lib.sp_image_create(image_id)
@@ -246,6 +251,7 @@ class ArtistBrowser(object):
             getitem_func=get_image)
 
     @property
+    @serialized
     def tracks(self):
         """The artist's tracks.
 
@@ -258,6 +264,7 @@ class ArtistBrowser(object):
         if not self.is_loaded:
             return []
 
+        @serialized
         def get_track(sp_artistbrowse, key):
             return spotify.Track(
                 sp_track=lib.sp_artistbrowse_track(sp_artistbrowse, key),
@@ -271,6 +278,7 @@ class ArtistBrowser(object):
             getitem_func=get_track)
 
     @property
+    @serialized
     def tophit_tracks(self):
         """The artist's top hit tracks.
 
@@ -279,6 +287,7 @@ class ArtistBrowser(object):
         if not self.is_loaded:
             return []
 
+        @serialized
         def get_track(sp_artistbrowse, key):
             return spotify.Track(
                 sp_track=lib.sp_artistbrowse_tophit_track(
@@ -293,6 +302,7 @@ class ArtistBrowser(object):
             getitem_func=get_track)
 
     @property
+    @serialized
     def albums(self):
         """The artist's albums.
 
@@ -304,6 +314,7 @@ class ArtistBrowser(object):
         if not self.is_loaded:
             return []
 
+        @serialized
         def get_album(sp_artistbrowse, key):
             return spotify.Album(
                 sp_album=lib.sp_artistbrowse_album(sp_artistbrowse, key),
@@ -317,6 +328,7 @@ class ArtistBrowser(object):
             getitem_func=get_album)
 
     @property
+    @serialized
     def similar_artists(self):
         """The artist's similar artists.
 
@@ -325,6 +337,7 @@ class ArtistBrowser(object):
         if not self.is_loaded:
             return []
 
+        @serialized
         def get_artist(sp_artistbrowse, key):
             return spotify.Artist(
                 sp_artist=lib.sp_artistbrowse_similar_artist(
@@ -339,6 +352,7 @@ class ArtistBrowser(object):
             getitem_func=get_artist)
 
     @property
+    @serialized
     def biography(self):
         """A biography of the artist.
 

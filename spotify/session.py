@@ -6,7 +6,7 @@ import operator
 import weakref
 
 import spotify
-from spotify import ffi, lib, utils
+from spotify import ffi, lib, serialized, utils
 
 
 __all__ = [
@@ -162,6 +162,7 @@ class Session(utils.EventEmitter):
             lib.sp_session_remembered_user, self._sp_session)
 
     @property
+    @serialized
     def user_name(self):
         """The username of the logged in user."""
         return utils.to_unicode(lib.sp_session_user_name(self._sp_session))
@@ -171,6 +172,7 @@ class Session(utils.EventEmitter):
         spotify.Error.maybe_raise(lib.sp_session_forget_me(self._sp_session))
 
     @property
+    @serialized
     def user(self):
         """The logged in :class:`User`."""
         sp_user = lib.sp_session_user(self._sp_session)
@@ -229,6 +231,7 @@ class Session(utils.EventEmitter):
         return next_timeout[0]
 
     @property
+    @serialized
     def playlist_container(self):
         """The :class:`PlaylistContainer` for the currently logged in user."""
         sp_playlistcontainer = lib.sp_session_playlistcontainer(
@@ -325,6 +328,7 @@ class Session(utils.EventEmitter):
             self._sp_session, value))
 
     @property
+    @serialized
     def user_country(self):
         """The country of the currently logged in user.
 

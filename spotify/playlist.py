@@ -6,7 +6,7 @@ import pprint
 import re
 
 import spotify
-from spotify import ffi, lib, utils
+from spotify import ffi, lib, serialized, utils
 
 
 __all__ = [
@@ -58,6 +58,7 @@ class Playlist(utils.EventEmitter):
         super(Playlist, self).__init__()
 
         assert uri or sp_playlist, 'uri or sp_playlist is required'
+
         if uri is not None:
             playlist = spotify.Link(uri).as_playlist()
             if playlist is None:
@@ -65,6 +66,7 @@ class Playlist(utils.EventEmitter):
                     'Failed to get playlist from Spotify URI: %r' % uri)
             sp_playlist = playlist._sp_playlist
             add_ref = True
+
         if add_ref:
             lib.sp_playlist_add_ref(sp_playlist)
         self._sp_playlist = ffi.gc(sp_playlist, lib.sp_playlist_release)
@@ -103,6 +105,7 @@ class Playlist(utils.EventEmitter):
         return utils.load(self, timeout=timeout)
 
     @property
+    @serialized
     def tracks(self):
         """The playlist's tracks.
 
@@ -111,6 +114,7 @@ class Playlist(utils.EventEmitter):
         if not self.is_loaded:
             return []
 
+        @serialized
         def get_track(sp_playlist, key):
             return spotify.Track(
                 sp_track=lib.sp_playlist_track(sp_playlist, key), add_ref=True)
@@ -125,6 +129,7 @@ class Playlist(utils.EventEmitter):
             getitem_func=get_track)
 
     @property
+    @serialized
     def tracks_with_metadata(self):
         """The playlist's tracks, with metadata specific to the playlist as a
         a list of :class:`~spotify.PlaylistTrack` objects.
@@ -134,14 +139,19 @@ class Playlist(utils.EventEmitter):
         if not self.is_loaded:
             return []
 
+        @serialized
+        def get_playlist_track(sp_playlist, key):
+            return PlaylistTrack(sp_playlist, key)
+
         return utils.Sequence(
             sp_obj=self._sp_playlist,
             add_ref_func=lib.sp_playlist_add_ref,
             release_func=lib.sp_playlist_release,
             len_func=lib.sp_playlist_num_tracks,
-            getitem_func=PlaylistTrack)
+            getitem_func=get_playlist_track)
 
     @property
+    @serialized
     def name(self):
         """The playlist's name.
 
@@ -162,6 +172,7 @@ class Playlist(utils.EventEmitter):
             lib.sp_playlist_rename(self._sp_playlist, utils.to_char(new_name)))
 
     @property
+    @serialized
     def owner(self):
         """The :class:`User` object for the owner of the playlist."""
         return spotify.User(
@@ -190,6 +201,7 @@ class Playlist(utils.EventEmitter):
             lib.sp_playlist_set_autolink_tracks(self._sp_playlist, int(link)))
 
     @property
+    @serialized
     def description(self):
         """The playlist's description.
 
@@ -221,6 +233,7 @@ class Playlist(utils.EventEmitter):
         """
         return bool(lib.sp_playlist_has_pending_changes(self._sp_playlist))
 
+    @serialized
     def add_tracks(self, tracks, position=None):
         """Add the given tracks to playlist at the given position.
 
@@ -278,6 +291,7 @@ class Playlist(utils.EventEmitter):
         return lib.sp_playlist_num_subscribers(self._sp_playlist)
 
     @property
+    @serialized
     def subscribers(self):
         """The canonical usernames of up to 500 of the subscribers of the
         playlist.
@@ -816,6 +830,7 @@ class PlaylistContainer(collections.MutableSequence, utils.EventEmitter):
             return 0
         return length
 
+    @serialized
     def __getitem__(self, key):
         # Required by collections.Sequence
 
@@ -893,6 +908,7 @@ class PlaylistContainer(collections.MutableSequence, utils.EventEmitter):
             raise IndexError('list index out of range')
         self.remove_playlist(key)
 
+    @serialized
     def add_new_playlist(self, name, index=None):
         """Add an empty playlist with ``name`` at the given ``index``.
 
@@ -913,6 +929,7 @@ class PlaylistContainer(collections.MutableSequence, utils.EventEmitter):
             self.move_playlist(self.__len__() - 1, index)
         return playlist
 
+    @serialized
     def add_playlist(self, playlist, index=None):
         """Add an existing ``playlist`` to the playlist container at the given
         ``index``.
@@ -1011,6 +1028,7 @@ class PlaylistContainer(collections.MutableSequence, utils.EventEmitter):
             self._sp_playlistcontainer, from_index, to_index, int(dry_run)))
 
     @property
+    @serialized
     def owner(self):
         """The :class:`User` object for the owner of the playlist container."""
         return spotify.User(
@@ -1215,6 +1233,7 @@ class PlaylistTrack(object):
     # TODO Add useful __repr__
 
     @property
+    @serialized
     def track(self):
         """The :class:`~spotify.Track`."""
         return spotify.Track(
@@ -1230,6 +1249,7 @@ class PlaylistTrack(object):
             self._sp_playlist, self._index)
 
     @property
+    @serialized
     def creator(self):
         """The :class:`~spotify.User` that added the track to the playlist."""
         return spotify.User(
@@ -1248,6 +1268,7 @@ class PlaylistTrack(object):
     """Whether the track is marked as seen or not."""
 
     @property
+    @serialized
     def message(self):
         """A message attached to the track. Typically used in the inbox."""
         message = lib.sp_playlist_track_message(self._sp_playlist, self._index)

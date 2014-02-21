@@ -5,7 +5,7 @@ import logging
 import threading
 
 import spotify
-from spotify import ffi, lib, utils
+from spotify import ffi, lib, serialized, utils
 
 
 __all__ = [
@@ -31,6 +31,7 @@ class Image(object):
 
     def __init__(self, uri=None, sp_image=None, add_ref=True):
         assert uri or sp_image, 'uri or sp_image is required'
+
         if uri is not None:
             image = spotify.Link(uri).as_image()
             if image is None:
@@ -38,9 +39,11 @@ class Image(object):
                     'Failed to get image from Spotify URI: %r' % uri)
             sp_image = image._sp_image
             add_ref = True
+
         if add_ref:
             lib.sp_image_add_ref(sp_image)
         self._sp_image = ffi.gc(sp_image, lib.sp_image_release)
+
         self.load_event = threading.Event()
         self._callback_handles = set()
 
@@ -110,6 +113,7 @@ class Image(object):
         return ImageFormat(lib.sp_image_format(self._sp_image))
 
     @property
+    @serialized
     def data(self):
         """The raw image data as a bytestring.
 

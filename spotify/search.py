@@ -5,7 +5,7 @@ import logging
 import threading
 
 import spotify
-from spotify import ffi, lib, utils
+from spotify import ffi, lib, serialized, utils
 
 
 __all__ = [
@@ -103,6 +103,7 @@ class Search(object):
         return utils.load(self, timeout=timeout)
 
     @property
+    @serialized
     def query(self):
         """The search query.
 
@@ -113,6 +114,7 @@ class Search(object):
         return query if query else None
 
     @property
+    @serialized
     def did_you_mean(self):
         """The search's "did you mean" query or :class:`None` if no such
         suggestion exists.
@@ -125,6 +127,7 @@ class Search(object):
         return did_you_mean if did_you_mean else None
 
     @property
+    @serialized
     def tracks(self):
         """The tracks matching the search query.
 
@@ -135,6 +138,7 @@ class Search(object):
         if not self.is_loaded:
             return []
 
+        @serialized
         def get_track(sp_search, key):
             return spotify.Track(
                 sp_track=lib.sp_search_track(sp_search, key),
@@ -159,6 +163,7 @@ class Search(object):
         return lib.sp_search_total_tracks(self._sp_search)
 
     @property
+    @serialized
     def albums(self):
         """The albums matching the search query.
 
@@ -169,6 +174,7 @@ class Search(object):
         if not self.is_loaded:
             return []
 
+        @serialized
         def get_album(sp_search, key):
             return spotify.Album(
                 sp_album=lib.sp_search_album(sp_search, key),
@@ -193,6 +199,7 @@ class Search(object):
         return lib.sp_search_total_albums(self._sp_search)
 
     @property
+    @serialized
     def artists(self):
         """The artists matching the search query.
 
@@ -203,6 +210,7 @@ class Search(object):
         if not self.is_loaded:
             return []
 
+        @serialized
         def get_artist(sp_search, key):
             return spotify.Artist(
                 sp_artist=lib.sp_search_artist(sp_search, key),
@@ -227,6 +235,7 @@ class Search(object):
         return lib.sp_search_total_artists(self._sp_search)
 
     @property
+    @serialized
     def playlists(self):
         """The playlists matching the search query as
         :class:`SearchPlaylist` objects containing the name, URI and
@@ -239,6 +248,7 @@ class Search(object):
         if not self.is_loaded:
             return []
 
+        @serialized
         def getitem(sp_search, key):
             return spotify.SearchPlaylist(
                 name=utils.to_unicode(

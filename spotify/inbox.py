@@ -4,7 +4,7 @@ import logging
 import threading
 
 import spotify
-from spotify import ffi, lib, utils
+from spotify import ffi, lib, serialized, utils
 
 
 __all__ = [
@@ -17,6 +17,7 @@ logger = logging.getLogger(__name__)
 class InboxPostResult(object):
     """The result object returned by :meth:`Session.inbox_post_tracks`."""
 
+    @serialized
     def __init__(
             self, canonical_username=None, tracks=None, message='',
             callback=None, sp_inbox=None, add_ref=True):
@@ -45,6 +46,7 @@ class InboxPostResult(object):
                 spotify.session_instance._sp_session, canonical_username,
                 [t._sp_track for t in tracks], len(tracks),
                 message, _inboxpost_complete_callback, handle)
+            add_ref = True
 
             if sp_inbox == ffi.NULL:
                 raise spotify.Error('Inbox post request failed to initialize')

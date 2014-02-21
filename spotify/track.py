@@ -1,7 +1,7 @@
 from __future__ import unicode_literals
 
 import spotify
-from spotify import ffi, lib, utils
+from spotify import ffi, lib, serialized, utils
 
 
 __all__ = [
@@ -28,6 +28,7 @@ class Track(object):
 
     def __init__(self, uri=None, sp_track=None, add_ref=True):
         assert uri or sp_track, 'uri or sp_track is required'
+
         if uri is not None:
             track = spotify.Link(uri).as_track()
             if track is None:
@@ -35,6 +36,7 @@ class Track(object):
                     'Failed to get track from Spotify URI: %r' % uri)
             sp_track = track._sp_track
             add_ref = True
+
         if add_ref:
             lib.sp_track_add_ref(sp_track)
         self._sp_track = ffi.gc(sp_track, lib.sp_track_release)
@@ -127,6 +129,7 @@ class Track(object):
             spotify.session_instance._sp_session, self._sp_track))
 
     @property
+    @serialized
     def playable(self):
         """The actual track that will be played when this track is played.
 
@@ -195,6 +198,7 @@ class Track(object):
             bool(value)))
 
     @property
+    @serialized
     def artists(self):
         """The artists performing on the track.
 
@@ -204,6 +208,7 @@ class Track(object):
         if not self.is_loaded:
             return []
 
+        @serialized
         def get_artist(sp_track, key):
             return spotify.Artist(
                 sp_artist=lib.sp_track_artist(sp_track, key),
@@ -217,6 +222,7 @@ class Track(object):
             getitem_func=get_artist)
 
     @property
+    @serialized
     def album(self):
         """The album of the track.
 
@@ -229,6 +235,7 @@ class Track(object):
         return spotify.Album(sp_album=sp_album, add_ref=True)
 
     @property
+    @serialized
     def name(self):
         """The track's name.
 

@@ -1,6 +1,6 @@
 from __future__ import unicode_literals
 
-from spotify import lib, utils
+from spotify import lib, serialized, utils
 
 
 __all__ = [
@@ -47,6 +47,7 @@ class LibError(Error):
     error_type = None
     """The :class:`ErrorType` of the error."""
 
+    @serialized
     def __init__(self, error_type):
         self.error_type = error_type
         message = utils.to_unicode(lib.sp_error_message(error_type))

@@ -4,7 +4,7 @@ import logging
 import threading
 
 import spotify
-from spotify import ffi, lib, utils
+from spotify import ffi, lib, serialized, utils
 
 
 __all__ = [
@@ -36,6 +36,7 @@ class Album(object):
                 raise ValueError(
                     'Failed to get album from Spotify URI: %r' % uri)
             sp_album = album._sp_album
+            add_ref = True
 
         if add_ref:
             lib.sp_album_add_ref(sp_album)
@@ -70,6 +71,7 @@ class Album(object):
         return bool(lib.sp_album_is_available(self._sp_album))
 
     @property
+    @serialized
     def artist(self):
         """The artist of the album.
 
@@ -80,6 +82,7 @@ class Album(object):
             return None
         return spotify.Artist(sp_artist=sp_artist, add_ref=True)
 
+    @serialized
     def cover(self, image_size=None):
         """The album's cover :class:`Image`.
 
@@ -115,6 +118,7 @@ class Album(object):
         return spotify.Link(sp_link=sp_link, add_ref=False)
 
     @property
+    @serialized
     def name(self):
         """The album's name.
 
@@ -248,6 +252,7 @@ class AlbumBrowser(object):
             self._sp_albumbrowse)
 
     @property
+    @serialized
     def album(self):
         """Get the :class:`Album` the browser is for.
 
@@ -259,6 +264,7 @@ class AlbumBrowser(object):
         return Album(sp_album=sp_album, add_ref=True)
 
     @property
+    @serialized
     def artist(self):
         """The :class:`Artist` of the album.
 
@@ -270,6 +276,7 @@ class AlbumBrowser(object):
         return spotify.Artist(sp_artist=sp_artist, add_ref=True)
 
     @property
+    @serialized
     def copyrights(self):
         """The album's copyright strings.
 
@@ -278,6 +285,7 @@ class AlbumBrowser(object):
         if not self.is_loaded:
             return []
 
+        @serialized
         def get_copyright(sp_albumbrowse, key):
             return utils.to_unicode(
                 lib.sp_albumbrowse_copyright(sp_albumbrowse, key))
@@ -290,6 +298,7 @@ class AlbumBrowser(object):
             getitem_func=get_copyright)
 
     @property
+    @serialized
     def tracks(self):
         """The album's tracks.
 
@@ -298,6 +307,7 @@ class AlbumBrowser(object):
         if not self.is_loaded:
             return []
 
+        @serialized
         def get_track(sp_albumbrowse, key):
             return spotify.Track(
                 sp_track=lib.sp_albumbrowse_track(sp_albumbrowse, key),
@@ -311,6 +321,7 @@ class AlbumBrowser(object):
             getitem_func=get_track)
 
     @property
+    @serialized
     def review(self):
         """A review of the album.
 

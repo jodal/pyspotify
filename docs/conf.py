@@ -8,6 +8,7 @@ import mock
 import os
 import re
 import sys
+import types
 
 
 def get_version(filename):
@@ -38,7 +39,18 @@ with open('sp-constants.csv') as fh:
         key, value = line.split(',', 1)
         setattr(lib, key, value)
 
-sys.modules['cffi'] = cffi
+
+# Unwrap decorated methods so Sphinx can inspect their signatures
+import spotify
+for mod_name, mod in vars(spotify).items():
+    if not isinstance(mod, types.ModuleType) or mod_name in ('threading',):
+        continue
+    for class_name, cls in vars(mod).items():
+        if not isinstance(cls, type):
+            continue
+        for method_name, method in vars(cls).items():
+            if hasattr(method, '__wrapped__'):
+                setattr(cls, method_name, method.__wrapped__)
 
 
 # -- General configuration ----------------------------------------------------

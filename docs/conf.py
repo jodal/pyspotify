@@ -4,11 +4,17 @@
 
 from __future__ import unicode_literals
 
-import mock
 import os
 import re
 import sys
 import types
+
+try:
+    # Python 3.3+
+    from unittest import mock
+except ImportError:
+    # Python <3.3
+    import mock
 
 
 def get_version(filename):
@@ -29,8 +35,8 @@ sys.modules['cffi'] = cffi
 ffi = cffi.FFI.return_value
 ffi.CData = bytes
 lib = ffi.verify.return_value
-lib.sp_error_message.return_value = ''
-lib.sp_error_message.__name__ = b'sp_error_message'
+lib.sp_error_message.return_value = b''
+lib.sp_error_message.__name__ = str('sp_error_message')
 
 
 # Add all libspotify constants to the lib mock

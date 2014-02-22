@@ -6,8 +6,13 @@ from distutils.command.build import build
 from setuptools import setup, find_packages
 
 
+def read_file(filename):
+    with open(filename) as fh:
+        return fh.read()
+
+
 def get_version(filename):
-    init_py = open(filename).read()
+    init_py = read_file(filename)
     metadata = dict(re.findall("__([a-z]+)__ = '([^']+)'", init_py))
     return metadata['version']
 
@@ -31,7 +36,7 @@ setup(
     author='Stein Magnus Jodal',
     author_email='stein.magnus@jodal.no',
     description='Python wrapper for libspotify',
-    long_description=open('README.rst').read(),
+    long_description=read_file('README.rst'),
     packages=find_packages(exclude=['tests', 'tests.*']),
     ext_package='spotify',
     zip_safe=False,

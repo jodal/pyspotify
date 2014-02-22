@@ -75,8 +75,9 @@ def _build_ffi():
             'pyspotify requires cffi >= 0.7, but found %s' % cffi.__version__)
 
     header_file = os.path.join(os.path.dirname(__file__), 'api.processed.h')
-    header = open(header_file).read()
-    header += '#define SPOTIFY_API_VERSION ...\n'
+    with open(header_file) as fh:
+        header = fh.read()
+        header += '#define SPOTIFY_API_VERSION ...\n'
 
     ffi = cffi.FFI()
     ffi.cdef(header)

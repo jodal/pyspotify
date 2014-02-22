@@ -21,14 +21,18 @@ def get_version(filename):
 sys.path.insert(0, os.path.abspath('..'))
 
 
+# Mock cffi module and cffi objects
 cffi = mock.Mock()
 cffi.__version__ = '0.8.1'
+sys.modules['cffi'] = cffi
 ffi = cffi.FFI.return_value
 ffi.CData = bytes
 lib = ffi.verify.return_value
 lib.sp_error_message.return_value = ''
 lib.sp_error_message.__name__ = b'sp_error_message'
 
+
+# Add all libspotify constants to the lib mock
 with open('sp-constants.csv') as fh:
     for line in fh.readlines():
         key, value = line.split(',', 1)

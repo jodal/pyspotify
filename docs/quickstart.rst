@@ -5,7 +5,7 @@ Quickstart
 This guide will quickly introduce you to some of the core features of
 pyspotify. It assumes that you've already installed pyspotify. If you do not,
 check out :doc:`installation`. For a complete reference of what pyspotify
-provides, refer to the :doc:`api`.
+provides, refer to the :doc:`api/index`.
 
 
 Application keys

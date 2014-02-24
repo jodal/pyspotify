@@ -10,8 +10,6 @@ still under active development.
 v2.0.0a2: Thread safety
 =======================
 
-- Ensure we never edit shared data structures without holding the global lock.
-
 - React to ``notify_main_thread`` callbacks and do ``process_events()`` for us
   in a worker thread in the background. This will be a lot easier to implement
   if thread safety is in place first. This functionality should probably be

@@ -13,6 +13,8 @@ Feature: Thread safety
   while we are still working on the data returned by the previous libspotify
   call, which could make the data garbage.
 
+- Ensure we never edit shared data structures without holding the global lock.
+
 Other changes
 -------------
 

@@ -56,6 +56,7 @@ class Toplist(object):
         assert (type is not None and region is not None) or sp_toplistbrowse, \
             'type and region, or sp_toplistbrowse, is required'
 
+        # TODO Document these attributes?
         self.type = type
         self.region = region
         self.canonical_username = canonical_username

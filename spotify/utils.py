@@ -7,7 +7,7 @@ import sys
 import time
 
 import spotify
-from spotify import ffi, lib
+from spotify import ffi, lib, serialized
 
 
 PY2 = sys.version_info[0] == 2
@@ -28,6 +28,7 @@ class EventEmitter(object):
     def __init__(self):
         self._listeners = collections.defaultdict(list)
 
+    @serialized
     def on(self, event, listener, *user_args):
         """Register a ``listener`` to be called on ``event``.
 
@@ -41,6 +42,7 @@ class EventEmitter(object):
         self._listeners[event].append(
             _Listener(callback=listener, user_args=user_args))
 
+    @serialized
     def off(self, event=None, listener=None):
         """Remove a ``listener`` that was to be called on ``event``.
 
@@ -68,7 +70,8 @@ class EventEmitter(object):
         The listeners will be called with any extra arguments passed to
         :meth:`emit` first, and then the extra arguments passed to :meth:`on`
         """
-        for listener in self._listeners[event]:
+        listeners = self._listeners[event][:]
+        for listener in listeners:
             args = list(event_args) + list(listener.user_args)
             result = listener.callback(*args)
             if result is False:

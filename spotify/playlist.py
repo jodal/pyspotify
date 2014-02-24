@@ -39,6 +39,7 @@ class Playlist(utils.EventEmitter):
     """
 
     @classmethod
+    @serialized
     def _cached(cls, sp_playlist, add_ref=True):
         """
         Get :class:`Playlist` instance for the given ``sp_playlist``. If
@@ -766,6 +767,7 @@ class PlaylistContainer(collections.MutableSequence, utils.EventEmitter):
     """
 
     @classmethod
+    @serialized
     def _cached(cls, sp_playlistcontainer, add_ref=True):
         """
         Get :class:`PlaylistContainer` instance for the given

@@ -1296,6 +1296,7 @@ class PlaylistUnseenTracks(collections.Sequence):
 
     _BATCH_SIZE = 100
 
+    @serialized
     def __init__(self, sp_playlistcontainer, sp_playlist):
         lib.sp_playlistcontainer_add_ref(sp_playlistcontainer)
         self._sp_playlistcontainer = ffi.gc(
@@ -1308,6 +1309,7 @@ class PlaylistUnseenTracks(collections.Sequence):
         self._sp_tracks_len = 0
         self._get_more_tracks()
 
+    @serialized
     def _get_more_tracks(self):
         self._sp_tracks_len = min(
             self._num_tracks, self._sp_tracks_len + self._BATCH_SIZE)

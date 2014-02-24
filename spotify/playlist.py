@@ -389,12 +389,14 @@ class Playlist(utils.EventEmitter):
             raise spotify.Error('Failed to get link from Spotify playlist')
         return spotify.Link(sp_link=sp_link, add_ref=False)
 
+    @serialized
     def on(self, event, listener, *user_args):
         if self not in spotify.session_instance._emitters:
             spotify.session_instance._emitters.append(self)
         super(Playlist, self).on(event, listener, *user_args)
     on.__doc__ = utils.EventEmitter.on.__doc__
 
+    @serialized
     def off(self, event=None, listener=None):
         super(Playlist, self).off(event, listener)
         if (self.num_listeners() == 0 and
@@ -1058,12 +1060,14 @@ class PlaylistContainer(collections.MutableSequence, utils.EventEmitter):
 
         self[index:index] = [value]
 
+    @serialized
     def on(self, event, listener, *user_args):
         if self not in spotify.session_instance._emitters:
             spotify.session_instance._emitters.append(self)
         super(PlaylistContainer, self).on(event, listener, *user_args)
     on.__doc__ = utils.EventEmitter.on.__doc__
 
+    @serialized
     def off(self, event=None, listener=None):
         super(PlaylistContainer, self).off(event, listener)
         if (self.num_listeners() == 0 and

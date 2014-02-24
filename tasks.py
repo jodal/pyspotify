@@ -24,7 +24,9 @@ def test(coverage=False, watch=False, warn=False):
 
 @task
 def preprocess_header():
-    run('cpp -nostdinc spotify/api.h > spotify/api.processed.h || true')
+    run(
+        'cpp -nostdinc spotify/api.h | egrep -v "(^#)|(^$)" '
+        '> spotify/api.processed.h || true')
 
 
 @task

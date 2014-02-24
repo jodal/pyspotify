@@ -37,6 +37,7 @@ class Session(utils.EventEmitter):
     :type config: :class:`Config` or :class:`None`
     """
 
+    @serialized
     def __init__(self, config=None):
         super(Session, self).__init__()
 

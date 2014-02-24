@@ -50,9 +50,11 @@ class Image(object):
     def __repr__(self):
         return 'Image(%r)' % self.link.uri
 
+    # FIXME The event is never set.
     load_event = None
     """:class:`threading.Event` that is set when the image is loaded."""
 
+    @serialized
     def add_load_callback(self, callback):
         """Add callback to be called when the image data has loaded.
 
@@ -73,6 +75,7 @@ class Image(object):
             self._sp_image, _image_load_callback, handle))
         return handle
 
+    @serialized
     def remove_load_callback(self, handle):
         """Remove a callback which was added with :meth:`add_load_callback`."""
         self._callback_handles.remove(handle)
@@ -151,6 +154,7 @@ class Image(object):
 
 
 @ffi.callback('void(sp_image *, void *)')
+@serialized
 def _image_load_callback(sp_image, handle):
     logger.debug('image_load_callback called')
     if handle == ffi.NULL:

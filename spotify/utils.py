@@ -13,8 +13,8 @@ from spotify import ffi, lib, serialized
 PY2 = sys.version_info[0] == 2
 
 if PY2:  # pragma: no branch
-    string_types = (basestring,)
-    text_type = unicode
+    string_types = (basestring,)  # noqa
+    text_type = unicode  # noqa
     binary_type = str
 else:
     string_types = (str,)

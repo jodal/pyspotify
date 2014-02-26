@@ -20,20 +20,21 @@ Development setup
    <https://launchpad.net/~fkrull/+archive/deadsnakes>`_ has packages of both
    old and new Python versions.
 
-2. On Debian/Ubuntu, make sure you have `apt.mopidy.com
-   <https://apt.mopidy.com/>`_ in your APT sources. Otherwise, install
-   libspotify from source yourself.
+2. Install the following with development headers: Python, libffi, and
+   libspotify.
 
-3. Install Python, libffi, and libspotify development files. On Debian/Ubuntu::
+   On Debian/Ubuntu, make sure you have `apt.mopidy.com
+   <https://apt.mopidy.com/>`_ in your APT sources to get the libspotify
+   package, then run::
 
        sudo apt-get install python-all-dev python3-all-dev libffi-dev libspotify-dev
 
-4. Create and activate a virtualenv::
+3. Create and activate a virtualenv::
 
        virtualenv ve
        source ve/bin/activate
 
-5. Install development dependencies::
+4. Install development dependencies::
 
        pip install cffi nose tox
 
@@ -42,7 +43,7 @@ Development setup
 
        pip install mock
 
-6. Run tests.
+5. Run tests.
 
    For a quick test suite run, using the virtualenv's Python version::
 

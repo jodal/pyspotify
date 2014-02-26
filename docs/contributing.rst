@@ -53,6 +53,24 @@ Development setup
 
        tox
 
+6. For some more development task helpers, install ``invoke``::
+
+       pip install invoke
+
+   To list available tasks, run::
+
+       invoke --list
+
+   For example, to run tests on any file change, run::
+
+       invoke test --watch
+
+   Or, to build docs when any file changes, run::
+
+       invoke docs --watch
+
+   See the file ``tasks.py`` for the task definitions.
+
 
 Submitting changes
 ==================

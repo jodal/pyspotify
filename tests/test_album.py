@@ -1,11 +1,11 @@
 from __future__ import unicode_literals
 
-import mock
 import unittest
 
 import spotify
 from spotify import utils
 import tests
+from tests import mock
 
 
 @mock.patch('spotify.album.lib', spec=spotify.lib)

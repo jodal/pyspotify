@@ -2,12 +2,12 @@
 
 from __future__ import unicode_literals
 
-import mock
 import unittest
 
 import spotify
 from spotify import utils
 import tests
+from tests import mock
 
 
 class EventEmitterTest(unittest.TestCase):

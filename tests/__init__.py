@@ -1,9 +1,15 @@
 from __future__ import unicode_literals
 
 import gc
-import mock
 import platform
 import weakref
+
+try:
+    # Python 3.3+
+    from unittest import mock
+except ImportError:
+    # From PyPI
+    import mock
 
 import cffi
 

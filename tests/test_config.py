@@ -2,11 +2,11 @@
 
 from __future__ import unicode_literals
 
-import mock
 import tempfile
 import unittest
 
 import spotify
+from tests import mock
 
 
 class ConfigTest(unittest.TestCase):

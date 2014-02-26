@@ -2,12 +2,12 @@
 
 from __future__ import unicode_literals
 
-import mock
 import unittest
 
 import spotify
 from spotify.session import _SessionCallbacks
 import tests
+from tests import mock
 
 
 def create_session(lib_mock):

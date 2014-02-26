@@ -1,10 +1,10 @@
 from __future__ import unicode_literals
 
-import mock
 import unittest
 
 import spotify
 import tests
+from tests import mock
 
 
 @mock.patch('spotify.toplist.lib', spec=spotify.lib)

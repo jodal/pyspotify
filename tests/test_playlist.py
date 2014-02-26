@@ -3,12 +3,12 @@
 from __future__ import unicode_literals
 
 import collections
-import mock
 import unittest
 
 import spotify
 from spotify.playlist import _PlaylistCallbacks, _PlaylistContainerCallbacks
 import tests
+from tests import mock
 
 
 @mock.patch('spotify.playlist.lib', spec=spotify.lib)

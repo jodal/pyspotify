@@ -35,7 +35,12 @@ Development setup
 
 5. Install development dependencies::
 
-       pip install cffi mock nose tox
+       pip install cffi nose tox
+
+   Note that if you're developing on Python <3.3, you also need to install
+   ``mock``::
+
+       pip install mock
 
 6. Run tests.
 

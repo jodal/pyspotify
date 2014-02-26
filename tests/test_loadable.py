@@ -1,11 +1,11 @@
 from __future__ import unicode_literals
 
-import mock
 import unittest
 import time
 
 import spotify
 from spotify.utils import load
+from tests import mock
 
 
 class Foo(object):

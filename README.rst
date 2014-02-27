@@ -27,18 +27,18 @@ Project resources
 - IRC: ``#mopidy`` at `irc.freenode.net <http://freenode.net/>`_
 - Mailing list: `mopidy@googlegroups.com <https://groups.google.com/forum/?fromgroups=#!forum/mopidy>`_
 
-.. image:: https://img.shields.io/pypi/v/pyspotify.svg
+.. image:: https://img.shields.io/pypi/v/pyspotify.png
     :target: https://pypi.python.org/pypi/pyspotify/
     :alt: Latest PyPI version
 
-.. image:: https://img.shields.io/npm/dm/pyspotify.svg
+.. image:: https://img.shields.io/npm/dm/pyspotify.png
     :target: https://pypi.python.org/pypi/pyspotify/
     :alt: Number of PyPI downloads
 
-.. image:: https://img.shields.io/travis/mopidy/pyspotify/v2.x/develop.svg
+.. image:: https://img.shields.io/travis/mopidy/pyspotify/v2.x/develop.png
     :target: https://travis-ci.org/mopidy/pyspotify
     :alt: Travis CI build status
 
-.. image:: https://img.shields.io/coveralls/mopidy/pyspotify/v2.x/develop.svg
+.. image:: https://img.shields.io/coveralls/mopidy/pyspotify/v2.x/develop.png
    :target: https://coveralls.io/r/mopidy/pyspotify?branch=v2.x/develop
    :alt: Test coverage

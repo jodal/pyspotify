@@ -207,7 +207,7 @@ If we turn on logging, the login process is a bit more informative::
     DEBUG:spotify.session:Connection state updated
     43
     >>> session.user
-    User(u'spotify:user:alice') 
+    User(u'spotify:user:alice')
 
 
 Browsing metadata
@@ -431,18 +431,31 @@ to get started.
 Thread safety
 =============
 
+If you've read the libspotify documentation, you may have noticed that
 libspotify itself isn't thread safe. This means that you must take care to
 never call libspotify functions from two threads at the same time, and to
-finish your work with e.g. strings returned by libspotify functions before
-calling the next libspotify function.
+finish your work with any pointers--e.g. strings--returned by libspotify
+functions before calling the next libspotify function. In summary, you'll need
+to use a single thread for all your use of libspotify, or protect all
+libspotify function calls with a single lock.
 
-In other words, you'll need to use a single thread for all your use of
-libspotify, or protect all libspotify function calls with a single lock.
+pyspotify, on the other hand, improves on this so that you can use pyspotify
+from multiple threads. pyspotify has a single global lock. This lock is
+acquired during all calls to libspotify, for as long as we're working with
+pointers returned from libspotify functions, and during all access to
+pyspotify's own internal state, like for example the collections of event
+listeners. In other words, pyspotify--as of 2.0.0a2--should be safe to use from
+multiple threads simultaneously.
 
-pyspotify plans to improve on this so that you can use pyspotify from multiple
-threads without issues. Currently (2.0.0a1) pyspotify protect all
-libspotify function calls with a single lock, but that's it. In other words,
-pyspotify as of 2.0.0a1 is not to be considered any more thread safe than
-libspotify itself, and you need to take the same precautions as you would with
-libspotify: use a single thread for all pyspotify usage or protect all
-pyspotify usage with a single lock.
+Even though pyspotify itself is thread safe, you cannot disregard threading
+issues entirely when using pyspotify. There's two things to watch out for.
+First, event listeners for a number of the events listed in
+:class:`~spotify.SessionEvent` will be called from internal threads in
+libspotify itself. This is clearly marked in the documentation for the relevant
+events. Second, if you use the :class:`~spotify.EventLoop` helper thread,
+listeners for all other events--that is, events *not* emitted from internal
+threads in libspotify--will be called from the :class:`~spotify.EventLoop`
+thread. This shouldn't be an issue if you just use pyspotify itself from
+within the event listeners, but the moment you start working with your
+application's state from inside event listeners, you'll need to apply the
+proper thread synchronization primitives to avoid getting into trouble.

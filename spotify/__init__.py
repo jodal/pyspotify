@@ -101,6 +101,7 @@ from spotify.audio import *  # noqa
 from spotify.config import *  # noqa
 from spotify.connection import *  # noqa
 from spotify.error import *  # noqa
+from spotify.eventloop import *  # noqa
 from spotify.image import *  # noqa
 from spotify.inbox import *  # noqa
 from spotify.link import *  # noqa

@@ -69,7 +69,7 @@ install it run::
 
 .. note::
 
-    The ``--pre`` argument to ``pip install`` is needed to make pip 1.5 or
+    The ``--pre`` argument to ``pip install`` is needed to make pip 1.4 or
     newer install pre-releases, like the alpha and beta releases of pyspotify
     2.x.
 

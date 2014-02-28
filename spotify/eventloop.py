@@ -42,9 +42,9 @@ class EventLoop(threading.Thread):
 
     .. warning::
 
-        Any event listeners you've registered will be called from the event
-        loop thread if you use :class:`EventLoop` to process the libspotify
-        events. pyspotify itself is thread safe, but you'll need to ensure that
+        If you use :class:`EventLoop` to process the libspotify events, any
+        event listeners you've registered will be called from the event loop
+        thread. pyspotify itself is thread safe, but you'll need to ensure that
         you have proper synchronization in your own application code, as always
         when working with threads.
     """

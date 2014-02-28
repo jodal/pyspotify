@@ -112,16 +112,16 @@ not be enough. A more robust solution is to call it repeatedly until the
 :attr:`~spotify.SessionEvent.LOGGED_IN` event is emitted on the
 :class:`~spotify.Session` object::
 
-    >>> session.connection_state
-    <ConnectionState.OFFLINE: 4>
-    >>> session.user is None
-    True
     >>> import threading
     >>> logged_in_event = threading.Event()
     >>> def logged_in_listener(session, error_type):
     ...     logged_in_event.set()
     ...
+    >>> session = spotify.Session()
     >>> session.on(spotify.SessionEvent.LOGGED_IN, logged_in_listener)
+    >>> session.login('alice', 's3cretpassword')
+    >>> session.connection_state
+    <ConnectionState.OFFLINE: 4>
     >>> while not logged_in_event.wait(0.1):
     ...     session.process_events()
     ...
@@ -130,8 +130,31 @@ not be enough. A more robust solution is to call it repeatedly until the
     >>> session.user
     User(u'spotify:user:alice')
 
-TODO: Waiting for the login to complete should be easier with the help of an
-event loop for processing events in the background.
+This solution works properly, but is a bit tedious. pyspotify provides an
+:class:`~spotify.EventLoop` helper thread that can make the
+:meth:`~spotify.Session.process_events` calls in the background. With it
+running, we can simplify the login process::
+
+    >>> import threading
+    >>> logged_in_event = threading.Event()
+    >>> def logged_in_listener(session, error_type):
+    ...     logged_in_event.set()
+    ...
+    >>> session = spotify.Session()
+    >>> session.on(spotify.SessionEvent.LOGGED_IN, logged_in_listener)
+    >>> session.login('alice', 's3cretpassword')
+    >>> session.connection_state
+    <ConnectionState.OFFLINE: 4>
+    >>> logged_in_event.wait()
+    >>> session.connection_state
+    <ConnectionState.LOGGED_IN: 1>
+    >>> session.user
+    User(u'spotify:user:alice')
+
+Note that when using :class:`~spotify.EventLoop`, your event listener
+functions are called from the :class:`~spotify.EventLoop` thread, and not from
+your main thread. You may need to add synchronization primitives to protect
+your application code from threading issues.
 
 
 Logging

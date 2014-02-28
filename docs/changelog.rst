@@ -15,7 +15,14 @@ Feature: Thread safety
 
 - Ensure we never edit shared data structures without holding the global lock.
 
-Other changes
+Feature: Event loop
+-------------------
+
+- Added an :class:`~spotify.EventLoop` helper thread that reacts to
+  :class:`~spotify.SessionEvent.NOTIFY_MAIN_THREAD` events and calls
+  :meth:`~spotify.Session.process_events` for you when appropriate.
+
+Minor changes
 -------------
 
 - Running ``python setup.py test`` now runs the test suite.

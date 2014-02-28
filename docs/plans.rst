@@ -10,17 +10,16 @@ still under active development.
 v2.0.0a2: Thread safety
 =======================
 
-- React to ``notify_main_thread`` callbacks and do ``process_events()`` for us
-  in a worker thread in the background. This will be a lot easier to implement
-  if thread safety is in place first. This functionality should probably be
-  possible to opt out of.
-
 - Enforce that the same cache directory isn't used by multiple processes by
   maintaining a lock file or similar.
 
 - Consider whether we can get rid of the global session instance now, so we can
   easily support multiple sessions in a single process if libspotify adds
   support for it.
+
+- Look into how asyncio support could work.
+
+- Revisit all TODOs and FIXMEs in code and tests.
 
 
 v2.0.0b1: Seen real usage

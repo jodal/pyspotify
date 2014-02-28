@@ -223,6 +223,9 @@ class Session(utils.EventEmitter):
         internal libspotify thread), it's your job to make sure this method is
         called (from the thread you use for accessing Spotify), so that further
         callbacks can be triggered (from the same thread).
+
+        pyspotify provides an :class:`~spotify.EventLoop` that you can use for
+        processing events when needed.
         """
         next_timeout = ffi.new('int *')
 

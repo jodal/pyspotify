@@ -22,14 +22,6 @@ Feature: Event loop
   :class:`~spotify.SessionEvent.NOTIFY_MAIN_THREAD` events and calls
   :meth:`~spotify.Session.process_events` for you when appropriate.
 
-Minor changes
--------------
-
-- Running ``python setup.py test`` now runs the test suite.
-
-- The test suite now runs on Mac OS X, using CPython 2.7, 3.2, 3.3, and PyPy
-  2.2, on every push to GitHub.
-
 Bug fixes
 ---------
 
@@ -37,6 +29,14 @@ Bug fixes
   memory leaks in libspotify.
 
 - Add missing error check to :meth:`spotify.Playlist.add_tracks`.
+
+Minor changes
+-------------
+
+- Running ``python setup.py test`` now runs the test suite.
+
+- The test suite now runs on Mac OS X, using CPython 2.7, 3.2, 3.3, and PyPy
+  2.2, on every push to GitHub.
 
 
 v2.0.0a1 (2014-01-14)
@@ -67,7 +67,9 @@ This release *does not* provide:
 These features are planned for the upcoming prereleases, as outlined in
 :doc:`plans`.
 
-**Development milestones**
+
+Development milestones
+----------------------
 
 - 2014-02-13: Playlist callbacks complete. pyspotify 2.x now covers 100% of
   the libspotify 12 API. Docs reviewed, quickstart guide extended. Redundant

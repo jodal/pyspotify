@@ -415,6 +415,21 @@ class Session(utils.EventEmitter):
         """
         return spotify.User(uri=uri)
 
+    def get_image(self, uri):
+        """
+        Get :class:`Image` from a Spotify image URI.
+
+        Example::
+
+            >>> session = spotify.Session()
+            # ...
+            >>> image = session.get_image(
+            ...     'spotify:image:a0bdcbe11b5cd126968e519b5ed1050b0e8183d0')
+            >>> image.load().data_uri[:50]
+            u'data:image/jpeg;base64,/9j/4AAQSkZJRgABAQEBLAEsAAD'
+        """
+        return spotify.Image(uri=uri)
+
     def search(
             self, query, callback=None,
             track_offset=0, track_count=20,

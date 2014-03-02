@@ -23,8 +23,10 @@ class Image(object):
     You can get images from :meth:`Album.cover`, :meth:`Artist.portrait`, or
     you can create an :class:`Image` yourself from a Spotify URI::
 
-        >>> image = spotify.Image(
-        ... 'spotify:image:a0bdcbe11b5cd126968e519b5ed1050b0e8183d0')
+        >>> session = spotify.Session()
+        # ...
+        >>> image = session.get_image(
+        ...     'spotify:image:a0bdcbe11b5cd126968e519b5ed1050b0e8183d0')
         >>> image.load().data_uri[:50]
         u'data:image/jpeg;base64,/9j/4AAQSkZJRgABAQEBLAEsAAD'
     """

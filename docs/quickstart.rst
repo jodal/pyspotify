@@ -75,7 +75,7 @@ URIs::
 
     >>> import spotify
     >>> session = spotify.Session()
-    >>> album = spotify.Album('spotify:album:0XHpO9qTpqJJQwa2zFxAAE')
+    >>> album = session.get_album('spotify:album:0XHpO9qTpqJJQwa2zFxAAE')
     >>> album
     Album(u'spotify:album:0XHpO9qTpqJJQwa2zFxAAE')
     >>> album.link
@@ -216,7 +216,7 @@ Browsing metadata
 When we're logged in, the objects we created from Spotify URIs becomes a lot
 more interesting::
 
-    >>> album = spotify.Album('spotify:album:0XHpO9qTpqJJQwa2zFxAAE')
+    >>> album = session.get_album('spotify:album:0XHpO9qTpqJJQwa2zFxAAE')
 
 If the object isn't loaded, you can call :meth:`~spotify.Album.load` to block
 until the object is loaded with data::

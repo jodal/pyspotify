@@ -22,7 +22,9 @@ class Album(object):
     You can get an album from a track or an artist, or you can create an
     :class:`Album` yourself from a Spotify URI::
 
-        >>> album = spotify.Album('spotify:album:6wXDbHLesy6zWqQawAa91d')
+        >>> session = spotify.Session()
+        # ...
+        >>> album = session.get_album('spotify:album:6wXDbHLesy6zWqQawAa91d')
         >>> album.load().name
         u'Forward / Return'
     """

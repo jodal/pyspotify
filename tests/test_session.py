@@ -560,6 +560,16 @@ class SessionTest(unittest.TestCase):
             session._sp_session)
         self.assertEqual(result, 'SE')
 
+    @mock.patch('spotify.Album')
+    def test_get_album(self, album_mock, lib_mock):
+        session = create_session(lib_mock)
+        album_mock.return_value = mock.sentinel.album
+
+        result = session.get_album('spotify:album:foo')
+
+        self.assertIs(result, mock.sentinel.album)
+        album_mock.assert_called_with(uri='spotify:album:foo')
+
     @mock.patch('spotify.Search')
     def test_search(self, search_mock, lib_mock):
         session = create_session(lib_mock)

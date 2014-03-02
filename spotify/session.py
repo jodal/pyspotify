@@ -268,7 +268,7 @@ class Session(utils.EventEmitter):
         :class:`InboxPostResult` instance when the request has completed.
         """
         return spotify.InboxPostResult(
-            canonical_username, tracks, message, callback)
+            self, canonical_username, tracks, message, callback)
 
     @property
     def starred(self):

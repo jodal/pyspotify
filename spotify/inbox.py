@@ -19,12 +19,13 @@ class InboxPostResult(object):
 
     @serialized
     def __init__(
-            self, canonical_username=None, tracks=None, message='',
+            self, session, canonical_username=None, tracks=None, message='',
             callback=None, sp_inbox=None, add_ref=True):
 
         assert canonical_username and tracks or sp_inbox, \
             'canonical_username and tracks, or sp_inbox, is required'
 
+        self._session = session
         self.complete_event = threading.Event()
         self._callback_handles = set()
 
@@ -43,7 +44,7 @@ class InboxPostResult(object):
             self._callback_handles.add(handle)
 
             sp_inbox = lib.sp_inbox_post_tracks(
-                spotify.session_instance._sp_session, canonical_username,
+                self._session._sp_session, canonical_username,
                 [t._sp_track for t in tracks], len(tracks),
                 message, _inboxpost_complete_callback, handle)
             add_ref = True

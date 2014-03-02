@@ -376,7 +376,7 @@ class SessionTest(unittest.TestCase):
             mock.sentinel.message, mock.sentinel.callback)
 
         inbox_mock.assert_called_with(
-            mock.sentinel.username, mock.sentinel.tracks,
+            session, mock.sentinel.username, mock.sentinel.tracks,
             mock.sentinel.message, mock.sentinel.callback)
         self.assertEqual(result, inbox_instance_mock)
 

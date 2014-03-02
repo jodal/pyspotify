@@ -32,7 +32,9 @@ class Playlist(utils.EventEmitter):
     :meth:`~Session.starred_for_user`, :meth:`~Session.search`, etc., or you
     can create a playlist yourself from a Spotify URI::
 
-        >>> playlist = spotify.Playlist(
+        >>> session = spotify.Session()
+        # ...
+        >>> playlist = session.get_playlist(
         ...     'spotify:user:fiat500c:playlist:54k50VZdvtnIPt4d8RBCmZ')
         >>> playlist.load().name
         u'500C feelgood playlist'

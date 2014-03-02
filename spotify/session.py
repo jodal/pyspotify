@@ -386,6 +386,21 @@ class Session(utils.EventEmitter):
         """
         return spotify.Artist(uri=uri)
 
+    def get_playlist(self, uri):
+        """
+        Get :class:`Playlist` from a Spotify playlist URI.
+
+        Example::
+
+            >>> session = spotify.Session()
+            # ...
+            >>> playlist = session.get_playlist(
+            ...     'spotify:user:fiat500c:playlist:54k50VZdvtnIPt4d8RBCmZ')
+            >>> playlist.load().name
+            u'500C feelgood playlist'
+        """
+        return spotify.Playlist(uri=uri)
+
     def search(
             self, query, callback=None,
             track_offset=0, track_count=20,

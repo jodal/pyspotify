@@ -49,13 +49,16 @@ class Toplist(object):
         Track(u'spotify:track:2dLLR6qlu5UJ5gk0dKz0h3')
     """
 
+    # TODO Add session.toplist() constructor, like session.search()?
+
     def __init__(
-            self, type=None, region=None, canonical_username=None,
+            self, session, type=None, region=None, canonical_username=None,
             callback=None, sp_toplistbrowse=None, add_ref=True):
 
         assert (type is not None and region is not None) or sp_toplistbrowse, \
             'type and region, or sp_toplistbrowse, is required'
 
+        self._session = session
         # TODO Document these attributes?
         self.type = type
         self.region = region
@@ -77,8 +80,8 @@ class Toplist(object):
             self._callback_handles.add(handle)
 
             sp_toplistbrowse = lib.sp_toplistbrowse_create(
-                spotify.session_instance._sp_session,
-                int(type), region, utils.to_char_or_null(canonical_username),
+                self._session._sp_session, int(type), region,
+                utils.to_char_or_null(canonical_username),
                 _toplistbrowse_complete_callback, handle)
             add_ref = False
 
@@ -147,7 +150,7 @@ class Toplist(object):
         @serialized
         def get_track(sp_toplistbrowse, key):
             return spotify.Track(
-                spotify.session_instance,
+                self._session,
                 sp_track=lib.sp_toplistbrowse_track(sp_toplistbrowse, key),
                 add_ref=True)
 
@@ -172,7 +175,7 @@ class Toplist(object):
         @serialized
         def get_album(sp_toplistbrowse, key):
             return spotify.Album(
-                spotify.session_instance,
+                self._session,
                 sp_album=lib.sp_toplistbrowse_album(sp_toplistbrowse, key),
                 add_ref=True)
 
@@ -197,7 +200,7 @@ class Toplist(object):
         @serialized
         def get_artist(sp_toplistbrowse, key):
             return spotify.Artist(
-                spotify.session_instance,
+                self._session,
                 sp_artist=lib.sp_toplistbrowse_artist(sp_toplistbrowse, key),
                 add_ref=True)
 

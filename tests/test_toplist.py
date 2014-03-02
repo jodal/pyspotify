@@ -10,6 +10,9 @@ from tests import mock
 @mock.patch('spotify.toplist.lib', spec=spotify.lib)
 class ToplistTest(unittest.TestCase):
 
+    def setUp(self):
+        self.session = tests.create_session()
+
     def tearDown(self):
         spotify.session_instance = None
 
@@ -17,7 +20,8 @@ class ToplistTest(unittest.TestCase):
         lib_mock.sp_toplistbrowse_error.return_value = (
             spotify.ErrorType.BAD_API_VERSION)
         sp_toplistbrowse = spotify.ffi.new('int *')
-        toplist = spotify.Toplist(sp_toplistbrowse=sp_toplistbrowse)
+        toplist = spotify.Toplist(
+            self.session, sp_toplistbrowse=sp_toplistbrowse)
 
         with self.assertRaises(spotify.Error):
             func(toplist)
@@ -25,34 +29,33 @@ class ToplistTest(unittest.TestCase):
     def test_create_without_type_or_region_or_sp_toplistbrowse_fails(
             self, lib_mock):
         with self.assertRaises(AssertionError):
-            spotify.Toplist()
+            spotify.Toplist(self.session)
 
     def test_create_from_type_and_current_user_region(self, lib_mock):
-        session = tests.create_session()
         sp_toplistbrowse = spotify.ffi.new('int *')
         lib_mock.sp_toplistbrowse_create.return_value = sp_toplistbrowse
 
         result = spotify.Toplist(
-            type=spotify.ToplistType.TRACKS, region=spotify.ToplistRegion.USER)
+            self.session, type=spotify.ToplistType.TRACKS,
+            region=spotify.ToplistRegion.USER)
 
         lib_mock.sp_toplistbrowse_create.assert_called_with(
-            session._sp_session, int(spotify.ToplistType.TRACKS),
+            self.session._sp_session, int(spotify.ToplistType.TRACKS),
             int(spotify.ToplistRegion.USER), spotify.ffi.NULL,
             mock.ANY, mock.ANY)
         self.assertEqual(lib_mock.sp_toplistbrowse_add_ref.call_count, 0)
         self.assertEqual(result._sp_toplistbrowse, sp_toplistbrowse)
 
     def test_create_from_type_and_specific_user_region(self, lib_mock):
-        session = tests.create_session()
         sp_toplistbrowse = spotify.ffi.new('int *')
         lib_mock.sp_toplistbrowse_create.return_value = sp_toplistbrowse
 
         spotify.Toplist(
-            type=spotify.ToplistType.TRACKS, region=spotify.ToplistRegion.USER,
-            canonical_username='alice')
+            self.session, type=spotify.ToplistType.TRACKS,
+            region=spotify.ToplistRegion.USER, canonical_username='alice')
 
         lib_mock.sp_toplistbrowse_create.assert_called_with(
-            session._sp_session, int(spotify.ToplistType.TRACKS),
+            self.session._sp_session, int(spotify.ToplistType.TRACKS),
             int(spotify.ToplistRegion.USER), mock.ANY, mock.ANY, mock.ANY)
         self.assertEqual(
             spotify.ffi.string(
@@ -60,27 +63,25 @@ class ToplistTest(unittest.TestCase):
             b'alice')
 
     def test_create_from_type_and_country(self, lib_mock):
-        session = tests.create_session()
         sp_toplistbrowse = spotify.ffi.new('int *')
         lib_mock.sp_toplistbrowse_create.return_value = sp_toplistbrowse
 
         spotify.Toplist(
-            type=spotify.ToplistType.TRACKS, region='NO')
+            self.session, type=spotify.ToplistType.TRACKS, region='NO')
 
         lib_mock.sp_toplistbrowse_create.assert_called_with(
-            session._sp_session, int(spotify.ToplistType.TRACKS),
+            self.session._sp_session, int(spotify.ToplistType.TRACKS),
             20047, spotify.ffi.NULL, mock.ANY, mock.ANY)
 
     def test_create_with_callback(self, lib_mock):
-        tests.create_session()
         sp_toplistbrowse = spotify.ffi.cast(
             'sp_toplistbrowse *', spotify.ffi.new('int *'))
         lib_mock.sp_toplistbrowse_create.return_value = sp_toplistbrowse
         callback = mock.Mock()
 
         result = spotify.Toplist(
-            type=spotify.ToplistType.TRACKS, region=spotify.ToplistRegion.USER,
-            callback=callback)
+            self.session, type=spotify.ToplistType.TRACKS,
+            region=spotify.ToplistRegion.USER, callback=callback)
 
         toplistbrowse_complete_cb = (
             lib_mock.sp_toplistbrowse_create.call_args[0][4])
@@ -91,15 +92,14 @@ class ToplistTest(unittest.TestCase):
         callback.assert_called_with(result)
 
     def test_toplist_is_gone_before_callback_is_called(self, lib_mock):
-        tests.create_session()
         sp_toplistbrowse = spotify.ffi.cast(
             'sp_toplistbrowse *', spotify.ffi.new('int *'))
         lib_mock.sp_toplistbrowse_create.return_value = sp_toplistbrowse
         callback = mock.Mock()
 
         result = spotify.Toplist(
-            type=spotify.ToplistType.TRACKS, region=spotify.ToplistRegion.USER,
-            callback=callback)
+            self.session, type=spotify.ToplistType.TRACKS,
+            region=spotify.ToplistRegion.USER, callback=callback)
         complete_event = result.complete_event
         result = None  # noqa
         tests.gc_collect()
@@ -119,7 +119,7 @@ class ToplistTest(unittest.TestCase):
     def test_adds_ref_to_sp_toplistbrowse_when_created(self, lib_mock):
         sp_toplistbrowse = spotify.ffi.new('int *')
 
-        spotify.Toplist(sp_toplistbrowse=sp_toplistbrowse)
+        spotify.Toplist(self.session, sp_toplistbrowse=sp_toplistbrowse)
 
         lib_mock.sp_toplistbrowse_add_ref.assert_called_once_with(
             sp_toplistbrowse)
@@ -127,18 +127,18 @@ class ToplistTest(unittest.TestCase):
     def test_releases_sp_toplistbrowse_when_toplist_dies(self, lib_mock):
         sp_toplistbrowse = spotify.ffi.new('int *')
 
-        toplist = spotify.Toplist(sp_toplistbrowse=sp_toplistbrowse)
+        toplist = spotify.Toplist(
+            self.session, sp_toplistbrowse=sp_toplistbrowse)
         toplist = None  # noqa
         tests.gc_collect()
 
         lib_mock.sp_toplistbrowse_release.assert_called_with(sp_toplistbrowse)
 
     def test_repr(self, lib_mock):
-        tests.create_session()
         sp_toplistbrowse = spotify.ffi.new('int *')
         lib_mock.sp_toplistbrowse_create.return_value = sp_toplistbrowse
         toplist = spotify.Toplist(
-            type=spotify.ToplistType.TRACKS, region='NO')
+            self.session, type=spotify.ToplistType.TRACKS, region='NO')
 
         result = repr(toplist)
 
@@ -150,7 +150,8 @@ class ToplistTest(unittest.TestCase):
     def test_is_loaded(self, lib_mock):
         lib_mock.sp_toplistbrowse_is_loaded.return_value = 1
         sp_toplistbrowse = spotify.ffi.new('int *')
-        toplist = spotify.Toplist(sp_toplistbrowse=sp_toplistbrowse)
+        toplist = spotify.Toplist(
+            self.session, sp_toplistbrowse=sp_toplistbrowse)
 
         result = toplist.is_loaded
 
@@ -161,7 +162,8 @@ class ToplistTest(unittest.TestCase):
     @mock.patch('spotify.utils.load')
     def test_load(self, load_mock, lib_mock):
         sp_toplistbrowse = spotify.ffi.new('int *')
-        toplist = spotify.Toplist(sp_toplistbrowse=sp_toplistbrowse)
+        toplist = spotify.Toplist(
+            self.session, sp_toplistbrowse=sp_toplistbrowse)
 
         toplist.load(10)
 
@@ -171,7 +173,8 @@ class ToplistTest(unittest.TestCase):
         lib_mock.sp_toplistbrowse_error.return_value = int(
             spotify.ErrorType.OTHER_PERMANENT)
         sp_toplistbrowse = spotify.ffi.new('int *')
-        toplist = spotify.Toplist(sp_toplistbrowse=sp_toplistbrowse)
+        toplist = spotify.Toplist(
+            self.session, sp_toplistbrowse=sp_toplistbrowse)
 
         result = toplist.error
 
@@ -182,7 +185,8 @@ class ToplistTest(unittest.TestCase):
     def test_backend_request_duration(self, lib_mock):
         lib_mock.sp_toplistbrowse_backend_request_duration.return_value = 137
         sp_toplistbrowse = spotify.ffi.new('int *')
-        toplist = spotify.Toplist(sp_toplistbrowse=sp_toplistbrowse)
+        toplist = spotify.Toplist(
+            self.session, sp_toplistbrowse=sp_toplistbrowse)
 
         result = toplist.backend_request_duration
 
@@ -193,7 +197,8 @@ class ToplistTest(unittest.TestCase):
     def test_backend_request_duration_when_not_loaded(self, lib_mock):
         lib_mock.sp_toplistbrowse_is_loaded.return_value = 0
         sp_toplistbrowse = spotify.ffi.new('int *')
-        toplist = spotify.Toplist(sp_toplistbrowse=sp_toplistbrowse)
+        toplist = spotify.Toplist(
+            self.session, sp_toplistbrowse=sp_toplistbrowse)
 
         result = toplist.backend_request_duration
 
@@ -210,7 +215,8 @@ class ToplistTest(unittest.TestCase):
         lib_mock.sp_toplistbrowse_num_tracks.return_value = 1
         lib_mock.sp_toplistbrowse_track.return_value = sp_track
         sp_toplistbrowse = spotify.ffi.new('int *')
-        toplist = spotify.Toplist(sp_toplistbrowse=sp_toplistbrowse)
+        toplist = spotify.Toplist(
+            self.session, sp_toplistbrowse=sp_toplistbrowse)
 
         self.assertEqual(lib_mock.sp_toplistbrowse_add_ref.call_count, 1)
         result = toplist.tracks
@@ -231,7 +237,8 @@ class ToplistTest(unittest.TestCase):
         lib_mock.sp_toplistbrowse_error.return_value = spotify.ErrorType.OK
         lib_mock.sp_toplistbrowse_num_tracks.return_value = 0
         sp_toplistbrowse = spotify.ffi.new('int *')
-        toplist = spotify.Toplist(sp_toplistbrowse=sp_toplistbrowse)
+        toplist = spotify.Toplist(
+            self.session, sp_toplistbrowse=sp_toplistbrowse)
 
         result = toplist.tracks
 
@@ -244,7 +251,8 @@ class ToplistTest(unittest.TestCase):
         lib_mock.sp_toplistbrowse_error.return_value = spotify.ErrorType.OK
         lib_mock.sp_toplistbrowse_is_loaded.return_value = 0
         sp_toplistbrowse = spotify.ffi.new('int *')
-        toplist = spotify.Toplist(sp_toplistbrowse=sp_toplistbrowse)
+        toplist = spotify.Toplist(
+            self.session, sp_toplistbrowse=sp_toplistbrowse)
 
         result = toplist.tracks
 
@@ -262,7 +270,8 @@ class ToplistTest(unittest.TestCase):
         lib_mock.sp_toplistbrowse_num_albums.return_value = 1
         lib_mock.sp_toplistbrowse_album.return_value = sp_album
         sp_toplistbrowse = spotify.ffi.new('int *')
-        toplist = spotify.Toplist(sp_toplistbrowse=sp_toplistbrowse)
+        toplist = spotify.Toplist(
+            self.session, sp_toplistbrowse=sp_toplistbrowse)
 
         self.assertEqual(lib_mock.sp_toplistbrowse_add_ref.call_count, 1)
         result = toplist.albums
@@ -283,7 +292,8 @@ class ToplistTest(unittest.TestCase):
         lib_mock.sp_toplistbrowse_error.return_value = spotify.ErrorType.OK
         lib_mock.sp_toplistbrowse_num_albums.return_value = 0
         sp_toplistbrowse = spotify.ffi.new('int *')
-        toplist = spotify.Toplist(sp_toplistbrowse=sp_toplistbrowse)
+        toplist = spotify.Toplist(
+            self.session, sp_toplistbrowse=sp_toplistbrowse)
 
         result = toplist.albums
 
@@ -296,7 +306,8 @@ class ToplistTest(unittest.TestCase):
         lib_mock.sp_toplistbrowse_error.return_value = spotify.ErrorType.OK
         lib_mock.sp_toplistbrowse_is_loaded.return_value = 0
         sp_toplistbrowse = spotify.ffi.new('int *')
-        toplist = spotify.Toplist(sp_toplistbrowse=sp_toplistbrowse)
+        toplist = spotify.Toplist(
+            self.session, sp_toplistbrowse=sp_toplistbrowse)
 
         result = toplist.albums
 
@@ -314,7 +325,8 @@ class ToplistTest(unittest.TestCase):
         lib_mock.sp_toplistbrowse_num_artists.return_value = 1
         lib_mock.sp_toplistbrowse_artist.return_value = sp_artist
         sp_toplistbrowse = spotify.ffi.new('int *')
-        toplist = spotify.Toplist(sp_toplistbrowse=sp_toplistbrowse)
+        toplist = spotify.Toplist(
+            self.session, sp_toplistbrowse=sp_toplistbrowse)
 
         self.assertEqual(lib_mock.sp_toplistbrowse_add_ref.call_count, 1)
         result = toplist.artists
@@ -336,7 +348,8 @@ class ToplistTest(unittest.TestCase):
         lib_mock.sp_toplistbrowse_error.return_value = spotify.ErrorType.OK
         lib_mock.sp_toplistbrowse_num_artists.return_value = 0
         sp_toplistbrowse = spotify.ffi.new('int *')
-        toplist = spotify.Toplist(sp_toplistbrowse=sp_toplistbrowse)
+        toplist = spotify.Toplist(
+            self.session, sp_toplistbrowse=sp_toplistbrowse)
 
         result = toplist.artists
 
@@ -349,7 +362,8 @@ class ToplistTest(unittest.TestCase):
         lib_mock.sp_toplistbrowse_error.return_value = spotify.ErrorType.OK
         lib_mock.sp_toplistbrowse_is_loaded.return_value = 0
         sp_toplistbrowse = spotify.ffi.new('int *')
-        toplist = spotify.Toplist(sp_toplistbrowse=sp_toplistbrowse)
+        toplist = spotify.Toplist(
+            self.session, sp_toplistbrowse=sp_toplistbrowse)
 
         result = toplist.artists
 

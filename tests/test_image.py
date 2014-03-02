@@ -10,6 +10,12 @@ from tests import mock
 @mock.patch('spotify.image.lib', spec=spotify.lib)
 class ImageTest(unittest.TestCase):
 
+    def setUp(self):
+        self.session = tests.create_session()
+
+    def tearDown(self):
+        spotify.session_instance = None
+
     def test_create_without_uri_or_sp_image_fails(self, lib_mock):
         with self.assertRaises(AssertionError):
             spotify.Image()
@@ -25,7 +31,7 @@ class ImageTest(unittest.TestCase):
 
         result = spotify.Image(uri)
 
-        link_mock.assert_called_with(uri)
+        link_mock.assert_called_with(self.session, uri)
         link_instance_mock.as_image.assert_called_with()
         lib_mock.sp_image_add_ref.assert_called_with(sp_image)
         self.assertEqual(result._sp_image, sp_image)

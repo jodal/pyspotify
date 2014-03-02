@@ -568,7 +568,7 @@ class SessionTest(unittest.TestCase):
         result = session.get_link('spotify:any:foo')
 
         self.assertIs(result, mock.sentinel.link)
-        link_mock.assert_called_with(uri='spotify:any:foo')
+        link_mock.assert_called_with(session, uri='spotify:any:foo')
 
     @mock.patch('spotify.Track')
     def test_get_track(self, track_mock, lib_mock):

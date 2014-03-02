@@ -63,7 +63,7 @@ class Playlist(utils.EventEmitter):
         self._session = session
 
         if uri is not None:
-            playlist = spotify.Link(uri).as_playlist()
+            playlist = spotify.Link(self._session, uri).as_playlist()
             if playlist is None:
                 raise spotify.Error(
                     'Failed to get playlist from Spotify URI: %r' % uri)
@@ -389,7 +389,7 @@ class Playlist(utils.EventEmitter):
             # TODO Figure out why we can still get NULL here even if
             # the playlist is both loaded and in RAM.
             raise spotify.Error('Failed to get link from Spotify playlist')
-        return spotify.Link(sp_link=sp_link, add_ref=False)
+        return spotify.Link(self._session, sp_link=sp_link, add_ref=False)
 
     @serialized
     def on(self, event, listener, *user_args):

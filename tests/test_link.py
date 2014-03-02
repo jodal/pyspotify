@@ -11,25 +11,19 @@ from tests import mock
 class LinkTest(unittest.TestCase):
 
     def setUp(self):
-        spotify.session_instance = mock.sentinel.session
+        self.session = tests.create_session()
 
     def tearDown(self):
         spotify.session_instance = None
 
-    def test_raises_error_if_session_doesnt_exist(self, lib_mock):
-        spotify.session_instance = None
-
-        with self.assertRaises(RuntimeError):
-            spotify.Link('spotify:track:foo')
-
     def test_create_without_uri_or_obj_or_sp_link_fails(self, lib_mock):
         with self.assertRaises(AssertionError):
-            spotify.Link()
+            spotify.Link(self.session)
 
     def test_create_from_sp_link(self, lib_mock):
         sp_link = spotify.ffi.new('int *')
 
-        result = spotify.Link(sp_link=sp_link)
+        result = spotify.Link(self.session, sp_link=sp_link)
 
         self.assertEqual(result._sp_link, sp_link)
 
@@ -37,7 +31,7 @@ class LinkTest(unittest.TestCase):
         sp_link = spotify.ffi.new('int *')
         lib_mock.sp_link_create_from_string.return_value = sp_link
 
-        spotify.Link('spotify:track:foo')
+        spotify.Link(self.session, 'spotify:track:foo')
 
         lib_mock.sp_link_create_from_string.assert_called_once_with(
             mock.ANY)
@@ -51,13 +45,13 @@ class LinkTest(unittest.TestCase):
         lib_mock.sp_link_create_from_string.return_value = spotify.ffi.NULL
 
         with self.assertRaises(ValueError):
-            spotify.Link('invalid link string')
+            spotify.Link(self.session, 'invalid link string')
 
     def test_releases_sp_link_when_link_dies(self, lib_mock):
         sp_link = spotify.ffi.new('int *')
         lib_mock.sp_link_create_from_string.return_value = sp_link
 
-        link = spotify.Link('spotify:track:foo')
+        link = spotify.Link(self.session, 'spotify:track:foo')
         link = None  # noqa
         tests.gc_collect()
 
@@ -69,7 +63,7 @@ class LinkTest(unittest.TestCase):
         string = 'foo'
 
         lib_mock.sp_link_as_string.side_effect = tests.buffer_writer(string)
-        link = spotify.Link(string)
+        link = spotify.Link(self.session, string)
 
         result = repr(link)
 
@@ -81,7 +75,7 @@ class LinkTest(unittest.TestCase):
         string = 'foo'
 
         lib_mock.sp_link_as_string.side_effect = tests.buffer_writer(string)
-        link = spotify.Link(string)
+        link = spotify.Link(self.session, string)
 
         self.assertEqual(str(link), link.uri)
 
@@ -91,7 +85,7 @@ class LinkTest(unittest.TestCase):
         string = 'foo' * 100
 
         lib_mock.sp_link_as_string.side_effect = tests.buffer_writer(string)
-        link = spotify.Link(string)
+        link = spotify.Link(self.session, string)
 
         result = link.uri
 
@@ -103,7 +97,7 @@ class LinkTest(unittest.TestCase):
         sp_link = spotify.ffi.new('int *')
         lib_mock.sp_link_create_from_string.return_value = sp_link
         lib_mock.sp_link_type.return_value = 1
-        link = spotify.Link('spotify:track:foo')
+        link = spotify.Link(self.session, 'spotify:track:foo')
 
         self.assertIs(link.type, spotify.LinkType.TRACK)
 
@@ -116,7 +110,7 @@ class LinkTest(unittest.TestCase):
         sp_track = spotify.ffi.new('int *')
         lib_mock.sp_link_as_track.return_value = sp_track
 
-        link = spotify.Link('spotify:track:foo')
+        link = spotify.Link(self.session, 'spotify:track:foo')
         self.assertEqual(link.as_track()._sp_track, sp_track)
 
         lib_mock.sp_link_as_track.assert_called_once_with(sp_link)
@@ -127,7 +121,7 @@ class LinkTest(unittest.TestCase):
         lib_mock.sp_link_create_from_string.return_value = sp_link
         lib_mock.sp_link_as_track.return_value = spotify.ffi.NULL
 
-        link = spotify.Link('spotify:track:foo')
+        link = spotify.Link(self.session, 'spotify:track:foo')
         self.assertIsNone(link.as_track())
 
         lib_mock.sp_link_as_track.assert_called_once_with(sp_link)
@@ -144,7 +138,7 @@ class LinkTest(unittest.TestCase):
 
         lib_mock.sp_link_as_track_and_offset.side_effect = func
 
-        link = spotify.Link('spotify:track:foo')
+        link = spotify.Link(self.session, 'spotify:track:foo')
         offset = link.as_track_offset()
 
         self.assertEqual(offset, 90)
@@ -158,7 +152,7 @@ class LinkTest(unittest.TestCase):
         lib_mock.sp_link_create_from_string.return_value = sp_link
         lib_mock.sp_link_as_track_and_offset.return_value = spotify.ffi.NULL
 
-        link = spotify.Link('spotify:track:foo')
+        link = spotify.Link(self.session, 'spotify:track:foo')
         offset = link.as_track_offset()
 
         self.assertIsNone(offset)
@@ -172,7 +166,7 @@ class LinkTest(unittest.TestCase):
         sp_album = spotify.ffi.new('int *')
         lib_mock.sp_link_as_album.return_value = sp_album
 
-        link = spotify.Link('spotify:album:foo')
+        link = spotify.Link(self.session, 'spotify:album:foo')
         self.assertEqual(link.as_album()._sp_album, sp_album)
 
         lib_mock.sp_link_as_album.assert_called_once_with(sp_link)
@@ -183,7 +177,7 @@ class LinkTest(unittest.TestCase):
         lib_mock.sp_link_create_from_string.return_value = sp_link
         lib_mock.sp_link_as_album.return_value = spotify.ffi.NULL
 
-        link = spotify.Link('spotify:album:foo')
+        link = spotify.Link(self.session, 'spotify:album:foo')
         self.assertIsNone(link.as_album())
 
         lib_mock.sp_link_as_album.assert_called_once_with(sp_link)
@@ -195,7 +189,7 @@ class LinkTest(unittest.TestCase):
         sp_artist = spotify.ffi.new('int *')
         lib_mock.sp_link_as_artist.return_value = sp_artist
 
-        link = spotify.Link('spotify:artist:foo')
+        link = spotify.Link(self.session, 'spotify:artist:foo')
         self.assertEqual(link.as_artist()._sp_artist, sp_artist)
 
         lib_mock.sp_link_as_artist.assert_called_once_with(sp_link)
@@ -206,25 +200,24 @@ class LinkTest(unittest.TestCase):
         lib_mock.sp_link_create_from_string.return_value = sp_link
         lib_mock.sp_link_as_artist.return_value = spotify.ffi.NULL
 
-        link = spotify.Link('spotify:artist:foo')
+        link = spotify.Link(self.session, 'spotify:artist:foo')
         self.assertIsNone(link.as_artist())
 
         lib_mock.sp_link_as_artist.assert_called_once_with(sp_link)
 
     @mock.patch('spotify.playlist.lib', spec=spotify.lib)
     def test_as_playlist(self, playlist_lib_mock, lib_mock):
-        session = tests.create_session()
         sp_link = spotify.ffi.new('int *')
         lib_mock.sp_link_create_from_string.return_value = sp_link
         lib_mock.sp_link_type.return_value = spotify.LinkType.PLAYLIST
         sp_playlist = spotify.ffi.new('int *')
         lib_mock.sp_playlist_create.return_value = sp_playlist
 
-        link = spotify.Link('spotify:playlist:foo')
+        link = spotify.Link(self.session, 'spotify:playlist:foo')
         self.assertEqual(link.as_playlist()._sp_playlist, sp_playlist)
 
         lib_mock.sp_playlist_create.assert_called_once_with(
-            session._sp_session, sp_link)
+            self.session._sp_session, sp_link)
 
         # Since we *created* the sp_playlist, we already have a refcount of 1
         # and shouldn't increase the refcount when wrapping this sp_playlist in
@@ -237,7 +230,7 @@ class LinkTest(unittest.TestCase):
         lib_mock.sp_link_create_from_string.return_value = sp_link
         lib_mock.sp_link_type.return_value = spotify.LinkType.ARTIST
 
-        link = spotify.Link('spotify:playlist:foo')
+        link = spotify.Link(self.session, 'spotify:playlist:foo')
         self.assertIsNone(link.as_playlist())
 
         self.assertEqual(lib_mock.sp_playlist_create.call_count, 0)
@@ -249,7 +242,7 @@ class LinkTest(unittest.TestCase):
         sp_user = spotify.ffi.new('int *')
         lib_mock.sp_link_as_user.return_value = sp_user
 
-        link = spotify.Link('spotify:user:foo')
+        link = spotify.Link(self.session, 'spotify:user:foo')
         self.assertEqual(link.as_user()._sp_user, sp_user)
 
         lib_mock.sp_link_as_user.assert_called_once_with(sp_link)
@@ -260,25 +253,24 @@ class LinkTest(unittest.TestCase):
         lib_mock.sp_link_create_from_string.return_value = sp_link
         lib_mock.sp_link_as_user.return_value = spotify.ffi.NULL
 
-        link = spotify.Link('spotify:user:foo')
+        link = spotify.Link(self.session, 'spotify:user:foo')
         self.assertIsNone(link.as_user())
 
         lib_mock.sp_link_as_user.assert_called_once_with(sp_link)
 
     @mock.patch('spotify.image.lib', spec=spotify.lib)
     def test_as_image(self, image_lib_mock, lib_mock):
-        session = tests.create_session()
         sp_link = spotify.ffi.new('int *')
         lib_mock.sp_link_create_from_string.return_value = sp_link
         lib_mock.sp_link_type.return_value = spotify.LinkType.IMAGE
         sp_image = spotify.ffi.new('int *')
         lib_mock.sp_image_create_from_link.return_value = sp_image
 
-        link = spotify.Link('spotify:image:foo')
+        link = spotify.Link(self.session, 'spotify:image:foo')
         self.assertEqual(link.as_image()._sp_image, sp_image)
 
         lib_mock.sp_image_create_from_link.assert_called_once_with(
-            session._sp_session, sp_link)
+            self.session._sp_session, sp_link)
 
         # Since we *created* the sp_image, we already have a refcount of 1 and
         # shouldn't increase the refcount when wrapping this sp_image in an
@@ -291,7 +283,7 @@ class LinkTest(unittest.TestCase):
         lib_mock.sp_link_create_from_string.return_value = sp_link
         lib_mock.sp_link_type.return_value = spotify.LinkType.ARTIST
 
-        link = spotify.Link('spotify:image:foo')
+        link = spotify.Link(self.session, 'spotify:image:foo')
         self.assertIsNone(link.as_image())
 
         self.assertEqual(lib_mock.sp_image_create_from_link.call_count, 0)

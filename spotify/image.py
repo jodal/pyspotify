@@ -35,7 +35,7 @@ class Image(object):
         assert uri or sp_image, 'uri or sp_image is required'
 
         if uri is not None:
-            image = spotify.Link(uri).as_image()
+            image = spotify.Link(spotify.session_instance, uri).as_image()
             if image is None:
                 raise ValueError(
                     'Failed to get image from Spotify URI: %r' % uri)

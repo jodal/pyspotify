@@ -358,7 +358,7 @@ class Session(utils.EventEmitter):
             >>> link
             Link('spotify:track:2Foc5Q5nqNiosCNqttzHof')
         """
-        return spotify.Link(uri=uri)
+        return spotify.Link(self, uri=uri)
 
     def get_track(self, uri):
         """

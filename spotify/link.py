@@ -39,11 +39,10 @@ class Link(object):
         u'Get Lucky'
     """
 
-    def __init__(self, uri=None, sp_link=None, add_ref=True):
+    def __init__(self, session, uri=None, sp_link=None, add_ref=True):
         assert uri or sp_link, 'uri or sp_link is required'
 
-        if spotify.session_instance is None:
-            raise RuntimeError('Session must be initialized to create links')
+        self._session = session
 
         if uri is not None:
             sp_link = lib.sp_link_create_from_string(utils.to_char(uri))
@@ -78,8 +77,7 @@ class Link(object):
         sp_track = lib.sp_link_as_track(self._sp_link)
         if sp_track == ffi.NULL:
             return None
-        return spotify.Track(
-            spotify.session_instance, sp_track=sp_track, add_ref=True)
+        return spotify.Track(self._session, sp_track=sp_track, add_ref=True)
 
     def as_track_offset(self):
         """Get the track offset in milliseconds from the link."""
@@ -95,8 +93,7 @@ class Link(object):
         sp_album = lib.sp_link_as_album(self._sp_link)
         if sp_album == ffi.NULL:
             return None
-        return spotify.Album(
-            spotify.session_instance, sp_album=sp_album, add_ref=True)
+        return spotify.Album(self._session, sp_album=sp_album, add_ref=True)
 
     @serialized
     def as_artist(self):
@@ -104,19 +101,18 @@ class Link(object):
         sp_artist = lib.sp_link_as_artist(self._sp_link)
         if sp_artist == ffi.NULL:
             return None
-        return spotify.Artist(
-            spotify.session_instance, sp_artist=sp_artist, add_ref=True)
+        return spotify.Artist(self._session, sp_artist=sp_artist, add_ref=True)
 
     def as_playlist(self):
         """Make a :class:`Playlist` from the link."""
         if self.type is not LinkType.PLAYLIST:
             return None
         sp_playlist = lib.sp_playlist_create(
-            spotify.session_instance._sp_session, self._sp_link)
+            self._session._sp_session, self._sp_link)
         if sp_playlist == ffi.NULL:
             return None
         return spotify.Playlist._cached(
-            spotify.session_instance, sp_playlist, add_ref=False)
+            self._session, sp_playlist, add_ref=False)
 
     @serialized
     def as_user(self):
@@ -124,15 +120,14 @@ class Link(object):
         sp_user = lib.sp_link_as_user(self._sp_link)
         if sp_user == ffi.NULL:
             return None
-        return spotify.User(
-            spotify.session_instance, sp_user=sp_user, add_ref=True)
+        return spotify.User(self._session, sp_user=sp_user, add_ref=True)
 
     def as_image(self):
         """Make an :class:`Image` from the link."""
         if self.type is not LinkType.IMAGE:
             return None
         sp_image = lib.sp_image_create_from_link(
-            spotify.session_instance._sp_session, self._sp_link)
+            self._session._sp_session, self._sp_link)
         if sp_image == ffi.NULL:
             return None
         return spotify.Image(sp_image=sp_image, add_ref=False)

@@ -315,6 +315,7 @@ class AlbumBrowser(object):
         @serialized
         def get_track(sp_albumbrowse, key):
             return spotify.Track(
+                self._session,
                 sp_track=lib.sp_albumbrowse_track(sp_albumbrowse, key),
                 add_ref=True)
 

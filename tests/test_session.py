@@ -568,7 +568,7 @@ class SessionTest(unittest.TestCase):
         result = session.get_track('spotify:track:foo')
 
         self.assertIs(result, mock.sentinel.track)
-        track_mock.assert_called_with(uri='spotify:track:foo')
+        track_mock.assert_called_with(session, uri='spotify:track:foo')
 
     @mock.patch('spotify.Album')
     def test_get_album(self, album_mock, lib_mock):
@@ -762,7 +762,7 @@ class PlayerTest(unittest.TestCase):
         lib_mock.sp_session_player_load.return_value = spotify.ErrorType.OK
         session = create_session(lib_mock)
         sp_track = spotify.ffi.new('int *')
-        track = spotify.Track(sp_track=sp_track)
+        track = spotify.Track(session, sp_track=sp_track)
 
         session.player.load(track)
 
@@ -775,7 +775,7 @@ class PlayerTest(unittest.TestCase):
             spotify.ErrorType.TRACK_NOT_PLAYABLE)
         session = create_session(lib_mock)
         sp_track = spotify.ffi.new('int *')
-        track = spotify.Track(sp_track=sp_track)
+        track = spotify.Track(session, sp_track=sp_track)
 
         with self.assertRaises(spotify.Error):
             session.player.load(track)
@@ -845,7 +845,7 @@ class PlayerTest(unittest.TestCase):
         lib_mock.sp_session_player_prefetch.return_value = spotify.ErrorType.OK
         session = create_session(lib_mock)
         sp_track = spotify.ffi.new('int *')
-        track = spotify.Track(sp_track=sp_track)
+        track = spotify.Track(session, sp_track=sp_track)
 
         session.player.prefetch(track)
 
@@ -858,7 +858,7 @@ class PlayerTest(unittest.TestCase):
             spotify.ErrorType.NO_CACHE)
         session = create_session(lib_mock)
         sp_track = spotify.ffi.new('int *')
-        track = spotify.Track(sp_track=sp_track)
+        track = spotify.Track(session, sp_track=sp_track)
 
         with self.assertRaises(spotify.Error):
             session.player.prefetch(track)

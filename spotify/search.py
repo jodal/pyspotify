@@ -141,6 +141,7 @@ class Search(object):
         @serialized
         def get_track(sp_search, key):
             return spotify.Track(
+                spotify.session_instance,
                 sp_track=lib.sp_search_track(sp_search, key),
                 add_ref=True)
 

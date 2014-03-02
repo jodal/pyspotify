@@ -73,7 +73,8 @@ class Link(object):
         sp_track = lib.sp_link_as_track(self._sp_link)
         if sp_track == ffi.NULL:
             return None
-        return spotify.Track(sp_track=sp_track, add_ref=True)
+        return spotify.Track(
+            spotify.session_instance, sp_track=sp_track, add_ref=True)
 
     def as_track_offset(self):
         """Get the track offset in milliseconds from the link."""

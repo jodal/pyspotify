@@ -354,7 +354,7 @@ class Session(utils.EventEmitter):
             >>> track.load().name
             u'Get Lucky'
         """
-        return spotify.Track(uri=uri)
+        return spotify.Track(self, uri=uri)
 
     def get_album(self, uri):
         """

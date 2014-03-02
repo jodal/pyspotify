@@ -270,6 +270,7 @@ class ArtistBrowser(object):
         @serialized
         def get_track(sp_artistbrowse, key):
             return spotify.Track(
+                spotify.session_instance,
                 sp_track=lib.sp_artistbrowse_track(sp_artistbrowse, key),
                 add_ref=True)
 
@@ -293,6 +294,7 @@ class ArtistBrowser(object):
         @serialized
         def get_track(sp_artistbrowse, key):
             return spotify.Track(
+                spotify.session_instance,
                 sp_track=lib.sp_artistbrowse_tophit_track(
                     sp_artistbrowse, key),
                 add_ref=True)

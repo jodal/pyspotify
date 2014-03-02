@@ -28,8 +28,10 @@ class Track(object):
     # TODO Review all maybe_raise() calls to check if they should ignore
     # ErrorType.IS_LOADING
 
-    def __init__(self, uri=None, sp_track=None, add_ref=True):
+    def __init__(self, session, uri=None, sp_track=None, add_ref=True):
         assert uri or sp_track, 'uri or sp_track is required'
+
+        self._session = session
 
         if uri is not None:
             track = spotify.Link(uri).as_track()
@@ -91,14 +93,12 @@ class Track(object):
 
         Will always return :class:`None` if the track isn't loaded.
         """
-        if spotify.session_instance is None:
-            raise RuntimeError('Session must be initialized')
         spotify.Error.maybe_raise(
             self.error, ignores=[spotify.ErrorType.IS_LOADING])
         if not self.is_loaded:
             return None
         return TrackAvailability(lib.sp_track_get_availability(
-            spotify.session_instance._sp_session, self._sp_track))
+            self._session._sp_session, self._sp_track))
 
     @property
     def is_local(self):
@@ -106,13 +106,11 @@ class Track(object):
 
         Will always return :class:`None` if the track isn't loaded.
         """
-        if spotify.session_instance is None:
-            raise RuntimeError('Session must be initialized')
         spotify.Error.maybe_raise(self.error)
         if not self.is_loaded:
             return None
         return bool(lib.sp_track_is_local(
-            spotify.session_instance._sp_session, self._sp_track))
+            self._session._sp_session, self._sp_track))
 
     @property
     def is_autolinked(self):
@@ -122,13 +120,11 @@ class Track(object):
 
         See :attr:`playable`.
         """
-        if spotify.session_instance is None:
-            raise RuntimeError('Session must be initialized')
         spotify.Error.maybe_raise(self.error)
         if not self.is_loaded:
             return None
         return bool(lib.sp_track_is_autolinked(
-            spotify.session_instance._sp_session, self._sp_track))
+            self._session._sp_session, self._sp_track))
 
     @property
     @serialized
@@ -139,15 +135,14 @@ class Track(object):
 
         See :attr:`is_autolinked`.
         """
-        if spotify.session_instance is None:
-            raise RuntimeError('Session must be initialized')
         spotify.Error.maybe_raise(
             self.error, ignores=[spotify.ErrorType.IS_LOADING])
         if not self.is_loaded:
             return None
         return Track(
+            self._session,
             sp_track=lib.sp_track_get_playable(
-                spotify.session_instance._sp_session, self._sp_track),
+                self._session._sp_session, self._sp_track),
             add_ref=True)
 
     @property
@@ -157,7 +152,10 @@ class Track(object):
 
         To convert to the real object::
 
-            >>> track = spotify.Track('spotify:track:2Foc5Q5nqNiosCNqttzHof')
+            >>> session = spotify.Session()
+            # ...
+            >>> track = session.get_track(
+            ...     'spotify:track:2Foc5Q5nqNiosCNqttzHof')
             >>> track.load()
             >>> track.is_placeholder
             True
@@ -181,22 +179,18 @@ class Track(object):
 
         Will always be :class:`None` if the track isn't loaded.
         """
-        if spotify.session_instance is None:
-            raise RuntimeError('Session must be initialized')
         spotify.Error.maybe_raise(self.error)
         if not self.is_loaded:
             return None
         return bool(lib.sp_track_is_starred(
-            spotify.session_instance._sp_session, self._sp_track))
+            self._session._sp_session, self._sp_track))
 
     @starred.setter
     def starred(self, value):
-        if spotify.session_instance is None:
-            raise RuntimeError('Session must be initialized')
         tracks = ffi.new('sp_track *[]', 1)
         tracks[0] = self._sp_track
         spotify.Error.maybe_raise(lib.sp_track_set_starred(
-            spotify.session_instance._sp_session, tracks, len(tracks),
+            self._session._sp_session, tracks, len(tracks),
             bool(value)))
 
     @property
@@ -234,8 +228,7 @@ class Track(object):
         sp_album = lib.sp_track_album(self._sp_track)
         if sp_album == ffi.NULL:
             return None
-        return spotify.Album(
-            spotify.session_instance, sp_album=sp_album, add_ref=True)
+        return spotify.Album(self._session, sp_album=sp_album, add_ref=True)
 
     @property
     @serialized
@@ -311,7 +304,8 @@ class LocalTrack(Track):
     there are more details in Hallon's docs.
     """
 
-    def __init__(self, artist=None, title=None, album=None, length=None):
+    def __init__(
+            self, session, artist=None, title=None, album=None, length=None):
         artist = utils.to_char_or_null(artist)
         title = utils.to_char_or_null(title)
         album = utils.to_char_or_null(album)
@@ -320,7 +314,8 @@ class LocalTrack(Track):
 
         sp_track = lib.sp_localtrack_create(artist, title, album, length)
 
-        super(LocalTrack, self).__init__(sp_track=sp_track, add_ref=False)
+        super(LocalTrack, self).__init__(
+            session, sp_track=sp_track, add_ref=False)
 
 
 @utils.make_enum('SP_TRACK_AVAILABILITY_')

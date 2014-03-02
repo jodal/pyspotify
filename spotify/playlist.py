@@ -120,6 +120,7 @@ class Playlist(utils.EventEmitter):
         @serialized
         def get_track(sp_playlist, key):
             return spotify.Track(
+                spotify.session_instance,
                 sp_track=lib.sp_playlist_track(sp_playlist, key), add_ref=True)
 
         # TODO Negative indexes
@@ -599,7 +600,8 @@ class _PlaylistCallbacks(object):
         logger.debug('Tracks added to playlist')
         playlist = Playlist._cached(sp_playlist, add_ref=True)
         tracks = [
-            spotify.Track(sp_track=sp_tracks[i], add_ref=True)
+            spotify.Track(
+                spotify.session_instance, sp_track=sp_tracks[i], add_ref=True)
             for i in range(num_tracks)]
         playlist.emit(
             PlaylistEvent.TRACKS_ADDED, playlist, tracks, int(position))
@@ -1245,6 +1247,7 @@ class PlaylistTrack(object):
     def track(self):
         """The :class:`~spotify.Track`."""
         return spotify.Track(
+            spotify.session_instance,
             sp_track=lib.sp_playlist_track(self._sp_playlist, self._index),
             add_ref=True)
 
@@ -1340,7 +1343,8 @@ class PlaylistUnseenTracks(collections.Sequence):
         sp_track = self._sp_tracks[key]
         if sp_track == ffi.NULL:
             return None
-        return spotify.Track(sp_track=sp_track, add_ref=True)
+        return spotify.Track(
+            spotify.session_instance, sp_track=sp_track, add_ref=True)
 
     def __repr__(self):
         return pprint.pformat(list(self))

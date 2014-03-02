@@ -147,6 +147,7 @@ class Toplist(object):
         @serialized
         def get_track(sp_toplistbrowse, key):
             return spotify.Track(
+                spotify.session_instance,
                 sp_track=lib.sp_toplistbrowse_track(sp_toplistbrowse, key),
                 add_ref=True)
 

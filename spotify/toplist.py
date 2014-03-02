@@ -171,6 +171,7 @@ class Toplist(object):
         @serialized
         def get_album(sp_toplistbrowse, key):
             return spotify.Album(
+                spotify.session_instance,
                 sp_album=lib.sp_toplistbrowse_album(sp_toplistbrowse, key),
                 add_ref=True)
 

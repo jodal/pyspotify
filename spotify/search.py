@@ -177,6 +177,7 @@ class Search(object):
         @serialized
         def get_album(sp_search, key):
             return spotify.Album(
+                spotify.session_instance,
                 sp_album=lib.sp_search_album(sp_search, key),
                 add_ref=True)
 

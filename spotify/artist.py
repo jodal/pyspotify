@@ -320,6 +320,7 @@ class ArtistBrowser(object):
         @serialized
         def get_album(sp_artistbrowse, key):
             return spotify.Album(
+                spotify.session_instance,
                 sp_album=lib.sp_artistbrowse_album(sp_artistbrowse, key),
                 add_ref=True)
 

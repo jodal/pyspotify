@@ -234,7 +234,8 @@ class Track(object):
         sp_album = lib.sp_track_album(self._sp_track)
         if sp_album == ffi.NULL:
             return None
-        return spotify.Album(sp_album=sp_album, add_ref=True)
+        return spotify.Album(
+            spotify.session_instance, sp_album=sp_album, add_ref=True)
 
     @property
     @serialized

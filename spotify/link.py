@@ -89,7 +89,8 @@ class Link(object):
         sp_album = lib.sp_link_as_album(self._sp_link)
         if sp_album == ffi.NULL:
             return None
-        return spotify.Album(sp_album=sp_album, add_ref=True)
+        return spotify.Album(
+            spotify.session_instance, sp_album=sp_album, add_ref=True)
 
     @serialized
     def as_artist(self):

@@ -369,7 +369,7 @@ class Session(utils.EventEmitter):
             >>> album.load().name
             u'Forward / Return'
         """
-        return spotify.Album(uri=uri)
+        return spotify.Album(self, uri=uri)
 
     def get_artist(self, uri):
         """

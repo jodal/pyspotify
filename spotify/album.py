@@ -29,8 +29,10 @@ class Album(object):
         u'Forward / Return'
     """
 
-    def __init__(self, uri=None, sp_album=None, add_ref=True):
+    def __init__(self, session, uri=None, sp_album=None, add_ref=True):
         assert uri or sp_album, 'uri or sp_album is required'
+
+        self._session = session
 
         if uri is not None:
             album = spotify.Link(uri).as_album()
@@ -99,8 +101,7 @@ class Album(object):
         cover_id = lib.sp_album_cover(self._sp_album, image_size)
         if cover_id == ffi.NULL:
             return None
-        sp_image = lib.sp_image_create(
-            spotify.session_instance._sp_session, cover_id)
+        sp_image = lib.sp_image_create(self._session._sp_session, cover_id)
         return spotify.Image(sp_image=sp_image, add_ref=False)
 
     def cover_link(self, image_size=None):
@@ -164,7 +165,8 @@ class Album(object):
 
         Can be created without the album being loaded.
         """
-        return spotify.AlbumBrowser(album=self, callback=callback)
+        return spotify.AlbumBrowser(
+            self._session, album=self, callback=callback)
 
 
 class AlbumBrowser(object):
@@ -181,11 +183,12 @@ class AlbumBrowser(object):
     """
 
     def __init__(
-            self, album=None, callback=None,
+            self, session, album=None, callback=None,
             sp_albumbrowse=None, add_ref=True):
 
         assert album or sp_albumbrowse, 'album or sp_albumbrowse is required'
 
+        self._session = session
         self.complete_event = threading.Event()
         self._callback_handles = set()
 
@@ -197,7 +200,7 @@ class AlbumBrowser(object):
             self._callback_handles.add(handle)
 
             sp_albumbrowse = lib.sp_albumbrowse_create(
-                spotify.session_instance._sp_session, album._sp_album,
+                self._session._sp_session, album._sp_album,
                 _albumbrowse_complete_callback, handle)
             add_ref = False
 
@@ -263,7 +266,7 @@ class AlbumBrowser(object):
         sp_album = lib.sp_albumbrowse_album(self._sp_albumbrowse)
         if sp_album == ffi.NULL:
             return None
-        return Album(sp_album=sp_album, add_ref=True)
+        return Album(self._session, sp_album=sp_album, add_ref=True)
 
     @property
     @serialized

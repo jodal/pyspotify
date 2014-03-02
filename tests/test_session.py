@@ -578,7 +578,7 @@ class SessionTest(unittest.TestCase):
         result = session.get_album('spotify:album:foo')
 
         self.assertIs(result, mock.sentinel.album)
-        album_mock.assert_called_with(uri='spotify:album:foo')
+        album_mock.assert_called_with(session, uri='spotify:album:foo')
 
     @mock.patch('spotify.Artist')
     def test_get_artist(self, artist_mock, lib_mock):

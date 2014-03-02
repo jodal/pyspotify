@@ -22,6 +22,21 @@ Feature: Event loop
   :class:`~spotify.SessionEvent.NOTIFY_MAIN_THREAD` events and calls
   :meth:`~spotify.Session.process_events` for you when appropriate.
 
+Refactoring: Remove global state
+--------------------------------
+
+To prepare for removing all global state, the use of the module attribute
+:attr:`spotify.session_instance` has been replaced with explicit passing of the
+session object to all objects that needs it. To allow for this, the following
+new methods have been added:
+
+- :meth:`Session.get_track`
+- :meth:`Session.get_album`
+- :meth:`Session.get_artist`
+- :meth:`Session.get_playlist`
+- :meth:`Session.get_user`
+- :meth:`Session.get_image`
+
 Bug fixes
 ---------
 

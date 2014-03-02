@@ -110,7 +110,8 @@ class Link(object):
             spotify.session_instance._sp_session, self._sp_link)
         if sp_playlist == ffi.NULL:
             return None
-        return spotify.Playlist._cached(sp_playlist, add_ref=False)
+        return spotify.Playlist._cached(
+            spotify.session_instance, sp_playlist, add_ref=False)
 
     @serialized
     def as_user(self):

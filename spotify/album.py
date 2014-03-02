@@ -102,7 +102,7 @@ class Album(object):
         if cover_id == ffi.NULL:
             return None
         sp_image = lib.sp_image_create(self._session._sp_session, cover_id)
-        return spotify.Image(sp_image=sp_image, add_ref=False)
+        return spotify.Image(self._session, sp_image=sp_image, add_ref=False)
 
     def cover_link(self, image_size=None):
         """A :class:`Link` to the album's cover.

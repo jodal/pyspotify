@@ -31,11 +31,13 @@ class Image(object):
         u'data:image/jpeg;base64,/9j/4AAQSkZJRgABAQEBLAEsAAD'
     """
 
-    def __init__(self, uri=None, sp_image=None, add_ref=True):
+    def __init__(self, session, uri=None, sp_image=None, add_ref=True):
         assert uri or sp_image, 'uri or sp_image is required'
 
+        self._session = session
+
         if uri is not None:
-            image = spotify.Link(spotify.session_instance, uri).as_image()
+            image = spotify.Link(self._session, uri).as_image()
             if image is None:
                 raise ValueError(
                     'Failed to get image from Spotify URI: %r' % uri)

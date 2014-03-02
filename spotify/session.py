@@ -447,7 +447,7 @@ class Session(utils.EventEmitter):
             >>> image.load().data_uri[:50]
             u'data:image/jpeg;base64,/9j/4AAQSkZJRgABAQEBLAEsAAD'
         """
-        return spotify.Image(uri=uri)
+        return spotify.Image(self, uri=uri)
 
     def search(
             self, query, callback=None,

@@ -130,7 +130,7 @@ class Link(object):
             self._session._sp_session, self._sp_link)
         if sp_image == ffi.NULL:
             return None
-        return spotify.Image(sp_image=sp_image, add_ref=False)
+        return spotify.Image(self._session, sp_image=sp_image, add_ref=False)
 
 
 @utils.make_enum('SP_LINKTYPE_')

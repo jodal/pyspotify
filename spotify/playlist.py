@@ -228,7 +228,7 @@ class Playlist(utils.EventEmitter):
         if not has_image:
             return None
         sp_image = lib.sp_image_create(self._session._sp_session, image_id)
-        return spotify.Image(sp_image=sp_image, add_ref=False)
+        return spotify.Image(self._session, sp_image=sp_image, add_ref=False)
 
     @property
     def has_pending_changes(self):
@@ -706,7 +706,8 @@ class _PlaylistCallbacks(object):
             spotify.session_instance, sp_playlist, add_ref=True)
         sp_image = lib.sp_image_create(
             spotify.session_instance._sp_session, image_id)
-        image = spotify.Image(sp_image=sp_image, add_ref=False)
+        image = spotify.Image(
+            spotify.session_instance, sp_image=sp_image, add_ref=False)
         playlist.emit(PlaylistEvent.IMAGE_CHANGED, playlist, image)
 
     @staticmethod

@@ -45,6 +45,7 @@ run::
 
     yaourt -S libspotify
 
+
 Fedora
 ------
 
@@ -52,7 +53,8 @@ libspotify is packaged in `rpmfusion non-free <http://rpmfusion.org/>`_.
 Install the repository package, then run::
 
     yum -y install libspotify-devel
-    
+
+
 Mac OS X
 --------
 

@@ -356,6 +356,21 @@ class Session(utils.EventEmitter):
         """
         return spotify.Album(uri=uri)
 
+    def get_artist(self, uri):
+        """
+        Get :class:`Artist` from a Spotify artist URI.
+
+        Example::
+
+            >>> session = spotify.Session()
+            # ...
+            >>> artist = session.get_artist(
+            ...     'spotify:artist:22xRIphSN7IkPVbErICu7s')
+            >>> artist.load().name
+            u'Rob Dougan'
+        """
+        return spotify.Artist(uri=uri)
+
     def search(
             self, query, callback=None,
             track_offset=0, track_count=20,

@@ -570,6 +570,16 @@ class SessionTest(unittest.TestCase):
         self.assertIs(result, mock.sentinel.album)
         album_mock.assert_called_with(uri='spotify:album:foo')
 
+    @mock.patch('spotify.Artist')
+    def test_get_artist(self, artist_mock, lib_mock):
+        session = create_session(lib_mock)
+        artist_mock.return_value = mock.sentinel.artist
+
+        result = session.get_artist('spotify:artist:foo')
+
+        self.assertIs(result, mock.sentinel.artist)
+        artist_mock.assert_called_with(uri='spotify:artist:foo')
+
     @mock.patch('spotify.Search')
     def test_search(self, search_mock, lib_mock):
         session = create_session(lib_mock)

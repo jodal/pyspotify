@@ -22,7 +22,10 @@ class Artist(object):
     You can get artists from tracks and albums, or you can create an
     :class:`Artist` yourself from a Spotify URI::
 
-        >>> artist = spotify.Artist('spotify:artist:22xRIphSN7IkPVbErICu7s')
+        >>> session = spotify.Session()
+        # ...
+        >>> artist = session.get_artist(
+        ...     'spotify:artist:22xRIphSN7IkPVbErICu7s')
         >>> artist.load().name
         u'Rob Dougan'
     """

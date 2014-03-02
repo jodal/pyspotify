@@ -18,7 +18,9 @@ class Track(object):
     You can get tracks from playlists or albums, or you can create a
     :class:`Track` yourself from a Spotify URI::
 
-        >>> track = spotify.Track('spotify:track:2Foc5Q5nqNiosCNqttzHof')
+        >>> session = spotify.Session()
+        # ...
+        >>> track = session.get_track('spotify:track:2Foc5Q5nqNiosCNqttzHof')
         >>> track.load().name
         u'Get Lucky'
     """

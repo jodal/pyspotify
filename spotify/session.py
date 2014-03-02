@@ -341,6 +341,21 @@ class Session(utils.EventEmitter):
         """
         return utils.to_country(lib.sp_session_user_country(self._sp_session))
 
+    def get_track(self, uri):
+        """
+        Get :class:`Track` from a Spotify track URI.
+
+        Example::
+
+            >>> session = spotify.Session()
+            # ...
+            >>> track = session.get_track(
+            ...     'spotify:track:2Foc5Q5nqNiosCNqttzHof')
+            >>> track.load().name
+            u'Get Lucky'
+        """
+        return spotify.Track(uri=uri)
+
     def get_album(self, uri):
         """
         Get :class:`Album` from a Spotify album URI.

@@ -15,7 +15,9 @@ class User(object):
     You can get users from the session, or you can create a :class:`User`
     yourself from a Spotify URI::
 
-        >>> user = spotify.User('spotify:user:jodal')
+        >>> session = spotify.Session()
+        # ...
+        >>> user = session.get_user('spotify:user:jodal')
         >>> user.load().display_name
         u'jodal'
     """

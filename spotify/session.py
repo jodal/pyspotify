@@ -342,6 +342,24 @@ class Session(utils.EventEmitter):
         """
         return utils.to_country(lib.sp_session_user_country(self._sp_session))
 
+    def get_link(self, uri):
+        """
+        Get :class:`Link` from any Spotify URI.
+
+        A link can be created from a string containing a Spotify URI on the
+        form ``spotify:...``.
+
+        Example::
+
+            >>> session = spotify.Session()
+            # ...
+            >>> link = session.get_link(
+            ...     'spotify:track:2Foc5Q5nqNiosCNqttzHof')
+            >>> link
+            Link('spotify:track:2Foc5Q5nqNiosCNqttzHof')
+        """
+        return spotify.Link(uri=uri)
+
     def get_track(self, uri):
         """
         Get :class:`Track` from a Spotify track URI.

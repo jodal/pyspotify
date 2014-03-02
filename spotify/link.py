@@ -13,25 +13,30 @@ __all__ = [
 class Link(object):
     """A Spotify object link.
 
-    A link can be created from a string containing a Spotify URI on the form
-    ``spotify:...``. You can also get links from the ``link`` attribute on most
-    objects, e.g. :attr:`Track.link`.
+    Call the :meth:`~Session.get_link` method on your :class:`Session` instance
+    to get a :class:`Link` object from a Spotify URI.  You can also get links
+    from the ``link`` attribute on most objects, e.g. :attr:`Track.link`.
 
     To get the URI from the link object you can use the :attr:`uri` attribute,
     or simply use the link as a string::
 
-        >>> link = spotify.Link('spotify:track:2Foc5Q5nqNiosCNqttzHof')
+        >>> session = spotify.Session()
+        # ...
+        >>> link = session.get_link(
+        ...     'spotify:track:2Foc5Q5nqNiosCNqttzHof')
         >>> link
         Link('spotify:track:2Foc5Q5nqNiosCNqttzHof')
         >>> link.uri
         'spotify:track:2Foc5Q5nqNiosCNqttzHof'
         >>> str(link)
         'spotify:track:2Foc5Q5nqNiosCNqttzHof'
+        >>> link.type
+        <LinkType.TRACK: 1>
         >>> track = link.as_track()
         >>> track.link
         Link('spotify:track:2Foc5Q5nqNiosCNqttzHof')
-
-    You must create a :class:`Session` before you can create links.
+        >>> track.load().name
+        u'Get Lucky'
     """
 
     def __init__(self, uri=None, sp_link=None, add_ref=True):

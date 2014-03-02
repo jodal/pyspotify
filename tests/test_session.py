@@ -560,6 +560,16 @@ class SessionTest(unittest.TestCase):
             session._sp_session)
         self.assertEqual(result, 'SE')
 
+    @mock.patch('spotify.Link')
+    def test_get_link(self, link_mock, lib_mock):
+        session = create_session(lib_mock)
+        link_mock.return_value = mock.sentinel.link
+
+        result = session.get_link('spotify:any:foo')
+
+        self.assertIs(result, mock.sentinel.link)
+        link_mock.assert_called_with(uri='spotify:any:foo')
+
     @mock.patch('spotify.Track')
     def test_get_track(self, track_mock, lib_mock):
         session = create_session(lib_mock)

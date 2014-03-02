@@ -180,6 +180,7 @@ class Playlist(utils.EventEmitter):
     def owner(self):
         """The :class:`User` object for the owner of the playlist."""
         return spotify.User(
+            spotify.session_instance,
             sp_user=lib.sp_playlist_owner(self._sp_playlist), add_ref=True)
 
     @property
@@ -663,7 +664,8 @@ class _PlaylistCallbacks(object):
     def track_created_changed(sp_playlist, position, sp_user, when, userdata):
         logger.debug('Playlist track created changed')
         playlist = Playlist._cached(sp_playlist, add_ref=True)
-        user = spotify.User(sp_user=sp_user, add_ref=True)
+        user = spotify.User(
+            spotify.session_instance, sp_user=sp_user, add_ref=True)
         playlist.emit(
             PlaylistEvent.TRACK_CREATED_CHANGED,
             playlist, int(position), user, int(when))
@@ -1264,6 +1266,7 @@ class PlaylistTrack(object):
     def creator(self):
         """The :class:`~spotify.User` that added the track to the playlist."""
         return spotify.User(
+            spotify.session_instance,
             sp_user=lib.sp_playlist_track_creator(
                 self._sp_playlist, self._index),
             add_ref=True)

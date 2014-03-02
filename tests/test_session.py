@@ -608,7 +608,7 @@ class SessionTest(unittest.TestCase):
         result = session.get_user('spotify:user:foo')
 
         self.assertIs(result, mock.sentinel.user)
-        user_mock.assert_called_with(uri='spotify:user:foo')
+        user_mock.assert_called_with(session, uri='spotify:user:foo')
 
     @mock.patch('spotify.Image')
     def test_get_image(self, image_mock, lib_mock):

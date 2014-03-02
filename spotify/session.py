@@ -179,7 +179,7 @@ class Session(utils.EventEmitter):
         sp_user = lib.sp_session_user(self._sp_session)
         if sp_user == ffi.NULL:
             return None
-        return spotify.User(sp_user=sp_user, add_ref=True)
+        return spotify.User(self, sp_user=sp_user, add_ref=True)
 
     def logout(self):
         """Log out the current user.
@@ -413,7 +413,7 @@ class Session(utils.EventEmitter):
             >>> user.load().display_name
             u'jodal'
         """
-        return spotify.User(uri=uri)
+        return spotify.User(self, uri=uri)
 
     def get_image(self, uri):
         """

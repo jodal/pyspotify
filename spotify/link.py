@@ -118,7 +118,8 @@ class Link(object):
         sp_user = lib.sp_link_as_user(self._sp_link)
         if sp_user == ffi.NULL:
             return None
-        return spotify.User(sp_user=sp_user, add_ref=True)
+        return spotify.User(
+            spotify.session_instance, sp_user=sp_user, add_ref=True)
 
     def as_image(self):
         """Make an :class:`Image` from the link."""

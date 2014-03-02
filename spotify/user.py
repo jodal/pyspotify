@@ -22,8 +22,10 @@ class User(object):
         u'jodal'
     """
 
-    def __init__(self, uri=None, sp_user=None, add_ref=True):
+    def __init__(self, session, uri=None, sp_user=None, add_ref=True):
         assert uri or sp_user, 'uri or sp_user is required'
+
+        self._session = session
 
         if uri is not None:
             user = spotify.Link(uri).as_user()
@@ -76,15 +78,10 @@ class User(object):
     @property
     def starred(self):
         """The :class:`Playlist` of tracks starred by the user."""
-        if spotify.session_instance is None:
-            return None
-        return spotify.session_instance.starred_for_user(self.canonical_name)
+        return self._session.starred_for_user(self.canonical_name)
 
     @property
     def published_playlists(self):
         """The :class:`PlaylistContainer` of playlists published by the
         user."""
-        if spotify.session_instance is None:
-            return None
-        return spotify.session_instance.published_playlists_for_user(
-            self.canonical_name)
+        return self._session.published_playlists_for_user(self.canonical_name)

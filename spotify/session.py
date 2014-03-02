@@ -384,7 +384,7 @@ class Session(utils.EventEmitter):
             >>> artist.load().name
             u'Rob Dougan'
         """
-        return spotify.Artist(uri=uri)
+        return spotify.Artist(self, uri=uri)
 
     def get_playlist(self, uri):
         """

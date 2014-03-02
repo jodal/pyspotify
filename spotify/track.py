@@ -207,6 +207,7 @@ class Track(object):
         @serialized
         def get_artist(sp_track, key):
             return spotify.Artist(
+                self._session,
                 sp_artist=lib.sp_track_artist(sp_track, key),
                 add_ref=True)
 

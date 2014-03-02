@@ -84,7 +84,7 @@ class Album(object):
         sp_artist = lib.sp_album_artist(self._sp_album)
         if sp_artist == ffi.NULL:
             return None
-        return spotify.Artist(sp_artist=sp_artist, add_ref=True)
+        return spotify.Artist(self._session, sp_artist=sp_artist, add_ref=True)
 
     @serialized
     def cover(self, image_size=None):
@@ -278,7 +278,7 @@ class AlbumBrowser(object):
         sp_artist = lib.sp_albumbrowse_artist(self._sp_albumbrowse)
         if sp_artist == ffi.NULL:
             return None
-        return spotify.Artist(sp_artist=sp_artist, add_ref=True)
+        return spotify.Artist(self._session, sp_artist=sp_artist, add_ref=True)
 
     @property
     @serialized

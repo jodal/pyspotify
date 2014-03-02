@@ -215,6 +215,7 @@ class Search(object):
         @serialized
         def get_artist(sp_search, key):
             return spotify.Artist(
+                spotify.session_instance,
                 sp_artist=lib.sp_search_artist(sp_search, key),
                 add_ref=True)
 

@@ -197,6 +197,7 @@ class Toplist(object):
         @serialized
         def get_artist(sp_toplistbrowse, key):
             return spotify.Artist(
+                spotify.session_instance,
                 sp_artist=lib.sp_toplistbrowse_artist(sp_toplistbrowse, key),
                 add_ref=True)
 

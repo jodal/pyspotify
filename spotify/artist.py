@@ -30,8 +30,10 @@ class Artist(object):
         u'Rob Dougan'
     """
 
-    def __init__(self, uri=None, sp_artist=None, add_ref=True):
+    def __init__(self, session, uri=None, sp_artist=None, add_ref=True):
         assert uri or sp_artist, 'uri or sp_artist is required'
+
+        self._session = session
 
         if uri is not None:
             artist = spotify.Link(uri).as_artist()
@@ -88,7 +90,7 @@ class Artist(object):
         if portrait_id == ffi.NULL:
             return None
         sp_image = lib.sp_image_create(
-            spotify.session_instance._sp_session, portrait_id)
+            self._session._sp_session, portrait_id)
         return spotify.Image(sp_image=sp_image, add_ref=False)
 
     def portrait_link(self, image_size=None):
@@ -125,7 +127,8 @@ class Artist(object):
 
         Can be created without the artist being loaded.
         """
-        return spotify.ArtistBrowser(artist=self, type=type, callback=callback)
+        return spotify.ArtistBrowser(
+            self._session, artist=self, type=type, callback=callback)
 
 
 class ArtistBrowser(object):
@@ -142,12 +145,13 @@ class ArtistBrowser(object):
     """
 
     def __init__(
-            self, artist=None, type=None, callback=None,
+            self, session, artist=None, type=None, callback=None,
             sp_artistbrowse=None, add_ref=True):
 
         assert artist or sp_artistbrowse, (
             'artist or sp_artistbrowse is required')
 
+        self._session = session
         self.complete_event = threading.Event()
         self._callback_handles = set()
 
@@ -162,7 +166,7 @@ class ArtistBrowser(object):
             self._callback_handles.add(handle)
 
             sp_artistbrowse = lib.sp_artistbrowse_create(
-                spotify.session_instance._sp_session, artist._sp_artist,
+                self._session._sp_session, artist._sp_artist,
                 int(type), _artistbrowse_complete_callback, handle)
             add_ref = False
 
@@ -228,7 +232,7 @@ class ArtistBrowser(object):
         sp_artist = lib.sp_artistbrowse_artist(self._sp_artistbrowse)
         if sp_artist == ffi.NULL:
             return None
-        return Artist(sp_artist=sp_artist, add_ref=True)
+        return Artist(self._session, sp_artist=sp_artist, add_ref=True)
 
     @property
     @serialized
@@ -270,7 +274,7 @@ class ArtistBrowser(object):
         @serialized
         def get_track(sp_artistbrowse, key):
             return spotify.Track(
-                spotify.session_instance,
+                self._session,
                 sp_track=lib.sp_artistbrowse_track(sp_artistbrowse, key),
                 add_ref=True)
 
@@ -294,7 +298,7 @@ class ArtistBrowser(object):
         @serialized
         def get_track(sp_artistbrowse, key):
             return spotify.Track(
-                spotify.session_instance,
+                self._session,
                 sp_track=lib.sp_artistbrowse_tophit_track(
                     sp_artistbrowse, key),
                 add_ref=True)
@@ -322,7 +326,7 @@ class ArtistBrowser(object):
         @serialized
         def get_album(sp_artistbrowse, key):
             return spotify.Album(
-                spotify.session_instance,
+                self._session,
                 sp_album=lib.sp_artistbrowse_album(sp_artistbrowse, key),
                 add_ref=True)
 
@@ -346,6 +350,7 @@ class ArtistBrowser(object):
         @serialized
         def get_artist(sp_artistbrowse, key):
             return spotify.Artist(
+                self._session,
                 sp_artist=lib.sp_artistbrowse_similar_artist(
                     sp_artistbrowse, key),
                 add_ref=True)

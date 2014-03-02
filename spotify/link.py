@@ -99,7 +99,8 @@ class Link(object):
         sp_artist = lib.sp_link_as_artist(self._sp_link)
         if sp_artist == ffi.NULL:
             return None
-        return spotify.Artist(sp_artist=sp_artist, add_ref=True)
+        return spotify.Artist(
+            spotify.session_instance, sp_artist=sp_artist, add_ref=True)
 
     def as_playlist(self):
         """Make a :class:`Playlist` from the link."""

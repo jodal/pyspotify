@@ -25,7 +25,7 @@ class Search(object):
     """
 
     def __init__(
-            self, query='', callback=None,
+            self, session, query='', callback=None,
             track_offset=0, track_count=20,
             album_offset=0, album_count=20,
             artist_offset=0, artist_count=20,
@@ -35,6 +35,7 @@ class Search(object):
 
         assert query or sp_search, 'query or sp_search is required'
 
+        self._session = session
         self.callback = callback
         self.track_offset = track_offset
         self.track_count = track_count
@@ -59,7 +60,7 @@ class Search(object):
             self._callback_handles.add(handle)
 
             sp_search = lib.sp_search_create(
-                spotify.session_instance._sp_session, utils.to_char(query),
+                self._session._sp_session, utils.to_char(query),
                 track_offset, track_count,
                 album_offset, album_count,
                 artist_offset, artist_count,
@@ -141,7 +142,7 @@ class Search(object):
         @serialized
         def get_track(sp_search, key):
             return spotify.Track(
-                spotify.session_instance,
+                self._session,
                 sp_track=lib.sp_search_track(sp_search, key),
                 add_ref=True)
 
@@ -178,7 +179,7 @@ class Search(object):
         @serialized
         def get_album(sp_search, key):
             return spotify.Album(
-                spotify.session_instance,
+                self._session,
                 sp_album=lib.sp_search_album(sp_search, key),
                 add_ref=True)
 
@@ -215,7 +216,7 @@ class Search(object):
         @serialized
         def get_artist(sp_search, key):
             return spotify.Artist(
-                spotify.session_instance,
+                self._session,
                 sp_artist=lib.sp_search_artist(sp_search, key),
                 add_ref=True)
 
@@ -300,7 +301,7 @@ class Search(object):
         playlist_count = playlist_count or self.playlist_count
 
         return Search(
-            query=self.query, callback=callback,
+            self._session, query=self.query, callback=callback,
             track_offset=track_offset, track_count=track_count,
             album_offset=album_offset, album_count=album_count,
             artist_offset=artist_offset, artist_count=artist_count,

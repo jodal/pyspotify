@@ -465,7 +465,7 @@ class Session(utils.EventEmitter):
         :attr:`SearchType.STANDARD`.
         """
         return spotify.Search(
-            query=query, callback=callback,
+            self, query=query, callback=callback,
             track_offset=track_offset, track_count=track_count,
             album_offset=album_offset, album_count=album_count,
             artist_offset=artist_offset, artist_count=artist_count,

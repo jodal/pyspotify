@@ -629,7 +629,7 @@ class SessionTest(unittest.TestCase):
 
         self.assertIs(result, mock.sentinel.search)
         search_mock.assert_called_with(
-            query='alice', callback=None,
+            session, query='alice', callback=None,
             track_offset=0, track_count=20,
             album_offset=0, album_count=20,
             artist_offset=0, artist_count=20,

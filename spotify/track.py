@@ -34,7 +34,7 @@ class Track(object):
         self._session = session
 
         if uri is not None:
-            track = spotify.Link(uri).as_track()
+            track = spotify.Link(self._session, uri=uri).as_track()
             if track is None:
                 raise ValueError(
                     'Failed to get track from Spotify URI: %r' % uri)
@@ -294,6 +294,7 @@ class Track(object):
         """A :class:`Link` to the track with an ``offset`` in milliseconds into
         the track."""
         return spotify.Link(
+            self._session,
             sp_link=lib.sp_link_create_from_track(self._sp_track, offset),
             add_ref=False)
 

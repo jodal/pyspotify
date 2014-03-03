@@ -35,7 +35,7 @@ class Album(object):
         self._session = session
 
         if uri is not None:
-            album = spotify.Link(uri).as_album()
+            album = spotify.Link(self._session, uri=uri).as_album()
             if album is None:
                 raise ValueError(
                     'Failed to get album from Spotify URI: %r' % uri)
@@ -118,7 +118,7 @@ class Album(object):
             image_size = spotify.ImageSize.NORMAL
         sp_link = lib.sp_link_create_from_album_cover(
             self._sp_album, image_size)
-        return spotify.Link(sp_link=sp_link, add_ref=False)
+        return spotify.Link(self._session, sp_link=sp_link, add_ref=False)
 
     @property
     @serialized
@@ -154,7 +154,7 @@ class Album(object):
     def link(self):
         """A :class:`Link` to the album."""
         sp_link = lib.sp_link_create_from_album(self._sp_album)
-        return spotify.Link(sp_link=sp_link, add_ref=False)
+        return spotify.Link(self._session, sp_link=sp_link, add_ref=False)
 
     def browse(self, callback=None):
         """Get an :class:`AlbumBrowser` for the album.

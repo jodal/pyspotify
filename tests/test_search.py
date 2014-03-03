@@ -515,7 +515,8 @@ class SearchTest(unittest.TestCase):
 
         result = search.link
 
-        link_mock.assert_called_once_with(sp_link=sp_link, add_ref=False)
+        link_mock.assert_called_once_with(
+            self.session, sp_link=sp_link, add_ref=False)
         self.assertEqual(result, mock.sentinel.link)
 
 

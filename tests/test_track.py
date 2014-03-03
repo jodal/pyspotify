@@ -36,7 +36,7 @@ class TrackTest(unittest.TestCase):
 
         result = spotify.Track(self.session, uri=uri)
 
-        link_mock.assert_called_with(uri)
+        link_mock.assert_called_with(self.session, uri=uri)
         link_instance_mock.as_track.assert_called_with()
         lib_mock.sp_track_add_ref.assert_called_with(sp_track)
         self.assertEqual(result._sp_track, sp_track)
@@ -532,7 +532,8 @@ class TrackTest(unittest.TestCase):
 
         lib_mock.sp_link_create_from_track.asssert_called_once_with(
             sp_track, 0)
-        link_mock.assert_called_once_with(sp_link=sp_link, add_ref=False)
+        link_mock.assert_called_once_with(
+            self.session, sp_link=sp_link, add_ref=False)
         self.assertEqual(result, mock.sentinel.link)
 
     @mock.patch('spotify.Link', spec=spotify.Link)
@@ -547,7 +548,8 @@ class TrackTest(unittest.TestCase):
 
         lib_mock.sp_link_create_from_track.asssert_called_once_with(
             sp_track, 90)
-        link_mock.assert_called_once_with(sp_link=sp_link, add_ref=False)
+        link_mock.assert_called_once_with(
+            self.session, sp_link=sp_link, add_ref=False)
         self.assertEqual(result, mock.sentinel.link)
 
 

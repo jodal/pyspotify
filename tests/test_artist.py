@@ -29,7 +29,7 @@ class ArtistTest(unittest.TestCase):
 
         result = spotify.Artist(self.session, uri=uri)
 
-        link_mock.assert_called_with(uri)
+        link_mock.assert_called_with(self.session, uri=uri)
         link_instance_mock.as_artist.assert_called_with()
         lib_mock.sp_artist_add_ref.assert_called_with(sp_artist)
         self.assertEqual(result._sp_artist, sp_artist)
@@ -159,7 +159,8 @@ class ArtistTest(unittest.TestCase):
 
         lib_mock.sp_link_create_from_artist_portrait.assert_called_once_with(
             sp_artist, spotify.ImageSize.NORMAL)
-        link_mock.assert_called_once_with(sp_link=sp_link, add_ref=False)
+        link_mock.assert_called_once_with(
+            self.session, sp_link=sp_link, add_ref=False)
         self.assertEqual(result, mock.sentinel.link)
 
     @mock.patch('spotify.Link', spec=spotify.Link)
@@ -172,7 +173,8 @@ class ArtistTest(unittest.TestCase):
 
         result = artist.link
 
-        link_mock.assert_called_once_with(sp_link=sp_link, add_ref=False)
+        link_mock.assert_called_once_with(
+            self.session, sp_link=sp_link, add_ref=False)
         self.assertEqual(result, mock.sentinel.link)
 
 

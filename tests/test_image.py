@@ -28,7 +28,7 @@ class ImageTest(unittest.TestCase):
 
         result = spotify.Image(self.session, uri=uri)
 
-        link_mock.assert_called_with(self.session, uri)
+        link_mock.assert_called_with(self.session, uri=uri)
         link_instance_mock.as_image.assert_called_with()
         lib_mock.sp_image_add_ref.assert_called_with(sp_image)
         self.assertEqual(result._sp_image, sp_image)
@@ -266,7 +266,8 @@ class ImageTest(unittest.TestCase):
 
         result = image.link
 
-        link_mock.assert_called_once_with(sp_link=sp_link, add_ref=False)
+        link_mock.assert_called_once_with(
+            self.session, sp_link=sp_link, add_ref=False)
         self.assertEqual(result, mock.sentinel.link)
 
 

@@ -27,7 +27,7 @@ class UserTest(unittest.TestCase):
 
         result = spotify.User(self.session, uri=uri)
 
-        link_mock.assert_called_with(uri)
+        link_mock.assert_called_with(self.session, uri=uri)
         link_instance_mock.as_user.assert_called_with()
         lib_mock.sp_user_add_ref.assert_called_with(sp_user)
         self.assertEqual(result._sp_user, sp_user)
@@ -119,7 +119,8 @@ class UserTest(unittest.TestCase):
 
         result = user.link
 
-        link_mock.assert_called_once_with(sp_link=sp_link, add_ref=False)
+        link_mock.assert_called_once_with(
+            self.session, sp_link=sp_link, add_ref=False)
         self.assertEqual(result, mock.sentinel.link)
 
     def test_starred(self, lib_mock):

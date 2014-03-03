@@ -37,7 +37,7 @@ class Image(object):
         self._session = session
 
         if uri is not None:
-            image = spotify.Link(self._session, uri).as_image()
+            image = spotify.Link(self._session, uri=uri).as_image()
             if image is None:
                 raise ValueError(
                     'Failed to get image from Spotify URI: %r' % uri)
@@ -153,6 +153,7 @@ class Image(object):
     def link(self):
         """A :class:`Link` to the image."""
         return spotify.Link(
+            self._session,
             sp_link=lib.sp_link_create_from_image(self._sp_image),
             add_ref=False)
 

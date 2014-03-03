@@ -312,6 +312,7 @@ class Search(object):
     def link(self):
         """A :class:`Link` to the search."""
         return spotify.Link(
+            self._session,
             sp_link=lib.sp_link_create_from_search(self._sp_search),
             add_ref=False)
 

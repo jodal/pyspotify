@@ -36,7 +36,7 @@ class Artist(object):
         self._session = session
 
         if uri is not None:
-            artist = spotify.Link(uri).as_artist()
+            artist = spotify.Link(self._session, uri=uri).as_artist()
             if artist is None:
                 raise ValueError(
                     'Failed to get artist from Spotify URI: %r' % uri)
@@ -107,13 +107,13 @@ class Artist(object):
             image_size = spotify.ImageSize.NORMAL
         sp_link = lib.sp_link_create_from_artist_portrait(
             self._sp_artist, image_size)
-        return spotify.Link(sp_link=sp_link, add_ref=False)
+        return spotify.Link(self._session, sp_link=sp_link, add_ref=False)
 
     @property
     def link(self):
         """A :class:`Link` to the artist."""
         sp_link = lib.sp_link_create_from_artist(self._sp_artist)
-        return spotify.Link(sp_link=sp_link, add_ref=False)
+        return spotify.Link(self._session, sp_link=sp_link, add_ref=False)
 
     def browse(self, type=None, callback=None):
         """Get an :class:`ArtistBrowser` for the artist.

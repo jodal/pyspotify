@@ -28,7 +28,7 @@ class User(object):
         self._session = session
 
         if uri is not None:
-            user = spotify.Link(uri).as_user()
+            user = spotify.Link(self._session, uri=uri).as_user()
             if user is None:
                 raise ValueError(
                     'Failed to get user from Spotify URI: %r' % uri)
@@ -73,6 +73,7 @@ class User(object):
     def link(self):
         """A :class:`Link` to the user."""
         return spotify.Link(
+            self._session,
             sp_link=lib.sp_link_create_from_user(self._sp_user), add_ref=False)
 
     @property

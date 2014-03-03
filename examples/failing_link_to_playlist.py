@@ -1,20 +1,24 @@
-"""
-This example should work, but fails to get the URIs of the playlists.
-See related comment in :meth:`spotify.Link.__init__`.
-"""
+# TODO This example should work, but fails to get the URIs of the playlists.
 
 from __future__ import print_function
 
+import logging
 import time
 
 import spotify
 
-session = spotify.Session()
-session.relogin()
-session.process_events()
+logging.basicConfig(level=logging.INFO)
 
-user = spotify.User('spotify:user:p3.no')
-user.load()
+# Assuming a spotify_appkey.key in the current dir:
+session = spotify.Session()
+
+# Assuming a previous login with remember_me=True and a proper logout:
+session.relogin()
+
+while session.connection_state != spotify.ConnectionState.LOGGED_IN:
+    session.process_events()
+
+user = session.get_user('spotify:user:p3.no').load()
 user.published_playlists.load()
 
 time.sleep(10)

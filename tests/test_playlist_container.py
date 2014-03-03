@@ -14,6 +14,7 @@ class PlaylistContainerTest(unittest.TestCase):
 
     def setUp(self):
         self.session = tests.create_session()
+        spotify.session_instance = self.session
 
     def tearDown(self):
         spotify.session_instance = None
@@ -1027,6 +1028,7 @@ class PlaylistContainerCallbacksTest(unittest.TestCase):
 
     def setUp(self):
         self.session = tests.create_session()
+        spotify.session_instance = self.session
 
     def tearDown(self):
         spotify.session_instance = None

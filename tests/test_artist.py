@@ -14,9 +14,6 @@ class ArtistTest(unittest.TestCase):
     def setUp(self):
         self.session = tests.create_session()
 
-    def tearDown(self):
-        spotify.session_instance = None
-
     def test_create_without_uri_or_sp_artist_fails(self, lib_mock):
         with self.assertRaises(AssertionError):
             spotify.Artist(self.session)
@@ -184,9 +181,6 @@ class ArtistBrowserTest(unittest.TestCase):
 
     def setUp(self):
         self.session = tests.create_session()
-
-    def tearDown(self):
-        spotify.session_instance = None
 
     def test_create_without_artist_or_sp_artistbrowse_fails(self, lib_mock):
         with self.assertRaises(AssertionError):

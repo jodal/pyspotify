@@ -13,9 +13,6 @@ class PlaylistTrackTest(unittest.TestCase):
     def setUp(self):
         self.session = tests.create_session()
 
-    def tearDown(self):
-        spotify.session_instance = None
-
     @mock.patch('spotify.track.lib', spec=spotify.lib)
     def test_track(self, track_lib_mock, lib_mock):
         sp_track = spotify.ffi.cast('sp_track *', spotify.ffi.new('int *'))

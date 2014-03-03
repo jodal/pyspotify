@@ -13,9 +13,6 @@ class UserTest(unittest.TestCase):
     def setUp(self):
         self.session = tests.create_session()
 
-    def tearDown(self):
-        spotify.session_instance = None
-
     def test_create_without_uri_or_sp_user_fails(self, lib_mock):
         with self.assertRaises(AssertionError):
             spotify.User(self.session)

@@ -13,9 +13,6 @@ class ToplistTest(unittest.TestCase):
     def setUp(self):
         self.session = tests.create_session()
 
-    def tearDown(self):
-        spotify.session_instance = None
-
     def assert_fails_if_error(self, lib_mock, func):
         lib_mock.sp_toplistbrowse_error.return_value = (
             spotify.ErrorType.BAD_API_VERSION)

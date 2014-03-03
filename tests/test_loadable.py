@@ -35,9 +35,6 @@ class LoadableTest(unittest.TestCase):
         self.session = tests.create_session()
         self.session.connection_state = spotify.ConnectionState.LOGGED_IN
 
-    def tearDown(self):
-        spotify.session_instance = None
-
     def test_load_raises_error_if_not_logged_in(
             self, is_loaded_mock, time_mock):
         self.session.connection_state = spotify.ConnectionState.LOGGED_OUT

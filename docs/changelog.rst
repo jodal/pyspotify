@@ -30,6 +30,7 @@ To prepare for removing all global state, the use of the module attribute
 session object to all objects that needs it. To allow for this, the following
 new methods have been added:
 
+- :meth:`spotify.Session.get_link`
 - :meth:`spotify.Session.get_track`
 - :meth:`spotify.Session.get_album`
 - :meth:`spotify.Session.get_artist`

@@ -196,7 +196,7 @@ def get_with_growing_buffer(func, *args):
     return to_unicode(buffer_)
 
 
-def load(obj, timeout=None):
+def load(session, obj, timeout=None):
     """Block until the object's data is loaded.
 
     The ``obj`` must at least have the :attr:`is_loaded` attribute. If it also
@@ -211,9 +211,7 @@ def load(obj, timeout=None):
 
     The method returns ``self`` to allow for chaining of calls.
     """
-    if spotify.session_instance is None:
-        raise RuntimeError('Session must be initialized to load objects')
-    if spotify.session_instance.user is None:
+    if session.connection_state is not spotify.ConnectionState.LOGGED_IN:
         raise RuntimeError('Session must be logged in to load objects')
     if timeout is None:
         timeout = 10
@@ -221,7 +219,7 @@ def load(obj, timeout=None):
     while not obj.is_loaded:
         # TODO Consider sleeping for the time returned by process_events()
         # instead of making a tight loop.
-        spotify.session_instance.process_events()
+        session.process_events()
         spotify.Error.maybe_raise(
             getattr(obj, 'error', 0), ignores=[spotify.ErrorType.IS_LOADING])
         if time.time() > deadline:

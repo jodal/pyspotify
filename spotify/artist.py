@@ -72,7 +72,7 @@ class Artist(object):
 
         The method returns ``self`` to allow for chaining of calls.
         """
-        return utils.load(self, timeout=timeout)
+        return utils.load(self._session, self, timeout=timeout)
 
     @serialized
     def portrait(self, image_size=None):
@@ -198,7 +198,7 @@ class ArtistBrowser(object):
 
         The method returns ``self`` to allow for chaining of calls.
         """
-        return utils.load(self, timeout=timeout)
+        return utils.load(self._session, self, timeout=timeout)
 
     @property
     def error(self):

@@ -112,7 +112,7 @@ class Toplist(object):
 
         The method returns ``self`` to allow for chaining of calls.
         """
-        return utils.load(self, timeout=timeout)
+        return utils.load(self._session, self, timeout=timeout)
 
     @property
     def error(self):

@@ -167,7 +167,7 @@ class ToplistTest(unittest.TestCase):
 
         toplist.load(10)
 
-        load_mock.assert_called_with(toplist, timeout=10)
+        load_mock.assert_called_with(self.session, toplist, timeout=10)
 
     def test_error(self, lib_mock):
         lib_mock.sp_toplistbrowse_error.return_value = int(

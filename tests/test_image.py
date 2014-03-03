@@ -174,7 +174,7 @@ class ImageTest(unittest.TestCase):
 
         image.load(10)
 
-        load_mock.assert_called_with(image, timeout=10)
+        load_mock.assert_called_with(self.session, image, timeout=10)
 
     def test_format(self, lib_mock):
         lib_mock.sp_image_is_loaded.return_value = 1

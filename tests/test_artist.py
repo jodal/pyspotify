@@ -112,7 +112,7 @@ class ArtistTest(unittest.TestCase):
 
         artist.load(10)
 
-        load_mock.assert_called_with(artist, timeout=10)
+        load_mock.assert_called_with(self.session, artist, timeout=10)
 
     @mock.patch('spotify.image.lib', spec=spotify.lib)
     def test_portrait(self, image_lib_mock, lib_mock):
@@ -326,7 +326,7 @@ class ArtistBrowserTest(unittest.TestCase):
 
         browser.load(10)
 
-        load_mock.assert_called_with(browser, timeout=10)
+        load_mock.assert_called_with(self.session, browser, timeout=10)
 
     def test_error(self, lib_mock):
         lib_mock.sp_artistbrowse_error.return_value = int(

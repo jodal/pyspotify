@@ -110,7 +110,7 @@ class UserTest(unittest.TestCase):
 
         user.load(10)
 
-        load_mock.assert_called_with(user, timeout=10)
+        load_mock.assert_called_with(self.session, user, timeout=10)
 
     @mock.patch('spotify.Link', spec=spotify.Link)
     def test_link_creates_link_to_user(self, link_mock, lib_mock):

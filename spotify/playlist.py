@@ -105,7 +105,7 @@ class Playlist(utils.EventEmitter):
 
         The method returns ``self`` to allow for chaining of calls.
         """
-        return utils.load(self, timeout=timeout)
+        return utils.load(self._session, self, timeout=timeout)
 
     @property
     @serialized
@@ -840,7 +840,7 @@ class PlaylistContainer(collections.MutableSequence, utils.EventEmitter):
 
         The method returns ``self`` to allow for chaining of calls.
         """
-        return utils.load(self, timeout=timeout)
+        return utils.load(self._session, self, timeout=timeout)
 
     def __len__(self):
         # Required by collections.Sequence

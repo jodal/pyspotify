@@ -108,7 +108,7 @@ class TrackTest(unittest.TestCase):
 
         track.load(10)
 
-        load_mock.assert_called_with(track, timeout=10)
+        load_mock.assert_called_with(self.session, track, timeout=10)
 
     def test_offline_status(self, lib_mock):
         lib_mock.sp_track_error.return_value = spotify.ErrorType.OK

@@ -101,7 +101,7 @@ class Search(object):
         """
         # TODO Replace with self.complete_event.wait(timeout) when we have a
         # thread that takes care of all ``process_events()`` calls for us.
-        return utils.load(self, timeout=timeout)
+        return utils.load(self._session, self, timeout=timeout)
 
     @property
     @serialized

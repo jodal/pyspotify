@@ -89,7 +89,7 @@ class AlbumTest(unittest.TestCase):
 
         album.load(10)
 
-        load_mock.assert_called_with(album, timeout=10)
+        load_mock.assert_called_with(self.session, album, timeout=10)
 
     def test_is_available(self, lib_mock):
         lib_mock.sp_album_is_available.return_value = 1
@@ -407,7 +407,7 @@ class AlbumBrowserTest(unittest.TestCase):
 
         browser.load(10)
 
-        load_mock.assert_called_with(browser, timeout=10)
+        load_mock.assert_called_with(self.session, browser, timeout=10)
 
     def test_error(self, lib_mock):
         lib_mock.sp_albumbrowse_error.return_value = int(

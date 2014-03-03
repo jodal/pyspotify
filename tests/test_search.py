@@ -149,7 +149,7 @@ class SearchTest(unittest.TestCase):
 
         search.load(10)
 
-        load_mock.assert_called_with(search, timeout=10)
+        load_mock.assert_called_with(self.session, search, timeout=10)
 
     @mock.patch('spotify.track.lib', spec=spotify.lib)
     def test_tracks(self, track_lib_mock, lib_mock):

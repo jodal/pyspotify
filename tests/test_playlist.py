@@ -128,7 +128,7 @@ class PlaylistTest(unittest.TestCase):
 
         playlist.load(10)
 
-        load_mock.assert_called_with(playlist, timeout=10)
+        load_mock.assert_called_with(self.session, playlist, timeout=10)
 
     @mock.patch('spotify.track.lib', spec=spotify.lib)
     def test_tracks(self, track_lib_mock, lib_mock):
@@ -1090,7 +1090,8 @@ class PlaylistContainerTest(unittest.TestCase):
 
         playlist_container.load(10)
 
-        load_mock.assert_called_with(playlist_container, timeout=10)
+        load_mock.assert_called_with(
+            self.session, playlist_container, timeout=10)
 
     def test_len(self, lib_mock):
         lib_mock.sp_playlistcontainer_num_playlists.return_value = 8

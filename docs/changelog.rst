@@ -30,12 +30,13 @@ To prepare for removing all global state, the use of the module attribute
 session object to all objects that needs it. To allow for this, the following
 new methods have been added:
 
-- :meth:`Session.get_track`
-- :meth:`Session.get_album`
-- :meth:`Session.get_artist`
-- :meth:`Session.get_playlist`
-- :meth:`Session.get_user`
-- :meth:`Session.get_image`
+- :meth:`spotify.Session.get_track`
+- :meth:`spotify.Session.get_album`
+- :meth:`spotify.Session.get_artist`
+- :meth:`spotify.Session.get_playlist`
+- :meth:`spotify.Session.get_user`
+- :meth:`spotify.Session.get_image`
+- TODO: Toplist requires a session now. Add getter for it as well?
 
 Bug fixes
 ---------

@@ -115,7 +115,7 @@ class Commander(cmd.Cmd):
             self.logger.warning('You must be logged in to play')
             return
         try:
-            track = spotify.Link(line).as_track()
+            track = self.session.get_track(line)
             track.load()
         except (ValueError, spotify.Error) as e:
             self.logger.warning(e)

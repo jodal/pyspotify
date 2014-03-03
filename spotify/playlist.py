@@ -1054,6 +1054,7 @@ class PlaylistContainer(collections.MutableSequence, utils.EventEmitter):
     def owner(self):
         """The :class:`User` object for the owner of the playlist container."""
         return spotify.User(
+            self._session,
             sp_user=lib.sp_playlistcontainer_owner(self._sp_playlistcontainer),
             add_ref=True)
 

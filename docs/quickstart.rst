@@ -427,6 +427,23 @@ pyspotify. For now, you'll have to move the raw PCM audio data from pyspotify
 to the audio device yourself. See :attr:`~spotify.SessionEvent.MUSIC_DELIVERY`
 to get started.
 
+Example :attr:`~spotify.SessionEvent.MUSIC_DELIVERY` callback whilst output helpers are written
+
+    def on_audio_received(self, session, audio_format, frames, num_frames):
+
+        if self._device is None:
+            self._device = alsaaudio.PCM(mode=self._mode)
+            self._period_size = (num_frames * audio_format.frame_size())
+            self._device.setperiodsize(self._period_size)
+            self._device.setformat(self._format)
+            self._device.setrate(audio_format.sample_rate)
+            self._device.setchannels(audio_format.channels)
+
+        if num_frames == 0:
+            # flush audio buffers on seek
+            return 0
+        return self._device.write(frames)
+
 
 Thread safety
 =============

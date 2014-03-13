@@ -28,16 +28,17 @@ Refactoring: Remove global state
 To prepare for removing all global state, the use of the module attribute
 :attr:`spotify.session_instance` has been replaced with explicit passing of the
 session object to all objects that needs it. To allow for this, the following
-new methods have been added:
+new methods have been added, and should be used instead of their old
+equivalents:
 
-- :meth:`spotify.Session.get_link`
-- :meth:`spotify.Session.get_track`
-- :meth:`spotify.Session.get_album`
-- :meth:`spotify.Session.get_artist`
-- :meth:`spotify.Session.get_playlist`
-- :meth:`spotify.Session.get_user`
-- :meth:`spotify.Session.get_image`
-- :meth:`spotify.Session.get_toplist`
+- :meth:`spotify.Session.get_link` (replaces :class:`spotify.Link`)
+- :meth:`spotify.Session.get_track` (replaces :class:`spotify.Track`)
+- :meth:`spotify.Session.get_album` (replaces :class:`spotify.Album`)
+- :meth:`spotify.Session.get_artist` (replaces :class:`spotify.Artist`)
+- :meth:`spotify.Session.get_playlist` (replaces :class:`spotify.Playlist`)
+- :meth:`spotify.Session.get_user` (replaces :class:`spotify.User`)
+- :meth:`spotify.Session.get_image` (replaces :class:`spotify.Image`)
+- :meth:`spotify.Session.get_toplist` (replaces :class:`spotify.Toplist`)
 
 Bug fixes
 ---------

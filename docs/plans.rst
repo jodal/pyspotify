@@ -17,8 +17,6 @@ v2.0.0a2: Thread safety
   easily support multiple sessions in a single process if libspotify adds
   support for it.
 
-- Look into how asyncio support could work.
-
 - Revisit all TODOs and FIXMEs in code and tests.
 
 
@@ -27,6 +25,8 @@ v2.0.0b1: Seen real usage
 
 - Reimplement Mopidy-Spotify using pyspotify 2. Will surely lead to bug fixes
   and/or API changes.
+
+- Look into how asyncio support could work.
 
 - Maybe add some more features to the jukebox example.
 

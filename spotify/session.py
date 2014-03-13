@@ -491,6 +491,47 @@ class Session(utils.EventEmitter):
             playlist_offset=playlist_offset, playlist_count=playlist_count,
             search_type=search_type)
 
+    def get_toplist(
+            self, type=None, region=None, canonical_username=None,
+            callback=None):
+        """Get a Spotify toplist of artists, albums, or tracks that are the
+        currently most popular worldwide or in a specific region.
+
+        ``type`` is a :class:`ToplistType` instance that specifies the type of
+        toplist to create.
+
+        ``region`` is either a :class:`ToplistRegion` instance, or a 2-letter
+        ISO 3166-1 country code as a unicode string, that specifies the
+        geographical region to create a toplist for.
+
+        If ``region`` is :attr:`ToplistRegion.USER` and ``canonical_username``
+        isn't specified, the region of the current user will be used. If
+        ``canonical_username`` is specified, the region of the specified user
+        will be used instead.
+
+        If ``callback`` isn't :class:`None`, it is expected to be a callable
+        that accepts a single argument, a :class:`Toplist` instance, when the
+        toplist request completes.
+
+        Example::
+
+            >>> import spotify
+            >>> session = spotify.Session()
+            # ...
+            >>> toplist = session.get_toplist(
+            ...     type=spotify.ToplistType.TRACKS, region='US')
+            >>> toplist.load()
+            >>> len(toplist.tracks)
+            100
+            >>> len(toplist.artists)
+            0
+            >>> toplist.tracks[0]
+            Track(u'spotify:track:2dLLR6qlu5UJ5gk0dKz0h3')
+        """
+        return spotify.Toplist(
+            self, type=type, region=region,
+            canonical_username=canonical_username, callback=callback)
+
 
 class Offline(object):
     """Offline sync controller.

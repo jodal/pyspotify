@@ -37,7 +37,7 @@ new methods have been added:
 - :meth:`spotify.Session.get_playlist`
 - :meth:`spotify.Session.get_user`
 - :meth:`spotify.Session.get_image`
-- TODO: Toplist requires a session now. Add getter for it as well?
+- :meth:`spotify.Session.get_toplist`
 
 Bug fixes
 ---------

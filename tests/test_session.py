@@ -646,6 +646,19 @@ class SessionTest(unittest.TestCase):
             playlist_offset=0, playlist_count=20,
             search_type=None)
 
+    @mock.patch('spotify.Toplist')
+    def test_toplist(self, toplist_mock, lib_mock):
+        session = create_session(lib_mock)
+        toplist_mock.return_value = mock.sentinel.toplist
+
+        result = session.get_toplist(
+            type=spotify.ToplistType.TRACKS, region='NO')
+
+        self.assertIs(result, mock.sentinel.toplist)
+        toplist_mock.assert_called_with(
+            session, type=spotify.ToplistType.TRACKS, region='NO',
+            canonical_username=None, callback=None)
+
 
 @mock.patch('spotify.session.lib', spec=spotify.lib)
 class OfflineTest(unittest.TestCase):

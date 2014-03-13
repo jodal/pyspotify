@@ -141,6 +141,8 @@ running, we can simplify the login process::
     ...     logged_in_event.set()
     ...
     >>> session = spotify.Session()
+    >>> loop = spotify.EventLoop(session)
+    >>> loop.start()
     >>> session.on(spotify.SessionEvent.LOGGED_IN, logged_in_listener)
     >>> session.login('alice', 's3cretpassword')
     >>> session.connection_state

@@ -1,3 +1,16 @@
+#!/usr/bin/env python
+
+"""
+This is an example of a simple command line client for Spotify using pyspotify.
+
+You can run this file directly::
+
+    python shell.py
+
+Then run the ``help`` command on the ``spotify>`` prompt to view all available
+commands.
+"""
+
 from __future__ import unicode_literals
 
 import cmd
@@ -5,6 +18,11 @@ import logging
 import threading
 
 import spotify
+
+try:
+    from spotify.alsa import AlsaDriver
+except ImportError:
+    AlsaDriver = None
 
 
 class Commander(cmd.Cmd):
@@ -24,6 +42,11 @@ class Commander(cmd.Cmd):
         self.session = spotify.Session()
         self.session.on(spotify.SessionEvent.LOGGED_IN, self.on_logged_in)
         self.session.on(spotify.SessionEvent.LOGGED_OUT, self.on_logged_out)
+        self.session.on(
+            spotify.SessionEvent.END_OF_TRACK, self.on_end_of_track)
+
+        if AlsaDriver is not None:
+            self.audio_driver = AlsaDriver(self.session)
 
         self.event_loop = spotify.EventLoop(self.session)
         self.event_loop.start()
@@ -36,6 +59,9 @@ class Commander(cmd.Cmd):
     def on_logged_out(self, session):
         self.logged_in.clear()
         self.logged_out.set()
+
+    def on_end_of_track(self, session):
+        self.session.player.play(False)
 
     def precmd(self, line):
         if line:
@@ -124,7 +150,6 @@ class Commander(cmd.Cmd):
         self.session.player.load(track)
         self.logger.info('Playing track')
         self.session.player.play()
-        # TODO Play received audio samples
 
     def do_search(self, query):
         "search <query>"

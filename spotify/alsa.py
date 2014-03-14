@@ -70,6 +70,9 @@ class AlsaDriver(object):
         # This method is called from an internal libspotify thread and must
         # not block in any way.
 
+        assert (
+            audio_format.sample_type == spotify.SampleType.INT16_NATIVE_ENDIAN)
+
         if self._device is None:
             import alsaaudio
 
@@ -77,7 +80,7 @@ class AlsaDriver(object):
                 mode=alsaaudio.PCM_NONBLOCK, card=self._card)
             if sys.byteorder == 'little':
                 self._device.setformat(alsaaudio.PCM_FORMAT_S16_LE)
-            elif sys.byteorder == 'big':
+            else:
                 self._device.setformat(alsaaudio.PCM_FORMAT_S16_BE)
             self._device.setrate(audio_format.sample_rate)
             self._device.setchannels(audio_format.channels)

@@ -13,6 +13,9 @@ class AlsaDriver(object):
     packaged in your Linux distribution. For example, on Debian/Ubuntu you can
     install the package ``python-alsaaudio``.
 
+    The ``card`` keyword argument is passed on to :class:`alsaaudio.PCM`.
+    Please refer to the pyalsaaudio documentation for details.
+
     Example::
 
         >>> import spotify.alsa

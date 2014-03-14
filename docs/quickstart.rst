@@ -424,10 +424,16 @@ For more details, see the API docs for :class:`~spotify.Playlist`.
 Playing music
 =============
 
-TODO: This section will be fleshed out when audio output helpers are added to
-pyspotify. For now, you'll have to move the raw PCM audio data from pyspotify
-to the audio device yourself. See :attr:`~spotify.SessionEvent.MUSIC_DELIVERY`
-to get started.
+Music data is delivered to the :attr:`~spotify.SessionEvent.MUSIC_DELIVERY`
+event listener as PCM frames. If you want to have full control of audio
+playback, you can deliver these audio frames to your operating systems' audio
+subsystem yourself. If you want some help on the road, pyspotify comes with
+audio drivers for some select audio subsystems.
+
+For now, have a look at :class:`spotify.alsa.AlsaDriver` and the
+``examples/play_track.py`` and ``examples/shell.py`` examples.
+
+TODO: Flesh out this section when more audio drivers are added to pyspotify.
 
 
 Thread safety

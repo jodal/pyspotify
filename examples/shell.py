@@ -151,6 +151,14 @@ class Commander(cmd.Cmd):
         self.logger.info('Playing track')
         self.session.player.play()
 
+    def do_seek(self, seconds):
+        "seek <seconds>"
+        if not self.logged_in.is_set():
+            self.logger.warning('You must be logged in to play')
+            return
+        # TODO Check if playing
+        self.session.player.seek(int(seconds) * 1000)
+
     def do_search(self, query):
         "search <query>"
         if not self.logged_in.is_set():

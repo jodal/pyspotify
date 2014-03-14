@@ -151,6 +151,19 @@ class Commander(cmd.Cmd):
         self.logger.info('Playing track')
         self.session.player.play()
 
+    def do_pause(self):
+        self.logger.info('Pausing track')
+        self.session.player.play(False)
+
+    def do_resume(self):
+        self.logger.info('Resuming track')
+        self.session.player.play()
+
+    def do_stop(self):
+        self.logger.info('Stopping track')
+        self.session.player.play(False)
+        self.session.player.unload()
+
     def do_seek(self, seconds):
         "seek <seconds>"
         if not self.logged_in.is_set():

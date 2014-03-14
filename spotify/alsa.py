@@ -43,7 +43,7 @@ class AlsaDriver(object):
         self.off()
 
     def on(self):
-        """Turn off the audio driver.
+        """Turn on the audio driver.
 
         This is done automatically when the driver is instantiated, so you'll
         only need to call this method if you ever call :meth:`off` and want to

@@ -18,9 +18,19 @@ Feature: Thread safety
 Feature: Event loop
 -------------------
 
-- Added an :class:`~spotify.EventLoop` helper thread that reacts to
+- Add :class:`~spotify.EventLoop` helper thread that reacts to
   :class:`~spotify.SessionEvent.NOTIFY_MAIN_THREAD` events and calls
   :meth:`~spotify.Session.process_events` for you when appropriate.
+
+Feature: Audio playback
+-----------------------
+
+- Add :class:`~spotify.alsa.AlsaDriver`, an audio driver for playback through
+  ALSA.
+
+- Update ``examples/shell.py`` to use the ALSA driver to play music.
+
+- Add ``examples/play_track.py`` as a simpler example of audio playback.
 
 Refactoring: Remove global state
 --------------------------------

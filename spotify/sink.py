@@ -31,19 +31,15 @@ class AlsaSink(object):
         # Listen to music...
     """
 
-    # TODO Add unit tests
-
     def __init__(self, session, card='default'):
         self._session = session
-        self._device = None
         self._card = card
 
-        import alsaaudio  # noqa: Crash early if not available
+        import alsaaudio  # Crash early if not available
+        self._alsaaudio = alsaaudio
+        self._device = None
 
         self.on()
-
-    def __del__(self):
-        self.off()
 
     def on(self):
         """Turn on the audio sink.
@@ -74,14 +70,12 @@ class AlsaSink(object):
             audio_format.sample_type == spotify.SampleType.INT16_NATIVE_ENDIAN)
 
         if self._device is None:
-            import alsaaudio
-
-            self._device = alsaaudio.PCM(
-                mode=alsaaudio.PCM_NONBLOCK, card=self._card)
+            self._device = self._alsaaudio.PCM(
+                mode=self._alsaaudio.PCM_NONBLOCK, card=self._card)
             if sys.byteorder == 'little':
-                self._device.setformat(alsaaudio.PCM_FORMAT_S16_LE)
+                self._device.setformat(self._alsaaudio.PCM_FORMAT_S16_LE)
             else:
-                self._device.setformat(alsaaudio.PCM_FORMAT_S16_BE)
+                self._device.setformat(self._alsaaudio.PCM_FORMAT_S16_BE)
             self._device.setrate(audio_format.sample_rate)
             self._device.setchannels(audio_format.channels)
             self._device.setperiodsize(num_frames * audio_format.frame_size())

@@ -5,10 +5,10 @@ import sys
 import spotify
 
 
-class AlsaDriver(object):
-    """Audio driver for systems with ALSA, e.g. most Linux systems.
+class AlsaSink(object):
+    """Audio sink for systems using ALSA, e.g. most Linux systems.
 
-    This driver requires `pyalsaaudio
+    This audio sink requires `pyalsaaudio
     <https://pypi.python.org/pypi/pyalsaaudio>`_. pyalsaaudio is probably
     packaged in your Linux distribution. For example, on Debian/Ubuntu you can
     install the package ``python-alsaaudio``.
@@ -18,9 +18,9 @@ class AlsaDriver(object):
 
     Example::
 
-        >>> import spotify.alsa
+        >>> import spotify.sink
         >>> session = spotify.Session()
-        >>> audio = spotify.alsa.AlsaDriver(session)
+        >>> audio = spotify.sink.AlsaSink(session)
         >>> loop = spotify.EventLoop(session)
         >>> loop.start()
         # Login, etc...
@@ -46,11 +46,11 @@ class AlsaDriver(object):
         self.off()
 
     def on(self):
-        """Turn on the audio driver.
+        """Turn on the audio sink.
 
-        This is done automatically when the driver is instantiated, so you'll
+        This is done automatically when the sink is instantiated, so you'll
         only need to call this method if you ever call :meth:`off` and want to
-        turn the driver back on.
+        turn the sink back on.
         """
         assert self._session.num_listeners(
             spotify.SessionEvent.MUSIC_DELIVERY) == 0
@@ -58,9 +58,9 @@ class AlsaDriver(object):
             spotify.SessionEvent.MUSIC_DELIVERY, self._on_music_delivery)
 
     def off(self):
-        """Turn off the audio driver.
+        """Turn off the audio sink.
 
-        This disconnects the driver from the relevant session events.
+        This disconnects the sink from the relevant session events.
         """
         self._session.off(
             spotify.SessionEvent.MUSIC_DELIVERY, self._on_music_delivery)

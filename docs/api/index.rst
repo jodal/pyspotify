@@ -32,7 +32,6 @@ further details.
     eventloop
     connection
     audio
-    audiodrivers
     link
     track
     album
@@ -44,3 +43,4 @@ further details.
     user
     toplist
     inbox
+    sink

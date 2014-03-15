@@ -428,12 +428,10 @@ Music data is delivered to the :attr:`~spotify.SessionEvent.MUSIC_DELIVERY`
 event listener as PCM frames. If you want to have full control of audio
 playback, you can deliver these audio frames to your operating systems' audio
 subsystem yourself. If you want some help on the road, pyspotify comes with
-audio drivers for some select audio subsystems.
+audio sinks for some select audio subsystems.
 
-For now, have a look at :class:`spotify.alsa.AlsaDriver` and the
+For details, have a look at the :mod:`spotify.sink` documentation, and the
 ``examples/play_track.py`` and ``examples/shell.py`` examples.
-
-TODO: Flesh out this section when more audio drivers are added to pyspotify.
 
 
 Thread safety

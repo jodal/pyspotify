@@ -25,10 +25,9 @@ Feature: Event loop
 Feature: Audio playback
 -----------------------
 
-- Add :class:`~spotify.alsa.AlsaDriver`, an audio driver for playback through
-  ALSA.
+- Add :class:`~spotify.sink.AlsaSink`, an audio sink for playback through ALSA.
 
-- Update ``examples/shell.py`` to use the ALSA driver to play music.
+- Update ``examples/shell.py`` to use the ALSA sink to play music.
 
 - Add ``examples/play_track.py`` as a simpler example of audio playback.
 

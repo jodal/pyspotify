@@ -13,10 +13,6 @@ v2.0.0a2: Thread safety
 - Enforce that the same cache directory isn't used by multiple processes by
   maintaining a lock file or similar.
 
-- Consider whether we can get rid of the global session instance now, so we can
-  easily support multiple sessions in a single process if libspotify adds
-  support for it.
-
 - Revisit all TODOs and FIXMEs in code and tests.
 
 

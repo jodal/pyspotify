@@ -590,6 +590,9 @@ class _PlaylistCallbacks(object):
             'subscribers_changed': cls.subscribers_changed,
         })
 
+    # XXX Avoid use of the spotify.session_instance global in the following
+    # callbacks.
+
     @staticmethod
     @ffi.callback(
         'void(sp_playlist *playlist, sp_track **tracks, int num_tracks, '
@@ -945,8 +948,7 @@ class PlaylistContainer(collections.MutableSequence, utils.EventEmitter):
             self._sp_playlistcontainer, utils.to_char(name))
         if sp_playlist == ffi.NULL:
             raise spotify.Error('Playlist creation failed')
-        playlist = Playlist._cached(
-            spotify.session_instance, sp_playlist, add_ref=True)
+        playlist = Playlist._cached(self._session, sp_playlist, add_ref=True)
         if index is not None:
             self.move_playlist(self.__len__() - 1, index)
         return playlist
@@ -1177,6 +1179,9 @@ class _PlaylistContainerCallbacks(object):
             'playlist_moved': cls.playlist_moved,
             'container_loaded': cls.container_loaded,
         })
+
+    # XXX Avoid use of the spotify.session_instance global in the following
+    # callbacks.
 
     @staticmethod
     @ffi.callback(

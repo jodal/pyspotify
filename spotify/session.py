@@ -1000,6 +1000,9 @@ class _SessionCallbacks(object):
             'private_session_mode_changed': cls.private_session_mode_changed,
         })
 
+    # XXX Avoid use of the spotify.session_instance global in the following
+    # callbacks.
+
     @staticmethod
     @ffi.callback('void(sp_session *, sp_error)')
     def logged_in(sp_session, sp_error):

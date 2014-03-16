@@ -26,8 +26,6 @@ v2.0.0b1: Seen real usage
 - Reimplement Mopidy-Spotify using pyspotify 2. Will surely lead to bug fixes
   and/or API changes.
 
-- Create GStreamer audio driver.
-
 - Look into how asyncio support could work.
 
 - Maybe add some more features to the jukebox example.

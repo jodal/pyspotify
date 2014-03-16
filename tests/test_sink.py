@@ -110,3 +110,73 @@ class AlsaSinkTest(unittest.TestCase):
         self.sink._device.write.assert_called_with(mock.sentinel.frames)
         self.assertEqual(
             num_consumed_frames, self.sink._device.write.return_value)
+
+
+class PortAudioSinkTest(unittest.TestCase):
+
+    def setUp(self):
+        self.session = mock.Mock()
+        self.session.num_listeners.return_value = 0
+        self.pyaudio = mock.Mock()
+        with mock.patch.dict('sys.modules', {'pyaudio': self.pyaudio}):
+            self.sink = spotify.sink.PortAudioSink(self.session)
+
+    def test_init_creates_device(self):
+        self.pyaudio.PyAudio.assert_called_with()
+        self.assertEqual(self.sink._device, self.pyaudio.PyAudio.return_value)
+
+    def test_init_connects_to_music_delivery_event(self):
+        self.session.on.assert_called_with(
+            spotify.SessionEvent.MUSIC_DELIVERY, self.sink._on_music_delivery)
+
+    def test_off_disconnects_from_music_delivery_event(self):
+        self.assertEqual(self.session.off.call_count, 0)
+
+        self.sink.off()
+
+        self.session.off.assert_called_with(
+            spotify.SessionEvent.MUSIC_DELIVERY, mock.ANY)
+
+    def test_off_closes_audio_stream(self):
+        stream_mock = mock.Mock()
+        self.sink._stream = stream_mock
+
+        self.sink.off()
+
+        stream_mock.close.assert_called_with()
+        self.assertIsNone(self.sink._stream)
+
+    def test_on_connects_to_music_delivery_event(self):
+        self.assertEqual(self.session.on.call_count, 1)
+
+        self.sink.off()
+        self.sink.on()
+
+        self.assertEqual(self.session.on.call_count, 2)
+
+    def test_music_delivery_creates_stream_if_needed(self):
+        audio_format = mock.Mock()
+        audio_format.sample_type = spotify.SampleType.INT16_NATIVE_ENDIAN
+
+        self.sink._on_music_delivery(
+            mock.sentinel.session, audio_format, mock.sentinel.frames,
+            mock.sentinel.num_frames)
+
+        self.sink._device.open.assert_called_with(
+            format=self.pyaudio.paInt16, channels=audio_format.channels,
+            rate=audio_format.sample_rate, output=True)
+        self.assertEqual(
+            self.sink._stream, self.sink._device.open.return_value)
+
+    def test_music_delivery_writes_frames_to_stream(self):
+        self.sink._stream = mock.Mock()
+        audio_format = mock.Mock()
+        audio_format.sample_type = spotify.SampleType.INT16_NATIVE_ENDIAN
+
+        num_consumed_frames = self.sink._on_music_delivery(
+            mock.sentinel.session, audio_format, mock.sentinel.frames,
+            mock.sentinel.num_frames)
+
+        self.sink._stream.write.assert_called_with(
+            mock.sentinel.frames, num_frames=mock.sentinel.num_frames)
+        self.assertEqual(num_consumed_frames, mock.sentinel.num_frames)

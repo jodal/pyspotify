@@ -134,10 +134,9 @@ class PortAudioSink(Sink):
         # 1) Only feed write() with the number of frames returned by
         # self._stream.get_write_available() on each call. This causes buffer
         # underruns every third or fourth write().
-        # 2) Let pyaudio call a callback
-        # function when it needs data, but then we need to introduce a thread
-        # safe buffer here which is filled when libspotify got data and drained
-        # when pyaudio needs data.
+        # 2) Let pyaudio call a callback function when it needs data, but then
+        # we need to introduce a thread safe buffer here which is filled when
+        # libspotify got data and drained when pyaudio needs data.
         self._stream.write(frames, num_frames=num_frames)
         return num_frames
 

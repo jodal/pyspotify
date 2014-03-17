@@ -39,7 +39,7 @@ loop.start()
 # Connect an audio sink
 audio = spotify.sink.AlsaSink(session)
 
-# EVents for coordination
+# Events for coordination
 logged_in = threading.Event()
 end_of_track = threading.Event()
 

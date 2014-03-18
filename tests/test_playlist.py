@@ -796,10 +796,10 @@ class PlaylistCallbacksTest(unittest.TestCase):
 
     def setUp(self):
         self.session = tests.create_session()
-        spotify.session_instance = self.session
+        spotify._session_instance = self.session
 
     def tearDown(self):
-        spotify.session_instance = None
+        spotify._session_instance = None
 
     @mock.patch('spotify.track.lib', spec=spotify.lib)
     def test_tracks_added_callback(self, track_lib_mock, lib_mock):

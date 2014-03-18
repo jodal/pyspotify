@@ -14,10 +14,10 @@ class PlaylistContainerTest(unittest.TestCase):
 
     def setUp(self):
         self.session = tests.create_session()
-        spotify.session_instance = self.session
+        spotify._session_instance = self.session
 
     def tearDown(self):
-        spotify.session_instance = None
+        spotify._session_instance = None
 
     def test_life_cycle(self, lib_mock):
         sp_playlistcontainer = spotify.ffi.new('int *')
@@ -1029,10 +1029,10 @@ class PlaylistContainerCallbacksTest(unittest.TestCase):
 
     def setUp(self):
         self.session = tests.create_session()
-        spotify.session_instance = self.session
+        spotify._session_instance = self.session
 
     def tearDown(self):
-        spotify.session_instance = None
+        spotify._session_instance = None
 
     def test_playlist_added_callback(self, lib_mock):
         callback = mock.Mock()

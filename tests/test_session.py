@@ -21,7 +21,7 @@ def create_session(lib_mock):
 class SessionTest(unittest.TestCase):
 
     def tearDown(self):
-        spotify.session_instance = None
+        spotify._session_instance = None
 
     def test_raises_error_if_a_session_already_exists(self, lib_mock):
         create_session(lib_mock)
@@ -71,7 +71,7 @@ class SessionTest(unittest.TestCase):
 
         session = spotify.Session(config=config)
         session = None  # noqa
-        spotify.session_instance = None
+        spotify._session_instance = None
         tests.gc_collect()
 
         lib_mock.sp_session_release.assert_called_with(sp_session)
@@ -664,7 +664,7 @@ class SessionTest(unittest.TestCase):
 class OfflineTest(unittest.TestCase):
 
     def tearDown(self):
-        spotify.session_instance = None
+        spotify._session_instance = None
 
     def test_set_connection_type(self, lib_mock):
         lib_mock.sp_session_set_connection_type.return_value = (
@@ -778,7 +778,7 @@ class OfflineTest(unittest.TestCase):
 class PlayerTest(unittest.TestCase):
 
     def tearDown(self):
-        spotify.session_instance = None
+        spotify._session_instance = None
 
     @mock.patch('spotify.track.lib', spec=spotify.lib)
     def test_player_load(self, track_lib_mock, lib_mock):
@@ -891,7 +891,7 @@ class PlayerTest(unittest.TestCase):
 class SocialTest(unittest.TestCase):
 
     def tearDown(self):
-        spotify.session_instance = None
+        spotify._session_instance = None
 
     def test_is_private_session(self, lib_mock):
         lib_mock.sp_session_is_private_session.return_value = 0
@@ -1027,7 +1027,7 @@ class SocialTest(unittest.TestCase):
 class SessionCallbacksTest(unittest.TestCase):
 
     def tearDown(self):
-        spotify.session_instance = None
+        spotify._session_instance = None
 
     def test_logged_in_callback(self, lib_mock):
         callback = mock.Mock()

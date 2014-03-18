@@ -14,7 +14,7 @@ _lock = threading.RLock()
 
 # Reference to the spotify.Session instance. Used to enforce that one and only
 # one session exists in each process.
-session_instance = None
+_session_instance = None
 
 
 def _setup_logging():

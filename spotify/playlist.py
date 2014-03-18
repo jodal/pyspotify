@@ -590,7 +590,7 @@ class _PlaylistCallbacks(object):
             'subscribers_changed': cls.subscribers_changed,
         })
 
-    # XXX Avoid use of the spotify.session_instance global in the following
+    # XXX Avoid use of the spotify._session_instance global in the following
     # callbacks.
 
     @staticmethod
@@ -600,10 +600,10 @@ class _PlaylistCallbacks(object):
     def tracks_added(sp_playlist, sp_tracks, num_tracks, position, userdata):
         logger.debug('Tracks added to playlist')
         playlist = Playlist._cached(
-            spotify.session_instance, sp_playlist, add_ref=True)
+            spotify._session_instance, sp_playlist, add_ref=True)
         tracks = [
             spotify.Track(
-                spotify.session_instance, sp_track=sp_tracks[i], add_ref=True)
+                spotify._session_instance, sp_track=sp_tracks[i], add_ref=True)
             for i in range(num_tracks)]
         playlist.emit(
             PlaylistEvent.TRACKS_ADDED, playlist, tracks, int(position))
@@ -615,7 +615,7 @@ class _PlaylistCallbacks(object):
     def tracks_removed(sp_playlist, tracks, num_tracks, userdata):
         logger.debug('Tracks removed from playlist')
         playlist = Playlist._cached(
-            spotify.session_instance, sp_playlist, add_ref=True)
+            spotify._session_instance, sp_playlist, add_ref=True)
         tracks = [int(tracks[i]) for i in range(num_tracks)]
         playlist.emit(PlaylistEvent.TRACKS_REMOVED, playlist, tracks)
 
@@ -626,7 +626,7 @@ class _PlaylistCallbacks(object):
     def tracks_moved(sp_playlist, tracks, num_tracks, position, userdata):
         logger.debug('Tracks moved within playlist')
         playlist = Playlist._cached(
-            spotify.session_instance, sp_playlist, add_ref=True)
+            spotify._session_instance, sp_playlist, add_ref=True)
         tracks = [int(tracks[i]) for i in range(num_tracks)]
         playlist.emit(
             PlaylistEvent.TRACKS_MOVED, playlist, tracks, int(position))
@@ -636,7 +636,7 @@ class _PlaylistCallbacks(object):
     def playlist_renamed(sp_playlist, userdata):
         logger.debug('Playlist renamed')
         playlist = Playlist._cached(
-            spotify.session_instance, sp_playlist, add_ref=True)
+            spotify._session_instance, sp_playlist, add_ref=True)
         playlist.emit(PlaylistEvent.PLAYLIST_RENAMED, playlist)
 
     @staticmethod
@@ -644,7 +644,7 @@ class _PlaylistCallbacks(object):
     def playlist_state_changed(sp_playlist, userdata):
         logger.debug('Playlist state changed')
         playlist = Playlist._cached(
-            spotify.session_instance, sp_playlist, add_ref=True)
+            spotify._session_instance, sp_playlist, add_ref=True)
         playlist.emit(PlaylistEvent.PLAYLIST_STATE_CHANGED, playlist)
 
     @staticmethod
@@ -652,7 +652,7 @@ class _PlaylistCallbacks(object):
     def playlist_update_in_progress(sp_playlist, done, userdata):
         logger.debug('Playlist update in progress')
         playlist = Playlist._cached(
-            spotify.session_instance, sp_playlist, add_ref=True)
+            spotify._session_instance, sp_playlist, add_ref=True)
         playlist.emit(
             PlaylistEvent.PLAYLIST_UPDATE_IN_PROGRESS, playlist, bool(done))
 
@@ -661,7 +661,7 @@ class _PlaylistCallbacks(object):
     def playlist_metadata_updated(sp_playlist, userdata):
         logger.debug('Playlist metadata updated')
         playlist = Playlist._cached(
-            spotify.session_instance, sp_playlist, add_ref=True)
+            spotify._session_instance, sp_playlist, add_ref=True)
         playlist.emit(PlaylistEvent.PLAYLIST_METADATA_UPDATED, playlist)
 
     @staticmethod
@@ -671,9 +671,9 @@ class _PlaylistCallbacks(object):
     def track_created_changed(sp_playlist, position, sp_user, when, userdata):
         logger.debug('Playlist track created changed')
         playlist = Playlist._cached(
-            spotify.session_instance, sp_playlist, add_ref=True)
+            spotify._session_instance, sp_playlist, add_ref=True)
         user = spotify.User(
-            spotify.session_instance, sp_user=sp_user, add_ref=True)
+            spotify._session_instance, sp_user=sp_user, add_ref=True)
         playlist.emit(
             PlaylistEvent.TRACK_CREATED_CHANGED,
             playlist, int(position), user, int(when))
@@ -684,7 +684,7 @@ class _PlaylistCallbacks(object):
     def track_seen_changed(sp_playlist, position, seen, userdata):
         logger.debug('Playlist track seen changed')
         playlist = Playlist._cached(
-            spotify.session_instance, sp_playlist, add_ref=True)
+            spotify._session_instance, sp_playlist, add_ref=True)
         playlist.emit(
             PlaylistEvent.TRACK_SEEN_CHANGED,
             playlist, int(position), bool(seen))
@@ -695,7 +695,7 @@ class _PlaylistCallbacks(object):
     def description_changed(sp_playlist, desc, userdata):
         logger.debug('Playlist description changed')
         playlist = Playlist._cached(
-            spotify.session_instance, sp_playlist, add_ref=True)
+            spotify._session_instance, sp_playlist, add_ref=True)
         playlist.emit(
             PlaylistEvent.DESCRIPTION_CHANGED,
             playlist, utils.to_unicode(desc))
@@ -706,11 +706,11 @@ class _PlaylistCallbacks(object):
     def image_changed(sp_playlist, image_id, userdata):
         logger.debug('Playlist image changed')
         playlist = Playlist._cached(
-            spotify.session_instance, sp_playlist, add_ref=True)
+            spotify._session_instance, sp_playlist, add_ref=True)
         sp_image = lib.sp_image_create(
-            spotify.session_instance._sp_session, image_id)
+            spotify._session_instance._sp_session, image_id)
         image = spotify.Image(
-            spotify.session_instance, sp_image=sp_image, add_ref=False)
+            spotify._session_instance, sp_image=sp_image, add_ref=False)
         playlist.emit(PlaylistEvent.IMAGE_CHANGED, playlist, image)
 
     @staticmethod
@@ -720,7 +720,7 @@ class _PlaylistCallbacks(object):
     def track_message_changed(sp_playlist, position, message, userdata):
         logger.debug('Playlist track message changed')
         playlist = Playlist._cached(
-            spotify.session_instance, sp_playlist, add_ref=True)
+            spotify._session_instance, sp_playlist, add_ref=True)
         playlist.emit(
             PlaylistEvent.TRACK_MESSAGE_CHANGED,
             playlist, int(position), utils.to_unicode(message))
@@ -730,7 +730,7 @@ class _PlaylistCallbacks(object):
     def subscribers_changed(sp_playlist, userdata):
         logger.debug('Playlist subscribers changed')
         playlist = Playlist._cached(
-            spotify.session_instance, sp_playlist, add_ref=True)
+            spotify._session_instance, sp_playlist, add_ref=True)
         playlist.emit(PlaylistEvent.SUBSCRIBERS_CHANGED, playlist)
 
 
@@ -1180,7 +1180,7 @@ class _PlaylistContainerCallbacks(object):
             'container_loaded': cls.container_loaded,
         })
 
-    # XXX Avoid use of the spotify.session_instance global in the following
+    # XXX Avoid use of the spotify._session_instance global in the following
     # callbacks.
 
     @staticmethod
@@ -1190,9 +1190,9 @@ class _PlaylistContainerCallbacks(object):
     def playlist_added(sp_playlistcontainer, sp_playlist, position, userdata):
         logger.debug('Playlist added at position %d', position)
         playlist_container = PlaylistContainer._cached(
-            spotify.session_instance, sp_playlistcontainer, add_ref=True)
+            spotify._session_instance, sp_playlistcontainer, add_ref=True)
         playlist = Playlist._cached(
-            spotify.session_instance, sp_playlist, add_ref=True)
+            spotify._session_instance, sp_playlist, add_ref=True)
         playlist_container.emit(
             PlaylistContainerEvent.PLAYLIST_ADDED,
             playlist_container, playlist, position)
@@ -1205,9 +1205,9 @@ class _PlaylistContainerCallbacks(object):
             sp_playlistcontainer, sp_playlist, position, userdata):
         logger.debug('Playlist removed at position %d', position)
         playlist_container = PlaylistContainer._cached(
-            spotify.session_instance, sp_playlistcontainer, add_ref=True)
+            spotify._session_instance, sp_playlistcontainer, add_ref=True)
         playlist = Playlist._cached(
-            spotify.session_instance, sp_playlist, add_ref=True)
+            spotify._session_instance, sp_playlist, add_ref=True)
         playlist_container.emit(
             PlaylistContainerEvent.PLAYLIST_REMOVED,
             playlist_container, playlist, position)
@@ -1222,9 +1222,9 @@ class _PlaylistContainerCallbacks(object):
         logger.debug(
             'Playlist moved from position %d to %d', position, new_position)
         playlist_container = PlaylistContainer._cached(
-            spotify.session_instance, sp_playlistcontainer, add_ref=True)
+            spotify._session_instance, sp_playlistcontainer, add_ref=True)
         playlist = Playlist._cached(
-            spotify.session_instance, sp_playlist, add_ref=True)
+            spotify._session_instance, sp_playlist, add_ref=True)
         playlist_container.emit(
             PlaylistContainerEvent.PLAYLIST_MOVED,
             playlist_container, playlist, position, new_position)
@@ -1235,7 +1235,7 @@ class _PlaylistContainerCallbacks(object):
     def container_loaded(sp_playlistcontainer, userdata):
         logger.debug('Playlist container loaded')
         playlist_container = PlaylistContainer._cached(
-            spotify.session_instance, sp_playlistcontainer, add_ref=True)
+            spotify._session_instance, sp_playlistcontainer, add_ref=True)
         playlist_container.emit(
             PlaylistContainerEvent.CONTAINER_LOADED, playlist_container)
 

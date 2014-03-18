@@ -25,7 +25,6 @@ further details.
 .. toctree::
     :maxdepth: 1
 
-    low-level
     error
     config
     session
@@ -44,3 +43,4 @@ further details.
     toplist
     inbox
     sink
+    internal

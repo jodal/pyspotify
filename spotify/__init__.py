@@ -33,7 +33,20 @@ def _setup_logging():
 
 
 def serialized(f):
-    """Acquires the global lock while calling the wrapped function.
+    """Decorator that serializes access to all decorated functions.
+
+    The decorator acquires pyspotify's single global lock while calling any
+    wrapped function. It is used to serialize access to:
+
+    - All calls to functions on :attr:`spotify.lib`.
+
+    - All code blocks working on pointers returned from functions on
+      :attr:`spotify.lib`.
+
+    - All code blocks working on other internal data structures in pyspotify.
+
+    Together this is what makes pyspotify safe to use from multiple threads and
+    enables convenient features like the :class:`~spotify.EventLoop`.
 
     Internal function.
     """

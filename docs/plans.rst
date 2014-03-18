@@ -10,9 +10,6 @@ still under active development.
 v2.0.0a2: Thread safety
 =======================
 
-- Enforce that the same cache directory isn't used by multiple processes by
-  maintaining a lock file or similar.
-
 - Revisit all TODOs and FIXMEs in code and tests.
 
 
@@ -31,6 +28,9 @@ v2.0.0b1: Seen real usage
 
 v2.0.0: Final release
 =====================
+
+- Enforce that the same cache and settings directories are not used by multiple
+  processes by maintaining a lock file.
 
 - Fix all remaining TODOs in code and tests.
 

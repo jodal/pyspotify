@@ -54,7 +54,7 @@ class LoadableTest(unittest.TestCase):
 
     def test_load_processes_events_until_loaded(
             self, is_loaded_mock, time_mock):
-        is_loaded_mock.side_effect = [False, False, True]
+        is_loaded_mock.side_effect = [False, False, False, False, True]
         time_mock.time.side_effect = time.time
 
         foo = Foo(self.session)
@@ -87,7 +87,7 @@ class LoadableTest(unittest.TestCase):
 
     def test_load_does_not_abort_on_is_loading_error(
             self, is_loaded_mock, time_mock):
-        is_loaded_mock.side_effect = [False, False, True]
+        is_loaded_mock.side_effect = [False, False, False, False, True]
         time_mock.time.side_effect = time.time
 
         foo = Foo(self.session)

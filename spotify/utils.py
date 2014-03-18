@@ -214,18 +214,29 @@ def load(session, obj, timeout=None):
     """
     if session.connection_state is not spotify.ConnectionState.LOGGED_IN:
         raise RuntimeError('Session must be logged in to load objects')
+
     if timeout is None:
         timeout = 10
     deadline = time.time() + timeout
+
     while not obj.is_loaded:
-        # TODO Consider sleeping for the time returned by process_events()
-        # instead of making a tight loop.
         session.process_events()
         spotify.Error.maybe_raise(
             getattr(obj, 'error', 0), ignores=[spotify.ErrorType.IS_LOADING])
+        if obj.is_loaded:
+            return obj
         if time.time() > deadline:
             raise spotify.Timeout(timeout)
+
+        # Instead of sleeping for a very short time and making a tight loop
+        # here, one might be tempted to sleep for the time returned by the
+        # session.process_events() call above. If no event loop is running,
+        # that could lead to very long waits (up to a minute or so) since no
+        # one is doing anything on "notify_main_thread" session callbacks,
+        # which is intended to interrupt the sleep interval prescribed by
+        # session.process_events(). Thus, it is better to make this loop tight.
         time.sleep(0.001)
+
     spotify.Error.maybe_raise(
         getattr(obj, 'error', 0), ignores=[spotify.ErrorType.IS_LOADING])
     return obj

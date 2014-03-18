@@ -7,12 +7,6 @@ pyspotify 2.x is a new Python wrapper for `libspotify
 still under active development.
 
 
-v2.0.0a2: Thread safety
-=======================
-
-- Revisit all TODOs and FIXMEs in code and tests.
-
-
 v2.0.0b1: Seen real usage
 =========================
 

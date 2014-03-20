@@ -3,7 +3,7 @@
 """
 This is an example of playing music from Spotify using pyspotify.
 
-The example use the :class:`spotify.sink.AlsaSink`, and will thus only work on
+The example use the :class:`spotify.AlsaSink`, and will thus only work on
 systems with an ALSA sound subsystem, which means most Linux systems.
 
 You can either run this file directly without arguments to play a default
@@ -22,7 +22,6 @@ import sys
 import threading
 
 import spotify
-import spotify.sink
 
 if sys.argv[1:]:
     track_uri = sys.argv[1]
@@ -37,7 +36,7 @@ loop = spotify.EventLoop(session)
 loop.start()
 
 # Connect an audio sink
-audio = spotify.sink.AlsaSink(session)
+audio = spotify.AlsaSink(session)
 
 # Events for coordination
 logged_in = threading.Event()

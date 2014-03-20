@@ -19,11 +19,6 @@ import threading
 
 import spotify
 
-try:
-    from spotify.sink import AlsaSink
-except ImportError:
-    AlsaSink = None
-
 
 class Commander(cmd.Cmd):
 
@@ -45,9 +40,9 @@ class Commander(cmd.Cmd):
         self.session.on(
             spotify.SessionEvent.END_OF_TRACK, self.on_end_of_track)
 
-        if AlsaSink is not None:
-            self.audio_driver = AlsaSink(self.session)
-        else:
+        try:
+            self.audio_driver = spotify.AlsaSink(self.session)
+        except ImportError:
             self.logger.warning(
                 'No audio sink found; audio playback unavailable.')
 

@@ -3,7 +3,6 @@ from __future__ import unicode_literals
 import unittest
 
 import spotify
-import spotify.sink
 from tests import mock
 
 
@@ -14,7 +13,7 @@ class AlsaSinkTest(unittest.TestCase):
         self.session.num_listeners.return_value = 0
         self.alsaaudio = mock.Mock()
         with mock.patch.dict('sys.modules', {'alsaaudio': self.alsaaudio}):
-            self.sink = spotify.sink.AlsaSink(self.session)
+            self.sink = spotify.AlsaSink(self.session)
 
     def test_init_connects_to_music_delivery_event(self):
         self.session.on.assert_called_with(
@@ -119,7 +118,7 @@ class PortAudioSinkTest(unittest.TestCase):
         self.session.num_listeners.return_value = 0
         self.pyaudio = mock.Mock()
         with mock.patch.dict('sys.modules', {'pyaudio': self.pyaudio}):
-            self.sink = spotify.sink.PortAudioSink(self.session)
+            self.sink = spotify.PortAudioSink(self.session)
 
     def test_init_creates_device(self):
         self.pyaudio.PyAudio.assert_called_with()

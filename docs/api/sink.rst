@@ -2,7 +2,7 @@
 Audio sinks
 ***********
 
-.. module:: spotify.sink
+.. module:: spotify
 
 .. autoclass:: AlsaSink
 

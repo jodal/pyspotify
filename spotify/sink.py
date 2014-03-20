@@ -49,9 +49,9 @@ class AlsaSink(Sink):
 
     Example::
 
-        >>> import spotify.sink
+        >>> import spotify
         >>> session = spotify.Session()
-        >>> audio = spotify.sink.AlsaSink(session)
+        >>> audio = spotify.AlsaSink(session)
         >>> loop = spotify.EventLoop(session)
         >>> loop.start()
         # Login, etc...

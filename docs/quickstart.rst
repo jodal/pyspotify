@@ -431,7 +431,8 @@ playback, you can deliver these audio frames to your operating systems' audio
 subsystem yourself. If you want some help on the road, pyspotify comes with
 audio sinks for some select audio subsystems.
 
-For details, have a look at the :mod:`spotify.sink` documentation, and the
+For details, have a look at the :class:`spotify.AlsaSink` and
+:class:`spotify.PortAudioSink` documentation, and the
 ``examples/play_track.py`` and ``examples/shell.py`` examples.
 
 

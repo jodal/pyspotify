@@ -25,10 +25,10 @@ Feature: Event loop
 Feature: Audio playback
 -----------------------
 
-- Add :class:`~spotify.sink.AlsaSink`, an audio sink for playback through ALSA
-  on Linux systems.
+- Add :class:`~spotify.AlsaSink`, an audio sink for playback through ALSA on
+  Linux systems.
 
-- Add :class:`~spotify.sink.PortAudioSink`, an audio sink for playback through
+- Add :class:`~spotify.PortAudioSink`, an audio sink for playback through
   PortAudio on most platforms, including Linux, OS X, and Windows.
 
 - Update ``examples/shell.py`` to use the ALSA sink to play music.

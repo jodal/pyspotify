@@ -7,7 +7,7 @@ pyspotify 2.x is a new Python wrapper for `libspotify
 still under active development.
 
 
-v2.0.0b1: Seen real usage
+v2.0.0b2: Seen real usage
 =========================
 
 - Reimplement Mopidy-Spotify using pyspotify 2. Will surely lead to bug fixes

@@ -2,7 +2,7 @@
 Changelog
 *********
 
-v2.0.0a2 (UNRELEASED)
+v2.0.0b1 (UNRELEASED)
 =====================
 
 Feature: Thread safety

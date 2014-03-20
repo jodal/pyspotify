@@ -27,8 +27,9 @@ Application keys can be obtained automatically and free of charge from Spotify.
 #. If you place the application key in the same directory as your application's
    main Python file, pyspotify will automatically find it and use it. If you
    want to keep the application key in another location, you'll need to set
-   :attr:`~spotify.Config.application_key` or
-   :attr:`~spotify.Config.application_key_filename` in your session config.
+   :attr:`~spotify.Config.application_key` in your session config or call
+   :meth:`~spotify.Config.load_application_key_file` to load the session key
+   file correctly.
 
 
 Creating a session

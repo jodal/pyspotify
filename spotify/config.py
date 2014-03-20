@@ -88,9 +88,9 @@ class Config(object):
     def application_key(self):
         """Your libspotify application key.
 
-        Must be a bytestring. Alternatively, you can set
-        :attr:`application_key_filename`, and pyspotify will read the file and
-        use it instead of :attr:`application_key`.
+        Must be a bytestring. Alternatively, you can call
+        :meth:`load_application_key_file`, and pyspotify will correctly read
+        the file into :attr:`application_key`.
         """
         return utils.to_bytes_or_none(
             ffi.cast('char *', self._sp_session_config.application_key))

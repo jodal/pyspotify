@@ -70,7 +70,7 @@ Minor changes
   2.2, on every push to GitHub.
 
 
-v2.0.0a1 (2014-01-14)
+v2.0.0a1 (2014-02-14)
 =====================
 
 pyspotify 2.x is a full rewrite of pyspotify. While pyspotify 1.x is a

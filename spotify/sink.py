@@ -4,6 +4,11 @@ import sys
 
 import spotify
 
+__all__ = [
+    'AlsaSink',
+    'PortAudioSink',
+]
+
 
 class Sink(object):
     def on(self):

@@ -38,7 +38,6 @@ class Toplist(object):
         self.canonical_username = canonical_username
 
         self.complete_event = threading.Event()
-        self._callback_handles = set()
 
         if sp_toplistbrowse is None:
             if isinstance(region, ToplistRegion):
@@ -47,10 +46,7 @@ class Toplist(object):
                 region = utils.to_country_code(region)
 
             handle = ffi.new_handle((callback, self))
-            # TODO Think through the life cycle of the handle object. Can it
-            # happen that we GC the search and handle object, and then later
-            # the callback is called?
-            self._callback_handles.add(handle)
+            spotify._callback_handles.add(handle)
 
             sp_toplistbrowse = lib.sp_toplistbrowse_create(
                 self._session._sp_session, int(type), region,
@@ -193,7 +189,7 @@ def _toplistbrowse_complete_callback(sp_toplistbrowse, handle):
             'toplistbrowse_complete_callback called without userdata')
         return
     (callback, toplist) = ffi.from_handle(handle)
-    toplist._callback_handles.remove(handle)
+    spotify._callback_handles.remove(handle)
     toplist.complete_event.set()
     if callback is not None:
         callback(toplist)

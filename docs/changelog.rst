@@ -61,6 +61,10 @@ Bug fixes
 
 - Add missing error check to :meth:`spotify.Playlist.add_tracks`.
 
+- Keep album, artist, image, inbox, search, and toplist objects alive until
+  their complete/load callbacks have been called, even if the end user doesn't
+  keep any references to the objects. (Fixes: :issue:`121`)
+
 Minor changes
 -------------
 

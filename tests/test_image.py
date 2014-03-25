@@ -95,6 +95,8 @@ class ImageTest(unittest.TestCase):
         image_load_cb(sp_image, callback_handle)
         self.assertEqual(callback.call_count, 1)
 
+    # TODO Test calling callback after image is GC-ed
+
     def test_add_and_remove_load_callback(self, lib_mock):
         lib_mock.sp_image_add_load_callback.return_value = int(
             spotify.ErrorType.OK)

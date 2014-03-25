@@ -50,14 +50,10 @@ class Search(object):
         self.search_type = search_type
 
         self.complete_event = threading.Event()
-        self._callback_handles = set()
 
         if sp_search is None:
             handle = ffi.new_handle((callback, self))
-            # TODO Think through the life cycle of the handle object. Can it
-            # happen that we GC the search and handle object, and then later
-            # the callback is called?
-            self._callback_handles.add(handle)
+            spotify._callback_handles.add(handle)
 
             sp_search = lib.sp_search_create(
                 self._session._sp_session, utils.to_char(query),
@@ -324,7 +320,7 @@ def _search_complete_callback(sp_search, handle):
         logger.warning('search_complete_callback called without userdata')
         return
     (callback, search_result) = ffi.from_handle(handle)
-    search_result._callback_handles.remove(handle)
+    spotify._callback_handles.remove(handle)
     search_result.complete_event.set()
     if callback is not None:
         callback(search_result)

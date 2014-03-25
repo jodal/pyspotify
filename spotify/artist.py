@@ -153,17 +153,13 @@ class ArtistBrowser(object):
 
         self._session = session
         self.complete_event = threading.Event()
-        self._callback_handles = set()
 
         if sp_artistbrowse is None:
             if type is None:
                 type = ArtistBrowserType.FULL
 
             handle = ffi.new_handle((callback, self))
-            # TODO Think through the life cycle of the handle object. Can it
-            # happen that we GC the browser and handle object, and then later
-            # the callback is called?
-            self._callback_handles.add(handle)
+            spotify._callback_handles.add(handle)
 
             sp_artistbrowse = lib.sp_artistbrowse_create(
                 self._session._sp_session, artist._sp_artist,
@@ -382,7 +378,7 @@ def _artistbrowse_complete_callback(sp_artistbrowse, handle):
             'artistbrowse_complete_callback called without userdata')
         return
     (callback, artist_browser) = ffi.from_handle(handle)
-    artist_browser._callback_handles.remove(handle)
+    spotify._callback_handles.remove(handle)
     artist_browser.complete_event.set()
     if callback is not None:
         callback(artist_browser)

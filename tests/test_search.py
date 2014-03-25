@@ -74,9 +74,8 @@ class SearchTest(unittest.TestCase):
         result = None  # noqa
         tests.gc_collect()
 
-        # FIXME The mock keeps the handle/userdata alive, thus the search
-        # result is kept alive, and this test doesn't test what it is intended
-        # to test.
+        # The mock keeps the handle/userdata alive, thus this test doesn't
+        # really test that spotify._callback_handles keeps the handle alive.
         search_complete_cb = lib_mock.sp_search_create.call_args[0][11]
         userdata = lib_mock.sp_search_create.call_args[0][12]
         search_complete_cb(sp_search, userdata)

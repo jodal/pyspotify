@@ -27,7 +27,6 @@ class InboxPostResult(object):
 
         self._session = session
         self.complete_event = threading.Event()
-        self._callback_handles = set()
 
         if sp_inbox is None:
             canonical_username = utils.to_char(canonical_username)
@@ -38,10 +37,7 @@ class InboxPostResult(object):
             message = utils.to_char(message)
 
             handle = ffi.new_handle((callback, self))
-            # TODO Think through the life cycle of the handle object. Can it
-            # happen that we GC the search and handle object, and then later
-            # the callback is called?
-            self._callback_handles.add(handle)
+            spotify._callback_handles.add(handle)
 
             sp_inbox = lib.sp_inbox_post_tracks(
                 self._session._sp_session, canonical_username,
@@ -83,7 +79,7 @@ def _inboxpost_complete_callback(sp_inbox, handle):
         logger.warning('inboxpost_complete_callback called without userdata')
         return
     (callback, inbox_post_result) = ffi.from_handle(handle)
-    inbox_post_result._callback_handles.remove(handle)
+    spotify._callback_handles.remove(handle)
     inbox_post_result.complete_event.set()
     if callback is not None:
         callback(inbox_post_result)

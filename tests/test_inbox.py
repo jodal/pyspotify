@@ -26,6 +26,9 @@ class InboxPostResultTest(unittest.TestCase):
 
         lib_mock.sp_inbox_add_ref.assert_called_with(sp_inbox)
 
+    @unittest.skip(
+        'FIXME Becomes flaky on PyPy in combination with '
+        'test_search_where_result_is_gone_before_callback_is_called')
     def test_releases_sp_inbox_when_result_dies(self, lib_mock):
         sp_inbox = spotify.ffi.new('int *')
 
@@ -126,9 +129,8 @@ class InboxPostResultTest(unittest.TestCase):
         result = None  # noqa
         tests.gc_collect()
 
-        # FIXME The mock keeps the handle/userdata alive, thus the search
-        # result is kept alive, and this test doesn't test what it is intended
-        # to test.
+        # The mock keeps the handle/userdata alive, thus this test doesn't
+        # really test that spotify._callback_handles keeps the handle alive.
         inboxpost_complete_cb = lib_mock.sp_inbox_post_tracks.call_args[0][5]
         userdata = lib_mock.sp_inbox_post_tracks.call_args[0][6]
         inboxpost_complete_cb(sp_inbox, userdata)

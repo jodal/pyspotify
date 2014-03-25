@@ -101,8 +101,8 @@ class ToplistTest(unittest.TestCase):
         result = None  # noqa
         tests.gc_collect()
 
-        # FIXME The mock keeps the handle/userdata alive, thus the toplist is
-        # kept alive, and this test doesn't test what it is intended to test.
+        # The mock keeps the handle/userdata alive, thus this test doesn't
+        # really test that spotify._callback_handles keeps the handle alive.
         toplistbrowse_complete_cb = (
             lib_mock.sp_toplistbrowse_create.call_args[0][4])
         userdata = lib_mock.sp_toplistbrowse_create.call_args[0][5]

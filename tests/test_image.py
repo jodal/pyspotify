@@ -95,7 +95,32 @@ class ImageTest(unittest.TestCase):
         image_load_cb(sp_image, callback_handle)
         self.assertEqual(callback.call_count, 1)
 
-    # TODO Test calling callback after image is GC-ed
+    def test_add_and_throw_away_image_and_call_load_callback(self, lib_mock):
+        lib_mock.sp_image_add_load_callback.return_value = int(
+            spotify.ErrorType.OK)
+        lib_mock.sp_image_remove_load_callback.return_value = int(
+            spotify.ErrorType.OK)
+        sp_image = spotify.ffi.cast('sp_image *', spotify.ffi.new('int *'))
+        image = spotify.Image(self.session, sp_image=sp_image)
+        callback = mock.Mock()
+
+        # Add
+        callback_handle = image.add_load_callback(callback)
+        lib_mock.sp_image_add_load_callback.assert_called_with(
+            sp_image, mock.ANY, callback_handle)
+        image_load_cb = lib_mock.sp_image_add_load_callback.call_args[0][1]
+
+        # Throw away reference to `image`
+        image = None  # noqa
+        tests.gc_collect()
+
+        # The mock keeps the handle/userdata alive, thus this test doesn't
+        # really test that spotify._callback_handles keeps the handle alive.
+
+        # Call
+        self.assertEqual(callback.call_count, 0)
+        image_load_cb(sp_image, callback_handle)
+        self.assertEqual(callback.call_count, 1)
 
     def test_add_and_remove_load_callback(self, lib_mock):
         lib_mock.sp_image_add_load_callback.return_value = int(

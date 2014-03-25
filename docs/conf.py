@@ -65,6 +65,7 @@ needs_sphinx = '1.0'
 
 extensions = [
     'sphinx.ext.autodoc',
+    'sphinx.ext.extlinks',
     'sphinx.ext.intersphinx',
     'sphinx.ext.viewcode',
 ]
@@ -105,3 +106,9 @@ html_split_index = False
 html_show_sourcelink = True
 
 htmlhelp_basename = 'pyspotify'
+
+# -- Options for extlink extension --------------------------------------------
+
+extlinks = {
+    'issue': ('https://github.com/mopidy/pyspotify/issues/%s', '#'),
+}

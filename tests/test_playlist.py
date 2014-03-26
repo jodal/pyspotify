@@ -59,11 +59,11 @@ class PlaylistTest(unittest.TestCase):
 
         # TODO Fails on CPython 2.7 and PyPy, but not Python 3.x. I can't
         # really understand why.
-        #lib_mock.sp_playlist_remove_callbacks.assert_called_with(
-        #    sp_playlist, mock.ANY, mock.ANY)
+        # lib_mock.sp_playlist_remove_callbacks.assert_called_with(
+        #     sp_playlist, mock.ANY, mock.ANY)
         # FIXME Won't be called because lib_mock has references to the
         # sp_playlist object, and it thus won't be GC-ed.
-        #lib_mock.sp_playlist_release.assert_called_with(sp_playlist)
+        # lib_mock.sp_playlist_release.assert_called_with(sp_playlist)
 
     def test_cached_playlist(self, lib_mock):
         sp_playlist = spotify.ffi.new('int *')

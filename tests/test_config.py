@@ -218,7 +218,8 @@ class ConfigTest(unittest.TestCase):
         self.config.proxy_username = 'æ proxy_username'
         self.config.proxy_password = 'æ proxy_password'
         # XXX Waiting for ca_certs_filename on OS X
-        #self.config.ca_certs_filename = b'æ ca_certs_filename'.encode('utf-8')
+        # self.config.ca_certs_filename = b'æ ca_certs_filename'.encode(
+        #     'utf-8')
         self.config.tracefile = 'æ tracefile'.encode('utf-8')
 
         self.assertEqual(
@@ -234,10 +235,10 @@ class ConfigTest(unittest.TestCase):
             spotify.ffi.string(self.config._sp_session_config.proxy_password),
             b'\xc3\xa6 proxy_password')
         # XXX See explanation in session.py
-        #self.assertEqual(
-        #    spotify.ffi.string(
-        #        self.config.sp_session_config.ca_certs_filename),
-        #    b'\xc3\xa6 ca_certs_filename')
+        # self.assertEqual(
+        #     spotify.ffi.string(
+        #         self.config.sp_session_config.ca_certs_filename),
+        #     b'\xc3\xa6 ca_certs_filename')
         self.assertEqual(
             spotify.ffi.string(self.config._sp_session_config.tracefile),
             b'\xc3\xa6 tracefile')

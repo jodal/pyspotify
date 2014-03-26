@@ -254,15 +254,15 @@ class Config(object):
             code can run on both Linux and OS X.
         """
         # XXX Waiting for ca_certs_filename on OS X
-        #return utils.to_bytes_or_none(
-        #    self._sp_session_config.ca_certs_filename)
+        # return utils.to_bytes_or_none(
+        #     self._sp_session_config.ca_certs_filename)
         pass
 
     @ca_certs_filename.setter
     def ca_certs_filename(self, value):
         # XXX Waiting for ca_certs_filename on OS X
-        #self._ca_certs_filename = utils.to_char_or_null(value)
-        #self._sp_session_config.ca_certs_filename = self._ca_certs_filename
+        # self._ca_certs_filename = utils.to_char_or_null(value)
+        # self._sp_session_config.ca_certs_filename = self._ca_certs_filename
         pass
 
     @property

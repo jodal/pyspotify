@@ -37,8 +37,8 @@ class PlaylistContainerTest(unittest.TestCase):
             sp_playlistcontainer, mock.ANY, mock.ANY)
         # FIXME Won't be called because lib_mock has references to the
         # sp_playlistcontainer object, and it thus won't be GC-ed.
-        #lib_mock.sp_playlistcontainer_release.assert_called_with(
-        #    sp_playlistcontainer)
+        # lib_mock.sp_playlistcontainer_release.assert_called_with(
+        #     sp_playlistcontainer)
 
     def test_cached_container(self, lib_mock):
         sp_playlistcontainer = spotify.ffi.new('int *')
@@ -208,7 +208,7 @@ class PlaylistContainerTest(unittest.TestCase):
             sp_playlistcontainer, 2)
         self.assertIsInstance(result, spotify.PlaylistFolder)
         self.assertEqual(result.id, 1002)
-        #self.assertEqual(result.name, '')  # Needs better mock impl
+        # self.assertEqual(result.name, '')  # Needs better mock impl
         self.assertEqual(result.type, spotify.PlaylistType.END_FOLDER)
 
     def test_getitem_raises_error_on_unknown_playlist_type(self, lib_mock):

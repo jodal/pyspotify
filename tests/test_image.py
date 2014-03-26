@@ -12,6 +12,10 @@ class ImageTest(unittest.TestCase):
 
     def setUp(self):
         self.session = tests.create_session()
+        spotify._session_instance = self.session
+
+    def tearDown(self):
+        spotify._session_instance = None
 
     def test_create_without_uri_or_sp_image_fails(self, lib_mock):
         with self.assertRaises(AssertionError):
@@ -115,7 +119,7 @@ class ImageTest(unittest.TestCase):
         tests.gc_collect()
 
         # The mock keeps the handle/userdata alive, thus this test doesn't
-        # really test that spotify._callback_handles keeps the handle alive.
+        # really test that image._callback_handles keeps the handle alive.
 
         # Call
         self.assertEqual(callback.call_count, 0)

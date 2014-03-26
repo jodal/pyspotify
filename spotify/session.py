@@ -61,6 +61,7 @@ class Session(utils.EventEmitter):
 
         self._cache = weakref.WeakValueDictionary()
         self._emitters = []
+        self._callback_handlers = set()
 
         self.offline = Offline(self)
         self.player = Player(self)
@@ -91,6 +92,16 @@ class Session(utils.EventEmitter):
     existing wrapper objects instead of creating new ones so that the set of
     event listeners on the wrapper object can be modified. This is achieved
     with a combination of this list and the :attr:`_cache` mapping.
+
+    Internal attribute.
+    """
+
+    _callback_handles = None
+    """A set of handles returned by :meth:`spotify.ffi.new_handle`.
+
+    These must be kept alive for the handle to remain valid until the callback
+    arrives, even if the end user does not maintain a reference to the object
+    the callback works on.
 
     Internal attribute.
     """

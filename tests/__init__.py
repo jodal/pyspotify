@@ -50,6 +50,7 @@ def create_session():
     session = mock.Mock()
     session._cache = weakref.WeakValueDictionary()
     session._emitters = []
+    session._callback_handles = set()
     return session
 
 

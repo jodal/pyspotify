@@ -17,12 +17,6 @@ _lock = threading.RLock()
 _session_instance = None
 
 
-# A set of handles returned by ffi.new_handle() that must be kept alive for the
-# handle to remain valid until the callback arrives, even if the end user does
-# not maintain a reference to the object the callback works on.
-_callback_handles = set()
-
-
 def _setup_logging():
     """Setup logging to log to nowhere by default.
 

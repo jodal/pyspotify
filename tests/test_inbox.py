@@ -14,6 +14,10 @@ class InboxPostResultTest(unittest.TestCase):
 
     def setUp(self):
         self.session = tests.create_session()
+        spotify._session_instance = self.session
+
+    def tearDown(self):
+        spotify._session_instance = None
 
     def test_create_without_user_and_tracks_or_sp_inbox_fails(self, lib_mock):
         with self.assertRaises(AssertionError):
@@ -130,7 +134,7 @@ class InboxPostResultTest(unittest.TestCase):
         tests.gc_collect()
 
         # The mock keeps the handle/userdata alive, thus this test doesn't
-        # really test that spotify._callback_handles keeps the handle alive.
+        # really test that session._callback_handles keeps the handle alive.
         inboxpost_complete_cb = lib_mock.sp_inbox_post_tracks.call_args[0][5]
         userdata = lib_mock.sp_inbox_post_tracks.call_args[0][6]
         inboxpost_complete_cb(sp_inbox, userdata)

@@ -183,6 +183,10 @@ class ArtistBrowserTest(unittest.TestCase):
 
     def setUp(self):
         self.session = tests.create_session()
+        spotify._session_instance = self.session
+
+    def tearDown(self):
+        spotify._session_instance = None
 
     def test_create_without_artist_or_sp_artistbrowse_fails(self, lib_mock):
         with self.assertRaises(AssertionError):
@@ -246,7 +250,7 @@ class ArtistBrowserTest(unittest.TestCase):
         tests.gc_collect()
 
         # The mock keeps the handle/userdata alive, thus this test doesn't
-        # really test that spotify._callback_handles keeps the handle alive.
+        # really test that session._callback_handles keeps the handle alive.
         artistbrowse_complete_cb = (
             lib_mock.sp_artistbrowse_create.call_args[0][3])
         userdata = lib_mock.sp_artistbrowse_create.call_args[0][4]

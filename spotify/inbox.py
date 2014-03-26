@@ -37,7 +37,7 @@ class InboxPostResult(object):
             message = utils.to_char(message)
 
             handle = ffi.new_handle((callback, self))
-            spotify._callback_handles.add(handle)
+            self._session._callback_handles.add(handle)
 
             sp_inbox = lib.sp_inbox_post_tracks(
                 self._session._sp_session, canonical_username,
@@ -79,7 +79,8 @@ def _inboxpost_complete_callback(sp_inbox, handle):
         logger.warning('inboxpost_complete_callback called without userdata')
         return
     (callback, inbox_post_result) = ffi.from_handle(handle)
-    spotify._callback_handles.remove(handle)
+    # XXX Avoid use of the spotify._session_instance global.
+    spotify._session_instance._callback_handles.remove(handle)
     inbox_post_result.complete_event.set()
     if callback is not None:
         callback(inbox_post_result)

@@ -52,7 +52,7 @@ class Search(object):
         self.complete_event = threading.Event()
 
         if sp_search is None:
-            handle = ffi.new_handle((callback, self))
+            handle = ffi.new_handle((self._session, self, callback))
             self._session._callback_handles.add(handle)
 
             sp_search = lib.sp_search_create(
@@ -319,9 +319,8 @@ def _search_complete_callback(sp_search, handle):
     if handle == ffi.NULL:
         logger.warning('search_complete_callback called without userdata')
         return
-    (callback, search_result) = ffi.from_handle(handle)
-    # XXX Avoid use of the spotify._session_instance global.
-    spotify._session_instance._callback_handles.remove(handle)
+    (session, search_result, callback) = ffi.from_handle(handle)
+    session._callback_handles.remove(handle)
     search_result.complete_event.set()
     if callback is not None:
         callback(search_result)

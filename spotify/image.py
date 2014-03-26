@@ -69,9 +69,8 @@ class Image(object):
         # FIXME Currently, callbacks added before load doesn't seem to be
         # called at all, while callbacks added after load is called
         # immediately.
-        handle = ffi.new_handle((callback, self))
-        # XXX Avoid use of the spotify._session_instance global.
-        spotify._session_instance._callback_handles.add(handle)
+        handle = ffi.new_handle((self._session, self, callback))
+        self._session._callback_handles.add(handle)
         spotify.Error.maybe_raise(lib.sp_image_add_load_callback(
             self._sp_image, _image_load_callback, handle))
         return handle
@@ -79,8 +78,7 @@ class Image(object):
     @serialized
     def remove_load_callback(self, handle):
         """Remove a callback which was added with :meth:`add_load_callback`."""
-        # XXX Avoid use of the spotify._session_instance global.
-        spotify._session_instance._callback_handles.remove(handle)
+        self._session._callback_handles.remove(handle)
         spotify.Error.maybe_raise(lib.sp_image_remove_load_callback(
             self._sp_image, _image_load_callback, handle))
 
@@ -163,9 +161,8 @@ def _image_load_callback(sp_image, handle):
     if handle == ffi.NULL:
         logger.warning('image_load_callback called without userdata')
         return
-    (callback, image) = ffi.from_handle(handle)
-    # XXX Avoid use of the spotify._session_instance global.
-    spotify._session_instance._callback_handles.remove(handle)
+    (session, image, callback) = ffi.from_handle(handle)
+    session._callback_handles.remove(handle)
     if callback is not None:
         callback(image)
 

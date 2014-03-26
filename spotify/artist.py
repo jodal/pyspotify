@@ -158,7 +158,7 @@ class ArtistBrowser(object):
             if type is None:
                 type = ArtistBrowserType.FULL
 
-            handle = ffi.new_handle((callback, self))
+            handle = ffi.new_handle((self._session, self, callback))
             self._session._callback_handles.add(handle)
 
             sp_artistbrowse = lib.sp_artistbrowse_create(
@@ -377,9 +377,8 @@ def _artistbrowse_complete_callback(sp_artistbrowse, handle):
         logger.warning(
             'artistbrowse_complete_callback called without userdata')
         return
-    (callback, artist_browser) = ffi.from_handle(handle)
-    # XXX Avoid use of the spotify._session_instance global.
-    spotify._session_instance._callback_handles.remove(handle)
+    (session, artist_browser, callback) = ffi.from_handle(handle)
+    session._callback_handles.remove(handle)
     artist_browser.complete_event.set()
     if callback is not None:
         callback(artist_browser)

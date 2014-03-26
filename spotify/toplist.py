@@ -45,7 +45,7 @@ class Toplist(object):
             else:
                 region = utils.to_country_code(region)
 
-            handle = ffi.new_handle((callback, self))
+            handle = ffi.new_handle((self._session, self, callback))
             self._session._callback_handles.add(handle)
 
             sp_toplistbrowse = lib.sp_toplistbrowse_create(
@@ -188,9 +188,8 @@ def _toplistbrowse_complete_callback(sp_toplistbrowse, handle):
         logger.warning(
             'toplistbrowse_complete_callback called without userdata')
         return
-    (callback, toplist) = ffi.from_handle(handle)
-    # XXX Avoid use of the spotify._session_instance global.
-    spotify._session_instance._callback_handles.remove(handle)
+    (session, toplist, callback) = ffi.from_handle(handle)
+    session._callback_handles.remove(handle)
     toplist.complete_event.set()
     if callback is not None:
         callback(toplist)

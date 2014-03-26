@@ -192,7 +192,7 @@ class AlbumBrowser(object):
         self.complete_event = threading.Event()
 
         if sp_albumbrowse is None:
-            handle = ffi.new_handle((callback, self))
+            handle = ffi.new_handle((self._session, self, callback))
             self._session._callback_handles.add(handle)
 
             sp_albumbrowse = lib.sp_albumbrowse_create(
@@ -340,9 +340,8 @@ def _albumbrowse_complete_callback(sp_albumbrowse, handle):
         logger.warning(
             'albumbrowse_complete_callback called without userdata')
         return
-    (callback, album_browser) = ffi.from_handle(handle)
-    # XXX Avoid use of the spotify._session_instance global.
-    spotify._session_instance._callback_handles.remove(handle)
+    (session, album_browser, callback) = ffi.from_handle(handle)
+    session._callback_handles.remove(handle)
     album_browser.complete_event.set()
     if callback is not None:
         callback(album_browser)

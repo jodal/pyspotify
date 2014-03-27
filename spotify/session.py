@@ -61,7 +61,7 @@ class Session(utils.EventEmitter):
 
         self._cache = weakref.WeakValueDictionary()
         self._emitters = []
-        self._callback_handlers = set()
+        self._callback_handles = set()
 
         self.offline = Offline(self)
         self.player = Player(self)

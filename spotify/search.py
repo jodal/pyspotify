@@ -334,12 +334,14 @@ class SearchPlaylist(collections.namedtuple(
     def playlist(self):
         """The :class:`~spotify.Playlist` object for this
         :class:`SearchPlaylist`."""
+        # TODO Need to pass on the session here
         return spotify.Playlist(self.uri)
 
     @property
     def image(self):
         """The :class:`~spotify.Image` object for this
         :class:`SearchPlaylist`."""
+        # TODO Need to pass on the session here
         return spotify.Image(self.image_uri)
 
 

@@ -268,9 +268,6 @@ class ArtistBrowserTest(unittest.TestCase):
 
         lib_mock.sp_artistbrowse_add_ref.assert_called_with(sp_artistbrowse)
 
-    @unittest.skip(
-        'FIXME Becomes flaky in combination with '
-        'test_create_from_artist_with_callback')
     def test_releases_sp_artistbrowse_when_artist_dies(self, lib_mock):
         sp_artistbrowse = spotify.ffi.new('int *')
 

@@ -346,9 +346,6 @@ class AlbumBrowserTest(unittest.TestCase):
 
         lib_mock.sp_albumbrowse_add_ref.assert_called_with(sp_albumbrowse)
 
-    @unittest.skip(
-        'FIXME Becomes flaky in combination with '
-        'test_create_from_album_with_callback')
     def test_releases_sp_albumbrowse_when_album_dies(self, lib_mock):
         sp_albumbrowse = spotify.ffi.cast('sp_albumbrowse *', 42)
 

@@ -48,8 +48,6 @@ class UserTest(unittest.TestCase):
 
         lib_mock.sp_user_add_ref.assert_called_once_with(sp_user)
 
-    @unittest.skip(
-        'FIXME Broke with the change from int* to sp_user*')
     def test_releases_sp_user_when_user_dies(self, lib_mock):
         sp_user = spotify.ffi.cast('sp_user *', 42)
 

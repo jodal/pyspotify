@@ -123,8 +123,6 @@ class ToplistTest(unittest.TestCase):
         lib_mock.sp_toplistbrowse_add_ref.assert_called_once_with(
             sp_toplistbrowse)
 
-    @unittest.skip(
-        'FIXME Broke with the change from int* to sp_toplistbrowse*')
     def test_releases_sp_toplistbrowse_when_toplist_dies(self, lib_mock):
         sp_toplistbrowse = spotify.ffi.cast('sp_toplistbrowse *', 42)
 

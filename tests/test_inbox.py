@@ -30,9 +30,6 @@ class InboxPostResultTest(unittest.TestCase):
 
         lib_mock.sp_inbox_add_ref.assert_called_with(sp_inbox)
 
-    @unittest.skip(
-        'FIXME Becomes flaky on PyPy in combination with '
-        'test_search_where_result_is_gone_before_callback_is_called')
     def test_releases_sp_inbox_when_result_dies(self, lib_mock):
         sp_inbox = spotify.ffi.new('int *')
 

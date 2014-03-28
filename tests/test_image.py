@@ -228,13 +228,13 @@ class ImageTest(unittest.TestCase):
     def test_data(self, lib_mock):
         lib_mock.sp_image_is_loaded.return_value = 1
 
+        size = 20
+        data = spotify.ffi.new('char[]', size)
+        data[0:3] = [b'a', b'b', b'c']
+
         def func(sp_image_ptr, data_size_ptr):
-            size = 20
-            data = spotify.ffi.new('char[]', size)
-            data[0:3] = [b'a', b'b', b'c']
-            data_void_ptr = spotify.ffi.cast('void *', data)
             data_size_ptr[0] = size
-            return data_void_ptr
+            return spotify.ffi.cast('void *', data)
 
         lib_mock.sp_image_data.side_effect = func
         sp_image = spotify.ffi.new('int *')

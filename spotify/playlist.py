@@ -83,6 +83,8 @@ class Playlist(utils.EventEmitter):
         self._lib = lib
 
     def __del__(self):
+        if not hasattr(self, '_lib'):
+            return
         self._lib.sp_playlist_remove_callbacks(
             self._sp_playlist, self._sp_playlist_callbacks, ffi.NULL)
 
@@ -827,6 +829,8 @@ class PlaylistContainer(collections.MutableSequence, utils.EventEmitter):
         self._lib = lib
 
     def __del__(self):
+        if not hasattr(self, '_lib'):
+            return
         self._lib.sp_playlistcontainer_remove_callbacks(
             self._sp_playlistcontainer, self._sp_playlistcontainer_callbacks,
             ffi.NULL)

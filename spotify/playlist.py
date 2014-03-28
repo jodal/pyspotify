@@ -78,10 +78,12 @@ class Playlist(utils.EventEmitter):
         lib.sp_playlist_add_callbacks(
             self._sp_playlist, self._sp_playlist_callbacks, ffi.NULL)
 
+        # Make sure we remove callbacks in __del__() using the same lib as we
+        # added callbacks with.
+        self._lib = lib
+
     def __del__(self):
-        if not hasattr(self, '_sp_playlist'):
-            return
-        lib.sp_playlist_remove_callbacks(
+        self._lib.sp_playlist_remove_callbacks(
             self._sp_playlist, self._sp_playlist_callbacks, ffi.NULL)
 
     def __repr__(self):
@@ -820,8 +822,12 @@ class PlaylistContainer(collections.MutableSequence, utils.EventEmitter):
             self._sp_playlistcontainer, self._sp_playlistcontainer_callbacks,
             ffi.NULL)
 
+        # Make sure we remove callbacks in __del__() using the same lib as we
+        # added callbacks with.
+        self._lib = lib
+
     def __del__(self):
-        lib.sp_playlistcontainer_remove_callbacks(
+        self._lib.sp_playlistcontainer_remove_callbacks(
             self._sp_playlistcontainer, self._sp_playlistcontainer_callbacks,
             ffi.NULL)
 

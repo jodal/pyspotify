@@ -20,7 +20,7 @@ class AlbumTest(unittest.TestCase):
 
     @mock.patch('spotify.Link', spec=spotify.Link)
     def test_create_from_uri(self, link_mock, lib_mock):
-        sp_album = spotify.ffi.new('int *')
+        sp_album = spotify.ffi.cast('sp_album *', 42)
         link_instance_mock = link_mock.return_value
         link_instance_mock.as_album.return_value = spotify.Album(
             self.session, sp_album=sp_album)
@@ -43,14 +43,14 @@ class AlbumTest(unittest.TestCase):
             spotify.Album(self.session, uri=uri)
 
     def test_adds_ref_to_sp_album_when_created(self, lib_mock):
-        sp_album = spotify.ffi.new('int *')
+        sp_album = spotify.ffi.cast('sp_album *', 42)
 
         spotify.Album(self.session, sp_album=sp_album)
 
         lib_mock.sp_album_add_ref.assert_called_with(sp_album)
 
     def test_releases_sp_album_when_album_dies(self, lib_mock):
-        sp_album = spotify.ffi.new('int *')
+        sp_album = spotify.ffi.cast('sp_album *', 42)
 
         album = spotify.Album(self.session, sp_album=sp_album)
         album = None  # noqa
@@ -62,7 +62,7 @@ class AlbumTest(unittest.TestCase):
     def test_repr(self, link_mock, lib_mock):
         link_instance_mock = link_mock.return_value
         link_instance_mock.uri = 'foo'
-        sp_album = spotify.ffi.new('int *')
+        sp_album = spotify.ffi.cast('sp_album *', 42)
         album = spotify.Album(self.session, sp_album=sp_album)
 
         result = repr(album)
@@ -71,7 +71,7 @@ class AlbumTest(unittest.TestCase):
 
     def test_is_loaded(self, lib_mock):
         lib_mock.sp_album_is_loaded.return_value = 1
-        sp_album = spotify.ffi.new('int *')
+        sp_album = spotify.ffi.cast('sp_album *', 42)
         album = spotify.Album(self.session, sp_album=sp_album)
 
         result = album.is_loaded
@@ -81,7 +81,7 @@ class AlbumTest(unittest.TestCase):
 
     @mock.patch('spotify.utils.load')
     def test_load(self, load_mock, lib_mock):
-        sp_album = spotify.ffi.new('int *')
+        sp_album = spotify.ffi.cast('sp_album *', 42)
         album = spotify.Album(self.session, sp_album=sp_album)
 
         album.load(10)
@@ -90,7 +90,7 @@ class AlbumTest(unittest.TestCase):
 
     def test_is_available(self, lib_mock):
         lib_mock.sp_album_is_available.return_value = 1
-        sp_album = spotify.ffi.new('int *')
+        sp_album = spotify.ffi.cast('sp_album *', 42)
         album = spotify.Album(self.session, sp_album=sp_album)
 
         result = album.is_available
@@ -100,7 +100,7 @@ class AlbumTest(unittest.TestCase):
 
     def test_is_available_is_none_if_unloaded(self, lib_mock):
         lib_mock.sp_album_is_loaded.return_value = 0
-        sp_album = spotify.ffi.new('int *')
+        sp_album = spotify.ffi.cast('sp_album *', 42)
         album = spotify.Album(self.session, sp_album=sp_album)
 
         result = album.is_available
@@ -110,9 +110,9 @@ class AlbumTest(unittest.TestCase):
 
     @mock.patch('spotify.artist.lib', spec=spotify.lib)
     def test_artist(self, artist_lib_mock, lib_mock):
-        sp_artist = spotify.ffi.new('int *')
+        sp_artist = spotify.ffi.cast('sp_artist *', 43)
         lib_mock.sp_album_artist.return_value = sp_artist
-        sp_album = spotify.ffi.new('int *')
+        sp_album = spotify.ffi.cast('sp_album *', 42)
         album = spotify.Album(self.session, sp_album=sp_album)
 
         result = album.artist
@@ -125,7 +125,7 @@ class AlbumTest(unittest.TestCase):
     @mock.patch('spotify.artist.lib', spec=spotify.lib)
     def test_artist_if_unloaded(self, artist_lib_mock, lib_mock):
         lib_mock.sp_album_artist.return_value = spotify.ffi.NULL
-        sp_album = spotify.ffi.new('int *')
+        sp_album = spotify.ffi.cast('sp_album *', 42)
         album = spotify.Album(self.session, sp_album=sp_album)
 
         result = album.artist
@@ -137,9 +137,9 @@ class AlbumTest(unittest.TestCase):
     def test_cover(self, image_lib_mock, lib_mock):
         sp_image_id = spotify.ffi.new('char[]', b'cover-id')
         lib_mock.sp_album_cover.return_value = sp_image_id
-        sp_image = spotify.ffi.new('int *')
+        sp_image = spotify.ffi.cast('sp_image *', 43)
         lib_mock.sp_image_create.return_value = sp_image
-        sp_album = spotify.ffi.new('int *')
+        sp_album = spotify.ffi.cast('sp_album *', 42)
         album = spotify.Album(self.session, sp_album=sp_album)
         image_size = spotify.ImageSize.SMALL
 
@@ -160,7 +160,7 @@ class AlbumTest(unittest.TestCase):
 
     def test_cover_is_none_if_null(self, lib_mock):
         lib_mock.sp_album_cover.return_value = spotify.ffi.NULL
-        sp_album = spotify.ffi.new('int *')
+        sp_album = spotify.ffi.cast('sp_album *', 42)
         album = spotify.Album(self.session, sp_album=sp_album)
 
         result = album.cover()
@@ -171,9 +171,9 @@ class AlbumTest(unittest.TestCase):
 
     @mock.patch('spotify.Link', spec=spotify.Link)
     def test_cover_link_creates_link_to_cover(self, link_mock, lib_mock):
-        sp_album = spotify.ffi.new('int *')
+        sp_album = spotify.ffi.cast('sp_album *', 42)
         album = spotify.Album(self.session, sp_album=sp_album)
-        sp_link = spotify.ffi.new('int *')
+        sp_link = spotify.ffi.cast('sp_link *', 43)
         lib_mock.sp_link_create_from_album_cover.return_value = sp_link
         link_mock.return_value = mock.sentinel.link
 
@@ -188,7 +188,7 @@ class AlbumTest(unittest.TestCase):
     def test_name(self, lib_mock):
         lib_mock.sp_album_name.return_value = spotify.ffi.new(
             'char[]', b'Foo Bar Baz')
-        sp_album = spotify.ffi.new('int *')
+        sp_album = spotify.ffi.cast('sp_album *', 42)
         album = spotify.Album(self.session, sp_album=sp_album)
 
         result = album.name
@@ -198,7 +198,7 @@ class AlbumTest(unittest.TestCase):
 
     def test_name_is_none_if_unloaded(self, lib_mock):
         lib_mock.sp_album_name.return_value = spotify.ffi.new('char[]', b'')
-        sp_album = spotify.ffi.new('int *')
+        sp_album = spotify.ffi.cast('sp_album *', 42)
         album = spotify.Album(self.session, sp_album=sp_album)
 
         result = album.name
@@ -208,7 +208,7 @@ class AlbumTest(unittest.TestCase):
 
     def test_year(self, lib_mock):
         lib_mock.sp_album_year.return_value = 2013
-        sp_album = spotify.ffi.new('int *')
+        sp_album = spotify.ffi.cast('sp_album *', 42)
         album = spotify.Album(self.session, sp_album=sp_album)
 
         result = album.year
@@ -218,7 +218,7 @@ class AlbumTest(unittest.TestCase):
 
     def test_year_is_none_if_unloaded(self, lib_mock):
         lib_mock.sp_album_is_loaded.return_value = 0
-        sp_album = spotify.ffi.new('int *')
+        sp_album = spotify.ffi.cast('sp_album *', 42)
         album = spotify.Album(self.session, sp_album=sp_album)
 
         result = album.year
@@ -228,7 +228,7 @@ class AlbumTest(unittest.TestCase):
 
     def test_type(self, lib_mock):
         lib_mock.sp_album_type.return_value = int(spotify.AlbumType.SINGLE)
-        sp_album = spotify.ffi.new('int *')
+        sp_album = spotify.ffi.cast('sp_album *', 42)
         album = spotify.Album(self.session, sp_album=sp_album)
 
         result = album.type
@@ -238,7 +238,7 @@ class AlbumTest(unittest.TestCase):
 
     def test_type_is_none_if_unloaded(self, lib_mock):
         lib_mock.sp_album_is_loaded.return_value = 0
-        sp_album = spotify.ffi.new('int *')
+        sp_album = spotify.ffi.cast('sp_album *', 42)
         album = spotify.Album(self.session, sp_album=sp_album)
 
         result = album.type
@@ -248,9 +248,9 @@ class AlbumTest(unittest.TestCase):
 
     @mock.patch('spotify.Link', spec=spotify.Link)
     def test_link_creates_link_to_album(self, link_mock, lib_mock):
-        sp_album = spotify.ffi.new('int *')
+        sp_album = spotify.ffi.cast('sp_album *', 42)
         album = spotify.Album(self.session, sp_album=sp_album)
-        sp_link = spotify.ffi.new('int *')
+        sp_link = spotify.ffi.cast('sp_link *', 43)
         lib_mock.sp_link_create_from_album.return_value = sp_link
         link_mock.return_value = mock.sentinel.link
 
@@ -276,10 +276,9 @@ class AlbumBrowserTest(unittest.TestCase):
             spotify.AlbumBrowser(self.session)
 
     def test_create_from_album(self, lib_mock):
-        sp_album = spotify.ffi.new('int *')
+        sp_album = spotify.ffi.cast('sp_album *', 43)
         album = spotify.Album(self.session, sp_album=sp_album)
-        sp_albumbrowse = spotify.ffi.cast(
-            'sp_albumbrowse *', spotify.ffi.new('int *'))
+        sp_albumbrowse = spotify.ffi.cast('sp_albumbrowse *', 42)
         lib_mock.sp_albumbrowse_create.return_value = sp_albumbrowse
 
         result = album.browse()
@@ -296,10 +295,9 @@ class AlbumBrowserTest(unittest.TestCase):
         self.assertTrue(result.complete_event.is_set())
 
     def test_create_from_album_with_callback(self, lib_mock):
-        sp_album = spotify.ffi.new('int *')
+        sp_album = spotify.ffi.cast('sp_album *', 43)
         album = spotify.Album(self.session, sp_album=sp_album)
-        sp_albumbrowse = spotify.ffi.cast(
-            'sp_albumbrowse *', spotify.ffi.new('int *'))
+        sp_albumbrowse = spotify.ffi.cast('sp_albumbrowse *', 42)
         lib_mock.sp_albumbrowse_create.return_value = sp_albumbrowse
         callback = mock.Mock()
 
@@ -316,10 +314,9 @@ class AlbumBrowserTest(unittest.TestCase):
         callback.assert_called_with(result)
 
     def test_browser_is_gone_before_callback_is_called(self, lib_mock):
-        sp_album = spotify.ffi.new('int *')
+        sp_album = spotify.ffi.cast('sp_album *', 43)
         album = spotify.Album(self.session, sp_album=sp_album)
-        sp_albumbrowse = spotify.ffi.cast(
-            'sp_albumbrowse *', spotify.ffi.new('int *'))
+        sp_albumbrowse = spotify.ffi.cast('sp_albumbrowse *', 42)
         lib_mock.sp_albumbrowse_create.return_value = sp_albumbrowse
         callback = mock.Mock()
 
@@ -343,7 +340,7 @@ class AlbumBrowserTest(unittest.TestCase):
 
     def test_adds_ref_to_sp_albumbrowse_when_created(self, lib_mock):
         session = tests.create_session()
-        sp_albumbrowse = spotify.ffi.new('int *')
+        sp_albumbrowse = spotify.ffi.cast('sp_albumbrowse *', 42)
 
         spotify.AlbumBrowser(session, sp_albumbrowse=sp_albumbrowse)
 
@@ -353,7 +350,7 @@ class AlbumBrowserTest(unittest.TestCase):
         'FIXME Becomes flaky in combination with '
         'test_create_from_album_with_callback')
     def test_releases_sp_albumbrowse_when_album_dies(self, lib_mock):
-        sp_albumbrowse = spotify.ffi.new('int *')
+        sp_albumbrowse = spotify.ffi.cast('sp_albumbrowse *', 42)
 
         browser = spotify.AlbumBrowser(
             self.session, sp_albumbrowse=sp_albumbrowse)
@@ -364,7 +361,7 @@ class AlbumBrowserTest(unittest.TestCase):
 
     @mock.patch('spotify.Link', spec=spotify.Link)
     def test_repr(self, link_mock, lib_mock):
-        sp_albumbrowse = spotify.ffi.new('int *')
+        sp_albumbrowse = spotify.ffi.cast('sp_albumbrowse *', 42)
         browser = spotify.AlbumBrowser(
             self.session, sp_albumbrowse=sp_albumbrowse)
         lib_mock.sp_albumbrowse_is_loaded.return_value = 1
@@ -378,7 +375,7 @@ class AlbumBrowserTest(unittest.TestCase):
         self.assertEqual(result, 'AlbumBrowser(%r)' % 'foo')
 
     def test_repr_if_unloaded(self, lib_mock):
-        sp_albumbrowse = spotify.ffi.new('int *')
+        sp_albumbrowse = spotify.ffi.cast('sp_albumbrowse *', 42)
         browser = spotify.AlbumBrowser(
             self.session, sp_albumbrowse=sp_albumbrowse)
         lib_mock.sp_albumbrowse_is_loaded.return_value = 0
@@ -389,7 +386,7 @@ class AlbumBrowserTest(unittest.TestCase):
 
     def test_is_loaded(self, lib_mock):
         lib_mock.sp_albumbrowse_is_loaded.return_value = 1
-        sp_albumbrowse = spotify.ffi.new('int *')
+        sp_albumbrowse = spotify.ffi.cast('sp_albumbrowse *', 42)
         browser = spotify.AlbumBrowser(
             self.session, sp_albumbrowse=sp_albumbrowse)
 
@@ -401,7 +398,7 @@ class AlbumBrowserTest(unittest.TestCase):
 
     @mock.patch('spotify.utils.load')
     def test_load(self, load_mock, lib_mock):
-        sp_albumbrowse = spotify.ffi.new('int *')
+        sp_albumbrowse = spotify.ffi.cast('sp_albumbrowse *', 42)
         browser = spotify.AlbumBrowser(
             self.session, sp_albumbrowse=sp_albumbrowse)
 
@@ -412,7 +409,7 @@ class AlbumBrowserTest(unittest.TestCase):
     def test_error(self, lib_mock):
         lib_mock.sp_albumbrowse_error.return_value = int(
             spotify.ErrorType.OTHER_PERMANENT)
-        sp_albumbrowse = spotify.ffi.new('int *')
+        sp_albumbrowse = spotify.ffi.cast('sp_albumbrowse *', 42)
         browser = spotify.AlbumBrowser(
             self.session, sp_albumbrowse=sp_albumbrowse)
 
@@ -423,7 +420,7 @@ class AlbumBrowserTest(unittest.TestCase):
 
     def test_backend_request_duration(self, lib_mock):
         lib_mock.sp_albumbrowse_backend_request_duration.return_value = 137
-        sp_albumbrowse = spotify.ffi.new('int *')
+        sp_albumbrowse = spotify.ffi.cast('sp_albumbrowse *', 42)
         browser = spotify.AlbumBrowser(
             self.session, sp_albumbrowse=sp_albumbrowse)
 
@@ -435,7 +432,7 @@ class AlbumBrowserTest(unittest.TestCase):
 
     def test_backend_request_duration_when_not_loaded(self, lib_mock):
         lib_mock.sp_albumbrowse_is_loaded.return_value = 0
-        sp_albumbrowse = spotify.ffi.new('int *')
+        sp_albumbrowse = spotify.ffi.cast('sp_albumbrowse *', 42)
         browser = spotify.AlbumBrowser(
             self.session, sp_albumbrowse=sp_albumbrowse)
 
@@ -447,10 +444,10 @@ class AlbumBrowserTest(unittest.TestCase):
         self.assertIsNone(result)
 
     def test_album(self, lib_mock):
-        sp_albumbrowse = spotify.ffi.new('int *')
+        sp_albumbrowse = spotify.ffi.cast('sp_albumbrowse *', 42)
         browser = spotify.AlbumBrowser(
             self.session, sp_albumbrowse=sp_albumbrowse)
-        sp_album = spotify.ffi.new('int *')
+        sp_album = spotify.ffi.cast('sp_album *', 43)
         lib_mock.sp_albumbrowse_album.return_value = sp_album
 
         result = browser.album
@@ -459,7 +456,7 @@ class AlbumBrowserTest(unittest.TestCase):
         self.assertEqual(result._sp_album, sp_album)
 
     def test_album_when_not_loaded(self, lib_mock):
-        sp_albumbrowse = spotify.ffi.new('int *')
+        sp_albumbrowse = spotify.ffi.cast('sp_albumbrowse *', 42)
         browser = spotify.AlbumBrowser(
             self.session, sp_albumbrowse=sp_albumbrowse)
         lib_mock.sp_albumbrowse_album.return_value = spotify.ffi.NULL
@@ -471,10 +468,10 @@ class AlbumBrowserTest(unittest.TestCase):
 
     @mock.patch('spotify.artist.lib', spec=spotify.lib)
     def test_artist(self, artist_lib_mock, lib_mock):
-        sp_albumbrowse = spotify.ffi.new('int *')
+        sp_albumbrowse = spotify.ffi.cast('sp_albumbrowse *', 42)
         browser = spotify.AlbumBrowser(
             self.session, sp_albumbrowse=sp_albumbrowse)
-        sp_artist = spotify.ffi.new('int *')
+        sp_artist = spotify.ffi.cast('sp_artist *', 43)
         lib_mock.sp_albumbrowse_artist.return_value = sp_artist
 
         result = browser.artist
@@ -483,7 +480,7 @@ class AlbumBrowserTest(unittest.TestCase):
         self.assertEqual(result._sp_artist, sp_artist)
 
     def test_artist_when_not_loaded(self, lib_mock):
-        sp_albumbrowse = spotify.ffi.new('int *')
+        sp_albumbrowse = spotify.ffi.cast('sp_albumbrowse *', 42)
         browser = spotify.AlbumBrowser(
             self.session, sp_albumbrowse=sp_albumbrowse)
         lib_mock.sp_albumbrowse_artist.return_value = spotify.ffi.NULL
@@ -497,7 +494,7 @@ class AlbumBrowserTest(unittest.TestCase):
         copyright = spotify.ffi.new('char[]', b'Apple Records 1973')
         lib_mock.sp_albumbrowse_num_copyrights.return_value = 1
         lib_mock.sp_albumbrowse_copyright.return_value = copyright
-        sp_albumbrowse = spotify.ffi.new('int *')
+        sp_albumbrowse = spotify.ffi.cast('sp_albumbrowse *', 42)
         browser = spotify.AlbumBrowser(
             self.session, sp_albumbrowse=sp_albumbrowse)
 
@@ -517,7 +514,7 @@ class AlbumBrowserTest(unittest.TestCase):
 
     def test_copyrights_if_no_copyrights(self, lib_mock):
         lib_mock.sp_albumbrowse_num_copyrights.return_value = 0
-        sp_albumbrowse = spotify.ffi.new('int *')
+        sp_albumbrowse = spotify.ffi.cast('sp_albumbrowse *', 42)
         browser = spotify.AlbumBrowser(
             self.session, sp_albumbrowse=sp_albumbrowse)
 
@@ -530,7 +527,7 @@ class AlbumBrowserTest(unittest.TestCase):
 
     def test_copyrights_if_unloaded(self, lib_mock):
         lib_mock.sp_albumbrowse_is_loaded.return_value = 0
-        sp_albumbrowse = spotify.ffi.new('int *')
+        sp_albumbrowse = spotify.ffi.cast('sp_albumbrowse *', 42)
         browser = spotify.AlbumBrowser(
             self.session, sp_albumbrowse=sp_albumbrowse)
 
@@ -541,10 +538,10 @@ class AlbumBrowserTest(unittest.TestCase):
 
     @mock.patch('spotify.track.lib', spec=spotify.lib)
     def test_tracks(self, track_lib_mock, lib_mock):
-        sp_track = spotify.ffi.cast('sp_track *', spotify.ffi.new('int *'))
+        sp_track = spotify.ffi.cast('sp_track *', 43)
         lib_mock.sp_albumbrowse_num_tracks.return_value = 1
         lib_mock.sp_albumbrowse_track.return_value = sp_track
-        sp_albumbrowse = spotify.ffi.new('int *')
+        sp_albumbrowse = spotify.ffi.cast('sp_albumbrowse *', 42)
         browser = spotify.AlbumBrowser(
             self.session, sp_albumbrowse=sp_albumbrowse)
 
@@ -564,7 +561,7 @@ class AlbumBrowserTest(unittest.TestCase):
 
     def test_tracks_if_no_tracks(self, lib_mock):
         lib_mock.sp_albumbrowse_num_tracks.return_value = 0
-        sp_albumbrowse = spotify.ffi.new('int *')
+        sp_albumbrowse = spotify.ffi.cast('sp_albumbrowse *', 42)
         browser = spotify.AlbumBrowser(
             self.session, sp_albumbrowse=sp_albumbrowse)
 
@@ -576,7 +573,7 @@ class AlbumBrowserTest(unittest.TestCase):
 
     def test_tracks_if_unloaded(self, lib_mock):
         lib_mock.sp_albumbrowse_is_loaded.return_value = 0
-        sp_albumbrowse = spotify.ffi.new('int *')
+        sp_albumbrowse = spotify.ffi.cast('sp_albumbrowse *', 42)
         browser = spotify.AlbumBrowser(
             self.session, sp_albumbrowse=sp_albumbrowse)
 
@@ -586,7 +583,7 @@ class AlbumBrowserTest(unittest.TestCase):
         self.assertEqual(len(result), 0)
 
     def test_review(self, lib_mock):
-        sp_albumbrowse = spotify.ffi.new('int *')
+        sp_albumbrowse = spotify.ffi.cast('sp_albumbrowse *', 42)
         browser = spotify.AlbumBrowser(
             self.session, sp_albumbrowse=sp_albumbrowse)
         review = spotify.ffi.new('char[]', b'A nice album')

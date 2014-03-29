@@ -233,7 +233,7 @@ class ConfigTest(unittest.TestCase):
         self.assertEqual(
             spotify.ffi.string(self.config._sp_session_config.proxy_password),
             b'\xc3\xa6 proxy_password')
-        # XXX See explanation in session.py
+        # XXX Waiting for ca_certs_filename on OS X
         # self.assertEqual(
         #     spotify.ffi.string(
         #         self.config.sp_session_config.ca_certs_filename),

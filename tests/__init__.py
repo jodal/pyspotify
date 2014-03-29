@@ -20,10 +20,6 @@ import spotify  # noqa
 cffi.verifier.cleanup_tmpdir()
 
 
-# TODO Review all use of ffi.cast() in the tests. Lots of `ffi.cast('sp_foo *',
-# ffi.new('int *'))` should probably be replaced by `ffi.cast('sp_foo *', 42)`.
-
-
 def buffer_writer(string):
     """Creates a function that takes a ``buffer`` and ``buffer_size`` as the
     two last arguments and writes the given ``string`` to ``buffer``.

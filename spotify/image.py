@@ -66,9 +66,6 @@ class Image(object):
 
         Callbacks added after the image is loaded is called immediately.
         """
-        # FIXME Currently, callbacks added before load doesn't seem to be
-        # called at all, while callbacks added after load is called
-        # immediately.
         handle = ffi.new_handle((self._session, self, callback))
         self._session._callback_handles.add(handle)
         spotify.Error.maybe_raise(lib.sp_image_add_load_callback(

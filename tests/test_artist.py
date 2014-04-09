@@ -136,6 +136,20 @@ class ArtistTest(unittest.TestCase):
         # Image object
         self.assertEqual(image_lib_mock.sp_image_add_ref.call_count, 0)
 
+    @mock.patch('spotify.image.lib', spec=spotify.lib)
+    def test_portrait_defaults_to_normal_size(self, image_lib_mock, lib_mock):
+        sp_image_id = spotify.ffi.new('char[]', b'portrait-id')
+        lib_mock.sp_artist_portrait.return_value = sp_image_id
+        sp_image = spotify.ffi.new('int *')
+        lib_mock.sp_image_create.return_value = sp_image
+        sp_artist = spotify.ffi.new('int *')
+        artist = spotify.Artist(self.session, sp_artist=sp_artist)
+
+        artist.portrait()
+
+        lib_mock.sp_artist_portrait.assert_called_with(
+            sp_artist, int(spotify.ImageSize.NORMAL))
+
     def test_portrait_is_none_if_null(self, lib_mock):
         lib_mock.sp_artist_portrait.return_value = spotify.ffi.NULL
         sp_artist = spotify.ffi.new('int *')
@@ -154,14 +168,28 @@ class ArtistTest(unittest.TestCase):
         sp_link = spotify.ffi.new('int *')
         lib_mock.sp_link_create_from_artist_portrait.return_value = sp_link
         link_mock.return_value = mock.sentinel.link
+        image_size = spotify.ImageSize.SMALL
 
-        result = artist.portrait_link(spotify.ImageSize.NORMAL)
+        result = artist.portrait_link(image_size)
 
         lib_mock.sp_link_create_from_artist_portrait.assert_called_once_with(
-            sp_artist, spotify.ImageSize.NORMAL)
+            sp_artist, int(image_size))
         link_mock.assert_called_once_with(
             self.session, sp_link=sp_link, add_ref=False)
         self.assertEqual(result, mock.sentinel.link)
+
+    @mock.patch('spotify.Link', spec=spotify.Link)
+    def test_portrait_link_defaults_to_normal_size(self, link_mock, lib_mock):
+        sp_artist = spotify.ffi.new('int *')
+        artist = spotify.Artist(self.session, sp_artist=sp_artist)
+        sp_link = spotify.ffi.new('int *')
+        lib_mock.sp_link_create_from_artist_portrait.return_value = sp_link
+        link_mock.return_value = mock.sentinel.link
+
+        artist.portrait_link()
+
+        lib_mock.sp_link_create_from_artist_portrait.assert_called_once_with(
+            sp_artist, int(spotify.ImageSize.NORMAL))
 
     @mock.patch('spotify.Link', spec=spotify.Link)
     def test_link_creates_link_to_artist(self, link_mock, lib_mock):

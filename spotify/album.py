@@ -98,7 +98,7 @@ class Album(object):
         """
         if image_size is None:
             image_size = spotify.ImageSize.NORMAL
-        cover_id = lib.sp_album_cover(self._sp_album, image_size)
+        cover_id = lib.sp_album_cover(self._sp_album, int(image_size))
         if cover_id == ffi.NULL:
             return None
         sp_image = lib.sp_image_create(self._session._sp_session, cover_id)
@@ -117,7 +117,7 @@ class Album(object):
         if image_size is None:
             image_size = spotify.ImageSize.NORMAL
         sp_link = lib.sp_link_create_from_album_cover(
-            self._sp_album, image_size)
+            self._sp_album, int(image_size))
         return spotify.Link(self._session, sp_link=sp_link, add_ref=False)
 
     @property

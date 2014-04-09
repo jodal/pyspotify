@@ -86,7 +86,7 @@ class Artist(object):
         """
         if image_size is None:
             image_size = spotify.ImageSize.NORMAL
-        portrait_id = lib.sp_artist_portrait(self._sp_artist, image_size)
+        portrait_id = lib.sp_artist_portrait(self._sp_artist, int(image_size))
         if portrait_id == ffi.NULL:
             return None
         sp_image = lib.sp_image_create(
@@ -106,7 +106,7 @@ class Artist(object):
         if image_size is None:
             image_size = spotify.ImageSize.NORMAL
         sp_link = lib.sp_link_create_from_artist_portrait(
-            self._sp_artist, image_size)
+            self._sp_artist, int(image_size))
         return spotify.Link(self._session, sp_link=sp_link, add_ref=False)
 
     @property

@@ -525,6 +525,14 @@ class SearchTest(unittest.TestCase):
 
 class SearchPlaylistTest(unittest.TestCase):
 
+    def test_attributes(self):
+        pl = spotify.SearchPlaylist(
+            name='foo', uri='uri:foo', image_uri='image:foo')
+
+        self.assertEqual(pl.name, 'foo')
+        self.assertEqual(pl.uri, 'uri:foo')
+        self.assertEqual(pl.image_uri, 'image:foo')
+
     @mock.patch('spotify.Playlist', spec=spotify.Playlist)
     def test_playlist(self, playlist_mock):
         playlist_mock.return_value = mock.sentinel.playlist

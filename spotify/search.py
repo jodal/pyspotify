@@ -1,6 +1,5 @@
 from __future__ import unicode_literals
 
-import collections
 import logging
 import threading
 
@@ -326,9 +325,22 @@ def _search_complete_callback(sp_search, handle):
         callback(search_result)
 
 
-class SearchPlaylist(collections.namedtuple(
-        'SearchPlaylist', ['name', 'uri', 'image_uri'])):
+class SearchPlaylist(object):
     """A playlist matching a search query."""
+
+    name = None
+    """The name of the playlist."""
+
+    uri = None
+    """The URI of the playlist."""
+
+    image_uri = None
+    """The URI of the playlist's image."""
+
+    def __init__(self, name, uri, image_uri):
+        self.name = name
+        self.uri = uri
+        self.image_uri = image_uri
 
     @property
     def playlist(self):

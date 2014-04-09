@@ -114,7 +114,7 @@ class Album(object):
         this method does not need to create the album cover image object to
         create a link to it.
         """
-        if image_size is not None:
+        if image_size is None:
             image_size = spotify.ImageSize.NORMAL
         sp_link = lib.sp_link_create_from_album_cover(
             self._sp_album, image_size)

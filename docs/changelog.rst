@@ -65,6 +65,9 @@ Bug fixes
   their complete/load callbacks have been called, even if the end user doesn't
   keep any references to the objects. (Fixes: :issue:`121`)
 
+- Fix flipped logic causing crash in :meth:`spotify.Album.cover_link`. (Fixes:
+  :issue:`126`)
+
 Minor changes
 -------------
 

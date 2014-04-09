@@ -525,35 +525,36 @@ class SearchTest(unittest.TestCase):
 
 class SearchPlaylistTest(unittest.TestCase):
 
+    def setUp(self):
+        self.session = tests.create_session()
+
     def test_attributes(self):
         pl = spotify.SearchPlaylist(
-            name='foo', uri='uri:foo', image_uri='image:foo')
+            self.session, name='foo', uri='uri:foo', image_uri='image:foo')
 
         self.assertEqual(pl.name, 'foo')
         self.assertEqual(pl.uri, 'uri:foo')
         self.assertEqual(pl.image_uri, 'image:foo')
 
-    @mock.patch('spotify.Playlist', spec=spotify.Playlist)
-    def test_playlist(self, playlist_mock):
-        playlist_mock.return_value = mock.sentinel.playlist
+    def test_playlist(self):
+        self.session.get_playlist.return_value = mock.sentinel.playlist
         pl = spotify.SearchPlaylist(
-            name='foo', uri='uri:foo', image_uri='image:foo')
+            self.session, name='foo', uri='uri:foo', image_uri='image:foo')
 
         result = pl.playlist
 
         self.assertEqual(result, mock.sentinel.playlist)
-        playlist_mock.assert_called_with(pl.uri)
+        self.session.get_playlist.assert_called_with(pl.uri)
 
-    @mock.patch('spotify.Image', spec=spotify.Image)
-    def test_image(self, image_mock):
-        image_mock.return_value = mock.sentinel.image
+    def test_image(self):
+        self.session.get_image.return_value = mock.sentinel.image
         pl = spotify.SearchPlaylist(
-            name='foo', uri='uri:foo', image_uri='image:foo')
+            self.session, name='foo', uri='uri:foo', image_uri='image:foo')
 
         result = pl.image
 
         self.assertEqual(result, mock.sentinel.image)
-        image_mock.assert_called_with(pl.image_uri)
+        self.session.get_image.assert_called_with(pl.image_uri)
 
 
 class SearchTypeTest(unittest.TestCase):

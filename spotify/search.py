@@ -250,6 +250,7 @@ class Search(object):
         @serialized
         def getitem(sp_search, key):
             return spotify.SearchPlaylist(
+                self._session,
                 name=utils.to_unicode(
                     lib.sp_search_playlist_name(self._sp_search, key)),
                 uri=utils.to_unicode(
@@ -337,7 +338,8 @@ class SearchPlaylist(object):
     image_uri = None
     """The URI of the playlist's image."""
 
-    def __init__(self, name, uri, image_uri):
+    def __init__(self, session, name, uri, image_uri):
+        self._session = session
         self.name = name
         self.uri = uri
         self.image_uri = image_uri
@@ -346,15 +348,13 @@ class SearchPlaylist(object):
     def playlist(self):
         """The :class:`~spotify.Playlist` object for this
         :class:`SearchPlaylist`."""
-        # TODO Need to pass on the session here
-        return spotify.Playlist(self.uri)
+        return self._session.get_playlist(self.uri)
 
     @property
     def image(self):
         """The :class:`~spotify.Image` object for this
         :class:`SearchPlaylist`."""
-        # TODO Need to pass on the session here
-        return spotify.Image(self.image_uri)
+        return self._session.get_image(self.image_uri)
 
 
 @utils.make_enum('SP_SEARCH_')

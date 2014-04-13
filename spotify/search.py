@@ -344,6 +344,9 @@ class SearchPlaylist(object):
         self.uri = uri
         self.image_uri = image_uri
 
+    def __repr__(self):
+        return 'SearchPlaylist(name=%r, uri=%r)' % (self.name, self.uri)
+
     @property
     def playlist(self):
         """The :class:`~spotify.Playlist` object for this

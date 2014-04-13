@@ -536,6 +536,15 @@ class SearchPlaylistTest(unittest.TestCase):
         self.assertEqual(pl.uri, 'uri:foo')
         self.assertEqual(pl.image_uri, 'image:foo')
 
+    def test_repr(self):
+        pl = spotify.SearchPlaylist(
+            self.session, name='foo', uri='uri:foo', image_uri='image:foo')
+
+        result = repr(pl)
+
+        self.assertEqual(
+            result, 'SearchPlaylist(name=%r, uri=%r)' % ('foo', 'uri:foo'))
+
     def test_playlist(self):
         self.session.get_playlist.return_value = mock.sentinel.playlist
         pl = spotify.SearchPlaylist(

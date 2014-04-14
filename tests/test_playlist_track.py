@@ -102,3 +102,27 @@ class PlaylistTrackTest(unittest.TestCase):
 
         lib_mock.sp_playlist_track_message.assert_called_with(sp_playlist, 0)
         self.assertIsNone(result)
+
+    @mock.patch('spotify.Track', spec=spotify.Track)
+    @mock.patch('spotify.User', spec=spotify.User)
+    def test_repr(self, user_mock, track_mock, lib_mock):
+        sp_track = spotify.ffi.cast('sp_track *', 43)
+        lib_mock.sp_playlist_track.return_value = sp_track
+        track_instance_mock = track_mock.return_value
+        track_instance_mock.link.uri = 'foo'
+
+        lib_mock.sp_playlist_track_create_time.return_value = 1234567890
+
+        sp_user = spotify.ffi.cast('sp_user *', 44)
+        lib_mock.sp_playlist_track_creator.return_value = sp_user
+        user_mock.return_value = 'alice-user-object'
+
+        sp_playlist = spotify.ffi.cast('sp_playlist *', 42)
+        playlist_track = spotify.PlaylistTrack(self.session, sp_playlist, 0)
+
+        result = repr(playlist_track)
+
+        self.assertEqual(
+            result,
+            'PlaylistTrack(uri=%r, creator=%r, create_time=%d)' % (
+                'foo', 'alice-user-object', 1234567890))

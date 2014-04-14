@@ -1275,7 +1275,9 @@ class PlaylistTrack(object):
 
         self._index = index
 
-    # TODO Add useful __repr__
+    def __repr__(self):
+        return 'PlaylistTrack(uri=%r, creator=%r, create_time=%d)' % (
+            self.track.link.uri, self.creator, self.create_time)
 
     @property
     @serialized

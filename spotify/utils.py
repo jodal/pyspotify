@@ -273,7 +273,8 @@ class Sequence(collections.Sequence):
         return self._getitem_func(self._sp_obj, key)
 
     def __repr__(self):
-        return pprint.pformat(list(self))
+        return '%s(%s)' % (
+            self.__class__.__name__, pprint.pformat(list(self)))
 
 
 def to_bytes(value):

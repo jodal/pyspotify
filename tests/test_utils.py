@@ -311,7 +311,7 @@ class SequenceTest(unittest.TestCase):
 
         result = repr(seq)
 
-        self.assertEqual(result, '[123]')
+        self.assertEqual(result, 'Sequence([123])')
 
 
 class ToBytesTest(unittest.TestCase):

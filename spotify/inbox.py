@@ -59,9 +59,9 @@ class InboxPostResult(object):
 
     def __repr__(self):
         if not self.complete_event.is_set():
-            return '<InboxPostResult: pending>'
+            return 'InboxPostResult(<pending>)'
         else:
-            return '<InboxPostResult: %s>' % self.error._name
+            return 'InboxPostResult(%s)' % self.error._name
 
     @property
     def error(self):

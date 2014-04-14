@@ -157,14 +157,18 @@ class InboxPostResultTest(unittest.TestCase):
         inbox_post_result = spotify.InboxPostResult(
             self.session, sp_inbox=sp_inbox)
 
-        self.assertEqual(repr(inbox_post_result), '<InboxPostResult: pending>')
+        self.assertEqual(repr(inbox_post_result), 'InboxPostResult(<pending>)')
 
         inbox_post_result.complete_event.set()
         lib_mock.sp_inbox_error.return_value = int(
             spotify.ErrorType.INBOX_IS_FULL)
 
         self.assertEqual(
-            repr(inbox_post_result), '<InboxPostResult: INBOX_IS_FULL>')
+            repr(inbox_post_result), 'InboxPostResult(INBOX_IS_FULL)')
+
+        lib_mock.sp_inbox_error.return_value = int(spotify.ErrorType.OK)
+
+        self.assertEqual(repr(inbox_post_result), 'InboxPostResult(OK)')
 
     def test_error(self, lib_mock):
         lib_mock.sp_inbox_error.return_value = int(

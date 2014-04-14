@@ -68,6 +68,11 @@ Bug fixes
 - Fix flipped logic causing crash in :meth:`spotify.Album.cover_link`. (Fixes:
   :issue:`126`)
 
+- Work around segfault in libspotify if
+  :attr:`spotify.session.Social.private_session` is set before the session is
+  logged in and the first events is processed. This is a bug in libspotify
+  which has been reported to Spotify through their IRC channel.
+
 Minor changes
 -------------
 

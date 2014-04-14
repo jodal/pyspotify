@@ -24,6 +24,32 @@ class Toplist(object):
     instance to get a :class:`Toplist` back.
     """
 
+    type = None
+    """A :class:`ToplistType` instance that specifies what kind of toplist this
+    is: top artists, top albums, or top tracks.
+
+    Changing this field has no effect on existing toplists.
+    """
+
+    region = None
+    """Either a :class:`ToplistRegion` instance, or a 2-letter ISO 3166-1
+    country code, that specifies the geographical region this toplist is for.
+
+    Changing this field has no effect on existing toplists.
+    """
+
+    canonical_username = None
+    """If :attr:`region` is :attr:`ToplistRegion.USER`, then this field
+    specifies which user the toplist is for.
+
+    Changing this field has no effect on existing toplists.
+    """
+
+    complete_event = None
+    """:class:`threading.Event` that is set when the toplist request is
+    completed.
+    """
+
     def __init__(
             self, session, type=None, region=None, canonical_username=None,
             callback=None, sp_toplistbrowse=None, add_ref=True):
@@ -32,11 +58,9 @@ class Toplist(object):
             'type and region, or sp_toplistbrowse, is required'
 
         self._session = session
-        # TODO Document these attributes?
         self.type = type
         self.region = region
         self.canonical_username = canonical_username
-
         self.complete_event = threading.Event()
 
         if sp_toplistbrowse is None:
@@ -58,11 +82,6 @@ class Toplist(object):
             lib.sp_toplistbrowse_add_ref(sp_toplistbrowse)
         self._sp_toplistbrowse = ffi.gc(
             sp_toplistbrowse, lib.sp_toplistbrowse_release)
-
-    complete_event = None
-    """:class:`threading.Event` that is set when the toplist request is
-    completed.
-    """
 
     def __repr__(self):
         return 'Toplist(type=%r, region=%r, canonical_username=%r)' % (

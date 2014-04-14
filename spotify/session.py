@@ -388,7 +388,8 @@ class Session(utils.EventEmitter):
 
     def get_local_track(
             self, artist=None, title=None, album=None, length=None):
-        """A Spotify local track.
+        """
+        Get :class:`Track` for a local track.
 
         Spotify's official clients supports adding your local music files to
         Spotify so they can be played in the Spotify client. These are not

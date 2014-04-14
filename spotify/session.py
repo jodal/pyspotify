@@ -677,12 +677,17 @@ class Social(object):
 
     @private_session.setter
     def private_session(self, value):
-        # TODO Segfaults unless we're logged in and have called
-        # process_events() at least once afterwards. Need to identify the
-        # relevant session callback, set a threading.Event from it, and check
-        # here if that event is set before calling the sp_ function.
+        # XXX sp_session_set_private_session() segfaults unless we login and
+        # call process_events() at least once before calling it. If we log out
+        # again, calling the function still works without segfaults. This bug
+        # has been reported to Spotify on IRC.
+        if self._session.connection_state != spotify.ConnectionState.LOGGED_IN:
+            raise RuntimeError(
+                'private_session can only be set when the session is logged '
+                'in. This is temporary workaround of a libspotify bug, '
+                'causing the application to segfault otherwise.')
         spotify.Error.maybe_raise(lib.sp_session_set_private_session(
-            self._session._sp_session, value))
+            self._session._sp_session, bool(value)))
 
     def is_scrobbling(self, social_provider):
         """Get the :class:`ScrobblingState` for the given

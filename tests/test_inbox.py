@@ -24,14 +24,14 @@ class InboxPostResultTest(unittest.TestCase):
             spotify.InboxPostResult(self.session)
 
     def test_adds_ref_to_sp_inbox_when_created(self, lib_mock):
-        sp_inbox = spotify.ffi.new('int *')
+        sp_inbox = spotify.ffi.cast('sp_inbox *', 42)
 
         spotify.InboxPostResult(self.session, sp_inbox=sp_inbox)
 
         lib_mock.sp_inbox_add_ref.assert_called_with(sp_inbox)
 
     def test_releases_sp_inbox_when_result_dies(self, lib_mock):
-        sp_inbox = spotify.ffi.new('int *')
+        sp_inbox = spotify.ffi.cast('sp_inbox *', 42)
 
         inbox_post_result = spotify.InboxPostResult(
             self.session, sp_inbox=sp_inbox)
@@ -42,11 +42,11 @@ class InboxPostResultTest(unittest.TestCase):
 
     @mock.patch('spotify.track.lib', spec=spotify.lib)
     def test_inbox_post_tracks(self, track_lib_mock, lib_mock):
-        sp_track1 = spotify.ffi.new('int *')
+        sp_track1 = spotify.ffi.cast('sp_track *', 43)
         track1 = spotify.Track(self.session, sp_track=sp_track1)
-        sp_track2 = spotify.ffi.new('int *')
+        sp_track2 = spotify.ffi.cast('sp_track *', 44)
         track2 = spotify.Track(self.session, sp_track=sp_track2)
-        sp_inbox = spotify.ffi.cast('sp_inbox *', spotify.ffi.new('int *'))
+        sp_inbox = spotify.ffi.cast('sp_inbox *', 42)
         lib_mock.sp_inbox_post_tracks.return_value = sp_inbox
 
         result = spotify.InboxPostResult(
@@ -76,9 +76,9 @@ class InboxPostResultTest(unittest.TestCase):
 
     @mock.patch('spotify.track.lib', spec=spotify.lib)
     def test_inbox_post_with_single_track(self, track_lib_mock, lib_mock):
-        sp_track1 = spotify.ffi.new('int *')
+        sp_track1 = spotify.ffi.cast('sp_track *', 43)
         track1 = spotify.Track(self.session, sp_track=sp_track1)
-        sp_inbox = spotify.ffi.cast('sp_inbox *', spotify.ffi.new('int *'))
+        sp_inbox = spotify.ffi.cast('sp_inbox *', 42)
         lib_mock.sp_inbox_post_tracks.return_value = sp_inbox
 
         result = spotify.InboxPostResult(
@@ -94,11 +94,11 @@ class InboxPostResultTest(unittest.TestCase):
 
     @mock.patch('spotify.track.lib', spec=spotify.lib)
     def test_inbox_post_with_callback(self, track_lib_mock, lib_mock):
-        sp_track1 = spotify.ffi.new('int *')
+        sp_track1 = spotify.ffi.cast('sp_track *', 43)
         track1 = spotify.Track(self.session, sp_track=sp_track1)
-        sp_track2 = spotify.ffi.new('int *')
+        sp_track2 = spotify.ffi.cast('sp_track *', 44)
         track2 = spotify.Track(self.session, sp_track=sp_track2)
-        sp_inbox = spotify.ffi.cast('sp_inbox *', spotify.ffi.new('int *'))
+        sp_inbox = spotify.ffi.cast('sp_inbox *', 42)
         lib_mock.sp_inbox_post_tracks.return_value = sp_inbox
         callback = mock.Mock()
 
@@ -116,11 +116,11 @@ class InboxPostResultTest(unittest.TestCase):
     def test_inbox_post_where_result_is_gone_before_callback_is_called(
             self, track_lib_mock, lib_mock):
 
-        sp_track1 = spotify.ffi.new('int *')
+        sp_track1 = spotify.ffi.cast('sp_track *', 43)
         track1 = spotify.Track(self.session, sp_track=sp_track1)
-        sp_track2 = spotify.ffi.new('int *')
+        sp_track2 = spotify.ffi.cast('sp_track *', 44)
         track2 = spotify.Track(self.session, sp_track=sp_track2)
-        sp_inbox = spotify.ffi.cast('sp_inbox *', spotify.ffi.new('int *'))
+        sp_inbox = spotify.ffi.cast('sp_inbox *', 42)
         lib_mock.sp_inbox_post_tracks.return_value = sp_inbox
         callback = mock.Mock()
 
@@ -142,9 +142,9 @@ class InboxPostResultTest(unittest.TestCase):
 
     @mock.patch('spotify.track.lib', spec=spotify.lib)
     def test_fail_to_init_raises_error(self, track_lib_mock, lib_mock):
-        sp_track1 = spotify.ffi.new('int *')
+        sp_track1 = spotify.ffi.cast('sp_track *', 43)
         track1 = spotify.Track(self.session, sp_track=sp_track1)
-        sp_track2 = spotify.ffi.new('int *')
+        sp_track2 = spotify.ffi.cast('sp_track *', 44)
         track2 = spotify.Track(self.session, sp_track=sp_track2)
         lib_mock.sp_inbox_post_tracks.return_value = spotify.ffi.NULL
 
@@ -153,7 +153,7 @@ class InboxPostResultTest(unittest.TestCase):
                 self.session, 'alice', [track1, track2], 'Enjoy!')
 
     def test_repr(self, lib_mock):
-        sp_inbox = spotify.ffi.new('int *')
+        sp_inbox = spotify.ffi.cast('sp_inbox *', 42)
         inbox_post_result = spotify.InboxPostResult(
             self.session, sp_inbox=sp_inbox)
 
@@ -173,7 +173,7 @@ class InboxPostResultTest(unittest.TestCase):
     def test_error(self, lib_mock):
         lib_mock.sp_inbox_error.return_value = int(
             spotify.ErrorType.INBOX_IS_FULL)
-        sp_inbox = spotify.ffi.new('int *')
+        sp_inbox = spotify.ffi.cast('sp_inbox *', 42)
         inbox_post_result = spotify.InboxPostResult(
             self.session, sp_inbox=sp_inbox)
 

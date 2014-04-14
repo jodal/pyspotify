@@ -18,12 +18,12 @@ class PlaylistUnseenTracksTest(unittest.TestCase):
 
     @mock.patch('spotify.track.lib', spec=spotify.lib)
     def test_normal_usage(self, track_lib_mock, lib_mock):
-        sp_playlistcontainer = spotify.ffi.new('int *')
-        sp_playlist = spotify.ffi.new('int *')
+        sp_playlistcontainer = spotify.ffi.cast('sp_playlistcontainer *', 42)
+        sp_playlist = spotify.ffi.cast('sp_playlist *', 43)
 
         total_num_tracks = 3
         sp_tracks = [
-            spotify.ffi.cast('sp_track *', spotify.ffi.new('int *'))
+            spotify.ffi.cast('sp_track *', 44 + i)
             for i in range(total_num_tracks)]
 
         def func(sp_pc, sp_p, sp_t, num_t):
@@ -65,8 +65,8 @@ class PlaylistUnseenTracksTest(unittest.TestCase):
         self.assertEqual(track1._sp_track, sp_tracks[1])
 
     def test_raises_error_on_failure(self, lib_mock):
-        sp_playlistcontainer = spotify.ffi.new('int *')
-        sp_playlist = spotify.ffi.new('int *')
+        sp_playlistcontainer = spotify.ffi.cast('sp_playlistcontainer *', 42)
+        sp_playlist = spotify.ffi.cast('sp_playlist *', 43)
         lib_mock.sp_playlistcontainer_get_unseen_tracks.return_value = -3
 
         with self.assertRaises(spotify.Error):
@@ -75,12 +75,12 @@ class PlaylistUnseenTracksTest(unittest.TestCase):
 
     @mock.patch('spotify.track.lib', spec=spotify.lib)
     def test_getitem_with_slice(self, track_lib_mock, lib_mock):
-        sp_playlistcontainer = spotify.ffi.new('int *')
-        sp_playlist = spotify.ffi.new('int *')
+        sp_playlistcontainer = spotify.ffi.cast('sp_playlistcontainer *', 42)
+        sp_playlist = spotify.ffi.cast('sp_playlist *', 43)
 
         total_num_tracks = 3
         sp_tracks = [
-            spotify.ffi.cast('sp_track *', spotify.ffi.new('int *'))
+            spotify.ffi.cast('sp_track *', 44 + i)
             for i in range(total_num_tracks)]
 
         def func(sp_pc, sp_p, sp_t, num_t):
@@ -104,8 +104,8 @@ class PlaylistUnseenTracksTest(unittest.TestCase):
         self.assertEqual(result[1]._sp_track, sp_tracks[1])
 
     def test_getitem_raises_index_error_on_negative_index(self, lib_mock):
-        sp_playlistcontainer = spotify.ffi.new('int *')
-        sp_playlist = spotify.ffi.new('int *')
+        sp_playlistcontainer = spotify.ffi.cast('sp_playlistcontainer *', 42)
+        sp_playlist = spotify.ffi.cast('sp_playlist *', 43)
         lib_mock.sp_playlistcontainer_get_unseen_tracks.return_value = 0
         tracks = spotify.PlaylistUnseenTracks(
             self.session, sp_playlistcontainer, sp_playlist)
@@ -116,8 +116,8 @@ class PlaylistUnseenTracksTest(unittest.TestCase):
         self.assertEqual(str(ctx.exception), 'list index out of range')
 
     def test_getitem_raises_index_error_on_too_high_index(self, lib_mock):
-        sp_playlistcontainer = spotify.ffi.new('int *')
-        sp_playlist = spotify.ffi.new('int *')
+        sp_playlistcontainer = spotify.ffi.cast('sp_playlistcontainer *', 42)
+        sp_playlist = spotify.ffi.cast('sp_playlist *', 43)
         lib_mock.sp_playlistcontainer_get_unseen_tracks.return_value = 0
         tracks = spotify.PlaylistUnseenTracks(
             self.session, sp_playlistcontainer, sp_playlist)
@@ -128,8 +128,8 @@ class PlaylistUnseenTracksTest(unittest.TestCase):
         self.assertEqual(str(ctx.exception), 'list index out of range')
 
     def test_getitem_raises_type_error_on_non_integral_index(self, lib_mock):
-        sp_playlistcontainer = spotify.ffi.new('int *')
-        sp_playlist = spotify.ffi.new('int *')
+        sp_playlistcontainer = spotify.ffi.cast('sp_playlistcontainer *', 42)
+        sp_playlist = spotify.ffi.cast('sp_playlist *', 43)
         lib_mock.sp_playlistcontainer_get_unseen_tracks.return_value = 0
         tracks = spotify.PlaylistUnseenTracks(
             self.session, sp_playlistcontainer, sp_playlist)
@@ -138,8 +138,8 @@ class PlaylistUnseenTracksTest(unittest.TestCase):
             tracks['abc']
 
     def test_repr(self, lib_mock):
-        sp_playlistcontainer = spotify.ffi.new('int *')
-        sp_playlist = spotify.ffi.new('int *')
+        sp_playlistcontainer = spotify.ffi.cast('sp_playlistcontainer *', 42)
+        sp_playlist = spotify.ffi.cast('sp_playlist *', 43)
         lib_mock.sp_playlistcontainer_get_unseen_tracks.return_value = 0
         tracks = spotify.PlaylistUnseenTracks(
             self.session, sp_playlistcontainer, sp_playlist)

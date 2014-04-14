@@ -390,7 +390,7 @@ class AlbumBrowserTest(unittest.TestCase):
         browser = spotify.AlbumBrowser(
             self.session, sp_albumbrowse=sp_albumbrowse)
         lib_mock.sp_albumbrowse_is_loaded.return_value = 1
-        sp_album = spotify.ffi.new('int *')
+        sp_album = spotify.ffi.cast('sp_album *', 43)
         lib_mock.sp_albumbrowse_album.return_value = sp_album
         link_instance_mock = link_mock.return_value
         link_instance_mock.uri = 'foo'

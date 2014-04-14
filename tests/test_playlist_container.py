@@ -20,7 +20,7 @@ class PlaylistContainerTest(unittest.TestCase):
         spotify._session_instance = None
 
     def test_life_cycle(self, lib_mock):
-        sp_playlistcontainer = spotify.ffi.new('int *')
+        sp_playlistcontainer = spotify.ffi.cast('sp_playlistcontainer *', 42)
 
         playlist_container = spotify.PlaylistContainer(
             self.session, sp_playlistcontainer)
@@ -41,7 +41,7 @@ class PlaylistContainerTest(unittest.TestCase):
         #     sp_playlistcontainer)
 
     def test_cached_container(self, lib_mock):
-        sp_playlistcontainer = spotify.ffi.new('int *')
+        sp_playlistcontainer = spotify.ffi.cast('sp_playlistcontainer *', 42)
 
         result1 = spotify.PlaylistContainer._cached(
             self.session, sp_playlistcontainer)
@@ -59,7 +59,7 @@ class PlaylistContainerTest(unittest.TestCase):
         user_instance_mock = user_mock.return_value
         user_instance_mock.link = link_instance_mock
         lib_mock.sp_playlistcontainer_num_playlists.return_value = 0
-        sp_playlistcontainer = spotify.ffi.new('int *')
+        sp_playlistcontainer = spotify.ffi.cast('sp_playlistcontainer *', 42)
         playlist_container = spotify.PlaylistContainer(
             self.session, sp_playlistcontainer=sp_playlistcontainer)
 
@@ -69,7 +69,7 @@ class PlaylistContainerTest(unittest.TestCase):
 
     def test_is_loaded(self, lib_mock):
         lib_mock.sp_playlistcontainer_is_loaded.return_value = 1
-        sp_playlistcontainer = spotify.ffi.new('int *')
+        sp_playlistcontainer = spotify.ffi.cast('sp_playlistcontainer *', 42)
         playlist_container = spotify.PlaylistContainer(
             self.session, sp_playlistcontainer=sp_playlistcontainer)
 
@@ -81,7 +81,7 @@ class PlaylistContainerTest(unittest.TestCase):
 
     @mock.patch('spotify.utils.load')
     def test_load(self, load_mock, lib_mock):
-        sp_playlistcontainer = spotify.ffi.new('int *')
+        sp_playlistcontainer = spotify.ffi.cast('sp_playlistcontainer *', 42)
         playlist_container = spotify.PlaylistContainer(
             self.session, sp_playlistcontainer=sp_playlistcontainer)
 
@@ -92,7 +92,7 @@ class PlaylistContainerTest(unittest.TestCase):
 
     def test_len(self, lib_mock):
         lib_mock.sp_playlistcontainer_num_playlists.return_value = 8
-        sp_playlistcontainer = spotify.ffi.new('int *')
+        sp_playlistcontainer = spotify.ffi.cast('sp_playlistcontainer *', 42)
         playlist_container = spotify.PlaylistContainer(
             self.session, sp_playlistcontainer=sp_playlistcontainer)
 
@@ -104,7 +104,7 @@ class PlaylistContainerTest(unittest.TestCase):
 
     def test_len_if_undefined(self, lib_mock):
         lib_mock.sp_playlistcontainer_num_playlists.return_value = -1
-        sp_playlistcontainer = spotify.ffi.new('int *')
+        sp_playlistcontainer = spotify.ffi.cast('sp_playlistcontainer *', 42)
         playlist_container = spotify.PlaylistContainer(
             self.session, sp_playlistcontainer=sp_playlistcontainer)
 
@@ -116,11 +116,11 @@ class PlaylistContainerTest(unittest.TestCase):
 
     def test_getitem(self, lib_mock):
         lib_mock.sp_playlistcontainer_num_playlists.return_value = 1
-        sp_playlist = spotify.ffi.new('int *')
+        sp_playlist = spotify.ffi.cast('sp_playlist *', 43)
         lib_mock.sp_playlistcontainer_playlist_type.return_value = int(
             spotify.PlaylistType.PLAYLIST)
         lib_mock.sp_playlistcontainer_playlist.return_value = sp_playlist
-        sp_playlistcontainer = spotify.ffi.new('int *')
+        sp_playlistcontainer = spotify.ffi.cast('sp_playlistcontainer *', 42)
         playlist_container = spotify.PlaylistContainer(
             self.session, sp_playlistcontainer=sp_playlistcontainer)
 
@@ -138,13 +138,13 @@ class PlaylistContainerTest(unittest.TestCase):
             int(spotify.PlaylistType.PLAYLIST),
             int(spotify.PlaylistType.PLAYLIST),
             int(spotify.PlaylistType.PLAYLIST)]
-        sp_playlist1 = spotify.ffi.new('int *')
-        sp_playlist2 = spotify.ffi.new('int *')
-        sp_playlist3 = spotify.ffi.new('int *')
+        sp_playlist1 = spotify.ffi.cast('sp_playlist *', 43)
+        sp_playlist2 = spotify.ffi.cast('sp_playlist *', 44)
+        sp_playlist3 = spotify.ffi.cast('sp_playlist *', 45)
         lib_mock.sp_playlistcontainer_playlist.side_effect = [
             sp_playlist1, sp_playlist2, sp_playlist3
         ]
-        sp_playlistcontainer = spotify.ffi.new('int *')
+        sp_playlistcontainer = spotify.ffi.cast('sp_playlistcontainer *', 42)
         playlist_container = spotify.PlaylistContainer(
             self.session, sp_playlistcontainer=sp_playlistcontainer)
 
@@ -168,13 +168,13 @@ class PlaylistContainerTest(unittest.TestCase):
             int(spotify.PlaylistType.START_FOLDER),
             int(spotify.PlaylistType.PLAYLIST),
             int(spotify.PlaylistType.END_FOLDER)]
-        sp_playlist = spotify.ffi.new('int *')
+        sp_playlist = spotify.ffi.cast('sp_playlist *', 43)
         lib_mock.sp_playlistcontainer_playlist.return_value = sp_playlist
         lib_mock.sp_playlistcontainer_playlist_folder_id.side_effect = [
             1001, 1002]
         lib_mock.sp_playlistcontainer_playlist_folder_name.side_effect = (
             tests.buffer_writer(folder_name))
-        sp_playlistcontainer = spotify.ffi.new('int *')
+        sp_playlistcontainer = spotify.ffi.cast('sp_playlistcontainer *', 42)
         playlist_container = spotify.PlaylistContainer(
             self.session, sp_playlistcontainer=sp_playlistcontainer)
 
@@ -214,7 +214,7 @@ class PlaylistContainerTest(unittest.TestCase):
         lib_mock.sp_playlistcontainer_num_playlists.return_value = 1
         lib_mock.sp_playlistcontainer_playlist_type.return_value = int(
             spotify.PlaylistType.PLACEHOLDER)
-        sp_playlistcontainer = spotify.ffi.new('int *')
+        sp_playlistcontainer = spotify.ffi.cast('sp_playlistcontainer *', 42)
         playlist_container = spotify.PlaylistContainer(
             self.session, sp_playlistcontainer=sp_playlistcontainer)
 
@@ -223,9 +223,9 @@ class PlaylistContainerTest(unittest.TestCase):
 
     def test_getitem_raises_index_error_on_negative_index(self, lib_mock):
         lib_mock.sp_playlistcontainer_num_playlists.return_value = 1
-        sp_playlist = spotify.ffi.new('int *')
+        sp_playlist = spotify.ffi.cast('sp_playlist *', 43)
         lib_mock.sp_playlistcontainer_playlist.return_value = sp_playlist
-        sp_playlistcontainer = spotify.ffi.new('int *')
+        sp_playlistcontainer = spotify.ffi.cast('sp_playlistcontainer *', 42)
         playlist_container = spotify.PlaylistContainer(
             self.session, sp_playlistcontainer=sp_playlistcontainer)
 
@@ -234,9 +234,9 @@ class PlaylistContainerTest(unittest.TestCase):
 
     def test_getitem_raises_index_error_on_too_high_index(self, lib_mock):
         lib_mock.sp_playlistcontainer_num_playlists.return_value = 1
-        sp_playlist = spotify.ffi.new('int *')
+        sp_playlist = spotify.ffi.cast('sp_playlist *', 43)
         lib_mock.sp_playlistcontainer_playlist.return_value = sp_playlist
-        sp_playlistcontainer = spotify.ffi.new('int *')
+        sp_playlistcontainer = spotify.ffi.cast('sp_playlistcontainer *', 42)
         playlist_container = spotify.PlaylistContainer(
             self.session, sp_playlistcontainer=sp_playlistcontainer)
 
@@ -245,9 +245,9 @@ class PlaylistContainerTest(unittest.TestCase):
 
     def test_getitem_raises_type_error_on_non_integral_index(self, lib_mock):
         lib_mock.sp_playlistcontainer_num_playlists.return_value = 1
-        sp_playlist = spotify.ffi.new('int *')
+        sp_playlist = spotify.ffi.cast('sp_playlist *', 43)
         lib_mock.sp_playlistcontainer_playlist.return_value = sp_playlist
-        sp_playlistcontainer = spotify.ffi.new('int *')
+        sp_playlistcontainer = spotify.ffi.cast('sp_playlistcontainer *', 42)
         playlist_container = spotify.PlaylistContainer(
             self.session, sp_playlistcontainer=sp_playlistcontainer)
 
@@ -255,7 +255,7 @@ class PlaylistContainerTest(unittest.TestCase):
             playlist_container['abc']
 
     def test_setitem_with_playlist_name(self, lib_mock):
-        sp_playlistcontainer = spotify.ffi.new('int *')
+        sp_playlistcontainer = spotify.ffi.cast('sp_playlistcontainer *', 42)
         playlist_container = spotify.PlaylistContainer(
             self.session, sp_playlistcontainer=sp_playlistcontainer)
         playlist_container.__len__ = mock.Mock(return_value=5)
@@ -269,9 +269,9 @@ class PlaylistContainerTest(unittest.TestCase):
         playlist_container.remove_playlist.assert_called_with(1)
 
     def test_setitem_with_existing_playlist(self, lib_mock):
-        sp_playlist = spotify.ffi.new('int *')
+        sp_playlist = spotify.ffi.cast('sp_playlist *', 43)
         playlist = spotify.Playlist(self.session, sp_playlist=sp_playlist)
-        sp_playlistcontainer = spotify.ffi.new('int *')
+        sp_playlistcontainer = spotify.ffi.cast('sp_playlistcontainer *', 42)
         playlist_container = spotify.PlaylistContainer(
             self.session, sp_playlistcontainer=sp_playlistcontainer)
         playlist_container.__len__ = mock.Mock(return_value=5)
@@ -284,9 +284,9 @@ class PlaylistContainerTest(unittest.TestCase):
         playlist_container.remove_playlist.assert_called_with(1)
 
     def test_setitem_with_slice(self, lib_mock):
-        sp_playlist = spotify.ffi.new('int *')
+        sp_playlist = spotify.ffi.cast('sp_playlist *', 43)
         playlist = spotify.Playlist(self.session, sp_playlist=sp_playlist)
-        sp_playlistcontainer = spotify.ffi.new('int *')
+        sp_playlistcontainer = spotify.ffi.cast('sp_playlistcontainer *', 42)
         playlist_container = spotify.PlaylistContainer(
             self.session, sp_playlistcontainer=sp_playlistcontainer)
         playlist_container.__len__ = mock.Mock(return_value=5)
@@ -303,9 +303,9 @@ class PlaylistContainerTest(unittest.TestCase):
             [mock.call(3), mock.call(2)], any_order=False)
 
     def test_setittem_with_slice_and_noniterable_value_fails(self, lib_mock):
-        sp_playlist = spotify.ffi.new('int *')
+        sp_playlist = spotify.ffi.cast('sp_playlist *', 43)
         playlist = spotify.Playlist(self.session, sp_playlist=sp_playlist)
-        sp_playlistcontainer = spotify.ffi.new('int *')
+        sp_playlistcontainer = spotify.ffi.cast('sp_playlistcontainer *', 42)
         playlist_container = spotify.PlaylistContainer(
             self.session, sp_playlistcontainer=sp_playlistcontainer)
         playlist_container.__len__ = mock.Mock(return_value=3)
@@ -316,7 +316,7 @@ class PlaylistContainerTest(unittest.TestCase):
             playlist_container[0:2] = playlist
 
     def test_setitem_raises_error_on_unknown_playlist_type(self, lib_mock):
-        sp_playlistcontainer = spotify.ffi.new('int *')
+        sp_playlistcontainer = spotify.ffi.cast('sp_playlistcontainer *', 42)
         playlist_container = spotify.PlaylistContainer(
             self.session, sp_playlistcontainer=sp_playlistcontainer)
         playlist_container.__len__ = mock.Mock(return_value=1)
@@ -330,7 +330,7 @@ class PlaylistContainerTest(unittest.TestCase):
         self.assertEqual(playlist_container.remove_playlist.call_count, 0)
 
     def test_setitem_raises_index_error_on_negative_index(self, lib_mock):
-        sp_playlistcontainer = spotify.ffi.new('int *')
+        sp_playlistcontainer = spotify.ffi.cast('sp_playlistcontainer *', 42)
         playlist_container = spotify.PlaylistContainer(
             self.session, sp_playlistcontainer=sp_playlistcontainer)
         playlist_container.__len__ = mock.Mock(return_value=1)
@@ -339,7 +339,7 @@ class PlaylistContainerTest(unittest.TestCase):
             playlist_container[-1] = None
 
     def test_setitem_raises_index_error_on_too_high_index(self, lib_mock):
-        sp_playlistcontainer = spotify.ffi.new('int *')
+        sp_playlistcontainer = spotify.ffi.cast('sp_playlistcontainer *', 42)
         playlist_container = spotify.PlaylistContainer(
             self.session, sp_playlistcontainer=sp_playlistcontainer)
         playlist_container.__len__ = mock.Mock(return_value=1)
@@ -348,7 +348,7 @@ class PlaylistContainerTest(unittest.TestCase):
             playlist_container[1] = None
 
     def test_setitem_raises_type_error_on_non_integral_index(self, lib_mock):
-        sp_playlistcontainer = spotify.ffi.new('int *')
+        sp_playlistcontainer = spotify.ffi.cast('sp_playlistcontainer *', 42)
         playlist_container = spotify.PlaylistContainer(
             self.session, sp_playlistcontainer=sp_playlistcontainer)
         playlist_container.__len__ = mock.Mock(return_value=1)
@@ -357,7 +357,7 @@ class PlaylistContainerTest(unittest.TestCase):
             playlist_container['abc'] = None
 
     def test_delitem(self, lib_mock):
-        sp_playlistcontainer = spotify.ffi.new('int *')
+        sp_playlistcontainer = spotify.ffi.cast('sp_playlistcontainer *', 42)
         playlist_container = spotify.PlaylistContainer(
             self.session, sp_playlistcontainer=sp_playlistcontainer)
         playlist_container.__len__ = mock.Mock(return_value=1)
@@ -368,7 +368,7 @@ class PlaylistContainerTest(unittest.TestCase):
         playlist_container.remove_playlist.assert_called_with(0)
 
     def test_delitem_with_slice(self, lib_mock):
-        sp_playlistcontainer = spotify.ffi.new('int *')
+        sp_playlistcontainer = spotify.ffi.cast('sp_playlistcontainer *', 42)
         playlist_container = spotify.PlaylistContainer(
             self.session, sp_playlistcontainer=sp_playlistcontainer)
         playlist_container.__len__ = mock.Mock(return_value=3)
@@ -381,7 +381,7 @@ class PlaylistContainerTest(unittest.TestCase):
             [mock.call(1), mock.call(0)], any_order=False)
 
     def test_delitem_raises_index_error_on_negative_index(self, lib_mock):
-        sp_playlistcontainer = spotify.ffi.new('int *')
+        sp_playlistcontainer = spotify.ffi.cast('sp_playlistcontainer *', 42)
         playlist_container = spotify.PlaylistContainer(
             self.session, sp_playlistcontainer=sp_playlistcontainer)
         playlist_container.__len__ = mock.Mock(return_value=1)
@@ -390,7 +390,7 @@ class PlaylistContainerTest(unittest.TestCase):
             del playlist_container[-1]
 
     def test_delitem_raises_index_error_on_too_high_index(self, lib_mock):
-        sp_playlistcontainer = spotify.ffi.new('int *')
+        sp_playlistcontainer = spotify.ffi.cast('sp_playlistcontainer *', 42)
         playlist_container = spotify.PlaylistContainer(
             self.session, sp_playlistcontainer=sp_playlistcontainer)
         playlist_container.__len__ = mock.Mock(return_value=1)
@@ -399,7 +399,7 @@ class PlaylistContainerTest(unittest.TestCase):
             del playlist_container[1]
 
     def test_delitem_raises_type_error_on_non_integral_index(self, lib_mock):
-        sp_playlistcontainer = spotify.ffi.new('int *')
+        sp_playlistcontainer = spotify.ffi.cast('sp_playlistcontainer *', 42)
         playlist_container = spotify.PlaylistContainer(
             self.session, sp_playlistcontainer=sp_playlistcontainer)
         playlist_container.__len__ = mock.Mock(return_value=1)
@@ -408,7 +408,7 @@ class PlaylistContainerTest(unittest.TestCase):
             del playlist_container['abc']
 
     def test_insert_with_playlist_name(self, lib_mock):
-        sp_playlistcontainer = spotify.ffi.new('int *')
+        sp_playlistcontainer = spotify.ffi.cast('sp_playlistcontainer *', 42)
         playlist_container = spotify.PlaylistContainer(
             self.session, sp_playlistcontainer=sp_playlistcontainer)
         playlist_container.__len__ = mock.Mock(return_value=5)
@@ -421,9 +421,9 @@ class PlaylistContainerTest(unittest.TestCase):
             'New playlist', index=3)
 
     def test_insert_with_existing_playlist(self, lib_mock):
-        sp_playlist = spotify.ffi.new('int *')
+        sp_playlist = spotify.ffi.cast('sp_playlist *', 43)
         playlist = spotify.Playlist(self.session, sp_playlist=sp_playlist)
-        sp_playlistcontainer = spotify.ffi.new('int *')
+        sp_playlistcontainer = spotify.ffi.cast('sp_playlistcontainer *', 42)
         playlist_container = spotify.PlaylistContainer(
             self.session, sp_playlistcontainer=sp_playlistcontainer)
         playlist_container.__len__ = mock.Mock(return_value=5)
@@ -435,24 +435,24 @@ class PlaylistContainerTest(unittest.TestCase):
         playlist_container.add_playlist.assert_called_with(playlist, index=3)
 
     def test_is_a_sequence(self, lib_mock):
-        sp_playlistcontainer = spotify.ffi.new('int *')
+        sp_playlistcontainer = spotify.ffi.cast('sp_playlistcontainer *', 42)
         playlist_container = spotify.PlaylistContainer(
             self.session, sp_playlistcontainer=sp_playlistcontainer)
 
         self.assertIsInstance(playlist_container, collections.Sequence)
 
     def test_is_a_mutable_sequence(self, lib_mock):
-        sp_playlistcontainer = spotify.ffi.new('int *')
+        sp_playlistcontainer = spotify.ffi.cast('sp_playlistcontainer *', 42)
         playlist_container = spotify.PlaylistContainer(
             self.session, sp_playlistcontainer=sp_playlistcontainer)
 
         self.assertIsInstance(playlist_container, collections.MutableSequence)
 
     def test_add_new_playlist_to_end_of_container(self, lib_mock):
-        sp_playlistcontainer = spotify.ffi.new('int *')
+        sp_playlistcontainer = spotify.ffi.cast('sp_playlistcontainer *', 42)
         playlist_container = spotify.PlaylistContainer(
             self.session, sp_playlistcontainer=sp_playlistcontainer)
-        sp_playlist = spotify.ffi.new('int *')
+        sp_playlist = spotify.ffi.cast('sp_playlist *', 43)
         lib_mock.sp_playlistcontainer_add_new_playlist.return_value = (
             sp_playlist)
 
@@ -472,10 +472,10 @@ class PlaylistContainerTest(unittest.TestCase):
             lib_mock.sp_playlistcontainer_move_playlist.call_count, 0)
 
     def test_add_new_playlist_at_given_index(self, lib_mock):
-        sp_playlistcontainer = spotify.ffi.new('int *')
+        sp_playlistcontainer = spotify.ffi.cast('sp_playlistcontainer *', 42)
         playlist_container = spotify.PlaylistContainer(
             self.session, sp_playlistcontainer=sp_playlistcontainer)
-        sp_playlist = spotify.ffi.new('int *')
+        sp_playlist = spotify.ffi.cast('sp_playlist *', 43)
         lib_mock.sp_playlistcontainer_add_new_playlist.return_value = (
             sp_playlist)
         lib_mock.sp_playlistcontainer_num_playlists.return_value = 100
@@ -498,7 +498,7 @@ class PlaylistContainerTest(unittest.TestCase):
             sp_playlistcontainer, 99, 7, 0)
 
     def test_add_new_playlist_fails_if_name_is_space_only(self, lib_mock):
-        sp_playlistcontainer = spotify.ffi.new('int *')
+        sp_playlistcontainer = spotify.ffi.cast('sp_playlistcontainer *', 42)
         playlist_container = spotify.PlaylistContainer(
             self.session, sp_playlistcontainer=sp_playlistcontainer)
 
@@ -518,7 +518,7 @@ class PlaylistContainerTest(unittest.TestCase):
             playlist_container.add_new_playlist(' \t\r\n')
 
     def test_add_new_playlist_fails_if_name_is_too_long(self, lib_mock):
-        sp_playlistcontainer = spotify.ffi.new('int *')
+        sp_playlistcontainer = spotify.ffi.cast('sp_playlistcontainer *', 42)
         playlist_container = spotify.PlaylistContainer(
             self.session, sp_playlistcontainer=sp_playlistcontainer)
 
@@ -528,7 +528,7 @@ class PlaylistContainerTest(unittest.TestCase):
     def test_add_new_playlist_fails_if_operation_fails(self, lib_mock):
         lib_mock.sp_playlistcontainer_add_new_playlist.return_value = (
             spotify.ffi.NULL)
-        sp_playlistcontainer = spotify.ffi.new('int *')
+        sp_playlistcontainer = spotify.ffi.cast('sp_playlistcontainer *', 42)
         playlist_container = spotify.PlaylistContainer(
             self.session, sp_playlistcontainer=sp_playlistcontainer)
 
@@ -536,11 +536,11 @@ class PlaylistContainerTest(unittest.TestCase):
             playlist_container.add_new_playlist('foo bar')
 
     def test_add_playlist_from_link(self, lib_mock):
-        sp_link = spotify.ffi.new('int *')
+        sp_link = spotify.ffi.cast('sp_link *', 43)
         link = spotify.Link(self.session, sp_link=sp_link, add_ref=False)
-        sp_playlist = spotify.ffi.new('int *')
+        sp_playlist = spotify.ffi.cast('sp_playlist *', 44)
         lib_mock.sp_playlistcontainer_add_playlist.return_value = sp_playlist
-        sp_playlistcontainer = spotify.ffi.new('int *')
+        sp_playlistcontainer = spotify.ffi.cast('sp_playlistcontainer *', 42)
         playlist_container = spotify.PlaylistContainer(
             self.session, sp_playlistcontainer=sp_playlistcontainer)
 
@@ -555,14 +555,14 @@ class PlaylistContainerTest(unittest.TestCase):
             lib_mock.sp_playlistcontainer_move_playlist.call_count, 0)
 
     def test_add_playlist_from_playlist(self, lib_mock):
-        sp_link = spotify.ffi.new('int *')
+        sp_link = spotify.ffi.cast('sp_link *', 43)
         link = spotify.Link(self.session, sp_link=sp_link, add_ref=False)
         existing_playlist = mock.Mock(spec=spotify.Playlist)
         existing_playlist.link = link
-        added_sp_playlist = spotify.ffi.new('int *')
+        added_sp_playlist = spotify.ffi.cast('sp_playlist *', 44)
         lib_mock.sp_playlistcontainer_add_playlist.return_value = (
             added_sp_playlist)
-        sp_playlistcontainer = spotify.ffi.new('int *')
+        sp_playlistcontainer = spotify.ffi.cast('sp_playlistcontainer *', 42)
         playlist_container = spotify.PlaylistContainer(
             self.session, sp_playlistcontainer=sp_playlistcontainer)
 
@@ -577,11 +577,11 @@ class PlaylistContainerTest(unittest.TestCase):
             lib_mock.sp_playlistcontainer_move_playlist.call_count, 0)
 
     def test_add_playlist_at_given_index(self, lib_mock):
-        sp_link = spotify.ffi.new('int *')
+        sp_link = spotify.ffi.cast('sp_link *', 43)
         link = spotify.Link(self.session, sp_link=sp_link, add_ref=False)
-        sp_playlist = spotify.ffi.new('int *')
+        sp_playlist = spotify.ffi.cast('sp_playlist *', 44)
         lib_mock.sp_playlistcontainer_add_playlist.return_value = sp_playlist
-        sp_playlistcontainer = spotify.ffi.new('int *')
+        sp_playlistcontainer = spotify.ffi.cast('sp_playlistcontainer *', 42)
         playlist_container = spotify.PlaylistContainer(
             self.session, sp_playlistcontainer=sp_playlistcontainer)
         lib_mock.sp_playlistcontainer_num_playlists.return_value = 100
@@ -599,11 +599,11 @@ class PlaylistContainerTest(unittest.TestCase):
             sp_playlistcontainer, 99, 7, 0)
 
     def test_add_playlist_already_in_the_container(self, lib_mock):
-        sp_link = spotify.ffi.new('int *')
+        sp_link = spotify.ffi.cast('sp_link *', 43)
         link = spotify.Link(self.session, sp_link=sp_link, add_ref=False)
         lib_mock.sp_playlistcontainer_add_playlist.return_value = (
             spotify.ffi.NULL)
-        sp_playlistcontainer = spotify.ffi.new('int *')
+        sp_playlistcontainer = spotify.ffi.cast('sp_playlistcontainer *', 42)
         playlist_container = spotify.PlaylistContainer(
             self.session, sp_playlistcontainer=sp_playlistcontainer)
 
@@ -616,7 +616,7 @@ class PlaylistContainerTest(unittest.TestCase):
             lib_mock.sp_playlistcontainer_move_playlist.call_count, 0)
 
     def test_add_playlist_from_unknown_type_fails(self, lib_mock):
-        sp_playlistcontainer = spotify.ffi.new('int *')
+        sp_playlistcontainer = spotify.ffi.cast('sp_playlistcontainer *', 42)
         playlist_container = spotify.PlaylistContainer(
             self.session, sp_playlistcontainer=sp_playlistcontainer)
 
@@ -626,7 +626,7 @@ class PlaylistContainerTest(unittest.TestCase):
     def test_add_folder(self, lib_mock):
         lib_mock.sp_playlistcontainer_add_folder.return_value = int(
             spotify.ErrorType.OK)
-        sp_playlistcontainer = spotify.ffi.new('int *')
+        sp_playlistcontainer = spotify.ffi.cast('sp_playlistcontainer *', 42)
         playlist_container = spotify.PlaylistContainer(
             self.session, sp_playlistcontainer=sp_playlistcontainer)
 
@@ -643,7 +643,7 @@ class PlaylistContainerTest(unittest.TestCase):
         lib_mock.sp_playlistcontainer_num_playlists.return_value = 7
         lib_mock.sp_playlistcontainer_add_folder.return_value = int(
             spotify.ErrorType.OK)
-        sp_playlistcontainer = spotify.ffi.new('int *')
+        sp_playlistcontainer = spotify.ffi.cast('sp_playlistcontainer *', 42)
         playlist_container = spotify.PlaylistContainer(
             self.session, sp_playlistcontainer=sp_playlistcontainer)
 
@@ -660,7 +660,7 @@ class PlaylistContainerTest(unittest.TestCase):
         lib_mock.sp_playlistcontainer_add_folder.return_value = int(
             spotify.ErrorType.INDEX_OUT_OF_RANGE)
 
-        sp_playlistcontainer = spotify.ffi.new('int *')
+        sp_playlistcontainer = spotify.ffi.cast('sp_playlistcontainer *', 42)
         playlist_container = spotify.PlaylistContainer(
             self.session, sp_playlistcontainer=sp_playlistcontainer)
 
@@ -668,7 +668,7 @@ class PlaylistContainerTest(unittest.TestCase):
             playlist_container.add_folder('foo bar', index=3)
 
     def test_add_folder_fails_if_name_is_space_only(self, lib_mock):
-        sp_playlistcontainer = spotify.ffi.new('int *')
+        sp_playlistcontainer = spotify.ffi.cast('sp_playlistcontainer *', 42)
         playlist_container = spotify.PlaylistContainer(
             self.session, sp_playlistcontainer=sp_playlistcontainer)
 
@@ -688,7 +688,7 @@ class PlaylistContainerTest(unittest.TestCase):
             playlist_container.add_folder(' \t\r\n')
 
     def test_add_folder_fails_if_name_is_too_long(self, lib_mock):
-        sp_playlistcontainer = spotify.ffi.new('int *')
+        sp_playlistcontainer = spotify.ffi.cast('sp_playlistcontainer *', 42)
         playlist_container = spotify.PlaylistContainer(
             self.session, sp_playlistcontainer=sp_playlistcontainer)
 
@@ -696,11 +696,11 @@ class PlaylistContainerTest(unittest.TestCase):
             playlist_container.add_folder('x' * 300)
 
     def test_remove_playlist(self, lib_mock):
-        sp_playlistcontainer = spotify.ffi.new('int *')
+        sp_playlistcontainer = spotify.ffi.cast('sp_playlistcontainer *', 42)
         playlist_container = spotify.PlaylistContainer(
             self.session, sp_playlistcontainer=sp_playlistcontainer)
         lib_mock.sp_playlistcontainer_num_playlists.return_value = 9
-        sp_playlist = spotify.ffi.new('int *')
+        sp_playlist = spotify.ffi.cast('sp_playlist *', 43)
         lib_mock.sp_playlistcontainer_playlist.return_value = sp_playlist
         lib_mock.sp_playlistcontainer_playlist_type.return_value = int(
             spotify.PlaylistType.PLAYLIST)
@@ -713,11 +713,11 @@ class PlaylistContainerTest(unittest.TestCase):
             sp_playlistcontainer, 5)
 
     def test_remove_playlist_out_of_range_fails(self, lib_mock):
-        sp_playlistcontainer = spotify.ffi.new('int *')
+        sp_playlistcontainer = spotify.ffi.cast('sp_playlistcontainer *', 42)
         playlist_container = spotify.PlaylistContainer(
             self.session, sp_playlistcontainer=sp_playlistcontainer)
         lib_mock.sp_playlistcontainer_num_playlists.return_value = 9
-        sp_playlist = spotify.ffi.new('int *')
+        sp_playlist = spotify.ffi.cast('sp_playlist *', 43)
         lib_mock.sp_playlistcontainer_playlist.return_value = sp_playlist
         lib_mock.sp_playlistcontainer_playlist_type.return_value = int(
             spotify.PlaylistType.PLAYLIST)
@@ -728,11 +728,11 @@ class PlaylistContainerTest(unittest.TestCase):
             playlist_container.remove_playlist(3)
 
     def test_remove_start_folder_removes_end_folder_too(self, lib_mock):
-        sp_playlistcontainer = spotify.ffi.new('int *')
+        sp_playlistcontainer = spotify.ffi.cast('sp_playlistcontainer *', 42)
         playlist_container = spotify.PlaylistContainer(
             self.session, sp_playlistcontainer=sp_playlistcontainer)
         lib_mock.sp_playlistcontainer_num_playlists.return_value = 3
-        sp_playlist = spotify.ffi.new('int *')
+        sp_playlist = spotify.ffi.cast('sp_playlist *', 43)
         lib_mock.sp_playlistcontainer_playlist.return_value = sp_playlist
         lib_mock.sp_playlistcontainer_playlist_type.side_effect = [
             int(spotify.PlaylistType.START_FOLDER),
@@ -757,11 +757,11 @@ class PlaylistContainerTest(unittest.TestCase):
         ], any_order=False)
 
     def test_remove_end_folder_removes_start_folder_too(self, lib_mock):
-        sp_playlistcontainer = spotify.ffi.new('int *')
+        sp_playlistcontainer = spotify.ffi.cast('sp_playlistcontainer *', 42)
         playlist_container = spotify.PlaylistContainer(
             self.session, sp_playlistcontainer=sp_playlistcontainer)
         lib_mock.sp_playlistcontainer_num_playlists.return_value = 3
-        sp_playlist = spotify.ffi.new('int *')
+        sp_playlist = spotify.ffi.cast('sp_playlist *', 43)
         lib_mock.sp_playlistcontainer_playlist.return_value = sp_playlist
         lib_mock.sp_playlistcontainer_playlist_type.side_effect = [
             int(spotify.PlaylistType.START_FOLDER),
@@ -786,11 +786,11 @@ class PlaylistContainerTest(unittest.TestCase):
         ], any_order=False)
 
     def test_remove_folder_with_everything_in_it(self, lib_mock):
-        sp_playlistcontainer = spotify.ffi.new('int *')
+        sp_playlistcontainer = spotify.ffi.cast('sp_playlistcontainer *', 42)
         playlist_container = spotify.PlaylistContainer(
             self.session, sp_playlistcontainer=sp_playlistcontainer)
         lib_mock.sp_playlistcontainer_num_playlists.return_value = 3
-        sp_playlist = spotify.ffi.new('int *')
+        sp_playlist = spotify.ffi.cast('sp_playlist *', 43)
         lib_mock.sp_playlistcontainer_playlist.return_value = sp_playlist
         lib_mock.sp_playlistcontainer_playlist_type.side_effect = [
             int(spotify.PlaylistType.START_FOLDER),
@@ -816,7 +816,7 @@ class PlaylistContainerTest(unittest.TestCase):
         ], any_order=False)
 
     def test_find_folder_indexes(self, lib_mock):
-        sp_playlist = spotify.ffi.new('int *')
+        sp_playlist = spotify.ffi.cast('sp_playlist *', 43)
         playlist = spotify.Playlist(self.session, sp_playlist=sp_playlist)
         playlists = [
             spotify.PlaylistFolder(
@@ -832,7 +832,7 @@ class PlaylistContainerTest(unittest.TestCase):
         self.assertEqual(result, [0, 2])
 
     def test_find_folder_indexes_with_unknown_id(self, lib_mock):
-        sp_playlist = spotify.ffi.new('int *')
+        sp_playlist = spotify.ffi.cast('sp_playlist *', 43)
         playlist = spotify.Playlist(self.session, sp_playlist=sp_playlist)
         playlists = [
             spotify.PlaylistFolder(
@@ -848,7 +848,7 @@ class PlaylistContainerTest(unittest.TestCase):
         self.assertEqual(result, [])
 
     def test_find_folder_indexes_recursive(self, lib_mock):
-        sp_playlist = spotify.ffi.new('int *')
+        sp_playlist = spotify.ffi.cast('sp_playlist *', 43)
         playlist = spotify.Playlist(self.session, sp_playlist=sp_playlist)
         playlists = [
             spotify.PlaylistFolder(
@@ -864,7 +864,7 @@ class PlaylistContainerTest(unittest.TestCase):
         self.assertEqual(result, [0, 1, 2])
 
     def test_find_folder_indexes_without_end(self, lib_mock):
-        sp_playlist = spotify.ffi.new('int *')
+        sp_playlist = spotify.ffi.cast('sp_playlist *', 43)
         playlist = spotify.Playlist(self.session, sp_playlist=sp_playlist)
         playlists = [
             spotify.PlaylistFolder(
@@ -878,7 +878,7 @@ class PlaylistContainerTest(unittest.TestCase):
         self.assertEqual(result, [0])
 
     def test_find_folder_indexes_without_start(self, lib_mock):
-        sp_playlist = spotify.ffi.new('int *')
+        sp_playlist = spotify.ffi.cast('sp_playlist *', 43)
         playlist = spotify.Playlist(self.session, sp_playlist=sp_playlist)
         playlists = [
             playlist,
@@ -894,7 +894,7 @@ class PlaylistContainerTest(unittest.TestCase):
     def test_move_playlist(self, lib_mock):
         lib_mock.sp_playlistcontainer_move_playlist.return_value = int(
             spotify.ErrorType.OK)
-        sp_playlistcontainer = spotify.ffi.new('int *')
+        sp_playlistcontainer = spotify.ffi.cast('sp_playlistcontainer *', 42)
         playlist_container = spotify.PlaylistContainer(
             self.session, sp_playlistcontainer=sp_playlistcontainer)
 
@@ -906,7 +906,7 @@ class PlaylistContainerTest(unittest.TestCase):
     def test_move_playlist_dry_run(self, lib_mock):
         lib_mock.sp_playlistcontainer_move_playlist.return_value = int(
             spotify.ErrorType.OK)
-        sp_playlistcontainer = spotify.ffi.new('int *')
+        sp_playlistcontainer = spotify.ffi.cast('sp_playlistcontainer *', 42)
         playlist_container = spotify.PlaylistContainer(
             self.session, sp_playlistcontainer=sp_playlistcontainer)
 
@@ -918,7 +918,7 @@ class PlaylistContainerTest(unittest.TestCase):
     def test_move_playlist_out_of_range_fails(self, lib_mock):
         lib_mock.sp_playlistcontainer_move_playlist.return_value = int(
             spotify.ErrorType.INDEX_OUT_OF_RANGE)
-        sp_playlistcontainer = spotify.ffi.new('int *')
+        sp_playlistcontainer = spotify.ffi.cast('sp_playlistcontainer *', 42)
         playlist_container = spotify.PlaylistContainer(
             self.session, sp_playlistcontainer=sp_playlistcontainer)
 
@@ -928,9 +928,9 @@ class PlaylistContainerTest(unittest.TestCase):
     @mock.patch('spotify.User', spec=spotify.User)
     def test_owner(self, user_mock, lib_mock):
         user_mock.return_value = mock.sentinel.user
-        sp_user = spotify.ffi.new('int *')
+        sp_user = spotify.ffi.cast('sp_user *', 43)
         lib_mock.sp_playlistcontainer_owner.return_value = sp_user
-        sp_playlistcontainer = spotify.ffi.new('int *')
+        sp_playlistcontainer = spotify.ffi.cast('sp_playlistcontainer *', 42)
         playlist_container = spotify.PlaylistContainer(
             self.session, sp_playlistcontainer=sp_playlistcontainer)
 
@@ -943,10 +943,10 @@ class PlaylistContainerTest(unittest.TestCase):
         self.assertEqual(result, mock.sentinel.user)
 
     def test_get_unseen_tracks(self, lib_mock):
-        sp_playlistcontainer = spotify.ffi.new('int *')
+        sp_playlistcontainer = spotify.ffi.cast('sp_playlistcontainer *', 42)
         playlist_container = spotify.PlaylistContainer(
             self.session, sp_playlistcontainer=sp_playlistcontainer)
-        sp_playlist = spotify.ffi.new('int *')
+        sp_playlist = spotify.ffi.cast('sp_playlist *', 43)
         playlist = spotify.Playlist(self.session, sp_playlist=sp_playlist)
         lib_mock.sp_playlistcontainer_get_unseen_tracks.return_value = 0
 
@@ -956,10 +956,10 @@ class PlaylistContainerTest(unittest.TestCase):
         self.assertEqual(len(result), 0)
 
     def test_clear_unseen_tracks(self, lib_mock):
-        sp_playlistcontainer = spotify.ffi.new('int *')
+        sp_playlistcontainer = spotify.ffi.cast('sp_playlistcontainer *', 42)
         playlist_container = spotify.PlaylistContainer(
             self.session, sp_playlistcontainer=sp_playlistcontainer)
-        sp_playlist = spotify.ffi.new('int *')
+        sp_playlist = spotify.ffi.cast('sp_playlist *', 43)
         playlist = spotify.Playlist(self.session, sp_playlist=sp_playlist)
         lib_mock.sp_playlistcontainer_clear_unseen_tracks.return_value = 0
 
@@ -969,10 +969,10 @@ class PlaylistContainerTest(unittest.TestCase):
             sp_playlistcontainer, sp_playlist)
 
     def test_clear_unseen_tracks_raises_error_on_failure(self, lib_mock):
-        sp_playlistcontainer = spotify.ffi.new('int *')
+        sp_playlistcontainer = spotify.ffi.cast('sp_playlistcontainer *', 42)
         playlist_container = spotify.PlaylistContainer(
             self.session, sp_playlistcontainer=sp_playlistcontainer)
-        sp_playlist = spotify.ffi.new('int *')
+        sp_playlist = spotify.ffi.cast('sp_playlist *', 43)
         playlist = spotify.Playlist(self.session, sp_playlist=sp_playlist)
         lib_mock.sp_playlistcontainer_clear_unseen_tracks.return_value = -1
 
@@ -980,7 +980,7 @@ class PlaylistContainerTest(unittest.TestCase):
             playlist_container.clear_unseen_tracks(playlist)
 
     def test_first_on_call_adds_obj_emitters_list(self, lib_mock):
-        sp_playlistcontainer = spotify.ffi.new('int *')
+        sp_playlistcontainer = spotify.ffi.cast('sp_playlistcontainer *', 42)
         playlist_container = spotify.PlaylistContainer(
             self.session, sp_playlistcontainer=sp_playlistcontainer)
 
@@ -992,7 +992,7 @@ class PlaylistContainerTest(unittest.TestCase):
         playlist_container.off()
 
     def test_last_off_call_removes_obj_from_emitters_list(self, lib_mock):
-        sp_playlistcontainer = spotify.ffi.new('int *')
+        sp_playlistcontainer = spotify.ffi.cast('sp_playlistcontainer *', 42)
         playlist_container = spotify.PlaylistContainer(
             self.session, sp_playlistcontainer=sp_playlistcontainer)
 
@@ -1004,7 +1004,7 @@ class PlaylistContainerTest(unittest.TestCase):
         self.assertNotIn(playlist_container, self.session._emitters)
 
     def test_other_off_calls_keeps_obj_in_emitters_list(self, lib_mock):
-        sp_playlistcontainer = spotify.ffi.new('int *')
+        sp_playlistcontainer = spotify.ffi.cast('sp_playlistcontainer *', 42)
         playlist_container = spotify.PlaylistContainer(
             self.session, sp_playlistcontainer=sp_playlistcontainer)
 

@@ -20,7 +20,7 @@ class ArtistTest(unittest.TestCase):
 
     @mock.patch('spotify.Link', spec=spotify.Link)
     def test_create_from_uri(self, link_mock, lib_mock):
-        sp_artist = spotify.ffi.new('int *')
+        sp_artist = spotify.ffi.cast('sp_artist *', 42)
         link_instance_mock = link_mock.return_value
         link_instance_mock.as_artist.return_value = spotify.Artist(
             self.session, sp_artist=sp_artist)
@@ -45,14 +45,14 @@ class ArtistTest(unittest.TestCase):
             spotify.Artist(self.session, uri=uri)
 
     def test_adds_ref_to_sp_artist_when_created(self, lib_mock):
-        sp_artist = spotify.ffi.new('int *')
+        sp_artist = spotify.ffi.cast('sp_artist *', 42)
 
         spotify.Artist(self.session, sp_artist=sp_artist)
 
         lib_mock.sp_artist_add_ref.assert_called_with(sp_artist)
 
     def test_releases_sp_artist_when_artist_dies(self, lib_mock):
-        sp_artist = spotify.ffi.new('int *')
+        sp_artist = spotify.ffi.cast('sp_artist *', 42)
 
         artist = spotify.Artist(self.session, sp_artist=sp_artist)
         artist = None  # noqa
@@ -64,7 +64,7 @@ class ArtistTest(unittest.TestCase):
     def test_repr(self, link_mock, lib_mock):
         link_instance_mock = link_mock.return_value
         link_instance_mock.uri = 'foo'
-        sp_artist = spotify.ffi.new('int *')
+        sp_artist = spotify.ffi.cast('sp_artist *', 42)
         artist = spotify.Artist(self.session, sp_artist=sp_artist)
 
         result = repr(artist)
@@ -74,7 +74,7 @@ class ArtistTest(unittest.TestCase):
     def test_name(self, lib_mock):
         lib_mock.sp_artist_name.return_value = spotify.ffi.new(
             'char[]', b'Foo Bar Baz')
-        sp_artist = spotify.ffi.new('int *')
+        sp_artist = spotify.ffi.cast('sp_artist *', 42)
         artist = spotify.Artist(self.session, sp_artist=sp_artist)
 
         result = artist.name
@@ -84,7 +84,7 @@ class ArtistTest(unittest.TestCase):
 
     def test_name_is_none_if_unloaded(self, lib_mock):
         lib_mock.sp_artist_name.return_value = spotify.ffi.new('char[]', b'')
-        sp_artist = spotify.ffi.new('int *')
+        sp_artist = spotify.ffi.cast('sp_artist *', 42)
         artist = spotify.Artist(self.session, sp_artist=sp_artist)
 
         result = artist.name
@@ -94,7 +94,7 @@ class ArtistTest(unittest.TestCase):
 
     def test_is_loaded(self, lib_mock):
         lib_mock.sp_artist_is_loaded.return_value = 1
-        sp_artist = spotify.ffi.new('int *')
+        sp_artist = spotify.ffi.cast('sp_artist *', 42)
         artist = spotify.Artist(self.session, sp_artist=sp_artist)
 
         result = artist.is_loaded
@@ -104,7 +104,7 @@ class ArtistTest(unittest.TestCase):
 
     @mock.patch('spotify.utils.load')
     def test_load(self, load_mock, lib_mock):
-        sp_artist = spotify.ffi.new('int *')
+        sp_artist = spotify.ffi.cast('sp_artist *', 42)
         artist = spotify.Artist(self.session, sp_artist=sp_artist)
 
         artist.load(10)
@@ -115,9 +115,9 @@ class ArtistTest(unittest.TestCase):
     def test_portrait(self, image_lib_mock, lib_mock):
         sp_image_id = spotify.ffi.new('char[]', b'portrait-id')
         lib_mock.sp_artist_portrait.return_value = sp_image_id
-        sp_image = spotify.ffi.new('int *')
+        sp_image = spotify.ffi.cast('sp_image *', 43)
         lib_mock.sp_image_create.return_value = sp_image
-        sp_artist = spotify.ffi.new('int *')
+        sp_artist = spotify.ffi.cast('sp_artist *', 42)
         artist = spotify.Artist(self.session, sp_artist=sp_artist)
         image_size = spotify.ImageSize.SMALL
 
@@ -140,9 +140,9 @@ class ArtistTest(unittest.TestCase):
     def test_portrait_defaults_to_normal_size(self, image_lib_mock, lib_mock):
         sp_image_id = spotify.ffi.new('char[]', b'portrait-id')
         lib_mock.sp_artist_portrait.return_value = sp_image_id
-        sp_image = spotify.ffi.new('int *')
+        sp_image = spotify.ffi.cast('sp_image *', 43)
         lib_mock.sp_image_create.return_value = sp_image
-        sp_artist = spotify.ffi.new('int *')
+        sp_artist = spotify.ffi.cast('sp_artist *', 42)
         artist = spotify.Artist(self.session, sp_artist=sp_artist)
 
         artist.portrait()
@@ -152,7 +152,7 @@ class ArtistTest(unittest.TestCase):
 
     def test_portrait_is_none_if_null(self, lib_mock):
         lib_mock.sp_artist_portrait.return_value = spotify.ffi.NULL
-        sp_artist = spotify.ffi.new('int *')
+        sp_artist = spotify.ffi.cast('sp_artist *', 42)
         artist = spotify.Artist(self.session, sp_artist=sp_artist)
 
         result = artist.portrait()
@@ -163,9 +163,9 @@ class ArtistTest(unittest.TestCase):
 
     @mock.patch('spotify.Link', spec=spotify.Link)
     def test_portrait_link_creates_link_to_portrait(self, link_mock, lib_mock):
-        sp_artist = spotify.ffi.new('int *')
+        sp_artist = spotify.ffi.cast('sp_artist *', 42)
         artist = spotify.Artist(self.session, sp_artist=sp_artist)
-        sp_link = spotify.ffi.new('int *')
+        sp_link = spotify.ffi.cast('sp_link *', 43)
         lib_mock.sp_link_create_from_artist_portrait.return_value = sp_link
         link_mock.return_value = mock.sentinel.link
         image_size = spotify.ImageSize.SMALL
@@ -180,9 +180,9 @@ class ArtistTest(unittest.TestCase):
 
     @mock.patch('spotify.Link', spec=spotify.Link)
     def test_portrait_link_defaults_to_normal_size(self, link_mock, lib_mock):
-        sp_artist = spotify.ffi.new('int *')
+        sp_artist = spotify.ffi.cast('sp_artist *', 42)
         artist = spotify.Artist(self.session, sp_artist=sp_artist)
-        sp_link = spotify.ffi.new('int *')
+        sp_link = spotify.ffi.cast('sp_link *', 43)
         lib_mock.sp_link_create_from_artist_portrait.return_value = sp_link
         link_mock.return_value = mock.sentinel.link
 
@@ -193,9 +193,9 @@ class ArtistTest(unittest.TestCase):
 
     @mock.patch('spotify.Link', spec=spotify.Link)
     def test_link_creates_link_to_artist(self, link_mock, lib_mock):
-        sp_artist = spotify.ffi.new('int *')
+        sp_artist = spotify.ffi.cast('sp_artist *', 42)
         artist = spotify.Artist(self.session, sp_artist=sp_artist)
-        sp_link = spotify.ffi.new('int *')
+        sp_link = spotify.ffi.cast('sp_link *', 43)
         lib_mock.sp_link_create_from_artist.return_value = sp_link
         link_mock.return_value = mock.sentinel.link
 
@@ -221,10 +221,9 @@ class ArtistBrowserTest(unittest.TestCase):
             spotify.ArtistBrowser(self.session)
 
     def test_create_from_artist(self, lib_mock):
-        sp_artist = spotify.ffi.new('int *')
+        sp_artist = spotify.ffi.cast('sp_artist *', 43)
         artist = spotify.Artist(self.session, sp_artist=sp_artist)
-        sp_artistbrowse = spotify.ffi.cast(
-            'sp_artistbrowse *', spotify.ffi.new('int *'))
+        sp_artistbrowse = spotify.ffi.cast('sp_artistbrowse *', 42)
         lib_mock.sp_artistbrowse_create.return_value = sp_artistbrowse
 
         result = artist.browse()
@@ -242,10 +241,9 @@ class ArtistBrowserTest(unittest.TestCase):
         self.assertTrue(result.complete_event.is_set())
 
     def test_create_from_artist_with_type_and_callback(self, lib_mock):
-        sp_artist = spotify.ffi.new('int *')
+        sp_artist = spotify.ffi.cast('sp_artist *', 43)
         artist = spotify.Artist(self.session, sp_artist=sp_artist)
-        sp_artistbrowse = spotify.ffi.cast(
-            'sp_artistbrowse *', spotify.ffi.new('int *'))
+        sp_artistbrowse = spotify.ffi.cast('sp_artistbrowse *', 42)
         lib_mock.sp_artistbrowse_create.return_value = sp_artistbrowse
         callback = mock.Mock()
 
@@ -264,10 +262,9 @@ class ArtistBrowserTest(unittest.TestCase):
         callback.assert_called_with(result)
 
     def test_browser_is_gone_before_callback_is_called(self, lib_mock):
-        sp_artist = spotify.ffi.new('int *')
+        sp_artist = spotify.ffi.cast('sp_artist *', 43)
         artist = spotify.Artist(self.session, sp_artist=sp_artist)
-        sp_artistbrowse = spotify.ffi.cast(
-            'sp_artistbrowse *', spotify.ffi.new('int *'))
+        sp_artistbrowse = spotify.ffi.cast('sp_artistbrowse *', 42)
         lib_mock.sp_artistbrowse_create.return_value = sp_artistbrowse
         callback = mock.Mock()
 
@@ -290,14 +287,14 @@ class ArtistBrowserTest(unittest.TestCase):
             callback.call_args[0][0]._sp_artistbrowse, sp_artistbrowse)
 
     def test_adds_ref_to_sp_artistbrowse_when_created(self, lib_mock):
-        sp_artistbrowse = spotify.ffi.new('int *')
+        sp_artistbrowse = spotify.ffi.cast('sp_artistbrowse *', 42)
 
         spotify.ArtistBrowser(self.session, sp_artistbrowse=sp_artistbrowse)
 
         lib_mock.sp_artistbrowse_add_ref.assert_called_with(sp_artistbrowse)
 
     def test_releases_sp_artistbrowse_when_artist_dies(self, lib_mock):
-        sp_artistbrowse = spotify.ffi.new('int *')
+        sp_artistbrowse = spotify.ffi.cast('sp_artistbrowse *', 42)
 
         browser = spotify.ArtistBrowser(
             self.session, sp_artistbrowse=sp_artistbrowse)
@@ -308,11 +305,11 @@ class ArtistBrowserTest(unittest.TestCase):
 
     @mock.patch('spotify.Link', spec=spotify.Link)
     def test_repr(self, link_mock, lib_mock):
-        sp_artistbrowse = spotify.ffi.new('int *')
+        sp_artistbrowse = spotify.ffi.cast('sp_artistbrowse *', 42)
         browser = spotify.ArtistBrowser(
             self.session, sp_artistbrowse=sp_artistbrowse)
         lib_mock.sp_artistbrowse_is_loaded.return_value = 1
-        sp_artist = spotify.ffi.new('int *')
+        sp_artist = spotify.ffi.cast('sp_artist *', 42)
         lib_mock.sp_artistbrowse_artist.return_value = sp_artist
         link_instance_mock = link_mock.return_value
         link_instance_mock.uri = 'foo'
@@ -322,7 +319,7 @@ class ArtistBrowserTest(unittest.TestCase):
         self.assertEqual(result, 'ArtistBrowser(%r)' % 'foo')
 
     def test_repr_if_unloaded(self, lib_mock):
-        sp_artistbrowse = spotify.ffi.new('int *')
+        sp_artistbrowse = spotify.ffi.cast('sp_artistbrowse *', 42)
         browser = spotify.ArtistBrowser(
             self.session, sp_artistbrowse=sp_artistbrowse)
         lib_mock.sp_artistbrowse_is_loaded.return_value = 0
@@ -333,7 +330,7 @@ class ArtistBrowserTest(unittest.TestCase):
 
     def test_is_loaded(self, lib_mock):
         lib_mock.sp_artistbrowse_is_loaded.return_value = 1
-        sp_artistbrowse = spotify.ffi.new('int *')
+        sp_artistbrowse = spotify.ffi.cast('sp_artistbrowse *', 42)
         browser = spotify.ArtistBrowser(
             self.session, sp_artistbrowse=sp_artistbrowse)
 
@@ -345,7 +342,7 @@ class ArtistBrowserTest(unittest.TestCase):
 
     @mock.patch('spotify.utils.load')
     def test_load(self, load_mock, lib_mock):
-        sp_artistbrowse = spotify.ffi.new('int *')
+        sp_artistbrowse = spotify.ffi.cast('sp_artistbrowse *', 42)
         browser = spotify.ArtistBrowser(
             self.session, sp_artistbrowse=sp_artistbrowse)
 
@@ -356,7 +353,7 @@ class ArtistBrowserTest(unittest.TestCase):
     def test_error(self, lib_mock):
         lib_mock.sp_artistbrowse_error.return_value = int(
             spotify.ErrorType.OTHER_PERMANENT)
-        sp_artistbrowse = spotify.ffi.new('int *')
+        sp_artistbrowse = spotify.ffi.cast('sp_artistbrowse *', 42)
         browser = spotify.ArtistBrowser(
             self.session, sp_artistbrowse=sp_artistbrowse)
 
@@ -367,7 +364,7 @@ class ArtistBrowserTest(unittest.TestCase):
 
     def test_backend_request_duration(self, lib_mock):
         lib_mock.sp_artistbrowse_backend_request_duration.return_value = 137
-        sp_artistbrowse = spotify.ffi.new('int *')
+        sp_artistbrowse = spotify.ffi.cast('sp_artistbrowse *', 42)
         browser = spotify.ArtistBrowser(
             self.session, sp_artistbrowse=sp_artistbrowse)
 
@@ -379,7 +376,7 @@ class ArtistBrowserTest(unittest.TestCase):
 
     def test_backend_request_duration_when_not_loaded(self, lib_mock):
         lib_mock.sp_artistbrowse_is_loaded.return_value = 0
-        sp_artistbrowse = spotify.ffi.new('int *')
+        sp_artistbrowse = spotify.ffi.cast('sp_artistbrowse *', 42)
         browser = spotify.ArtistBrowser(
             self.session, sp_artistbrowse=sp_artistbrowse)
 
@@ -391,10 +388,10 @@ class ArtistBrowserTest(unittest.TestCase):
         self.assertIsNone(result)
 
     def test_artist(self, lib_mock):
-        sp_artistbrowse = spotify.ffi.new('int *')
+        sp_artistbrowse = spotify.ffi.cast('sp_artistbrowse *', 42)
         browser = spotify.ArtistBrowser(
             self.session, sp_artistbrowse=sp_artistbrowse)
-        sp_artist = spotify.ffi.new('int *')
+        sp_artist = spotify.ffi.cast('sp_artist *', 43)
         lib_mock.sp_artistbrowse_artist.return_value = sp_artist
 
         result = browser.artist
@@ -403,7 +400,7 @@ class ArtistBrowserTest(unittest.TestCase):
         self.assertEqual(result._sp_artist, sp_artist)
 
     def test_artist_when_not_loaded(self, lib_mock):
-        sp_artistbrowse = spotify.ffi.new('int *')
+        sp_artistbrowse = spotify.ffi.cast('sp_artistbrowse *', 42)
         browser = spotify.ArtistBrowser(
             self.session, sp_artistbrowse=sp_artistbrowse)
         lib_mock.sp_artistbrowse_artist.return_value = spotify.ffi.NULL
@@ -418,9 +415,9 @@ class ArtistBrowserTest(unittest.TestCase):
         image_id = spotify.ffi.new('char[]', b'image-id')
         lib_mock.sp_artistbrowse_num_portraits.return_value = 1
         lib_mock.sp_artistbrowse_portrait.return_value = image_id
-        sp_image = spotify.ffi.new('int *')
+        sp_image = spotify.ffi.cast('sp_image *', 43)
         lib_mock.sp_image_create.return_value = sp_image
-        sp_artistbrowse = spotify.ffi.new('int *')
+        sp_artistbrowse = spotify.ffi.cast('sp_artistbrowse *', 42)
         browser = spotify.ArtistBrowser(
             self.session, sp_artistbrowse=sp_artistbrowse)
 
@@ -446,7 +443,7 @@ class ArtistBrowserTest(unittest.TestCase):
 
     def test_portraits_if_no_portraits(self, lib_mock):
         lib_mock.sp_artistbrowse_num_portraits.return_value = 0
-        sp_artistbrowse = spotify.ffi.new('int *')
+        sp_artistbrowse = spotify.ffi.cast('sp_artistbrowse *', 42)
         browser = spotify.ArtistBrowser(
             self.session, sp_artistbrowse=sp_artistbrowse)
 
@@ -459,7 +456,7 @@ class ArtistBrowserTest(unittest.TestCase):
 
     def test_portraits_if_unloaded(self, lib_mock):
         lib_mock.sp_artistbrowse_is_loaded.return_value = 0
-        sp_artistbrowse = spotify.ffi.new('int *')
+        sp_artistbrowse = spotify.ffi.cast('sp_artistbrowse *', 42)
         browser = spotify.ArtistBrowser(
             self.session, sp_artistbrowse=sp_artistbrowse)
 
@@ -470,10 +467,10 @@ class ArtistBrowserTest(unittest.TestCase):
 
     @mock.patch('spotify.track.lib', spec=spotify.lib)
     def test_tracks(self, track_lib_mock, lib_mock):
-        sp_track = spotify.ffi.cast('sp_track *', spotify.ffi.new('int *'))
+        sp_track = spotify.ffi.cast('sp_track *', 43)
         lib_mock.sp_artistbrowse_num_tracks.return_value = 1
         lib_mock.sp_artistbrowse_track.return_value = sp_track
-        sp_artistbrowse = spotify.ffi.new('int *')
+        sp_artistbrowse = spotify.ffi.cast('sp_artistbrowse *', 42)
         browser = spotify.ArtistBrowser(
             self.session, sp_artistbrowse=sp_artistbrowse)
 
@@ -493,7 +490,7 @@ class ArtistBrowserTest(unittest.TestCase):
 
     def test_tracks_if_no_tracks(self, lib_mock):
         lib_mock.sp_artistbrowse_num_tracks.return_value = 0
-        sp_artistbrowse = spotify.ffi.new('int *')
+        sp_artistbrowse = spotify.ffi.cast('sp_artistbrowse *', 42)
         browser = spotify.ArtistBrowser(
             self.session, sp_artistbrowse=sp_artistbrowse)
 
@@ -505,7 +502,7 @@ class ArtistBrowserTest(unittest.TestCase):
 
     def test_tracks_if_unloaded(self, lib_mock):
         lib_mock.sp_artistbrowse_is_loaded.return_value = 0
-        sp_artistbrowse = spotify.ffi.new('int *')
+        sp_artistbrowse = spotify.ffi.cast('sp_artistbrowse *', 42)
         browser = spotify.ArtistBrowser(
             self.session, sp_artistbrowse=sp_artistbrowse)
 
@@ -516,10 +513,10 @@ class ArtistBrowserTest(unittest.TestCase):
 
     @mock.patch('spotify.track.lib', spec=spotify.lib)
     def test_tophit_tracks(self, track_lib_mock, lib_mock):
-        sp_track = spotify.ffi.cast('sp_track *', spotify.ffi.new('int *'))
+        sp_track = spotify.ffi.cast('sp_track *', 43)
         lib_mock.sp_artistbrowse_num_tophit_tracks.return_value = 1
         lib_mock.sp_artistbrowse_tophit_track.return_value = sp_track
-        sp_artistbrowse = spotify.ffi.new('int *')
+        sp_artistbrowse = spotify.ffi.cast('sp_artistbrowse *', 42)
         browser = spotify.ArtistBrowser(
             self.session, sp_artistbrowse=sp_artistbrowse)
 
@@ -541,7 +538,7 @@ class ArtistBrowserTest(unittest.TestCase):
 
     def test_tophit_tracks_if_no_tracks(self, lib_mock):
         lib_mock.sp_artistbrowse_num_tophit_tracks.return_value = 0
-        sp_artistbrowse = spotify.ffi.new('int *')
+        sp_artistbrowse = spotify.ffi.cast('sp_artistbrowse *', 42)
         browser = spotify.ArtistBrowser(
             self.session, sp_artistbrowse=sp_artistbrowse)
 
@@ -554,7 +551,7 @@ class ArtistBrowserTest(unittest.TestCase):
 
     def test_tophit_tracks_if_unloaded(self, lib_mock):
         lib_mock.sp_artistbrowse_is_loaded.return_value = 0
-        sp_artistbrowse = spotify.ffi.new('int *')
+        sp_artistbrowse = spotify.ffi.cast('sp_artistbrowse *', 42)
         browser = spotify.ArtistBrowser(
             self.session, sp_artistbrowse=sp_artistbrowse)
 
@@ -565,10 +562,10 @@ class ArtistBrowserTest(unittest.TestCase):
 
     @mock.patch('spotify.album.lib', spec=spotify.lib)
     def test_albums(self, album_lib_mock, lib_mock):
-        sp_album = spotify.ffi.cast('sp_album *', spotify.ffi.new('int *'))
+        sp_album = spotify.ffi.cast('sp_album *', 43)
         lib_mock.sp_artistbrowse_num_albums.return_value = 1
         lib_mock.sp_artistbrowse_album.return_value = sp_album
-        sp_artistbrowse = spotify.ffi.new('int *')
+        sp_artistbrowse = spotify.ffi.cast('sp_artistbrowse *', 42)
         browser = spotify.ArtistBrowser(
             self.session, sp_artistbrowse=sp_artistbrowse)
 
@@ -588,7 +585,7 @@ class ArtistBrowserTest(unittest.TestCase):
 
     def test_albums_if_no_albums(self, lib_mock):
         lib_mock.sp_artistbrowse_num_albums.return_value = 0
-        sp_artistbrowse = spotify.ffi.new('int *')
+        sp_artistbrowse = spotify.ffi.cast('sp_artistbrowse *', 42)
         browser = spotify.ArtistBrowser(
             self.session, sp_artistbrowse=sp_artistbrowse)
 
@@ -600,7 +597,7 @@ class ArtistBrowserTest(unittest.TestCase):
 
     def test_albums_if_unloaded(self, lib_mock):
         lib_mock.sp_artistbrowse_is_loaded.return_value = 0
-        sp_artistbrowse = spotify.ffi.new('int *')
+        sp_artistbrowse = spotify.ffi.cast('sp_artistbrowse *', 42)
         browser = spotify.ArtistBrowser(
             self.session, sp_artistbrowse=sp_artistbrowse)
 
@@ -610,10 +607,10 @@ class ArtistBrowserTest(unittest.TestCase):
         self.assertEqual(len(result), 0)
 
     def test_similar_artists(self, lib_mock):
-        sp_artist = spotify.ffi.cast('sp_artist *', spotify.ffi.new('int *'))
+        sp_artist = spotify.ffi.cast('sp_artist *', 43)
         lib_mock.sp_artistbrowse_num_similar_artists.return_value = 1
         lib_mock.sp_artistbrowse_similar_artist.return_value = sp_artist
-        sp_artistbrowse = spotify.ffi.new('int *')
+        sp_artistbrowse = spotify.ffi.cast('sp_artistbrowse *', 42)
         browser = spotify.ArtistBrowser(
             self.session, sp_artistbrowse=sp_artistbrowse)
 
@@ -636,7 +633,7 @@ class ArtistBrowserTest(unittest.TestCase):
 
     def test_similar_artists_if_no_artists(self, lib_mock):
         lib_mock.sp_artistbrowse_num_similar_artists.return_value = 0
-        sp_artistbrowse = spotify.ffi.new('int *')
+        sp_artistbrowse = spotify.ffi.cast('sp_artistbrowse *', 42)
         browser = spotify.ArtistBrowser(
             self.session, sp_artistbrowse=sp_artistbrowse)
 
@@ -649,7 +646,7 @@ class ArtistBrowserTest(unittest.TestCase):
 
     def test_similar_artists_if_unloaded(self, lib_mock):
         lib_mock.sp_artistbrowse_is_loaded.return_value = 0
-        sp_artistbrowse = spotify.ffi.new('int *')
+        sp_artistbrowse = spotify.ffi.cast('sp_artistbrowse *', 42)
         browser = spotify.ArtistBrowser(
             self.session, sp_artistbrowse=sp_artistbrowse)
 
@@ -659,7 +656,7 @@ class ArtistBrowserTest(unittest.TestCase):
         self.assertEqual(len(result), 0)
 
     def test_biography(self, lib_mock):
-        sp_artistbrowse = spotify.ffi.new('int *')
+        sp_artistbrowse = spotify.ffi.cast('sp_artistbrowse *', 42)
         browser = spotify.ArtistBrowser(
             self.session, sp_artistbrowse=sp_artistbrowse)
         biography = spotify.ffi.new('char[]', b'Lived, played, and died')

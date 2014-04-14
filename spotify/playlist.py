@@ -836,8 +836,7 @@ class PlaylistContainer(collections.MutableSequence, utils.EventEmitter):
             ffi.NULL)
 
     def __repr__(self):
-        return '<spotify.PlaylistContainer owned by %s: %s>' % (
-            self.owner.link.uri, pprint.pformat(list(self)))
+        return 'PlaylistContainer(%s)' % pprint.pformat(list(self))
 
     @property
     def is_loaded(self):

@@ -65,8 +65,7 @@ class PlaylistContainerTest(unittest.TestCase):
 
         result = repr(playlist_container)
 
-        self.assertEqual(
-            result, '<spotify.PlaylistContainer owned by %s: []>' % 'foo')
+        self.assertEqual(result, 'PlaylistContainer([])')
 
     def test_is_loaded(self, lib_mock):
         lib_mock.sp_playlistcontainer_is_loaded.return_value = 1

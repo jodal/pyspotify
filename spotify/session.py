@@ -386,6 +386,57 @@ class Session(utils.EventEmitter):
         """
         return spotify.Track(self, uri=uri)
 
+    def get_local_track(
+            self, artist=None, title=None, album=None, length=None):
+        """A Spotify local track.
+
+        Spotify's official clients supports adding your local music files to
+        Spotify so they can be played in the Spotify client. These are not
+        synced with Spotify's servers or between your devices and there is not
+        trace of them in your Spotify user account. The exception is when you
+        add one of these local tracks to a playlist or mark them as starred.
+        This creates a "local track" which pyspotify also will be able to
+        observe.
+
+        "Local tracks" can be recognized in several ways:
+
+        - The track's URI will be of the form
+          ``spotify:local:ARTIST:ALBUM:TITLE:LENGTH_IN_SECONDS``. Any of the
+          parts in all caps can be left out if there is no information
+          available. That is, ``spotify:local::::`` is a valid local track URI.
+
+        - :attr:`Link.type` will be :class:`LinkType.LOCALTRACK` for the
+          track's link.
+
+        - :attr:`Track.is_local` will be :class:`True` for the track.
+
+        This method can be used to create local tracks that can be starred or
+        added to playlists.
+
+        ``artist`` may be an artist name. ``title`` may be a track name.
+        ``album`` may be an album name. ``length`` may be a track length in
+        milliseconds.
+
+        Note that when creating a local track you provide the length in
+        milliseconds, while the local track URI contains the length in seconds.
+        """
+
+        if artist is None:
+            artist = ''
+        if title is None:
+            title = ''
+        if album is None:
+            album = ''
+        if length is None:
+            length = -1
+
+        artist = utils.to_char(artist)
+        title = utils.to_char(title)
+        album = utils.to_char(album)
+        sp_track = lib.sp_localtrack_create(artist, title, album, length)
+
+        return spotify.Track(self, sp_track=sp_track, add_ref=False)
+
     def get_album(self, uri):
         """
         Get :class:`Album` from a Spotify album URI.

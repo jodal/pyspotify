@@ -6,9 +6,6 @@ Tracks
 
 .. autoclass:: Track
 
-.. autoclass:: LocalTrack
-    :no-inherited-members:
-
 .. autoclass:: TrackAvailability
     :no-inherited-members:
 

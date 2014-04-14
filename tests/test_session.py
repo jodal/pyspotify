@@ -580,6 +580,67 @@ class SessionTest(unittest.TestCase):
         self.assertIs(result, mock.sentinel.track)
         track_mock.assert_called_with(session, uri='spotify:track:foo')
 
+    @mock.patch('spotify.Track')
+    def test_get_local_track(self, track_mock, lib_mock):
+        session = create_session(lib_mock)
+        sp_track = spotify.ffi.cast('sp_track *', 42)
+        lib_mock.sp_localtrack_create.return_value = sp_track
+        track_mock.return_value = mock.sentinel.track
+
+        track = session.get_local_track(
+            artist='foo', title='bar', album='baz', length=210000)
+
+        self.assertEqual(track, mock.sentinel.track)
+        lib_mock.sp_localtrack_create.assert_called_once_with(
+            mock.ANY, mock.ANY, mock.ANY, 210000)
+        self.assertEqual(
+            spotify.ffi.string(lib_mock.sp_localtrack_create.call_args[0][0]),
+            b'foo')
+        self.assertEqual(
+            spotify.ffi.string(lib_mock.sp_localtrack_create.call_args[0][1]),
+            b'bar')
+        self.assertEqual(
+            spotify.ffi.string(lib_mock.sp_localtrack_create.call_args[0][2]),
+            b'baz')
+        self.assertEqual(
+            lib_mock.sp_localtrack_create.call_args[0][3], 210000)
+
+        # Since we *created* the sp_track, we already have a refcount of 1 and
+        # shouldn't increase the refcount when wrapping this sp_track in a
+        # Track object
+        track_mock.assert_called_with(
+            session, sp_track=sp_track, add_ref=False)
+
+    @mock.patch('spotify.Track')
+    def test_get_local_track_with_defaults(self, track_mock, lib_mock):
+        session = create_session(lib_mock)
+        sp_track = spotify.ffi.cast('sp_track *', 42)
+        lib_mock.sp_localtrack_create.return_value = sp_track
+        track_mock.return_value = mock.sentinel.track
+
+        track = session.get_local_track()
+
+        self.assertEqual(track, mock.sentinel.track)
+        lib_mock.sp_localtrack_create.assert_called_once_with(
+            mock.ANY, mock.ANY, mock.ANY, -1)
+        self.assertEqual(
+            spotify.ffi.string(lib_mock.sp_localtrack_create.call_args[0][0]),
+            b'')
+        self.assertEqual(
+            spotify.ffi.string(lib_mock.sp_localtrack_create.call_args[0][1]),
+            b'')
+        self.assertEqual(
+            spotify.ffi.string(lib_mock.sp_localtrack_create.call_args[0][2]),
+            b'')
+        self.assertEqual(
+            lib_mock.sp_localtrack_create.call_args[0][3], -1)
+
+        # Since we *created* the sp_track, we already have a refcount of 1 and
+        # shouldn't increase the refcount when wrapping this sp_track in a
+        # Track object
+        track_mock.assert_called_with(
+            session, sp_track=sp_track, add_ref=False)
+
     @mock.patch('spotify.Album')
     def test_get_album(self, album_mock, lib_mock):
         session = create_session(lib_mock)

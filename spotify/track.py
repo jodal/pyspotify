@@ -5,7 +5,6 @@ from spotify import ffi, lib, serialized, utils
 
 
 __all__ = [
-    'LocalTrack',
     'Track',
     'TrackAvailability',
     'TrackOfflineStatus',
@@ -308,27 +307,6 @@ class Track(object):
             self._session,
             sp_link=lib.sp_link_create_from_track(self._sp_track, offset),
             add_ref=False)
-
-
-class LocalTrack(Track):
-    """A Spotify local track.
-
-    TODO: Explain what a local track is. libspotify docs doesn't say much, but
-    there are more details in Hallon's docs.
-    """
-
-    def __init__(
-            self, session, artist=None, title=None, album=None, length=None):
-        artist = utils.to_char_or_null(artist)
-        title = utils.to_char_or_null(title)
-        album = utils.to_char_or_null(album)
-        if length is None:
-            length = -1
-
-        sp_track = lib.sp_localtrack_create(artist, title, album, length)
-
-        super(LocalTrack, self).__init__(
-            session, sp_track=sp_track, add_ref=False)
 
 
 @utils.make_enum('SP_TRACK_AVAILABILITY_')

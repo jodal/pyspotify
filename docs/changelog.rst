@@ -46,6 +46,8 @@ equivalents:
 
 - :meth:`spotify.Session.get_link` (replaces :class:`spotify.Link`)
 - :meth:`spotify.Session.get_track` (replaces :class:`spotify.Track`)
+- :meth:`spotify.Session.get_local_track` (replaces
+  :class:`spotify.LocalTrack`)
 - :meth:`spotify.Session.get_album` (replaces :class:`spotify.Album`)
 - :meth:`spotify.Session.get_artist` (replaces :class:`spotify.Artist`)
 - :meth:`spotify.Session.get_playlist` (replaces :class:`spotify.Playlist`)
@@ -75,6 +77,9 @@ Bug fixes
 
 - Multiple attributes on :class:`Track` raised an exception if accessed before
   the track was loaded. They now return :class:`None` or similar as documented.
+
+- Fix segfault when creating local tracks without all arguments specified.
+  ``NULL`` was used as the placeholder instead of the empty string.
 
 Minor changes
 -------------

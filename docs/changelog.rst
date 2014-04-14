@@ -73,6 +73,9 @@ Bug fixes
   logged in and the first events is processed. This is a bug in libspotify
   which has been reported to Spotify through their IRC channel.
 
+- Multiple attributes on :class:`Track` raised an exception if accessed before
+  the track was loaded. They now return :class:`None` or similar as documented.
+
 Minor changes
 -------------
 

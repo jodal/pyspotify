@@ -178,7 +178,7 @@ class TrackTest(unittest.TestCase):
         self.assertTrue(result)
 
     def test_is_local_is_none_if_unloaded(self, lib_mock):
-        lib_mock.sp_track_error.return_value = spotify.ErrorType.OK
+        lib_mock.sp_track_error.return_value = spotify.ErrorType.IS_LOADING
         lib_mock.sp_track_is_loaded.return_value = 0
         sp_track = spotify.ffi.cast('sp_track *', 42)
         track = spotify.Track(self.session, sp_track=sp_track)
@@ -204,7 +204,7 @@ class TrackTest(unittest.TestCase):
         self.assertTrue(result)
 
     def test_is_autolinked_is_none_if_unloaded(self, lib_mock):
-        lib_mock.sp_track_error.return_value = spotify.ErrorType.OK
+        lib_mock.sp_track_error.return_value = spotify.ErrorType.IS_LOADING
         lib_mock.sp_track_is_loaded.return_value = 0
         sp_track = spotify.ffi.cast('sp_track *', 42)
         track = spotify.Track(self.session, sp_track=sp_track)
@@ -284,7 +284,7 @@ class TrackTest(unittest.TestCase):
         self.assertTrue(result)
 
     def test_is_starred_is_none_if_unloaded(self, lib_mock):
-        lib_mock.sp_track_error.return_value = spotify.ErrorType.OK
+        lib_mock.sp_track_error.return_value = spotify.ErrorType.IS_LOADING
         lib_mock.sp_track_is_loaded.return_value = 0
         sp_track = spotify.ffi.cast('sp_track *', 42)
         track = spotify.Track(self.session, sp_track=sp_track)
@@ -351,7 +351,7 @@ class TrackTest(unittest.TestCase):
         self.assertEqual(lib_mock.sp_track_artist.call_count, 0)
 
     def test_artists_if_unloaded(self, lib_mock):
-        lib_mock.sp_track_error.return_value = spotify.ErrorType.OK
+        lib_mock.sp_track_error.return_value = spotify.ErrorType.IS_LOADING
         lib_mock.sp_track_is_loaded.return_value = 0
         sp_track = spotify.ffi.cast('sp_track *', 42)
         track = spotify.Track(self.session, sp_track=sp_track)
@@ -381,14 +381,14 @@ class TrackTest(unittest.TestCase):
 
     @mock.patch('spotify.album.lib', spec=spotify.lib)
     def test_album_if_unloaded(self, album_lib_mock, lib_mock):
-        lib_mock.sp_track_error.return_value = spotify.ErrorType.OK
-        lib_mock.sp_track_album.return_value = spotify.ffi.NULL
+        lib_mock.sp_track_error.return_value = spotify.ErrorType.IS_LOADING
+        lib_mock.sp_track_is_loaded.return_value = 0
         sp_track = spotify.ffi.cast('sp_track *', 42)
         track = spotify.Track(self.session, sp_track=sp_track)
 
         result = track.album
 
-        lib_mock.sp_track_album.assert_called_with(sp_track)
+        self.assertEqual(lib_mock.sp_track_album.call_count, 0)
         self.assertIsNone(result)
 
     def test_album_fails_if_error(self, lib_mock):
@@ -407,14 +407,15 @@ class TrackTest(unittest.TestCase):
         self.assertEqual(result, 'Foo Bar Baz')
 
     def test_name_is_none_if_unloaded(self, lib_mock):
-        lib_mock.sp_track_error.return_value = spotify.ErrorType.OK
+        lib_mock.sp_track_error.return_value = spotify.ErrorType.IS_LOADING
+        lib_mock.sp_track_is_loaded.return_value = 0
         lib_mock.sp_track_name.return_value = spotify.ffi.new('char[]', b'')
         sp_track = spotify.ffi.cast('sp_track *', 42)
         track = spotify.Track(self.session, sp_track=sp_track)
 
         result = track.name
 
-        lib_mock.sp_track_name.assert_called_once_with(sp_track)
+        self.assertEqual(lib_mock.sp_track_name.call_count, 0)
         self.assertIsNone(result)
 
     def test_name_fails_if_error(self, lib_mock):
@@ -432,14 +433,14 @@ class TrackTest(unittest.TestCase):
         self.assertEqual(result, 60000)
 
     def test_duration_is_none_if_unloaded(self, lib_mock):
-        lib_mock.sp_track_error.return_value = spotify.ErrorType.OK
-        lib_mock.sp_track_duration.return_value = 0
+        lib_mock.sp_track_error.return_value = spotify.ErrorType.IS_LOADING
+        lib_mock.sp_track_is_loaded.return_value = 0
         sp_track = spotify.ffi.cast('sp_track *', 42)
         track = spotify.Track(self.session, sp_track=sp_track)
 
         result = track.duration
 
-        lib_mock.sp_track_duration.assert_called_with(sp_track)
+        self.assertEqual(lib_mock.sp_track_duration.call_count, 0)
         self.assertIsNone(result)
 
     def test_duration_fails_if_error(self, lib_mock):
@@ -457,14 +458,14 @@ class TrackTest(unittest.TestCase):
         self.assertEqual(result, 90)
 
     def test_popularity_is_none_if_unloaded(self, lib_mock):
-        lib_mock.sp_track_error.return_value = spotify.ErrorType.OK
+        lib_mock.sp_track_error.return_value = spotify.ErrorType.IS_LOADING
         lib_mock.sp_track_is_loaded.return_value = 0
         sp_track = spotify.ffi.cast('sp_track *', 42)
         track = spotify.Track(self.session, sp_track=sp_track)
 
         result = track.popularity
 
-        lib_mock.sp_track_is_loaded.assert_called_with(sp_track)
+        self.assertEqual(lib_mock.sp_track_popularity.call_count, 0)
         self.assertIsNone(result)
 
     def test_popularity_fails_if_error(self, lib_mock):
@@ -482,14 +483,14 @@ class TrackTest(unittest.TestCase):
         self.assertEqual(result, 2)
 
     def test_disc_is_none_if_unloaded(self, lib_mock):
-        lib_mock.sp_track_error.return_value = spotify.ErrorType.OK
-        lib_mock.sp_track_disc.return_value = 0
+        lib_mock.sp_track_error.return_value = spotify.ErrorType.IS_LOADING
+        lib_mock.sp_track_is_loaded.return_value = 0
         sp_track = spotify.ffi.cast('sp_track *', 42)
         track = spotify.Track(self.session, sp_track=sp_track)
 
         result = track.disc
 
-        lib_mock.sp_track_disc.assert_called_with(sp_track)
+        self.assertEqual(lib_mock.sp_track_disc.call_count, 0)
         self.assertIsNone(result)
 
     def test_disc_fails_if_error(self, lib_mock):
@@ -507,14 +508,14 @@ class TrackTest(unittest.TestCase):
         self.assertEqual(result, 7)
 
     def test_index_is_none_if_unloaded(self, lib_mock):
-        lib_mock.sp_track_error.return_value = spotify.ErrorType.OK
-        lib_mock.sp_track_index.return_value = 0
+        lib_mock.sp_track_error.return_value = spotify.ErrorType.IS_LOADING
+        lib_mock.sp_track_is_loaded.return_value = 0
         sp_track = spotify.ffi.cast('sp_track *', 42)
         track = spotify.Track(self.session, sp_track=sp_track)
 
         result = track.index
 
-        lib_mock.sp_track_index.assert_called_with(sp_track)
+        self.assertEqual(lib_mock.sp_track_index.call_count, 0)
         self.assertIsNone(result)
 
     def test_index_fails_if_error(self, lib_mock):

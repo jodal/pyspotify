@@ -25,9 +25,6 @@ class Track(object):
         u'Get Lucky'
     """
 
-    # TODO Review all maybe_raise() calls to check if they should ignore
-    # ErrorType.IS_LOADING
-
     def __init__(self, session, uri=None, sp_track=None, add_ref=True):
         assert uri or sp_track, 'uri or sp_track is required'
 
@@ -106,7 +103,8 @@ class Track(object):
 
         Will always return :class:`None` if the track isn't loaded.
         """
-        spotify.Error.maybe_raise(self.error)
+        spotify.Error.maybe_raise(
+            self.error, ignores=[spotify.ErrorType.IS_LOADING])
         if not self.is_loaded:
             return None
         return bool(lib.sp_track_is_local(
@@ -120,7 +118,8 @@ class Track(object):
 
         See :attr:`playable`.
         """
-        spotify.Error.maybe_raise(self.error)
+        spotify.Error.maybe_raise(
+            self.error, ignores=[spotify.ErrorType.IS_LOADING])
         if not self.is_loaded:
             return None
         return bool(lib.sp_track_is_autolinked(
@@ -179,7 +178,8 @@ class Track(object):
 
         Will always be :class:`None` if the track isn't loaded.
         """
-        spotify.Error.maybe_raise(self.error)
+        spotify.Error.maybe_raise(
+            self.error, ignores=[spotify.ErrorType.IS_LOADING])
         if not self.is_loaded:
             return None
         return bool(lib.sp_track_is_starred(
@@ -200,7 +200,8 @@ class Track(object):
 
         Will always return :class:`None` if the track isn't loaded.
         """
-        spotify.Error.maybe_raise(self.error)
+        spotify.Error.maybe_raise(
+            self.error, ignores=[spotify.ErrorType.IS_LOADING])
         if not self.is_loaded:
             return []
 
@@ -225,10 +226,11 @@ class Track(object):
 
         Will always return :class:`None` if the track isn't loaded.
         """
-        spotify.Error.maybe_raise(self.error)
-        sp_album = lib.sp_track_album(self._sp_track)
-        if sp_album == ffi.NULL:
+        spotify.Error.maybe_raise(
+            self.error, ignores=[spotify.ErrorType.IS_LOADING])
+        if not self.is_loaded:
             return None
+        sp_album = lib.sp_track_album(self._sp_track)
         return spotify.Album(self._session, sp_album=sp_album, add_ref=True)
 
     @property
@@ -238,9 +240,11 @@ class Track(object):
 
         Will always return :class:`None` if the track isn't loaded.
         """
-        spotify.Error.maybe_raise(self.error)
-        name = utils.to_unicode(lib.sp_track_name(self._sp_track))
-        return name if name else None
+        spotify.Error.maybe_raise(
+            self.error, ignores=[spotify.ErrorType.IS_LOADING])
+        if not self.is_loaded:
+            return None
+        return utils.to_unicode(lib.sp_track_name(self._sp_track))
 
     @property
     def duration(self):
@@ -248,9 +252,11 @@ class Track(object):
 
         Will always return :class:`None` if the track isn't loaded.
         """
-        spotify.Error.maybe_raise(self.error)
-        duration = lib.sp_track_duration(self._sp_track)
-        return duration if duration else None
+        spotify.Error.maybe_raise(
+            self.error, ignores=[spotify.ErrorType.IS_LOADING])
+        if not self.is_loaded:
+            return None
+        return lib.sp_track_duration(self._sp_track)
 
     @property
     def popularity(self):
@@ -258,7 +264,8 @@ class Track(object):
 
         Will always return :class:`None` if the track isn't loaded.
         """
-        spotify.Error.maybe_raise(self.error)
+        spotify.Error.maybe_raise(
+            self.error, ignores=[spotify.ErrorType.IS_LOADING])
         if not self.is_loaded:
             return None
         return lib.sp_track_popularity(self._sp_track)
@@ -270,9 +277,11 @@ class Track(object):
         Will always return :class:`None` if the track isn't part of an album or
         artist browser.
         """
-        spotify.Error.maybe_raise(self.error)
-        disc = lib.sp_track_disc(self._sp_track)
-        return disc if disc else None
+        spotify.Error.maybe_raise(
+            self.error, ignores=[spotify.ErrorType.IS_LOADING])
+        if not self.is_loaded:
+            return None
+        return lib.sp_track_disc(self._sp_track)
 
     @property
     def index(self):
@@ -281,9 +290,11 @@ class Track(object):
         Will always return :class:`None` if the track isn't part of an album or
         artist browser.
         """
-        spotify.Error.maybe_raise(self.error)
-        index = lib.sp_track_index(self._sp_track)
-        return index if index else None
+        spotify.Error.maybe_raise(
+            self.error, ignores=[spotify.ErrorType.IS_LOADING])
+        if not self.is_loaded:
+            return None
+        return lib.sp_track_index(self._sp_track)
 
     @property
     def link(self):

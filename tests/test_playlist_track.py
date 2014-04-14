@@ -15,9 +15,9 @@ class PlaylistTrackTest(unittest.TestCase):
 
     @mock.patch('spotify.track.lib', spec=spotify.lib)
     def test_track(self, track_lib_mock, lib_mock):
-        sp_track = spotify.ffi.cast('sp_track *', spotify.ffi.new('int *'))
+        sp_track = spotify.ffi.cast('sp_track *', 43)
         lib_mock.sp_playlist_track.return_value = sp_track
-        sp_playlist = spotify.ffi.new('int *')
+        sp_playlist = spotify.ffi.cast('sp_playlist *', 42)
         playlist_track = spotify.PlaylistTrack(self.session, sp_playlist, 0)
 
         result = playlist_track.track
@@ -29,7 +29,7 @@ class PlaylistTrackTest(unittest.TestCase):
 
     def test_create_time(self, lib_mock):
         lib_mock.sp_playlist_track_create_time.return_value = 1234567890
-        sp_playlist = spotify.ffi.new('int *')
+        sp_playlist = spotify.ffi.cast('sp_playlist *', 42)
         playlist_track = spotify.PlaylistTrack(self.session, sp_playlist, 0)
 
         result = playlist_track.create_time
@@ -40,9 +40,9 @@ class PlaylistTrackTest(unittest.TestCase):
 
     @mock.patch('spotify.user.lib', spec=spotify.lib)
     def test_creator(self, user_lib_mock, lib_mock):
-        sp_user = spotify.ffi.cast('sp_user *', spotify.ffi.new('int *'))
+        sp_user = spotify.ffi.cast('sp_user *', 43)
         lib_mock.sp_playlist_track_creator.return_value = sp_user
-        sp_playlist = spotify.ffi.new('int *')
+        sp_playlist = spotify.ffi.cast('sp_playlist *', 42)
         playlist_track = spotify.PlaylistTrack(self.session, sp_playlist, 0)
 
         result = playlist_track.creator
@@ -54,7 +54,7 @@ class PlaylistTrackTest(unittest.TestCase):
 
     def test_is_seen(self, lib_mock):
         lib_mock.sp_playlist_track_seen.return_value = 0
-        sp_playlist = spotify.ffi.new('int *')
+        sp_playlist = spotify.ffi.cast('sp_playlist *', 42)
         playlist_track = spotify.PlaylistTrack(self.session, sp_playlist, 0)
 
         result = playlist_track.seen
@@ -65,7 +65,7 @@ class PlaylistTrackTest(unittest.TestCase):
     def test_set_seen(self, lib_mock):
         lib_mock.sp_playlist_track_set_seen.return_value = int(
             spotify.ErrorType.OK)
-        sp_playlist = spotify.ffi.new('int *')
+        sp_playlist = spotify.ffi.cast('sp_playlist *', 42)
         playlist_track = spotify.PlaylistTrack(self.session, sp_playlist, 0)
 
         playlist_track.seen = True
@@ -76,7 +76,7 @@ class PlaylistTrackTest(unittest.TestCase):
     def test_set_seen_fails_if_error(self, lib_mock):
         lib_mock.sp_playlist_track_set_seen.return_value = int(
             spotify.ErrorType.BAD_API_VERSION)
-        sp_playlist = spotify.ffi.new('int *')
+        sp_playlist = spotify.ffi.cast('sp_playlist *', 42)
         playlist_track = spotify.PlaylistTrack(self.session, sp_playlist, 0)
 
         with self.assertRaises(spotify.Error):
@@ -85,7 +85,7 @@ class PlaylistTrackTest(unittest.TestCase):
     def test_message(self, lib_mock):
         lib_mock.sp_playlist_track_message.return_value = spotify.ffi.new(
             'char[]', b'foo bar')
-        sp_playlist = spotify.ffi.new('int *')
+        sp_playlist = spotify.ffi.cast('sp_playlist *', 42)
         playlist_track = spotify.PlaylistTrack(self.session, sp_playlist, 0)
 
         result = playlist_track.message
@@ -95,7 +95,7 @@ class PlaylistTrackTest(unittest.TestCase):
 
     def test_message_is_none_when_null(self, lib_mock):
         lib_mock.sp_playlist_track_message.return_value = spotify.ffi.NULL
-        sp_playlist = spotify.ffi.new('int *')
+        sp_playlist = spotify.ffi.cast('sp_playlist *', 42)
         playlist_track = spotify.PlaylistTrack(self.session, sp_playlist, 0)
 
         result = playlist_track.message

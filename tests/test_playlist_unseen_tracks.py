@@ -144,4 +144,4 @@ class PlaylistUnseenTracksTest(unittest.TestCase):
         tracks = spotify.PlaylistUnseenTracks(
             self.session, sp_playlistcontainer, sp_playlist)
 
-        self.assertEqual(repr(tracks), '[]')
+        self.assertEqual(repr(tracks), 'PlaylistUnseenTracks([])')

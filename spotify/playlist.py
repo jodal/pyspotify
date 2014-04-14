@@ -1385,4 +1385,4 @@ class PlaylistUnseenTracks(collections.Sequence):
         return spotify.Track(self._session, sp_track=sp_track, add_ref=True)
 
     def __repr__(self):
-        return pprint.pformat(list(self))
+        return 'PlaylistUnseenTracks(%s)' % pprint.pformat(list(self))

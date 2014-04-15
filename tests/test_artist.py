@@ -236,9 +236,9 @@ class ArtistBrowserTest(unittest.TestCase):
         artistbrowse_complete_cb = (
             lib_mock.sp_artistbrowse_create.call_args[0][3])
         userdata = lib_mock.sp_artistbrowse_create.call_args[0][4]
-        self.assertFalse(result.complete_event.is_set())
+        self.assertFalse(result.loaded_event.is_set())
         artistbrowse_complete_cb(sp_artistbrowse, userdata)
-        self.assertTrue(result.complete_event.is_set())
+        self.assertTrue(result.loaded_event.is_set())
 
     def test_create_from_artist_with_type_and_callback(self, lib_mock):
         sp_artist = spotify.ffi.cast('sp_artist *', 43)
@@ -258,7 +258,7 @@ class ArtistBrowserTest(unittest.TestCase):
         userdata = lib_mock.sp_artistbrowse_create.call_args[0][4]
         artistbrowse_complete_cb(sp_artistbrowse, userdata)
 
-        result.complete_event.wait(3)
+        result.loaded_event.wait(3)
         callback.assert_called_with(result)
 
     def test_browser_is_gone_before_callback_is_called(self, lib_mock):
@@ -270,7 +270,7 @@ class ArtistBrowserTest(unittest.TestCase):
 
         result = spotify.ArtistBrowser(
             self.session, artist=artist, callback=callback)
-        complete_event = result.complete_event
+        loaded_event = result.loaded_event
         result = None  # noqa
         tests.gc_collect()
 
@@ -281,7 +281,7 @@ class ArtistBrowserTest(unittest.TestCase):
         userdata = lib_mock.sp_artistbrowse_create.call_args[0][4]
         artistbrowse_complete_cb(sp_artistbrowse, userdata)
 
-        complete_event.wait(3)
+        loaded_event.wait(3)
         self.assertEqual(callback.call_count, 1)
         self.assertEqual(
             callback.call_args[0][0]._sp_artistbrowse, sp_artistbrowse)

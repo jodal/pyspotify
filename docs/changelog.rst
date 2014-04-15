@@ -55,6 +55,22 @@ equivalents:
 - :meth:`spotify.Session.get_image` (replaces :class:`spotify.Image`)
 - :meth:`spotify.Session.get_toplist` (replaces :class:`spotify.Toplist`)
 
+Refactoring: Consistent naming of threading.Event objects
+---------------------------------------------------------
+
+All :class:`threading.Event` objects have been renamed to be consistently
+named across classes.
+
+- :attr:`AlbumBrowser.loaded_event` replaces
+  :attr:`AlbumBrowser.complete_event`.
+- :attr:`ArtistBrowser.loaded_event` replaces
+  :attr:`ArtistBrowser.complete_event`.
+- :attr:`Image.loaded_event` replaces :attr:`Image.load_event`.
+- :attr:`InboxPostResult.loaded_event` replaces
+  :attr:`InboxPostResult.complete_event`.
+- :attr:`Search.loaded_event` replaces :attr:`Search.complete_event`.
+- :attr:`Toplist.loaded_event` replaces :attr:`Toplist.complete_event`.
+
 Bug fixes
 ---------
 

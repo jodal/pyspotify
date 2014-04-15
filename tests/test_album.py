@@ -318,9 +318,9 @@ class AlbumBrowserTest(unittest.TestCase):
         albumbrowse_complete_cb = (
             lib_mock.sp_albumbrowse_create.call_args[0][2])
         userdata = lib_mock.sp_albumbrowse_create.call_args[0][3]
-        self.assertFalse(result.complete_event.is_set())
+        self.assertFalse(result.loaded_event.is_set())
         albumbrowse_complete_cb(sp_albumbrowse, userdata)
-        self.assertTrue(result.complete_event.is_set())
+        self.assertTrue(result.loaded_event.is_set())
 
     def test_create_from_album_with_callback(self, lib_mock):
         sp_album = spotify.ffi.cast('sp_album *', 43)
@@ -338,7 +338,7 @@ class AlbumBrowserTest(unittest.TestCase):
         userdata = lib_mock.sp_albumbrowse_create.call_args[0][3]
         albumbrowse_complete_cb(sp_albumbrowse, userdata)
 
-        result.complete_event.wait(3)
+        result.loaded_event.wait(3)
         callback.assert_called_with(result)
 
     def test_browser_is_gone_before_callback_is_called(self, lib_mock):
@@ -350,7 +350,7 @@ class AlbumBrowserTest(unittest.TestCase):
 
         result = spotify.AlbumBrowser(
             self.session, album=album, callback=callback)
-        complete_event = result.complete_event
+        loaded_event = result.loaded_event
         result = None  # noqa
         tests.gc_collect()
 
@@ -361,7 +361,7 @@ class AlbumBrowserTest(unittest.TestCase):
         userdata = lib_mock.sp_albumbrowse_create.call_args[0][3]
         albumbrowse_complete_cb(sp_albumbrowse, userdata)
 
-        complete_event.wait(3)
+        loaded_event.wait(3)
         self.assertEqual(callback.call_count, 1)
         self.assertEqual(
             callback.call_args[0][0]._sp_albumbrowse, sp_albumbrowse)

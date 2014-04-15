@@ -189,7 +189,7 @@ class AlbumBrowser(object):
         assert album or sp_albumbrowse, 'album or sp_albumbrowse is required'
 
         self._session = session
-        self.complete_event = threading.Event()
+        self.loaded_event = threading.Event()
 
         if sp_albumbrowse is None:
             handle = ffi.new_handle((self._session, self, callback))
@@ -205,7 +205,7 @@ class AlbumBrowser(object):
         self._sp_albumbrowse = ffi.gc(
             sp_albumbrowse, lib.sp_albumbrowse_release)
 
-    complete_event = None
+    loaded_event = None
     """:class:`threading.Event` that is set when the album browser is loaded.
     """
 
@@ -342,7 +342,7 @@ def _albumbrowse_complete_callback(sp_albumbrowse, handle):
         return
     (session, album_browser, callback) = ffi.from_handle(handle)
     session._callback_handles.remove(handle)
-    album_browser.complete_event.set()
+    album_browser.loaded_event.set()
     if callback is not None:
         callback(album_browser)
 

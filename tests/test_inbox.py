@@ -68,11 +68,11 @@ class InboxPostResultTest(unittest.TestCase):
         self.assertIsInstance(result, spotify.InboxPostResult)
         self.assertEqual(result._sp_inbox, sp_inbox)
 
-        self.assertFalse(result.complete_event.is_set())
+        self.assertFalse(result.loaded_event.is_set())
         inboxpost_complete_cb = lib_mock.sp_inbox_post_tracks.call_args[0][5]
         userdata = lib_mock.sp_inbox_post_tracks.call_args[0][6]
         inboxpost_complete_cb(sp_inbox, userdata)
-        self.assertTrue(result.complete_event.wait(3))
+        self.assertTrue(result.loaded_event.wait(3))
 
     @mock.patch('spotify.track.lib', spec=spotify.lib)
     def test_inbox_post_with_single_track(self, track_lib_mock, lib_mock):
@@ -109,7 +109,7 @@ class InboxPostResultTest(unittest.TestCase):
         userdata = lib_mock.sp_inbox_post_tracks.call_args[0][6]
         inboxpost_complete_cb(sp_inbox, userdata)
 
-        result.complete_event.wait(3)
+        result.loaded_event.wait(3)
         callback.assert_called_with(result)
 
     @mock.patch('spotify.track.lib', spec=spotify.lib)
@@ -126,7 +126,7 @@ class InboxPostResultTest(unittest.TestCase):
 
         result = spotify.InboxPostResult(
             self.session, 'alice', [track1, track2], callback=callback)
-        complete_event = result.complete_event
+        loaded_event = result.loaded_event
         result = None  # noqa
         tests.gc_collect()
 
@@ -136,7 +136,7 @@ class InboxPostResultTest(unittest.TestCase):
         userdata = lib_mock.sp_inbox_post_tracks.call_args[0][6]
         inboxpost_complete_cb(sp_inbox, userdata)
 
-        complete_event.wait(3)
+        loaded_event.wait(3)
         self.assertEqual(callback.call_count, 1)
         self.assertEqual(callback.call_args[0][0]._sp_inbox, sp_inbox)
 
@@ -159,7 +159,7 @@ class InboxPostResultTest(unittest.TestCase):
 
         self.assertEqual(repr(inbox_post_result), 'InboxPostResult(<pending>)')
 
-        inbox_post_result.complete_event.set()
+        inbox_post_result.loaded_event.set()
         lib_mock.sp_inbox_error.return_value = int(
             spotify.ErrorType.INBOX_IS_FULL)
 

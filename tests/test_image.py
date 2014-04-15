@@ -73,11 +73,11 @@ class ImageTest(unittest.TestCase):
 
         self.assertEqual(result, 'Image(%r)' % 'foo')
 
-    def test_load_event_is_unset_by_default(self, lib_mock):
+    def test_loaded_event_is_unset_by_default(self, lib_mock):
         sp_image = spotify.ffi.cast('sp_image *', 42)
         image = spotify.Image(self.session, sp_image=sp_image)
 
-        self.assertFalse(image.load_event.is_set())
+        self.assertFalse(image.loaded_event.is_set())
 
     def test_add_and_call_load_callback(self, lib_mock):
         lib_mock.sp_image_add_load_callback.return_value = int(

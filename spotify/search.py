@@ -48,7 +48,7 @@ class Search(object):
             search_type = SearchType.STANDARD
         self.search_type = search_type
 
-        self.complete_event = threading.Event()
+        self.loaded_event = threading.Event()
 
         if sp_search is None:
             handle = ffi.new_handle((self._session, self, callback))
@@ -67,8 +67,8 @@ class Search(object):
             lib.sp_search_add_ref(sp_search)
         self._sp_search = ffi.gc(sp_search, lib.sp_search_release)
 
-    complete_event = None
-    """:class:`threading.Event` that is set when the search is completed."""
+    loaded_event = None
+    """:class:`threading.Event` that is set when the search is loaded."""
 
     def __repr__(self):
         return 'Search(%r)' % self.link.uri
@@ -319,7 +319,7 @@ def _search_complete_callback(sp_search, handle):
         return
     (session, search_result, callback) = ffi.from_handle(handle)
     session._callback_handles.remove(handle)
-    search_result.complete_event.set()
+    search_result.loaded_event.set()
     if callback is not None:
         callback(search_result)
 

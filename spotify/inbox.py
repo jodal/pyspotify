@@ -26,7 +26,7 @@ class InboxPostResult(object):
             'canonical_username and tracks, or sp_inbox, is required'
 
         self._session = session
-        self.complete_event = threading.Event()
+        self.loaded_event = threading.Event()
 
         if sp_inbox is None:
             canonical_username = utils.to_char(canonical_username)
@@ -52,13 +52,13 @@ class InboxPostResult(object):
             lib.sp_inbox_add_ref(sp_inbox)
         self._sp_inbox = ffi.gc(sp_inbox, lib.sp_inbox_release)
 
-    complete_event = None
-    """:class:`threading.Event` that is set when the inbox post is
-    completed.
+    loaded_event = None
+    """:class:`threading.Event` that is set when the inbox post result is
+    loaded.
     """
 
     def __repr__(self):
-        if not self.complete_event.is_set():
+        if not self.loaded_event.is_set():
             return 'InboxPostResult(<pending>)'
         else:
             return 'InboxPostResult(%s)' % self.error._name
@@ -80,6 +80,6 @@ def _inboxpost_complete_callback(sp_inbox, handle):
         return
     (session, inbox_post_result, callback) = ffi.from_handle(handle)
     session._callback_handles.remove(handle)
-    inbox_post_result.complete_event.set()
+    inbox_post_result.loaded_event.set()
     if callback is not None:
         callback(inbox_post_result)

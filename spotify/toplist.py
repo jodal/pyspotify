@@ -45,10 +45,8 @@ class Toplist(object):
     Changing this field has no effect on existing toplists.
     """
 
-    complete_event = None
-    """:class:`threading.Event` that is set when the toplist request is
-    completed.
-    """
+    loaded_event = None
+    """:class:`threading.Event` that is set when the toplist is loaded."""
 
     def __init__(
             self, session, type=None, region=None, canonical_username=None,
@@ -61,7 +59,7 @@ class Toplist(object):
         self.type = type
         self.region = region
         self.canonical_username = canonical_username
-        self.complete_event = threading.Event()
+        self.loaded_event = threading.Event()
 
         if sp_toplistbrowse is None:
             if isinstance(region, ToplistRegion):
@@ -209,7 +207,7 @@ def _toplistbrowse_complete_callback(sp_toplistbrowse, handle):
         return
     (session, toplist, callback) = ffi.from_handle(handle)
     session._callback_handles.remove(handle)
-    toplist.complete_event.set()
+    toplist.loaded_event.set()
     if callback is not None:
         callback(toplist)
 

@@ -48,13 +48,13 @@ class Image(object):
             lib.sp_image_add_ref(sp_image)
         self._sp_image = ffi.gc(sp_image, lib.sp_image_release)
 
-        self.load_event = threading.Event()
+        self.loaded_event = threading.Event()
 
     def __repr__(self):
         return 'Image(%r)' % self.link.uri
 
     # FIXME The event is never set.
-    load_event = None
+    loaded_event = None
     """:class:`threading.Event` that is set when the image is loaded."""
 
     @serialized

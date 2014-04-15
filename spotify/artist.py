@@ -152,7 +152,7 @@ class ArtistBrowser(object):
             'artist or sp_artistbrowse is required')
 
         self._session = session
-        self.complete_event = threading.Event()
+        self.loaded_event = threading.Event()
 
         if sp_artistbrowse is None:
             if type is None:
@@ -171,7 +171,7 @@ class ArtistBrowser(object):
         self._sp_artistbrowse = ffi.gc(
             sp_artistbrowse, lib.sp_artistbrowse_release)
 
-    complete_event = None
+    loaded_event = None
     """:class:`threading.Event` that is set when the artist browser is loaded.
     """
 
@@ -379,7 +379,7 @@ def _artistbrowse_complete_callback(sp_artistbrowse, handle):
         return
     (session, artist_browser, callback) = ffi.from_handle(handle)
     session._callback_handles.remove(handle)
-    artist_browser.complete_event.set()
+    artist_browser.loaded_event.set()
     if callback is not None:
         callback(artist_browser)
 

@@ -46,11 +46,11 @@ class SearchTest(unittest.TestCase):
         self.assertEqual(lib_mock.sp_search_add_ref.call_count, 0)
         self.assertIsInstance(result, spotify.Search)
 
-        self.assertFalse(result.complete_event.is_set())
+        self.assertFalse(result.loaded_event.is_set())
         search_complete_cb = lib_mock.sp_search_create.call_args[0][11]
         userdata = lib_mock.sp_search_create.call_args[0][12]
         search_complete_cb(sp_search, userdata)
-        self.assertTrue(result.complete_event.wait(3))
+        self.assertTrue(result.loaded_event.wait(3))
 
     def test_search_with_callback(self, lib_mock):
         sp_search = spotify.ffi.cast('sp_search *', 42)
@@ -63,7 +63,7 @@ class SearchTest(unittest.TestCase):
         userdata = lib_mock.sp_search_create.call_args[0][12]
         search_complete_cb(sp_search, userdata)
 
-        result.complete_event.wait(3)
+        result.loaded_event.wait(3)
         callback.assert_called_with(result)
 
     def test_search_where_result_is_gone_before_callback_is_called(
@@ -74,7 +74,7 @@ class SearchTest(unittest.TestCase):
         callback = mock.Mock()
 
         result = spotify.Search(self.session, query='alice', callback=callback)
-        complete_event = result.complete_event
+        loaded_event = result.loaded_event
         result = None  # noqa
         tests.gc_collect()
 
@@ -84,7 +84,7 @@ class SearchTest(unittest.TestCase):
         userdata = lib_mock.sp_search_create.call_args[0][12]
         search_complete_cb(sp_search, userdata)
 
-        complete_event.wait(3)
+        loaded_event.wait(3)
         self.assertEqual(callback.call_count, 1)
         self.assertEqual(callback.call_args[0][0]._sp_search, sp_search)
 
@@ -104,11 +104,11 @@ class SearchTest(unittest.TestCase):
 
         lib_mock.sp_search_release.assert_called_with(sp_search)
 
-    def test_complete_event_is_unset_by_default(self, lib_mock):
+    def test_loaded_event_is_unset_by_default(self, lib_mock):
         sp_search = spotify.ffi.cast('sp_search *', 42)
         search = spotify.Search(self.session, sp_search=sp_search)
 
-        self.assertFalse(search.complete_event.is_set())
+        self.assertFalse(search.loaded_event.is_set())
 
     @mock.patch('spotify.Link', spec=spotify.Link)
     def test_repr(self, link_mock, lib_mock):

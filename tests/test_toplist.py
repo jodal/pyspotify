@@ -88,7 +88,7 @@ class ToplistTest(unittest.TestCase):
         userdata = lib_mock.sp_toplistbrowse_create.call_args[0][5]
         toplistbrowse_complete_cb(sp_toplistbrowse, userdata)
 
-        result.complete_event.wait(3)
+        result.loaded_event.wait(3)
         callback.assert_called_with(result)
 
     def test_toplist_is_gone_before_callback_is_called(self, lib_mock):
@@ -99,7 +99,7 @@ class ToplistTest(unittest.TestCase):
         result = spotify.Toplist(
             self.session, type=spotify.ToplistType.TRACKS,
             region=spotify.ToplistRegion.USER, callback=callback)
-        complete_event = result.complete_event
+        loaded_event = result.loaded_event
         result = None  # noqa
         tests.gc_collect()
 
@@ -110,7 +110,7 @@ class ToplistTest(unittest.TestCase):
         userdata = lib_mock.sp_toplistbrowse_create.call_args[0][5]
         toplistbrowse_complete_cb(sp_toplistbrowse, userdata)
 
-        complete_event.wait(3)
+        loaded_event.wait(3)
         self.assertEqual(callback.call_count, 1)
         self.assertEqual(
             callback.call_args[0][0]._sp_toplistbrowse, sp_toplistbrowse)

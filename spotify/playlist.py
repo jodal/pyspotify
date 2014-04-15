@@ -394,7 +394,7 @@ class Playlist(utils.EventEmitter):
             if not self.is_in_ram:
                 raise spotify.Error(
                     'The playlist must have been in RAM to create a link')
-            # TODO Figure out why we can still get NULL here even if
+            # XXX Figure out why we can still get NULL here even if
             # the playlist is both loaded and in RAM.
             raise spotify.Error('Failed to get link from Spotify playlist')
         return spotify.Link(self._session, sp_link=sp_link, add_ref=False)

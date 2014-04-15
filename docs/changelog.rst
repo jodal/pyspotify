@@ -61,15 +61,17 @@ Refactoring: Consistent naming of ``threading.Event`` objects
 All :class:`threading.Event` objects have been renamed to be consistently
 named across classes.
 
-- :attr:`AlbumBrowser.loaded_event` replaces
-  :attr:`AlbumBrowser.complete_event`.
-- :attr:`ArtistBrowser.loaded_event` replaces
-  :attr:`ArtistBrowser.complete_event`.
-- :attr:`Image.loaded_event` replaces :attr:`Image.load_event`.
-- :attr:`InboxPostResult.loaded_event` replaces
-  :attr:`InboxPostResult.complete_event`.
-- :attr:`Search.loaded_event` replaces :attr:`Search.complete_event`.
-- :attr:`Toplist.loaded_event` replaces :attr:`Toplist.complete_event`.
+- :attr:`spotify.AlbumBrowser.loaded_event` replaces
+  :attr:`spotify.AlbumBrowser.complete_event`.
+- :attr:`spotify.ArtistBrowser.loaded_event` replaces
+  :attr:`spotify.ArtistBrowser.complete_event`.
+- :attr:`spotify.Image.loaded_event` replaces :attr:`spotify.Image.load_event`.
+- :attr:`spotify.InboxPostResult.loaded_event` replaces
+  :attr:`spotify.InboxPostResult.complete_event`.
+- :attr:`spotify.Search.loaded_event` replaces
+  :attr:`spotify.Search.complete_event`.
+- :attr:`spotify.Toplist.loaded_event` replaces
+  :attr:`spotify.Toplist.complete_event`.
 
 Refactoring: Change how to register image load listeners
 --------------------------------------------------------
@@ -77,29 +79,31 @@ Refactoring: Change how to register image load listeners
 pyspotify have two main schemes for registering listener functions:
 
 - Objects that only emit an event when it is done loading, like
-  :class:`AlbumBrowser`, :class:`ArtistBrowser`, :class:`InboxPostResult`,
-  :class:`Search`, and :class:`Toplist`, accept a single callback as a
-  ``callback`` argument to its constructor or constructor methods.
+  :class:`~spotify.AlbumBrowser`, :class:`~spotify.ArtistBrowser`,
+  :class:`~spotify.InboxPostResult`, :class:`~spotify.Search`, and
+  :class:`~spotify.Toplist`, accept a single callback as a ``callback``
+  argument to its constructor or constructor methods.
 
-- Objects that have multiple callback events, like :class:`Session`,
-  :class:`PlaylistContainer`, and :class:`Playlist`, accept the registration
-  and unregistration of one or more listener functions for each event it
-  emits. This can happen any time during the object's life cycle.
+- Objects that have multiple callback events, like :class:`~spotify.Session`,
+  :class:`~spotify.PlaylistContainer`, and :class:`~spotify.Playlist`, accept
+  the registration and unregistration of one or more listener functions for
+  each event it emits. This can happen any time during the object's life cycle.
 
 Due to pyspotify's close mapping to libspotify's organization, :class:`Image`
 objects used to use a third variant with two methods,
-:meth:`Image.add_load_callback` and :meth:`Image.remove_load_callback`, for
-adding and removing load callbacks. These methods have now been removed, and
-:class:`Image` accepts a ``callback`` argument to its constructor and
-constructor methods:
+:meth:`~spotify.Image.add_load_callback` and
+:meth:`~spotify.Image.remove_load_callback`, for adding and removing load
+callbacks. These methods have now been removed, and :class:`~spotify.Image`
+accepts a ``callback`` argument to its constructor and constructor methods:
 
-- :meth:`Album.cover` accepts a ``callback`` argument.
-- :meth:`Artist.portrait` accepts a ``callback`` argument.
-- :meth:`ArtistBrowser.portraits` is now a method and accepts a ``callback``
+- :meth:`spotify.Album.cover` accepts a ``callback`` argument.
+- :meth:`spotify.Artist.portrait` accepts a ``callback`` argument.
+- :meth:`spotify.ArtistBrowser.portraits` is now a method and accepts a
+  ``callback`` argument.
+- :meth:`spotify.Link.as_image` accepts a ``callback`` argument.
+- :meth:`spotify.Playlist.image` is now a method and accepts a ``callback``
   argument.
-- :meth:`Link.as_image` accepts a ``callback`` argument.
-- :meth:`Playlist.image` is now a method and accepts a ``callback`` argument.
-- :meth:`Session.get_image` accepts a ``callback`` argument.
+- :meth:`spotify.Session.get_image` accepts a ``callback`` argument.
 
 Bug fixes
 ---------
@@ -117,12 +121,13 @@ Bug fixes
   :issue:`126`)
 
 - Work around segfault in libspotify if
-  :attr:`spotify.session.Social.private_session` is set before the session is
+  :attr:`~spotify.session.Social.private_session` is set before the session is
   logged in and the first events is processed. This is a bug in libspotify
   which has been reported to Spotify through their IRC channel.
 
-- Multiple attributes on :class:`Track` raised an exception if accessed before
-  the track was loaded. They now return :class:`None` or similar as documented.
+- Multiple attributes on :class:`~spotify.Track` raised an exception if
+  accessed before the track was loaded. They now return :class:`None` or
+  similar as documented.
 
 - Fix segfault when creating local tracks without all arguments specified.
   ``NULL`` was used as the placeholder instead of the empty string.

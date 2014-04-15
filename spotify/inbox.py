@@ -73,6 +73,7 @@ class InboxPostResult(object):
 
 
 @ffi.callback('void(sp_inbox *, void *)')
+@serialized
 def _inboxpost_complete_callback(sp_inbox, handle):
     logger.debug('inboxpost_complete_callback called')
     if handle == ffi.NULL:

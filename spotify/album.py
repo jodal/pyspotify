@@ -339,6 +339,7 @@ class AlbumBrowser(object):
 
 
 @ffi.callback('void(sp_albumbrowse *, void *)')
+@serialized
 def _albumbrowse_complete_callback(sp_albumbrowse, handle):
     logger.debug('albumbrowse_complete_callback called')
     if handle == ffi.NULL:

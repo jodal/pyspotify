@@ -312,6 +312,7 @@ class Search(object):
 
 
 @ffi.callback('void(sp_search *, void *)')
+@serialized
 def _search_complete_callback(sp_search, handle):
     logger.debug('search_complete_callback called')
     if handle == ffi.NULL:

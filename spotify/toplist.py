@@ -199,6 +199,7 @@ class Toplist(object):
 
 
 @ffi.callback('void(sp_toplistbrowse *, void *)')
+@serialized
 def _toplistbrowse_complete_callback(sp_toplistbrowse, handle):
     logger.debug('toplistbrowse_complete_callback called')
     if handle == ffi.NULL:

@@ -384,6 +384,7 @@ class ArtistBrowser(object):
 
 
 @ffi.callback('void(sp_artistbrowse *, void *)')
+@serialized
 def _artistbrowse_complete_callback(sp_artistbrowse, handle):
     logger.debug('artistbrowse_complete_callback called')
     if handle == ffi.NULL:

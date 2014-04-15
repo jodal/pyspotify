@@ -29,9 +29,16 @@ class Image(object):
         ...     'spotify:image:a0bdcbe11b5cd126968e519b5ed1050b0e8183d0')
         >>> image.load().data_uri[:50]
         u'data:image/jpeg;base64,/9j/4AAQSkZJRgABAQEBLAEsAAD'
+
+    If ``callback`` isn't :class:`None`, it is expected to be a callable
+    that accepts a single argument, an :class:`Image` instance, when
+    the image is done loading.
     """
 
-    def __init__(self, session, uri=None, sp_image=None, add_ref=True):
+    def __init__(
+            self, session, uri=None, sp_image=None, add_ref=True,
+            callback=None):
+
         assert uri or sp_image, 'uri or sp_image is required'
 
         self._session = session
@@ -50,34 +57,16 @@ class Image(object):
 
         self.loaded_event = threading.Event()
 
-    def __repr__(self):
-        return 'Image(%r)' % self.link.uri
-
-    # FIXME The event is never set.
-    loaded_event = None
-    """:class:`threading.Event` that is set when the image is loaded."""
-
-    @serialized
-    def add_load_callback(self, callback):
-        """Add callback to be called when the image data has loaded.
-
-        Returns a callback handle that can be used to remove the callback
-        again.
-
-        Callbacks added after the image is loaded is called immediately.
-        """
         handle = ffi.new_handle((self._session, self, callback))
         self._session._callback_handles.add(handle)
         spotify.Error.maybe_raise(lib.sp_image_add_load_callback(
             self._sp_image, _image_load_callback, handle))
-        return handle
 
-    @serialized
-    def remove_load_callback(self, handle):
-        """Remove a callback which was added with :meth:`add_load_callback`."""
-        self._session._callback_handles.remove(handle)
-        spotify.Error.maybe_raise(lib.sp_image_remove_load_callback(
-            self._sp_image, _image_load_callback, handle))
+    def __repr__(self):
+        return 'Image(%r)' % self.link.uri
+
+    loaded_event = None
+    """:class:`threading.Event` that is set when the image is loaded."""
 
     @property
     def is_loaded(self):
@@ -160,8 +149,13 @@ def _image_load_callback(sp_image, handle):
         return
     (session, image, callback) = ffi.from_handle(handle)
     session._callback_handles.remove(handle)
+    image.loaded_event.set()
     if callback is not None:
         callback(image)
+
+    # Load callbacks are by nature only called once per image, so we clean up
+    # and remove the load callback the first time it is called.
+    lib.sp_image_remove_load_callback(sp_image, _image_load_callback, handle)
 
 
 @utils.make_enum('SP_IMAGE_FORMAT_')

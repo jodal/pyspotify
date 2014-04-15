@@ -122,15 +122,21 @@ class Link(object):
             return None
         return spotify.User(self._session, sp_user=sp_user, add_ref=True)
 
-    def as_image(self):
-        """Make an :class:`Image` from the link."""
+    def as_image(self, callback=None):
+        """Make an :class:`Image` from the link.
+
+        If ``callback`` isn't :class:`None`, it is expected to be a callable
+        that accepts a single argument, an :class:`Image` instance, when
+        the image is done loading.
+        """
         if self.type is not LinkType.IMAGE:
             return None
         sp_image = lib.sp_image_create_from_link(
             self._session._sp_session, self._sp_link)
         if sp_image == ffi.NULL:
             return None
-        return spotify.Image(self._session, sp_image=sp_image, add_ref=False)
+        return spotify.Image(
+            self._session, sp_image=sp_image, add_ref=False, callback=callback)
 
 
 @utils.make_enum('SP_LINKTYPE_')

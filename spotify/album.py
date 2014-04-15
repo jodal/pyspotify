@@ -87,11 +87,15 @@ class Album(object):
         return spotify.Artist(self._session, sp_artist=sp_artist, add_ref=True)
 
     @serialized
-    def cover(self, image_size=None):
+    def cover(self, image_size=None, callback=None):
         """The album's cover :class:`Image`.
 
         ``image_size`` is an :class:`ImageSize` value, by default
         :attr:`ImageSize.NORMAL`.
+
+        If ``callback`` isn't :class:`None`, it is expected to be a callable
+        that accepts a single argument, an :class:`Image` instance, when
+        the image is done loading.
 
         Will always return :class:`None` if the album isn't loaded or the
         album has no cover.
@@ -102,7 +106,8 @@ class Album(object):
         if cover_id == ffi.NULL:
             return None
         sp_image = lib.sp_image_create(self._session._sp_session, cover_id)
-        return spotify.Image(self._session, sp_image=sp_image, add_ref=False)
+        return spotify.Image(
+            self._session, sp_image=sp_image, add_ref=False, callback=callback)
 
     def cover_link(self, image_size=None):
         """A :class:`Link` to the album's cover.

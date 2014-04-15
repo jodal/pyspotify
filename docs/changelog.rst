@@ -55,8 +55,8 @@ equivalents:
 - :meth:`spotify.Session.get_image` (replaces :class:`spotify.Image`)
 - :meth:`spotify.Session.get_toplist` (replaces :class:`spotify.Toplist`)
 
-Refactoring: Consistent naming of threading.Event objects
----------------------------------------------------------
+Refactoring: Consistent naming of ``threading.Event`` objects
+-------------------------------------------------------------
 
 All :class:`threading.Event` objects have been renamed to be consistently
 named across classes.
@@ -70,6 +70,36 @@ named across classes.
   :attr:`InboxPostResult.complete_event`.
 - :attr:`Search.loaded_event` replaces :attr:`Search.complete_event`.
 - :attr:`Toplist.loaded_event` replaces :attr:`Toplist.complete_event`.
+
+Refactoring: Change how to register image load listeners
+--------------------------------------------------------
+
+pyspotify have two main schemes for registering listener functions:
+
+- Objects that only emit an event when it is done loading, like
+  :class:`AlbumBrowser`, :class:`ArtistBrowser`, :class:`InboxPostResult`,
+  :class:`Search`, and :class:`Toplist`, accept a single callback as a
+  ``callback`` argument to its constructor or constructor methods.
+
+- Objects that have multiple callback events, like :class:`Session`,
+  :class:`PlaylistContainer`, and :class:`Playlist`, accept the registration
+  and unregistration of one or more listener functions for each event it
+  emits. This can happen any time during the object's life cycle.
+
+Due to pyspotify's close mapping to libspotify's organization, :class:`Image`
+objects used to use a third variant with two methods,
+:meth:`Image.add_load_callback` and :meth:`Image.remove_load_callback`, for
+adding and removing load callbacks. These methods have now been removed, and
+:class:`Image` accepts a ``callback`` argument to its constructor and
+constructor methods:
+
+- :meth:`Album.cover` accepts a ``callback`` argument.
+- :meth:`Artist.portrait` accepts a ``callback`` argument.
+- :meth:`ArtistBrowser.portraits` is now a method and accepts a ``callback``
+  argument.
+- :meth:`Link.as_image` accepts a ``callback`` argument.
+- :meth:`Playlist.image` is now a method and accepts a ``callback`` argument.
+- :meth:`Session.get_image` accepts a ``callback`` argument.
 
 Bug fixes
 ---------

@@ -216,9 +216,15 @@ class Playlist(utils.EventEmitter):
         description = lib.sp_playlist_get_description(self._sp_playlist)
         return utils.to_unicode_or_none(description)
 
-    @property
-    def image(self):
+    def image(self, callback=None):
         """The playlist's :class:`Image`.
+
+        Due to limitations in libspotify's API you can't specify the
+        :class:`ImageSize` of these images.
+
+        If ``callback`` isn't :class:`None`, it is expected to be a callable
+        that accepts a single argument, an :class:`Image` instance, when
+        the image is done loading.
 
         Will always return :class:`None` if the playlist isn't loaded or the
         playlist has no image.
@@ -229,7 +235,8 @@ class Playlist(utils.EventEmitter):
         if not has_image:
             return None
         sp_image = lib.sp_image_create(self._session._sp_session, image_id)
-        return spotify.Image(self._session, sp_image=sp_image, add_ref=False)
+        return spotify.Image(
+            self._session, sp_image=sp_image, add_ref=False, callback=callback)
 
     @property
     def has_pending_changes(self):

@@ -497,9 +497,13 @@ class Session(utils.EventEmitter):
         """
         return spotify.User(self, uri=uri)
 
-    def get_image(self, uri):
+    def get_image(self, uri, callback=None):
         """
         Get :class:`Image` from a Spotify image URI.
+
+        If ``callback`` isn't :class:`None`, it is expected to be a callable
+        that accepts a single argument, an :class:`Image` instance, when
+        the image is done loading.
 
         Example::
 
@@ -510,7 +514,7 @@ class Session(utils.EventEmitter):
             >>> image.load().data_uri[:50]
             u'data:image/jpeg;base64,/9j/4AAQSkZJRgABAQEBLAEsAAD'
         """
-        return spotify.Image(self, uri=uri)
+        return spotify.Image(self, uri=uri, callback=callback)
 
     def search(
             self, query, callback=None,

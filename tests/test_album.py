@@ -133,33 +133,34 @@ class AlbumTest(unittest.TestCase):
         lib_mock.sp_album_artist.assert_called_with(sp_album)
         self.assertIsNone(result)
 
-    @mock.patch('spotify.image.lib', spec=spotify.lib)
-    def test_cover(self, image_lib_mock, lib_mock):
+    @mock.patch('spotify.Image', spec=spotify.Image)
+    def test_cover(self, image_mock, lib_mock):
+        sp_album = spotify.ffi.cast('sp_album *', 42)
+        album = spotify.Album(self.session, sp_album=sp_album)
         sp_image_id = spotify.ffi.new('char[]', b'cover-id')
         lib_mock.sp_album_cover.return_value = sp_image_id
         sp_image = spotify.ffi.cast('sp_image *', 43)
         lib_mock.sp_image_create.return_value = sp_image
-        sp_album = spotify.ffi.cast('sp_album *', 42)
-        album = spotify.Album(self.session, sp_album=sp_album)
+        image_mock.return_value = mock.sentinel.image
         image_size = spotify.ImageSize.SMALL
+        callback = mock.Mock()
 
-        result = album.cover(image_size)
+        result = album.cover(image_size, callback=callback)
 
+        self.assertIs(result, mock.sentinel.image)
         lib_mock.sp_album_cover.assert_called_with(
             sp_album, int(image_size))
         lib_mock.sp_image_create.assert_called_with(
             self.session._sp_session, sp_image_id)
 
-        self.assertIsInstance(result, spotify.Image)
-        self.assertEqual(result._sp_image, sp_image)
-
         # Since we *created* the sp_image, we already have a refcount of 1 and
         # shouldn't increase the refcount when wrapping this sp_image in an
         # Image object
-        self.assertEqual(image_lib_mock.sp_image_add_ref.call_count, 0)
+        image_mock.assert_called_with(
+            self.session, sp_image=sp_image, add_ref=False, callback=callback)
 
-    @mock.patch('spotify.image.lib', spec=spotify.lib)
-    def test_cover_defaults_to_normal_size(self, image_lib_mock, lib_mock):
+    @mock.patch('spotify.Image', spec=spotify.Image)
+    def test_cover_defaults_to_normal_size(self, image_mock, lib_mock):
         sp_image_id = spotify.ffi.new('char[]', b'cover-id')
         lib_mock.sp_album_cover.return_value = sp_image_id
         sp_image = spotify.ffi.cast('sp_image *', 43)

@@ -23,6 +23,8 @@ class ImageTest(unittest.TestCase):
 
     @mock.patch('spotify.Link', spec=spotify.Link)
     def test_create_from_uri(self, link_mock, lib_mock):
+        lib_mock.sp_image_add_load_callback.return_value = int(
+            spotify.ErrorType.OK)
         sp_image = spotify.ffi.cast('sp_image *', 42)
         link_instance_mock = link_mock.return_value
         link_instance_mock.as_image.return_value = spotify.Image(
@@ -47,6 +49,8 @@ class ImageTest(unittest.TestCase):
             spotify.Image(self.session, uri=uri)
 
     def test_adds_ref_to_sp_image_when_created(self, lib_mock):
+        lib_mock.sp_image_add_load_callback.return_value = int(
+            spotify.ErrorType.OK)
         sp_image = spotify.ffi.cast('sp_image *', 42)
 
         spotify.Image(self.session, sp_image=sp_image)
@@ -54,6 +58,8 @@ class ImageTest(unittest.TestCase):
         lib_mock.sp_image_add_ref.assert_called_with(sp_image)
 
     def test_releases_sp_image_when_image_dies(self, lib_mock):
+        lib_mock.sp_image_add_load_callback.return_value = int(
+            spotify.ErrorType.OK)
         sp_image = spotify.ffi.cast('sp_image *', 42)
 
         image = spotify.Image(self.session, sp_image=sp_image)
@@ -66,6 +72,8 @@ class ImageTest(unittest.TestCase):
     def test_repr(self, link_mock, lib_mock):
         link_instance_mock = link_mock.return_value
         link_instance_mock.uri = 'foo'
+        lib_mock.sp_image_add_load_callback.return_value = int(
+            spotify.ErrorType.OK)
         sp_image = spotify.ffi.cast('sp_image *', 42)
         image = spotify.Image(self.session, sp_image=sp_image)
 
@@ -74,108 +82,88 @@ class ImageTest(unittest.TestCase):
         self.assertEqual(result, 'Image(%r)' % 'foo')
 
     def test_loaded_event_is_unset_by_default(self, lib_mock):
+        lib_mock.sp_image_add_load_callback.return_value = int(
+            spotify.ErrorType.OK)
         sp_image = spotify.ffi.cast('sp_image *', 42)
         image = spotify.Image(self.session, sp_image=sp_image)
 
         self.assertFalse(image.loaded_event.is_set())
 
-    def test_add_and_call_load_callback(self, lib_mock):
+    def test_create_with_callback(self, lib_mock):
         lib_mock.sp_image_add_load_callback.return_value = int(
             spotify.ErrorType.OK)
         lib_mock.sp_image_remove_load_callback.return_value = int(
             spotify.ErrorType.OK)
         sp_image = spotify.ffi.cast('sp_image *', 42)
-        image = spotify.Image(self.session, sp_image=sp_image)
+        lib_mock.sp_image_create.return_value = sp_image
         callback = mock.Mock()
 
-        # Add
-        callback_handle = image.add_load_callback(callback)
-        lib_mock.sp_image_add_load_callback.assert_called_with(
-            sp_image, mock.ANY, callback_handle)
-        image_load_cb = lib_mock.sp_image_add_load_callback.call_args[0][1]
+        # Add callback
+        image = spotify.Image(
+            self.session, sp_image=sp_image, callback=callback)
 
-        # Call
+        lib_mock.sp_image_add_load_callback.assert_called_with(
+            sp_image, mock.ANY, mock.ANY)
+        image_load_cb = lib_mock.sp_image_add_load_callback.call_args[0][1]
+        callback_handle = lib_mock.sp_image_add_load_callback.call_args[0][2]
+
+        # Call calls callback, sets event, and removes callback registration
         self.assertEqual(callback.call_count, 0)
+        self.assertEqual(lib_mock.sp_image_remove_load_callback.call_count, 0)
+        self.assertFalse(image.loaded_event.is_set())
         image_load_cb(sp_image, callback_handle)
-        self.assertEqual(callback.call_count, 1)
+        callback.assert_called_once_with(image)
+        lib_mock.sp_image_remove_load_callback.assert_called_with(
+            sp_image, image_load_cb, callback_handle)
+        self.assertTrue(image.loaded_event.is_set())
 
-    def test_add_and_throw_away_image_and_call_load_callback(self, lib_mock):
+    def test_create_with_callback_and_throw_away_image_and_call_load_callback(
+            self, lib_mock):
+
         lib_mock.sp_image_add_load_callback.return_value = int(
             spotify.ErrorType.OK)
         lib_mock.sp_image_remove_load_callback.return_value = int(
             spotify.ErrorType.OK)
         sp_image = spotify.ffi.cast('sp_image *', 42)
-        image = spotify.Image(self.session, sp_image=sp_image)
+        lib_mock.sp_image_create.return_value = sp_image
         callback = mock.Mock()
 
-        # Add
-        callback_handle = image.add_load_callback(callback)
-        lib_mock.sp_image_add_load_callback.assert_called_with(
-            sp_image, mock.ANY, callback_handle)
-        image_load_cb = lib_mock.sp_image_add_load_callback.call_args[0][1]
+        # Add callback
+        image = spotify.Image(
+            self.session, sp_image=sp_image, callback=callback)
+        loaded_event = image.loaded_event
 
-        # Throw away reference to `image`
+        # Throw away reference to 'image'
         image = None  # noqa
         tests.gc_collect()
 
         # The mock keeps the handle/userdata alive, thus this test doesn't
-        # really test that image._callback_handles keeps the handle alive.
+        # really test that session._callback_handles keeps the handle alive.
 
-        # Call
-        self.assertEqual(callback.call_count, 0)
+        # Call callback
+        image_load_cb = lib_mock.sp_image_add_load_callback.call_args[0][1]
+        callback_handle = lib_mock.sp_image_add_load_callback.call_args[0][2]
         image_load_cb(sp_image, callback_handle)
-        self.assertEqual(callback.call_count, 1)
 
-    def test_add_and_remove_load_callback(self, lib_mock):
+        loaded_event.wait(3)
+        self.assertEqual(callback.call_count, 1)
+        self.assertEqual(callback.call_args[0][0]._sp_image, sp_image)
+
+    def test_create_with_callback_fails_if_error_adding_callback(
+            self, lib_mock):
+
         lib_mock.sp_image_add_load_callback.return_value = int(
-            spotify.ErrorType.OK)
-        lib_mock.sp_image_remove_load_callback.return_value = int(
-            spotify.ErrorType.OK)
+            spotify.ErrorType.BAD_API_VERSION)
         sp_image = spotify.ffi.cast('sp_image *', 42)
-        image = spotify.Image(self.session, sp_image=sp_image)
         callback = mock.Mock()
 
-        # Add
-        callback_handle = image.add_load_callback(callback)
-        lib_mock.sp_image_add_load_callback.assert_called_with(
-            sp_image, mock.ANY, callback_handle)
-        image_load_cb = lib_mock.sp_image_add_load_callback.call_args[0][1]
-
-        # Remove
-        image.remove_load_callback(callback_handle)
-        lib_mock.sp_image_remove_load_callback.assert_called_with(
-            sp_image, image_load_cb, callback_handle)
-
-    def test_add_load_callback_fails_if_error(self, lib_mock):
-        lib_mock.sp_image_add_load_callback.return_value = int(
-            spotify.ErrorType.BAD_API_VERSION)
-        sp_image = spotify.ffi.cast('sp_image *', 42)
-        image = spotify.Image(self.session, sp_image=sp_image)
-
         with self.assertRaises(spotify.Error):
-            image.add_load_callback(None)
-
-    def test_remove_load_callback_fails_if_error(self, lib_mock):
-        lib_mock.sp_image_add_load_callback.return_value = int(
-            spotify.ErrorType.OK)
-        lib_mock.sp_image_remove_load_callback.return_value = int(
-            spotify.ErrorType.BAD_API_VERSION)
-        sp_image = spotify.ffi.cast('sp_image *', 42)
-        image = spotify.Image(self.session, sp_image=sp_image)
-        callback_id = image.add_load_callback(None)
-
-        with self.assertRaises(spotify.Error):
-            image.remove_load_callback(callback_id)
-
-    def test_remove_load_callback_fails_if_unknown_callback(self, lib_mock):
-        sp_image = spotify.ffi.cast('sp_image *', 42)
-        image = spotify.Image(self.session, sp_image=sp_image)
-
-        with self.assertRaises(LookupError):
-            image.remove_load_callback(b'foo')
+            spotify.Image(self.session, sp_image=sp_image, callback=callback)
 
     def test_is_loaded(self, lib_mock):
         lib_mock.sp_image_is_loaded.return_value = 1
+        lib_mock.sp_image_add_load_callback.return_value = int(
+            spotify.ErrorType.OK)
         sp_image = spotify.ffi.cast('sp_image *', 42)
         image = spotify.Image(self.session, sp_image=sp_image)
 
@@ -187,6 +175,8 @@ class ImageTest(unittest.TestCase):
     def test_error(self, lib_mock):
         lib_mock.sp_image_error.return_value = int(
             spotify.ErrorType.IS_LOADING)
+        lib_mock.sp_image_add_load_callback.return_value = int(
+            spotify.ErrorType.OK)
         sp_image = spotify.ffi.cast('sp_image *', 42)
         image = spotify.Image(self.session, sp_image=sp_image)
 
@@ -197,6 +187,8 @@ class ImageTest(unittest.TestCase):
 
     @mock.patch('spotify.utils.load')
     def test_load(self, load_mock, lib_mock):
+        lib_mock.sp_image_add_load_callback.return_value = int(
+            spotify.ErrorType.OK)
         sp_image = spotify.ffi.cast('sp_image *', 42)
         image = spotify.Image(self.session, sp_image=sp_image)
 
@@ -207,6 +199,8 @@ class ImageTest(unittest.TestCase):
     def test_format(self, lib_mock):
         lib_mock.sp_image_is_loaded.return_value = 1
         lib_mock.sp_image_format.return_value = int(spotify.ImageFormat.JPEG)
+        lib_mock.sp_image_add_load_callback.return_value = int(
+            spotify.ErrorType.OK)
         sp_image = spotify.ffi.cast('sp_image *', 42)
         image = spotify.Image(self.session, sp_image=sp_image)
 
@@ -217,6 +211,8 @@ class ImageTest(unittest.TestCase):
 
     def test_format_is_none_if_unloaded(self, lib_mock):
         lib_mock.sp_image_is_loaded.return_value = 0
+        lib_mock.sp_image_add_load_callback.return_value = int(
+            spotify.ErrorType.OK)
         sp_image = spotify.ffi.cast('sp_image *', 42)
         image = spotify.Image(self.session, sp_image=sp_image)
 
@@ -237,6 +233,8 @@ class ImageTest(unittest.TestCase):
             return spotify.ffi.cast('void *', data)
 
         lib_mock.sp_image_data.side_effect = func
+        lib_mock.sp_image_add_load_callback.return_value = int(
+            spotify.ErrorType.OK)
         sp_image = spotify.ffi.cast('sp_image *', 42)
         image = spotify.Image(self.session, sp_image=sp_image)
 
@@ -247,6 +245,8 @@ class ImageTest(unittest.TestCase):
 
     def test_data_is_none_if_unloaded(self, lib_mock):
         lib_mock.sp_image_is_loaded.return_value = 0
+        lib_mock.sp_image_add_load_callback.return_value = int(
+            spotify.ErrorType.OK)
         sp_image = spotify.ffi.cast('sp_image *', 42)
         image = spotify.Image(self.session, sp_image=sp_image)
 
@@ -257,6 +257,8 @@ class ImageTest(unittest.TestCase):
 
     def test_data_uri(self, lib_mock):
         lib_mock.sp_image_format.return_value = int(spotify.ImageFormat.JPEG)
+        lib_mock.sp_image_add_load_callback.return_value = int(
+            spotify.ErrorType.OK)
         sp_image = spotify.ffi.cast('sp_image *', 42)
 
         prop_mock = mock.PropertyMock()
@@ -270,6 +272,8 @@ class ImageTest(unittest.TestCase):
 
     def test_data_uri_is_none_if_unloaded(self, lib_mock):
         lib_mock.sp_image_is_loaded.return_value = 0
+        lib_mock.sp_image_add_load_callback.return_value = int(
+            spotify.ErrorType.OK)
         sp_image = spotify.ffi.cast('sp_image *', 42)
         image = spotify.Image(self.session, sp_image=sp_image)
 
@@ -278,6 +282,8 @@ class ImageTest(unittest.TestCase):
         self.assertIsNone(result)
 
     def test_data_uri_fails_if_unknown_image_format(self, lib_mock):
+        lib_mock.sp_image_add_load_callback.return_value = int(
+            spotify.ErrorType.OK)
         sp_image = spotify.ffi.cast('sp_image *', 42)
         image = spotify.Image(self.session, sp_image=sp_image)
         image.__dict__['format'] = mock.Mock(
@@ -289,6 +295,8 @@ class ImageTest(unittest.TestCase):
 
     @mock.patch('spotify.Link', spec=spotify.Link)
     def test_link_creates_link_to_image(self, link_mock, lib_mock):
+        lib_mock.sp_image_add_load_callback.return_value = int(
+            spotify.ErrorType.OK)
         sp_image = spotify.ffi.cast('sp_image *', 42)
         image = spotify.Image(self.session, sp_image=sp_image)
         sp_link = spotify.ffi.cast('sp_link *', 43)

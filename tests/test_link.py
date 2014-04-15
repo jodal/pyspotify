@@ -255,34 +255,38 @@ class LinkTest(unittest.TestCase):
 
         lib_mock.sp_link_as_user.assert_called_once_with(sp_link)
 
-    @mock.patch('spotify.image.lib', spec=spotify.lib)
-    def test_as_image(self, image_lib_mock, lib_mock):
+    @mock.patch('spotify.Image', spec=spotify.Image)
+    def test_as_image(self, image_mock, lib_mock):
         sp_link = spotify.ffi.cast('sp_link *', 42)
         lib_mock.sp_link_create_from_string.return_value = sp_link
         lib_mock.sp_link_type.return_value = spotify.LinkType.IMAGE
         sp_image = spotify.ffi.cast('sp_image *', 43)
         lib_mock.sp_image_create_from_link.return_value = sp_image
+        image_mock.return_value = mock.sentinel.image
+        callback = mock.Mock()
 
         link = spotify.Link(self.session, 'spotify:image:foo')
-        self.assertEqual(link.as_image()._sp_image, sp_image)
+        result = link.as_image(callback=callback)
 
+        self.assertIs(result, mock.sentinel.image)
         lib_mock.sp_image_create_from_link.assert_called_once_with(
             self.session._sp_session, sp_link)
 
         # Since we *created* the sp_image, we already have a refcount of 1 and
         # shouldn't increase the refcount when wrapping this sp_image in an
         # Image object
-        self.assertEqual(image_lib_mock.sp_image_add_ref.call_count, 0)
+        image_mock.assert_called_with(
+            self.session, sp_image=sp_image, add_ref=False, callback=callback)
 
-    @mock.patch('spotify.image.lib', spec=spotify.lib)
-    def test_as_image_if_not_a_image(self, image_lib_mock, lib_mock):
+    def test_as_image_if_not_a_image(self, lib_mock):
         sp_link = spotify.ffi.cast('sp_link *', 42)
         lib_mock.sp_link_create_from_string.return_value = sp_link
         lib_mock.sp_link_type.return_value = spotify.LinkType.ARTIST
 
         link = spotify.Link(self.session, 'spotify:image:foo')
-        self.assertIsNone(link.as_image())
+        result = link.as_image()
 
+        self.assertIsNone(result)
         self.assertEqual(lib_mock.sp_image_create_from_link.call_count, 0)
 
 

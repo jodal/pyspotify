@@ -346,8 +346,8 @@ class PlaylistTest(unittest.TestCase):
         lib_mock.sp_playlist_get_description.assert_called_with(sp_playlist)
         self.assertIsNone(result)
 
-    @mock.patch('spotify.image.lib', spec=spotify.lib)
-    def test_image(self, image_lib_mock, lib_mock):
+    @mock.patch('spotify.Image', spec=spotify.Image)
+    def test_image(self, image_mock, lib_mock):
         image_id = b'image-id'
 
         def func(sp_playlist, sp_image_id):
@@ -360,9 +360,12 @@ class PlaylistTest(unittest.TestCase):
         lib_mock.sp_image_create.return_value = sp_image
         sp_playlist = spotify.ffi.cast('sp_playlist *', 42)
         playlist = spotify.Playlist(self.session, sp_playlist=sp_playlist)
+        image_mock.return_value = mock.sentinel.image
+        callback = mock.Mock()
 
-        result = playlist.image
+        result = playlist.image(callback=callback)
 
+        self.assertIs(result, mock.sentinel.image)
         lib_mock.sp_playlist_get_image.assert_called_with(
             sp_playlist, mock.ANY)
         lib_mock.sp_image_create.assert_called_with(
@@ -371,20 +374,18 @@ class PlaylistTest(unittest.TestCase):
             spotify.ffi.string(lib_mock.sp_image_create.call_args[0][1]),
             b'image-id')
 
-        self.assertIsInstance(result, spotify.Image)
-        self.assertEqual(result._sp_image, sp_image)
-
         # Since we *created* the sp_image, we already have a refcount of 1 and
         # shouldn't increase the refcount when wrapping this sp_image in an
         # Image object
-        self.assertEqual(image_lib_mock.sp_image_add_ref.call_count, 0)
+        image_mock.assert_called_with(
+            self.session, sp_image=sp_image, add_ref=False, callback=callback)
 
     def test_image_is_none_if_no_image(self, lib_mock):
         lib_mock.sp_playlist_get_image.return_value = 0
         sp_playlist = spotify.ffi.cast('sp_playlist *', 42)
         playlist = spotify.Playlist(self.session, sp_playlist=sp_playlist)
 
-        result = playlist.image
+        result = playlist.image()
 
         lib_mock.sp_playlist_get_image.assert_called_with(
             sp_playlist, mock.ANY)
@@ -968,6 +969,8 @@ class PlaylistCallbacksTest(unittest.TestCase):
         image_id = spotify.ffi.new('char[]', b'image-id')
         sp_image = spotify.ffi.cast('sp_image *', 43)
         lib_mock.sp_image_create.return_value = sp_image
+        image_lib_mock.sp_image_add_load_callback.return_value = int(
+            spotify.ErrorType.OK)
 
         _PlaylistCallbacks.image_changed(
             sp_playlist, image_id, spotify.ffi.NULL)

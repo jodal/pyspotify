@@ -684,12 +684,14 @@ class SessionTest(unittest.TestCase):
     @mock.patch('spotify.Image')
     def test_get_image(self, image_mock, lib_mock):
         session = create_session(lib_mock)
+        callback = mock.Mock()
         image_mock.return_value = mock.sentinel.image
 
-        result = session.get_image('spotify:image:foo')
+        result = session.get_image('spotify:image:foo', callback=callback)
 
         self.assertIs(result, mock.sentinel.image)
-        image_mock.assert_called_with(session, uri='spotify:image:foo')
+        image_mock.assert_called_with(
+            session, uri='spotify:image:foo', callback=callback)
 
     @mock.patch('spotify.Search')
     def test_search(self, search_mock, lib_mock):

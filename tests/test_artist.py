@@ -111,33 +111,34 @@ class ArtistTest(unittest.TestCase):
 
         load_mock.assert_called_with(self.session, artist, timeout=10)
 
-    @mock.patch('spotify.image.lib', spec=spotify.lib)
-    def test_portrait(self, image_lib_mock, lib_mock):
+    @mock.patch('spotify.Image', spec=spotify.Image)
+    def test_portrait(self, image_mock, lib_mock):
+        sp_artist = spotify.ffi.cast('sp_artist *', 42)
+        artist = spotify.Artist(self.session, sp_artist=sp_artist)
         sp_image_id = spotify.ffi.new('char[]', b'portrait-id')
         lib_mock.sp_artist_portrait.return_value = sp_image_id
         sp_image = spotify.ffi.cast('sp_image *', 43)
         lib_mock.sp_image_create.return_value = sp_image
-        sp_artist = spotify.ffi.cast('sp_artist *', 42)
-        artist = spotify.Artist(self.session, sp_artist=sp_artist)
+        image_mock.return_value = mock.sentinel.image
         image_size = spotify.ImageSize.SMALL
+        callback = mock.Mock()
 
-        result = artist.portrait(image_size)
+        result = artist.portrait(image_size, callback=callback)
 
+        self.assertIs(result, mock.sentinel.image)
         lib_mock.sp_artist_portrait.assert_called_with(
             sp_artist, int(image_size))
         lib_mock.sp_image_create.assert_called_with(
             self.session._sp_session, sp_image_id)
 
-        self.assertIsInstance(result, spotify.Image)
-        self.assertEqual(result._sp_image, sp_image)
-
         # Since we *created* the sp_image, we already have a refcount of 1 and
         # shouldn't increase the refcount when wrapping this sp_image in an
         # Image object
-        self.assertEqual(image_lib_mock.sp_image_add_ref.call_count, 0)
+        image_mock.assert_called_with(
+            self.session, sp_image=sp_image, add_ref=False, callback=callback)
 
-    @mock.patch('spotify.image.lib', spec=spotify.lib)
-    def test_portrait_defaults_to_normal_size(self, image_lib_mock, lib_mock):
+    @mock.patch('spotify.Image', spec=spotify.Image)
+    def test_portrait_defaults_to_normal_size(self, image_mock, lib_mock):
         sp_image_id = spotify.ffi.new('char[]', b'portrait-id')
         lib_mock.sp_artist_portrait.return_value = sp_image_id
         sp_image = spotify.ffi.cast('sp_image *', 43)
@@ -410,19 +411,21 @@ class ArtistBrowserTest(unittest.TestCase):
         lib_mock.sp_artistbrowse_artist.assert_called_with(sp_artistbrowse)
         self.assertIsNone(result)
 
-    @mock.patch('spotify.image.lib', spec=spotify.lib)
-    def test_portraits(self, image_lib_mock, lib_mock):
-        image_id = spotify.ffi.new('char[]', b'image-id')
-        lib_mock.sp_artistbrowse_num_portraits.return_value = 1
-        lib_mock.sp_artistbrowse_portrait.return_value = image_id
-        sp_image = spotify.ffi.cast('sp_image *', 43)
-        lib_mock.sp_image_create.return_value = sp_image
+    @mock.patch('spotify.Image', spec=spotify.Image)
+    def test_portraits(self, image_mock, lib_mock):
         sp_artistbrowse = spotify.ffi.cast('sp_artistbrowse *', 42)
         browser = spotify.ArtistBrowser(
             self.session, sp_artistbrowse=sp_artistbrowse)
+        lib_mock.sp_artistbrowse_num_portraits.return_value = 1
+        image_id = spotify.ffi.new('char[]', b'image-id')
+        lib_mock.sp_artistbrowse_portrait.return_value = image_id
+        sp_image = spotify.ffi.cast('sp_image *', 43)
+        lib_mock.sp_image_create.return_value = sp_image
+        image_mock.return_value = mock.sentinel.image
+        callback = mock.Mock()
 
         self.assertEqual(lib_mock.sp_artistbrowse_add_ref.call_count, 1)
-        result = browser.portraits
+        result = browser.portraits(callback=callback)
         self.assertEqual(lib_mock.sp_artistbrowse_add_ref.call_count, 2)
 
         self.assertEqual(len(result), 1)
@@ -430,8 +433,7 @@ class ArtistBrowserTest(unittest.TestCase):
             sp_artistbrowse)
 
         item = result[0]
-        self.assertIsInstance(item, spotify.Image)
-        self.assertEqual(item._sp_image, sp_image)
+        self.assertIs(item, mock.sentinel.image)
         self.assertEqual(lib_mock.sp_artistbrowse_portrait.call_count, 1)
         lib_mock.sp_artistbrowse_portrait.assert_called_with(
             sp_artistbrowse, 0)
@@ -439,7 +441,8 @@ class ArtistBrowserTest(unittest.TestCase):
         # Since we *created* the sp_image, we already have a refcount of 1 and
         # shouldn't increase the refcount when wrapping this sp_image in an
         # Image object
-        self.assertEqual(image_lib_mock.sp_image_add_ref.call_count, 0)
+        image_mock.assert_called_with(
+            self.session, sp_image=sp_image, add_ref=False, callback=callback)
 
     def test_portraits_if_no_portraits(self, lib_mock):
         lib_mock.sp_artistbrowse_num_portraits.return_value = 0
@@ -447,7 +450,7 @@ class ArtistBrowserTest(unittest.TestCase):
         browser = spotify.ArtistBrowser(
             self.session, sp_artistbrowse=sp_artistbrowse)
 
-        result = browser.portraits
+        result = browser.portraits()
 
         self.assertEqual(len(result), 0)
         lib_mock.sp_artistbrowse_num_portraits.assert_called_with(
@@ -460,7 +463,7 @@ class ArtistBrowserTest(unittest.TestCase):
         browser = spotify.ArtistBrowser(
             self.session, sp_artistbrowse=sp_artistbrowse)
 
-        result = browser.portraits
+        result = browser.portraits()
 
         lib_mock.sp_artistbrowse_is_loaded.assert_called_with(sp_artistbrowse)
         self.assertEqual(len(result), 0)

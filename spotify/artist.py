@@ -75,11 +75,15 @@ class Artist(object):
         return utils.load(self._session, self, timeout=timeout)
 
     @serialized
-    def portrait(self, image_size=None):
+    def portrait(self, image_size=None, callback=None):
         """The artist's portrait :class:`Image`.
 
         ``image_size`` is an :class:`ImageSize` value, by default
         :attr:`ImageSize.NORMAL`.
+
+        If ``callback`` isn't :class:`None`, it is expected to be a callable
+        that accepts a single argument, an :class:`Image` instance, when
+        the image is done loading.
 
         Will always return :class:`None` if the artist isn't loaded or the
         artist has no portrait.
@@ -91,7 +95,8 @@ class Artist(object):
             return None
         sp_image = lib.sp_image_create(
             self._session._sp_session, portrait_id)
-        return spotify.Image(self._session, sp_image=sp_image, add_ref=False)
+        return spotify.Image(
+            self._session, sp_image=sp_image, add_ref=False, callback=callback)
 
     def portrait_link(self, image_size=None):
         """A :class:`Link` to the artist's portrait.
@@ -230,10 +235,17 @@ class ArtistBrowser(object):
             return None
         return Artist(self._session, sp_artist=sp_artist, add_ref=True)
 
-    @property
     @serialized
-    def portraits(self):
+    def portraits(self, callback=None):
         """The artist's portraits.
+
+        Due to limitations in libspotify's API you can't specify the
+        :class:`ImageSize` of these images.
+
+        If ``callback`` isn't :class:`None`, it is expected to be a callable
+        that accepts a single argument, an :class:`Image` instance, when
+        the image is done loading. The callable will be called once for each
+        portrait.
 
         Will always return an empty list if the artist browser isn't loaded.
         """
@@ -245,7 +257,8 @@ class ArtistBrowser(object):
             image_id = lib.sp_artistbrowse_portrait(sp_artistbrowse, key)
             sp_image = lib.sp_image_create(image_id)
             return spotify.Image(
-                self._session, sp_image=sp_image, add_ref=False)
+                self._session, sp_image=sp_image, add_ref=False,
+                callback=callback)
 
         return utils.Sequence(
             sp_obj=self._sp_artistbrowse,

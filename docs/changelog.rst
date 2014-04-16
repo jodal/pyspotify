@@ -132,6 +132,9 @@ Bug fixes
 - Fix segfault when creating local tracks without all arguments specified.
   ``NULL`` was used as the placeholder instead of the empty string.
 
+- Support negative indexes on all custom sequence types. For example,
+  ``collection[-1]`` returns the last element in the collection.
+
 Minor changes
 -------------
 

@@ -64,6 +64,12 @@ class PlaylistUnseenTracksTest(unittest.TestCase):
         self.assertIsInstance(track1, spotify.Track)
         self.assertEqual(track1._sp_track, sp_tracks[1])
 
+        # Getting item with negative index
+        track2 = tracks[-3]
+        self.assertEqual(track2._sp_track, track0._sp_track)
+        self.assertEqual(
+            lib_mock.sp_playlistcontainer_get_unseen_tracks.call_count, 2)
+
     def test_raises_error_on_failure(self, lib_mock):
         sp_playlistcontainer = spotify.ffi.cast('sp_playlistcontainer *', 42)
         sp_playlist = spotify.ffi.cast('sp_playlist *', 43)
@@ -103,7 +109,7 @@ class PlaylistUnseenTracksTest(unittest.TestCase):
         self.assertIsInstance(result[1], spotify.Track)
         self.assertEqual(result[1]._sp_track, sp_tracks[1])
 
-    def test_getitem_raises_index_error_on_negative_index(self, lib_mock):
+    def test_getitem_raises_index_error_on_too_low_index(self, lib_mock):
         sp_playlistcontainer = spotify.ffi.cast('sp_playlistcontainer *', 42)
         sp_playlist = spotify.ffi.cast('sp_playlist *', 43)
         lib_mock.sp_playlistcontainer_get_unseen_tracks.return_value = 0

@@ -268,6 +268,8 @@ class Sequence(collections.Sequence):
             raise TypeError(
                 'list indices must be int or slice, not %s' %
                 key.__class__.__name__)
+        if key < 0:
+            key += self.__len__()
         if not 0 <= key < self.__len__():
             raise IndexError('list index out of range')
         return self._getitem_func(self._sp_obj, key)

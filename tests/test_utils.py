@@ -238,6 +238,22 @@ class SequenceTest(unittest.TestCase):
         self.assertEqual(result, mock.sentinel.item_one)
         getitem_func.assert_called_with(sp_search, 0)
 
+    def test_getitem_with_negative_index(self, lib_mock):
+        sp_search = spotify.ffi.cast('sp_search *', 42)
+        getitem_func = mock.Mock()
+        getitem_func.return_value = mock.sentinel.item_one
+        seq = utils.Sequence(
+            sp_obj=sp_search,
+            add_ref_func=lib_mock.sp_search_add_ref,
+            release_func=lib_mock.sp_search_release,
+            len_func=lambda x: 1,
+            getitem_func=getitem_func)
+
+        result = seq[-1]
+
+        self.assertEqual(result, mock.sentinel.item_one)
+        getitem_func.assert_called_with(sp_search, 0)
+
     def test_getitem_with_slice(self, lib_mock):
         sp_search = spotify.ffi.cast('sp_search *', 42)
         getitem_func = mock.Mock()
@@ -264,7 +280,7 @@ class SequenceTest(unittest.TestCase):
         self.assertEqual(result[0], mock.sentinel.item_one)
         self.assertEqual(result[1], mock.sentinel.item_two)
 
-    def test_getitem_raises_index_error_on_negative_index(self, lib_mock):
+    def test_getitem_raises_index_error_on_too_low_index(self, lib_mock):
         sp_search = spotify.ffi.cast('sp_search *', 42)
         seq = utils.Sequence(
             sp_obj=sp_search,
@@ -274,7 +290,7 @@ class SequenceTest(unittest.TestCase):
             getitem_func=None)
 
         with self.assertRaises(IndexError):
-            seq[-1]
+            seq[-3]
 
     def test_getitem_raises_index_error_on_too_high_index(self, lib_mock):
         sp_search = spotify.ffi.cast('sp_search *', 42)

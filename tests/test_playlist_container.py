@@ -132,6 +132,24 @@ class PlaylistContainerTest(unittest.TestCase):
         self.assertIsInstance(result, spotify.Playlist)
         self.assertEqual(result._sp_playlist, sp_playlist)
 
+    def test_getitem_with_negative_index(self, lib_mock):
+        lib_mock.sp_playlistcontainer_num_playlists.return_value = 1
+        sp_playlist = spotify.ffi.cast('sp_playlist *', 43)
+        lib_mock.sp_playlistcontainer_playlist_type.return_value = int(
+            spotify.PlaylistType.PLAYLIST)
+        lib_mock.sp_playlistcontainer_playlist.return_value = sp_playlist
+        sp_playlistcontainer = spotify.ffi.cast('sp_playlistcontainer *', 42)
+        playlist_container = spotify.PlaylistContainer(
+            self.session, sp_playlistcontainer=sp_playlistcontainer)
+
+        result = playlist_container[-1]
+
+        lib_mock.sp_playlistcontainer_playlist.assert_called_with(
+            sp_playlistcontainer, 0)
+        lib_mock.sp_playlist_add_ref.assert_called_with(sp_playlist)
+        self.assertIsInstance(result, spotify.Playlist)
+        self.assertEqual(result._sp_playlist, sp_playlist)
+
     def test_getitem_with_slice(self, lib_mock):
         lib_mock.sp_playlistcontainer_num_playlists.return_value = 3
         lib_mock.sp_playlistcontainer_playlist_type.side_effect = [
@@ -221,7 +239,7 @@ class PlaylistContainerTest(unittest.TestCase):
         with self.assertRaises(spotify.Error):
             playlist_container[0]
 
-    def test_getitem_raises_index_error_on_negative_index(self, lib_mock):
+    def test_getitem_raises_index_error_on_too_low_index(self, lib_mock):
         lib_mock.sp_playlistcontainer_num_playlists.return_value = 1
         sp_playlist = spotify.ffi.cast('sp_playlist *', 43)
         lib_mock.sp_playlistcontainer_playlist.return_value = sp_playlist
@@ -230,7 +248,7 @@ class PlaylistContainerTest(unittest.TestCase):
             self.session, sp_playlistcontainer=sp_playlistcontainer)
 
         with self.assertRaises(IndexError):
-            playlist_container[-1]
+            playlist_container[-3]
 
     def test_getitem_raises_index_error_on_too_high_index(self, lib_mock):
         lib_mock.sp_playlistcontainer_num_playlists.return_value = 1

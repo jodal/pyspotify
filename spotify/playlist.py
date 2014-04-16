@@ -127,7 +127,6 @@ class Playlist(utils.EventEmitter):
                 self._session,
                 sp_track=lib.sp_playlist_track(sp_playlist, key), add_ref=True)
 
-        # TODO Negative indexes
         # TODO Adding and removing tracks as if this was a regular list
         return utils.Sequence(
             sp_obj=self._sp_playlist,
@@ -877,6 +876,8 @@ class PlaylistContainer(collections.MutableSequence, utils.EventEmitter):
             raise TypeError(
                 'list indices must be int or slice, not %s' %
                 key.__class__.__name__)
+        if key < 0:
+            key += self.__len__()
         if not 0 <= key < self.__len__():
             raise IndexError('list index out of range')
 
@@ -1380,6 +1381,8 @@ class PlaylistUnseenTracks(collections.Sequence):
             raise TypeError(
                 'list indices must be int or slice, not %s' %
                 key.__class__.__name__)
+        if key < 0:
+            key += self.__len__()
         if not 0 <= key < self.__len__():
             raise IndexError('list index out of range')
         while key >= self._sp_tracks_len:

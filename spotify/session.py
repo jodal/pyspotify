@@ -1147,9 +1147,9 @@ class _SessionCallbacks(object):
             logger.debug('Music delivery, but no listener')
             return 0
         audio_format = spotify.AudioFormat(sp_audioformat)
-        buffer_ = ffi.buffer(
+        frames_buffer = ffi.buffer(
             frames, audio_format.frame_size() * num_frames)
-        frames_bytes = buffer_[:]
+        frames_bytes = frames_buffer[:]
         num_frames_consumed = spotify._session_instance.call(
             SessionEvent.MUSIC_DELIVERY,
             spotify._session_instance, audio_format, frames_bytes, num_frames)

@@ -909,6 +909,15 @@ class PlayerTest(unittest.TestCase):
         with self.assertRaises(spotify.Error):
             session.player.play(True)
 
+    def test_player_pause(self, lib_mock):
+        lib_mock.sp_session_player_play.return_value = spotify.ErrorType.OK
+        session = create_session(lib_mock)
+
+        session.player.pause()
+
+        lib_mock.sp_session_player_play.assert_called_once_with(
+            session._sp_session, 0)
+
     def test_player_unload(self, lib_mock):
         lib_mock.sp_session_player_unload.return_value = spotify.ErrorType.OK
         session = create_session(lib_mock)

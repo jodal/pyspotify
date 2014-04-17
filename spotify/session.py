@@ -696,6 +696,13 @@ class Player(object):
         spotify.Error.maybe_raise(lib.sp_session_player_play(
             self._session._sp_session, play))
 
+    def pause(self):
+        """Pause the currently loaded track.
+
+        This is the same as calling :meth:`play` with :class:`False`.
+        """
+        self.play(False)
+
     def unload(self):
         """Stops the currently playing track."""
         spotify.Error.maybe_raise(

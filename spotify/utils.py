@@ -62,7 +62,7 @@ class EventEmitter(object):
             else:
                 self._listeners[event] = [
                     l for l in self._listeners[event]
-                    if l.callback is not listener]
+                    if l.callback != listener]
 
     def emit(self, event, *event_args):
         """Call the registered listeners for ``event``.

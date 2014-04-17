@@ -30,6 +30,8 @@ class Sink(object):
         """
         self._session.off(
             spotify.SessionEvent.MUSIC_DELIVERY, self._on_music_delivery)
+        assert self._session.num_listeners(
+            spotify.SessionEvent.MUSIC_DELIVERY) == 0
         self._close()
 
     def _on_music_delivery(self, session, audio_format, frames, num_frames):

@@ -1180,7 +1180,7 @@ class _SessionCallbacks(object):
         if not spotify._session_instance:
             return
         data = utils.to_unicode(data).strip()
-        logger.debug('Log message from Spotify: %s', data)
+        logger.debug('libspotify log message: %s', data)
         spotify._session_instance.emit(
             SessionEvent.LOG_MESSAGE, spotify._session_instance, data)
 

@@ -76,7 +76,7 @@ named across classes.
 Refactoring: Change how to register image load listeners
 --------------------------------------------------------
 
-pyspotify have two main schemes for registering listener functions:
+pyspotify has two main schemes for registering listener functions:
 
 - Objects that only emit an event when it is done loading, like
   :class:`~spotify.AlbumBrowser`, :class:`~spotify.ArtistBrowser`,
@@ -122,7 +122,7 @@ Bug fixes
 
 - Work around segfault in libspotify if
   :attr:`~spotify.session.Social.private_session` is set before the session is
-  logged in and the first events is processed. This is a bug in libspotify
+  logged in and the first events are processed. This is a bug in libspotify
   which has been reported to Spotify through their IRC channel.
 
 - Multiple attributes on :class:`~spotify.Track` raised an exception if

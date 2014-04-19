@@ -36,6 +36,18 @@ class PlaylistTest(unittest.TestCase):
         self.assertEqual(result._sp_playlist, sp_playlist)
 
     @mock.patch('spotify.Link', spec=spotify.Link)
+    def test_create_from_uri_is_cached(self, link_mock, lib_mock):
+        sp_playlist = spotify.ffi.cast('sp_playlist *', 42)
+        link_instance_mock = link_mock.return_value
+        link_instance_mock.as_playlist.return_value = spotify.Playlist(
+            self.session, sp_playlist=sp_playlist)
+        uri = 'spotify:playlist:foo'
+
+        result = spotify.Playlist(self.session, uri=uri)
+
+        self.assertEqual(self.session._cache[sp_playlist], result)
+
+    @mock.patch('spotify.Link', spec=spotify.Link)
     def test_create_from_uri_fail_raises_error(self, link_mock, lib_mock):
         link_instance_mock = link_mock.return_value
         link_instance_mock.as_playlist.return_value = None

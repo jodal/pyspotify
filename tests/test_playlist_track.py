@@ -7,7 +7,7 @@ import tests
 from tests import mock
 
 
-@mock.patch('spotify.playlist.lib', spec=spotify.lib)
+@mock.patch('spotify.playlist_track.lib', spec=spotify.lib)
 class PlaylistTrackTest(unittest.TestCase):
 
     def setUp(self):

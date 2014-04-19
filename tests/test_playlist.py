@@ -179,18 +179,23 @@ class PlaylistTest(unittest.TestCase):
         lib_mock.sp_playlist_is_loaded.assert_called_with(sp_playlist)
         self.assertEqual(len(result), 0)
 
-    def test_tracks_with_metadata(self, lib_mock):
+    @mock.patch('spotify.playlist_track.lib', spec=spotify.lib)
+    def test_tracks_with_metadata(self, playlist_track_lib_mock, lib_mock):
         lib_mock.sp_playlist_num_tracks.return_value = 1
         sp_playlist = spotify.ffi.cast('sp_playlist *', 42)
         playlist = spotify.Playlist(self.session, sp_playlist=sp_playlist)
 
         # Created a Playlist with a ref to sp_playlist
         self.assertEqual(lib_mock.sp_playlist_add_ref.call_count, 1)
+        self.assertEqual(
+            playlist_track_lib_mock.sp_playlist_add_ref.call_count, 0)
 
         result = playlist.tracks_with_metadata
 
         # Created a Sequence with a ref to sp_playlist
         self.assertEqual(lib_mock.sp_playlist_add_ref.call_count, 2)
+        self.assertEqual(
+            playlist_track_lib_mock.sp_playlist_add_ref.call_count, 0)
 
         self.assertEqual(len(result), 1)
         lib_mock.sp_playlist_num_tracks.assert_called_with(sp_playlist)
@@ -199,7 +204,9 @@ class PlaylistTest(unittest.TestCase):
         self.assertIsInstance(item, spotify.PlaylistTrack)
 
         # Created a PlaylistTrack with a ref to sp_playlist
-        self.assertEqual(lib_mock.sp_playlist_add_ref.call_count, 3)
+        self.assertEqual(lib_mock.sp_playlist_add_ref.call_count, 2)
+        self.assertEqual(
+            playlist_track_lib_mock.sp_playlist_add_ref.call_count, 1)
 
     def test_tracks_with_metadata_if_no_tracks(self, lib_mock):
         lib_mock.sp_playlist_num_tracks.return_value = 0

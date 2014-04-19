@@ -7,7 +7,7 @@ import tests
 from tests import mock
 
 
-@mock.patch('spotify.playlist.lib', spec=spotify.lib)
+@mock.patch('spotify.playlist_unseen_tracks.lib', spec=spotify.lib)
 class PlaylistUnseenTracksTest(unittest.TestCase):
 
     # TODO Test that the collection releases sp_playlistcontainer and

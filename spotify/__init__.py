@@ -120,6 +120,7 @@ from spotify.inbox import *  # noqa
 from spotify.link import *  # noqa
 from spotify.offline import *  # noqa
 from spotify.playlist import *  # noqa
+from spotify.playlist_unseen_tracks import *  # noqa
 from spotify.search import *  # noqa
 from spotify.session import *  # noqa
 from spotify.sink import *  # noqa

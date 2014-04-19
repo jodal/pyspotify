@@ -960,13 +960,14 @@ class PlaylistContainerTest(unittest.TestCase):
             self.session, sp_user=sp_user, add_ref=True)
         self.assertEqual(result, mock.sentinel.user)
 
-    def test_get_unseen_tracks(self, lib_mock):
+    @mock.patch('spotify.playlist_unseen_tracks.lib', spec=spotify.lib)
+    def test_get_unseen_tracks(self, unseen_lib_mock, lib_mock):
         sp_playlistcontainer = spotify.ffi.cast('sp_playlistcontainer *', 42)
         playlist_container = spotify.PlaylistContainer(
             self.session, sp_playlistcontainer=sp_playlistcontainer)
         sp_playlist = spotify.ffi.cast('sp_playlist *', 43)
         playlist = spotify.Playlist(self.session, sp_playlist=sp_playlist)
-        lib_mock.sp_playlistcontainer_get_unseen_tracks.return_value = 0
+        unseen_lib_mock.sp_playlistcontainer_get_unseen_tracks.return_value = 0
 
         result = playlist_container.get_unseen_tracks(playlist)
 

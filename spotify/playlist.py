@@ -114,19 +114,7 @@ class Playlist(utils.EventEmitter):
         if not self.is_loaded:
             return []
 
-        @serialized
-        def get_track(sp_playlist, key):
-            return spotify.Track(
-                self._session,
-                sp_track=lib.sp_playlist_track(sp_playlist, key), add_ref=True)
-
-        # TODO Adding and removing tracks as if this was a regular list
-        return utils.Sequence(
-            sp_obj=self._sp_playlist,
-            add_ref_func=lib.sp_playlist_add_ref,
-            release_func=lib.sp_playlist_release,
-            len_func=lib.sp_playlist_num_tracks,
-            getitem_func=get_track)
+        return _Tracks(self._session, self._sp_playlist)
 
     @property
     @serialized
@@ -139,16 +127,7 @@ class Playlist(utils.EventEmitter):
         if not self.is_loaded:
             return []
 
-        @serialized
-        def get_playlist_track(sp_playlist, key):
-            return PlaylistTrack(self._session, sp_playlist, key)
-
-        return utils.Sequence(
-            sp_obj=self._sp_playlist,
-            add_ref_func=lib.sp_playlist_add_ref,
-            release_func=lib.sp_playlist_release,
-            len_func=lib.sp_playlist_num_tracks,
-            getitem_func=get_playlist_track)
+        return _PlaylistTracks(self._session, self._sp_playlist)
 
     @property
     @serialized
@@ -737,6 +716,33 @@ class _PlaylistCallbacks(object):
 @utils.make_enum('SP_PLAYLIST_OFFLINE_STATUS_')
 class PlaylistOfflineStatus(utils.IntEnum):
     pass
+
+
+class _Tracks(utils.Sequence):
+
+    def __init__(self, session, sp_playlist):
+        self._session = session
+        return super(_Tracks, self).__init__(
+            sp_obj=sp_playlist,
+            add_ref_func=lib.sp_playlist_add_ref,
+            release_func=lib.sp_playlist_release,
+            len_func=lib.sp_playlist_num_tracks,
+            getitem_func=self.get_track)
+
+    @serialized
+    def get_track(self, sp_playlist, key):
+        return spotify.Track(
+            self._session,
+            sp_track=lib.sp_playlist_track(sp_playlist, key), add_ref=True)
+
+    # TODO Adding and removing tracks as if this was a regular list
+
+
+class _PlaylistTracks(_Tracks):
+
+    @serialized
+    def get_track(self, sp_playlist, key):
+        return PlaylistTrack(self._session, sp_playlist, key)
 
 
 class PlaylistTrack(object):

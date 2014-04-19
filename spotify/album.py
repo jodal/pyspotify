@@ -180,7 +180,9 @@ class AlbumBrowser(object):
     You can get an album browser from any :class:`Album` instance by calling
     :meth:`Album.browse`::
 
-        >>> album = spotify.Album('spotify:album:6wXDbHLesy6zWqQawAa91d')
+        >>> session = spotify.Session()
+        # ...
+        >>> album = session.get_album('spotify:album:6wXDbHLesy6zWqQawAa91d')
         >>> browser = album.browse()
         >>> browser.load()
         >>> len(browser.tracks)

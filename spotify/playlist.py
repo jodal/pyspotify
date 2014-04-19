@@ -772,7 +772,7 @@ class PlaylistContainer(collections.MutableSequence, utils.EventEmitter):
     To add a playlist you can use :meth:`append` or :meth:`insert` with either
     the name of a new playlist or an existing playlist object. For example::
 
-        >>> playlist = spotify.Playlist(
+        >>> playlist = session.get_playlist(
         ...     'spotify:user:fiat500c:playlist:54k50VZdvtnIPt4d8RBCmZ')
         >>> container.insert(3, playlist)
         >>> container.append('New empty playlist')

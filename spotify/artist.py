@@ -142,7 +142,10 @@ class ArtistBrowser(object):
     You can get an artist browser from any :class:`Artist` instance by calling
     :meth:`Artist.browse`::
 
-        >>> artist = spotify.Artist('spotify:artist:421vyBBkhgRAOz4cYPvrZJ')
+        >>> session = spotify.Session()
+        # ...
+        >>> artist = session.get_artist(
+        ...     'spotify:artist:421vyBBkhgRAOz4cYPvrZJ')
         >>> browser = artist.browse()
         >>> browser.load()
         >>> len(browser.albums)

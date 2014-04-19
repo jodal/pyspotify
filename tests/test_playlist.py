@@ -1022,37 +1022,8 @@ class PlaylistCallbacksTest(unittest.TestCase):
         callback.assert_called_once_with(playlist)
 
 
-class PlaylistFolderTest(unittest.TestCase):
-
-    def test_id(self):
-        folder = spotify.PlaylistFolder(
-            id=123, name='foo', type=spotify.PlaylistType.START_FOLDER)
-
-        self.assertEqual(folder.id, 123)
-
-    def test_image(self):
-        folder = spotify.PlaylistFolder(
-            id=123, name='foo', type=spotify.PlaylistType.START_FOLDER)
-
-        self.assertEqual(folder.name, 'foo')
-
-    def test_type(self):
-        folder = spotify.PlaylistFolder(
-            id=123, name='foo', type=spotify.PlaylistType.START_FOLDER)
-
-        self.assertEqual(folder.type, spotify.PlaylistType.START_FOLDER)
-
-
 class PlaylistOfflineStatusTest(unittest.TestCase):
 
     def test_has_constants(self):
         self.assertEqual(spotify.PlaylistOfflineStatus.NO, 0)
         self.assertEqual(spotify.PlaylistOfflineStatus.DOWNLOADING, 2)
-
-
-class PlaylistTypeTest(unittest.TestCase):
-
-    def test_has_constants(self):
-        self.assertEqual(spotify.PlaylistType.PLAYLIST, 0)
-        self.assertEqual(spotify.PlaylistType.START_FOLDER, 1)
-        self.assertEqual(spotify.PlaylistType.END_FOLDER, 2)

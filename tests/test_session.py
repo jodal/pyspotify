@@ -300,7 +300,7 @@ class SessionTest(unittest.TestCase):
         with self.assertRaises(spotify.Error):
             session.process_events()
 
-    @mock.patch('spotify.playlist.lib', spec=spotify.lib)
+    @mock.patch('spotify.playlist_container.lib', spec=spotify.lib)
     def test_playlist_container(self, playlist_lib_mock, lib_mock):
         lib_mock.sp_session_playlistcontainer.return_value = (
             spotify.ffi.cast('sp_playlistcontainer *', 42))
@@ -312,7 +312,7 @@ class SessionTest(unittest.TestCase):
             session._sp_session)
         self.assertIsInstance(result, spotify.PlaylistContainer)
 
-    @mock.patch('spotify.playlist.lib', spec=spotify.lib)
+    @mock.patch('spotify.playlist_container.lib', spec=spotify.lib)
     def test_playlist_container_if_already_listened_to(
             self, playlist_lib_mock, lib_mock):
         lib_mock.sp_session_playlistcontainer.return_value = (
@@ -435,7 +435,7 @@ class SessionTest(unittest.TestCase):
             session._sp_session, b'alice')
         self.assertIsNone(result)
 
-    @mock.patch('spotify.playlist.lib', spec=spotify.lib)
+    @mock.patch('spotify.playlist_container.lib', spec=spotify.lib)
     def test_published_playlists_for_user(self, playlist_lib_mock, lib_mock):
         func_mock = lib_mock.sp_session_publishedcontainer_for_user_create
         func_mock.return_value = spotify.ffi.cast('sp_playlistcontainer *', 42)
@@ -452,7 +452,7 @@ class SessionTest(unittest.TestCase):
         self.assertEqual(
             playlist_lib_mock.sp_playlistcontainer_add_ref.call_count, 0)
 
-    @mock.patch('spotify.playlist.lib', spec=spotify.lib)
+    @mock.patch('spotify.playlist_container.lib', spec=spotify.lib)
     def test_published_playlists_for_current_user(
             self, playlist_lib_mock, lib_mock):
         func_mock = lib_mock.sp_session_publishedcontainer_for_user_create

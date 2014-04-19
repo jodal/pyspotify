@@ -30,7 +30,8 @@ class LibspotifyVersionTest(unittest.TestCase):
         self.assertEqual(result, 73)
 
     def test_libspotify_build_id(self, lib_mock):
-        build_id = spotify.ffi.new('char []', b'12.1.51.foobaræøå')
+        build_id = spotify.ffi.new(
+            'char []', '12.1.51.foobaræøå'.encode('utf-8'))
         lib_mock.sp_build_id.return_value = build_id
 
         result = spotify.get_libspotify_build_id()

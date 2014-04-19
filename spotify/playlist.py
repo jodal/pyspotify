@@ -72,6 +72,7 @@ class Playlist(utils.EventEmitter):
                 raise spotify.Error(
                     'Failed to get playlist from Spotify URI: %r' % uri)
             sp_playlist = playlist._sp_playlist
+            session._cache[sp_playlist] = self
             add_ref = True
 
         if add_ref:

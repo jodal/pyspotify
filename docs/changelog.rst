@@ -135,6 +135,14 @@ Bug fixes
 - Support negative indexes on all custom sequence types. For example,
   ``collection[-1]`` returns the last element in the collection.
 
+- We now cache playlists when created from URIs. Previously, only playlists
+  created from ``sp_playlist`` objects were cached. This avoids a potentially
+  large number of wrapper object recreations due to a flood of updates to the
+  playlist when it is intially loaded. Combined with having registered a
+  callback for the libspotify ``playlist_update_in_progress`` callback, this
+  could cause deep call stacks reaching the maximum recursion depth. (Fixes:
+  :issue:`122`)
+
 Minor changes
 -------------
 

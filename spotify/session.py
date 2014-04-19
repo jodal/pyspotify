@@ -72,8 +72,8 @@ class Session(utils.EventEmitter):
     """A mapping from sp_* objects to their corresponding Python instances.
 
     The ``_cached`` helper contructors on wrapper objects use this cache for
-    finding and returning existing alive wrapper objects for the sp_* object is
-    about to create a wrapper for.
+    finding and returning existing alive wrapper objects for the sp_* object it
+    is about to create a wrapper for.
 
     The cache *does not* keep objects alive. It's only a means for looking up
     the objects if they are kept alive somewhere else in the application.

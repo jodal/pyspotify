@@ -50,9 +50,13 @@ class Playlist(utils.EventEmitter):
         Internal method.
         """
         if sp_playlist in session._cache:
-            return session._cache[sp_playlist]
+            playlist = session._cache[sp_playlist]
+            logger.debug(
+                'Getting %r wrapper %r from cache', sp_playlist, playlist)
+            return playlist
         playlist = Playlist(session, sp_playlist=sp_playlist, add_ref=add_ref)
         session._cache[sp_playlist] = playlist
+        logger.debug('Creating new %r wrapper %r', sp_playlist, playlist)
         return playlist
 
     def __init__(self, session, uri=None, sp_playlist=None, add_ref=True):
@@ -804,11 +808,18 @@ class PlaylistContainer(collections.MutableSequence, utils.EventEmitter):
         Internal method.
         """
         if sp_playlistcontainer in session._cache:
-            return session._cache[sp_playlistcontainer]
+            playlist_container = session._cache[sp_playlistcontainer]
+            logger.debug(
+                'Getting %r wrapper %r from cache',
+                sp_playlistcontainer, playlist_container)
+            return playlist_container
         playlist_container = PlaylistContainer(
             session,
             sp_playlistcontainer=sp_playlistcontainer, add_ref=add_ref)
         session._cache[sp_playlistcontainer] = playlist_container
+        logger.debug(
+            'Creating new %r wrapper %r',
+            sp_playlistcontainer, playlist_container)
         return playlist_container
 
     def __init__(self, session, sp_playlistcontainer, add_ref=True):

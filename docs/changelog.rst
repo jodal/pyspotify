@@ -151,8 +151,11 @@ Minor changes
 
 - Running ``python setup.py test`` now runs the test suite.
 
-- The test suite now runs on Mac OS X, using CPython 2.7, 3.2, 3.3, and PyPy
-  2.2, on every push to GitHub.
+- The tests are now compatible with CPython 3.4. No changes to the
+  implementation was required.
+
+- The test suite now runs on Mac OS X, using CPython 2.7, 3.2, 3.3, 3.4, and
+  PyPy 2.2, on every push to GitHub.
 
 
 v2.0.0a1 (2014-02-14)

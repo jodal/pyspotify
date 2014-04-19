@@ -17,7 +17,11 @@ further details.
 
         >>> import spotify
         >>> spotify.__version__
-        '2.0.0'
+        u'2.0.0'
+
+.. autofunction:: get_libspotify_api_version
+
+.. autofunction:: get_libspotify_build_id
 
 
 **Sections**

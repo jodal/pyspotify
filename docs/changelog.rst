@@ -138,6 +138,9 @@ Bug fixes
 Minor changes
 -------------
 
+- Add :func:`spotify.get_libspotify_api_version` and
+  :func:`spotify.get_libspotify_build_id`.
+
 - Running ``python setup.py test`` now runs the test suite.
 
 - The test suite now runs on Mac OS X, using CPython 2.7, 3.2, 3.3, and PyPy

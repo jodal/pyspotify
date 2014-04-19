@@ -127,3 +127,4 @@ from spotify.social import *  # noqa
 from spotify.toplist import *  # noqa
 from spotify.track import *  # noqa
 from spotify.user import *  # noqa
+from spotify.version import *  # noqa

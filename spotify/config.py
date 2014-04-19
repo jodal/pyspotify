@@ -1,7 +1,7 @@
 from __future__ import unicode_literals
 
 import spotify
-from spotify import lib, ffi, utils
+from spotify import ffi, utils
 from spotify.session import _SessionCallbacks
 
 __all__ = [
@@ -28,7 +28,7 @@ class Config(object):
         })
 
         # Defaults
-        self.api_version = lib.SPOTIFY_API_VERSION
+        self.api_version = spotify.get_libspotify_api_version()
         self.cache_location = b'tmp'
         self.settings_location = b'tmp'
         self.user_agent = 'pyspotify %s' % spotify.__version__
@@ -41,7 +41,7 @@ class Config(object):
         """The API version of the libspotify we're using.
 
         You should not need to change this. It defaults to the value provided
-        by libspotify through :attr:`spotify.lib.SPOTIFY_API_VERSION`.
+        by libspotify through :func:`spotify.get_libspotify_api_version`.
         """
         return self._sp_session_config.api_version
 

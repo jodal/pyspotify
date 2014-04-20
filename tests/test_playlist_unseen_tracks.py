@@ -14,7 +14,7 @@ class PlaylistUnseenTracksTest(unittest.TestCase):
     # sp_playlist when no longer referenced.
 
     def setUp(self):
-        self.session = tests.create_session()
+        self.session = tests.create_session_mock()
 
     @mock.patch('spotify.track.lib', spec=spotify.lib)
     def test_normal_usage(self, track_lib_mock, lib_mock):

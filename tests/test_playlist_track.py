@@ -11,7 +11,7 @@ from tests import mock
 class PlaylistTrackTest(unittest.TestCase):
 
     def setUp(self):
-        self.session = tests.create_session()
+        self.session = tests.create_session_mock()
 
     @mock.patch('spotify.track.lib', spec=spotify.lib)
     def test_track(self, track_lib_mock, lib_mock):

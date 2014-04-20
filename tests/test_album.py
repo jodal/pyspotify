@@ -12,7 +12,7 @@ from tests import mock
 class AlbumTest(unittest.TestCase):
 
     def setUp(self):
-        self.session = tests.create_session()
+        self.session = tests.create_session_mock()
 
     def test_create_without_uri_or_sp_album_fails(self, lib_mock):
         with self.assertRaises(AssertionError):
@@ -294,7 +294,7 @@ class AlbumTest(unittest.TestCase):
 class AlbumBrowserTest(unittest.TestCase):
 
     def setUp(self):
-        self.session = tests.create_session()
+        self.session = tests.create_session_mock()
         spotify._session_instance = self.session
 
     def tearDown(self):
@@ -368,7 +368,7 @@ class AlbumBrowserTest(unittest.TestCase):
             callback.call_args[0][0]._sp_albumbrowse, sp_albumbrowse)
 
     def test_adds_ref_to_sp_albumbrowse_when_created(self, lib_mock):
-        session = tests.create_session()
+        session = tests.create_session_mock()
         sp_albumbrowse = spotify.ffi.cast('sp_albumbrowse *', 42)
 
         spotify.AlbumBrowser(session, sp_albumbrowse=sp_albumbrowse)

@@ -14,7 +14,7 @@ from tests import mock
 class PlaylistTest(unittest.TestCase):
 
     def setUp(self):
-        self.session = tests.create_session()
+        self.session = tests.create_session_mock()
 
     def test_create_without_uri_or_sp_playlist_fails(self, lib_mock):
         with self.assertRaises(AssertionError):
@@ -813,7 +813,7 @@ class PlaylistTest(unittest.TestCase):
 class PlaylistCallbacksTest(unittest.TestCase):
 
     def setUp(self):
-        self.session = tests.create_session()
+        self.session = tests.create_session_mock()
         spotify._session_instance = self.session
 
     def tearDown(self):

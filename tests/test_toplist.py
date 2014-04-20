@@ -11,7 +11,7 @@ from tests import mock
 class ToplistTest(unittest.TestCase):
 
     def setUp(self):
-        self.session = tests.create_session()
+        self.session = tests.create_session_mock()
         spotify._session_instance = self.session
 
     def tearDown(self):

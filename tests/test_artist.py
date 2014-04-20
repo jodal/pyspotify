@@ -12,7 +12,7 @@ from tests import mock
 class ArtistTest(unittest.TestCase):
 
     def setUp(self):
-        self.session = tests.create_session()
+        self.session = tests.create_session_mock()
 
     def test_create_without_uri_or_sp_artist_fails(self, lib_mock):
         with self.assertRaises(AssertionError):
@@ -211,7 +211,7 @@ class ArtistTest(unittest.TestCase):
 class ArtistBrowserTest(unittest.TestCase):
 
     def setUp(self):
-        self.session = tests.create_session()
+        self.session = tests.create_session_mock()
         spotify._session_instance = self.session
 
     def tearDown(self):

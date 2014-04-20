@@ -11,7 +11,7 @@ from tests import mock
 class TrackTest(unittest.TestCase):
 
     def setUp(self):
-        self.session = tests.create_session()
+        self.session = tests.create_session_mock()
 
     def assert_fails_if_error(self, lib_mock, func):
         lib_mock.sp_track_error.return_value = (
@@ -308,7 +308,7 @@ class TrackTest(unittest.TestCase):
             self.session._sp_session, mock.ANY, 1, 1)
 
     def test_set_starred_fails_if_error(self, lib_mock):
-        tests.create_session()
+        tests.create_session_mock()
         lib_mock.sp_track_set_starred.return_value = (
             spotify.ErrorType.BAD_API_VERSION)
         sp_track = spotify.ffi.cast('sp_track *', 42)

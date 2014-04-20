@@ -11,7 +11,7 @@ from tests import mock
 class SearchTest(unittest.TestCase):
 
     def setUp(self):
-        self.session = tests.create_session()
+        self.session = tests.create_session_mock()
         spotify._session_instance = self.session
 
     def tearDown(self):
@@ -526,7 +526,7 @@ class SearchTest(unittest.TestCase):
 class SearchPlaylistTest(unittest.TestCase):
 
     def setUp(self):
-        self.session = tests.create_session()
+        self.session = tests.create_session_mock()
 
     def test_attributes(self):
         pl = spotify.SearchPlaylist(

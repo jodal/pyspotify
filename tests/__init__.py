@@ -42,7 +42,7 @@ def buffer_writer(string):
     return func
 
 
-def create_session():
+def create_session_mock():
     """Creates a :class:`spotify.Session` mock for testing."""
     session = mock.Mock()
     session._cache = weakref.WeakValueDictionary()

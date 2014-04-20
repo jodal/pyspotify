@@ -11,7 +11,7 @@ from tests import mock
 class UserTest(unittest.TestCase):
 
     def setUp(self):
-        self.session = tests.create_session()
+        self.session = tests.create_session_mock()
 
     def test_create_without_uri_or_sp_user_fails(self, lib_mock):
         with self.assertRaises(AssertionError):

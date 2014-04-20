@@ -32,7 +32,7 @@ class FooWithError(Foo):
 class LoadableTest(unittest.TestCase):
 
     def setUp(self):
-        self.session = tests.create_session()
+        self.session = tests.create_session_mock()
         self.session.connection_state = spotify.ConnectionState.LOGGED_IN
 
     def test_load_raises_error_if_not_logged_in(

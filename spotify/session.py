@@ -286,16 +286,20 @@ class Session(utils.EventEmitter):
     @property
     def starred(self):
         """The starred :class:`Playlist` for the currently logged in user."""
-        sp_playlist = lib.sp_session_starred_create(self._sp_session)
-        if sp_playlist == ffi.NULL:
-            return None
-        return spotify.Playlist._cached(self, sp_playlist, add_ref=False)
+        return self.starred_for_user()
 
-    def starred_for_user(self, canonical_username):
+    def starred_for_user(self, canonical_username=None):
         """The starred :class:`Playlist` for the user with
-        ``canonical_username``."""
-        sp_playlist = lib.sp_session_starred_for_user_create(
-            self._sp_session, utils.to_bytes(canonical_username))
+        ``canonical_username``.
+
+        If ``canonical_username`` isn't specified, the starred playlist for
+        the currently logged in user is returned.
+        """
+        if canonical_username is None:
+            sp_playlist = lib.sp_session_starred_create(self._sp_session)
+        else:
+            sp_playlist = lib.sp_session_starred_for_user_create(
+                self._sp_session, utils.to_bytes(canonical_username))
         if sp_playlist == ffi.NULL:
             return None
         return spotify.Playlist._cached(self, sp_playlist, add_ref=False)
@@ -305,7 +309,8 @@ class Session(utils.EventEmitter):
         with ``canonical_username``.
 
         If ``canonical_username`` isn't specified, the published container for
-        the currently logged in user is returned."""
+        the currently logged in user is returned.
+        """
         if canonical_username is None:
             canonical_username = ffi.NULL
         else:
@@ -327,7 +332,8 @@ class Session(utils.EventEmitter):
         """Set preferred :class:`Bitrate` for offline sync.
 
         If ``allow_resync`` is :class:`True` libspotify may resynchronize
-        already synced tracks."""
+        already synced tracks.
+        """
         spotify.Error.maybe_raise(lib.sp_session_preferred_offline_bitrate(
             self._sp_session, bitrate, allow_resync))
 

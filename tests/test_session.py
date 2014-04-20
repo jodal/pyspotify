@@ -418,6 +418,23 @@ class SessionTest(unittest.TestCase):
         # a Playlist object
         self.assertEqual(playlist_lib_mock.sp_playlist_add_ref.call_count, 0)
 
+    @mock.patch('spotify.playlist.lib', spec=spotify.lib)
+    def test_starred_for_current_user(self, playlist_lib_mock, lib_mock):
+        lib_mock.sp_session_starred_create.return_value = (
+            spotify.ffi.cast('sp_playlist *', 42))
+        session = tests.create_real_session(lib_mock)
+
+        result = session.starred_for_user()
+
+        lib_mock.sp_session_starred_create.assert_called_with(
+            session._sp_session)
+        self.assertIsInstance(result, spotify.Playlist)
+
+        # Since we *created* the sp_playlist, we already have a refcount of 1
+        # and shouldn't increase the refcount when wrapping this sp_playlist in
+        # a Playlist object
+        self.assertEqual(playlist_lib_mock.sp_playlist_add_ref.call_count, 0)
+
     def test_starred_for_user_if_not_logged_in(self, lib_mock):
         lib_mock.sp_session_starred_for_user_create.return_value = (
             spotify.ffi.NULL)

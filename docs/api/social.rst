@@ -4,7 +4,7 @@ Social
 
 .. module:: spotify
 
-.. autoclass:: spotify.session.Social
+.. autoclass:: spotify.social.Social
 
 .. autoclass:: ScrobblingState
     :no-inherited-members:

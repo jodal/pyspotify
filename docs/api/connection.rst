@@ -4,7 +4,7 @@ Connection
 
 .. module:: spotify
 
-.. autoclass:: spotify.session.Offline
+.. autoclass:: spotify.connection.Offline
 
 .. autoclass:: ConnectionRule
     :no-inherited-members:

@@ -1,11 +1,10 @@
 from __future__ import unicode_literals
 
-import functools
 import logging
-import operator
 import weakref
 
 import spotify
+import spotify.connection
 import spotify.social
 from spotify import ffi, lib, serialized, utils
 
@@ -64,7 +63,7 @@ class Session(utils.EventEmitter):
         self._emitters = []
         self._callback_handles = set()
 
-        self.offline = Offline(self)
+        self.offline = spotify.connection.Offline(self)
         self.player = Player(self)
         self.social = spotify.social.Social(self)
         spotify._session_instance = self
@@ -115,7 +114,7 @@ class Session(utils.EventEmitter):
     """
 
     offline = None
-    """An :class:`~spotify.session.Offline` instance for controlling offline
+    """An :class:`~spotify.connection.Offline` instance for controlling offline
     sync."""
 
     player = None
@@ -599,70 +598,6 @@ class Session(utils.EventEmitter):
         return spotify.Toplist(
             self, type=type, region=region,
             canonical_username=canonical_username, callback=callback)
-
-
-class Offline(object):
-    """Offline sync controller.
-
-    You'll never need to create an instance of this class yourself. You'll find
-    it ready to use as the :attr:`~Session.offline` attribute on the
-    :class:`Session` instance.
-    """
-
-    def __init__(self, session):
-        self._session = session
-
-    def set_connection_type(self, connection_type):
-        """Set the :class:`ConnectionType`.
-
-        This is used together with :meth:`~Offline.set_connection_rules` to
-        control offline syncing and network usage.
-        """
-        spotify.Error.maybe_raise(lib.sp_session_set_connection_type(
-            self._session._sp_session, connection_type))
-
-    def set_connection_rules(self, *connection_rules):
-        """Set one or more :class:`connection rules <ConnectionRule>`.
-
-        This is used together with :meth:`~Offline.set_connection_type` to
-        control offline syncing and network usage.
-
-        To remove all rules, simply call this method without any arguments.
-        """
-        connection_rules = functools.reduce(operator.or_, connection_rules, 0)
-        spotify.Error.maybe_raise(lib.sp_session_set_connection_rules(
-            self._session._sp_session, connection_rules))
-
-    @property
-    def tracks_to_sync(self):
-        """Total number of tracks that needs download before everything from
-        all playlists that is marked for offline is fully synchronized.
-        """
-        return lib.sp_offline_tracks_to_sync(self._session._sp_session)
-
-    @property
-    def num_playlists(self):
-        """Number of playlists that is marked for offline synchronization."""
-        return lib.sp_offline_num_playlists(self._session._sp_session)
-
-    @property
-    def sync_status(self):
-        """The :class:`OfflineSyncStatus` or :class:`None` if not syncing.
-
-        The :attr:`~SessionEvent.OFFLINE_STATUS_UPDATED` event is emitted on
-        the session object when this is updated.
-        """
-        sp_offline_sync_status = ffi.new('sp_offline_sync_status *')
-        syncing = lib.sp_offline_sync_get_status(
-            self._session._sp_session, sp_offline_sync_status)
-        if syncing:
-            return spotify.OfflineSyncStatus(sp_offline_sync_status)
-
-    @property
-    def time_left(self):
-        """The number of seconds until the user has to get online and
-        relogin."""
-        return lib.sp_offline_time_left(self._session._sp_session)
 
 
 class Player(object):

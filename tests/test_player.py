@@ -4,8 +4,8 @@ import unittest
 
 import spotify
 
+import tests
 from tests import mock
-from tests.test_session import create_session
 
 
 @mock.patch('spotify.player.lib', spec=spotify.lib)
@@ -18,7 +18,7 @@ class PlayerTest(unittest.TestCase):
     @mock.patch('spotify.track.lib', spec=spotify.lib)
     def test_player_load(self, track_lib_mock, session_lib_mock, lib_mock):
         lib_mock.sp_session_player_load.return_value = spotify.ErrorType.OK
-        session = create_session(session_lib_mock)
+        session = tests.create_real_session(session_lib_mock)
         sp_track = spotify.ffi.cast('sp_track *', 42)
         track = spotify.Track(session, sp_track=sp_track)
 
@@ -32,7 +32,7 @@ class PlayerTest(unittest.TestCase):
             self, track_lib_mock, session_lib_mock, lib_mock):
         lib_mock.sp_session_player_load.return_value = (
             spotify.ErrorType.TRACK_NOT_PLAYABLE)
-        session = create_session(session_lib_mock)
+        session = tests.create_real_session(session_lib_mock)
         sp_track = spotify.ffi.cast('sp_track *', 42)
         track = spotify.Track(session, sp_track=sp_track)
 
@@ -41,7 +41,7 @@ class PlayerTest(unittest.TestCase):
 
     def test_player_seek(self, session_lib_mock, lib_mock):
         lib_mock.sp_session_player_seek.return_value = spotify.ErrorType.OK
-        session = create_session(session_lib_mock)
+        session = tests.create_real_session(session_lib_mock)
 
         session.player.seek(45000)
 
@@ -51,14 +51,14 @@ class PlayerTest(unittest.TestCase):
     def test_player_seek_fail_raises_error(self, session_lib_mock, lib_mock):
         lib_mock.sp_session_player_seek.return_value = (
             spotify.ErrorType.BAD_API_VERSION)
-        session = create_session(session_lib_mock)
+        session = tests.create_real_session(session_lib_mock)
 
         with self.assertRaises(spotify.Error):
             session.player.seek(45000)
 
     def test_player_play(self, session_lib_mock, lib_mock):
         lib_mock.sp_session_player_play.return_value = spotify.ErrorType.OK
-        session = create_session(session_lib_mock)
+        session = tests.create_real_session(session_lib_mock)
 
         session.player.play(True)
 
@@ -67,7 +67,7 @@ class PlayerTest(unittest.TestCase):
 
     def test_player_play_with_false_to_pause(self, session_lib_mock, lib_mock):
         lib_mock.sp_session_player_play.return_value = spotify.ErrorType.OK
-        session = create_session(session_lib_mock)
+        session = tests.create_real_session(session_lib_mock)
 
         session.player.play(False)
 
@@ -77,14 +77,14 @@ class PlayerTest(unittest.TestCase):
     def test_player_play_fail_raises_error(self, session_lib_mock, lib_mock):
         lib_mock.sp_session_player_play.return_value = (
             spotify.ErrorType.BAD_API_VERSION)
-        session = create_session(session_lib_mock)
+        session = tests.create_real_session(session_lib_mock)
 
         with self.assertRaises(spotify.Error):
             session.player.play(True)
 
     def test_player_pause(self, session_lib_mock, lib_mock):
         lib_mock.sp_session_player_play.return_value = spotify.ErrorType.OK
-        session = create_session(session_lib_mock)
+        session = tests.create_real_session(session_lib_mock)
 
         session.player.pause()
 
@@ -93,7 +93,7 @@ class PlayerTest(unittest.TestCase):
 
     def test_player_unload(self, session_lib_mock, lib_mock):
         lib_mock.sp_session_player_unload.return_value = spotify.ErrorType.OK
-        session = create_session(session_lib_mock)
+        session = tests.create_real_session(session_lib_mock)
 
         session.player.unload()
 
@@ -103,7 +103,7 @@ class PlayerTest(unittest.TestCase):
     def test_player_unload_fail_raises_error(self, session_lib_mock, lib_mock):
         lib_mock.sp_session_player_unload.return_value = (
             spotify.ErrorType.BAD_API_VERSION)
-        session = create_session(session_lib_mock)
+        session = tests.create_real_session(session_lib_mock)
 
         with self.assertRaises(spotify.Error):
             session.player.unload()
@@ -111,7 +111,7 @@ class PlayerTest(unittest.TestCase):
     @mock.patch('spotify.track.lib', spec=spotify.lib)
     def test_player_prefetch(self, track_lib_mock, session_lib_mock, lib_mock):
         lib_mock.sp_session_player_prefetch.return_value = spotify.ErrorType.OK
-        session = create_session(session_lib_mock)
+        session = tests.create_real_session(session_lib_mock)
         sp_track = spotify.ffi.cast('sp_track *', 42)
         track = spotify.Track(session, sp_track=sp_track)
 
@@ -125,7 +125,7 @@ class PlayerTest(unittest.TestCase):
             self, track_lib_mock, session_lib_mock, lib_mock):
         lib_mock.sp_session_player_prefetch.return_value = (
             spotify.ErrorType.NO_CACHE)
-        session = create_session(session_lib_mock)
+        session = tests.create_real_session(session_lib_mock)
         sp_track = spotify.ffi.cast('sp_track *', 42)
         track = spotify.Track(session, sp_track=sp_track)
 

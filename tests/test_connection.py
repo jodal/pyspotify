@@ -4,8 +4,8 @@ import unittest
 
 import spotify
 
+import tests
 from tests import mock
-from tests.test_session import create_session
 
 
 @mock.patch('spotify.connection.lib', spec=spotify.lib)
@@ -18,7 +18,7 @@ class OfflineTest(unittest.TestCase):
     def test_set_connection_type(self, session_lib_mock, lib_mock):
         lib_mock.sp_session_set_connection_type.return_value = (
             spotify.ErrorType.OK)
-        session = create_session(session_lib_mock)
+        session = tests.create_real_session(session_lib_mock)
 
         session.offline.set_connection_type(
             spotify.ConnectionType.MOBILE_ROAMING)
@@ -30,7 +30,7 @@ class OfflineTest(unittest.TestCase):
             self, session_lib_mock, lib_mock):
         lib_mock.sp_session_set_connection_type.return_value = (
             spotify.ErrorType.BAD_API_VERSION)
-        session = create_session(session_lib_mock)
+        session = tests.create_real_session(session_lib_mock)
 
         with self.assertRaises(spotify.Error):
             session.offline.set_connection_type(
@@ -39,7 +39,7 @@ class OfflineTest(unittest.TestCase):
     def test_set_connection_rules(self, session_lib_mock, lib_mock):
         lib_mock.sp_session_set_connection_rules.return_value = (
             spotify.ErrorType.OK)
-        session = create_session(session_lib_mock)
+        session = tests.create_real_session(session_lib_mock)
 
         session.offline.set_connection_rules(
             spotify.ConnectionRule.NETWORK,
@@ -54,7 +54,7 @@ class OfflineTest(unittest.TestCase):
             self, session_lib_mock, lib_mock):
         lib_mock.sp_session_set_connection_rules.return_value = (
             spotify.ErrorType.OK)
-        session = create_session(session_lib_mock)
+        session = tests.create_real_session(session_lib_mock)
 
         session.offline.set_connection_rules()
 
@@ -65,7 +65,7 @@ class OfflineTest(unittest.TestCase):
             self, session_lib_mock, lib_mock):
         lib_mock.sp_session_set_connection_rules.return_value = (
             spotify.ErrorType.BAD_API_VERSION)
-        session = create_session(session_lib_mock)
+        session = tests.create_real_session(session_lib_mock)
 
         with self.assertRaises(spotify.Error):
             session.offline.set_connection_rules(
@@ -73,7 +73,7 @@ class OfflineTest(unittest.TestCase):
 
     def test_offline_tracks_to_sync(self, session_lib_mock, lib_mock):
         lib_mock.sp_offline_tracks_to_sync.return_value = 17
-        session = create_session(session_lib_mock)
+        session = tests.create_real_session(session_lib_mock)
 
         result = session.offline.tracks_to_sync
 
@@ -83,7 +83,7 @@ class OfflineTest(unittest.TestCase):
 
     def test_offline_num_playlists(self, session_lib_mock, lib_mock):
         lib_mock.sp_offline_num_playlists.return_value = 5
-        session = create_session(session_lib_mock)
+        session = tests.create_real_session(session_lib_mock)
 
         result = session.offline.num_playlists
 
@@ -97,7 +97,7 @@ class OfflineTest(unittest.TestCase):
             return 1
 
         lib_mock.sp_offline_sync_get_status.side_effect = func
-        session = create_session(session_lib_mock)
+        session = tests.create_real_session(session_lib_mock)
 
         result = session.offline.sync_status
 
@@ -109,7 +109,7 @@ class OfflineTest(unittest.TestCase):
     def test_offline_sync_status_when_not_syncing(
             self, session_lib_mock, lib_mock):
         lib_mock.sp_offline_sync_get_status.return_value = 0
-        session = create_session(session_lib_mock)
+        session = tests.create_real_session(session_lib_mock)
 
         result = session.offline.sync_status
 
@@ -119,7 +119,7 @@ class OfflineTest(unittest.TestCase):
 
     def test_offline_time_left(self, session_lib_mock, lib_mock):
         lib_mock.sp_offline_time_left.return_value = 3600
-        session = create_session(session_lib_mock)
+        session = tests.create_real_session(session_lib_mock)
 
         result = session.offline.time_left
 

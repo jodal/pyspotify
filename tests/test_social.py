@@ -4,8 +4,8 @@ import unittest
 
 import spotify
 
+import tests
 from tests import mock
-from tests.test_session import create_session
 
 
 @mock.patch('spotify.social.lib', spec=spotify.lib)
@@ -17,7 +17,7 @@ class SocialTest(unittest.TestCase):
 
     def test_is_private_session(self, session_lib_mock, lib_mock):
         lib_mock.sp_session_is_private_session.return_value = 0
-        session = create_session(session_lib_mock)
+        session = tests.create_real_session(session_lib_mock)
 
         result = session.social.private_session
 
@@ -28,7 +28,7 @@ class SocialTest(unittest.TestCase):
     def test_set_private_session(self, session_lib_mock, lib_mock):
         lib_mock.sp_session_set_private_session.return_value = (
             spotify.ErrorType.OK)
-        session = create_session(session_lib_mock)
+        session = tests.create_real_session(session_lib_mock)
 
         session.social.private_session = True
 
@@ -39,7 +39,7 @@ class SocialTest(unittest.TestCase):
             self, session_lib_mock, lib_mock):
         lib_mock.sp_session_set_private_session.return_value = (
             spotify.ErrorType.BAD_API_VERSION)
-        session = create_session(session_lib_mock)
+        session = tests.create_real_session(session_lib_mock)
 
         with self.assertRaises(spotify.Error):
             session.social.private_session = True
@@ -52,7 +52,7 @@ class SocialTest(unittest.TestCase):
             return spotify.ErrorType.OK
 
         lib_mock.sp_session_is_scrobbling.side_effect = func
-        session = create_session(session_lib_mock)
+        session = tests.create_real_session(session_lib_mock)
 
         result = session.social.is_scrobbling(spotify.SocialProvider.SPOTIFY)
 
@@ -63,14 +63,14 @@ class SocialTest(unittest.TestCase):
     def test_is_scrobbling_fail_raises_error(self, session_lib_mock, lib_mock):
         lib_mock.sp_session_is_scrobbling.return_value = (
             spotify.ErrorType.BAD_API_VERSION)
-        session = create_session(session_lib_mock)
+        session = tests.create_real_session(session_lib_mock)
 
         with self.assertRaises(spotify.Error):
             session.social.is_scrobbling(spotify.SocialProvider.SPOTIFY)
 
     def test_set_scrobbling(self, session_lib_mock, lib_mock):
         lib_mock.sp_session_set_scrobbling.return_value = spotify.ErrorType.OK
-        session = create_session(session_lib_mock)
+        session = tests.create_real_session(session_lib_mock)
 
         session.social.set_scrobbling(
             spotify.SocialProvider.SPOTIFY,
@@ -85,7 +85,7 @@ class SocialTest(unittest.TestCase):
             self, session_lib_mock, lib_mock):
         lib_mock.sp_session_set_scrobbling.return_value = (
             spotify.ErrorType.BAD_API_VERSION)
-        session = create_session(session_lib_mock)
+        session = tests.create_real_session(session_lib_mock)
 
         with self.assertRaises(spotify.Error):
             session.social.set_scrobbling(
@@ -99,7 +99,7 @@ class SocialTest(unittest.TestCase):
             return spotify.ErrorType.OK
 
         lib_mock.sp_session_is_scrobbling_possible.side_effect = func
-        session = create_session(session_lib_mock)
+        session = tests.create_real_session(session_lib_mock)
 
         result = session.social.is_scrobbling_possible(
             spotify.SocialProvider.FACEBOOK)
@@ -112,7 +112,7 @@ class SocialTest(unittest.TestCase):
             self, session_lib_mock, lib_mock):
         lib_mock.sp_session_is_scrobbling_possible.return_value = (
             spotify.ErrorType.BAD_API_VERSION)
-        session = create_session(session_lib_mock)
+        session = tests.create_real_session(session_lib_mock)
 
         with self.assertRaises(spotify.Error):
             session.social.is_scrobbling_possible(
@@ -121,7 +121,7 @@ class SocialTest(unittest.TestCase):
     def test_set_social_credentials(self, session_lib_mock, lib_mock):
         lib_mock.sp_session_set_social_credentials.return_value = (
             spotify.ErrorType.OK)
-        session = create_session(session_lib_mock)
+        session = tests.create_real_session(session_lib_mock)
 
         session.social.set_social_credentials(
             spotify.SocialProvider.LASTFM, 'alice', 'secret')
@@ -142,7 +142,7 @@ class SocialTest(unittest.TestCase):
             self, session_lib_mock, lib_mock):
         lib_mock.sp_session_login.return_value = (
             spotify.ErrorType.BAD_API_VERSION)
-        session = create_session(session_lib_mock)
+        session = tests.create_real_session(session_lib_mock)
 
         with self.assertRaises(spotify.Error):
             session.social.set_social_credentials(

@@ -42,8 +42,16 @@ def buffer_writer(string):
     return func
 
 
+def create_real_session(lib_mock):
+    """Create a real :class:`spotify.Session` using ``lib_mock``."""
+    lib_mock.sp_session_create.return_value = spotify.ErrorType.OK
+    config = spotify.Config()
+    config.application_key = b'\x01' * 321
+    return spotify.Session(config=config)
+
+
 def create_session_mock():
-    """Creates a :class:`spotify.Session` mock for testing."""
+    """Create a :class:`spotify.Session` mock for testing."""
     session = mock.Mock()
     session._cache = weakref.WeakValueDictionary()
     session._emitters = []

@@ -46,5 +46,6 @@ further details.
     user
     toplist
     inbox
+    player
     sink
     internal

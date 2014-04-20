@@ -7,5 +7,3 @@ Sessions
 .. autoclass:: Session
 
 .. autoclass:: SessionEvent
-
-.. autoclass:: spotify.session.Player

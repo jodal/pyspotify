@@ -19,9 +19,9 @@ class Playlist(utils.EventEmitter):
     """A Spotify playlist.
 
     You can get playlists from the :attr:`~Session.playlist_container`,
-    :attr:`~Session.inbox`, :attr:`~Session.starred`,
-    :meth:`~Session.get_starred`, :meth:`~Session.search`, etc., or you
-    can create a playlist yourself from a Spotify URI::
+    :attr:`~Session.inbox`, :meth:`~Session.get_starred`,
+    :meth:`~Session.search`, etc., or you can create a playlist yourself from a
+    Spotify URI::
 
         >>> session = spotify.Session()
         # ...

@@ -283,11 +283,6 @@ class Session(utils.EventEmitter):
         return spotify.InboxPostResult(
             self, canonical_username, tracks, message, callback)
 
-    @property
-    def starred(self):
-        """The starred :class:`Playlist` for the currently logged in user."""
-        return self.get_starred()
-
     def get_starred(self, canonical_username=None):
         """Get the starred :class:`Playlist` for the user with
         ``canonical_username``.

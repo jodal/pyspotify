@@ -62,10 +62,12 @@ With all the above getters added to the :class:`~spotify.Session` object, it
 made sense to rename some existing methods of :class:`~spotify.Session` for
 consistency:
 
-- :meth:`spotify.Session.get_starred` replaces
-  :meth:`~spotify.Session.starred_for_user`. It now returns the starred
-  playlist for the currently logged in user if no username is provided,
-  just like the :attr:`spotify.Session.starred` attribute.
+- :meth:`spotify.Session.starred_for_user`.
+  is replaced by :meth:`~spotify.Session.get_starred`.
+
+- :attr:`spotify.Session.starred` to get the currently logged in user's starred
+  playlist is replaced by :meth:`~spotify.Session.get_starred` without any
+  arguments.
 
 Refactoring: Consistent naming of ``threading.Event`` objects
 -------------------------------------------------------------

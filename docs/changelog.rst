@@ -5,6 +5,24 @@ Changelog
 v2.0.0b1 (UNRELEASED)
 =====================
 
+pyspotify 2.x is a full rewrite of pyspotify. While pyspotify 1.x is a
+CPython C extension, pyspotify 2.x uses `CFFI <http://cffi.readthedocs.org/>`__
+to make 100% of the libspotify C library available from Python. It works on
+CPython 2.7 and 3.2+, as well as PyPy 2.1+.
+
+Since the previous release, pyspotify has become thread safe. That is,
+pyspotify can safely be used from multiple threads. The added thread safety
+made an integrated event loop possible, which greatly simplifies the usage of
+pyspotify, as can be seen from the updated example in ``examples/shell.py``.
+Audio sink helpers for ALSA and PortAudio have been added, together with
+updated examples that can play music. A number of bugs have been fixed, and at
+the time of the release, there are no known issues.
+
+The pyspotify 2.0.0b1 release marks the completion of all planned features for
+pyspotify 2.x. The :doc:`plans` for the next releases are focused on fixing
+bugs as they surface, incrementally improving the documentation, and
+integrating feedback from increased usage of the library in the wild.
+
 Feature: Thread safety
 ----------------------
 

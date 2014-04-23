@@ -69,6 +69,11 @@ consistency:
   playlist is replaced by :meth:`~spotify.Session.get_starred` without any
   arguments.
 
+- :meth:`spotify.Session.get_published_playlists` replaces
+  :meth:`~spotify.Session.published_playlists_for_user`. As previously, it
+  returns the published playlists for the currently logged in user if no
+  username is provided.
+
 Refactoring: Consistent naming of ``threading.Event`` objects
 -------------------------------------------------------------
 

@@ -299,9 +299,9 @@ class Session(utils.EventEmitter):
             return None
         return spotify.Playlist._cached(self, sp_playlist, add_ref=False)
 
-    def published_playlists_for_user(self, canonical_username=None):
-        """The :class:`PlaylistContainer` of published playlists for the user
-        with ``canonical_username``.
+    def get_published_playlists(self, canonical_username=None):
+        """Get the :class:`PlaylistContainer` of published playlists for the
+        user with ``canonical_username``.
 
         If ``canonical_username`` isn't specified, the published container for
         the currently logged in user is returned.

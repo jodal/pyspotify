@@ -136,7 +136,7 @@ class UserTest(unittest.TestCase):
         self.assertEqual(result, mock.sentinel.playlist)
 
     def test_published_playlists(self, lib_mock):
-        self.session.published_playlists_for_user.return_value = (
+        self.session.get_published_playlists.return_value = (
             mock.sentinel.playlist_container)
         lib_mock.sp_user_canonical_name.return_value = spotify.ffi.new(
             'char[]', b'alice')
@@ -145,5 +145,5 @@ class UserTest(unittest.TestCase):
 
         result = user.published_playlists
 
-        self.session.published_playlists_for_user.assert_called_with('alice')
+        self.session.get_published_playlists.assert_called_with('alice')
         self.assertEqual(result, mock.sentinel.playlist_container)

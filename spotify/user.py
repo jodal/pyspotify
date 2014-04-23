@@ -85,4 +85,4 @@ class User(object):
     def published_playlists(self):
         """The :class:`PlaylistContainer` of playlists published by the
         user."""
-        return self._session.published_playlists_for_user(self.canonical_name)
+        return self._session.get_published_playlists(self.canonical_name)

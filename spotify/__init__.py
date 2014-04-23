@@ -3,7 +3,7 @@ from __future__ import unicode_literals
 import threading
 
 
-__version__ = '2.0.0b1'
+__version__ = '2.0.0b2'
 
 
 # Global reentrant lock to be held whenever libspotify functions are called or

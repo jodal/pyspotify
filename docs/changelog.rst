@@ -18,17 +18,20 @@ Feature: Thread safety
 Feature: Event loop
 -------------------
 
-- Add :class:`~spotify.EventLoop` helper thread that reacts to
+- Add :class:`spotify.EventLoop` helper thread that reacts to
   :class:`~spotify.SessionEvent.NOTIFY_MAIN_THREAD` events and calls
   :meth:`~spotify.Session.process_events` for you when appropriate.
+
+- Update ``examples/shell.py`` to be a lot simpler with the help of the new
+  event loop.
 
 Feature: Audio playback
 -----------------------
 
-- Add :class:`~spotify.AlsaSink`, an audio sink for playback through ALSA on
+- Add :class:`spotify.AlsaSink`, an audio sink for playback through ALSA on
   Linux systems.
 
-- Add :class:`~spotify.PortAudioSink`, an audio sink for playback through
+- Add :class:`spotify.PortAudioSink`, an audio sink for playback through
   PortAudio on most platforms, including Linux, OS X, and Windows.
 
 - Update ``examples/shell.py`` to use the ALSA sink to play music.
@@ -44,25 +47,25 @@ session object to all objects that needs it. To allow for this, the following
 new methods have been added, and should be used instead of their old
 equivalents:
 
-- :meth:`spotify.Session.get_link` (replaces :class:`spotify.Link`)
-- :meth:`spotify.Session.get_track` (replaces :class:`spotify.Track`)
-- :meth:`spotify.Session.get_local_track` (replaces
-  :class:`spotify.LocalTrack`)
-- :meth:`spotify.Session.get_album` (replaces :class:`spotify.Album`)
-- :meth:`spotify.Session.get_artist` (replaces :class:`spotify.Artist`)
-- :meth:`spotify.Session.get_playlist` (replaces :class:`spotify.Playlist`)
-- :meth:`spotify.Session.get_user` (replaces :class:`spotify.User`)
-- :meth:`spotify.Session.get_image` (replaces :class:`spotify.Image`)
-- :meth:`spotify.Session.get_toplist` (replaces :class:`spotify.Toplist`)
+- :meth:`spotify.Session.get_link` replaces :class:`spotify.Link`.
+- :meth:`spotify.Session.get_track` replaces :class:`spotify.Track`.
+- :meth:`spotify.Session.get_local_track` replaces
+  :class:`spotify.LocalTrack`.
+- :meth:`spotify.Session.get_album` replaces :class:`spotify.Album`.
+- :meth:`spotify.Session.get_artist` replaces :class:`spotify.Artist`.
+- :meth:`spotify.Session.get_playlist` replaces :class:`spotify.Playlist`.
+- :meth:`spotify.Session.get_user` replaces :class:`spotify.User`.
+- :meth:`spotify.Session.get_image` replaces :class:`spotify.Image`.
+- :meth:`spotify.Session.get_toplist` replaces :class:`spotify.Toplist`.
 
 Refactoring: Consistent naming of ``Session`` members
 -----------------------------------------------------
 
-With all the above getters added to the :class:`~spotify.Session` object, it
+With all the above getters added to the :class:`spotify.Session` object, it
 made sense to rename some existing methods of :class:`~spotify.Session` for
 consistency:
 
-- :meth:`spotify.Session.starred_for_user`.
+- :meth:`spotify.Session.starred_for_user`
   is replaced by :meth:`~spotify.Session.get_starred`.
 
 - :attr:`spotify.Session.starred` to get the currently logged in user's starred
@@ -133,14 +136,14 @@ Bug fixes
 - Add missing error check to :meth:`spotify.Playlist.add_tracks`.
 
 - Keep album, artist, image, inbox, search, and toplist objects alive until
-  their complete/load callbacks have been called, even if the end user doesn't
-  keep any references to the objects. (Fixes: :issue:`121`)
+  their complete/load callbacks have been called, even if the library user
+  doesn't keep any references to the objects. (Fixes: :issue:`121`)
 
 - Fix flipped logic causing crash in :meth:`spotify.Album.cover_link`. (Fixes:
   :issue:`126`)
 
 - Work around segfault in libspotify if
-  :attr:`~spotify.session.Social.private_session` is set before the session is
+  :attr:`~spotify.social.Social.private_session` is set before the session is
   logged in and the first events are processed. This is a bug in libspotify
   which has been reported to Spotify through their IRC channel.
 

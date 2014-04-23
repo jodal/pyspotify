@@ -20,7 +20,7 @@ class Playlist(utils.EventEmitter):
 
     You can get playlists from the :attr:`~Session.playlist_container`,
     :attr:`~Session.inbox`, :attr:`~Session.starred`,
-    :meth:`~Session.starred_for_user`, :meth:`~Session.search`, etc., or you
+    :meth:`~Session.get_starred`, :meth:`~Session.search`, etc., or you
     can create a playlist yourself from a Spotify URI::
 
         >>> session = spotify.Session()

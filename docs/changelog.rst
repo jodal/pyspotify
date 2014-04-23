@@ -55,6 +55,18 @@ equivalents:
 - :meth:`spotify.Session.get_image` (replaces :class:`spotify.Image`)
 - :meth:`spotify.Session.get_toplist` (replaces :class:`spotify.Toplist`)
 
+Refactoring: Consistent naming of ``Session`` members
+-----------------------------------------------------
+
+With all the above getters added to the :class:`~spotify.Session` object, it
+made sense to rename some existing methods of :class:`~spotify.Session` for
+consistency:
+
+- :meth:`spotify.Session.get_starred` replaces
+  :meth:`~spotify.Session.starred_for_user`. It now returns the starred
+  playlist for the currently logged in user if no username is provided,
+  just like the :attr:`spotify.Session.starred` attribute.
+
 Refactoring: Consistent naming of ``threading.Event`` objects
 -------------------------------------------------------------
 

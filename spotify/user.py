@@ -79,7 +79,7 @@ class User(object):
     @property
     def starred(self):
         """The :class:`Playlist` of tracks starred by the user."""
-        return self._session.starred_for_user(self.canonical_name)
+        return self._session.get_starred(self.canonical_name)
 
     @property
     def published_playlists(self):

@@ -124,7 +124,7 @@ class UserTest(unittest.TestCase):
         self.assertEqual(result, mock.sentinel.link)
 
     def test_starred(self, lib_mock):
-        self.session.starred_for_user.return_value = mock.sentinel.playlist
+        self.session.get_starred.return_value = mock.sentinel.playlist
         lib_mock.sp_user_canonical_name.return_value = spotify.ffi.new(
             'char[]', b'alice')
         sp_user = spotify.ffi.cast('sp_user *', 42)
@@ -132,7 +132,7 @@ class UserTest(unittest.TestCase):
 
         result = user.starred
 
-        self.session.starred_for_user.assert_called_with('alice')
+        self.session.get_starred.assert_called_with('alice')
         self.assertEqual(result, mock.sentinel.playlist)
 
     def test_published_playlists(self, lib_mock):

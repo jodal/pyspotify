@@ -286,10 +286,10 @@ class Session(utils.EventEmitter):
     @property
     def starred(self):
         """The starred :class:`Playlist` for the currently logged in user."""
-        return self.starred_for_user()
+        return self.get_starred()
 
-    def starred_for_user(self, canonical_username=None):
-        """The starred :class:`Playlist` for the user with
+    def get_starred(self, canonical_username=None):
+        """Get the starred :class:`Playlist` for the user with
         ``canonical_username``.
 
         If ``canonical_username`` isn't specified, the starred playlist for

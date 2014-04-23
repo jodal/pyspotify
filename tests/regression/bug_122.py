@@ -1,8 +1,15 @@
 import logging
+import sys
 import threading
 import time
 
 import spotify
+
+
+if len(sys.argv) != 3:
+    sys.exit('Usage: %s USERNAME PASSWORD' % sys.argv[0])
+
+username, password = sys.argv[1], sys.argv[2]
 
 
 def login(session, username, password):

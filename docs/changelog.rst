@@ -2,7 +2,7 @@
 Changelog
 *********
 
-v2.0.0b1 (UNRELEASED)
+v2.0.0b1 (2014-04-24)
 =====================
 
 pyspotify 2.x is a full rewrite of pyspotify. While pyspotify 1.x is a

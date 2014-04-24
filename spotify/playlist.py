@@ -231,17 +231,17 @@ class Playlist(utils.EventEmitter):
             self._sp_playlist, [t._sp_track for t in tracks], len(tracks),
             position, self._session._sp_session))
 
-    def remove_tracks(self, tracks):
-        """Remove the given tracks from the playlist.
+    def remove_tracks(self, positions):
+        """Remove the tracks at the given positions from the playlist.
 
-        ``tracks`` can be a single :class:`~spotify.Track` or a list of
-        :class:`~spotify.Track` objects.
+        ``positions`` can be a single position or a list of positions to
+        remove.
         """
-        if isinstance(tracks, spotify.Track):
-            tracks = [tracks]
-        tracks = list(set(tracks))  # Remove duplicates
+        if isinstance(positions, int):
+            positions = [positions]
+        positions = list(set(positions))  # Remove duplicates
         spotify.Error.maybe_raise(lib.sp_playlist_remove_tracks(
-            self._sp_playlist, [t._sp_track for t in tracks], len(tracks)))
+            self._sp_playlist, positions, len(positions)))
 
     def reorder_tracks(self, tracks, new_position):
         """Move the given ``tracks`` to a ``new_position`` in the playlist.

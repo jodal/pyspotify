@@ -7,6 +7,13 @@ v2.0.0b2 (UNRELEASED)
 
 No changes yet.
 
+Bug fixes
+---------
+
+- Fix :class:`spotify.Playlist.remove_tracks`. It now accepts a list of
+  track positions instead of a list of tracks. This makes it possible to
+  remove any of multiple identical tracks in a playlist. (Fixes: :issue:`128`)
+
 
 v2.0.0b1 (2014-04-24)
 =====================

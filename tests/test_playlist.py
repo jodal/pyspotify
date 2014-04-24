@@ -483,61 +483,56 @@ class PlaylistTest(unittest.TestCase):
     def test_remove_tracks(self, track_lib_mock, lib_mock):
         lib_mock.sp_playlist_remove_tracks.return_value = int(
             spotify.ErrorType.OK)
-        sp_track1 = spotify.ffi.cast('sp_track *', 43)
-        track1 = spotify.Track(self.session, sp_track=sp_track1)
-        sp_track2 = spotify.ffi.cast('sp_track *', 44)
-        track2 = spotify.Track(self.session, sp_track=sp_track2)
         sp_playlist = spotify.ffi.cast('sp_playlist *', 42)
         playlist = spotify.Playlist(self.session, sp_playlist=sp_playlist)
+        position1 = 13
+        position2 = 17
 
-        playlist.remove_tracks([track1, track2])
+        playlist.remove_tracks([position1, position2])
 
         lib_mock.sp_playlist_remove_tracks.assert_called_with(
             sp_playlist, mock.ANY, 2)
         self.assertIn(
-            sp_track1, lib_mock.sp_playlist_remove_tracks.call_args[0][1])
+            position1, lib_mock.sp_playlist_remove_tracks.call_args[0][1])
         self.assertIn(
-            sp_track2, lib_mock.sp_playlist_remove_tracks.call_args[0][1])
+            position2, lib_mock.sp_playlist_remove_tracks.call_args[0][1])
 
     @mock.patch('spotify.track.lib', spec=spotify.lib)
     def test_remove_tracks_with_a_single_track(self, track_lib_mock, lib_mock):
         lib_mock.sp_playlist_remove_tracks.return_value = int(
             spotify.ErrorType.OK)
-        sp_track = spotify.ffi.cast('sp_track *', 43)
-        track = spotify.Track(self.session, sp_track=sp_track)
         sp_playlist = spotify.ffi.cast('sp_playlist *', 42)
         playlist = spotify.Playlist(self.session, sp_playlist=sp_playlist)
+        position = 17
 
-        playlist.remove_tracks(track)
+        playlist.remove_tracks(position)
 
         lib_mock.sp_playlist_remove_tracks.assert_called_with(
-            sp_playlist, [sp_track], 1)
+            sp_playlist, [position], 1)
 
     @mock.patch('spotify.track.lib', spec=spotify.lib)
     def test_remove_tracks_with_duplicates(self, track_lib_mock, lib_mock):
         lib_mock.sp_playlist_remove_tracks.return_value = int(
             spotify.ErrorType.OK)
-        sp_track = spotify.ffi.cast('sp_track *', 43)
-        track = spotify.Track(self.session, sp_track=sp_track)
         sp_playlist = spotify.ffi.cast('sp_playlist *', 42)
         playlist = spotify.Playlist(self.session, sp_playlist=sp_playlist)
+        position = 17
 
-        playlist.remove_tracks([track, track])
+        playlist.remove_tracks([position, position])
 
         lib_mock.sp_playlist_remove_tracks.assert_called_with(
-            sp_playlist, [sp_track], 1)
+            sp_playlist, [position], 1)
 
     @mock.patch('spotify.track.lib', spec=spotify.lib)
     def test_remove_tracks_fails_if_error(self, track_lib_mock, lib_mock):
         lib_mock.sp_playlist_remove_tracks.return_value = int(
             spotify.ErrorType.PERMISSION_DENIED)
-        sp_track = spotify.ffi.cast('sp_track *', 43)
-        track = spotify.Track(self.session, sp_track=sp_track)
         sp_playlist = spotify.ffi.cast('sp_playlist *', 42)
         playlist = spotify.Playlist(self.session, sp_playlist=sp_playlist)
+        position = 17
 
         with self.assertRaises(spotify.Error):
-            playlist.remove_tracks(track)
+            playlist.remove_tracks(position)
 
     @mock.patch('spotify.track.lib', spec=spotify.lib)
     def test_reorder_tracks(self, track_lib_mock, lib_mock):

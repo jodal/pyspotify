@@ -92,6 +92,13 @@ class TrackTest(unittest.TestCase):
 
         self.assertFalse(track1 != track2)
 
+    def test_hash(self, lib_mock):
+        sp_track = spotify.ffi.cast('sp_track *', 42)
+        track1 = spotify.Track(self.session, sp_track=sp_track)
+        track2 = spotify.Track(self.session, sp_track=sp_track)
+
+        self.assertFalse(hash(track1) != hash(track2))
+
     def test_is_loaded(self, lib_mock):
         lib_mock.sp_track_is_loaded.return_value = 1
         sp_track = spotify.ffi.cast('sp_track *', 42)

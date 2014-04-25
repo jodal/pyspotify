@@ -14,6 +14,12 @@ Bug fixes
   track positions instead of a list of tracks. This makes it possible to
   remove any of multiple identical tracks in a playlist. (Fixes: :issue:`128`)
 
+Minor changes
+-------------
+
+- Make :class:`~spotify.Track` objects representing the same libspotify object
+  equal.
+
 
 v2.0.0b1 (2014-04-24)
 =====================

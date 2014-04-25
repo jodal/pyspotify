@@ -44,6 +44,15 @@ class Track(object):
     def __repr__(self):
         return 'Track(%r)' % self.link.uri
 
+    def __eq__(self, other):
+        if isinstance(other, self.__class__):
+            return self._sp_track == other._sp_track
+        else:
+            return False
+
+    def __ne__(self, other):
+        return not self.__eq__(other)
+
     @property
     def is_loaded(self):
         """Whether the track's data is loaded."""

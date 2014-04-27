@@ -49,6 +49,18 @@ class Album(object):
     def __repr__(self):
         return 'Album(%r)' % self.link.uri
 
+    def __eq__(self, other):
+        if isinstance(other, self.__class__):
+            return self._sp_album == other._sp_album
+        else:
+            return False
+
+    def __ne__(self, other):
+        return not self.__eq__(other)
+
+    def __hash__(self):
+        return hash(self._sp_album)
+
     @property
     def is_loaded(self):
         """Whether the album's data is loaded."""
@@ -221,6 +233,18 @@ class AlbumBrowser(object):
             return 'AlbumBrowser(%r)' % self.album.link.uri
         else:
             return 'AlbumBrowser(<not loaded>)'
+
+    def __eq__(self, other):
+        if isinstance(other, self.__class__):
+            return self._sp_albumbrowse == other._sp_albumbrowse
+        else:
+            return False
+
+    def __ne__(self, other):
+        return not self.__eq__(other)
+
+    def __hash__(self):
+        return hash(self._sp_albumbrowse)
 
     @property
     def is_loaded(self):

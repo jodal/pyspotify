@@ -69,6 +69,28 @@ class AlbumTest(unittest.TestCase):
 
         self.assertEqual(result, 'Album(%r)' % 'foo')
 
+    def test_eq(self, lib_mock):
+        sp_album = spotify.ffi.cast('sp_album *', 42)
+        album1 = spotify.Album(self.session, sp_album=sp_album)
+        album2 = spotify.Album(self.session, sp_album=sp_album)
+
+        self.assertTrue(album1 == album2)
+        self.assertFalse(album1 == 'foo')
+
+    def test_ne(self, lib_mock):
+        sp_album = spotify.ffi.cast('sp_album *', 42)
+        album1 = spotify.Album(self.session, sp_album=sp_album)
+        album2 = spotify.Album(self.session, sp_album=sp_album)
+
+        self.assertFalse(album1 != album2)
+
+    def test_hash(self, lib_mock):
+        sp_album = spotify.ffi.cast('sp_album *', 42)
+        album1 = spotify.Album(self.session, sp_album=sp_album)
+        album2 = spotify.Album(self.session, sp_album=sp_album)
+
+        self.assertFalse(hash(album1) != hash(album2))
+
     def test_is_loaded(self, lib_mock):
         lib_mock.sp_album_is_loaded.return_value = 1
         sp_album = spotify.ffi.cast('sp_album *', 42)
@@ -409,6 +431,34 @@ class AlbumBrowserTest(unittest.TestCase):
         result = repr(browser)
 
         self.assertEqual(result, 'AlbumBrowser(<not loaded>)')
+
+    def test_eq(self, lib_mock):
+        sp_albumbrowse = spotify.ffi.cast('sp_albumbrowse *', 42)
+        browser1 = spotify.AlbumBrowser(
+            self.session, sp_albumbrowse=sp_albumbrowse)
+        browser2 = spotify.AlbumBrowser(
+            self.session, sp_albumbrowse=sp_albumbrowse)
+
+        self.assertTrue(browser1 == browser2)
+        self.assertFalse(browser1 == 'foo')
+
+    def test_ne(self, lib_mock):
+        sp_albumbrowse = spotify.ffi.cast('sp_albumbrowse *', 42)
+        browser1 = spotify.AlbumBrowser(
+            self.session, sp_albumbrowse=sp_albumbrowse)
+        browser2 = spotify.AlbumBrowser(
+            self.session, sp_albumbrowse=sp_albumbrowse)
+
+        self.assertFalse(browser1 != browser2)
+
+    def test_hash(self, lib_mock):
+        sp_albumbrowse = spotify.ffi.cast('sp_albumbrowse *', 42)
+        browser1 = spotify.AlbumBrowser(
+            self.session, sp_albumbrowse=sp_albumbrowse)
+        browser2 = spotify.AlbumBrowser(
+            self.session, sp_albumbrowse=sp_albumbrowse)
+
+        self.assertFalse(hash(browser1) != hash(browser2))
 
     def test_is_loaded(self, lib_mock):
         lib_mock.sp_albumbrowse_is_loaded.return_value = 1

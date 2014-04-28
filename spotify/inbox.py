@@ -63,6 +63,18 @@ class InboxPostResult(object):
         else:
             return 'InboxPostResult(%s)' % self.error._name
 
+    def __eq__(self, other):
+        if isinstance(other, self.__class__):
+            return self._sp_inbox == other._sp_inbox
+        else:
+            return False
+
+    def __ne__(self, other):
+        return not self.__eq__(other)
+
+    def __hash__(self):
+        return hash(self._sp_inbox)
+
     @property
     def error(self):
         """An :class:`ErrorType` associated with the inbox post result.

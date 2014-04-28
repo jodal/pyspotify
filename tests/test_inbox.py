@@ -170,6 +170,28 @@ class InboxPostResultTest(unittest.TestCase):
 
         self.assertEqual(repr(inbox_post_result), 'InboxPostResult(OK)')
 
+    def test_eq(self, lib_mock):
+        sp_inbox = spotify.ffi.cast('sp_inbox *', 42)
+        inbox1 = spotify.InboxPostResult(self.session, sp_inbox=sp_inbox)
+        inbox2 = spotify.InboxPostResult(self.session, sp_inbox=sp_inbox)
+
+        self.assertTrue(inbox1 == inbox2)
+        self.assertFalse(inbox1 == 'foo')
+
+    def test_ne(self, lib_mock):
+        sp_inbox = spotify.ffi.cast('sp_inbox *', 42)
+        inbox1 = spotify.InboxPostResult(self.session, sp_inbox=sp_inbox)
+        inbox2 = spotify.InboxPostResult(self.session, sp_inbox=sp_inbox)
+
+        self.assertFalse(inbox1 != inbox2)
+
+    def test_hash(self, lib_mock):
+        sp_inbox = spotify.ffi.cast('sp_inbox *', 42)
+        inbox1 = spotify.InboxPostResult(self.session, sp_inbox=sp_inbox)
+        inbox2 = spotify.InboxPostResult(self.session, sp_inbox=sp_inbox)
+
+        self.assertFalse(hash(inbox1) != hash(inbox2))
+
     def test_error(self, lib_mock):
         lib_mock.sp_inbox_error.return_value = int(
             spotify.ErrorType.INBOX_IS_FULL)

@@ -67,11 +67,23 @@ class Search(object):
             lib.sp_search_add_ref(sp_search)
         self._sp_search = ffi.gc(sp_search, lib.sp_search_release)
 
-    loaded_event = None
-    """:class:`threading.Event` that is set when the search is loaded."""
-
     def __repr__(self):
         return 'Search(%r)' % self.link.uri
+
+    def __eq__(self, other):
+        if isinstance(other, self.__class__):
+            return self._sp_search == other._sp_search
+        else:
+            return False
+
+    def __ne__(self, other):
+        return not self.__eq__(other)
+
+    def __hash__(self):
+        return hash(self._sp_search)
+
+    loaded_event = None
+    """:class:`threading.Event` that is set when the search is loaded."""
 
     @property
     def is_loaded(self):

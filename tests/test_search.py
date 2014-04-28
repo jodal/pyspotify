@@ -121,6 +121,28 @@ class SearchTest(unittest.TestCase):
 
         self.assertEqual(result, 'Search(%r)' % 'foo')
 
+    def test_eq(self, lib_mock):
+        sp_search = spotify.ffi.cast('sp_search *', 42)
+        search1 = spotify.Search(self.session, sp_search=sp_search)
+        search2 = spotify.Search(self.session, sp_search=sp_search)
+
+        self.assertTrue(search1 == search2)
+        self.assertFalse(search1 == 'foo')
+
+    def test_ne(self, lib_mock):
+        sp_search = spotify.ffi.cast('sp_search *', 42)
+        search1 = spotify.Search(self.session, sp_search=sp_search)
+        search2 = spotify.Search(self.session, sp_search=sp_search)
+
+        self.assertFalse(search1 != search2)
+
+    def test_hash(self, lib_mock):
+        sp_search = spotify.ffi.cast('sp_search *', 42)
+        search1 = spotify.Search(self.session, sp_search=sp_search)
+        search2 = spotify.Search(self.session, sp_search=sp_search)
+
+        self.assertFalse(hash(search1) != hash(search2))
+
     def test_is_loaded(self, lib_mock):
         lib_mock.sp_search_is_loaded.return_value = 1
         sp_search = spotify.ffi.cast('sp_search *', 42)

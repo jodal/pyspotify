@@ -81,6 +81,34 @@ class ImageTest(unittest.TestCase):
 
         self.assertEqual(result, 'Image(%r)' % 'foo')
 
+    def test_eq(self, lib_mock):
+        lib_mock.sp_image_add_load_callback.return_value = int(
+            spotify.ErrorType.OK)
+        sp_image = spotify.ffi.cast('sp_image *', 42)
+        image1 = spotify.Image(self.session, sp_image=sp_image)
+        image2 = spotify.Image(self.session, sp_image=sp_image)
+
+        self.assertTrue(image1 == image2)
+        self.assertFalse(image1 == 'foo')
+
+    def test_ne(self, lib_mock):
+        lib_mock.sp_image_add_load_callback.return_value = int(
+            spotify.ErrorType.OK)
+        sp_image = spotify.ffi.cast('sp_image *', 42)
+        image1 = spotify.Image(self.session, sp_image=sp_image)
+        image2 = spotify.Image(self.session, sp_image=sp_image)
+
+        self.assertFalse(image1 != image2)
+
+    def test_hash(self, lib_mock):
+        lib_mock.sp_image_add_load_callback.return_value = int(
+            spotify.ErrorType.OK)
+        sp_image = spotify.ffi.cast('sp_image *', 42)
+        image1 = spotify.Image(self.session, sp_image=sp_image)
+        image2 = spotify.Image(self.session, sp_image=sp_image)
+
+        self.assertFalse(hash(image1) != hash(image2))
+
     def test_loaded_event_is_unset_by_default(self, lib_mock):
         lib_mock.sp_image_add_load_callback.return_value = int(
             spotify.ErrorType.OK)

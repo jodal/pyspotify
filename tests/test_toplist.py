@@ -146,6 +146,34 @@ class ToplistTest(unittest.TestCase):
             "Toplist(type=<ToplistType.TRACKS: 2>, region=%r, "
             "canonical_username=None)" % 'NO')
 
+    def test_eq(self, lib_mock):
+        sp_toplistbrowse = spotify.ffi.cast('sp_toplistbrowse *', 42)
+        toplist1 = spotify.Toplist(
+            self.session, sp_toplistbrowse=sp_toplistbrowse)
+        toplist2 = spotify.Toplist(
+            self.session, sp_toplistbrowse=sp_toplistbrowse)
+
+        self.assertTrue(toplist1 == toplist2)
+        self.assertFalse(toplist1 == 'foo')
+
+    def test_ne(self, lib_mock):
+        sp_toplistbrowse = spotify.ffi.cast('sp_toplistbrowse *', 42)
+        toplist1 = spotify.Toplist(
+            self.session, sp_toplistbrowse=sp_toplistbrowse)
+        toplist2 = spotify.Toplist(
+            self.session, sp_toplistbrowse=sp_toplistbrowse)
+
+        self.assertFalse(toplist1 != toplist2)
+
+    def test_hash(self, lib_mock):
+        sp_toplistbrowse = spotify.ffi.cast('sp_toplistbrowse *', 42)
+        toplist1 = spotify.Toplist(
+            self.session, sp_toplistbrowse=sp_toplistbrowse)
+        toplist2 = spotify.Toplist(
+            self.session, sp_toplistbrowse=sp_toplistbrowse)
+
+        self.assertFalse(hash(toplist1) != hash(toplist2))
+
     def test_is_loaded(self, lib_mock):
         lib_mock.sp_toplistbrowse_is_loaded.return_value = 1
         sp_toplistbrowse = spotify.ffi.cast('sp_toplistbrowse *', 42)

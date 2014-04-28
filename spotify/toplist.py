@@ -85,6 +85,18 @@ class Toplist(object):
         return 'Toplist(type=%r, region=%r, canonical_username=%r)' % (
             self.type, self.region, self.canonical_username)
 
+    def __eq__(self, other):
+        if isinstance(other, self.__class__):
+            return self._sp_toplistbrowse == other._sp_toplistbrowse
+        else:
+            return False
+
+    def __ne__(self, other):
+        return not self.__eq__(other)
+
+    def __hash__(self):
+        return hash(self._sp_toplistbrowse)
+
     @property
     def is_loaded(self):
         """Whether the toplist's data is loaded yet."""

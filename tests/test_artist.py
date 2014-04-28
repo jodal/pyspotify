@@ -71,6 +71,28 @@ class ArtistTest(unittest.TestCase):
 
         self.assertEqual(result, 'Artist(%r)' % 'foo')
 
+    def test_eq(self, lib_mock):
+        sp_artist = spotify.ffi.cast('sp_artist *', 42)
+        artist1 = spotify.Artist(self.session, sp_artist=sp_artist)
+        artist2 = spotify.Artist(self.session, sp_artist=sp_artist)
+
+        self.assertTrue(artist1 == artist2)
+        self.assertFalse(artist1 == 'foo')
+
+    def test_ne(self, lib_mock):
+        sp_artist = spotify.ffi.cast('sp_artist *', 42)
+        artist1 = spotify.Artist(self.session, sp_artist=sp_artist)
+        artist2 = spotify.Artist(self.session, sp_artist=sp_artist)
+
+        self.assertFalse(artist1 != artist2)
+
+    def test_hash(self, lib_mock):
+        sp_artist = spotify.ffi.cast('sp_artist *', 42)
+        artist1 = spotify.Artist(self.session, sp_artist=sp_artist)
+        artist2 = spotify.Artist(self.session, sp_artist=sp_artist)
+
+        self.assertFalse(hash(artist1) != hash(artist2))
+
     def test_name(self, lib_mock):
         lib_mock.sp_artist_name.return_value = spotify.ffi.new(
             'char[]', b'Foo Bar Baz')
@@ -328,6 +350,34 @@ class ArtistBrowserTest(unittest.TestCase):
         result = repr(browser)
 
         self.assertEqual(result, 'ArtistBrowser(<not loaded>)')
+
+    def test_eq(self, lib_mock):
+        sp_artistbrowse = spotify.ffi.cast('sp_artistbrowse *', 42)
+        browser1 = spotify.ArtistBrowser(
+            self.session, sp_artistbrowse=sp_artistbrowse)
+        browser2 = spotify.ArtistBrowser(
+            self.session, sp_artistbrowse=sp_artistbrowse)
+
+        self.assertTrue(browser1 == browser2)
+        self.assertFalse(browser1 == 'foo')
+
+    def test_ne(self, lib_mock):
+        sp_artistbrowse = spotify.ffi.cast('sp_artistbrowse *', 42)
+        browser1 = spotify.ArtistBrowser(
+            self.session, sp_artistbrowse=sp_artistbrowse)
+        browser2 = spotify.ArtistBrowser(
+            self.session, sp_artistbrowse=sp_artistbrowse)
+
+        self.assertFalse(browser1 != browser2)
+
+    def test_hash(self, lib_mock):
+        sp_artistbrowse = spotify.ffi.cast('sp_artistbrowse *', 42)
+        browser1 = spotify.ArtistBrowser(
+            self.session, sp_artistbrowse=sp_artistbrowse)
+        browser2 = spotify.ArtistBrowser(
+            self.session, sp_artistbrowse=sp_artistbrowse)
+
+        self.assertFalse(hash(browser1) != hash(browser2))
 
     def test_is_loaded(self, lib_mock):
         lib_mock.sp_artistbrowse_is_loaded.return_value = 1

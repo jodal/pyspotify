@@ -224,10 +224,6 @@ class AlbumBrowser(object):
         self._sp_albumbrowse = ffi.gc(
             sp_albumbrowse, lib.sp_albumbrowse_release)
 
-    loaded_event = None
-    """:class:`threading.Event` that is set when the album browser is loaded.
-    """
-
     def __repr__(self):
         if self.is_loaded:
             return 'AlbumBrowser(%r)' % self.album.link.uri
@@ -245,6 +241,10 @@ class AlbumBrowser(object):
 
     def __hash__(self):
         return hash(self._sp_albumbrowse)
+
+    loaded_event = None
+    """:class:`threading.Event` that is set when the album browser is loaded.
+    """
 
     @property
     def is_loaded(self):

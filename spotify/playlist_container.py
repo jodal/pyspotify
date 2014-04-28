@@ -119,6 +119,18 @@ class PlaylistContainer(collections.MutableSequence, utils.EventEmitter):
     def __repr__(self):
         return 'PlaylistContainer(%s)' % pprint.pformat(list(self))
 
+    def __eq__(self, other):
+        if isinstance(other, self.__class__):
+            return self._sp_playlistcontainer == other._sp_playlistcontainer
+        else:
+            return False
+
+    def __ne__(self, other):
+        return not self.__eq__(other)
+
+    def __hash__(self):
+        return hash(self._sp_playlistcontainer)
+
     @property
     def is_loaded(self):
         """Whether the playlist container's data is loaded."""

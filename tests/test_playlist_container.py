@@ -67,6 +67,34 @@ class PlaylistContainerTest(unittest.TestCase):
 
         self.assertEqual(result, 'PlaylistContainer([])')
 
+    def test_eq(self, lib_mock):
+        sp_playlistcontainer = spotify.ffi.cast('sp_playlistcontainer *', 42)
+        playlist_container1 = spotify.PlaylistContainer(
+            self.session, sp_playlistcontainer=sp_playlistcontainer)
+        playlist_container2 = spotify.PlaylistContainer(
+            self.session, sp_playlistcontainer=sp_playlistcontainer)
+
+        self.assertTrue(playlist_container1 == playlist_container2)
+        self.assertFalse(playlist_container1 == 'foo')
+
+    def test_ne(self, lib_mock):
+        sp_playlistcontainer = spotify.ffi.cast('sp_playlistcontainer *', 42)
+        playlist_container1 = spotify.PlaylistContainer(
+            self.session, sp_playlistcontainer=sp_playlistcontainer)
+        playlist_container2 = spotify.PlaylistContainer(
+            self.session, sp_playlistcontainer=sp_playlistcontainer)
+
+        self.assertFalse(playlist_container1 != playlist_container2)
+
+    def test_hash(self, lib_mock):
+        sp_playlistcontainer = spotify.ffi.cast('sp_playlistcontainer *', 42)
+        playlist_container1 = spotify.PlaylistContainer(
+            self.session, sp_playlistcontainer=sp_playlistcontainer)
+        playlist_container2 = spotify.PlaylistContainer(
+            self.session, sp_playlistcontainer=sp_playlistcontainer)
+
+        self.assertEqual(hash(playlist_container1), hash(playlist_container2))
+
     def test_is_loaded(self, lib_mock):
         lib_mock.sp_playlistcontainer_is_loaded.return_value = 1
         sp_playlistcontainer = spotify.ffi.cast('sp_playlistcontainer *', 42)

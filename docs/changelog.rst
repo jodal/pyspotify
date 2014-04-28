@@ -17,8 +17,11 @@ Bug fixes
 Minor changes
 -------------
 
-- Make :class:`~spotify.Track` objects representing the same libspotify object
-  equal.
+- Make all objects compare as equal and have the same hash if they wrap the
+  same libspotify object.  his makes it possible to find the index of a track
+  in a playlist by doing ``playlist.tracks.index(track)``, where
+  ``playlist.tracks`` is a custom collection always returning new
+  :class:`~spotify.Track` instances. (Related to: :issue:`128`)
 
 
 v2.0.0b1 (2014-04-24)

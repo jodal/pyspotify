@@ -569,8 +569,10 @@ class PlaylistContainerTest(unittest.TestCase):
         with self.assertRaises(spotify.Error):
             playlist_container.add_new_playlist('foo bar')
 
+    @mock.patch('spotify.link.lib', lib=spotify.lib)
     @mock.patch('spotify.playlist.lib', lib=spotify.lib)
-    def test_add_playlist_from_link(self, playlist_lib_mock, lib_mock):
+    def test_add_playlist_from_link(
+            self, playlist_lib_mock, link_lib_mock, lib_mock):
         sp_link = spotify.ffi.cast('sp_link *', 43)
         link = spotify.Link(self.session, sp_link=sp_link, add_ref=False)
         sp_playlist = spotify.ffi.cast('sp_playlist *', 44)
@@ -589,8 +591,10 @@ class PlaylistContainerTest(unittest.TestCase):
         self.assertEqual(
             lib_mock.sp_playlistcontainer_move_playlist.call_count, 0)
 
+    @mock.patch('spotify.link.lib', lib=spotify.lib)
     @mock.patch('spotify.playlist.lib', lib=spotify.lib)
-    def test_add_playlist_from_playlist(self, playlist_lib_mock, lib_mock):
+    def test_add_playlist_from_playlist(
+            self, playlist_lib_mock, link_lib_mock, lib_mock):
         sp_link = spotify.ffi.cast('sp_link *', 43)
         link = spotify.Link(self.session, sp_link=sp_link, add_ref=False)
         existing_playlist = mock.Mock(spec=spotify.Playlist)
@@ -613,8 +617,10 @@ class PlaylistContainerTest(unittest.TestCase):
         self.assertEqual(
             lib_mock.sp_playlistcontainer_move_playlist.call_count, 0)
 
+    @mock.patch('spotify.link.lib', lib=spotify.lib)
     @mock.patch('spotify.playlist.lib', lib=spotify.lib)
-    def test_add_playlist_at_given_index(self, playlist_lib_mock, lib_mock):
+    def test_add_playlist_at_given_index(
+            self, playlist_lib_mock, link_lib_mock, lib_mock):
         sp_link = spotify.ffi.cast('sp_link *', 43)
         link = spotify.Link(self.session, sp_link=sp_link, add_ref=False)
         sp_playlist = spotify.ffi.cast('sp_playlist *', 44)
@@ -636,7 +642,9 @@ class PlaylistContainerTest(unittest.TestCase):
         lib_mock.sp_playlistcontainer_move_playlist.assert_called_with(
             sp_playlistcontainer, 99, 7, 0)
 
-    def test_add_playlist_already_in_the_container(self, lib_mock):
+    @mock.patch('spotify.link.lib', lib=spotify.lib)
+    def test_add_playlist_already_in_the_container(
+            self, link_lib_mock, lib_mock):
         sp_link = spotify.ffi.cast('sp_link *', 43)
         link = spotify.Link(self.session, sp_link=sp_link, add_ref=False)
         lib_mock.sp_playlistcontainer_add_playlist.return_value = (

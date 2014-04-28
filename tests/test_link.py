@@ -76,6 +76,28 @@ class LinkTest(unittest.TestCase):
 
         self.assertEqual(str(link), link.uri)
 
+    def test_eq(self, lib_mock):
+        sp_link = spotify.ffi.cast('sp_link *', 42)
+        link1 = spotify.Link(self.session, sp_link=sp_link)
+        link2 = spotify.Link(self.session, sp_link=sp_link)
+
+        self.assertTrue(link1 == link2)
+        self.assertFalse(link1 == 'foo')
+
+    def test_ne(self, lib_mock):
+        sp_link = spotify.ffi.cast('sp_link *', 42)
+        link1 = spotify.Link(self.session, sp_link=sp_link)
+        link2 = spotify.Link(self.session, sp_link=sp_link)
+
+        self.assertFalse(link1 != link2)
+
+    def test_hash(self, lib_mock):
+        sp_link = spotify.ffi.cast('sp_link *', 42)
+        link1 = spotify.Link(self.session, sp_link=sp_link)
+        link2 = spotify.Link(self.session, sp_link=sp_link)
+
+        self.assertFalse(hash(link1) != hash(link2))
+
     def test_uri_grows_buffer_to_fit_link(self, lib_mock):
         sp_link = spotify.ffi.cast('sp_link *', 42)
         lib_mock.sp_link_create_from_string.return_value = sp_link

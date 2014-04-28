@@ -61,6 +61,18 @@ class Link(object):
     def __str__(self):
         return self.uri
 
+    def __eq__(self, other):
+        if isinstance(other, self.__class__):
+            return self._sp_link == other._sp_link
+        else:
+            return False
+
+    def __ne__(self, other):
+        return not self.__eq__(other)
+
+    def __hash__(self):
+        return hash(self._sp_link)
+
     @property
     def uri(self):
         return utils.get_with_growing_buffer(

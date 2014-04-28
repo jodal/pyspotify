@@ -117,6 +117,28 @@ class PlaylistTest(unittest.TestCase):
 
         self.assertEqual(result, 'Playlist(<error: error message>)')
 
+    def test_eq(self, lib_mock):
+        sp_playlist = spotify.ffi.cast('sp_playlist *', 42)
+        playlist1 = spotify.Playlist(self.session, sp_playlist=sp_playlist)
+        playlist2 = spotify.Playlist(self.session, sp_playlist=sp_playlist)
+
+        self.assertTrue(playlist1 == playlist2)
+        self.assertFalse(playlist1 == 'foo')
+
+    def test_ne(self, lib_mock):
+        sp_playlist = spotify.ffi.cast('sp_playlist *', 42)
+        playlist1 = spotify.Playlist(self.session, sp_playlist=sp_playlist)
+        playlist2 = spotify.Playlist(self.session, sp_playlist=sp_playlist)
+
+        self.assertFalse(playlist1 != playlist2)
+
+    def test_hash(self, lib_mock):
+        sp_playlist = spotify.ffi.cast('sp_playlist *', 42)
+        playlist1 = spotify.Playlist(self.session, sp_playlist=sp_playlist)
+        playlist2 = spotify.Playlist(self.session, sp_playlist=sp_playlist)
+
+        self.assertFalse(hash(playlist1) != hash(playlist2))
+
     def test_is_loaded(self, lib_mock):
         lib_mock.sp_playlist_is_loaded.return_value = 1
         sp_playlist = spotify.ffi.cast('sp_playlist *', 42)

@@ -88,6 +88,18 @@ class Playlist(utils.EventEmitter):
         except spotify.Error as exc:
             return 'Playlist(<error: %s>)' % exc
 
+    def __eq__(self, other):
+        if isinstance(other, self.__class__):
+            return self._sp_playlist == other._sp_playlist
+        else:
+            return False
+
+    def __ne__(self, other):
+        return not self.__eq__(other)
+
+    def __hash__(self):
+        return hash(self._sp_playlist)
+
     @property
     def is_loaded(self):
         """Whether the playlist's data is loaded."""

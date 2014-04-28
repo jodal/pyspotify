@@ -137,7 +137,7 @@ class PlaylistTest(unittest.TestCase):
         playlist1 = spotify.Playlist(self.session, sp_playlist=sp_playlist)
         playlist2 = spotify.Playlist(self.session, sp_playlist=sp_playlist)
 
-        self.assertFalse(hash(playlist1) != hash(playlist2))
+        self.assertEqual(hash(playlist1), hash(playlist2))
 
     def test_is_loaded(self, lib_mock):
         lib_mock.sp_playlist_is_loaded.return_value = 1

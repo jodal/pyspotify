@@ -91,7 +91,7 @@ class ArtistTest(unittest.TestCase):
         artist1 = spotify.Artist(self.session, sp_artist=sp_artist)
         artist2 = spotify.Artist(self.session, sp_artist=sp_artist)
 
-        self.assertFalse(hash(artist1) != hash(artist2))
+        self.assertEqual(hash(artist1), hash(artist2))
 
     def test_name(self, lib_mock):
         lib_mock.sp_artist_name.return_value = spotify.ffi.new(
@@ -377,7 +377,7 @@ class ArtistBrowserTest(unittest.TestCase):
         browser2 = spotify.ArtistBrowser(
             self.session, sp_artistbrowse=sp_artistbrowse)
 
-        self.assertFalse(hash(browser1) != hash(browser2))
+        self.assertEqual(hash(browser1), hash(browser2))
 
     def test_is_loaded(self, lib_mock):
         lib_mock.sp_artistbrowse_is_loaded.return_value = 1

@@ -141,7 +141,7 @@ class SearchTest(unittest.TestCase):
         search1 = spotify.Search(self.session, sp_search=sp_search)
         search2 = spotify.Search(self.session, sp_search=sp_search)
 
-        self.assertFalse(hash(search1) != hash(search2))
+        self.assertEqual(hash(search1), hash(search2))
 
     def test_is_loaded(self, lib_mock):
         lib_mock.sp_search_is_loaded.return_value = 1

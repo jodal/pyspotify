@@ -172,7 +172,7 @@ class ToplistTest(unittest.TestCase):
         toplist2 = spotify.Toplist(
             self.session, sp_toplistbrowse=sp_toplistbrowse)
 
-        self.assertFalse(hash(toplist1) != hash(toplist2))
+        self.assertEqual(hash(toplist1), hash(toplist2))
 
     def test_is_loaded(self, lib_mock):
         lib_mock.sp_toplistbrowse_is_loaded.return_value = 1

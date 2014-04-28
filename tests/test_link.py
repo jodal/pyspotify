@@ -96,7 +96,7 @@ class LinkTest(unittest.TestCase):
         link1 = spotify.Link(self.session, sp_link=sp_link)
         link2 = spotify.Link(self.session, sp_link=sp_link)
 
-        self.assertFalse(hash(link1) != hash(link2))
+        self.assertEqual(hash(link1), hash(link2))
 
     def test_uri_grows_buffer_to_fit_link(self, lib_mock):
         sp_link = spotify.ffi.cast('sp_link *', 42)

@@ -89,7 +89,7 @@ class AlbumTest(unittest.TestCase):
         album1 = spotify.Album(self.session, sp_album=sp_album)
         album2 = spotify.Album(self.session, sp_album=sp_album)
 
-        self.assertFalse(hash(album1) != hash(album2))
+        self.assertEqual(hash(album1), hash(album2))
 
     def test_is_loaded(self, lib_mock):
         lib_mock.sp_album_is_loaded.return_value = 1
@@ -458,7 +458,7 @@ class AlbumBrowserTest(unittest.TestCase):
         browser2 = spotify.AlbumBrowser(
             self.session, sp_albumbrowse=sp_albumbrowse)
 
-        self.assertFalse(hash(browser1) != hash(browser2))
+        self.assertEqual(hash(browser1), hash(browser2))
 
     def test_is_loaded(self, lib_mock):
         lib_mock.sp_albumbrowse_is_loaded.return_value = 1

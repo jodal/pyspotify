@@ -107,7 +107,7 @@ class ImageTest(unittest.TestCase):
         image1 = spotify.Image(self.session, sp_image=sp_image)
         image2 = spotify.Image(self.session, sp_image=sp_image)
 
-        self.assertFalse(hash(image1) != hash(image2))
+        self.assertEqual(hash(image1), hash(image2))
 
     def test_loaded_event_is_unset_by_default(self, lib_mock):
         lib_mock.sp_image_add_load_callback.return_value = int(

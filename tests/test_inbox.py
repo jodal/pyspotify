@@ -190,7 +190,7 @@ class InboxPostResultTest(unittest.TestCase):
         inbox1 = spotify.InboxPostResult(self.session, sp_inbox=sp_inbox)
         inbox2 = spotify.InboxPostResult(self.session, sp_inbox=sp_inbox)
 
-        self.assertFalse(hash(inbox1) != hash(inbox2))
+        self.assertEqual(hash(inbox1), hash(inbox2))
 
     def test_error(self, lib_mock):
         lib_mock.sp_inbox_error.return_value = int(

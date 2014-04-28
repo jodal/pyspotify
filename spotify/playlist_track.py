@@ -32,6 +32,20 @@ class PlaylistTrack(object):
         return 'PlaylistTrack(uri=%r, creator=%r, create_time=%d)' % (
             self.track.link.uri, self.creator, self.create_time)
 
+    def __eq__(self, other):
+        if isinstance(other, self.__class__):
+            return (
+                self._sp_playlist == other._sp_playlist and
+                self._index == other._index)
+        else:
+            return False
+
+    def __ne__(self, other):
+        return not self.__eq__(other)
+
+    def __hash__(self):
+        return hash((self._sp_playlist, self._index))
+
     @property
     @serialized
     def track(self):

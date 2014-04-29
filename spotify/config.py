@@ -249,21 +249,40 @@ class Config(object):
         from the local certificate store.
 
         .. warning::
-            libspotify 12.1.51 for OS X does not have this field. Thus,
-            this field is currently a no-op in pyspotify so that the same
-            code can run on both Linux and OS X.
+            libspotify 12.1.51 for OS X does not have this field. Assignment to
+            this field in pyspotify on OS X does nothing, so that the same code
+            can run on both Linux and OS X.
         """
-        # XXX Waiting for ca_certs_filename on OS X
-        # return utils.to_bytes_or_none(
-        #     self._sp_session_config.ca_certs_filename)
-        pass
+        ptr = self._get_ca_certs_filename_ptr()
+        if ptr is not None:
+            return utils.to_bytes_or_none(ptr[0])
+        else:
+            return None
 
     @ca_certs_filename.setter
     def ca_certs_filename(self, value):
-        # XXX Waiting for ca_certs_filename on OS X
-        # self._ca_certs_filename = utils.to_char_or_null(value)
-        # self._sp_session_config.ca_certs_filename = self._ca_certs_filename
-        pass
+        ptr = self._get_ca_certs_filename_ptr()
+        if ptr is not None:
+            self._ca_certs_filename = utils.to_char_or_null(value)
+            ptr[0] = self._ca_certs_filename
+
+    def _get_ca_certs_filename_ptr(self):
+        # XXX This function does pointer arithmetic based on the assumption
+        # that if the ca_certs_filename field exists in sp_session_config on
+        # the current platform, it will reside between the proxy_password and
+        # tracefile fields.
+        #
+        # If CFFI supported #ifdef we could make this exact
+        # science by including ca_certs_filename field in the sp_session_config
+        # struct only if the SP_WITH_CURL macro is defined, ref. the
+        # sp_session_create example in the libspotify docs.
+        proxy_password_ptr = spotify.ffi.addressof(
+            self._sp_session_config, 'proxy_password')
+        tracefile_ptr = spotify.ffi.addressof(
+            self._sp_session_config, 'tracefile')
+        if tracefile_ptr - proxy_password_ptr != 2:
+            return None
+        return proxy_password_ptr + 1
 
     @property
     def tracefile(self):

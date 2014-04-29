@@ -2,6 +2,7 @@
 
 from __future__ import unicode_literals
 
+import platform
 import tempfile
 import unittest
 
@@ -186,18 +187,32 @@ class ConfigTest(unittest.TestCase):
     def test_proxy_password_defaults_to_none(self):
         self.assertIsNone(self.config.proxy_password)
 
-    @unittest.skip('XXX Waiting for ca_certs_filename on OS X')
+    @unittest.skipIf(
+        platform.system() == 'Darwin',
+        'The struct field does not exist in libspotify for OS X')
     def test_ca_certs_filename(self):
         self.config.ca_certs_filename = b'ca.crt'
 
         self.assertEqual(
             spotify.ffi.string(
-                self.config._sp_session_config.ca_certs_filename),
+                self.config._get_ca_certs_filename_ptr()[0]),
             b'ca.crt')
         self.assertEqual(self.config.ca_certs_filename, b'ca.crt')
 
-    @unittest.skip('XXX Waiting for ca_certs_filename on OS X')
+    @unittest.skipIf(
+        platform.system() == 'Darwin',
+        'The struct field does not exist in libspotify for OS X')
     def test_ca_certs_filename_defaults_to_none(self):
+        self.assertIsNone(self.config.ca_certs_filename)
+
+    @unittest.skipIf(
+        platform.system() != 'Darwin',
+        'Not supported on this operating system')
+    def test_ca_certs_filename_is_a_noop_on_os_x(self):
+        self.assertIsNone(self.config.ca_certs_filename)
+
+        self.config.ca_certs_filename = b'ca.crt'
+
         self.assertIsNone(self.config.ca_certs_filename)
 
     def test_tracefile(self):

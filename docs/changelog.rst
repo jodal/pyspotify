@@ -23,6 +23,11 @@ Minor changes
   ``playlist.tracks`` is a custom collection always returning new
   :class:`~spotify.Track` instances. (Related to: :issue:`128`)
 
+- :attr:`spotify.Config.ca_certs_filename` now works on systems where
+  libspotify has this field. On systems where this field isn't present in
+  libspotify, assigning to it will have no effect. Previously, assignment to
+  this field was a noop because the field is missing from libspotify on OS X.
+
 
 v2.0.0b1 (2014-04-24)
 =====================

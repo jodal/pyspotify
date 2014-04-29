@@ -5,7 +5,7 @@ Changelog
 v2.0.0b2 (UNRELEASED)
 =====================
 
-No changes yet.
+The second beta is a minor bug fix release.
 
 Bug fixes
 ---------
@@ -18,7 +18,7 @@ Minor changes
 -------------
 
 - Make all objects compare as equal and have the same hash if they wrap the
-  same libspotify object.  his makes it possible to find the index of a track
+  same libspotify object. This makes it possible to find the index of a track
   in a playlist by doing ``playlist.tracks.index(track)``, where
   ``playlist.tracks`` is a custom collection always returning new
   :class:`~spotify.Track` instances. (Related to: :issue:`128`)
@@ -26,7 +26,8 @@ Minor changes
 - :attr:`spotify.Config.ca_certs_filename` now works on systems where
   libspotify has this field. On systems where this field isn't present in
   libspotify, assigning to it will have no effect. Previously, assignment to
-  this field was a noop because the field is missing from libspotify on OS X.
+  this field was a noop on all platforms because the field is missing from
+  libspotify on OS X.
 
 
 v2.0.0b1 (2014-04-24)

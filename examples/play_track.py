@@ -61,9 +61,9 @@ session.relogin()
 
 logged_in.wait()
 
-# TODO Get rid of this sleep
-import time
-time.sleep(1)
+# XXX This isn't very elegant
+while session.connection_state != spotify.ConnectionState.LOGGED_IN:
+    session.process_events()
 
 # Play a track
 track = session.get_track(track_uri).load()

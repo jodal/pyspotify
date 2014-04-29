@@ -2,7 +2,7 @@
 Changelog
 *********
 
-v2.0.0b2 (UNRELEASED)
+v2.0.0b2 (2014-04-29)
 =====================
 
 The second beta is a minor bug fix release.

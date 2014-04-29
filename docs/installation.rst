@@ -106,9 +106,7 @@ Arch Linux
 If you're on Arch Linux, you can install the pyspotify build dependencies by
 running::
 
-    sudo pacman -S base-devel
-
-TODO: Check if you need to install libffi headers, etc.
+    sudo pacman -S base-devel python2 python
 
 
 Mac OS X

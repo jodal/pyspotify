@@ -223,7 +223,9 @@ def load(session, obj, timeout=None):
         return obj
 
     if session.connection_state is not spotify.ConnectionState.LOGGED_IN:
-        raise RuntimeError('Session must be logged in to load objects')
+        raise RuntimeError(
+            'Session must be logged in and online to load objects: %r'
+            % session.connection_state)
 
     if timeout is None:
         timeout = 10

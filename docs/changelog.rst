@@ -8,20 +8,26 @@ v2.0.0b3 (UNRELEASED)
 Refactoring: Connection cleanup
 -------------------------------
 
-- Parts of :attr:`spotify.Session.offline` has been moved to
-  :attr:`spotify.Session.connection`:
+Parts of :class:`spotify.Session` and :attr:`spotify.Session.offline` has been
+moved to :attr:`spotify.Session.connection`:
 
-  - :attr:`session.connection.type <spotify.connection.Connection.type>`
-    replaces :meth:`session.offline.set_connection_type
-    <spotify.offline.Offline.set_connection_type>`
+- :meth:`~spotify.offline.Offline.set_connection_type` has been replaced by
+  :attr:`session.connection.type <spotify.connection.Connection.type>`,
+  which now also allows reading the current connection type.
 
-  - :meth:`session.connection.set_connection_rules
-    <spotify.connection.Connection.set_connection_rules>` replaces
-    :meth:`session.offline.set_connection_rules
-    <spotify.offline.Offline.set_connection_rules>`
+- :meth:`~spotify.offline.Offline.set_connection_rules` has been replaced by:
 
-- :attr:`session.connection.state <spotify.connection.Connection.state>`
-  replaces :attr:`session.connection_state <spotify.Session.connection_state>`.
+  - :attr:`~spotify.connection.Connection.allow_network`
+  - :attr:`~spotify.connection.Connection.allow_network_if_roaming`
+  - :attr:`~spotify.connection.Connection.allow_sync_over_wifi`
+  - :attr:`~spotify.connection.Connection.allow_sync_over_mobile`
+
+  The new attributes allow reading the current connection rules, so your
+  application don't have to keep track of what rules it has set.
+
+- :attr:`session.connection_state <spotify.Session.connection_state>`.
+  has been replaced by :attr:`session.connection.state
+  <spotify.connection.Connection.state>`
 
 Minor changes
 -------------

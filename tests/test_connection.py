@@ -64,19 +64,80 @@ class ConnectionTest(unittest.TestCase):
 
         self.assertIs(result, spotify.ConnectionType.UNKNOWN)
 
-    def test_set_connection_rules(self, session_lib_mock, lib_mock):
+    def test_allow_network_defaults_to_true(self, session_lib_mock, lib_mock):
+        session = tests.create_real_session(session_lib_mock)
+
+        self.assertTrue(session.connection.allow_network)
+
+    def test_set_allow_network(self, session_lib_mock, lib_mock):
         lib_mock.sp_session_set_connection_rules.return_value = (
             spotify.ErrorType.OK)
         session = tests.create_real_session(session_lib_mock)
 
-        session.connection.set_connection_rules(
-            spotify.ConnectionRule.NETWORK,
-            spotify.ConnectionRule.ALLOW_SYNC_OVER_WIFI)
+        session.connection.allow_network = False
 
+        self.assertFalse(session.connection.allow_network)
+        lib_mock.sp_session_set_connection_rules.assert_called_with(
+            session._sp_session,
+            int(spotify.ConnectionRule.ALLOW_SYNC_OVER_WIFI))
+
+    def test_allow_network_if_roaming_defaults_to_false(
+            self, session_lib_mock, lib_mock):
+        session = tests.create_real_session(session_lib_mock)
+
+        self.assertFalse(session.connection.allow_network_if_roaming)
+
+    def test_set_allow_network_if_roaming(self, session_lib_mock, lib_mock):
+        lib_mock.sp_session_set_connection_rules.return_value = (
+            spotify.ErrorType.OK)
+        session = tests.create_real_session(session_lib_mock)
+
+        session.connection.allow_network_if_roaming = True
+
+        self.assertTrue(session.connection.allow_network_if_roaming)
         lib_mock.sp_session_set_connection_rules.assert_called_with(
             session._sp_session,
             spotify.ConnectionRule.NETWORK |
+            spotify.ConnectionRule.NETWORK_IF_ROAMING |
             spotify.ConnectionRule.ALLOW_SYNC_OVER_WIFI)
+
+    def test_allow_sync_over_wifi_defaults_to_true(
+            self, session_lib_mock, lib_mock):
+        session = tests.create_real_session(session_lib_mock)
+
+        self.assertTrue(session.connection.allow_sync_over_wifi)
+
+    def test_set_allow_sync_over_wifi(self, session_lib_mock, lib_mock):
+        lib_mock.sp_session_set_connection_rules.return_value = (
+            spotify.ErrorType.OK)
+        session = tests.create_real_session(session_lib_mock)
+
+        session.connection.allow_sync_over_wifi = False
+
+        self.assertFalse(session.connection.allow_sync_over_wifi)
+        lib_mock.sp_session_set_connection_rules.assert_called_with(
+            session._sp_session,
+            int(spotify.ConnectionRule.NETWORK))
+
+    def test_allow_sync_over_mobile_defaults_to_false(
+            self, session_lib_mock, lib_mock):
+        session = tests.create_real_session(session_lib_mock)
+
+        self.assertFalse(session.connection.allow_sync_over_mobile)
+
+    def test_set_allow_sync_over_mobile(self, session_lib_mock, lib_mock):
+        lib_mock.sp_session_set_connection_rules.return_value = (
+            spotify.ErrorType.OK)
+        session = tests.create_real_session(session_lib_mock)
+
+        session.connection.allow_sync_over_mobile = True
+
+        self.assertTrue(session.connection.allow_sync_over_mobile)
+        lib_mock.sp_session_set_connection_rules.assert_called_with(
+            session._sp_session,
+            spotify.ConnectionRule.NETWORK |
+            spotify.ConnectionRule.ALLOW_SYNC_OVER_WIFI |
+            spotify.ConnectionRule.ALLOW_SYNC_OVER_MOBILE)
 
     def test_set_connection_rules_without_rules(
             self, session_lib_mock, lib_mock):
@@ -84,7 +145,8 @@ class ConnectionTest(unittest.TestCase):
             spotify.ErrorType.OK)
         session = tests.create_real_session(session_lib_mock)
 
-        session.connection.set_connection_rules()
+        session.connection.allow_network = False
+        session.connection.allow_sync_over_wifi = False
 
         lib_mock.sp_session_set_connection_rules.assert_called_with(
             session._sp_session, 0)
@@ -96,8 +158,7 @@ class ConnectionTest(unittest.TestCase):
         session = tests.create_real_session(session_lib_mock)
 
         with self.assertRaises(spotify.Error):
-            session.connection.set_connection_rules(
-                spotify.ConnectionRule.NETWORK)
+            session.connection.allow_network = False
 
 
 class ConnectionRuleTest(unittest.TestCase):

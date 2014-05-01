@@ -24,7 +24,13 @@ class Connection(object):
 
     def __init__(self, session):
         self._session = session
+
+        # The following defaults are based on the libspotify documentation
         self._connection_type = spotify.ConnectionType.UNKNOWN
+        self._allow_network = True
+        self._allow_network_if_roaming = False
+        self._allow_sync_over_wifi = True
+        self._allow_sync_over_mobile = False
 
     @property
     def state(self):
@@ -36,10 +42,14 @@ class Connection(object):
     def type(self):
         """The session's :class:`ConnectionType`.
 
-        Set to a :class:`ConnectionType` value to change.
+        Defaults to :attr:`ConnectionType.UNKNOWN`. Set to a
+        :class:`ConnectionType` value to tell libspotify what type of
+        connection you're using.
 
-        This is used together with :meth:`set_connection_rules` to
-        control offline syncing and network usage.
+        This is used together with :attr:`allow_network`,
+        :attr:`allow_network_if_roaming`, :attr:`allow_sync_over_wifi`, and
+        :attr:`allow_sync_over_mobile` to control offline syncing and network
+        usage.
         """
         return self._connection_type
 
@@ -49,17 +59,77 @@ class Connection(object):
             self._session._sp_session, value))
         self._connection_type = value
 
-    def set_connection_rules(self, *connection_rules):
-        """Set one or more :class:`connection rules <ConnectionRule>`.
+    @property
+    def allow_network(self):
+        """Wether or not network access is allowed at all.
 
-        This is used together with :attr:`type` to control offline syncing and
-        network usage.
-
-        To remove all rules, simply call this method without any arguments.
+        Defaults to :class:`True`. Setting this to :class:`False` turns on
+        offline mode.
         """
-        connection_rules = functools.reduce(operator.or_, connection_rules, 0)
+        return self._allow_network
+
+    @allow_network.setter
+    def allow_network(self, value):
+        self._allow_network = value
+        self._update_connection_rules()
+
+    @property
+    def allow_network_if_roaming(self):
+        """Wether or not network access is allowed if :attr:`type` is set to
+        :attr:`ConnectionType.MOBILE_ROAMING`.
+
+        Defaults to :class:`False`.
+        """
+        return self._allow_network_if_roaming
+
+    @allow_network_if_roaming.setter
+    def allow_network_if_roaming(self, value):
+        self._allow_network_if_roaming = value
+        self._update_connection_rules()
+
+    @property
+    def allow_sync_over_wifi(self):
+        """Wether or not offline syncing is allowed when :attr:`type` is set to
+        :attr:`ConnectionType.WIFI`.
+
+        Defaults to :class:`True`.
+        """
+        return self._allow_sync_over_wifi
+
+    @allow_sync_over_wifi.setter
+    def allow_sync_over_wifi(self, value):
+        self._allow_sync_over_wifi = value
+        self._update_connection_rules()
+
+    @property
+    def allow_sync_over_mobile(self):
+        """Wether or not offline syncing is allowed when :attr:`type` is set to
+        :attr:`ConnectionType.MOBILE`, or
+        :attr:`allow_network_if_roaming` is :class:`True` and :attr:`type` is
+        set to :attr:`ConnectionType.MOBILE_ROAMING`.
+
+        Defaults to :class:`True`.
+        """
+        return self._allow_sync_over_mobile
+
+    @allow_sync_over_mobile.setter
+    def allow_sync_over_mobile(self, value):
+        self._allow_sync_over_mobile = value
+        self._update_connection_rules()
+
+    def _update_connection_rules(self):
+        rules = []
+        if self._allow_network:
+            rules.append(spotify.ConnectionRule.NETWORK)
+        if self._allow_network_if_roaming:
+            rules.append(spotify.ConnectionRule.NETWORK_IF_ROAMING)
+        if self._allow_sync_over_wifi:
+            rules.append(spotify.ConnectionRule.ALLOW_SYNC_OVER_WIFI)
+        if self._allow_sync_over_mobile:
+            rules.append(spotify.ConnectionRule.ALLOW_SYNC_OVER_MOBILE)
+        rules = functools.reduce(operator.or_, rules, 0)
         spotify.Error.maybe_raise(lib.sp_session_set_connection_rules(
-            self._session._sp_session, connection_rules))
+            self._session._sp_session, rules))
 
 
 @utils.make_enum('SP_CONNECTION_RULE_')

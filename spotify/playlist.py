@@ -518,7 +518,7 @@ class PlaylistEvent(object):
     :type playlist: :class:`Playlist`
     :param position: the position of the entry in the playlist that was changed
     :type position: int
-    :param seen: wether the entry is seen or not
+    :param seen: whether the entry is seen or not
     :type seen: bool
     """
 

@@ -76,7 +76,7 @@ class Connection(object):
 
     @property
     def allow_network(self):
-        """Wether or not network access is allowed at all.
+        """Whether or not network access is allowed at all.
 
         Defaults to :class:`True`. Setting this to :class:`False` turns on
         offline mode.
@@ -90,7 +90,7 @@ class Connection(object):
 
     @property
     def allow_network_if_roaming(self):
-        """Wether or not network access is allowed if :attr:`~Connection.type`
+        """Whether or not network access is allowed if :attr:`~Connection.type`
         is set to :attr:`ConnectionType.MOBILE_ROAMING`.
 
         Defaults to :class:`False`.
@@ -104,7 +104,7 @@ class Connection(object):
 
     @property
     def allow_sync_over_wifi(self):
-        """Wether or not offline syncing is allowed when
+        """Whether or not offline syncing is allowed when
         :attr:`~Connection.type` is set to :attr:`ConnectionType.WIFI`.
 
         Defaults to :class:`True`.
@@ -118,7 +118,7 @@ class Connection(object):
 
     @property
     def allow_sync_over_mobile(self):
-        """Wether or not offline syncing is allowed when
+        """Whether or not offline syncing is allowed when
         :attr:`~Connection.type` is set to :attr:`ConnectionType.MOBILE`, or
         :attr:`allow_network_if_roaming` is :class:`True` and
         :attr:`~Connection.type` is set to

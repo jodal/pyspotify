@@ -58,7 +58,7 @@ def login(session, username, password):
         raise RuntimeError('Login timed out')
     logger.debug('Logged in as %r', session.user_name)
 
-    while session.connection_state != spotify.ConnectionState.LOGGED_IN:
+    while session.connection.state != spotify.ConnectionState.LOGGED_IN:
         logger.debug('Waiting for connection')
         time.sleep(0.1)
 

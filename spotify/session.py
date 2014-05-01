@@ -216,12 +216,6 @@ class Session(utils.EventEmitter):
         spotify.Error.maybe_raise(
             lib.sp_session_flush_caches(self._sp_session))
 
-    @property
-    def connection_state(self):
-        """The current :class:`ConnectionState`."""
-        return spotify.ConnectionState(
-            lib.sp_session_connectionstate(self._sp_session))
-
     def set_cache_size(self, size):
         """Set maximum size in MB for libspotify's cache.
 

@@ -62,7 +62,7 @@ session.relogin()
 logged_in.wait()
 
 # XXX This isn't very elegant
-while session.connection_state != spotify.ConnectionState.LOGGED_IN:
+while session.connection.state != spotify.ConnectionState.LOGGED_IN:
     session.process_events()
 
 # Play a track

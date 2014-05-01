@@ -25,7 +25,9 @@ class SocialTest(unittest.TestCase):
             session._sp_session)
         self.assertFalse(result)
 
-    def test_set_private_session(self, session_lib_mock, lib_mock):
+    @mock.patch('spotify.connection.lib', spec=spotify.lib)
+    def test_set_private_session(
+            self, conn_lib_mock, session_lib_mock, lib_mock):
         lib_mock.sp_session_set_private_session.return_value = (
             spotify.ErrorType.OK)
         session = tests.create_real_session(session_lib_mock)
@@ -35,8 +37,9 @@ class SocialTest(unittest.TestCase):
         lib_mock.sp_session_set_private_session.assert_called_with(
             session._sp_session, 1)
 
+    @mock.patch('spotify.connection.lib', spec=spotify.lib)
     def test_set_private_session_fail_raises_error(
-            self, session_lib_mock, lib_mock):
+            self, conn_lib_mock, session_lib_mock, lib_mock):
         lib_mock.sp_session_set_private_session.return_value = (
             spotify.ErrorType.BAD_API_VERSION)
         session = tests.create_real_session(session_lib_mock)

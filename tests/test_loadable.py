@@ -34,12 +34,12 @@ class LoadableTest(unittest.TestCase):
 
     def setUp(self):
         self.session = tests.create_session_mock()
-        self.session.connection_state = spotify.ConnectionState.LOGGED_IN
+        self.session.connection.state = spotify.ConnectionState.LOGGED_IN
 
     def test_load_raises_error_if_not_logged_in(
             self, is_loaded_mock, time_mock):
         is_loaded_mock.return_value = False
-        self.session.connection_state = spotify.ConnectionState.LOGGED_OUT
+        self.session.connection.state = spotify.ConnectionState.LOGGED_OUT
         foo = Foo(self.session)
 
         with self.assertRaises(RuntimeError):
@@ -48,7 +48,7 @@ class LoadableTest(unittest.TestCase):
     def test_load_raises_error_if_offline(
             self, is_loaded_mock, time_mock):
         is_loaded_mock.return_value = False
-        self.session.connection_state = spotify.ConnectionState.OFFLINE
+        self.session.connection.state = spotify.ConnectionState.OFFLINE
         foo = Foo(self.session)
 
         with self.assertRaises(RuntimeError):
@@ -57,7 +57,7 @@ class LoadableTest(unittest.TestCase):
     def test_load_returns_immediately_if_offline_but_already_loaded(
             self, is_loaded_mock, time_mock):
         is_loaded_mock.return_value = True
-        self.session.connection_state = spotify.ConnectionState.OFFLINE
+        self.session.connection.state = spotify.ConnectionState.OFFLINE
         foo = Foo(self.session)
 
         result = foo.load()

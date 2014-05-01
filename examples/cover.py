@@ -6,7 +6,7 @@ session = spotify.Session()
 # Assuming a previous login with remember_me=True and a proper logout:
 session.relogin()
 
-while session.connection_state != spotify.ConnectionState.LOGGED_IN:
+while session.connection.state != spotify.ConnectionState.LOGGED_IN:
     session.process_events()
 
 album = session.get_album('spotify:album:4m2880jivSbbyEGAKfITCa').load()

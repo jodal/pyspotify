@@ -36,7 +36,7 @@ class Social(object):
         # call process_events() at least once before calling it. If we log out
         # again, calling the function still works without segfaults. This bug
         # has been reported to Spotify on IRC.
-        if self._session.connection_state != spotify.ConnectionState.LOGGED_IN:
+        if self._session.connection.state != spotify.ConnectionState.LOGGED_IN:
             raise RuntimeError(
                 'private_session can only be set when the session is logged '
                 'in. This is temporary workaround of a libspotify bug, '

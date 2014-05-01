@@ -245,17 +245,6 @@ class SessionTest(unittest.TestCase):
         with self.assertRaises(spotify.Error):
             session.flush_caches()
 
-    def test_connection_state(self, lib_mock):
-        lib_mock.sp_session_connectionstate.return_value = int(
-            spotify.ConnectionState.LOGGED_OUT)
-        session = tests.create_real_session(lib_mock)
-
-        self.assertIs(
-            session.connection_state, spotify.ConnectionState.LOGGED_OUT)
-
-        lib_mock.sp_session_connectionstate.assert_called_once_with(
-            session._sp_session)
-
     def test_set_cache_size(self, lib_mock):
         lib_mock.sp_session_set_cache_size.return_value = spotify.ErrorType.OK
         session = tests.create_real_session(lib_mock)

@@ -25,6 +25,12 @@ class Connection(object):
     def __init__(self, session):
         self._session = session
 
+    @property
+    def state(self):
+        """The current :class:`ConnectionState`."""
+        return spotify.ConnectionState(
+            lib.sp_session_connectionstate(self._session._sp_session))
+
     def set_connection_type(self, connection_type):
         """Set the :class:`ConnectionType`.
 

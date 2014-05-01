@@ -15,6 +15,17 @@ class ConnectionTest(unittest.TestCase):
     def tearDown(self):
         spotify._session_instance = None
 
+    def test_connection_state(self, session_lib_mock, lib_mock):
+        lib_mock.sp_session_connectionstate.return_value = int(
+            spotify.ConnectionState.LOGGED_OUT)
+        session = tests.create_real_session(session_lib_mock)
+
+        self.assertIs(
+            session.connection.state, spotify.ConnectionState.LOGGED_OUT)
+
+        lib_mock.sp_session_connectionstate.assert_called_once_with(
+            session._sp_session)
+
     def test_set_connection_type(self, session_lib_mock, lib_mock):
         lib_mock.sp_session_set_connection_type.return_value = (
             spotify.ErrorType.OK)

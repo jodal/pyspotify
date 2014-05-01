@@ -15,7 +15,7 @@ session = spotify.Session()
 # Assuming a previous login with remember_me=True and a proper logout:
 session.relogin()
 
-while session.connection_state != spotify.ConnectionState.LOGGED_IN:
+while session.connection.state != spotify.ConnectionState.LOGGED_IN:
     session.process_events()
 
 user = session.get_user('spotify:user:p3.no').load()

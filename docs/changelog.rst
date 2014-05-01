@@ -8,17 +8,20 @@ v2.0.0b3 (UNRELEASED)
 Refactoring: Connection cleanup
 -------------------------------
 
-Parts of :attr:`spotify.Session.offline` has been moved to
-:attr:`spotify.Session.connection`:
+- Parts of :attr:`spotify.Session.offline` has been moved to
+  :attr:`spotify.Session.connection`:
 
-- :meth:`~spotify.connection.Connection.set_connection_type`
-- :meth:`~spotify.connection.Connection.set_connection_rules`
+  - :meth:`~spotify.connection.Connection.set_connection_type`
+  - :meth:`~spotify.connection.Connection.set_connection_rules`
+
+- :attr:`session.connection.state <spotify.connection.Connection.state>`
+  replaces :attr:`session.connection_state <spotify.Session.connection_state>`.
 
 Minor changes
 -------------
 
 - ``load()`` methods now return the object if it is already loaded, even if
-  :attr:`~spotify.Session.connection_state` isn't
+  :attr:`~spotify.Session.connection.state` isn't
   :attr:`~spotify.ConnectionState.LOGGED_IN`. Previously, a
   :exc:`RuntimeError` was raised requiring the session to be logged in and
   online before loading already loaded objects.

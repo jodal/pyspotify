@@ -33,7 +33,7 @@ Minor changes
 -------------
 
 - ``load()`` methods now return the object if it is already loaded, even if
-  :attr:`~spotify.Session.connection.state` isn't
+  :attr:`~spotify.connection.Connection.state` isn't
   :attr:`~spotify.ConnectionState.LOGGED_IN`. Previously, a
   :exc:`RuntimeError` was raised requiring the session to be logged in and
   online before loading already loaded objects.

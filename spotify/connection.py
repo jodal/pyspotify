@@ -46,10 +46,11 @@ class Connection(object):
         :class:`ConnectionType` value to tell libspotify what type of
         connection you're using.
 
-        This is used together with :attr:`allow_network`,
-        :attr:`allow_network_if_roaming`, :attr:`allow_sync_over_wifi`, and
-        :attr:`allow_sync_over_mobile` to control offline syncing and network
-        usage.
+        This is used together with :attr:`~Connection.allow_network`,
+        :attr:`~Connection.allow_network_if_roaming`,
+        :attr:`~Connection.allow_sync_over_wifi`, and
+        :attr:`~Connection.allow_sync_over_mobile` to control offline syncing
+        and network usage.
         """
         return self._connection_type
 
@@ -75,8 +76,8 @@ class Connection(object):
 
     @property
     def allow_network_if_roaming(self):
-        """Wether or not network access is allowed if :attr:`type` is set to
-        :attr:`ConnectionType.MOBILE_ROAMING`.
+        """Wether or not network access is allowed if :attr:`~Connection.type`
+        is set to :attr:`ConnectionType.MOBILE_ROAMING`.
 
         Defaults to :class:`False`.
         """
@@ -89,8 +90,8 @@ class Connection(object):
 
     @property
     def allow_sync_over_wifi(self):
-        """Wether or not offline syncing is allowed when :attr:`type` is set to
-        :attr:`ConnectionType.WIFI`.
+        """Wether or not offline syncing is allowed when
+        :attr:`~Connection.type` is set to :attr:`ConnectionType.WIFI`.
 
         Defaults to :class:`True`.
         """
@@ -103,10 +104,11 @@ class Connection(object):
 
     @property
     def allow_sync_over_mobile(self):
-        """Wether or not offline syncing is allowed when :attr:`type` is set to
-        :attr:`ConnectionType.MOBILE`, or
-        :attr:`allow_network_if_roaming` is :class:`True` and :attr:`type` is
-        set to :attr:`ConnectionType.MOBILE_ROAMING`.
+        """Wether or not offline syncing is allowed when
+        :attr:`~Connection.type` is set to :attr:`ConnectionType.MOBILE`, or
+        :attr:`allow_network_if_roaming` is :class:`True` and
+        :attr:`~Connection.type` is set to
+        :attr:`ConnectionType.MOBILE_ROAMING`.
 
         Defaults to :class:`True`.
         """

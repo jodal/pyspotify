@@ -197,6 +197,12 @@ def get_with_growing_buffer(func, *args):
     return to_unicode(buffer_)
 
 
+def _check_error(obj):
+    error_type = getattr(obj, 'error', spotify.ErrorType.OK)
+    spotify.Error.maybe_raise(
+        error_type, ignores=[spotify.ErrorType.IS_LOADING])
+
+
 def load(session, obj, timeout=None):
     """Block until the object's data is loaded.
 
@@ -221,8 +227,7 @@ def load(session, obj, timeout=None):
 
     while not obj.is_loaded:
         session.process_events()
-        spotify.Error.maybe_raise(
-            getattr(obj, 'error', 0), ignores=[spotify.ErrorType.IS_LOADING])
+        _check_error(obj)
         if obj.is_loaded:
             return obj
         if time.time() > deadline:
@@ -237,8 +242,7 @@ def load(session, obj, timeout=None):
         # session.process_events(). Thus, it is better to make this loop tight.
         time.sleep(0.001)
 
-    spotify.Error.maybe_raise(
-        getattr(obj, 'error', 0), ignores=[spotify.ErrorType.IS_LOADING])
+    _check_error(obj)
     return obj
 
 

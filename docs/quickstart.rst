@@ -51,7 +51,7 @@ change any config to something else than the default, you must create a
     >>> config = spotify.Config()
     >>> config.user_agent = 'My awesome Spotify client'
     >>> config.tracefile = b'/tmp/libspotify-trace.log'
-    >>> session = spotify.Session(config=config)
+    >>> session = spotify.Session(config)
 
 
 Text encoding
@@ -86,8 +86,15 @@ URIs::
 
 But that's mostly how far you get with a fresh session. To do more, you need to
 login to the Spotify service using a Spotify account with the Premium
-subscription. The free ad financed Spotify subscription will not work with
-pyspotify or any other application using libspotify.
+subscription.
+
+.. warning::
+
+    pyspotify and all other libspotify applications required a Spotify Premium
+    subscription.
+
+    The Free Spotify subscription, or the old Unlimited subscription, will not
+    work with pyspotify or any other application using libspotify.
 
 ::
 

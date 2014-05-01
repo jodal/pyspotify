@@ -4,7 +4,7 @@ Connection
 
 .. module:: spotify
 
-.. autoclass:: spotify.connection.Offline
+.. autoclass:: spotify.connection.Connection
 
 .. autoclass:: ConnectionRule
     :no-inherited-members:
@@ -14,5 +14,3 @@ Connection
 
 .. autoclass:: ConnectionType
     :no-inherited-members:
-
-.. autoclass:: OfflineSyncStatus

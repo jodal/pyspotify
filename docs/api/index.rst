@@ -34,18 +34,19 @@ further details.
     session
     eventloop
     connection
-    audio
+    offline
     link
+    user
     track
     album
     artist
     image
     search
-    social
     playlist
-    user
     toplist
     inbox
+    social
     player
+    audio
     sink
     internal

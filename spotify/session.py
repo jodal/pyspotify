@@ -64,7 +64,8 @@ class Session(utils.EventEmitter):
         self._emitters = []
         self._callback_handles = set()
 
-        self.offline = spotify.connection.Offline(self)
+        self.connection = spotify.connection.Connection(self)
+        self.offline = spotify.offline.Offline(self)
         self.player = spotify.player.Player(self)
         self.social = spotify.social.Social(self)
         spotify._session_instance = self
@@ -114,8 +115,12 @@ class Session(utils.EventEmitter):
     will generally have no effect.
     """
 
+    connection = None
+    """An :class:`~spotify.connection.Connection` instance for controlling the
+    connection to the Spotify servers."""
+
     offline = None
-    """An :class:`~spotify.connection.Offline` instance for controlling offline
+    """An :class:`~spotify.offline.Offline` instance for controlling offline
     sync."""
 
     player = None

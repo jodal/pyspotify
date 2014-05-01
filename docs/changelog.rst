@@ -5,6 +5,15 @@ Changelog
 v2.0.0b3 (UNRELEASED)
 =====================
 
+Refactoring: Connection cleanup
+-------------------------------
+
+Parts of :attr:`spotify.Session.offline` has been moved to
+:attr:`spotify.Session.connection`:
+
+- :meth:`~spotify.connection.Connection.set_connection_type`
+- :meth:`~spotify.connection.Connection.set_connection_rules`
+
 Minor changes
 -------------
 

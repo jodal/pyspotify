@@ -94,7 +94,7 @@ subscription.
     subscription.
 
     The Free Spotify subscription, or the old Unlimited subscription, will not
-    work with pyspotify or any other application using libspotify.
+    work with pyspotify or any other applications using libspotify.
 
 ::
 

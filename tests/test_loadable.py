@@ -23,6 +23,7 @@ class Foo(object):
 
 
 class FooWithError(Foo):
+    @property
     def error(self):
         return spotify.Error(spotify.Error.OK)
 
@@ -37,11 +38,32 @@ class LoadableTest(unittest.TestCase):
 
     def test_load_raises_error_if_not_logged_in(
             self, is_loaded_mock, time_mock):
+        is_loaded_mock.return_value = False
         self.session.connection_state = spotify.ConnectionState.LOGGED_OUT
         foo = Foo(self.session)
 
         with self.assertRaises(RuntimeError):
             foo.load()
+
+    def test_load_raises_error_if_offline(
+            self, is_loaded_mock, time_mock):
+        is_loaded_mock.return_value = False
+        self.session.connection_state = spotify.ConnectionState.OFFLINE
+        foo = Foo(self.session)
+
+        with self.assertRaises(RuntimeError):
+            foo.load()
+
+    def test_load_returns_immediately_if_offline_but_already_loaded(
+            self, is_loaded_mock, time_mock):
+        is_loaded_mock.return_value = True
+        self.session.connection_state = spotify.ConnectionState.OFFLINE
+        foo = Foo(self.session)
+
+        result = foo.load()
+
+        self.assertEqual(result, foo)
+        self.assertEqual(self.session.process_events.call_count, 0)
 
     def test_load_raises_error_when_timeout_is_reached(
             self, is_loaded_mock, time_mock):
@@ -54,7 +76,7 @@ class LoadableTest(unittest.TestCase):
 
     def test_load_processes_events_until_loaded(
             self, is_loaded_mock, time_mock):
-        is_loaded_mock.side_effect = [False, False, False, False, True]
+        is_loaded_mock.side_effect = [False, False, False, False, False, True]
         time_mock.time.side_effect = time.time
 
         foo = Foo(self.session)
@@ -63,11 +85,14 @@ class LoadableTest(unittest.TestCase):
         self.assertEqual(self.session.process_events.call_count, 2)
         self.assertEqual(time_mock.sleep.call_count, 2)
 
-    def test_load_raises_exception_on_error(self, is_loaded_mock, time_mock):
+    @mock.patch.object(FooWithError, 'error', new_callable=mock.PropertyMock)
+    def test_load_raises_exception_on_error(
+            self, error_mock, is_loaded_mock, time_mock):
+        error_mock.side_effect = [
+            spotify.ErrorType.IS_LOADING, spotify.ErrorType.OTHER_PERMANENT]
         is_loaded_mock.side_effect = [False, False, True]
 
-        foo = Foo(self.session)
-        foo.error = spotify.ErrorType.OTHER_PERMANENT
+        foo = FooWithError(self.session)
 
         with self.assertRaises(spotify.Error):
             foo.load()
@@ -87,7 +112,7 @@ class LoadableTest(unittest.TestCase):
 
     def test_load_does_not_abort_on_is_loading_error(
             self, is_loaded_mock, time_mock):
-        is_loaded_mock.side_effect = [False, False, False, False, True]
+        is_loaded_mock.side_effect = [False, False, False, False, False, True]
         time_mock.time.side_effect = time.time
 
         foo = Foo(self.session)

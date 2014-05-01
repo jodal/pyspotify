@@ -218,6 +218,10 @@ def load(session, obj, timeout=None):
 
     The method returns ``self`` to allow for chaining of calls.
     """
+    _check_error(obj)
+    if obj.is_loaded:
+        return obj
+
     if session.connection_state is not spotify.ConnectionState.LOGGED_IN:
         raise RuntimeError('Session must be logged in to load objects')
 

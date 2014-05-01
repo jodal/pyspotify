@@ -11,8 +11,14 @@ Refactoring: Connection cleanup
 - Parts of :attr:`spotify.Session.offline` has been moved to
   :attr:`spotify.Session.connection`:
 
-  - :meth:`~spotify.connection.Connection.set_connection_type`
-  - :meth:`~spotify.connection.Connection.set_connection_rules`
+  - :attr:`session.connection.type <spotify.connection.Connection.type>`
+    replaces :meth:`session.offline.set_connection_type
+    <spotify.offline.Offline.set_connection_type>`
+
+  - :meth:`session.connection.set_connection_rules
+    <spotify.connection.Connection.set_connection_rules>` replaces
+    :meth:`session.offline.set_connection_rules
+    <spotify.offline.Offline.set_connection_rules>`
 
 - :attr:`session.connection.state <spotify.connection.Connection.state>`
   replaces :attr:`session.connection_state <spotify.Session.connection_state>`.

@@ -24,27 +24,36 @@ class Connection(object):
 
     def __init__(self, session):
         self._session = session
+        self._connection_type = spotify.ConnectionType.UNKNOWN
 
     @property
     def state(self):
-        """The current :class:`ConnectionState`."""
+        """The session's current :class:`ConnectionState`."""
         return spotify.ConnectionState(
             lib.sp_session_connectionstate(self._session._sp_session))
 
-    def set_connection_type(self, connection_type):
-        """Set the :class:`ConnectionType`.
+    @property
+    def type(self):
+        """The session's :class:`ConnectionType`.
 
-        This is used together with :meth:`~Offline.set_connection_rules` to
+        Set to a :class:`ConnectionType` value to change.
+
+        This is used together with :meth:`set_connection_rules` to
         control offline syncing and network usage.
         """
+        return self._connection_type
+
+    @type.setter
+    def type(self, value):
         spotify.Error.maybe_raise(lib.sp_session_set_connection_type(
-            self._session._sp_session, connection_type))
+            self._session._sp_session, value))
+        self._connection_type = value
 
     def set_connection_rules(self, *connection_rules):
         """Set one or more :class:`connection rules <ConnectionRule>`.
 
-        This is used together with :meth:`~Offline.set_connection_type` to
-        control offline syncing and network usage.
+        This is used together with :attr:`type` to control offline syncing and
+        network usage.
 
         To remove all rules, simply call this method without any arguments.
         """

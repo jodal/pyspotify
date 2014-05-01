@@ -26,16 +26,30 @@ class ConnectionTest(unittest.TestCase):
         lib_mock.sp_session_connectionstate.assert_called_once_with(
             session._sp_session)
 
+    def test_connection_type_defaults_to_unknown(
+            self, session_lib_mock, lib_mock):
+        lib_mock.sp_session_set_connection_type.return_value = (
+            spotify.ErrorType.OK)
+        session = tests.create_real_session(session_lib_mock)
+
+        result = session.connection.type
+
+        self.assertIs(result, spotify.ConnectionType.UNKNOWN)
+        self.assertEqual(lib_mock.sp_session_set_connection_type.call_count, 0)
+
     def test_set_connection_type(self, session_lib_mock, lib_mock):
         lib_mock.sp_session_set_connection_type.return_value = (
             spotify.ErrorType.OK)
         session = tests.create_real_session(session_lib_mock)
 
-        session.connection.set_connection_type(
-            spotify.ConnectionType.MOBILE_ROAMING)
+        session.connection.type = spotify.ConnectionType.MOBILE_ROAMING
 
         lib_mock.sp_session_set_connection_type.assert_called_with(
             session._sp_session, spotify.ConnectionType.MOBILE_ROAMING)
+
+        result = session.connection.type
+
+        self.assertIs(result, spotify.ConnectionType.MOBILE_ROAMING)
 
     def test_set_connection_type_fail_raises_error(
             self, session_lib_mock, lib_mock):
@@ -44,8 +58,11 @@ class ConnectionTest(unittest.TestCase):
         session = tests.create_real_session(session_lib_mock)
 
         with self.assertRaises(spotify.Error):
-            session.connection.set_connection_type(
-                spotify.ConnectionType.UNKNOWN)
+            session.connection.type = spotify.ConnectionType.MOBILE_ROAMING
+
+        result = session.connection.type
+
+        self.assertIs(result, spotify.ConnectionType.UNKNOWN)
 
     def test_set_connection_rules(self, session_lib_mock, lib_mock):
         lib_mock.sp_session_set_connection_rules.return_value = (

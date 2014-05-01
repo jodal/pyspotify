@@ -125,11 +125,11 @@ succeeded or failed::
     previous session, it may authenticate you without a connection to Spotify's
     servers. Thus, you may very well be logged in, but still offline.
 
-    The connection state in this examples goes from ``LOGGED_OUT``, to
-    ``OFFLINE``, to ``LOGGED_IN``. If libspotify hasn't cached any information
-    about your Spotify user account, the connection state will probably go
-    directly from ``LOGGED_OUT`` to ``LOGGED_IN``. Your application should be
-    prepared for this.
+    The connection state in the above example goes from the ``LOGGED_OUT``
+    state, to ``OFFLINE``, to ``LOGGED_IN``. If libspotify hasn't cached any
+    information about your Spotify user account, the connection state will
+    probably go directly from ``LOGGED_OUT`` to ``LOGGED_IN``. Your application
+    should be prepared for this.
 
     For more details, see the :attr:`session.connection.state
     <spotify.connection.Connection.state>` documentation.

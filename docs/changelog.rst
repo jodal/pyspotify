@@ -25,7 +25,7 @@ moved to :attr:`spotify.Session.connection`:
   The new attributes allow reading the current connection rules, so your
   application don't have to keep track of what rules it has set.
 
-- :attr:`session.connection_state <spotify.Session.connection_state>`.
+- :attr:`session.connection_state <spotify.Session.connection_state>`
   has been replaced by :attr:`session.connection.state
   <spotify.connection.Connection.state>`
 

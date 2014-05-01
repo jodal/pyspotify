@@ -34,7 +34,21 @@ class Connection(object):
 
     @property
     def state(self):
-        """The session's current :class:`ConnectionState`."""
+        """The session's current :class:`ConnectionState`.
+
+        The connection state involves two components, authentication and
+        offline mode. The mapping is as follows
+
+        - :attr:`~ConnectionState.LOGGED_OUT`: not authenticated, offline
+        - :attr:`~ConnectionState.OFFLINE`: authenticated, offline
+        - :attr:`~ConnectionState.LOGGED_IN`: authenticated, online
+        - :attr:`~ConnectionState.DISCONNECTED`: authenticated, offline, was
+          previously online
+
+        Register listeners for the
+        :attr:`spotify.SessionEvent.CONNECTION_STATE_UPDATED` event to be
+        notified when the connection state changes.
+        """
         return spotify.ConnectionState(
             lib.sp_session_connectionstate(self._session._sp_session))
 

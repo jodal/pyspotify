@@ -103,26 +103,52 @@ session to :meth:`~spotify.Session.process_events` until the login has
 succeeded or failed::
 
     >>> session.connection.state
-    <ConnectionState.OFFLINE: 4>
+    <ConnectionState.LOGGED_OUT: 0>
+    >>> session.process_events()
+    >>> session.connection.state
+    <ConnectionState.OFFLINE: 1>
     >>> session.process_events()
     >>> session.connection.state
     <ConnectionState.LOGGED_IN: 1>
 
-Here we called :meth:`~spotify.Session.process_events` only once, which may
-not be enough. A more robust solution is to call it repeatedly until the
-:attr:`~spotify.SessionEvent.LOGGED_IN` event is emitted on the
-:class:`~spotify.Session` object::
+.. note::
+
+    The connection state is a representation of both your authentication state
+    and your offline mode. If libspotify has cached your user object from a
+    previous session, it may authenticate you without a connection to Spotify's
+    servers. Thus, you may very well be logged in, but still offline.
+
+    The connection state in this examples goes from ``LOGGED_OUT``, to
+    ``OFFLINE``, to ``LOGGED_IN``. If libspotify hasn't cached any information
+    about your Spotify user account, the connection state will probably go
+    directly from ``LOGGED_OUT`` to ``LOGGED_IN``. Your application should be
+    prepared for this.
+
+    For more details, see the :attr:`session.connection.state
+    <spotify.connection.Connection.state>` documentation.
+
+We only called :meth:`~spotify.Session.process_events` twice, which may not be
+enough to get to the :attr:`~spotify.ConnectionState.LOGGED_IN` connection
+state. A more robust solution is to call it repeatedly until the
+:attr:`~spotify.SessionEvent.CONNECTION_STATE_UPDATED` event is emitted on the
+:class:`~spotify.Session` object and :attr:`session.connection.state
+<spotify.connection.Connection.state>` is
+:attr:`~spotify.ConnectionState.LOGGED_IN`::
 
     >>> import threading
     >>> logged_in_event = threading.Event()
-    >>> def logged_in_listener(session, error_type):
-    ...     logged_in_event.set()
+    >>> def connection_state_listener(session):
+    ...     if session.connection.state is spotify.ConnectionState.LOGGED_IN:
+    ...         logged_in_event.set()
     ...
     >>> session = spotify.Session()
-    >>> session.on(spotify.SessionEvent.LOGGED_IN, logged_in_listener)
+    >>> session.on(
+    ...     spotify.SessionEvent.CONNECTION_STATE_UPDATED,
+    ...     connection_state_listener)
+    ...
     >>> session.login('alice', 's3cretpassword')
     >>> session.connection.state
-    <ConnectionState.OFFLINE: 4>
+    <ConnectionState.LOGGED_OUT: 0>
     >>> while not logged_in_event.wait(0.1):
     ...     session.process_events()
     ...
@@ -138,13 +164,19 @@ running, we can simplify the login process::
 
     >>> import threading
     >>> logged_in_event = threading.Event()
-    >>> def logged_in_listener(session, error_type):
-    ...     logged_in_event.set()
+    >>> def connection_state_listener(session):
+    ...     if session.connection.state is spotify.ConnectionState.LOGGED_IN:
+    ...         logged_in_event.set()
     ...
     >>> session = spotify.Session()
     >>> loop = spotify.EventLoop(session)
     >>> loop.start()
-    >>> session.on(spotify.SessionEvent.LOGGED_IN, logged_in_listener)
+    >>> session.on(
+    ...     spotify.SessionEvent.CONNECTION_STATE_UPDATED,
+    ...     connection_state_listener)
+    ...
+    >>> session.connection.state
+    <ConnectionState.LOGGED_OUT: 0>
     >>> session.login('alice', 's3cretpassword')
     >>> session.connection.state
     <ConnectionState.OFFLINE: 4>

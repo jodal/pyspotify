@@ -631,6 +631,14 @@ class SessionEvent(object):
     LOGGED_IN = 'logged_in'
     """Called when login has completed.
 
+    Note that even if login has succeeded, that does not mean that you're
+    online yet as libspotify may have cached enough information to let you
+    authenticate with Spotify while offline.
+
+    This event should be used to get notified about login errors. To get
+    notified about the authentication and connection state, refer to the
+    :attr:`SessionEvent.CONNECTION_STATE_UPDATED` event.
+
     :param session: the current session
     :type session: :class:`Session`
     :param error_type: the login error type

@@ -161,6 +161,22 @@ class Session(utils.EventEmitter):
         spotify.Error.maybe_raise(lib.sp_session_login(
             self._sp_session, username, password, bool(remember_me), blob))
 
+    def logout(self):
+        """Log out the current user.
+
+        If you logged in with the ``remember_me`` argument set to
+        :class:`True`, you will also need to call :meth:`forget_me` to
+        completely remove all credentials of the user that was logged in.
+        """
+        spotify.Error.maybe_raise(lib.sp_session_logout(self._sp_session))
+
+    @property
+    def remembered_user_name(self):
+        """The username of the remembered user from a previous :meth:`login`
+        call."""
+        return utils.get_with_growing_buffer(
+            lib.sp_session_remembered_user, self._sp_session)
+
     def relogin(self):
         """Relogin as the remembered user.
 
@@ -171,19 +187,6 @@ class Session(utils.EventEmitter):
         :attr:`remembered_user_name`.
         """
         spotify.Error.maybe_raise(lib.sp_session_relogin(self._sp_session))
-
-    @property
-    def remembered_user_name(self):
-        """The username of the remembered user from a previous :meth:`login`
-        call."""
-        return utils.get_with_growing_buffer(
-            lib.sp_session_remembered_user, self._sp_session)
-
-    @property
-    @serialized
-    def user_name(self):
-        """The username of the logged in user."""
-        return utils.to_unicode(lib.sp_session_user_name(self._sp_session))
 
     def forget_me(self):
         """Forget the remembered user from a previous :meth:`login` call."""
@@ -198,14 +201,49 @@ class Session(utils.EventEmitter):
             return None
         return spotify.User(self, sp_user=sp_user, add_ref=True)
 
-    def logout(self):
-        """Log out the current user.
+    @property
+    @serialized
+    def user_name(self):
+        """The username of the logged in user."""
+        return utils.to_unicode(lib.sp_session_user_name(self._sp_session))
 
-        If you logged in with the ``remember_me`` argument set to
-        :class:`True`, you will also need to call :meth:`forget_me` to
-        completely remove all credentials of the user that was logged in.
+    @property
+    @serialized
+    def user_country(self):
+        """The country of the currently logged in user.
+
+        The :attr:`~SessionEvent.OFFLINE_STATUS_UPDATED` event is emitted on
+        the session object when this changes.
         """
-        spotify.Error.maybe_raise(lib.sp_session_logout(self._sp_session))
+        return utils.to_country(lib.sp_session_user_country(self._sp_session))
+
+    @property
+    @serialized
+    def playlist_container(self):
+        """The :class:`PlaylistContainer` for the currently logged in user."""
+        sp_playlistcontainer = lib.sp_session_playlistcontainer(
+            self._sp_session)
+        if sp_playlistcontainer == ffi.NULL:
+            return None
+        return spotify.PlaylistContainer._cached(
+            self, sp_playlistcontainer, add_ref=True)
+
+    @property
+    def inbox(self):
+        """The inbox :class:`Playlist` for the currently logged in user."""
+        sp_playlist = lib.sp_session_inbox_create(self._sp_session)
+        if sp_playlist == ffi.NULL:
+            return None
+        return spotify.Playlist._cached(
+            self, sp_playlist=sp_playlist, add_ref=False)
+
+    def set_cache_size(self, size):
+        """Set maximum size in MB for libspotify's cache.
+
+        If set to 0 (the default), up to 10% of the free disk space will be
+        used."""
+        spotify.Error.maybe_raise(lib.sp_session_set_cache_size(
+            self._sp_session, size))
 
     def flush_caches(self):
         """Write all cached data to disk.
@@ -216,13 +254,32 @@ class Session(utils.EventEmitter):
         spotify.Error.maybe_raise(
             lib.sp_session_flush_caches(self._sp_session))
 
-    def set_cache_size(self, size):
-        """Set maximum size in MB for libspotify's cache.
+    def preferred_bitrate(self, bitrate):
+        """Set preferred :class:`Bitrate` for music streaming."""
+        spotify.Error.maybe_raise(lib.sp_session_preferred_bitrate(
+            self._sp_session, bitrate))
 
-        If set to 0 (the default), up to 10% of the free disk space will be
-        used."""
-        spotify.Error.maybe_raise(lib.sp_session_set_cache_size(
-            self._sp_session, size))
+    def preferred_offline_bitrate(self, bitrate, allow_resync=False):
+        """Set preferred :class:`Bitrate` for offline sync.
+
+        If ``allow_resync`` is :class:`True` libspotify may resynchronize
+        already synced tracks.
+        """
+        spotify.Error.maybe_raise(lib.sp_session_preferred_offline_bitrate(
+            self._sp_session, bitrate, allow_resync))
+
+    @property
+    def volume_normalization(self):
+        """Whether volume normalization is active or not.
+
+        Set to :class:`True` or :class:`False` to change.
+        """
+        return bool(lib.sp_session_get_volume_normalization(self._sp_session))
+
+    @volume_normalization.setter
+    def volume_normalization(self, value):
+        spotify.Error.maybe_raise(lib.sp_session_set_volume_normalization(
+            self._sp_session, value))
 
     def process_events(self):
         """Process pending events in libspotify.
@@ -244,26 +301,6 @@ class Session(utils.EventEmitter):
             self._sp_session, next_timeout))
 
         return next_timeout[0]
-
-    @property
-    @serialized
-    def playlist_container(self):
-        """The :class:`PlaylistContainer` for the currently logged in user."""
-        sp_playlistcontainer = lib.sp_session_playlistcontainer(
-            self._sp_session)
-        if sp_playlistcontainer == ffi.NULL:
-            return None
-        return spotify.PlaylistContainer._cached(
-            self, sp_playlistcontainer, add_ref=True)
-
-    @property
-    def inbox(self):
-        """The inbox :class:`Playlist` for the currently logged in user."""
-        sp_playlist = lib.sp_session_inbox_create(self._sp_session)
-        if sp_playlist == ffi.NULL:
-            return None
-        return spotify.Playlist._cached(
-            self, sp_playlist=sp_playlist, add_ref=False)
 
     def inbox_post_tracks(
             self, canonical_username, tracks, message, callback=None):
@@ -316,43 +353,6 @@ class Session(utils.EventEmitter):
             return None
         return spotify.PlaylistContainer._cached(
             self, sp_playlistcontainer, add_ref=False)
-
-    def preferred_bitrate(self, bitrate):
-        """Set preferred :class:`Bitrate` for music streaming."""
-        spotify.Error.maybe_raise(lib.sp_session_preferred_bitrate(
-            self._sp_session, bitrate))
-
-    def preferred_offline_bitrate(self, bitrate, allow_resync=False):
-        """Set preferred :class:`Bitrate` for offline sync.
-
-        If ``allow_resync`` is :class:`True` libspotify may resynchronize
-        already synced tracks.
-        """
-        spotify.Error.maybe_raise(lib.sp_session_preferred_offline_bitrate(
-            self._sp_session, bitrate, allow_resync))
-
-    @property
-    def volume_normalization(self):
-        """Whether volume normalization is active or not.
-
-        Set to :class:`True` or :class:`False` to change.
-        """
-        return bool(lib.sp_session_get_volume_normalization(self._sp_session))
-
-    @volume_normalization.setter
-    def volume_normalization(self, value):
-        spotify.Error.maybe_raise(lib.sp_session_set_volume_normalization(
-            self._sp_session, value))
-
-    @property
-    @serialized
-    def user_country(self):
-        """The country of the currently logged in user.
-
-        The :attr:`~SessionEvent.OFFLINE_STATUS_UPDATED` event is emitted on
-        the session object when this changes.
-        """
-        return utils.to_country(lib.sp_session_user_country(self._sp_session))
 
     def get_link(self, uri):
         """

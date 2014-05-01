@@ -126,22 +126,21 @@ class SessionTest(unittest.TestCase):
         with self.assertRaises(spotify.Error):
             session.login('alice', 'secret')
 
-    def test_relogin(self, lib_mock):
-        lib_mock.sp_session_relogin.return_value = spotify.ErrorType.OK
+    def test_logout(self, lib_mock):
+        lib_mock.sp_session_logout.return_value = spotify.ErrorType.OK
         session = tests.create_real_session(lib_mock)
 
-        session.relogin()
+        session.logout()
 
-        lib_mock.sp_session_relogin.assert_called_once_with(
-            session._sp_session)
+        lib_mock.sp_session_logout.assert_called_once_with(session._sp_session)
 
-    def test_relogin_fail_raises_error(self, lib_mock):
-        lib_mock.sp_session_relogin.return_value = (
-            spotify.ErrorType.NO_CREDENTIALS)
+    def test_logout_fail_raises_error(self, lib_mock):
+        lib_mock.sp_session_login.return_value = (
+            spotify.ErrorType.BAD_API_VERSION)
         session = tests.create_real_session(lib_mock)
 
         with self.assertRaises(spotify.Error):
-            session.relogin()
+            session.logout()
 
     def test_remembered_user_name_grows_buffer_to_fit_username(self, lib_mock):
         username = 'alice' * 100
@@ -166,15 +165,22 @@ class SessionTest(unittest.TestCase):
             session._sp_session, mock.ANY, mock.ANY)
         self.assertIsNone(result)
 
-    def test_user_name(self, lib_mock):
-        lib_mock.sp_session_user_name.return_value = spotify.ffi.new(
-            'char[]', b'alice')
+    def test_relogin(self, lib_mock):
+        lib_mock.sp_session_relogin.return_value = spotify.ErrorType.OK
         session = tests.create_real_session(lib_mock)
 
-        result = session.user_name
+        session.relogin()
 
-        lib_mock.sp_session_user_name.assert_called_with(session._sp_session)
-        self.assertEqual(result, 'alice')
+        lib_mock.sp_session_relogin.assert_called_once_with(
+            session._sp_session)
+
+    def test_relogin_fail_raises_error(self, lib_mock):
+        lib_mock.sp_session_relogin.return_value = (
+            spotify.ErrorType.NO_CREDENTIALS)
+        session = tests.create_real_session(lib_mock)
+
+        with self.assertRaises(spotify.Error):
+            session.relogin()
 
     def test_forget_me(self, lib_mock):
         lib_mock.sp_session_forget_me.return_value = spotify.ErrorType.OK
@@ -212,76 +218,26 @@ class SessionTest(unittest.TestCase):
         lib_mock.sp_session_user.assert_called_with(session._sp_session)
         self.assertIsNone(result)
 
-    def test_logout(self, lib_mock):
-        lib_mock.sp_session_logout.return_value = spotify.ErrorType.OK
+    def test_user_name(self, lib_mock):
+        lib_mock.sp_session_user_name.return_value = spotify.ffi.new(
+            'char[]', b'alice')
         session = tests.create_real_session(lib_mock)
 
-        session.logout()
+        result = session.user_name
 
-        lib_mock.sp_session_logout.assert_called_once_with(session._sp_session)
+        lib_mock.sp_session_user_name.assert_called_with(session._sp_session)
+        self.assertEqual(result, 'alice')
 
-    def test_logout_fail_raises_error(self, lib_mock):
-        lib_mock.sp_session_login.return_value = (
-            spotify.ErrorType.BAD_API_VERSION)
+    def test_user_country(self, lib_mock):
+        lib_mock.sp_session_user_country.return_value = (
+            ord('S') << 8 | ord('E'))
         session = tests.create_real_session(lib_mock)
 
-        with self.assertRaises(spotify.Error):
-            session.logout()
+        result = session.user_country
 
-    def test_flush_caches(self, lib_mock):
-        lib_mock.sp_session_flush_caches.return_value = spotify.ErrorType.OK
-        session = tests.create_real_session(lib_mock)
-
-        session.flush_caches()
-
-        lib_mock.sp_session_flush_caches.assert_called_once_with(
+        lib_mock.sp_session_user_country.assert_called_with(
             session._sp_session)
-
-    def test_flush_caches_fail_raises_error(self, lib_mock):
-        lib_mock.sp_session_flush_caches.return_value = (
-            spotify.ErrorType.BAD_API_VERSION)
-        session = tests.create_real_session(lib_mock)
-
-        with self.assertRaises(spotify.Error):
-            session.flush_caches()
-
-    def test_set_cache_size(self, lib_mock):
-        lib_mock.sp_session_set_cache_size.return_value = spotify.ErrorType.OK
-        session = tests.create_real_session(lib_mock)
-
-        session.set_cache_size(100)
-
-        lib_mock.sp_session_set_cache_size.assert_called_once_with(
-            session._sp_session, 100)
-
-    def test_set_cache_size_fail_raises_error(self, lib_mock):
-        lib_mock.sp_session_set_cache_size.return_value = (
-            spotify.ErrorType.BAD_API_VERSION)
-        session = tests.create_real_session(lib_mock)
-
-        with self.assertRaises(spotify.Error):
-            session.set_cache_size(100)
-
-    def test_process_events_returns_ms_to_next_timeout(self, lib_mock):
-        def func(sp_session, int_ptr):
-            int_ptr[0] = 5500
-            return spotify.ErrorType.OK
-
-        lib_mock.sp_session_process_events.side_effect = func
-
-        session = tests.create_real_session(lib_mock)
-
-        timeout = session.process_events()
-
-        self.assertEqual(timeout, 5500)
-
-    def test_process_events_fail_raises_error(self, lib_mock):
-        lib_mock.sp_session_process_events.return_value = (
-            spotify.ErrorType.BAD_API_VERSION)
-        session = tests.create_real_session(lib_mock)
-
-        with self.assertRaises(spotify.Error):
-            session.process_events()
+        self.assertEqual(result, 'SE')
 
     @mock.patch('spotify.playlist_container.lib', spec=spotify.lib)
     def test_playlist_container(self, playlist_lib_mock, lib_mock):
@@ -348,6 +304,136 @@ class SessionTest(unittest.TestCase):
         lib_mock.sp_session_inbox_create.assert_called_with(
             session._sp_session)
         self.assertIsNone(result)
+
+    def test_set_cache_size(self, lib_mock):
+        lib_mock.sp_session_set_cache_size.return_value = spotify.ErrorType.OK
+        session = tests.create_real_session(lib_mock)
+
+        session.set_cache_size(100)
+
+        lib_mock.sp_session_set_cache_size.assert_called_once_with(
+            session._sp_session, 100)
+
+    def test_set_cache_size_fail_raises_error(self, lib_mock):
+        lib_mock.sp_session_set_cache_size.return_value = (
+            spotify.ErrorType.BAD_API_VERSION)
+        session = tests.create_real_session(lib_mock)
+
+        with self.assertRaises(spotify.Error):
+            session.set_cache_size(100)
+
+    def test_flush_caches(self, lib_mock):
+        lib_mock.sp_session_flush_caches.return_value = spotify.ErrorType.OK
+        session = tests.create_real_session(lib_mock)
+
+        session.flush_caches()
+
+        lib_mock.sp_session_flush_caches.assert_called_once_with(
+            session._sp_session)
+
+    def test_flush_caches_fail_raises_error(self, lib_mock):
+        lib_mock.sp_session_flush_caches.return_value = (
+            spotify.ErrorType.BAD_API_VERSION)
+        session = tests.create_real_session(lib_mock)
+
+        with self.assertRaises(spotify.Error):
+            session.flush_caches()
+
+    def test_preferred_bitrate(self, lib_mock):
+        lib_mock.sp_session_preferred_bitrate.return_value = (
+            spotify.ErrorType.OK)
+        session = tests.create_real_session(lib_mock)
+
+        session.preferred_bitrate(spotify.Bitrate.BITRATE_320k)
+
+        lib_mock.sp_session_preferred_bitrate.assert_called_with(
+            session._sp_session, spotify.Bitrate.BITRATE_320k)
+
+    def test_preferred_bitrate_fail_raises_error(self, lib_mock):
+        lib_mock.sp_session_preferred_bitrate.return_value = (
+            spotify.ErrorType.INVALID_ARGUMENT)
+        session = tests.create_real_session(lib_mock)
+
+        with self.assertRaises(spotify.Error):
+            session.preferred_bitrate(17)
+
+    def test_preferred_offline_bitrate(self, lib_mock):
+        lib_mock.sp_session_preferred_offline_bitrate.return_value = (
+            spotify.ErrorType.OK)
+        session = tests.create_real_session(lib_mock)
+
+        session.preferred_offline_bitrate(spotify.Bitrate.BITRATE_320k)
+
+        lib_mock.sp_session_preferred_offline_bitrate.assert_called_with(
+            session._sp_session, spotify.Bitrate.BITRATE_320k, 0)
+
+    def test_preferred_offline_bitrate_with_allow_resync(self, lib_mock):
+        lib_mock.sp_session_preferred_offline_bitrate.return_value = (
+            spotify.ErrorType.OK)
+        session = tests.create_real_session(lib_mock)
+
+        session.preferred_offline_bitrate(
+            spotify.Bitrate.BITRATE_320k, allow_resync=True)
+
+        lib_mock.sp_session_preferred_offline_bitrate.assert_called_with(
+            session._sp_session, spotify.Bitrate.BITRATE_320k, 1)
+
+    def test_preferred_offline_bitrate_fail_raises_error(self, lib_mock):
+        lib_mock.sp_session_preferred_offline_bitrate.return_value = (
+            spotify.ErrorType.INVALID_ARGUMENT)
+        session = tests.create_real_session(lib_mock)
+
+        with self.assertRaises(spotify.Error):
+            session.preferred_offline_bitrate(17)
+
+    def test_get_volume_normalization(self, lib_mock):
+        lib_mock.sp_session_get_volume_normalization.return_value = 0
+        session = tests.create_real_session(lib_mock)
+
+        result = session.volume_normalization
+
+        lib_mock.sp_session_get_volume_normalization.assert_called_with(
+            session._sp_session)
+        self.assertFalse(result)
+
+    def test_set_volume_normalization(self, lib_mock):
+        lib_mock.sp_session_set_volume_normalization.return_value = (
+            spotify.ErrorType.OK)
+        session = tests.create_real_session(lib_mock)
+
+        session.volume_normalization = True
+
+        lib_mock.sp_session_set_volume_normalization.assert_called_with(
+            session._sp_session, 1)
+
+    def test_set_volume_normalization_fail_raises_error(self, lib_mock):
+        lib_mock.sp_session_set_volume_normalization.return_value = (
+            spotify.ErrorType.BAD_API_VERSION)
+        session = tests.create_real_session(lib_mock)
+
+        with self.assertRaises(spotify.Error):
+            session.volume_normalization = True
+
+    def test_process_events_returns_ms_to_next_timeout(self, lib_mock):
+        def func(sp_session, int_ptr):
+            int_ptr[0] = 5500
+            return spotify.ErrorType.OK
+
+        lib_mock.sp_session_process_events.side_effect = func
+
+        session = tests.create_real_session(lib_mock)
+
+        timeout = session.process_events()
+
+        self.assertEqual(timeout, 5500)
+
+    def test_process_events_fail_raises_error(self, lib_mock):
+        lib_mock.sp_session_process_events.return_value = (
+            spotify.ErrorType.BAD_API_VERSION)
+        session = tests.create_real_session(lib_mock)
+
+        with self.assertRaises(spotify.Error):
+            session.process_events()
 
     @mock.patch('spotify.InboxPostResult', spec=spotify.InboxPostResult)
     def test_inbox_post_tracks(self, inbox_mock, lib_mock):
@@ -446,92 +532,6 @@ class SessionTest(unittest.TestCase):
 
         func_mock.assert_called_with(session._sp_session, b'alice')
         self.assertIsNone(result)
-
-    def test_preferred_bitrate(self, lib_mock):
-        lib_mock.sp_session_preferred_bitrate.return_value = (
-            spotify.ErrorType.OK)
-        session = tests.create_real_session(lib_mock)
-
-        session.preferred_bitrate(spotify.Bitrate.BITRATE_320k)
-
-        lib_mock.sp_session_preferred_bitrate.assert_called_with(
-            session._sp_session, spotify.Bitrate.BITRATE_320k)
-
-    def test_preferred_bitrate_fail_raises_error(self, lib_mock):
-        lib_mock.sp_session_preferred_bitrate.return_value = (
-            spotify.ErrorType.INVALID_ARGUMENT)
-        session = tests.create_real_session(lib_mock)
-
-        with self.assertRaises(spotify.Error):
-            session.preferred_bitrate(17)
-
-    def test_preferred_offline_bitrate(self, lib_mock):
-        lib_mock.sp_session_preferred_offline_bitrate.return_value = (
-            spotify.ErrorType.OK)
-        session = tests.create_real_session(lib_mock)
-
-        session.preferred_offline_bitrate(spotify.Bitrate.BITRATE_320k)
-
-        lib_mock.sp_session_preferred_offline_bitrate.assert_called_with(
-            session._sp_session, spotify.Bitrate.BITRATE_320k, 0)
-
-    def test_preferred_offline_bitrate_with_allow_resync(self, lib_mock):
-        lib_mock.sp_session_preferred_offline_bitrate.return_value = (
-            spotify.ErrorType.OK)
-        session = tests.create_real_session(lib_mock)
-
-        session.preferred_offline_bitrate(
-            spotify.Bitrate.BITRATE_320k, allow_resync=True)
-
-        lib_mock.sp_session_preferred_offline_bitrate.assert_called_with(
-            session._sp_session, spotify.Bitrate.BITRATE_320k, 1)
-
-    def test_preferred_offline_bitrate_fail_raises_error(self, lib_mock):
-        lib_mock.sp_session_preferred_offline_bitrate.return_value = (
-            spotify.ErrorType.INVALID_ARGUMENT)
-        session = tests.create_real_session(lib_mock)
-
-        with self.assertRaises(spotify.Error):
-            session.preferred_offline_bitrate(17)
-
-    def test_get_volume_normalization(self, lib_mock):
-        lib_mock.sp_session_get_volume_normalization.return_value = 0
-        session = tests.create_real_session(lib_mock)
-
-        result = session.volume_normalization
-
-        lib_mock.sp_session_get_volume_normalization.assert_called_with(
-            session._sp_session)
-        self.assertFalse(result)
-
-    def test_set_volume_normalization(self, lib_mock):
-        lib_mock.sp_session_set_volume_normalization.return_value = (
-            spotify.ErrorType.OK)
-        session = tests.create_real_session(lib_mock)
-
-        session.volume_normalization = True
-
-        lib_mock.sp_session_set_volume_normalization.assert_called_with(
-            session._sp_session, 1)
-
-    def test_set_volume_normalization_fail_raises_error(self, lib_mock):
-        lib_mock.sp_session_set_volume_normalization.return_value = (
-            spotify.ErrorType.BAD_API_VERSION)
-        session = tests.create_real_session(lib_mock)
-
-        with self.assertRaises(spotify.Error):
-            session.volume_normalization = True
-
-    def test_user_country(self, lib_mock):
-        lib_mock.sp_session_user_country.return_value = (
-            ord('S') << 8 | ord('E'))
-        session = tests.create_real_session(lib_mock)
-
-        result = session.user_country
-
-        lib_mock.sp_session_user_country.assert_called_with(
-            session._sp_session)
-        self.assertEqual(result, 'SE')
 
     @mock.patch('spotify.Link')
     def test_get_link(self, link_mock, lib_mock):

@@ -43,9 +43,9 @@ logged_in = threading.Event()
 end_of_track = threading.Event()
 
 
-def on_logged_in(session, error_type):
-    assert error_type == spotify.ErrorType.OK, 'Login failed'
-    logged_in.set()
+def on_connection_state_updated(session):
+    if session.connection.state is spotify.ConnectionState.LOGGED_IN:
+        logged_in.set()
 
 
 def on_end_of_track(self):
@@ -53,17 +53,14 @@ def on_end_of_track(self):
 
 
 # Register event listeners
-session.on(spotify.SessionEvent.LOGGED_IN, on_logged_in)
+session.on(
+    spotify.SessionEvent.CONNECTION_STATE_UPDATED, on_connection_state_updated)
 session.on(spotify.SessionEvent.END_OF_TRACK, on_end_of_track)
 
 # Assuming a previous login with remember_me=True and a proper logout
 session.relogin()
 
 logged_in.wait()
-
-# XXX This isn't very elegant
-while session.connection.state != spotify.ConnectionState.LOGGED_IN:
-    session.process_events()
 
 # Play a track
 track = session.get_track(track_uri).load()

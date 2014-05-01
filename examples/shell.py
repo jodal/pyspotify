@@ -35,8 +35,9 @@ class Commander(cmd.Cmd):
         self.logged_out.set()
 
         self.session = spotify.Session()
-        self.session.on(spotify.SessionEvent.LOGGED_IN, self.on_logged_in)
-        self.session.on(spotify.SessionEvent.LOGGED_OUT, self.on_logged_out)
+        self.session.on(
+            spotify.SessionEvent.CONNECTION_STATE_UPDATED,
+            self.on_connection_state_changed)
         self.session.on(
             spotify.SessionEvent.END_OF_TRACK, self.on_end_of_track)
 
@@ -49,14 +50,13 @@ class Commander(cmd.Cmd):
         self.event_loop = spotify.EventLoop(self.session)
         self.event_loop.start()
 
-    def on_logged_in(self, session, error_type):
-        # TODO Handle error situations
-        self.logged_in.set()
-        self.logged_out.clear()
-
-    def on_logged_out(self, session):
-        self.logged_in.clear()
-        self.logged_out.set()
+    def on_connection_state_changed(self, session):
+        if session.connection.state is spotify.ConnectionState.LOGGED_IN:
+            self.logged_in.set()
+            self.logged_out.clear()
+        elif session.connection.state is spotify.ConnectionState.LOGGED_OUT:
+            self.logged_in.clear()
+            self.logged_out.set()
 
     def on_end_of_track(self, session):
         self.session.player.play(False)

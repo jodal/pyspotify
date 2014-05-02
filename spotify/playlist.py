@@ -1,5 +1,6 @@
 from __future__ import unicode_literals
 
+import collections
 import logging
 
 import spotify
@@ -125,7 +126,7 @@ class Playlist(utils.EventEmitter):
         if not self.is_loaded:
             return []
 
-        return _Tracks(self._session, self._sp_playlist)
+        return _Tracks(self._session, self)
 
     @property
     @serialized
@@ -138,7 +139,7 @@ class Playlist(utils.EventEmitter):
         if not self.is_loaded:
             return []
 
-        return _PlaylistTracks(self._session, self._sp_playlist)
+        return _PlaylistTracks(self._session, self)
 
     @property
     @serialized
@@ -729,12 +730,13 @@ class PlaylistOfflineStatus(utils.IntEnum):
     pass
 
 
-class _Tracks(utils.Sequence):
+class _Tracks(utils.Sequence, collections.MutableSequence):
 
-    def __init__(self, session, sp_playlist):
+    def __init__(self, session, playlist):
         self._session = session
+        self._playlist = playlist
         return super(_Tracks, self).__init__(
-            sp_obj=sp_playlist,
+            sp_obj=playlist._sp_playlist,
             add_ref_func=lib.sp_playlist_add_ref,
             release_func=lib.sp_playlist_release,
             len_func=lib.sp_playlist_num_tracks,
@@ -746,7 +748,49 @@ class _Tracks(utils.Sequence):
             self._session,
             sp_track=lib.sp_playlist_track(sp_playlist, key), add_ref=True)
 
-    # TODO Adding and removing tracks as if this was a regular list
+    def __setitem__(self, key, value):
+        # Required by collections.MutableSequence
+
+        if not isinstance(key, (int, slice)):
+            raise TypeError(
+                'list indices must be int or slice, not %s' %
+                key.__class__.__name__)
+        if isinstance(key, slice):
+            if not isinstance(value, collections.Iterable):
+                raise TypeError('can only assign an iterable')
+        if isinstance(key, int):
+            if not 0 <= key < self.__len__():
+                raise IndexError('list index out of range')
+            key = slice(key, key + 1)
+            value = [value]
+
+        for i, val in enumerate(value, key.start):
+            self._playlist.add_tracks(val, position=i)
+
+        key = slice(key.start + len(value), key.stop + len(value), key.step)
+        del self[key]
+
+    def __delitem__(self, key):
+        # Required by collections.MutableSequence
+
+        if isinstance(key, slice):
+            start, stop, step = key.indices(self.__len__())
+            indexes = range(start, stop, step)
+            for i in reversed(sorted(indexes)):
+                self._playlist.remove_tracks(i)
+            return
+        if not isinstance(key, int):
+            raise TypeError(
+                'list indices must be int or slice, not %s' %
+                key.__class__.__name__)
+        if not 0 <= key < self.__len__():
+            raise IndexError('list index out of range')
+        self._playlist.remove_tracks(key)
+
+    def insert(self, index, value):
+        # Required by collections.MutableSequence
+
+        self[index:index] = [value]
 
 
 class _PlaylistTracks(_Tracks):

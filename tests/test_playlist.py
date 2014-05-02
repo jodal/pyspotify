@@ -2,6 +2,7 @@
 
 from __future__ import unicode_literals
 
+import collections
 import unittest
 
 import spotify
@@ -200,6 +201,161 @@ class PlaylistTest(unittest.TestCase):
 
         lib_mock.sp_playlist_is_loaded.assert_called_with(sp_playlist)
         self.assertEqual(len(result), 0)
+
+    def test_tracks_is_a_mutable_sequence(self, lib_mock):
+        sp_playlist = spotify.ffi.cast('sp_playlist *', 42)
+        playlist = spotify.Playlist(self.session, sp_playlist=sp_playlist)
+
+        self.assertIsInstance(playlist.tracks, collections.MutableSequence)
+
+    def test_tracks_setitem(self, lib_mock):
+        sp_playlist = spotify.ffi.cast('sp_playlist *', 42)
+        playlist = spotify.Playlist(self.session, sp_playlist=sp_playlist)
+        tracks = playlist.tracks
+        tracks.__len__ = mock.Mock(return_value=5)
+        playlist.remove_tracks = mock.Mock()
+        playlist.add_tracks = mock.Mock()
+
+        tracks[0] = mock.sentinel.track
+
+        playlist.add_tracks.assert_called_with(mock.sentinel.track, position=0)
+        playlist.remove_tracks.assert_called_with(1)
+
+    def test_tracks_setitem_with_slice(self, lib_mock):
+        sp_playlist = spotify.ffi.cast('sp_playlist *', 42)
+        playlist = spotify.Playlist(self.session, sp_playlist=sp_playlist)
+        tracks = playlist.tracks
+        tracks.__len__ = mock.Mock(return_value=5)
+        playlist.remove_tracks = mock.Mock()
+        playlist.add_tracks = mock.Mock()
+
+        tracks[0:2] = [mock.sentinel.track1, mock.sentinel.track2]
+
+        playlist.add_tracks.assert_has_calls([
+            mock.call(mock.sentinel.track1, position=0),
+            mock.call(mock.sentinel.track2, position=1),
+        ], any_order=False)
+        playlist.remove_tracks.assert_has_calls([
+            mock.call(3),
+            mock.call(2),
+        ], any_order=False)
+
+    def test_tracks_setittem_with_slice_and_noniterable_value_fails(
+            self, lib_mock):
+        sp_playlist = spotify.ffi.cast('sp_playlist *', 42)
+        playlist = spotify.Playlist(self.session, sp_playlist=sp_playlist)
+        tracks = playlist.tracks
+        tracks.__len__ = mock.Mock(return_value=5)
+
+        with self.assertRaises(TypeError):
+            tracks[0:2] = mock.sentinel.track
+
+    def test_tracks_setitem_raises_index_error_on_negative_index(
+            self, lib_mock):
+        sp_playlist = spotify.ffi.cast('sp_playlist *', 42)
+        playlist = spotify.Playlist(self.session, sp_playlist=sp_playlist)
+        tracks = playlist.tracks
+        tracks.__len__ = mock.Mock(return_value=5)
+
+        with self.assertRaises(IndexError):
+            tracks[-1] = None
+
+    def test_tracks_setitem_raises_index_error_on_too_high_index(
+            self, lib_mock):
+        sp_playlist = spotify.ffi.cast('sp_playlist *', 42)
+        playlist = spotify.Playlist(self.session, sp_playlist=sp_playlist)
+        tracks = playlist.tracks
+        tracks.__len__ = mock.Mock(return_value=1)
+
+        with self.assertRaises(IndexError):
+            tracks[1] = None
+
+    def test_tracks_setitem_raises_type_error_on_non_integral_index(
+            self, lib_mock):
+        sp_playlist = spotify.ffi.cast('sp_playlist *', 42)
+        playlist = spotify.Playlist(self.session, sp_playlist=sp_playlist)
+        tracks = playlist.tracks
+        tracks.__len__ = mock.Mock(return_value=1)
+
+        with self.assertRaises(TypeError):
+            tracks['abc'] = None
+
+    def test_tracks_delitem(self, lib_mock):
+        lib_mock.sp_playlist_remove_tracks.return_value = int(
+            spotify.ErrorType.OK)
+        sp_playlist = spotify.ffi.cast('sp_playlist *', 42)
+        playlist = spotify.Playlist(self.session, sp_playlist=sp_playlist)
+        tracks = playlist.tracks
+        tracks.__len__ = mock.Mock(return_value=4)
+
+        del tracks[3]
+
+        lib_mock.sp_playlist_remove_tracks.assert_called_with(
+            sp_playlist, [3], 1)
+
+    def test_tracks_delitem_with_slice(self, lib_mock):
+        lib_mock.sp_playlist_remove_tracks.return_value = int(
+            spotify.ErrorType.OK)
+        sp_playlist = spotify.ffi.cast('sp_playlist *', 42)
+        playlist = spotify.Playlist(self.session, sp_playlist=sp_playlist)
+        tracks = playlist.tracks
+        tracks.__len__ = mock.Mock(return_value=3)
+
+        del tracks[0:2]
+
+        # Delete items in reverse order, so the indexes doesn't change
+        lib_mock.sp_playlist_remove_tracks.assert_has_calls([
+            mock.call(sp_playlist, [1], 1),
+            mock.call(sp_playlist, [0], 1),
+        ], any_order=False)
+
+    def test_tracks_delitem_raises_index_error_on_negative_index(
+            self, lib_mock):
+        lib_mock.sp_playlist_remove_tracks.return_value = int(
+            spotify.ErrorType.OK)
+        sp_playlist = spotify.ffi.cast('sp_playlist *', 42)
+        playlist = spotify.Playlist(self.session, sp_playlist=sp_playlist)
+        tracks = playlist.tracks
+        tracks.__len__ = mock.Mock(return_value=1)
+
+        with self.assertRaises(IndexError):
+            del tracks[-1]
+
+    def test_tracks_delitem_raises_index_error_on_too_high_index(
+            self, lib_mock):
+        lib_mock.sp_playlist_remove_tracks.return_value = int(
+            spotify.ErrorType.OK)
+        sp_playlist = spotify.ffi.cast('sp_playlist *', 42)
+        playlist = spotify.Playlist(self.session, sp_playlist=sp_playlist)
+        tracks = playlist.tracks
+        tracks.__len__ = mock.Mock(return_value=1)
+
+        with self.assertRaises(IndexError):
+            del tracks[1]
+
+    def test_tracks_delitem_raises_type_error_on_non_integral_index(
+            self, lib_mock):
+        lib_mock.sp_playlist_remove_tracks.return_value = int(
+            spotify.ErrorType.OK)
+        sp_playlist = spotify.ffi.cast('sp_playlist *', 42)
+        playlist = spotify.Playlist(self.session, sp_playlist=sp_playlist)
+        tracks = playlist.tracks
+        tracks.__len__ = mock.Mock(return_value=1)
+
+        with self.assertRaises(TypeError):
+            del tracks['abc']
+
+    def test_tracks_insert(self, lib_mock):
+        sp_playlist = spotify.ffi.cast('sp_playlist *', 42)
+        playlist = spotify.Playlist(self.session, sp_playlist=sp_playlist)
+        tracks = playlist.tracks
+        tracks.__len__ = mock.Mock(return_value=5)
+        playlist.add_tracks = mock.Mock()
+
+        tracks.insert(3, mock.sentinel.track)
+
+        playlist.add_tracks.assert_called_with(
+            mock.sentinel.track, position=3)
 
     @mock.patch('spotify.playlist_track.lib', spec=spotify.lib)
     def test_tracks_with_metadata(self, playlist_track_lib_mock, lib_mock):

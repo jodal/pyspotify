@@ -38,6 +38,11 @@ Minor changes
   :exc:`RuntimeError` was raised requiring the session to be logged in and
   online before loading already loaded objects.
 
+- :attr:`spotify.Playlist.tracks` now implements the
+  :attr:`collections.MutableSequence` contract, supporting deleting items with
+  ``del playlist.tracks[i]``, adding items with ``playlist.tracks[i] =
+  track``, etc.
+
 
 v2.0.0b2 (2014-04-29)
 =====================

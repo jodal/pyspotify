@@ -23,13 +23,13 @@ class Offline(object):
     @property
     def tracks_to_sync(self):
         """Total number of tracks that needs download before everything from
-        all playlists that is marked for offline is fully synchronized.
+        all playlists that are marked for offline is fully synchronized.
         """
         return lib.sp_offline_tracks_to_sync(self._session._sp_session)
 
     @property
     def num_playlists(self):
-        """Number of playlists that is marked for offline synchronization."""
+        """Number of playlists that are marked for offline synchronization."""
         return lib.sp_offline_num_playlists(self._session._sp_session)
 
     @property

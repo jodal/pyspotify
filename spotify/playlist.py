@@ -613,7 +613,8 @@ class _PlaylistCallbacks(object):
     @ffi.callback(
         'void(sp_playlist *playlist, int *tracks, int num_tracks, '
         'int position, void *userdata)')
-    def tracks_moved(sp_playlist, old_indexes, num_tracks, new_index, userdata):
+    def tracks_moved(
+            sp_playlist, old_indexes, num_tracks, new_index, userdata):
         logger.debug('Tracks moved within playlist')
         playlist = Playlist._cached(
             spotify._session_instance, sp_playlist, add_ref=True)

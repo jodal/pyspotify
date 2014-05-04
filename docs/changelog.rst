@@ -51,15 +51,15 @@ Affected functions include:
 
 Affected events include:
 
-- :meth:`spotify.PlaylistContainerEvent.PLAYLIST_ADDED`
-- :meth:`spotify.PlaylistContainerEvent.PLAYLIST_REMOVED`
-- :meth:`spotify.PlaylistContainerEvent.PLAYLIST_MOVED`
-- :meth:`spotify.PlaylistEvent.TRACKS_ADDED`
-- :meth:`spotify.PlaylistEvent.TRACKS_REMOVED`
-- :meth:`spotify.PlaylistEvent.TRACKS_MOVED`
-- :meth:`spotify.PlaylistEvent.TRACK_CREATED_CHANGED`
-- :meth:`spotify.PlaylistEvent.TRACK_SEEN_CHANGED`
-- :meth:`spotify.PlaylistEvent.TRACK_MESSAGE_CHANGED`
+- :attr:`spotify.PlaylistContainerEvent.PLAYLIST_ADDED`
+- :attr:`spotify.PlaylistContainerEvent.PLAYLIST_REMOVED`
+- :attr:`spotify.PlaylistContainerEvent.PLAYLIST_MOVED`
+- :attr:`spotify.PlaylistEvent.TRACKS_ADDED`
+- :attr:`spotify.PlaylistEvent.TRACKS_REMOVED`
+- :attr:`spotify.PlaylistEvent.TRACKS_MOVED`
+- :attr:`spotify.PlaylistEvent.TRACK_CREATED_CHANGED`
+- :attr:`spotify.PlaylistEvent.TRACK_SEEN_CHANGED`
+- :attr:`spotify.PlaylistEvent.TRACK_MESSAGE_CHANGED`
 
 Minor changes
 -------------

@@ -29,6 +29,38 @@ moved to :attr:`spotify.Session.connection`:
   has been replaced by :attr:`session.connection.state
   <spotify.connection.Connection.state>`
 
+Refactoring: position vs index
+------------------------------
+
+Originally, pyspotify named everything identically with libspotify and have
+thus ended up with a mix of the terms "position" and "index" for the same
+concept. Now, we use "index" all over the place, as that's also the name used
+in the Python world at large. This changes the signature of three methods,
+which may affect you if you use keyword arguments to call the methods. There's
+also a number of affected events, but these changes shouldn't stop your code
+from working.
+
+Affected functions include:
+
+- :meth:`spotify.Playlist.add_tracks` now takes ``index`` instead of
+  ``position``.
+- :meth:`spotify.Playlist.remove_tracks` now takes ``indexes`` instead of
+  ``positions``.
+- :meth:`spotify.Playlist.reorder_tracks` now takes ``new_index`` instead of
+  ``new_position``.
+
+Affected events include:
+
+- :meth:`spotify.PlaylistContainerEvent.PLAYLIST_ADDED`
+- :meth:`spotify.PlaylistContainerEvent.PLAYLIST_REMOVED`
+- :meth:`spotify.PlaylistContainerEvent.PLAYLIST_MOVED`
+- :meth:`spotify.PlaylistEvent.TRACKS_ADDED`
+- :meth:`spotify.PlaylistEvent.TRACKS_REMOVED`
+- :meth:`spotify.PlaylistEvent.TRACKS_MOVED`
+- :meth:`spotify.PlaylistEvent.TRACK_CREATED_CHANGED`
+- :meth:`spotify.PlaylistEvent.TRACK_SEEN_CHANGED`
+- :meth:`spotify.PlaylistEvent.TRACK_MESSAGE_CHANGED`
+
 Minor changes
 -------------
 

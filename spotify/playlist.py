@@ -229,40 +229,39 @@ class Playlist(utils.EventEmitter):
         return bool(lib.sp_playlist_has_pending_changes(self._sp_playlist))
 
     @serialized
-    def add_tracks(self, tracks, position=None):
-        """Add the given tracks to playlist at the given position.
+    def add_tracks(self, tracks, index=None):
+        """Add the given ``tracks`` to playlist at the given ``index``.
 
         ``tracks`` can either be a single :class:`~spotify.Track` or a list of
-        :class:`~spotify.Track` objects. If ``position`` isn't specified, the
+        :class:`~spotify.Track` objects. If ``index`` isn't specified, the
         tracks are added to the end of the playlist.
         """
         if isinstance(tracks, spotify.Track):
             tracks = [tracks]
-        if position is None:
-            position = len(self.tracks)
+        if index is None:
+            index = len(self.tracks)
         spotify.Error.maybe_raise(lib.sp_playlist_add_tracks(
             self._sp_playlist, [t._sp_track for t in tracks], len(tracks),
-            position, self._session._sp_session))
+            index, self._session._sp_session))
 
-    def remove_tracks(self, positions):
-        """Remove the tracks at the given positions from the playlist.
+    def remove_tracks(self, indexes):
+        """Remove the tracks at the given ``indexes`` from the playlist.
 
-        ``positions`` can be a single position or a list of positions to
-        remove.
+        ``indexes`` can be a single index or a list of indexes to remove.
         """
-        if isinstance(positions, int):
-            positions = [positions]
-        positions = list(set(positions))  # Remove duplicates
+        if isinstance(indexes, int):
+            indexes = [indexes]
+        indexes = list(set(indexes))  # Remove duplicates
         spotify.Error.maybe_raise(lib.sp_playlist_remove_tracks(
-            self._sp_playlist, positions, len(positions)))
+            self._sp_playlist, indexes, len(indexes)))
 
-    def reorder_tracks(self, tracks, new_position):
-        """Move the given ``tracks`` to a ``new_position`` in the playlist.
+    def reorder_tracks(self, tracks, new_index):
+        """Move the given ``tracks`` to a ``new_index`` in the playlist.
 
         ``tracks`` can be a single :class:`~spotify.Track` or a list of
         :class:`~spotify.Track` objects.
 
-        ``new_position`` must be equal to or lower than the current playlist
+        ``new_index`` must be equal to or lower than the current playlist
         length.
         """
         if isinstance(tracks, spotify.Track):
@@ -270,7 +269,7 @@ class Playlist(utils.EventEmitter):
         tracks = list(set(tracks))  # Remove duplicates
         spotify.Error.maybe_raise(lib.sp_playlist_reorder_tracks(
             self._sp_playlist, [t._sp_track for t in tracks], len(tracks),
-            new_position))
+            new_index))
 
     @property
     def num_subscribers(self):
@@ -410,7 +409,7 @@ class PlaylistEvent(object):
 
         import spotify
 
-        def tracks_added(playlist, tracks, position):
+        def tracks_added(playlist, tracks, index):
             print('Tracks added to playlist')
 
         session = spotify.Session()
@@ -431,8 +430,8 @@ class PlaylistEvent(object):
     :type playlist: :class:`Playlist`
     :param tracks: the added tracks
     :type tracks: list of :class:`Track`
-    :param position: the position in the playlist the tracks were added at
-    :type position: int
+    :param index: the index in the playlist the tracks were added at
+    :type index: int
     """
 
     TRACKS_REMOVED = 'tracks_removed'
@@ -440,8 +439,8 @@ class PlaylistEvent(object):
 
     :param playlist: the playlist
     :type playlist: :class:`Playlist`
-    :param tracks: positions of the tracks that were removed
-    :type tracks: list of ints
+    :param indexes: indexes of the tracks that were removed
+    :type indexes: list of ints
     """
 
     TRACKS_MOVED = 'tracks_moved'
@@ -449,10 +448,10 @@ class PlaylistEvent(object):
 
     :param playlist: the playlist
     :type playlist: :class:`Playlist`
-    :param tracks: positions of the tracks that were moved
-    :type tracks: list of ints
-    :param position: the position in the playlist the tracks were moved to
-    :type position: int
+    :param old_indexes: old indexes of the tracks that were moved
+    :type old_indexes: list of ints
+    :param new_index: the new index in the playlist the tracks were moved to
+    :type new_index: int
     """
 
     PLAYLIST_RENAMED = 'playlist_renamed'
@@ -504,8 +503,8 @@ class PlaylistEvent(object):
 
     :param playlist: the playlist
     :type playlist: :class:`Playlist`
-    :param position: the position of the entry in the playlist that was changed
-    :type position: int
+    :param index: the index of the entry in the playlist that was changed
+    :type index: int
     :param user: the user that created the playlist entry
     :type user: :class:`User`
     :param time: the time the entry was created, in seconds since Unix epoch
@@ -517,8 +516,8 @@ class PlaylistEvent(object):
 
     :param playlist: the playlist
     :type playlist: :class:`Playlist`
-    :param position: the position of the entry in the playlist that was changed
-    :type position: int
+    :param index: the index of the entry in the playlist that was changed
+    :type index: int
     :param seen: whether the entry is seen or not
     :type seen: bool
     """
@@ -546,8 +545,8 @@ class PlaylistEvent(object):
 
     :param playlist: the playlist
     :type playlist: :class:`Playlist`
-    :param position: the position of the entry in the playlist that was changed
-    :type position: int
+    :param index: the index of the entry in the playlist that was changed
+    :type index: int
     :param message: the new message
     :type message: string
     """
@@ -588,7 +587,7 @@ class _PlaylistCallbacks(object):
     @ffi.callback(
         'void(sp_playlist *playlist, sp_track **tracks, int num_tracks, '
         'int position, void *userdata)')
-    def tracks_added(sp_playlist, sp_tracks, num_tracks, position, userdata):
+    def tracks_added(sp_playlist, sp_tracks, num_tracks, index, userdata):
         logger.debug('Tracks added to playlist')
         playlist = Playlist._cached(
             spotify._session_instance, sp_playlist, add_ref=True)
@@ -597,7 +596,7 @@ class _PlaylistCallbacks(object):
                 spotify._session_instance, sp_track=sp_tracks[i], add_ref=True)
             for i in range(num_tracks)]
         playlist.emit(
-            PlaylistEvent.TRACKS_ADDED, playlist, tracks, int(position))
+            PlaylistEvent.TRACKS_ADDED, playlist, tracks, int(index))
 
     @staticmethod
     @ffi.callback(
@@ -614,13 +613,13 @@ class _PlaylistCallbacks(object):
     @ffi.callback(
         'void(sp_playlist *playlist, int *tracks, int num_tracks, '
         'int position, void *userdata)')
-    def tracks_moved(sp_playlist, tracks, num_tracks, position, userdata):
+    def tracks_moved(sp_playlist, old_indexes, num_tracks, new_index, userdata):
         logger.debug('Tracks moved within playlist')
         playlist = Playlist._cached(
             spotify._session_instance, sp_playlist, add_ref=True)
-        tracks = [int(tracks[i]) for i in range(num_tracks)]
+        old_indexes = [int(old_indexes[i]) for i in range(num_tracks)]
         playlist.emit(
-            PlaylistEvent.TRACKS_MOVED, playlist, tracks, int(position))
+            PlaylistEvent.TRACKS_MOVED, playlist, old_indexes, int(new_index))
 
     @staticmethod
     @ffi.callback('void(sp_playlist *playlist, void *userdata)')
@@ -659,7 +658,7 @@ class _PlaylistCallbacks(object):
     @ffi.callback(
         'void(sp_playlist *playlist, int position, sp_user *user, '
         'int when, void *userdata)')
-    def track_created_changed(sp_playlist, position, sp_user, when, userdata):
+    def track_created_changed(sp_playlist, index, sp_user, when, userdata):
         logger.debug('Playlist track created changed')
         playlist = Playlist._cached(
             spotify._session_instance, sp_playlist, add_ref=True)
@@ -667,18 +666,18 @@ class _PlaylistCallbacks(object):
             spotify._session_instance, sp_user=sp_user, add_ref=True)
         playlist.emit(
             PlaylistEvent.TRACK_CREATED_CHANGED,
-            playlist, int(position), user, int(when))
+            playlist, int(index), user, int(when))
 
     @staticmethod
     @ffi.callback(
         'void(sp_playlist *playlist, int position, bool seen, void *userdata)')
-    def track_seen_changed(sp_playlist, position, seen, userdata):
+    def track_seen_changed(sp_playlist, index, seen, userdata):
         logger.debug('Playlist track seen changed')
         playlist = Playlist._cached(
             spotify._session_instance, sp_playlist, add_ref=True)
         playlist.emit(
             PlaylistEvent.TRACK_SEEN_CHANGED,
-            playlist, int(position), bool(seen))
+            playlist, int(index), bool(seen))
 
     @staticmethod
     @ffi.callback(
@@ -708,13 +707,13 @@ class _PlaylistCallbacks(object):
     @ffi.callback(
         'void(sp_playlist *playlist, int position, char *message, '
         'void *userdata)')
-    def track_message_changed(sp_playlist, position, message, userdata):
+    def track_message_changed(sp_playlist, index, message, userdata):
         logger.debug('Playlist track message changed')
         playlist = Playlist._cached(
             spotify._session_instance, sp_playlist, add_ref=True)
         playlist.emit(
             PlaylistEvent.TRACK_MESSAGE_CHANGED,
-            playlist, int(position), utils.to_unicode(message))
+            playlist, int(index), utils.to_unicode(message))
 
     @staticmethod
     @ffi.callback('void(sp_playlist *playlist, void *userdata)')
@@ -765,7 +764,7 @@ class _Tracks(utils.Sequence, collections.MutableSequence):
             value = [value]
 
         for i, val in enumerate(value, key.start):
-            self._playlist.add_tracks(val, position=i)
+            self._playlist.add_tracks(val, index=i)
 
         key = slice(key.start + len(value), key.stop + len(value), key.step)
         del self[key]

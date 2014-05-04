@@ -216,7 +216,7 @@ class PlaylistContainer(collections.MutableSequence, utils.EventEmitter):
             else:
                 self.add_new_playlist(val, index=i)
 
-        # Adjust for the new playlist at position key.start.
+        # Adjust for the new playlist at index key.start.
         key = slice(key.start + len(value), key.stop + len(value), key.step)
         del self[key]
 
@@ -439,8 +439,8 @@ class PlaylistContainerEvent(object):
     :type playlist_container: :class:`PlaylistContainer`
     :param playlist: the added playlist
     :type playlist: :class:`Playlist`
-    :param position: the position the playlist was added at
-    :type position: int
+    :param index: the index the playlist was added at
+    :type index: int
     """
 
     PLAYLIST_REMOVED = 'playlist_removed'
@@ -450,8 +450,8 @@ class PlaylistContainerEvent(object):
     :type playlist_container: :class:`PlaylistContainer`
     :param playlist: the removed playlist
     :type playlist: :class:`Playlist`
-    :param position: the position the playlist was removed from
-    :type position: int
+    :param index: the index the playlist was removed from
+    :type index: int
     """
 
     PLAYLIST_MOVED = 'playlist_moved'
@@ -461,10 +461,10 @@ class PlaylistContainerEvent(object):
     :type playlist_container: :class:`PlaylistContainer`
     :param playlist: the moved playlist
     :type playlist: :class:`Playlist`
-    :param position: the position the playlist was moved from
-    :type position: int
-    :param new_position: the position the playlist was moved to
-    :type new_position: int
+    :param old_index: the index the playlist was moved from
+    :type old_index: int
+    :param new_index: the index the playlist was moved to
+    :type new_index: int
     """
 
     CONTAINER_LOADED = 'container_loaded'
@@ -494,47 +494,47 @@ class _PlaylistContainerCallbacks(object):
     @ffi.callback(
         'void(sp_playlistcontainer *pc, sp_playlist *playlist, int position, '
         'void *userdata)')
-    def playlist_added(sp_playlistcontainer, sp_playlist, position, userdata):
-        logger.debug('Playlist added at position %d', position)
+    def playlist_added(sp_playlistcontainer, sp_playlist, index, userdata):
+        logger.debug('Playlist added at index %d', index)
         playlist_container = PlaylistContainer._cached(
             spotify._session_instance, sp_playlistcontainer, add_ref=True)
         playlist = spotify.Playlist._cached(
             spotify._session_instance, sp_playlist, add_ref=True)
         playlist_container.emit(
             PlaylistContainerEvent.PLAYLIST_ADDED,
-            playlist_container, playlist, position)
+            playlist_container, playlist, index)
 
     @staticmethod
     @ffi.callback(
         'void(sp_playlistcontainer *pc, sp_playlist *playlist, int position, '
         'void *userdata)')
     def playlist_removed(
-            sp_playlistcontainer, sp_playlist, position, userdata):
-        logger.debug('Playlist removed at position %d', position)
+            sp_playlistcontainer, sp_playlist, index, userdata):
+        logger.debug('Playlist removed at index %d', index)
         playlist_container = PlaylistContainer._cached(
             spotify._session_instance, sp_playlistcontainer, add_ref=True)
         playlist = spotify.Playlist._cached(
             spotify._session_instance, sp_playlist, add_ref=True)
         playlist_container.emit(
             PlaylistContainerEvent.PLAYLIST_REMOVED,
-            playlist_container, playlist, position)
+            playlist_container, playlist, index)
 
     @staticmethod
     @ffi.callback(
         'void(sp_playlistcontainer *pc, sp_playlist *playlist, int position, '
         'int new_position, void *userdata)')
     def playlist_moved(
-            sp_playlistcontainer, sp_playlist, position, new_position,
+            sp_playlistcontainer, sp_playlist, old_index, new_index,
             userdata):
         logger.debug(
-            'Playlist moved from position %d to %d', position, new_position)
+            'Playlist moved from index %d to %d', old_index, new_index)
         playlist_container = PlaylistContainer._cached(
             spotify._session_instance, sp_playlistcontainer, add_ref=True)
         playlist = spotify.Playlist._cached(
             spotify._session_instance, sp_playlist, add_ref=True)
         playlist_container.emit(
             PlaylistContainerEvent.PLAYLIST_MOVED,
-            playlist_container, playlist, position, new_position)
+            playlist_container, playlist, old_index, new_index)
 
     @staticmethod
     @ffi.callback(

@@ -218,7 +218,7 @@ class PlaylistTest(unittest.TestCase):
 
         tracks[0] = mock.sentinel.track
 
-        playlist.add_tracks.assert_called_with(mock.sentinel.track, position=0)
+        playlist.add_tracks.assert_called_with(mock.sentinel.track, index=0)
         playlist.remove_tracks.assert_called_with(1)
 
     def test_tracks_setitem_with_slice(self, lib_mock):
@@ -232,8 +232,8 @@ class PlaylistTest(unittest.TestCase):
         tracks[0:2] = [mock.sentinel.track1, mock.sentinel.track2]
 
         playlist.add_tracks.assert_has_calls([
-            mock.call(mock.sentinel.track1, position=0),
-            mock.call(mock.sentinel.track2, position=1),
+            mock.call(mock.sentinel.track1, index=0),
+            mock.call(mock.sentinel.track2, index=1),
         ], any_order=False)
         playlist.remove_tracks.assert_has_calls([
             mock.call(3),
@@ -355,7 +355,7 @@ class PlaylistTest(unittest.TestCase):
         tracks.insert(3, mock.sentinel.track)
 
         playlist.add_tracks.assert_called_with(
-            mock.sentinel.track, position=3)
+            mock.sentinel.track, index=3)
 
     @mock.patch('spotify.playlist_track.lib', spec=spotify.lib)
     def test_tracks_with_metadata(self, playlist_track_lib_mock, lib_mock):
@@ -610,14 +610,14 @@ class PlaylistTest(unittest.TestCase):
         sp_playlist = spotify.ffi.cast('sp_playlist *', 42)
         playlist = spotify.Playlist(self.session, sp_playlist=sp_playlist)
 
-        playlist.add_tracks([track1, track2], position=4)
+        playlist.add_tracks([track1, track2], index=4)
 
         lib_mock.sp_playlist_add_tracks.assert_called_with(
             sp_playlist, [sp_track1, sp_track2], 2, 4,
             self.session._sp_session)
 
     @mock.patch('spotify.track.lib', spec=spotify.lib)
-    def test_add_tracks_without_position(self, track_lib_mock, lib_mock):
+    def test_add_tracks_without_index(self, track_lib_mock, lib_mock):
         lib_mock.sp_playlist_add_tracks.return_value = int(
             spotify.ErrorType.OK)
         lib_mock.sp_playlist_num_tracks.return_value = 10
@@ -643,7 +643,7 @@ class PlaylistTest(unittest.TestCase):
         sp_playlist = spotify.ffi.cast('sp_playlist *', 42)
         playlist = spotify.Playlist(self.session, sp_playlist=sp_playlist)
 
-        playlist.add_tracks(track, position=7)
+        playlist.add_tracks(track, index=7)
 
         lib_mock.sp_playlist_add_tracks.assert_called_with(
             sp_playlist, [sp_track], 1, 7, self.session._sp_session)
@@ -663,17 +663,17 @@ class PlaylistTest(unittest.TestCase):
             spotify.ErrorType.OK)
         sp_playlist = spotify.ffi.cast('sp_playlist *', 42)
         playlist = spotify.Playlist(self.session, sp_playlist=sp_playlist)
-        position1 = 13
-        position2 = 17
+        index1 = 13
+        index2 = 17
 
-        playlist.remove_tracks([position1, position2])
+        playlist.remove_tracks([index1, index2])
 
         lib_mock.sp_playlist_remove_tracks.assert_called_with(
             sp_playlist, mock.ANY, 2)
         self.assertIn(
-            position1, lib_mock.sp_playlist_remove_tracks.call_args[0][1])
+            index1, lib_mock.sp_playlist_remove_tracks.call_args[0][1])
         self.assertIn(
-            position2, lib_mock.sp_playlist_remove_tracks.call_args[0][1])
+            index2, lib_mock.sp_playlist_remove_tracks.call_args[0][1])
 
     @mock.patch('spotify.track.lib', spec=spotify.lib)
     def test_remove_tracks_with_a_single_track(self, track_lib_mock, lib_mock):
@@ -681,12 +681,12 @@ class PlaylistTest(unittest.TestCase):
             spotify.ErrorType.OK)
         sp_playlist = spotify.ffi.cast('sp_playlist *', 42)
         playlist = spotify.Playlist(self.session, sp_playlist=sp_playlist)
-        position = 17
+        index = 17
 
-        playlist.remove_tracks(position)
+        playlist.remove_tracks(index)
 
         lib_mock.sp_playlist_remove_tracks.assert_called_with(
-            sp_playlist, [position], 1)
+            sp_playlist, [index], 1)
 
     @mock.patch('spotify.track.lib', spec=spotify.lib)
     def test_remove_tracks_with_duplicates(self, track_lib_mock, lib_mock):
@@ -694,12 +694,12 @@ class PlaylistTest(unittest.TestCase):
             spotify.ErrorType.OK)
         sp_playlist = spotify.ffi.cast('sp_playlist *', 42)
         playlist = spotify.Playlist(self.session, sp_playlist=sp_playlist)
-        position = 17
+        index = 17
 
-        playlist.remove_tracks([position, position])
+        playlist.remove_tracks([index, index])
 
         lib_mock.sp_playlist_remove_tracks.assert_called_with(
-            sp_playlist, [position], 1)
+            sp_playlist, [index], 1)
 
     @mock.patch('spotify.track.lib', spec=spotify.lib)
     def test_remove_tracks_fails_if_error(self, track_lib_mock, lib_mock):
@@ -707,10 +707,10 @@ class PlaylistTest(unittest.TestCase):
             spotify.ErrorType.PERMISSION_DENIED)
         sp_playlist = spotify.ffi.cast('sp_playlist *', 42)
         playlist = spotify.Playlist(self.session, sp_playlist=sp_playlist)
-        position = 17
+        index = 17
 
         with self.assertRaises(spotify.Error):
-            playlist.remove_tracks(position)
+            playlist.remove_tracks(index)
 
     @mock.patch('spotify.track.lib', spec=spotify.lib)
     def test_reorder_tracks(self, track_lib_mock, lib_mock):
@@ -1004,12 +1004,12 @@ class PlaylistCallbacksTest(unittest.TestCase):
             spotify.ffi.cast('sp_track *', 44),
             spotify.ffi.cast('sp_track *', 45),
         ]
-        position = 7
+        index = 7
 
         _PlaylistCallbacks.tracks_added(
-            sp_playlist, sp_tracks, len(sp_tracks), position, spotify.ffi.NULL)
+            sp_playlist, sp_tracks, len(sp_tracks), index, spotify.ffi.NULL)
 
-        callback.assert_called_once_with(playlist, mock.ANY, position)
+        callback.assert_called_once_with(playlist, mock.ANY, index)
         tracks = callback.call_args[0][1]
         self.assertEqual(len(tracks), len(sp_tracks))
         self.assertIsInstance(tracks[0], spotify.Track)
@@ -1043,13 +1043,13 @@ class PlaylistCallbacksTest(unittest.TestCase):
             self.session, sp_playlist=sp_playlist)
         playlist.on(spotify.PlaylistEvent.TRACKS_MOVED, callback)
         track_numbers = [43, 44, 45]
-        position = 7
+        index = 7
 
         _PlaylistCallbacks.tracks_moved(
-            sp_playlist, track_numbers, len(track_numbers), position,
+            sp_playlist, track_numbers, len(track_numbers), index,
             spotify.ffi.NULL)
 
-        callback.assert_called_once_with(playlist, mock.ANY, position)
+        callback.assert_called_once_with(playlist, mock.ANY, index)
         tracks = callback.call_args[0][1]
         self.assertEqual(len(tracks), len(track_numbers))
         self.assertEqual(tracks[0], 43)
@@ -1110,14 +1110,14 @@ class PlaylistCallbacksTest(unittest.TestCase):
         playlist = spotify.Playlist._cached(
             self.session, sp_playlist=sp_playlist)
         playlist.on(spotify.PlaylistEvent.TRACK_CREATED_CHANGED, callback)
-        position = 7
+        index = 7
         sp_user = spotify.ffi.cast('sp_user *', 43)
         time = 123456789
 
         _PlaylistCallbacks.track_created_changed(
-            sp_playlist, position, sp_user, time, spotify.ffi.NULL)
+            sp_playlist, index, sp_user, time, spotify.ffi.NULL)
 
-        callback.assert_called_once_with(playlist, position, mock.ANY, time)
+        callback.assert_called_once_with(playlist, index, mock.ANY, time)
         user = callback.call_args[0][2]
         self.assertIsInstance(user, spotify.User)
         self.assertEqual(user._sp_user, sp_user)
@@ -1129,13 +1129,13 @@ class PlaylistCallbacksTest(unittest.TestCase):
         playlist = spotify.Playlist._cached(
             self.session, sp_playlist=sp_playlist)
         playlist.on(spotify.PlaylistEvent.TRACK_SEEN_CHANGED, callback)
-        position = 7
+        index = 7
         seen = True
 
         _PlaylistCallbacks.track_seen_changed(
-            sp_playlist, position, int(seen), spotify.ffi.NULL)
+            sp_playlist, index, int(seen), spotify.ffi.NULL)
 
-        callback.assert_called_once_with(playlist, position, seen)
+        callback.assert_called_once_with(playlist, index, seen)
 
     def test_description_changed_callback(self, lib_mock):
         callback = mock.Mock()
@@ -1181,14 +1181,14 @@ class PlaylistCallbacksTest(unittest.TestCase):
         playlist = spotify.Playlist._cached(
             self.session, sp_playlist=sp_playlist)
         playlist.on(spotify.PlaylistEvent.TRACK_MESSAGE_CHANGED, callback)
-        position = 7
+        index = 7
         message = 'foo bar æøå'
         msg = spotify.ffi.new('char[]', message.encode('utf-8'))
 
         _PlaylistCallbacks.track_message_changed(
-            sp_playlist, position, msg, spotify.ffi.NULL)
+            sp_playlist, index, msg, spotify.ffi.NULL)
 
-        callback.assert_called_once_with(playlist, position, message)
+        callback.assert_called_once_with(playlist, index, message)
 
     def test_subscribers_changed_callback(self, lib_mock):
         callback = mock.Mock()

@@ -2,8 +2,14 @@
 Changelog
 *********
 
-v2.0.0b3 (UNRELEASED)
+v2.0.0b3 (2014-05-04)
 =====================
+
+The third beta includes a couple of changes to the API in the name of
+consistency, as well as three minor improvements.
+
+Also worth noticing is that with this release, pyspotify 2.x has been in
+development for a year and a day. Happy birthday, pyspotify 2!
 
 Refactoring: Connection cleanup
 -------------------------------

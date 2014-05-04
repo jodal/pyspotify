@@ -38,6 +38,36 @@ class LinkTest(unittest.TestCase):
             b'spotify:track:foo')
         self.assertEqual(lib_mock.sp_link_add_ref.call_count, 0)
 
+    def test_create_from_open_spotify_com_url(self, lib_mock):
+        sp_link = spotify.ffi.cast('sp_link *', 42)
+        lib_mock.sp_link_create_from_string.return_value = sp_link
+
+        spotify.Link(
+            self.session,
+            'http://open.spotify.com/track/bar ')
+
+        lib_mock.sp_link_create_from_string.assert_called_once_with(
+            mock.ANY)
+        self.assertEqual(
+            spotify.ffi.string(
+                lib_mock.sp_link_create_from_string.call_args[0][0]),
+            b'spotify:track:bar')
+
+    def test_create_from_play_spotify_com_url(self, lib_mock):
+        sp_link = spotify.ffi.cast('sp_link *', 42)
+        lib_mock.sp_link_create_from_string.return_value = sp_link
+
+        spotify.Link(
+            self.session,
+            'https://play.spotify.com/track/bar?gurba=123')
+
+        lib_mock.sp_link_create_from_string.assert_called_once_with(
+            mock.ANY)
+        self.assertEqual(
+            spotify.ffi.string(
+                lib_mock.sp_link_create_from_string.call_args[0][0]),
+            b'spotify:track:bar')
+
     def test_raises_error_if_string_isnt_parseable(self, lib_mock):
         lib_mock.sp_link_create_from_string.return_value = spotify.ffi.NULL
 

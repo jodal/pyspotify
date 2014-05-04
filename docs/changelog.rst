@@ -75,6 +75,9 @@ Minor changes
   ``del playlist.tracks[i]``, adding items with ``playlist.tracks[i] =
   track``, etc.
 
+- :meth:`spotify.Session.get_link` and all other methods accepting Spotify
+  URIs now also understand open.spotify.com and play.spotify.com URLs.
+
 
 v2.0.0b2 (2014-04-29)
 =====================

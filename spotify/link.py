@@ -1,8 +1,14 @@
 from __future__ import unicode_literals
 
+try:
+    # Python 3
+    from urllib.parse import urlparse  # noqa
+except ImportError:
+    # Python 2
+    from urlparse import urlparse  # noqa
+
 import spotify
 from spotify import ffi, lib, serialized, utils
-
 
 __all__ = [
     'Link',
@@ -37,6 +43,17 @@ class Link(object):
         Link('spotify:track:2Foc5Q5nqNiosCNqttzHof')
         >>> track.load().name
         u'Get Lucky'
+
+    You can also get :class:`Link` objects from open.spotify.com and
+    play.spotify.com URLs::
+
+        >>> session.get_link(
+        ...     'http://open.spotify.com/track/4wl1dK5dHGp3Ig51stvxb0')
+        Link('spotify:track:4wl1dK5dHGp3Ig51stvxb0')
+        >>> session.get_link(
+        ...     'https://play.spotify.com/track/4wl1dK5dHGp3Ig51stvxb0'
+        ...     '?play=true&utm_source=open.spotify.com&utm_medium=open')
+        Link('spotify:track:4wl1dK5dHGp3Ig51stvxb0')
     """
 
     def __init__(self, session, uri=None, sp_link=None, add_ref=True):
@@ -45,7 +62,8 @@ class Link(object):
         self._session = session
 
         if uri is not None:
-            sp_link = lib.sp_link_create_from_string(utils.to_char(uri))
+            sp_link = lib.sp_link_create_from_string(
+                utils.to_char(Link._normalize_uri(uri)))
             add_ref = False
             if sp_link == ffi.NULL:
                 raise ValueError(
@@ -54,6 +72,15 @@ class Link(object):
         if add_ref:
             lib.sp_link_add_ref(sp_link)
         self._sp_link = ffi.gc(sp_link, lib.sp_link_release)
+
+    @staticmethod
+    def _normalize_uri(uri):
+        if uri.startswith('spotify:'):
+            return uri
+        parsed = urlparse(uri)
+        if parsed.netloc not in ('open.spotify.com', 'play.spotify.com'):
+            return uri
+        return 'spotify%s' % parsed.path.strip().replace('/', ':')
 
     def __repr__(self):
         return 'Link(%r)' % self.uri

@@ -365,10 +365,12 @@ class Session(utils.EventEmitter):
 
             >>> session = spotify.Session()
             # ...
-            >>> link = session.get_link(
+            >>> session.get_link(
             ...     'spotify:track:2Foc5Q5nqNiosCNqttzHof')
-            >>> link
             Link('spotify:track:2Foc5Q5nqNiosCNqttzHof')
+            >>> session.get_link(
+            ...     'http://open.spotify.com/track/4wl1dK5dHGp3Ig51stvxb0')
+            Link('spotify:track:4wl1dK5dHGp3Ig51stvxb0')
         """
         return spotify.Link(self, uri=uri)
 

@@ -142,6 +142,17 @@ class LinkTest(unittest.TestCase):
             sp_link, mock.ANY, mock.ANY)
         self.assertEqual(result, string)
 
+    def test_url_expands_uri_to_http_url(self, lib_mock):
+        sp_link = spotify.ffi.cast('sp_link *', 42)
+        lib_mock.sp_link_create_from_string.return_value = sp_link
+        string = 'spotify:track:foo'
+        lib_mock.sp_link_as_string.side_effect = tests.buffer_writer(string)
+        link = spotify.Link(self.session, string)
+
+        result = link.url
+
+        self.assertEqual(result, 'https://open.spotify.com/track/foo')
+
     def test_type(self, lib_mock):
         sp_link = spotify.ffi.cast('sp_link *', 42)
         lib_mock.sp_link_create_from_string.return_value = sp_link

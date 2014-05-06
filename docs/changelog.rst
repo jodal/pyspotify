@@ -5,7 +5,12 @@ Changelog
 v2.0.0b4 (UNRELEASED)
 =====================
 
-No changes yet.
+Minor changes
+-------------
+
+- Added :attr:`spotify.Link.url` which returns an
+  ``https://open.spotify.com/...`` URL for the link object.
+
 
 
 v2.0.0b3 (2014-05-04)

@@ -67,6 +67,16 @@ class AlsaSink(Sink):
         >>> session.player.load(track)
         >>> session.player.play()
         # Listen to music...
+
+    .. warning::
+
+        There is a known memory leak in pyalsaaudio 0.7 when used on Python
+        3.x which makes :class:`AlsaSink` unfeasible for anything else than
+        short demonstrations. This issue is not present on Python 2.7.
+
+        For more details, see `pyspotify issue #127
+        <https://github.com/mopidy/pyspotify/issues/127>`_ and `pyalsaaudio
+        issue #16 <https://sourceforge.net/p/pyalsaaudio/bugs/16/>`_.
     """
 
     def __init__(self, session, card='default'):

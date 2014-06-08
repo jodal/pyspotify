@@ -11,6 +11,13 @@ Minor changes
 - Added :attr:`spotify.Link.url` which returns an
   ``https://open.spotify.com/...`` URL for the link object.
 
+Bug fixes
+---------
+
+- Fix :class:`spotify.Playlist.reorder_tracks`. It now accepts a list of
+  track indexes instead of a list of tracks. This makes it possible to
+  reorder any of multiple identical tracks in a playlist and is consistent with
+  :class:`spotify.Playlist.remove_tracks`. (Fixes: :issue:`134`)
 
 
 v2.0.0b3 (2014-05-04)

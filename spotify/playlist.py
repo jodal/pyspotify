@@ -255,21 +255,20 @@ class Playlist(utils.EventEmitter):
         spotify.Error.maybe_raise(lib.sp_playlist_remove_tracks(
             self._sp_playlist, indexes, len(indexes)))
 
-    def reorder_tracks(self, tracks, new_index):
-        """Move the given ``tracks`` to a ``new_index`` in the playlist.
+    def reorder_tracks(self, indexes, new_index):
+        """Move the tracks at the given ``indexes`` to a ``new_index`` in the
+        playlist.
 
-        ``tracks`` can be a single :class:`~spotify.Track` or a list of
-        :class:`~spotify.Track` objects.
+        ``indexes`` can be a single index or a list of indexes to move.
 
         ``new_index`` must be equal to or lower than the current playlist
         length.
         """
-        if isinstance(tracks, spotify.Track):
-            tracks = [tracks]
-        tracks = list(set(tracks))  # Remove duplicates
+        if isinstance(indexes, int):
+            indexes = [indexes]
+        indexes = list(set(indexes))  # Remove duplicates
         spotify.Error.maybe_raise(lib.sp_playlist_reorder_tracks(
-            self._sp_playlist, [t._sp_track for t in tracks], len(tracks),
-            new_index))
+            self._sp_playlist, indexes, len(indexes), new_index))
 
     @property
     def num_subscribers(self):

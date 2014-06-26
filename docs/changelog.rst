@@ -19,6 +19,9 @@ Bug fixes
   reorder any of multiple identical tracks in a playlist and is consistent with
   :class:`spotify.Playlist.remove_tracks`. (Fixes: :issue:`134`)
 
+- Fix pause/resume/stop in the ``examples/shell.py`` example. (PR:
+  :issue:`140`)
+
 
 v2.0.0b3 (2014-05-04)
 =====================

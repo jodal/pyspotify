@@ -115,3 +115,16 @@ Mac OS X
 If you're on Mac OS X, you'll need to install Xcode from the Mac App Store to
 get the pyspotify build dependencies. If you're using Homebrew, you already
 have Xcode installed.
+
+.. warning::
+
+    Due to a currently unresolved issue, the CFFI-generated C extension module
+    in pyspotify is linked with libspotify without the ``.dylib`` file suffix.
+
+    If ``pip install --pre pyspotify`` fails with the message "Reason: image
+    not found", then run the following command and rerun the pip command::
+
+        ln -s /usr/local/opt/libspotify/lib/libspotify.dylib \
+            /usr/local/opt/libspotify/lib/libspotify
+
+    If you know how to permanently fix this, please comment on :issue:`130`.

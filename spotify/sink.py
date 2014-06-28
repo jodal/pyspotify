@@ -3,12 +3,16 @@ from __future__ import unicode_literals
 import sys
 
 import spotify
+import logging
+from collections import deque
+
 
 __all__ = [
     'AlsaSink',
     'PortAudioSink',
 ]
 
+logger = logging.getLogger(__name__)
 
 class Sink(object):
     def on(self):
@@ -156,26 +160,48 @@ class PortAudioSink(Sink):
         self._device = self._pyaudio.PyAudio()
         self._stream = None
 
+        # XXX move to conf?
+        self._buffer_sec = .5
+
         self.on()
+
+    def _pyaudio_callback(self, in_data, frame_count, time_info, status):
+        try:
+            frames = self._circular_buffer.popleft()
+        except IndexError:
+            frames = ''
+
+        if len(frames) < (self._frame_size * frame_count):
+            logger.debug('Not enough frames for PortAudio, finishing stream')
+            callback_status = self._pyaudio.paComplete
+        else:
+            callback_status = self._pyaudio.paContinue
+
+        return (frames, callback_status)
 
     def _on_music_delivery(self, session, audio_format, frames, num_frames):
         assert (
             audio_format.sample_type == spotify.SampleType.INT16_NATIVE_ENDIAN)
 
-        if self._stream is None:
+        if self._stream is None or not self._stream.is_active():
+
+            buffer_slots = (self._buffer_sec *
+                (audio_format.sample_rate / num_frames))
+            self._circular_buffer = deque(maxlen=buffer_slots)
+
             self._stream = self._device.open(
                 format=self._pyaudio.paInt16, channels=audio_format.channels,
-                rate=audio_format.sample_rate, output=True)
+                rate=audio_format.sample_rate, frames_per_buffer=num_frames,
+                stream_callback=self._pyaudio_callback, output=True)
 
-        # XXX write() is a blocking call. There are two non-blocking
-        # alternatives:
-        # 1) Only feed write() with the number of frames returned by
-        # self._stream.get_write_available() on each call. This causes buffer
-        # underruns every third or fourth write().
-        # 2) Let pyaudio call a callback function when it needs data, but then
-        # we need to introduce a thread safe buffer here which is filled when
-        # libspotify got data and drained when pyaudio needs data.
-        self._stream.write(frames, num_frames=num_frames)
+            self._frame_size = audio_format.frame_size()
+
+        if len(self._circular_buffer) < self._circular_buffer.maxlen:
+            self._circular_buffer.append(frames)
+        else:
+            # buffer is full, indicate that we didn't take any data
+            num_frames = 0
+
         return num_frames
 
     def _close(self):

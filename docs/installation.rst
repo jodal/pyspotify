@@ -116,6 +116,13 @@ If you're on Mac OS X, you'll need to install Xcode from the Mac App Store to
 get the pyspotify build dependencies. If you're using Homebrew, you already
 have Xcode installed.
 
+You then need to install the Xcode command line developer tools::
+
+    xcode-select --install
+
+If you get an error about ``ffi.h`` not being found when installing the cffi
+Python package, try running the above command.
+
 .. warning::
 
     Due to a currently unresolved issue, the CFFI-generated C extension module

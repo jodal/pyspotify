@@ -112,11 +112,9 @@ running::
 Mac OS X
 --------
 
-If you're on Mac OS X, you'll need to install Xcode from the Mac App Store to
-get the pyspotify build dependencies. If you're using Homebrew, you already
-have Xcode installed.
-
-You then need to install the Xcode command line developer tools::
+If you're on Mac OS X, you'll need to install the Xcode command line developer
+tools. Even if you've already installed Xcode from the App Store, e.g. to get
+Homebrew working, you should run this command::
 
     xcode-select --install
 

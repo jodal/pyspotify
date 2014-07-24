@@ -11,6 +11,8 @@ __all__ = [
 
 
 class Sink(object):
+
+
     def on(self):
         """Turn on the audio sink.
 
@@ -34,10 +36,15 @@ class Sink(object):
             spotify.SessionEvent.MUSIC_DELIVERY) == 0
         self._close()
 
+
+
     def _on_music_delivery(self, session, audio_format, frames, num_frames):
         # This method is called from an internal libspotify thread and must
         # not block in any way.
         raise NotImplementedError
+
+    def send_time(self, num_frames, sample_rate):
+      self._session.player.add_position((num_frames*1000)/sample_rate)
 
     def _close(self):
         pass
@@ -91,12 +98,12 @@ class AlsaSink(Sink):
     def __init__(self, session, card='default'):
         self._session = session
         self._card = card
-
         import alsaaudio  # Crash early if not available
         self._alsaaudio = alsaaudio
         self._device = None
 
         self.on()
+
 
     def _on_music_delivery(self, session, audio_format, frames, num_frames):
         assert (
@@ -113,6 +120,8 @@ class AlsaSink(Sink):
             self._device.setchannels(audio_format.channels)
             self._device.setperiodsize(num_frames * audio_format.frame_size())
 
+
+        self.send_time(num_frames,audio_format.sample_rate)
         return self._device.write(frames)
 
     def _close(self):
@@ -150,7 +159,6 @@ class PortAudioSink(Sink):
 
     def __init__(self, session):
         self._session = session
-
         import pyaudio  # Crash early if not available
         self._pyaudio = pyaudio
         self._device = self._pyaudio.PyAudio()
@@ -176,6 +184,7 @@ class PortAudioSink(Sink):
         # we need to introduce a thread safe buffer here which is filled when
         # libspotify got data and drained when pyaudio needs data.
         self._stream.write(frames, num_frames=num_frames)
+        self.send_time(num_frames, audio_format.sample_rate)
         return num_frames
 
     def _close(self):

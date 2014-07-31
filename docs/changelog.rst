@@ -5,6 +5,8 @@ Changelog
 v2.0.0b4 (UNRELEASED)
 =====================
 
+pyspotify 2.x has been verified to work on PyPy3.
+
 Minor changes
 -------------
 

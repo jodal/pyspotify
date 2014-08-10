@@ -61,6 +61,8 @@ Mac OS X
 If you're using `Homebrew <http://brew.sh/>`_, it has a formula for
 libspotify::
 
+    brew tap homebrew/binary
+
     brew install libspotify
 
 TODO: Check if pyspotify works with the Mac OS X download option from the

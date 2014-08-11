@@ -59,11 +59,27 @@ Mac OS X
 --------
 
 If you're using `Homebrew <http://brew.sh/>`_, it has a formula for
-libspotify::
+libspotify in the homebrew/binary tap::
 
-    brew tap homebrew/binary
+    brew install homebrew/binary/libspotify
 
-    brew install libspotify
+.. warning::
+
+   There's an issue with building pyspotify against libspotify on OS X where
+   the pyspotify installation fails with "Reason: image not found".
+
+   A known workaround is to create a symlink after installing libspotify, but
+   before installing pyspotify::
+
+       sudo ln -s /usr/local/opt/libspotify/lib/libspotify.12.1.51.dylib \
+       /usr/local/opt/libspotify/lib/libspotify
+
+   Alternatively, the mopidy/mopidy Homebrew tap has a libspotify formula which
+   includes the workaround::
+
+       brew install mopidy/mopidy/libspotify
+
+   For details, or if you have a proper fix for this, see :issue:`130`.
 
 TODO: Check if pyspotify works with the Mac OS X download option from the
 libspotify web site.

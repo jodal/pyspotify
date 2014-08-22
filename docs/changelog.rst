@@ -24,6 +24,10 @@ Bug fixes
 - Fix pause/resume/stop in the ``examples/shell.py`` example. (PR:
   :issue:`140`)
 
+- Errors passed to session callbacks are now logged with the full error type
+  representation, instead of just the integer value. E.g. where previously
+  only "8" was logged, we now log "<ErrorType.UNABLE_TO_CONTACT_SERVER: 8>".
+
 
 v2.0.0b3 (2014-05-04)
 =====================

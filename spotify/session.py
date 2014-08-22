@@ -912,13 +912,13 @@ class _SessionCallbacks(object):
     def logged_in(sp_session, sp_error):
         if not spotify._session_instance:
             return
-        if sp_error == spotify.ErrorType.OK:
+        error_type = spotify.ErrorType(sp_error)
+        if error_type == spotify.ErrorType.OK:
             logger.info('Logged in')
         else:
-            logger.error('Login error: %s', spotify.ErrorType(sp_error))
+            logger.error('Login error: %r', error_type)
         spotify._session_instance.emit(
-            SessionEvent.LOGGED_IN,
-            spotify._session_instance, spotify.ErrorType(sp_error))
+            SessionEvent.LOGGED_IN, spotify._session_instance, error_type)
 
     @staticmethod
     @ffi.callback('void(sp_session *)')
@@ -944,7 +944,7 @@ class _SessionCallbacks(object):
         if not spotify._session_instance:
             return
         error_type = spotify.ErrorType(sp_error)
-        logger.error('Connection error: %s', error_type)
+        logger.error('Connection error: %r', error_type)
         spotify._session_instance.emit(
             SessionEvent.CONNECTION_ERROR,
             spotify._session_instance, error_type)
@@ -1024,7 +1024,7 @@ class _SessionCallbacks(object):
         if not spotify._session_instance:
             return
         error_type = spotify.ErrorType(sp_error)
-        logger.error('Streaming error: %s', error_type)
+        logger.error('Streaming error: %r', error_type)
         spotify._session_instance.emit(
             SessionEvent.STREAMING_ERROR,
             spotify._session_instance, error_type)
@@ -1107,7 +1107,7 @@ class _SessionCallbacks(object):
         if not spotify._session_instance:
             return
         error_type = spotify.ErrorType(sp_error)
-        logger.error('Scrobble error: %s', error_type)
+        logger.error('Scrobble error: %r', error_type)
         spotify._session_instance.emit(
             SessionEvent.SCROBBLE_ERROR,
             spotify._session_instance, error_type)

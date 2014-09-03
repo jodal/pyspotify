@@ -455,7 +455,7 @@ offline playback::
     >>> playlist.offline_download_completed
     20
     # More process_events()
-    >>> offline.status
+    >>> playlist.offline_status
     <PlaylistOfflineStatus.YES: 1>
 
 For more details, see the API docs for :class:`~spotify.Playlist`.

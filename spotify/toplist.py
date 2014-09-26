@@ -216,7 +216,8 @@ def _toplistbrowse_complete_callback(sp_toplistbrowse, handle):
     logger.debug('toplistbrowse_complete_callback called')
     if handle == ffi.NULL:
         logger.warning(
-            'toplistbrowse_complete_callback called without userdata')
+            'pyspotify toplistbrowse_complete_callback '
+            'called without userdata')
         return
     (session, toplist, callback) = ffi.from_handle(handle)
     session._callback_handles.remove(handle)

@@ -89,7 +89,8 @@ class InboxPostResult(object):
 def _inboxpost_complete_callback(sp_inbox, handle):
     logger.debug('inboxpost_complete_callback called')
     if handle == ffi.NULL:
-        logger.warning('inboxpost_complete_callback called without userdata')
+        logger.warning(
+            'pyspotify inboxpost_complete_callback called without userdata')
         return
     (session, inbox_post_result, callback) = ffi.from_handle(handle)
     session._callback_handles.remove(handle)

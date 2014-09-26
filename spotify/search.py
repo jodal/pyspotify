@@ -328,7 +328,8 @@ class Search(object):
 def _search_complete_callback(sp_search, handle):
     logger.debug('search_complete_callback called')
     if handle == ffi.NULL:
-        logger.warning('search_complete_callback called without userdata')
+        logger.warning(
+            'pyspotify search_complete_callback called without userdata')
         return
     (session, search_result, callback) = ffi.from_handle(handle)
     session._callback_handles.remove(handle)

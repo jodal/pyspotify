@@ -13,6 +13,12 @@ Minor changes
 - Added :attr:`spotify.Link.url` which returns an
   ``https://open.spotify.com/...`` URL for the link object.
 
+- Adjusted ``info``, ``warning``, and ``error`` level log messages to include
+  the word "Spotify" or "pyspotify" for context in applications not including
+  the logger name in the log. ``debug`` level messages have not been changed,
+  as it is assumed that more details, including the logger name, is included in
+  debug logs.
+
 Bug fixes
 ---------
 

@@ -416,7 +416,7 @@ def _artistbrowse_complete_callback(sp_artistbrowse, handle):
     logger.debug('artistbrowse_complete_callback called')
     if handle == ffi.NULL:
         logger.warning(
-            'artistbrowse_complete_callback called without userdata')
+            'pyspotify artistbrowse_complete_callback called without userdata')
         return
     (session, artist_browser, callback) = ffi.from_handle(handle)
     session._callback_handles.remove(handle)

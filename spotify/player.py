@@ -14,13 +14,25 @@ class Player(object):
 
     def __init__(self, session):
         self._session = session
+        self.position = 0
+        self.seek_offset = 0
 
     def load(self, track):
         """Load :class:`Track` for playback."""
         spotify.Error.maybe_raise(lib.sp_session_player_load(
             self._session._sp_session, track._sp_track))
+        self.position = 0
+        self.seek_offset = 0
+
+    def add_position(self,pos):
+        self.position = self.position + pos
+
+    def get_position(self):
+        return self.position + self.seek_offset
 
     def seek(self, offset):
+        self.seek_offset = offset
+        self.position = 0
         """Seek to the offset in ms in the currently loaded track."""
         spotify.Error.maybe_raise(
             lib.sp_session_player_seek(self._session._sp_session, offset))

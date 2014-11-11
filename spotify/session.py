@@ -552,6 +552,8 @@ class Session(utils.EventEmitter):
 
         ``search_type`` is a :class:`SearchType` value. It defaults to
         :attr:`SearchType.STANDARD`.
+
+        Returns a :class:`Search` instance.
         """
         return spotify.Search(
             self, query=query, callback=callback,
@@ -564,7 +566,7 @@ class Session(utils.EventEmitter):
     def get_toplist(
             self, type=None, region=None, canonical_username=None,
             callback=None):
-        """Get a Spotify toplist of artists, albums, or tracks that are the
+        """Get a :class:`Toplist` of artists, albums, or tracks that are the
         currently most popular worldwide or in a specific region.
 
         ``type`` is a :class:`ToplistType` instance that specifies the type of

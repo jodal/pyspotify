@@ -119,6 +119,7 @@ from spotify.image import *  # noqa
 from spotify.inbox import *  # noqa
 from spotify.link import *  # noqa
 from spotify.offline import *  # noqa
+from spotify.player import *  # noqa
 from spotify.playlist import *  # noqa
 from spotify.playlist_container import *  # noqa
 from spotify.playlist_track import *  # noqa

@@ -19,6 +19,9 @@ Minor changes
   as it is assumed that more details, including the logger name, is included in
   debug logs.
 
+- Added :attr:`spotify.player.Player.state` which is maintained by calls to
+  the various :class:`~spotify.player.Player` methods.
+
 Bug fixes
 ---------
 

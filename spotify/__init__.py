@@ -1,5 +1,7 @@
 from __future__ import unicode_literals
 
+import binascii
+import sys
 import threading
 
 
@@ -72,6 +74,17 @@ def _serialize_access_to_library(lib):
             setattr(lib, name, serialized(getattr(lib, name)))
 
 
+def _get_cffi_modulename(header, source, sys_version):
+    """Create CFFI module name that does not depend on CFFI version."""
+    key = '\x00'.join([sys.version[:3], source, header])
+    key = key.encode('utf-8')
+    k1 = hex(binascii.crc32(key[0::2]) & 0xffffffff)
+    k1 = k1.lstrip('0x').rstrip('L')
+    k2 = hex(binascii.crc32(key[1::2]) & 0xffffffff)
+    k2 = k2.lstrip('0').rstrip('L')
+    return ('_spotify_cffi_%s%s' % (k1, k2)).encode('utf-8')
+
+
 def _build_ffi():
     """Build CFFI instance with knowledge of all libspotify types and a library
     object which wraps libspotify for use from Python.
@@ -92,10 +105,13 @@ def _build_ffi():
         header = fh.read()
         header += '#define SPOTIFY_API_VERSION ...\n'
 
+    source = '#include "libspotify/api.h"'
+
     ffi = cffi.FFI()
     ffi.cdef(header)
     lib = ffi.verify(
-        '#include "libspotify/api.h"',
+        source,
+        modulename=_get_cffi_modulename(header, source, sys.version),
         libraries=[str('spotify')],
         ext_package='spotify')
 

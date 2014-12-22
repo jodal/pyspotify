@@ -82,7 +82,7 @@ def _get_cffi_modulename(header, source, sys_version):
     k1 = k1.lstrip('0x').rstrip('L')
     k2 = hex(binascii.crc32(key[1::2]) & 0xffffffff)
     k2 = k2.lstrip('0').rstrip('L')
-    return ('_spotify_cffi_%s%s' % (k1, k2)).encode('utf-8')
+    return str('_spotify_cffi_%s%s' % (k1, k2))  # Native string type on Py2/3
 
 
 def _build_ffi():

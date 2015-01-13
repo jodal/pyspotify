@@ -95,4 +95,4 @@ class EventLoop(threading.Thread):
             self._queue.put_nowait(1)
         except queue.Full:
             logger.warning(
-                'Event loop queue full; dropped notification event')
+                'pyspotify event loop queue full; dropped notification event')

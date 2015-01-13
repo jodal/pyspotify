@@ -370,7 +370,7 @@ def _albumbrowse_complete_callback(sp_albumbrowse, handle):
     logger.debug('albumbrowse_complete_callback called')
     if handle == ffi.NULL:
         logger.warning(
-            'albumbrowse_complete_callback called without userdata')
+            'pyspotify albumbrowse_complete_callback called without userdata')
         return
     (session, album_browser, callback) = ffi.from_handle(handle)
     session._callback_handles.remove(handle)

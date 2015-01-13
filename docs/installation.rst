@@ -130,27 +130,24 @@ running::
 Mac OS X
 --------
 
-If you're on Mac OS X, you'll need to install Xcode from the Mac App Store to
-get the pyspotify build dependencies. If you're using Homebrew, you already
-have Xcode installed.
+If you're on Mac OS X, you'll need to install the Xcode command line developer
+tools. Even if you've already installed Xcode from the App Store, e.g. to get
+Homebrew working, you should run this command::
+
+    xcode-select --install
+
+If you get an error about ``ffi.h`` not being found when installing the cffi
+Python package, try running the above command.
 
 .. warning::
 
-    If you use the Python version bundled with OS X, and have upgraded to Xcode
-    5.1 or later, building of all Python C extensions including pyspotify fails
-    with this Clang error::
+    Due to a currently unresolved issue, the CFFI-generated C extension module
+    in pyspotify is linked with libspotify without the ``.dylib`` file suffix.
 
-        clang: error: unknown argument: '-mno-fused-madd'
+    If ``pip install --pre pyspotify`` fails with the message "Reason: image
+    not found", then run the following command and rerun the pip command::
 
-    Python C extensions are built using the same flags as the Python
-    installation they are installed into. Apple ships a Python version that
-    was built using flags that are not supported by the Clang version shipped
-    with Xcode 5.1.
+        ln -s /usr/local/opt/libspotify/lib/libspotify.dylib \
+            /usr/local/opt/libspotify/lib/libspotify
 
-    The workaround until Apple fixes this issue is to install pyspotify with
-    an extra compiler flag to make Clang ignore the unknown arguments::
-
-        CFLAGS=-Qunused-arguments pip install --pre pyspotify
-
-    This issue does not affect Python installed from the packages available
-    from Python.org or Python installed from Homebrew.
+    If you know how to permanently fix this, please comment on :issue:`130`.

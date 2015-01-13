@@ -157,7 +157,7 @@ class Image(object):
 def _image_load_callback(sp_image, handle):
     logger.debug('image_load_callback called')
     if handle == ffi.NULL:
-        logger.warning('image_load_callback called without userdata')
+        logger.warning('pyspotify image_load_callback called without userdata')
         return
     (session, image, callback) = ffi.from_handle(handle)
     session._callback_handles.remove(handle)

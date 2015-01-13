@@ -48,8 +48,17 @@ class AlsaSink(Sink):
 
     This audio sink requires `pyalsaaudio
     <https://pypi.python.org/pypi/pyalsaaudio>`_. pyalsaaudio is probably
-    packaged in your Linux distribution. For example, on Debian/Ubuntu you can
-    install the package ``python-alsaaudio``.
+    packaged in your Linux distribution.
+
+    For example, on Debian/Ubuntu you can install it from APT::
+
+        sudo apt-get install python-alsaaudio
+
+    Or, if you want to install pyalsaaudio inside a virtualenv, install the
+    ALSA development headers from APT, then pyalsaaudio::
+
+        sudo apt-get install libasound2-dev
+        pip install pyalsaaudio
 
     The ``card`` keyword argument is passed on to :class:`alsaaudio.PCM`.
     Please refer to the pyalsaaudio documentation for details.
@@ -67,6 +76,16 @@ class AlsaSink(Sink):
         >>> session.player.load(track)
         >>> session.player.play()
         # Listen to music...
+
+    .. warning::
+
+        There is a known memory leak in pyalsaaudio 0.7 when used on Python
+        3.x which makes :class:`AlsaSink` unfeasible for anything else than
+        short demonstrations. This issue is not present on Python 2.7.
+
+        For more details, see `pyspotify issue #127
+        <https://github.com/mopidy/pyspotify/issues/127>`_ and `pyalsaaudio
+        issue #16 <https://sourceforge.net/p/pyalsaaudio/bugs/16/>`_.
     """
 
     def __init__(self, session, card='default'):
@@ -106,15 +125,27 @@ class PortAudioSink(Sink):
     """Audio sink for `PortAudio <http://www.portaudio.com/>`_.
 
     PortAudio is available for many platforms, including Linux, OS X, and
-    Windows.
+    Windows. This audio sink requires `PyAudio
+    <https://pypi.python.org/pypi/pyaudio>`_.  PyAudio is probably packaged in
+    your Linux distribution.
 
-    This audio sink requires `pyaudio <https://pypi.python.org/pypi/pyaudio>`_.
-    pyaudio is probably packaged in your Linux distribution. For example, on
-    Debian/Ubuntu you can install the package ``python-pyaudio`` or
-    ``python3-pyaudio``.
+    On Debian/Ubuntu you can install PyAudio from APT::
 
-    For an example, see the :class:`AlsaSink` example. Just replace
-    ``AlsaSink`` with ``PortAudioSink``.
+        sudo apt-get install python-pyaudio
+
+    Or, if you want to install PyAudio inside a virtualenv, install the
+    PortAudio development headers from APT, then PyAudio::
+
+        sudo apt-get install portaudio19-dev
+        pip install --allow-unverified=pyaudio pyaudio
+
+    On OS X you can install PortAudio using Homebrew::
+
+        brew install portaudio
+        pip install --allow-unverified=pyaudio pyaudio
+
+    For an example of how to use this class, see the :class:`AlsaSink` example.
+    Just replace ``AlsaSink`` with ``PortAudioSink``.
     """
 
     def __init__(self, session):

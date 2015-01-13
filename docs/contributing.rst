@@ -15,7 +15,8 @@ Development setup
    - CPython 3.2
    - CPython 3.3
    - CPython 3.4
-   - PyPy 2
+   - PyPy 2.1+
+   - PyPy3 2.3+
 
    If you're on Ubuntu, the `Dead Snakes PPA
    <https://launchpad.net/~fkrull/+archive/deadsnakes>`_ has packages of both

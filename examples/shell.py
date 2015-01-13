@@ -149,15 +149,15 @@ class Commander(cmd.Cmd):
         self.logger.info('Playing track')
         self.session.player.play()
 
-    def do_pause(self):
+    def do_pause(self, line):
         self.logger.info('Pausing track')
         self.session.player.play(False)
 
-    def do_resume(self):
+    def do_resume(self, line):
         self.logger.info('Resuming track')
         self.session.player.play()
 
-    def do_stop(self):
+    def do_stop(self, line):
         self.logger.info('Stopping track')
         self.session.player.play(False)
         self.session.player.unload()

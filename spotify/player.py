@@ -4,12 +4,36 @@ import spotify
 from spotify import lib
 
 
+__all__ = [
+    'PlayerState',
+]
+
+
+class PlayerState(object):
+    UNLOADED = 'unloaded'
+    LOADED = 'loaded'
+    PLAYING = 'playing'
+    PAUSED = 'paused'
+
+
 class Player(object):
     """Playback controller.
 
     You'll never need to create an instance of this class yourself. You'll find
     it ready to use as the :attr:`~Session.player` attribute on the
     :class:`Session` instance.
+    """
+
+    state = PlayerState.UNLOADED
+    """The player state.
+
+    - The state is initially :attr:`PlayerState.UNLOADED`.
+    - When a track is loaded, the state changes to :attr:`PlayerState.LOADED`.
+    - When playback is started the state changes to
+      :attr:`PlayerState.PLAYING`.
+    - When playback is paused the state changes to :attr:`PlayerState.PAUSED`.
+    - When the track is unloaded the state changes to
+      :attr:`PlayerState.UNLOADED` again.
     """
 
     def __init__(self, session):
@@ -19,6 +43,7 @@ class Player(object):
         """Load :class:`Track` for playback."""
         spotify.Error.maybe_raise(lib.sp_session_player_load(
             self._session._sp_session, track._sp_track))
+        self.state = PlayerState.LOADED
 
     def seek(self, offset):
         """Seek to the offset in ms in the currently loaded track."""
@@ -35,6 +60,10 @@ class Player(object):
         """
         spotify.Error.maybe_raise(lib.sp_session_player_play(
             self._session._sp_session, play))
+        if play:
+            self.state = PlayerState.PLAYING
+        else:
+            self.state = PlayerState.PAUSED
 
     def pause(self):
         """Pause the currently loaded track.
@@ -47,6 +76,7 @@ class Player(object):
         """Stops the currently playing track."""
         spotify.Error.maybe_raise(
             lib.sp_session_player_unload(self._session._sp_session))
+        self.state = PlayerState.UNLOADED
 
     def prefetch(self, track):
         """Prefetch a :class:`Track` for playback.

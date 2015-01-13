@@ -1,9 +1,11 @@
 from __future__ import unicode_literals
 
+import binascii
+import sys
 import threading
 
 
-__version__ = '2.0.0b3'
+__version__ = '2.0.0b4'
 
 
 # Global reentrant lock to be held whenever libspotify functions are called or
@@ -72,6 +74,17 @@ def _serialize_access_to_library(lib):
             setattr(lib, name, serialized(getattr(lib, name)))
 
 
+def _get_cffi_modulename(header, source, sys_version):
+    """Create CFFI module name that does not depend on CFFI version."""
+    key = '\x00'.join([sys.version[:3], source, header])
+    key = key.encode('utf-8')
+    k1 = hex(binascii.crc32(key[0::2]) & 0xffffffff)
+    k1 = k1.lstrip('0x').rstrip('L')
+    k2 = hex(binascii.crc32(key[1::2]) & 0xffffffff)
+    k2 = k2.lstrip('0').rstrip('L')
+    return str('_spotify_cffi_%s%s' % (k1, k2))  # Native string type on Py2/3
+
+
 def _build_ffi():
     """Build CFFI instance with knowledge of all libspotify types and a library
     object which wraps libspotify for use from Python.
@@ -92,10 +105,13 @@ def _build_ffi():
         header = fh.read()
         header += '#define SPOTIFY_API_VERSION ...\n'
 
+    source = '#include "libspotify/api.h"'
+
     ffi = cffi.FFI()
     ffi.cdef(header)
     lib = ffi.verify(
-        '#include "libspotify/api.h"',
+        source,
+        modulename=_get_cffi_modulename(header, source, sys.version),
         libraries=[str('spotify')],
         ext_package='spotify')
 
@@ -119,6 +135,7 @@ from spotify.image import *  # noqa
 from spotify.inbox import *  # noqa
 from spotify.link import *  # noqa
 from spotify.offline import *  # noqa
+from spotify.player import *  # noqa
 from spotify.playlist import *  # noqa
 from spotify.playlist_container import *  # noqa
 from spotify.playlist_track import *  # noqa

@@ -2,6 +2,46 @@
 Changelog
 *********
 
+v2.0.0b4 (2015-01-13)
+=====================
+
+The fourth beta includes a single API change, a couple of API additions, and
+otherwise minor tweaks to logging.
+
+pyspotify 2.x has been verified to work on PyPy3, and PyPy3 is now part of the
+test matrix.
+
+Minor changes
+-------------
+
+- Added :attr:`spotify.Link.url` which returns an
+  ``https://open.spotify.com/...`` URL for the link object.
+
+- Adjusted ``info``, ``warning``, and ``error`` level log messages to include
+  the word "Spotify" or "pyspotify" for context in applications not including
+  the logger name in the log. ``debug`` level messages have not been changed,
+  as it is assumed that more details, including the logger name, is included in
+  debug logs.
+
+- Added :attr:`spotify.player.Player.state` which is maintained by calls to
+  the various :class:`~spotify.player.Player` methods.
+
+Bug fixes
+---------
+
+- Fix :class:`spotify.Playlist.reorder_tracks`. It now accepts a list of
+  track indexes instead of a list of tracks. This makes it possible to
+  reorder any of multiple identical tracks in a playlist and is consistent with
+  :class:`spotify.Playlist.remove_tracks`. (Fixes: :issue:`134`)
+
+- Fix pause/resume/stop in the ``examples/shell.py`` example. (PR:
+  :issue:`140`)
+
+- Errors passed to session callbacks are now logged with the full error type
+  representation, instead of just the integer value. E.g. where previously
+  only "8" was logged, we now log "<ErrorType.UNABLE_TO_CONTACT_SERVER: 8>".
+
+
 v2.0.0b3 (2014-05-04)
 =====================
 

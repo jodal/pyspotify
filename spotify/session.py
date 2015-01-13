@@ -552,6 +552,8 @@ class Session(utils.EventEmitter):
 
         ``search_type`` is a :class:`SearchType` value. It defaults to
         :attr:`SearchType.STANDARD`.
+
+        Returns a :class:`Search` instance.
         """
         return spotify.Search(
             self, query=query, callback=callback,
@@ -564,7 +566,7 @@ class Session(utils.EventEmitter):
     def get_toplist(
             self, type=None, region=None, canonical_username=None,
             callback=None):
-        """Get a Spotify toplist of artists, albums, or tracks that are the
+        """Get a :class:`Toplist` of artists, albums, or tracks that are the
         currently most popular worldwide or in a specific region.
 
         ``type`` is a :class:`ToplistType` instance that specifies the type of
@@ -912,20 +914,20 @@ class _SessionCallbacks(object):
     def logged_in(sp_session, sp_error):
         if not spotify._session_instance:
             return
-        if sp_error == spotify.ErrorType.OK:
-            logger.info('Logged in')
+        error_type = spotify.ErrorType(sp_error)
+        if error_type == spotify.ErrorType.OK:
+            logger.info('Spotify logged in')
         else:
-            logger.error('Login error: %s', spotify.ErrorType(sp_error))
+            logger.error('Spotify login error: %r', error_type)
         spotify._session_instance.emit(
-            SessionEvent.LOGGED_IN,
-            spotify._session_instance, spotify.ErrorType(sp_error))
+            SessionEvent.LOGGED_IN, spotify._session_instance, error_type)
 
     @staticmethod
     @ffi.callback('void(sp_session *)')
     def logged_out(sp_session):
         if not spotify._session_instance:
             return
-        logger.info('Logged out')
+        logger.info('Spotify logged out')
         spotify._session_instance.emit(
             SessionEvent.LOGGED_OUT, spotify._session_instance)
 
@@ -944,7 +946,7 @@ class _SessionCallbacks(object):
         if not spotify._session_instance:
             return
         error_type = spotify.ErrorType(sp_error)
-        logger.error('Connection error: %s', error_type)
+        logger.error('Spotify connection error: %r', error_type)
         spotify._session_instance.emit(
             SessionEvent.CONNECTION_ERROR,
             spotify._session_instance, error_type)
@@ -1024,7 +1026,7 @@ class _SessionCallbacks(object):
         if not spotify._session_instance:
             return
         error_type = spotify.ErrorType(sp_error)
-        logger.error('Streaming error: %s', error_type)
+        logger.error('Spotify streaming error: %r', error_type)
         spotify._session_instance.emit(
             SessionEvent.STREAMING_ERROR,
             spotify._session_instance, error_type)
@@ -1107,7 +1109,7 @@ class _SessionCallbacks(object):
         if not spotify._session_instance:
             return
         error_type = spotify.ErrorType(sp_error)
-        logger.error('Scrobble error: %s', error_type)
+        logger.error('Spotify scrobble error: %r', error_type)
         spotify._session_instance.emit(
             SessionEvent.SCROBBLE_ERROR,
             spotify._session_instance, error_type)
@@ -1119,7 +1121,7 @@ class _SessionCallbacks(object):
             return
         is_private = bool(is_private)
         status = 'private' if is_private else 'public'
-        logger.error('Private session mode changed: %s', status)
+        logger.debug('Private session mode changed: %s', status)
         spotify._session_instance.emit(
             SessionEvent.PRIVATE_SESSION_MODE_CHANGED,
             spotify._session_instance, is_private)

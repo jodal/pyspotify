@@ -238,20 +238,24 @@ class Config(object):
 
     @property
     def ca_certs_filename(self):
-        """Path to a file containing the root CA certificates that the peer
-        should be verified with.
+        """Path to a file containing the root CA certificates that HTTPS
+        servers should be verified with.
 
-        Defaults to :class:`None`. Must be a bytestring otherwise.
+        Defaults to :class:`None`. Must be a bytestring file path otherwise.
+
+        This is not used for verifying Spotify's servers, but may be
+        used for verifying third parties' HTTPS servers, like the Last.fm
+        servers if you scrobbling the music you listen to through libspotify.
+
+        libspotify for OS X use other means for communicating with HTTPS
+        servers and ignores this configuration.
 
         The file must be a concatenation of all certificates in PEM format.
         Provided with libspotify is a sample PEM file in the ``examples/``
         dir. It is recommended that the application export a similar file
-        from the local certificate store.
-
-        .. warning::
-            libspotify 12.1.51 for OS X does not have this field. Assignment to
-            this field in pyspotify on OS X does nothing, so that the same code
-            can run on both Linux and OS X.
+        from the local certificate store. On Linux systems, the certificate
+        store is often found at :file:`/etc/ssl/certs/ca-certificates.crt` or
+        :file:`/etc/ssl/certs/ca-bundle.crt`
         """
         ptr = self._get_ca_certs_filename_ptr()
         if ptr is not None:

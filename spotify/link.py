@@ -102,8 +102,15 @@ class Link(object):
 
     @property
     def uri(self):
+        """The link's Spotify URI."""
         return utils.get_with_growing_buffer(
             lib.sp_link_as_string, self._sp_link)
+
+    @property
+    def url(self):
+        """The link's HTTP URL."""
+        return 'https://open.spotify.com%s' % (
+            self.uri[len('spotify'):].replace(':', '/'))
 
     @property
     def type(self):

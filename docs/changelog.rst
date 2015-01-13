@@ -2,10 +2,14 @@
 Changelog
 *********
 
-v2.0.0b4 (UNRELEASED)
+v2.0.0b4 (2015-01-13)
 =====================
 
-pyspotify 2.x has been verified to work on PyPy3.
+The fourth beta includes a single API change, a couple of API additions, and
+otherwise minor tweaks to logging.
+
+pyspotify 2.x has been verified to work on PyPy3, and PyPy3 is now part of the
+test matrix.
 
 Minor changes
 -------------

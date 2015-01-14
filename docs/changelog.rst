@@ -29,10 +29,10 @@ Minor changes
 Bug fixes
 ---------
 
-- Fix :class:`spotify.Playlist.reorder_tracks`. It now accepts a list of
+- Fix :meth:`spotify.Playlist.reorder_tracks`. It now accepts a list of
   track indexes instead of a list of tracks. This makes it possible to
   reorder any of multiple identical tracks in a playlist and is consistent with
-  :class:`spotify.Playlist.remove_tracks`. (Fixes: :issue:`134`)
+  :meth:`spotify.Playlist.remove_tracks`. (Fixes: :issue:`134`)
 
 - Fix pause/resume/stop in the ``examples/shell.py`` example. (PR:
   :issue:`140`)

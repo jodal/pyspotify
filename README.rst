@@ -2,15 +2,15 @@
 pyspotify
 =========
 
-.. image:: https://pypip.in/v/pyspotify/badge.png
-    :target: https://crate.io/packages/pyspotify/
+.. image:: https://img.shields.io/pypi/v/pyspotify.svg?style=flat
+    :target: https://pypi.python.org/pypi/pyspotify/
     :alt: Latest PyPI version
 
-.. image:: https://pypip.in/d/pyspotify/badge.png
-    :target: https://crate.io/packages/pyspotify/
+.. image:: https://img.shields.io/pypi/dm/pyspotify.svg?style=flat
+    :target: https://pypi.python.org/pypi/pyspotify/
     :alt: Number of PyPI downloads
 
-.. image:: https://travis-ci.org/mopidy/pyspotify.png?branch=develop
+.. image:: https://img.shields.io/travis/mopidy/pyspotify/v1.x/develop.svg?style=flat
     :target: https://travis-ci.org/mopidy/pyspotify
     :alt: Travis CI build status
 

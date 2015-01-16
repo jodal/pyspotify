@@ -8,7 +8,7 @@ Build-Depends:
     python-all-dev (>= 2.6.6-3~),
     python-all-dbg (>= 2.6.6-3~)
 Build-Depends-Indep: python-sphinx (>= 1.0.7+dfsg)
-Standards-Version: 3.9.4
+Standards-Version: 3.9.6
 Homepage: http://pyspotify.mopidy.com/
 Vcs-Git: git://github.com/mopidy/pyspotify.git
 Vcs-Browser: https://github.com/mopidy/pyspotify

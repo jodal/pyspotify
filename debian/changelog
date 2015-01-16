@@ -6,6 +6,7 @@ python-spotify (1.12-0mopidy1) UNRELEASED; urgency=medium
   * Bump debhelper compat level to 8.
   * Bump Standards-Version to 3.9.6.
   * Update copyright file format URL.
+  * Update copyright years.
 
  -- Stein Magnus Jodal <stein.magnus@jodal.no>  Fri, 16 Jan 2015 09:57:26 +0100
 

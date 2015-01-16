@@ -5,8 +5,14 @@ Changes
 .. currentmodule:: spotify
 
 
-v1.12 (UNRELEASED)
+v1.12 (2015-01-16)
 ==================
+
+This version is compatible with *libspotify* version 12.
+
+This is the first release in 18 months, including only minor improvements
+accumulated during the first eight months. Development focus has for a long
+time been on pyspotify 2 which is in beta and is fully usable.
 
 **New features**
 
@@ -30,10 +36,10 @@ v1.12 (UNRELEASED)
   Alternatively, you can use ``fab test`` to build *pyspotify* and run the
   tests.
 
-- Jukebox example code cleaned up. It now has better error handling and you
-  can select the audio sink to use. Changed to using argparse (requires
-  Python >= 2.7). Please use the ``-?`` command line option to get more
-  information.
+- Jukebox example code cleaned up. It now has better error handling and you can
+  select the audio sink to use. Changed to using argparse (requires Python >=
+  2.7). Please use the ``-?`` command line option to get more information.
+
 
 v1.11 (2013-07-01)
 ==================

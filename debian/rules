@@ -21,4 +21,4 @@ override_dh_installdocs-indep:
 override_dh_auto_clean-indep:
 	dh_auto_clean
 	make -C docs/ clean
-	rm -rf build/
+	rm -rf build/ dist/ MANIFEST

@@ -5,6 +5,42 @@ Changes
 .. currentmodule:: spotify
 
 
+v1.12 (2015-01-16)
+==================
+
+This version is compatible with *libspotify* version 12.
+
+This is the first release in 18 months, including only minor improvements
+accumulated during the first eight months. Development focus has for a long
+time been on pyspotify 2 which is in beta and is fully usable.
+
+**New features**
+
+- Added methods for marking playlists for offline use:
+  :meth:`~spotify.Playlist.get_offline_status`,
+  :meth:`~spotify.Playlist.set_offline_mode`, and
+  :meth:`~spotify.Playlist.get_offline_download_completed`. Contributed by
+  Alexandre Petitjean.
+
+**Other changes**
+
+- For developers: In *pyspotify* 1.7 we split out our mock version of
+  libspotify to an independent project, *libmockspotify*. We've now reverted
+  this, and a copy of the source code of libmockspotify 0.3.1 is included in
+  the *pyspotify* repo. *libmockspotify* is deprecated, and from now on we
+  maintain whatever *libspotify* mocks we need for *pyspotify* development in
+  the *pyspotify* repo.
+
+  To be able to run the tests, you still need to pass ``--with-mock`` to your
+  ``python setup.py ...`` command to build pyspotify with mock support.
+  Alternatively, you can use ``fab test`` to build *pyspotify* and run the
+  tests.
+
+- Jukebox example code cleaned up. It now has better error handling and you can
+  select the audio sink to use. Changed to using argparse (requires Python >=
+  2.7). Please use the ``-?`` command line option to get more information.
+
+
 v1.11 (2013-07-01)
 ==================
 

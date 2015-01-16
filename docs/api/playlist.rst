@@ -189,7 +189,7 @@ objects.
 
     .. method:: type
 
-        returns ``'playlist'``
+        Returns ``'playlist'``
 
     .. method:: update_subscribers
 
@@ -202,6 +202,25 @@ objects.
         about the subscribers. You
         can call those two functions anytime you want but the information might
         not be up to date in such cases
+
+    .. method:: get_offline_status
+
+        :rtype: :class:`int`
+        :returns:
+            - 0 if not offline enabled
+            - 1 if synchronized to local storage
+            - 2 if currently downloading
+            - 3 if queued for download
+
+    .. method:: set_offline_mode(offline)
+
+        :param offline: If the playlist should be synced for offline playback.
+        :type offline: :class:`bool`
+
+    .. method:: get_offline_download_completed
+
+        :rtype: :class:`int`
+        :returns: percentage complete, 0 if not downloading
 
 The :class:`PlaylistFolder` class
 =================================

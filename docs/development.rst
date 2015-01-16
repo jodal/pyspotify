@@ -97,14 +97,15 @@ Creating releases
 
 #. Update changelog and commit it.
 
-#. Merge the release branch (``develop`` in the example) into ``master``::
+#. Merge the release branch (``v1.x/develop`` in the example) into
+   ``v1.x/master``::
 
-    git checkout master
-    git merge --no-ff -m "Release v1.2.0" develop
+    git checkout v1.x/master
+    git merge --no-ff -m "Release v1.12" v1.x/develop
 
 #. Tag the release::
 
-    git tag -a -m "Release v1.2.0" v1.2.0
+    git tag -a -m "Release v1.12" v1.12
 
 #. Push to GitHub::
 

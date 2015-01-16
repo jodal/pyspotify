@@ -26,9 +26,9 @@ apply for, and receive an API key from Spotify.
 Project resources
 =================
 
-- `Documentation <http://pyspotify.mopidy.com/>`_
+- `Documentation <https://pyspotify.mopidy.com/>`_
 - `Source code <https://github.com/mopidy/pyspotify>`_
 - `Issue tracker <https://github.com/mopidy/pyspotify/issues>`_
 - `CI server <https://travis-ci.org/mopidy/pyspotify>`_
 - IRC: ``#mopidy`` at `irc.freenode.net <http://freenode.net/>`_
-- `Download development snapshot <https://github.com/mopidy/pyspotify/tarball/develop#egg=pyspotify-dev>`_
+- `Download development snapshot <https://github.com/mopidy/pyspotify/tarball/v1.x/develop#egg=pyspotify-dev>`_

@@ -161,38 +161,34 @@ Playlist_is_loaded(PyObject *self)
 static PyObject *
 Playlist_remove_tracks(PyObject *self, PyObject *args)
 {
-    PyObject *item, *py_indicies;
+    PyObject *item, *py_indices;
     sp_error error;
 
-    int *indices;
     int i, num_tracks, playlist_length;
 
-    if (!PyArg_ParseTuple(args, "O", &py_indicies))
+    if (!PyArg_ParseTuple(args, "O", &py_indices))
         return NULL;
-    if (!PySequence_Check(py_indicies)) {
+    if (!PySequence_Check(py_indices)) {
         PyErr_SetString(PyExc_TypeError, "expected sequence");
         return NULL;
     }
 
     playlist_length = sp_playlist_num_tracks(Playlist_SP_PLAYLIST(self));
 
-    num_tracks = (int)PySequence_Size(py_indicies);
-    /* TODO: could we use int *indices[num_tracks]; instead? */
-    indices = PyMem_New(int, num_tracks);
+    num_tracks = (int)PySequence_Size(py_indices);
+    int indices[num_tracks];
 
     for (i = 0; i < num_tracks; i++) {
-        item = PySequence_GetItem(py_indicies, i);
+        item = PySequence_GetItem(py_indices, i);
         indices[i] = (int)PyInt_AsLong(item);
         Py_DECREF(item);
 
         if (indices[i] == -1 && PyErr_Occurred() != NULL) {
-            PyMem_Free(indices);
             return NULL;
         }
 
         if (indices[i] < 0 || indices[i] > playlist_length) {
             PyErr_SetString(PyExc_IndexError, "specified track does not exist");
-            PyMem_Free(indices);
             return NULL;
         }
     }
@@ -202,7 +198,6 @@ Playlist_remove_tracks(PyObject *self, PyObject *args)
         Playlist_SP_PLAYLIST(self), indices, num_tracks);
     Py_END_ALLOW_THREADS;
 
-    PyMem_Free(indices);
     return none_or_raise_error(error);
 }
 
@@ -759,6 +754,52 @@ Playlist_add_tracks(PyObject *self, PyObject *args)
 }
 
 static PyObject *
+Playlist_get_offline_status(PyObject *self)
+{
+    if (!g_session) {
+        PyErr_SetString(SpotifyError, "Not logged in.");
+        return NULL;
+    }
+    /* TODO: return enums that represent sp_playlist_offline_status */
+    enum sp_playlist_offline_status offline_status = sp_playlist_get_offline_status(
+        g_session, Playlist_SP_PLAYLIST(self));
+    return Py_BuildValue("i", offline_status);
+}
+
+static PyObject *
+Playlist_set_offline_mode(PyObject *self, PyObject *args)
+{
+    bool offline;
+    sp_error error;
+
+    if (!g_session) {
+        PyErr_SetString(SpotifyError, "Not logged in.");
+        return NULL;
+    }
+
+    if (!PyArg_ParseTuple(args, "i", &offline))
+        return NULL;
+
+    error = sp_playlist_set_offline_mode(g_session,
+                                         Playlist_SP_PLAYLIST(self),
+                                         offline);
+    return none_or_raise_error(error);
+}
+
+static PyObject *
+Playlist_get_offline_download_completed(PyObject *self)
+{
+    if (!g_session) {
+        PyErr_SetString(SpotifyError, "Not logged in.");
+        return NULL;
+    }
+
+    int completed = sp_playlist_get_offline_download_completed(
+        g_session, Playlist_SP_PLAYLIST(self));
+    return Py_BuildValue("i", completed);
+}
+
+static PyObject *
 Playlist_type(PyObject *self)
 {
     return PyBytes_FromString("playlist");
@@ -891,6 +932,18 @@ static PyMethodDef Playlist_methods[] = {
     {"update_subscribers",
      (PyCFunction)Playlist_update_subscribers, METH_NOARGS,
      "Update the subscribers information for this playlist"
+    },
+    {"get_offline_status",
+     (PyCFunction)Playlist_get_offline_status, METH_NOARGS,
+     "Get offline status for this playlist"
+    },
+    {"set_offline_mode",
+     (PyCFunction)Playlist_set_offline_mode, METH_VARARGS,
+     "Set the playlists offline mode."
+    },
+    {"get_offline_download_completed",
+     (PyCFunction)Playlist_get_offline_download_completed, METH_NOARGS,
+     "Get download progress for this playlist"
     },
     {"type",
      (PyCFunction)Playlist_type, METH_NOARGS,

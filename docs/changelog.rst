@@ -2,6 +2,18 @@
 Changelog
 *********
 
+v2.0.0b5 (UNRELEASED)
+=====================
+
+This release is still in development.
+
+Minor changes
+-------------
+
+- Changed :meth:`spotify.Link.as_playlist()` to also support creating playlists
+  from links with type :attr:`spotify.LinkType.STARRED`.
+
+
 v2.0.0b4 (2015-01-13)
 =====================
 

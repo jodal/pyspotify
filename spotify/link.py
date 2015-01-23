@@ -151,7 +151,7 @@ class Link(object):
 
     def as_playlist(self):
         """Make a :class:`Playlist` from the link."""
-        if self.type is not LinkType.PLAYLIST:
+        if self.type not in (LinkType.PLAYLIST, LinkType.STARRED):
             return None
         sp_playlist = lib.sp_playlist_create(
             self._session._sp_session, self._sp_link)

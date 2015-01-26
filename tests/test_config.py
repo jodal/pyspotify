@@ -35,6 +35,14 @@ class ConfigTest(unittest.TestCase):
     def test_cache_location_defaults_to_tmp_in_cwd(self):
         self.assertEqual(self.config.cache_location, b'tmp')
 
+    def test_cache_location_converts_none_to_empty_string(self):
+        self.config.cache_location = None
+
+        self.assertEqual(
+            spotify.ffi.string(self.config._sp_session_config.cache_location),
+            b'')
+        self.assertEqual(self.config.cache_location, b'')
+
     def test_settings_location(self):
         self.config.settings_location = b'/settings'
 

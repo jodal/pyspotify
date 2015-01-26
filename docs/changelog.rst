@@ -13,6 +13,13 @@ Minor changes
 - Changed :meth:`spotify.Link.as_playlist()` to also support creating playlists
   from links with type :attr:`spotify.LinkType.STARRED`.
 
+Bug fixes
+---------
+
+- Work around segfault in libspotify when :attr:`spotify.Config.cache_location`
+  is set to :class:`None` and then used to create a session. (Fixes:
+  :issue:`151`)
+
 
 v2.0.0b4 (2015-01-13)
 =====================

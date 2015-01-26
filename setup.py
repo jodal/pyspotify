@@ -56,11 +56,6 @@ setup(
         'build': CFFIBuild,
         'install': CFFIInstall,
     },
-    test_suite='nose.collector',
-    tests_require=[
-        'nose',
-        'mock >= 1.0',
-    ],
     classifiers=[
         'Development Status :: 4 - Beta',
         'Intended Audience :: Developers',

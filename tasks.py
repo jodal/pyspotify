@@ -14,11 +14,9 @@ def docs(watch=False, warn=False):
 def test(coverage=False, watch=False, warn=False):
     if watch:
         return watcher(test, coverage=coverage)
-    cmd = 'nosetests'
+    cmd = 'py.test'
     if coverage:
-        cmd += (
-            ' --with-coverage --cover-package=spotify'
-            ' --cover-branches --cover-html')
+        cmd += ' --cov=spotify --cov-report=term-missing'
     run(cmd, pty=True, warn=warn)
 
 

@@ -121,7 +121,7 @@ class Playlist(utils.EventEmitter):
     def tracks(self):
         """The playlist's tracks.
 
-        Will always return an empty list if the search isn't loaded.
+        Will always return an empty list if the playlist isn't loaded.
         """
         if not self.is_loaded:
             return []
@@ -134,7 +134,7 @@ class Playlist(utils.EventEmitter):
         """The playlist's tracks, with metadata specific to the playlist as a
         a list of :class:`~spotify.PlaylistTrack` objects.
 
-        Will always return an empty list if the search isn't loaded.
+        Will always return an empty list if the playlist isn't loaded.
         """
         if not self.is_loaded:
             return []
@@ -148,7 +148,7 @@ class Playlist(utils.EventEmitter):
 
         Assigning to :attr:`name` will rename the playlist.
 
-        Will always return :class:`None` if the track isn't loaded.
+        Will always return :class:`None` if the playlist isn't loaded.
         """
         name = utils.to_unicode(lib.sp_playlist_name(self._sp_playlist))
         return name if name else None

@@ -1,7 +1,7 @@
 from __future__ import unicode_literals
 
-import unittest
 import time
+import unittest
 
 import spotify
 from spotify.utils import load

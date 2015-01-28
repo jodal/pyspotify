@@ -42,7 +42,7 @@ class LoadableTest(unittest.TestCase):
         self.session.connection.state = spotify.ConnectionState.LOGGED_OUT
         foo = Foo(self.session)
 
-        with self.assertRaises(RuntimeError):
+        with self.assertRaises(spotify.Error):
             foo.load()
 
     def test_load_raises_error_if_offline(
@@ -51,7 +51,7 @@ class LoadableTest(unittest.TestCase):
         self.session.connection.state = spotify.ConnectionState.OFFLINE
         foo = Foo(self.session)
 
-        with self.assertRaises(RuntimeError):
+        with self.assertRaises(spotify.Error):
             foo.load()
 
     def test_load_returns_immediately_if_offline_but_already_loaded(

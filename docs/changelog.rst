@@ -13,6 +13,9 @@ Minor changes
 - Changed :meth:`spotify.Link.as_playlist()` to also support creating playlists
   from links with type :attr:`spotify.LinkType.STARRED`.
 
+- Changed all ``load()`` methods to raise :exc:`spotify.Error` instead of
+  :exc:`RuntimeError` if the session isn't logged in.
+
 - Changed from nose to py.test as test runner.
 
 Bug fixes

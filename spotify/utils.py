@@ -206,6 +206,9 @@ def _check_error(obj):
 def load(session, obj, timeout=None):
     """Block until the object's data is loaded.
 
+    If the session isn't logged in, a :exc:`spotify.Error` is raised as Spotify
+    objects cannot be loaded without being online and logged in.
+
     The ``obj`` must at least have the :attr:`is_loaded` attribute. If it also
     has an :meth:`error` method, it will be checked for errors to raise.
 
@@ -223,7 +226,7 @@ def load(session, obj, timeout=None):
         return obj
 
     if session.connection.state is not spotify.ConnectionState.LOGGED_IN:
-        raise RuntimeError(
+        raise spotify.Error(
             'Session must be logged in and online to load objects: %r'
             % session.connection.state)
 

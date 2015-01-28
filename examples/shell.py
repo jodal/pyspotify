@@ -99,7 +99,11 @@ class Commander(cmd.Cmd):
 
     def do_login(self, line):
         "login <username> <password>"
-        username, password = line.split(' ', 1)
+        tokens = line.split(' ', 1)
+        if len(tokens) != 2:
+            self.logger.warning("Wrong number of arguments")
+            return
+        username, password = tokens
         self.session.login(username, password, remember_me=True)
         self.logged_in.wait()
 

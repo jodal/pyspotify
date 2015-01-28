@@ -165,9 +165,11 @@ class Commander(cmd.Cmd):
     def do_seek(self, seconds):
         "seek <seconds>"
         if not self.logged_in.is_set():
-            self.logger.warning('You must be logged in to play')
+            self.logger.warning('You must be logged in to seek')
             return
-        # TODO Check if playing
+        if self.session.player.state is spotify.PlayerState.UNLOADED:
+            self.logger.warning('A track must be loaded before seeking')
+            return
         self.session.player.seek(int(seconds) * 1000)
 
     def do_search(self, query):

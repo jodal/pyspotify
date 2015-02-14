@@ -1,0 +1,5 @@
+python-spotify (2.0.0b4-0mopidy1) unstable; urgency=medium
+
+  * Initial release of pyspotify 2.
+
+ -- Stein Magnus Jodal <stein.magnus@jodal.no>  Sat, 14 Feb 2015 20:37:33 +0100

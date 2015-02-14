@@ -1,0 +1,7 @@
+python-spotify/
+python3-spotify/
+python-spotify-doc/
+files
+*.debhelper
+*.log
+*.substvars

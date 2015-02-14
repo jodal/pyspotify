@@ -1,0 +1,21 @@
+#!/usr/bin/make -f
+
+#export DH_VERBOSE=1
+
+export PYBUILD_NAME=spotify
+export PYBUILD_TEST_PYTEST=1
+export PYBUILD_TEST_ARGS={dir}/tests/
+
+%:
+	dh $@ --with python2,python3,sphinxdoc --buildsystem=pybuild
+
+override_dh_auto_clean:
+	dh_auto_clean
+	rm -rf spotify/__pycache__
+
+override_dh_installchangelogs:
+	dh_installchangelogs docs/changelog.rst
+
+override_dh_installdocs:
+	python setup.py build_sphinx
+	dh_installdocs

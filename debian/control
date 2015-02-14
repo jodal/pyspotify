@@ -1,0 +1,69 @@
+Source: python-spotify
+Section: python
+Priority: optional
+Maintainer: Stein Magnus Jodal <stein.magnus@jodal.no>
+Build-Depends:
+    debhelper (>= 9),
+    dh-python,
+    libspotify-dev (>= 12), libspotify-dev (<< 13),
+    python-all-dev,
+    python3-all-dev,
+    python-setuptools,
+    python3-setuptools,
+    python-cffi (>= 0.7),
+    python3-cffi (>= 0.7),
+    python-pytest,
+    python3-pytest,
+    python-mock,
+    python3-mock
+Build-Depends-Indep:
+    python-sphinx (>= 1.0)
+Standards-Version: 3.9.6
+Homepage: https://pyspotify.mopidy.com/
+Vcs-Git: git://github.com/mopidy/pyspotify.git
+Vcs-Browser: https://github.com/mopidy/pyspotify
+X-Python-Version: >= 2.7
+X-Python3-Version: >= 3.2
+
+Package: python-spotify
+Architecture: any
+Depends:
+    ${python:Depends},
+    ${misc:Depends},
+    ${shlibs:Depends},
+    libspotify12
+Suggests:
+    python-spotify-doc
+Description: Python bindings for libspotify (Python 2)
+ pyspotify provides a Python interface to Spotify's online music streaming
+ service through the libspotify C library.
+ .
+ This package contains the Python 2 version of pyspotify.
+
+Package: python3-spotify
+Architecture: any
+Depends:
+    ${python3:Depends},
+    ${misc:Depends},
+    ${shlibs:Depends},
+    libspotify12
+Suggests:
+    python-spotify-doc
+Description: Python bindings for libspotify (Python 3)
+ pyspotify provides a Python interface to Spotify's online music streaming
+ service through the libspotify C library.
+ .
+ This package contains the Python 3 version of pyspotify.
+
+Package: python-spotify-doc
+Section: doc
+Architecture: all
+Depends:
+    ${sphinxdoc:Depends},
+    ${misc:Depends}
+Recommends: python-spotify
+Description: Python bindings for libspotify (documentation)
+ pyspotify provides a Python interface to Spotify's online music streaming
+ service through the libspotify C library.
+ .
+ This package contains documentation for pyspotify.

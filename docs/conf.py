@@ -16,8 +16,6 @@ except ImportError:
     # Python <3.3
     import mock
 
-import spotify
-
 
 def get_version(filename):
     init_py = open(filename).read()
@@ -49,6 +47,7 @@ with open('sp-constants.csv') as fh:
 
 
 # Unwrap decorated methods so Sphinx can inspect their signatures
+import spotify  # flake8: noqa
 for mod_name, mod in vars(spotify).items():
     if not isinstance(mod, types.ModuleType) or mod_name in ('threading',):
         continue

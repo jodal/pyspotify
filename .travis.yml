@@ -9,7 +9,8 @@ addons:
     packages:
       - libffi-dev
       - libspotify-dev
-      - python-all-dev
+      - python-dev
+      - python3-dev
 
 env:
   - TOX_ENV=py27

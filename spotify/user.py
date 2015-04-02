@@ -10,6 +10,7 @@ __all__ = [
 
 
 class User(object):
+
     """A Spotify user.
 
     You can get users from the session, or you can create a :class:`User`

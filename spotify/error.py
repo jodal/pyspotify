@@ -12,6 +12,7 @@ __all__ = [
 
 
 class Error(Exception):
+
     """A Spotify error.
 
     This is the superclass of all custom exceptions raised by pyspotify.
@@ -36,6 +37,7 @@ class ErrorType(utils.IntEnum):
 
 
 class LibError(Error):
+
     """A libspotify error.
 
     Where many libspotify functions return error codes that must be checked
@@ -68,6 +70,7 @@ for attr in dir(lib):
 
 
 class Timeout(Error):
+
     """Exception raised by an operation not completing within the given
     timeout."""
 

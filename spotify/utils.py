@@ -23,6 +23,7 @@ else:
 
 
 class EventEmitter(object):
+
     """Mixin for adding event emitter functionality to a class."""
 
     def __init__(self):
@@ -110,10 +111,12 @@ class EventEmitter(object):
 
 class _Listener(collections.namedtuple(
         'Listener', ['callback', 'user_args'])):
+
     """An listener of events from an :class:`EventEmitter`"""
 
 
 class IntEnum(int):
+
     """An enum type for values mapping to integers.
 
     Tries to stay as close as possible to the enum type specified in
@@ -256,6 +259,7 @@ def load(session, obj, timeout=None):
 
 
 class Sequence(collections.Sequence):
+
     """Helper class for making sequences from a length and getitem function.
 
     The ``sp_obj`` is assumed to already have gotten an extra reference through

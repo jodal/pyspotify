@@ -23,6 +23,7 @@ class Foo(object):
 
 
 class FooWithError(Foo):
+
     @property
     def error(self):
         return spotify.Error(spotify.Error.OK)

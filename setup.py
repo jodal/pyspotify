@@ -20,6 +20,7 @@ def get_version(filename):
 
 
 class CFFIBuild(build):
+
     def finalize_options(self):
         from spotify import ffi
         self.distribution.ext_modules = [ffi.verifier.get_extension()]
@@ -27,6 +28,7 @@ class CFFIBuild(build):
 
 
 class CFFIInstall(install):
+
     def finalize_options(self):
         from spotify import ffi
         self.distribution.ext_modules = [ffi.verifier.get_extension()]

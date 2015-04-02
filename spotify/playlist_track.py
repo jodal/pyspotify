@@ -14,6 +14,7 @@ logger = logging.getLogger(__name__)
 
 
 class PlaylistTrack(object):
+
     """A playlist track with metadata specific to the playlist.
 
     Use :attr:`~spotify.Playlist.tracks_with_metadata` to get a list of

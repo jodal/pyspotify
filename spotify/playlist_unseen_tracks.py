@@ -16,6 +16,7 @@ logger = logging.getLogger(__name__)
 
 
 class PlaylistUnseenTracks(collections.Sequence):
+
     """A list of unseen tracks in a playlist.
 
     The list may contain items that are :class:`None`.

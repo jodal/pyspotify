@@ -17,6 +17,7 @@ __all__ = [
 
 
 class Link(object):
+
     """A Spotify object link.
 
     Call the :meth:`~Session.get_link` method on your :class:`Session` instance

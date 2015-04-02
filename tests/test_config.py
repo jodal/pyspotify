@@ -11,6 +11,7 @@ from tests import mock
 
 
 class ConfigTest(unittest.TestCase):
+
     def setUp(self):
         self.config = spotify.Config()
 

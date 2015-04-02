@@ -20,6 +20,7 @@ logger = logging.getLogger(__name__)
 
 
 class PlaylistContainer(collections.MutableSequence, utils.EventEmitter):
+
     """A Spotify playlist container.
 
     The playlist container can be accessed as a regular Python collection to
@@ -407,6 +408,7 @@ class PlaylistContainer(collections.MutableSequence, utils.EventEmitter):
 
 
 class PlaylistContainerEvent(object):
+
     """Playlist container events.
 
     Using :class:`PlaylistContainer` objects, you can register listener
@@ -476,6 +478,7 @@ class PlaylistContainerEvent(object):
 
 
 class _PlaylistContainerCallbacks(object):
+
     """Internal class."""
 
     @classmethod
@@ -549,6 +552,7 @@ class _PlaylistContainerCallbacks(object):
 
 class PlaylistFolder(collections.namedtuple(
         'PlaylistFolder', ['id', 'name', 'type'])):
+
     """An object marking the start or end of a playlist folder."""
     pass
 

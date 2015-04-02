@@ -18,6 +18,7 @@ logger = logging.getLogger(__name__)
 
 
 class Image(object):
+
     """A Spotify image.
 
     You can get images from :meth:`Album.cover`, :meth:`Artist.portrait`,

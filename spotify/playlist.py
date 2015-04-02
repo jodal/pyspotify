@@ -17,6 +17,7 @@ logger = logging.getLogger(__name__)
 
 
 class Playlist(utils.EventEmitter):
+
     """A Spotify playlist.
 
     You can get playlists from the :attr:`~Session.playlist_container`,
@@ -397,6 +398,7 @@ class Playlist(utils.EventEmitter):
 
 
 class PlaylistEvent(object):
+
     """Playlist events.
 
     Using :class:`Playlist` objects, you can register listener functions to be

@@ -21,6 +21,7 @@ logger = logging.getLogger(__name__)
 
 
 class EventLoop(threading.Thread):
+
     """Event loop for automatically processing events from libspotify.
 
     The event loop is a :class:`~threading.Thread` that listens to

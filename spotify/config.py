@@ -10,6 +10,7 @@ __all__ = [
 
 
 class Config(object):
+
     """The session config.
 
     Create an instance and assign to its attributes to configure. Then use the

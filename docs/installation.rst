@@ -71,7 +71,7 @@ libspotify in the homebrew/binary tap::
    A known workaround is to create a symlink after installing libspotify, but
    before installing pyspotify::
 
-       sudo ln -s /usr/local/opt/libspotify/lib/libspotify.12.1.51.dylib \
+       ln -s /usr/local/opt/libspotify/lib/libspotify.12.1.51.dylib \
        /usr/local/opt/libspotify/lib/libspotify
 
    Alternatively, the mopidy/mopidy Homebrew tap has a libspotify formula which

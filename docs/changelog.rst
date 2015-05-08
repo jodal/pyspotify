@@ -25,6 +25,10 @@ Bug fixes
   is set to :class:`None` and then used to create a session. (Fixes:
   :issue:`151`)
 
+- Return a :class:`spotify.PlaylistPlaceholder` object instead of raising an
+  exception if the playlist container contains an element of type
+  :attr:`~spotify.PlaylistType.PLACEHOLDER`. (Fixes: :issue:`159`)
+
 
 v2.0.0b4 (2015-01-13)
 =====================

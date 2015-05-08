@@ -260,7 +260,7 @@ class PlaylistContainerTest(unittest.TestCase):
         # self.assertEqual(result.name, '')  # Needs better mock impl
         self.assertEqual(result.type, spotify.PlaylistType.END_FOLDER)
 
-    def test_getitem_raises_error_on_unknown_playlist_type(self, lib_mock):
+    def test_getitem_with_placeholder(self, lib_mock):
         lib_mock.sp_playlistcontainer_num_playlists.return_value = 1
         lib_mock.sp_playlistcontainer_playlist_type.return_value = int(
             spotify.PlaylistType.PLACEHOLDER)
@@ -268,8 +268,10 @@ class PlaylistContainerTest(unittest.TestCase):
         playlist_container = spotify.PlaylistContainer(
             self.session, sp_playlistcontainer=sp_playlistcontainer)
 
-        with self.assertRaises(spotify.Error):
-            playlist_container[0]
+        result = playlist_container[0]
+
+        self.assertEqual(lib_mock.sp_playlistcontainer_playlist.call_count, 0)
+        self.assertIsInstance(result, spotify.PlaylistPlaceholder)
 
     def test_getitem_raises_index_error_on_too_low_index(self, lib_mock):
         lib_mock.sp_playlistcontainer_num_playlists.return_value = 1

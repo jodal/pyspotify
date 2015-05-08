@@ -13,6 +13,7 @@ __all__ = [
     'PlaylistContainer',
     'PlaylistContainerEvent',
     'PlaylistFolder',
+    'PlaylistPlaceholder',
     'PlaylistType',
 ]
 
@@ -190,6 +191,8 @@ class PlaylistContainer(collections.MutableSequence, utils.EventEmitter):
                     lib.sp_playlistcontainer_playlist_folder_name,
                     self._sp_playlistcontainer, key),
                 type=playlist_type)
+        elif playlist_type is PlaylistType.PLACEHOLDER:
+            return PlaylistPlaceholder()
         else:
             raise spotify.Error('Unknown playlist type: %r' % playlist_type)
 
@@ -554,6 +557,11 @@ class PlaylistFolder(collections.namedtuple(
         'PlaylistFolder', ['id', 'name', 'type'])):
 
     """An object marking the start or end of a playlist folder."""
+    pass
+
+
+class PlaylistPlaceholder(object):
+    """An object marking an unknown entry in the playlist container."""
     pass
 
 

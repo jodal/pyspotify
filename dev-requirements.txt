@@ -1,3 +1,6 @@
+flake8
+flake8-import-order
+mock
 pytest
 pytest-cov
-mock
+tox

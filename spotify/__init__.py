@@ -5,7 +5,7 @@ import sys
 import threading
 
 
-__version__ = '2.0.0b4'
+__version__ = '2.0.0b5'
 
 
 # Global reentrant lock to be held whenever libspotify functions are called or

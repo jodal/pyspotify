@@ -10,6 +10,7 @@ __all__ = [
 
 
 class Config(object):
+
     """The session config.
 
     Create an instance and assign to its attributes to configure. Then use the
@@ -63,7 +64,11 @@ class Config(object):
 
     @cache_location.setter
     def cache_location(self, value):
-        self._cache_location = utils.to_char_or_null(value)
+        # XXX: libspotify segfaults if cache_location is set to NULL, but
+        # doesn't seem to care if other strings in sp_session_config is NULL.
+        if value is None:
+            value = ''
+        self._cache_location = utils.to_char(value)
         self._sp_session_config.cache_location = self._cache_location
 
     @property

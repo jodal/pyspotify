@@ -10,6 +10,7 @@ __all__ = [
 
 
 class Offline(object):
+
     """Offline sync controller.
 
     You'll never need to create an instance of this class yourself. You'll find
@@ -53,6 +54,7 @@ class Offline(object):
 
 
 class OfflineSyncStatus(object):
+
     """A Spotify offline sync status object.
 
     You'll never need to create an instance of this class yourself. You'll find

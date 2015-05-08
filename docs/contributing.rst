@@ -38,18 +38,13 @@ Development setup
 
 4. Install development dependencies::
 
-       pip install cffi nose tox
-
-   Note that if you're developing on Python <3.3, you also need to install
-   ``mock``::
-
-       pip install mock
+       pip install -r dev-requirements.txt
 
 5. Run tests.
 
    For a quick test suite run, using the virtualenv's Python version::
 
-       nosetests
+       py.test
 
    For a complete test suite run, using all the Python implementations::
 

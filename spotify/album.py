@@ -17,6 +17,7 @@ logger = logging.getLogger(__name__)
 
 
 class Album(object):
+
     """A Spotify album.
 
     You can get an album from a track or an artist, or you can create an
@@ -187,6 +188,7 @@ class Album(object):
 
 
 class AlbumBrowser(object):
+
     """An album browser for a Spotify album.
 
     You can get an album browser from any :class:`Album` instance by calling

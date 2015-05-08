@@ -17,6 +17,7 @@ logger = logging.getLogger(__name__)
 
 
 class Search(object):
+
     """A Spotify search result.
 
     Call the :meth:`~Session.search` method on your :class:`Session` instance
@@ -339,6 +340,7 @@ def _search_complete_callback(sp_search, handle):
 
 
 class SearchPlaylist(object):
+
     """A playlist matching a search query."""
 
     name = None

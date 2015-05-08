@@ -2,6 +2,34 @@
 Changelog
 *********
 
+v2.0.0b5 (2015-05-09)
+=====================
+
+A fifth beta with a couple of bug fixes.
+
+Minor changes
+-------------
+
+- Changed :meth:`spotify.Link.as_playlist()` to also support creating playlists
+  from links with type :attr:`spotify.LinkType.STARRED`.
+
+- Changed all ``load()`` methods to raise :exc:`spotify.Error` instead of
+  :exc:`RuntimeError` if the session isn't logged in.
+
+- Changed from nose to py.test as test runner.
+
+Bug fixes
+---------
+
+- Work around segfault in libspotify when :attr:`spotify.Config.cache_location`
+  is set to :class:`None` and then used to create a session. (Fixes:
+  :issue:`151`)
+
+- Return a :class:`spotify.PlaylistPlaceholder` object instead of raising an
+  exception if the playlist container contains an element of type
+  :attr:`~spotify.PlaylistType.PLACEHOLDER`. (Fixes: :issue:`159`)
+
+
 v2.0.0b4 (2015-01-13)
 =====================
 

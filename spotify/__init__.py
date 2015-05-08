@@ -5,7 +5,7 @@ import sys
 import threading
 
 
-__version__ = '2.0.0b4'
+__version__ = '2.0.0b5'
 
 
 # Global reentrant lock to be held whenever libspotify functions are called or
@@ -64,14 +64,18 @@ def serialized(f):
     return wrapper
 
 
-def _serialize_access_to_library(lib):
-    """Modify CFFI library to serialize all calls to library functions.
+class _SerializedLib(object):
+    """CFFI library wrapper to serialize all calls to library functions.
 
-    Internal function.
+    Internal class.
     """
-    for name in dir(lib):
-        if name.startswith('sp_') and callable(getattr(lib, name)):
-            setattr(lib, name, serialized(getattr(lib, name)))
+
+    def __init__(self, lib):
+        for name in dir(lib):
+            attr = getattr(lib, name)
+            if name.startswith('sp_') and callable(attr):
+                attr = serialized(attr)
+            setattr(self, name, attr)
 
 
 def _get_cffi_modulename(header, source, sys_version):
@@ -115,7 +119,7 @@ def _build_ffi():
         libraries=[str('spotify')],
         ext_package='spotify')
 
-    _serialize_access_to_library(lib)
+    lib = _SerializedLib(lib)
 
     return ffi, lib
 

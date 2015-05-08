@@ -4,7 +4,7 @@ import re
 
 from distutils.command.build import build
 
-from setuptools import setup, find_packages
+from setuptools import find_packages, setup
 from setuptools.command.install import install
 
 
@@ -20,6 +20,7 @@ def get_version(filename):
 
 
 class CFFIBuild(build):
+
     def finalize_options(self):
         from spotify import ffi
         self.distribution.ext_modules = [ffi.verifier.get_extension()]
@@ -27,6 +28,7 @@ class CFFIBuild(build):
 
 
 class CFFIInstall(install):
+
     def finalize_options(self):
         from spotify import ffi
         self.distribution.ext_modules = [ffi.verifier.get_extension()]
@@ -56,11 +58,6 @@ setup(
         'build': CFFIBuild,
         'install': CFFIInstall,
     },
-    test_suite='nose.collector',
-    tests_require=[
-        'nose',
-        'mock >= 1.0',
-    ],
     classifiers=[
         'Development Status :: 4 - Beta',
         'Intended Audience :: Developers',

@@ -47,7 +47,7 @@ with open('sp-constants.csv') as fh:
 
 
 # Unwrap decorated methods so Sphinx can inspect their signatures
-import spotify
+import spotify  # flake8: noqa
 for mod_name, mod in vars(spotify).items():
     if not isinstance(mod, types.ModuleType) or mod_name in ('threading',):
         continue

@@ -18,10 +18,12 @@ logger = logging.getLogger(__name__)
 
 
 class Image(object):
+
     """A Spotify image.
 
-    You can get images from :meth:`Album.cover`, :meth:`Artist.portrait`, or
-    you can create an :class:`Image` yourself from a Spotify URI::
+    You can get images from :meth:`Album.cover`, :meth:`Artist.portrait`,
+    :meth:`Playlist.image`, or you can create an :class:`Image` yourself from a
+    Spotify URI::
 
         >>> session = spotify.Session()
         # ...

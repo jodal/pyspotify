@@ -11,6 +11,7 @@ __all__ = [
 
 
 class Sink(object):
+
     def on(self):
         """Turn on the audio sink.
 
@@ -44,6 +45,7 @@ class Sink(object):
 
 
 class AlsaSink(Sink):
+
     """Audio sink for systems using ALSA, e.g. most Linux systems.
 
     This audio sink requires `pyalsaaudio
@@ -122,6 +124,7 @@ class AlsaSink(Sink):
 
 
 class PortAudioSink(Sink):
+
     """Audio sink for `PortAudio <http://www.portaudio.com/>`_.
 
     PortAudio is available for many platforms, including Linux, OS X, and

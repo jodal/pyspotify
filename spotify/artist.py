@@ -17,6 +17,7 @@ logger = logging.getLogger(__name__)
 
 
 class Artist(object):
+
     """A Spotify artist.
 
     You can get artists from tracks and albums, or you can create an
@@ -149,6 +150,7 @@ class Artist(object):
 
 
 class ArtistBrowser(object):
+
     """An artist browser for a Spotify artist.
 
     You can get an artist browser from any :class:`Artist` instance by calling

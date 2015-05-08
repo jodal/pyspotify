@@ -12,12 +12,7 @@ except ImportError:
     # From PyPI
     import mock
 
-import cffi
-
-# Import the module so that ffi.verify() is run before cffi.verifier is used
-import spotify  # noqa
-
-cffi.verifier.cleanup_tmpdir()
+import spotify
 
 
 def buffer_writer(string):

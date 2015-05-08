@@ -5,6 +5,14 @@ Changelog
 v2.0.0b6 (UNRELEASED)
 =====================
 
+Dependency changes
+------------------
+
+- Require cffi >= 1.0. (Fixes: :issue:`133`, :issue:`160`)
+
+- If you're using pyspotify with PyPy or PyPy3 you need version 2.6 or newer as
+  older versions of PyPy come with a too old cffi version.
+
 ALSA sink
 ---------
 

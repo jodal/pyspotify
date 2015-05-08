@@ -2,10 +2,10 @@
 Changelog
 *********
 
-v2.0.0b5 (UNRELEASED)
+v2.0.0b5 (2015-05-09)
 =====================
 
-This release is still in development.
+A fifth beta with a couple of bug fixes.
 
 Minor changes
 -------------

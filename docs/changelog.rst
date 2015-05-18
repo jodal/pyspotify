@@ -11,6 +11,12 @@ ALSA sink
 - Changed the :class:`spotify.AlsaSink` keyword argument ``card`` to ``device``
   to align with pyalsaaudio 0.8.
 
+- Updated to work with pyalsaaudio 0.8 which changed the signature of
+  :class:`alsaaudio.PCM`. :class:`spotify.AlsaSink` still works with
+  pyalsaaudio 0.7, but 0.8 is recommended at least for Python 3 users, as it
+  fixes a memory leak present on Python 3 (see :issue:`127`). (Fixes:
+  :issue:`162`)
+
 
 v2.0.0b5 (2015-05-09)
 =====================

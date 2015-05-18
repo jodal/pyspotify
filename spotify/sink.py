@@ -62,7 +62,7 @@ class AlsaSink(Sink):
         sudo apt-get install libasound2-dev
         pip install pyalsaaudio
 
-    The ``card`` keyword argument is passed on to :class:`alsaaudio.PCM`.
+    The ``device`` keyword argument is passed on to :class:`alsaaudio.PCM`.
     Please refer to the pyalsaaudio documentation for details.
 
     Example::
@@ -90,9 +90,9 @@ class AlsaSink(Sink):
         issue #16 <https://sourceforge.net/p/pyalsaaudio/bugs/16/>`_.
     """
 
-    def __init__(self, session, card='default'):
+    def __init__(self, session, device='default'):
         self._session = session
-        self._card = card
+        self._device_name = device
 
         import alsaaudio  # Crash early if not available
         self._alsaaudio = alsaaudio
@@ -106,7 +106,7 @@ class AlsaSink(Sink):
 
         if self._device is None:
             self._device = self._alsaaudio.PCM(
-                mode=self._alsaaudio.PCM_NONBLOCK, card=self._card)
+                mode=self._alsaaudio.PCM_NONBLOCK, card=self._device_name)
             if sys.byteorder == 'little':
                 self._device.setformat(self._alsaaudio.PCM_FORMAT_S16_LE)
             else:

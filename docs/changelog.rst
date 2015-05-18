@@ -2,6 +2,16 @@
 Changelog
 *********
 
+v2.0.0b6 (UNRELEASED)
+=====================
+
+ALSA sink
+---------
+
+- Changed the :class:`spotify.AlsaSink` keyword argument ``card`` to ``device``
+  to align with pyalsaaudio 0.8.
+
+
 v2.0.0b5 (2015-05-09)
 =====================
 

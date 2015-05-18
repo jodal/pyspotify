@@ -107,7 +107,8 @@ class AlsaSink(Sink):
         if self._device is None:
             if hasattr(self._alsaaudio, 'pcms'):  # pyalsaaudio >= 0.8
                 self._device = self._alsaaudio.PCM(
-                    mode=self._alsaaudio.PCM_NONBLOCK, device=self._device_name)
+                    mode=self._alsaaudio.PCM_NONBLOCK,
+                    device=self._device_name)
             else:  # pyalsaaudio == 0.7
                 self._device = self._alsaaudio.PCM(
                     mode=self._alsaaudio.PCM_NONBLOCK, card=self._device_name)

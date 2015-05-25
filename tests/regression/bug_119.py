@@ -8,10 +8,28 @@ import time
 import spotify
 
 
-if len(sys.argv) != 3:
-    sys.exit('Usage: %s USERNAME PASSWORD' % sys.argv[0])
+logger = logging.getLogger(__name__)
 
-username, password = sys.argv[1], sys.argv[2]
+
+ALBUMS = [
+    'spotify:album:02Zb13fM8k04tRwTfMUhe9',  # OK
+    'spotify:album:3ph1ceuYuayuzoIJzPQji2',  # Fails
+    'spotify:album:4IBQvwIbtDluogvDe2qpaB',  # Fails
+    'spotify:album:5VppVyy751PTQWrfJbrJ4H',  # Fails
+    'spotify:album:2cRMVS71c49Pf5SnIlJX3U',  # OK
+    'spotify:album:6mulYcpWRDAiv7KIouWvyP',  # OK
+    'spotify:album:02jqf49ws9bcTvXLPGtjbT',  # Fails
+    'spotify:album:17orrZznh0gmxYtpNP47nK',  # Fails
+    'spotify:album:5lnQLEUiVDkLbFJHXHQu9m',  # Fails
+    'spotify:album:3ph1ceuYuayuzoIJzPQji2',  # Fails
+]
+
+
+def init():
+    session = spotify.Session()
+    loop = spotify.EventLoop(session)
+    loop.start()
+    return session
 
 
 def login(session, username, password):
@@ -30,35 +48,43 @@ def login(session, username, password):
         time.sleep(0.1)
 
 
-logging.basicConfig(level=logging.INFO)
-logger = logging.getLogger(__name__)
+def logout(session):
+    logged_out_event = threading.Event()
 
-session = spotify.Session()
-loop = spotify.EventLoop(session)
-loop.start()
+    def logged_out_listener(session):
+        logged_out_event.set()
 
-login(session, username, password)
+    session.on(spotify.SessionEvent.LOGGED_OUT, logged_out_listener)
+    session.logout()
 
-albums = [
-    'spotify:album:02Zb13fM8k04tRwTfMUhe9',  # OK
-    'spotify:album:3ph1ceuYuayuzoIJzPQji2',  # Fails
-    'spotify:album:4IBQvwIbtDluogvDe2qpaB',  # Fails
-    'spotify:album:5VppVyy751PTQWrfJbrJ4H',  # Fails
-    'spotify:album:2cRMVS71c49Pf5SnIlJX3U',  # OK
-    'spotify:album:6mulYcpWRDAiv7KIouWvyP',  # OK
-    'spotify:album:02jqf49ws9bcTvXLPGtjbT',  # Fails
-    'spotify:album:17orrZznh0gmxYtpNP47nK',  # Fails
-    'spotify:album:5lnQLEUiVDkLbFJHXHQu9m',  # Fails
-    'spotify:album:3ph1ceuYuayuzoIJzPQji2',  # Fails
-]
+    if not logged_out_event.wait(10):
+        raise RuntimeError('Logout timed out')
 
-logger.info('Getting albums')
 
-for uri in albums:
-    logger.info('Loading %s...', uri)
+def get_albums(session):
+    logger.info('Getting albums')
+    for uri in ALBUMS:
+        logger.info('Loading %s...', uri)
+        try:
+            album = session.get_album(uri)
+            # album.browse()  # Add this line, and everything works
+            logger.info(album.load(3).name)
+        except spotify.Timeout:
+            logger.warning('Timeout')
+
+
+if __name__ == '__main__':
+    if len(sys.argv) != 3:
+        sys.exit('Usage: %s USERNAME PASSWORD' % sys.argv[0])
+
+    logging.basicConfig(level=logging.INFO)
+
+    username, password = sys.argv[1], sys.argv[2]
+    session = init()
+    login(session, username, password)
+
     try:
-        album = session.get_album(uri)
-        # album.browse()  # Add this line, and everything works
-        logger.info(album.load(30).name)
-    except spotify.Timeout:
-        logger.warning('Timeout')
+        get_albums(session)
+        logout(session)
+    except KeyboardInterrupt:
+        logout(session)

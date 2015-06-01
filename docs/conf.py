@@ -90,8 +90,8 @@ autodoc_default_flags = ['members', 'undoc-members', 'inherited-members']
 autodoc_member_order = 'bysource'
 
 intersphinx_mapping = {
-    'python': ('http://docs.python.org/3', None),
-    'pyalsaaudio': ('http://pyalsaaudio.sourceforge.net', None),
+    'python': ('http://docs.python.org/3/', None),
+    'pyalsaaudio': ('https://larsimmisch.github.io/pyalsaaudio/', None),
 }
 
 

@@ -222,9 +222,9 @@ updated examples that can play music. A number of bugs have been fixed, and at
 the time of the release, there are no known issues.
 
 The pyspotify 2.0.0b1 release marks the completion of all planned features for
-pyspotify 2.x. The :doc:`plans` for the next releases are focused on fixing
-bugs as they surface, incrementally improving the documentation, and
-integrating feedback from increased usage of the library in the wild.
+pyspotify 2.x. The plans for the next releases are focused on fixing bugs as
+they surface, incrementally improving the documentation, and integrating
+feedback from increased usage of the library in the wild.
 
 Feature: Thread safety
 ----------------------
@@ -426,8 +426,7 @@ This release *does not* provide:
 
 - audio playback drivers.
 
-These features are planned for the upcoming prereleases, as outlined in
-:doc:`plans`.
+These features are planned for the upcoming prereleases.
 
 
 Development milestones

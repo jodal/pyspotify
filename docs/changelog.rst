@@ -2,8 +2,17 @@
 Changelog
 *********
 
-v2.0.0b6 (UNRELEASED)
-=====================
+v2.0.0 (2015-06-01)
+===================
+
+pyspotify 2.x is a full rewrite of pyspotify. While pyspotify 1.x is a
+CPython C extension, pyspotify 2.x uses `CFFI
+<https://cffi.readthedocs.org/>`__ to wrap the libspotify C library. It works
+on CPython 2.7 and 3.2+, as well as PyPy 2.6+. pyspotify 2.0 makes 100% of the
+libspotify 12.1.51 API available from Python, going far beyond the API coverage
+of pyspotify 1.x.
+
+The following are the changes since pyspotify 2.0.0b5.
 
 Dependency changes
 ------------------

@@ -81,8 +81,11 @@ libspotify in the homebrew/binary tap::
 
    For details, or if you have a proper fix for this, see :issue:`130`.
 
-TODO: Check if pyspotify works with the Mac OS X download option from the
-libspotify web site.
+.. warning::
+
+    It is currently unknown if pyspotify works with the Mac OS X download
+    option from the libspotify web site. If you can provide any information
+    either way, please open an issue.
 
 
 Installing pyspotify

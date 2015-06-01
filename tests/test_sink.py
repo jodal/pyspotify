@@ -35,6 +35,7 @@ class AlsaSinkTest(unittest.TestCase, BaseSinkTest):
         self.session = mock.Mock()
         self.session.num_listeners.return_value = 0
         self.alsaaudio = mock.Mock()
+        self.alsaaudio.pcms = mock.Mock()
         with mock.patch.dict('sys.modules', {'alsaaudio': self.alsaaudio}):
             self.sink = spotify.AlsaSink(self.session)
 
@@ -59,12 +60,31 @@ class AlsaSinkTest(unittest.TestCase, BaseSinkTest):
             mock.sentinel.session, audio_format, mock.sentinel.frames,
             num_frames)
 
+        # The ``device`` kwarg was added in pyalsaaudio 0.8
         self.alsaaudio.PCM.assert_called_with(
-            mode=self.alsaaudio.PCM_NONBLOCK, card='default')
+            mode=self.alsaaudio.PCM_NONBLOCK, device='default')
+
         device.setformat.assert_called_with(mock.ANY)
         device.setrate.assert_called_with(audio_format.sample_rate)
         device.setchannels.assert_called_with(audio_format.channels)
         device.setperiodsize.assert_called_with(2048 * 4)
+
+    def test_music_delivery_creates_device_with_alsaaudio_0_7(self):
+        del self.alsaaudio.pcms  # Remove pyalsaudio 0.8 version marker
+        device = mock.Mock()
+        self.alsaaudio.PCM.return_value = device
+        audio_format = mock.Mock()
+        audio_format.frame_size.return_value = 4
+        audio_format.sample_type = spotify.SampleType.INT16_NATIVE_ENDIAN
+        num_frames = 2048
+
+        self.sink._on_music_delivery(
+            mock.sentinel.session, audio_format, mock.sentinel.frames,
+            num_frames)
+
+        # The ``card`` kwarg was deprecated in pyalsaaudio 0.8
+        self.alsaaudio.PCM.assert_called_with(
+            mode=self.alsaaudio.PCM_NONBLOCK, card='default')
 
     def test_sets_little_endian_format_if_little_endian_system(self):
         device = mock.Mock()

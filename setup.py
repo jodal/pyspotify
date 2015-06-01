@@ -2,10 +2,8 @@ from __future__ import unicode_literals
 
 import re
 
-from distutils.command.build import build
 
 from setuptools import find_packages, setup
-from setuptools.command.install import install
 
 
 def read_file(filename):
@@ -19,22 +17,6 @@ def get_version(filename):
     return metadata['version']
 
 
-class CFFIBuild(build):
-
-    def finalize_options(self):
-        from spotify import ffi
-        self.distribution.ext_modules = [ffi.verifier.get_extension()]
-        build.finalize_options(self)
-
-
-class CFFIInstall(install):
-
-    def finalize_options(self):
-        from spotify import ffi
-        self.distribution.ext_modules = [ffi.verifier.get_extension()]
-        install.finalize_options(self)
-
-
 setup(
     name='pyspotify',
     version=get_version('spotify/__init__.py'),
@@ -45,19 +27,11 @@ setup(
     description='Python wrapper for libspotify',
     long_description=read_file('README.rst'),
     packages=find_packages(exclude=['tests', 'tests.*']),
-    ext_package='spotify',
     zip_safe=False,
     include_package_data=True,
-    install_requires=[
-        'cffi >= 0.7',
-    ],
-    setup_requires=[
-        'cffi >= 0.7'
-    ],
-    cmdclass={
-        'build': CFFIBuild,
-        'install': CFFIInstall,
-    },
+    setup_requires=['cffi >= 1.0.0'],
+    cffi_modules=['spotify/_spotify_build.py:ffi'],
+    install_requires=['cffi >= 1.0.0'],
     classifiers=[
         'Development Status :: 4 - Beta',
         'Intended Audience :: Developers',

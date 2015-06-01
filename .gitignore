@@ -3,9 +3,11 @@
 *.so
 *.sw[po]
 .coverage
+.eggs/
 .tox/
 __pycache__/
 _build/
+_spotify.*
 build/
 cover/
 dist/

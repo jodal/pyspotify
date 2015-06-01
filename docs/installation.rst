@@ -81,8 +81,11 @@ libspotify in the homebrew/binary tap::
 
    For details, or if you have a proper fix for this, see :issue:`130`.
 
-TODO: Check if pyspotify works with the Mac OS X download option from the
-libspotify web site.
+.. warning::
+
+    It is currently unknown if pyspotify works with the Mac OS X download
+    option from the libspotify web site. If you can provide any information
+    either way, please open an issue.
 
 
 Installing pyspotify
@@ -92,18 +95,13 @@ You can install pyspotify from PyPI. PyPI may have a pyspotify package
 precompiled for your OS and architecture available as a wheel package. To
 install it run::
 
-    pip install --pre pyspotify
-
-.. note::
-
-    The ``--pre`` argument to ``pip install`` is needed to make pip 1.4 or
-    newer install pre-releases, like the alpha and beta releases of pyspotify
-    2.x.
+    pip install pyspotify
 
 If this fails, then pyspotify probably isn't available prebuilt for your OS and
 architecture. In that case, you'll need a C compiler, Python development
 headers, and libffi development headers to build pyspotify. When you got that
-in place, you can rerun the ``pip`` command to install pyspotify.
+in place, you can rerun the ``pip install pyspotify`` command to install
+pyspotify.
 
 Once you have pyspotify installed, you should head over to :doc:`quickstart`
 for a short introduction to pyspotify.
@@ -144,8 +142,8 @@ Python package, try running the above command.
     Due to a currently unresolved issue, the CFFI-generated C extension module
     in pyspotify is linked with libspotify without the ``.dylib`` file suffix.
 
-    If ``pip install --pre pyspotify`` fails with the message "Reason: image
-    not found", then run the following command and rerun the pip command::
+    If ``pip install pyspotify`` fails with the message "Reason: image not
+    found", then run the following command and rerun the pip command::
 
         ln -s /usr/local/opt/libspotify/lib/libspotify.dylib \
             /usr/local/opt/libspotify/lib/libspotify

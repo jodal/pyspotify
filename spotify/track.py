@@ -12,6 +12,7 @@ __all__ = [
 
 
 class Track(object):
+
     """A Spotify track.
 
     You can get tracks from playlists or albums, or you can create a

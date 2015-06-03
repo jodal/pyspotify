@@ -15,6 +15,7 @@ __all__ = [
 
 class AudioBufferStats(collections.namedtuple(
         'AudioBufferStats', ['samples', 'stutter'])):
+
     """Stats about the application's audio buffers."""
     pass
 
@@ -30,6 +31,7 @@ class SampleType(utils.IntEnum):
 
 
 class AudioFormat(object):
+
     """A Spotify audio format object.
 
     You'll never need to create an instance of this class yourself, but you'll

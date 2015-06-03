@@ -33,6 +33,8 @@ Playlists
 .. autoclass:: PlaylistOfflineStatus
     :no-inherited-members:
 
+.. autoclass:: PlaylistPlaceholder
+
 .. autoclass:: PlaylistTrack
 
 .. autoclass:: PlaylistType

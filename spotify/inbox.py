@@ -15,6 +15,7 @@ logger = logging.getLogger(__name__)
 
 
 class InboxPostResult(object):
+
     """The result object returned by :meth:`Session.inbox_post_tracks`."""
 
     @serialized

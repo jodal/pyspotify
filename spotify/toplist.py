@@ -17,6 +17,7 @@ logger = logging.getLogger(__name__)
 
 
 class Toplist(object):
+
     """A Spotify toplist of artists, albums or tracks that are currently most
     popular worldwide or in a specific region.
 

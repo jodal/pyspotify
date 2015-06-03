@@ -1,3 +1,5 @@
+from __future__ import print_function
+
 import logging
 import sys
 import threading
@@ -45,5 +47,5 @@ logger.debug('Loading playlist %r %r', pl, pl._sp_playlist)
 pl.load()
 logger.debug('Loaded playlist %r %r', pl, pl._sp_playlist)
 
-print pl
-print pl.tracks
+print(pl)
+print(pl.tracks)

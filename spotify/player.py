@@ -17,6 +17,7 @@ class PlayerState(object):
 
 
 class Player(object):
+
     """Playback controller.
 
     You'll never need to create an instance of this class yourself. You'll find

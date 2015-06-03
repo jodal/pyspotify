@@ -11,6 +11,7 @@ __all__ = [
 
 
 class Social(object):
+
     """Social sharing controller.
 
     You'll never need to create an instance of this class yourself. You'll find

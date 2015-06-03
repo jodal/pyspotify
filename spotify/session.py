@@ -4,10 +4,10 @@ import logging
 import weakref
 
 import spotify
+from spotify import ffi, lib, serialized, utils
 import spotify.connection
 import spotify.player
 import spotify.social
-from spotify import ffi, lib, serialized, utils
 
 
 __all__ = [
@@ -19,6 +19,7 @@ logger = logging.getLogger(__name__)
 
 
 class Session(utils.EventEmitter):
+
     """The Spotify session.
 
     If no ``config`` is provided, the default config is used.
@@ -73,7 +74,7 @@ class Session(utils.EventEmitter):
     _cache = None
     """A mapping from sp_* objects to their corresponding Python instances.
 
-    The ``_cached`` helper contructors on wrapper objects use this cache for
+    The ``_cached`` helper constructors on wrapper objects use this cache for
     finding and returning existing alive wrapper objects for the sp_* object it
     is about to create a wrapper for.
 
@@ -606,6 +607,7 @@ class Session(utils.EventEmitter):
 
 
 class SessionEvent(object):
+
     """Session events.
 
     Using the :class:`Session` object, you can register listener functions to
@@ -879,6 +881,7 @@ class SessionEvent(object):
 
 
 class _SessionCallbacks(object):
+
     """Internal class."""
 
     @classmethod

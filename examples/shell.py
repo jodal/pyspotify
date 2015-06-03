@@ -99,7 +99,11 @@ class Commander(cmd.Cmd):
 
     def do_login(self, line):
         "login <username> <password>"
-        username, password = line.split(' ', 1)
+        tokens = line.split(' ', 1)
+        if len(tokens) != 2:
+            self.logger.warning("Wrong number of arguments")
+            return
+        username, password = tokens
         self.session.login(username, password, remember_me=True)
         self.logged_in.wait()
 
@@ -165,9 +169,11 @@ class Commander(cmd.Cmd):
     def do_seek(self, seconds):
         "seek <seconds>"
         if not self.logged_in.is_set():
-            self.logger.warning('You must be logged in to play')
+            self.logger.warning('You must be logged in to seek')
             return
-        # TODO Check if playing
+        if self.session.player.state is spotify.PlayerState.UNLOADED:
+            self.logger.warning('A track must be loaded before seeking')
+            return
         self.session.player.seek(int(seconds) * 1000)
 
     def do_search(self, query):

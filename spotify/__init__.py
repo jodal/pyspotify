@@ -1,11 +1,9 @@
 from __future__ import unicode_literals
 
-import binascii
-import sys
 import threading
 
 
-__version__ = '2.0.0b4'
+__version__ = '2.0.0'
 
 
 # Global reentrant lock to be held whenever libspotify functions are called or
@@ -64,65 +62,25 @@ def serialized(f):
     return wrapper
 
 
-def _serialize_access_to_library(lib):
-    """Modify CFFI library to serialize all calls to library functions.
+class _SerializedLib(object):
+    """CFFI library wrapper to serialize all calls to library functions.
 
-    Internal function.
+    Internal class.
     """
-    for name in dir(lib):
-        if name.startswith('sp_') and callable(getattr(lib, name)):
-            setattr(lib, name, serialized(getattr(lib, name)))
 
-
-def _get_cffi_modulename(header, source, sys_version):
-    """Create CFFI module name that does not depend on CFFI version."""
-    key = '\x00'.join([sys.version[:3], source, header])
-    key = key.encode('utf-8')
-    k1 = hex(binascii.crc32(key[0::2]) & 0xffffffff)
-    k1 = k1.lstrip('0x').rstrip('L')
-    k2 = hex(binascii.crc32(key[1::2]) & 0xffffffff)
-    k2 = k2.lstrip('0').rstrip('L')
-    return str('_spotify_cffi_%s%s' % (k1, k2))  # Native string type on Py2/3
-
-
-def _build_ffi():
-    """Build CFFI instance with knowledge of all libspotify types and a library
-    object which wraps libspotify for use from Python.
-
-    Internal function.
-    """
-    from distutils.version import StrictVersion
-    import os
-
-    import cffi
-
-    if StrictVersion(cffi.__version__) < StrictVersion('0.7'):
-        raise RuntimeError(
-            'pyspotify requires cffi >= 0.7, but found %s' % cffi.__version__)
-
-    header_file = os.path.join(os.path.dirname(__file__), 'api.processed.h')
-    with open(header_file) as fh:
-        header = fh.read()
-        header += '#define SPOTIFY_API_VERSION ...\n'
-
-    source = '#include "libspotify/api.h"'
-
-    ffi = cffi.FFI()
-    ffi.cdef(header)
-    lib = ffi.verify(
-        source,
-        modulename=_get_cffi_modulename(header, source, sys.version),
-        libraries=[str('spotify')],
-        ext_package='spotify')
-
-    _serialize_access_to_library(lib)
-
-    return ffi, lib
+    def __init__(self, lib):
+        for name in dir(lib):
+            attr = getattr(lib, name)
+            if name.startswith('sp_') and callable(attr):
+                attr = serialized(attr)
+            setattr(self, name, attr)
 
 
 _setup_logging()
-ffi, lib = _build_ffi()
 
+from spotify._spotify import ffi, lib  # noqa
+
+lib = _SerializedLib(lib)
 
 from spotify.album import *  # noqa
 from spotify.artist import *  # noqa

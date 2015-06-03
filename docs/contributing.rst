@@ -15,8 +15,8 @@ Development setup
    - CPython 3.2
    - CPython 3.3
    - CPython 3.4
-   - PyPy 2.1+
-   - PyPy3 2.3+
+   - PyPy 2.6+
+   - PyPy3 2.6+
 
    If you're on Ubuntu, the `Dead Snakes PPA
    <https://launchpad.net/~fkrull/+archive/deadsnakes>`_ has packages of both
@@ -38,18 +38,13 @@ Development setup
 
 4. Install development dependencies::
 
-       pip install cffi nose tox
-
-   Note that if you're developing on Python <3.3, you also need to install
-   ``mock``::
-
-       pip install mock
+       pip install -r dev-requirements.txt
 
 5. Run tests.
 
    For a quick test suite run, using the virtualenv's Python version::
 
-       nosetests
+       py.test
 
    For a complete test suite run, using all the Python implementations::
 

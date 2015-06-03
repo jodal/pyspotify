@@ -15,6 +15,7 @@ __all__ = [
 
 
 class Connection(object):
+
     """Connection controller.
 
     You'll never need to create an instance of this class yourself. You'll find

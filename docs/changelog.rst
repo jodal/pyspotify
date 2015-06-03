@@ -2,6 +2,67 @@
 Changelog
 *********
 
+v2.0.0 (2015-06-01)
+===================
+
+pyspotify 2.x is a full rewrite of pyspotify. While pyspotify 1.x is a
+CPython C extension, pyspotify 2.x uses `CFFI
+<https://cffi.readthedocs.org/>`__ to wrap the libspotify C library. It works
+on CPython 2.7 and 3.2+, as well as PyPy 2.6+. pyspotify 2.0 makes 100% of the
+libspotify 12.1.51 API available from Python, going far beyond the API coverage
+of pyspotify 1.x.
+
+The following are the changes since pyspotify 2.0.0b5.
+
+Dependency changes
+------------------
+
+- Require cffi >= 1.0. (Fixes: :issue:`133`, :issue:`160`)
+
+- If you're using pyspotify with PyPy or PyPy3 you need version 2.6 or newer as
+  older versions of PyPy come with a too old cffi version.
+
+ALSA sink
+---------
+
+- Changed the :class:`spotify.AlsaSink` keyword argument ``card`` to ``device``
+  to align with pyalsaaudio 0.8.
+
+- Updated to work with pyalsaaudio 0.8 which changed the signature of
+  :class:`alsaaudio.PCM`. :class:`spotify.AlsaSink` still works with
+  pyalsaaudio 0.7, but 0.8 is recommended at least for Python 3 users, as it
+  fixes a memory leak present on Python 3 (see :issue:`127`). (Fixes:
+  :issue:`162`)
+
+
+v2.0.0b5 (2015-05-09)
+=====================
+
+A fifth beta with a couple of bug fixes.
+
+Minor changes
+-------------
+
+- Changed :meth:`spotify.Link.as_playlist()` to also support creating playlists
+  from links with type :attr:`spotify.LinkType.STARRED`.
+
+- Changed all ``load()`` methods to raise :exc:`spotify.Error` instead of
+  :exc:`RuntimeError` if the session isn't logged in.
+
+- Changed from nose to py.test as test runner.
+
+Bug fixes
+---------
+
+- Work around segfault in libspotify when :attr:`spotify.Config.cache_location`
+  is set to :class:`None` and then used to create a session. (Fixes:
+  :issue:`151`)
+
+- Return a :class:`spotify.PlaylistPlaceholder` object instead of raising an
+  exception if the playlist container contains an element of type
+  :attr:`~spotify.PlaylistType.PLACEHOLDER`. (Fixes: :issue:`159`)
+
+
 v2.0.0b4 (2015-01-13)
 =====================
 
@@ -29,10 +90,10 @@ Minor changes
 Bug fixes
 ---------
 
-- Fix :class:`spotify.Playlist.reorder_tracks`. It now accepts a list of
+- Fix :meth:`spotify.Playlist.reorder_tracks`. It now accepts a list of
   track indexes instead of a list of tracks. This makes it possible to
   reorder any of multiple identical tracks in a playlist and is consistent with
-  :class:`spotify.Playlist.remove_tracks`. (Fixes: :issue:`134`)
+  :meth:`spotify.Playlist.remove_tracks`. (Fixes: :issue:`134`)
 
 - Fix pause/resume/stop in the ``examples/shell.py`` example. (PR:
   :issue:`140`)
@@ -170,9 +231,9 @@ updated examples that can play music. A number of bugs have been fixed, and at
 the time of the release, there are no known issues.
 
 The pyspotify 2.0.0b1 release marks the completion of all planned features for
-pyspotify 2.x. The :doc:`plans` for the next releases are focused on fixing
-bugs as they surface, incrementally improving the documentation, and
-integrating feedback from increased usage of the library in the wild.
+pyspotify 2.x. The plans for the next releases are focused on fixing bugs as
+they surface, incrementally improving the documentation, and integrating
+feedback from increased usage of the library in the wild.
 
 Feature: Thread safety
 ----------------------
@@ -374,8 +435,7 @@ This release *does not* provide:
 
 - audio playback drivers.
 
-These features are planned for the upcoming prereleases, as outlined in
-:doc:`plans`.
+These features are planned for the upcoming prereleases.
 
 
 Development milestones

@@ -11,6 +11,7 @@ __all__ = [
 
 
 class Sink(object):
+
     def on(self):
         """Turn on the audio sink.
 
@@ -44,6 +45,7 @@ class Sink(object):
 
 
 class AlsaSink(Sink):
+
     """Audio sink for systems using ALSA, e.g. most Linux systems.
 
     This audio sink requires `pyalsaaudio
@@ -60,7 +62,7 @@ class AlsaSink(Sink):
         sudo apt-get install libasound2-dev
         pip install pyalsaaudio
 
-    The ``card`` keyword argument is passed on to :class:`alsaaudio.PCM`.
+    The ``device`` keyword argument is passed on to :class:`alsaaudio.PCM`.
     Please refer to the pyalsaaudio documentation for details.
 
     Example::
@@ -88,9 +90,9 @@ class AlsaSink(Sink):
         issue #16 <https://sourceforge.net/p/pyalsaaudio/bugs/16/>`_.
     """
 
-    def __init__(self, session, card='default'):
+    def __init__(self, session, device='default'):
         self._session = session
-        self._card = card
+        self._device_name = device
 
         import alsaaudio  # Crash early if not available
         self._alsaaudio = alsaaudio
@@ -103,8 +105,13 @@ class AlsaSink(Sink):
             audio_format.sample_type == spotify.SampleType.INT16_NATIVE_ENDIAN)
 
         if self._device is None:
-            self._device = self._alsaaudio.PCM(
-                mode=self._alsaaudio.PCM_NONBLOCK, card=self._card)
+            if hasattr(self._alsaaudio, 'pcms'):  # pyalsaaudio >= 0.8
+                self._device = self._alsaaudio.PCM(
+                    mode=self._alsaaudio.PCM_NONBLOCK,
+                    device=self._device_name)
+            else:  # pyalsaaudio == 0.7
+                self._device = self._alsaaudio.PCM(
+                    mode=self._alsaaudio.PCM_NONBLOCK, card=self._device_name)
             if sys.byteorder == 'little':
                 self._device.setformat(self._alsaaudio.PCM_FORMAT_S16_LE)
             else:
@@ -122,6 +129,7 @@ class AlsaSink(Sink):
 
 
 class PortAudioSink(Sink):
+
     """Audio sink for `PortAudio <http://www.portaudio.com/>`_.
 
     PortAudio is available for many platforms, including Linux, OS X, and

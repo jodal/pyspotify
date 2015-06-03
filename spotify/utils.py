@@ -23,6 +23,7 @@ else:
 
 
 class EventEmitter(object):
+
     """Mixin for adding event emitter functionality to a class."""
 
     def __init__(self):
@@ -110,10 +111,12 @@ class EventEmitter(object):
 
 class _Listener(collections.namedtuple(
         'Listener', ['callback', 'user_args'])):
+
     """An listener of events from an :class:`EventEmitter`"""
 
 
 class IntEnum(int):
+
     """An enum type for values mapping to integers.
 
     Tries to stay as close as possible to the enum type specified in
@@ -206,6 +209,9 @@ def _check_error(obj):
 def load(session, obj, timeout=None):
     """Block until the object's data is loaded.
 
+    If the session isn't logged in, a :exc:`spotify.Error` is raised as Spotify
+    objects cannot be loaded without being online and logged in.
+
     The ``obj`` must at least have the :attr:`is_loaded` attribute. If it also
     has an :meth:`error` method, it will be checked for errors to raise.
 
@@ -223,7 +229,7 @@ def load(session, obj, timeout=None):
         return obj
 
     if session.connection.state is not spotify.ConnectionState.LOGGED_IN:
-        raise RuntimeError(
+        raise spotify.Error(
             'Session must be logged in and online to load objects: %r'
             % session.connection.state)
 
@@ -253,6 +259,7 @@ def load(session, obj, timeout=None):
 
 
 class Sequence(collections.Sequence):
+
     """Helper class for making sequences from a length and getitem function.
 
     The ``sp_obj`` is assumed to already have gotten an extra reference through

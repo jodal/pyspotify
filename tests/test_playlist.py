@@ -651,6 +651,7 @@ class PlaylistTest(unittest.TestCase):
     def test_add_tracks_fails_if_error(self, lib_mock):
         lib_mock.sp_playlist_add_tracks.return_value = int(
             spotify.ErrorType.PERMISSION_DENIED)
+        lib_mock.sp_playlist_num_tracks.return_value = 0
         sp_playlist = spotify.ffi.cast('sp_playlist *', 42)
         playlist = spotify.Playlist(self.session, sp_playlist=sp_playlist)
 

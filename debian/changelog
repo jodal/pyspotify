@@ -1,6 +1,7 @@
 python-spotify (2.0.0-0mopidy1) unstable; urgency=medium
 
   * New upstream release.
+  * Require python-cffi >= 1.0.
   * Install examples.
 
  -- Stein Magnus Jodal <stein.magnus@jodal.no>  Wed, 03 Jun 2015 20:34:02 +0200

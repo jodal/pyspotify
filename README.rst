@@ -44,7 +44,6 @@ Project resources
 - `CI server <https://travis-ci.org/mopidy/pyspotify>`_
 - `Download development snapshot <https://github.com/mopidy/pyspotify/archive/v2.x/develop.tar.gz#egg=pyspotify-dev>`_
 - IRC: ``#mopidy`` at `irc.freenode.net <http://freenode.net/>`_
-- Mailing list: `mopidy@googlegroups.com <https://groups.google.com/forum/?fromgroups=#!forum/mopidy>`_
 
 .. image:: https://img.shields.io/pypi/v/pyspotify.svg?style=flat
     :target: https://pypi.python.org/pypi/pyspotify/

@@ -19,8 +19,9 @@ Dependency changes
 
 - Require cffi >= 1.0. (Fixes: :issue:`133`, :issue:`160`)
 
-- If you're using pyspotify with PyPy or PyPy3 you need version 2.6 or newer as
-  older versions of PyPy come with a too old cffi version.
+- If you're using pyspotify with PyPy you need version 2.6 or newer as older
+  versions of PyPy come with a too old cffi version. For PyPy3, you'll probably
+  need the yet to be released PyPy3 2.5.
 
 ALSA sink
 ---------

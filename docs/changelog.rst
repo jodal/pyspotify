@@ -2,6 +2,15 @@
 Changelog
 *********
 
+v2.0.1 (unreleased)
+===================
+
+Bug fix release.
+
+- Make :meth:`spotify.Session.get_playlist` acquire the global lock before
+  modifying the global playlist cache.
+
+
 v2.0.0 (2015-06-01)
 ===================
 

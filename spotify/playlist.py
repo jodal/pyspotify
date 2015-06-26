@@ -48,6 +48,7 @@ class Playlist(utils.EventEmitter):
         session._cache[sp_playlist] = playlist
         return playlist
 
+    @serialized
     def __init__(self, session, uri=None, sp_playlist=None, add_ref=True):
         super(Playlist, self).__init__()
 

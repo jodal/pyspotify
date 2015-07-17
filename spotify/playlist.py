@@ -69,9 +69,7 @@ class Playlist(utils.EventEmitter):
             lib.sp_playlist_add_ref(sp_playlist)
         self._sp_playlist = ffi.gc(sp_playlist, lib.sp_playlist_release)
 
-        self._sp_playlist_callbacks = _PlaylistCallbacks.get_struct()
-        lib.sp_playlist_add_callbacks(
-            self._sp_playlist, self._sp_playlist_callbacks, ffi.NULL)
+        self._sp_playlist_callbacks = None
 
         # Make sure we remove callbacks in __del__() using the same lib as we
         # added callbacks with.
@@ -79,6 +77,8 @@ class Playlist(utils.EventEmitter):
 
     def __del__(self):
         if not hasattr(self, '_lib'):
+            return
+        if getattr(self, '_sp_playlist_callbacks', None) is None:
             return
         self._lib.sp_playlist_remove_callbacks(
             self._sp_playlist, self._sp_playlist_callbacks, ffi.NULL)
@@ -384,6 +384,10 @@ class Playlist(utils.EventEmitter):
 
     @serialized
     def on(self, event, listener, *user_args):
+        if self._sp_playlist_callbacks is None:
+            self._sp_playlist_callbacks = _PlaylistCallbacks.get_struct()
+            lib.sp_playlist_add_callbacks(
+                self._sp_playlist, self._sp_playlist_callbacks, ffi.NULL)
         if self not in self._session._emitters:
             self._session._emitters.append(self)
         super(Playlist, self).on(event, listener, *user_args)

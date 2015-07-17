@@ -101,11 +101,7 @@ class PlaylistContainer(collections.MutableSequence, utils.EventEmitter):
         self._sp_playlistcontainer = ffi.gc(
             sp_playlistcontainer, lib.sp_playlistcontainer_release)
 
-        self._sp_playlistcontainer_callbacks = (
-            _PlaylistContainerCallbacks.get_struct())
-        lib.sp_playlistcontainer_add_callbacks(
-            self._sp_playlistcontainer, self._sp_playlistcontainer_callbacks,
-            ffi.NULL)
+        self._sp_playlistcontainer_callbacks = None
 
         # Make sure we remove callbacks in __del__() using the same lib as we
         # added callbacks with.
@@ -113,6 +109,8 @@ class PlaylistContainer(collections.MutableSequence, utils.EventEmitter):
 
     def __del__(self):
         if not hasattr(self, '_lib'):
+            return
+        if getattr(self, '_sp_playlistcontainer_callbacks', None) is None:
             return
         self._lib.sp_playlistcontainer_remove_callbacks(
             self._sp_playlistcontainer, self._sp_playlistcontainer_callbacks,
@@ -396,6 +394,12 @@ class PlaylistContainer(collections.MutableSequence, utils.EventEmitter):
 
     @serialized
     def on(self, event, listener, *user_args):
+        if self._sp_playlistcontainer_callbacks is None:
+            self._sp_playlistcontainer_callbacks = (
+                _PlaylistContainerCallbacks.get_struct())
+            lib.sp_playlistcontainer_add_callbacks(
+                self._sp_playlistcontainer,
+                self._sp_playlistcontainer_callbacks, ffi.NULL)
         if self not in self._session._emitters:
             self._session._emitters.append(self)
         super(PlaylistContainer, self).on(event, listener, *user_args)

@@ -10,6 +10,12 @@ Bug fix release.
 - Make :meth:`spotify.Session.get_playlist` acquire the global lock before
   modifying the global playlist cache.
 
+- Make :class:`~spotify.Playlist` and :class:`~spotify.PlaylistContainer`
+  register callbacks with libspotify if and only if a Python event handler is
+  added to the object. Previously, we always registered the callbacks with
+  libspotify. Hopefully, this will remove the preconditions for the crashes in
+  :issue:`122`, :issue:`153`, and :issue:`165`.
+
 
 v2.0.0 (2015-06-01)
 ===================

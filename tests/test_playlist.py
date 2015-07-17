@@ -64,14 +64,21 @@ class PlaylistTest(unittest.TestCase):
         sp_playlist = playlist._sp_playlist
 
         lib_mock.sp_playlist_add_ref.assert_called_with(sp_playlist)
+
+        # Callbacks are only added when someone registers a Python event
+        # handler on the playlist:
+        lib_mock.sp_playlist_add_callbacks.assert_not_called()
+        playlist.on(spotify.PlaylistEvent.TRACKS_ADDED, lambda *args: None)
         lib_mock.sp_playlist_add_callbacks.assert_called_with(
             sp_playlist, mock.ANY, mock.ANY)
 
         playlist = None  # noqa
         tests.gc_collect()
 
+        # Callbacks are removed when the playlist is GC-ed:
         lib_mock.sp_playlist_remove_callbacks.assert_called_with(
             sp_playlist, mock.ANY, mock.ANY)
+
         # FIXME Won't be called because lib_mock has references to the
         # sp_playlist object, and it thus won't be GC-ed.
         # lib_mock.sp_playlist_release.assert_called_with(sp_playlist)

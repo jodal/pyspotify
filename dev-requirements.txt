@@ -1,6 +1,9 @@
+delocate
 flake8
 flake8-import-order
+invoke
 mock
 pytest
 pytest-cov
 tox
+twine

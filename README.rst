@@ -12,7 +12,7 @@ Spotify. All from your own Python applications.
 pyspotify use `CFFI <https://cffi.readthedocs.org/>`_ to make a pure Python
 wrapper around the official `libspotify
 <https://developer.spotify.com/technologies/libspotify/>`__ library. It works
-on CPython 2.7 and 3.2+, as well as PyPy 2.6+ and PyPy3 2.6+.  It is known to
+on CPython 2.7 and 3.2+, as well as PyPy 2.6+ and PyPy3 2.5+.  It is known to
 work on Linux and OS X. Windows support should be possible, but is awaiting a
 contributor with the interest and knowledge to maintain it.
 
@@ -44,7 +44,6 @@ Project resources
 - `CI server <https://travis-ci.org/mopidy/pyspotify>`_
 - `Download development snapshot <https://github.com/mopidy/pyspotify/archive/v2.x/develop.tar.gz#egg=pyspotify-dev>`_
 - IRC: ``#mopidy`` at `irc.freenode.net <http://freenode.net/>`_
-- Mailing list: `mopidy@googlegroups.com <https://groups.google.com/forum/?fromgroups=#!forum/mopidy>`_
 
 .. image:: https://img.shields.io/pypi/v/pyspotify.svg?style=flat
     :target: https://pypi.python.org/pypi/pyspotify/

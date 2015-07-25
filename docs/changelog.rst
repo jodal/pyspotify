@@ -2,6 +2,21 @@
 Changelog
 *********
 
+v2.0.1 (2015-07-20)
+===================
+
+Bug fix release.
+
+- Make :meth:`spotify.Session.get_playlist` acquire the global lock before
+  modifying the global playlist cache.
+
+- Make :class:`~spotify.Playlist` and :class:`~spotify.PlaylistContainer`
+  register callbacks with libspotify if and only if a Python event handler is
+  added to the object. Previously, we always registered the callbacks with
+  libspotify. Hopefully, this will remove the preconditions for the crashes in
+  :issue:`122`, :issue:`153`, and :issue:`165`.
+
+
 v2.0.0 (2015-06-01)
 ===================
 
@@ -19,8 +34,9 @@ Dependency changes
 
 - Require cffi >= 1.0. (Fixes: :issue:`133`, :issue:`160`)
 
-- If you're using pyspotify with PyPy or PyPy3 you need version 2.6 or newer as
-  older versions of PyPy come with a too old cffi version.
+- If you're using pyspotify with PyPy you need version 2.6 or newer as older
+  versions of PyPy come with a too old cffi version. For PyPy3, you'll probably
+  need the yet to be released PyPy3 2.5.
 
 ALSA sink
 ---------

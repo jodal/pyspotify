@@ -1,3 +1,9 @@
+python-spotify (2.0.1-0mopidy1) unstable; urgency=medium
+
+  * New upstream release.
+
+ -- Stein Magnus Jodal <stein.magnus@jodal.no>  Sat, 25 Jul 2015 14:00:11 +0200
+
 python-spotify (2.0.0-0mopidy1) unstable; urgency=medium
 
   * New upstream release.

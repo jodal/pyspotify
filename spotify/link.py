@@ -1,5 +1,7 @@
 from __future__ import unicode_literals
 
+import re
+
 try:
     # Python 3
     from urllib.parse import urlparse  # noqa
@@ -159,11 +161,17 @@ class Link(object):
             self._session, sp_playlist, add_ref=False)
 
     def _as_sp_playlist(self):
-        if self.type not in (LinkType.PLAYLIST, LinkType.STARRED):
-            return None
-        sp_playlist = lib.sp_playlist_create(
-            self._session._sp_session, self._sp_link)
-        if sp_playlist == ffi.NULL:
+        sp_playlist = None
+        if self.type == LinkType.PLAYLIST:
+            sp_playlist = lib.sp_playlist_create(
+                self._session._sp_session, self._sp_link)
+        elif self.type == LinkType.STARRED:
+            matches = re.match(r'^spotify:user:([^:]+):starred$', self.uri)
+            if matches:
+                username = matches.group(1)
+                sp_playlist = lib.sp_session_starred_for_user_create(
+                    self._session._sp_session, utils.to_bytes(username))
+        if sp_playlist is None or sp_playlist == ffi.NULL:
             return None
         return sp_playlist
 

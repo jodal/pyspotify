@@ -286,17 +286,19 @@ class LinkTest(unittest.TestCase):
 
     @mock.patch('spotify.playlist.lib', spec=spotify.lib)
     def test_as_playlist_if_starred(self, playlist_lib_mock, lib_mock):
+        uri = 'spotify:user:alice:starred'
         sp_link = spotify.ffi.cast('sp_link *', 42)
         lib_mock.sp_link_create_from_string.return_value = sp_link
         lib_mock.sp_link_type.return_value = spotify.LinkType.STARRED
+        lib_mock.sp_link_as_string.side_effect = tests.buffer_writer(uri)
         sp_playlist = spotify.ffi.cast('sp_playlist *', 43)
-        lib_mock.sp_playlist_create.return_value = sp_playlist
+        lib_mock.sp_session_starred_for_user_create.return_value = sp_playlist
 
-        link = spotify.Link(self.session, 'spotify:playlist:foo')
+        link = spotify.Link(self.session, uri)
         self.assertEqual(link.as_playlist()._sp_playlist, sp_playlist)
 
-        lib_mock.sp_playlist_create.assert_called_once_with(
-            self.session._sp_session, sp_link)
+        lib_mock.sp_session_starred_for_user_create.assert_called_once_with(
+            self.session._sp_session, b'alice')
 
     @mock.patch('spotify.playlist.lib', spec=spotify.lib)
     def test_as_playlist_if_not_a_playlist(self, playlist_lib_mock, lib_mock):

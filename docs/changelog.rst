@@ -7,8 +7,9 @@ v2.0.2 (UNRELEASED)
 
 Bug fix release.
 
-- Fix double release of ``sp_playlist`` objects when playlists are retrieved by
-  URI through :meth:`spotify.Session.get_playlist`.
+- Use ``sp_session_starred_for_user_create(session, username)`` instead of
+  ``sp_playlist_create(session, link)`` to get starred playlists by URI. The
+  previous approach caused segfaults under some circumstances.
 
 
 v2.0.1 (2015-07-20)

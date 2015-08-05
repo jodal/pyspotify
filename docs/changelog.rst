@@ -11,6 +11,9 @@ Bug fix release.
   :attr:`spotify.Link.uri` acquire the global lock while working on data
   returned from libspotify.
 
+- Fix double release of ``sp_playlist`` objects when playlists are retrieved by
+  URI through :meth:`spotify.Session.get_playlist`.
+
 
 v2.0.1 (2015-07-20)
 ===================

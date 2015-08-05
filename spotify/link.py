@@ -153,14 +153,20 @@ class Link(object):
 
     def as_playlist(self):
         """Make a :class:`Playlist` from the link."""
+        sp_playlist = self._as_sp_playlist()
+        if sp_playlist is None:
+            return None
+        return spotify.Playlist._cached(
+            self._session, sp_playlist, add_ref=False)
+
+    def _as_sp_playlist(self):
         if self.type not in (LinkType.PLAYLIST, LinkType.STARRED):
             return None
         sp_playlist = lib.sp_playlist_create(
             self._session._sp_session, self._sp_link)
         if sp_playlist == ffi.NULL:
             return None
-        return spotify.Playlist._cached(
-            self._session, sp_playlist, add_ref=False)
+        return sp_playlist
 
     @serialized
     def as_user(self):

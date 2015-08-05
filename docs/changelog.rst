@@ -9,7 +9,8 @@ Bug fix release.
 
 - Use ``sp_session_starred_for_user_create(session, username)`` instead of
   ``sp_playlist_create(session, link)`` to get starred playlists by URI. The
-  previous approach caused segfaults under some circumstances.
+  previous approach caused segfaults under some circumstances. (Fixes:
+  :ms-issue:`60`)
 
 
 v2.0.1 (2015-07-20)

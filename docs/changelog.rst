@@ -7,10 +7,6 @@ v2.0.2 (UNRELEASED)
 
 Bug fix release.
 
-- Make :attr:`spotify.Session.remembered_user_name` and
-  :attr:`spotify.Link.uri` acquire the global lock while working on data
-  returned from libspotify.
-
 - Fix double release of ``sp_playlist`` objects when playlists are retrieved by
   URI through :meth:`spotify.Session.get_playlist`.
 

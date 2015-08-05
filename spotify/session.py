@@ -172,7 +172,6 @@ class Session(utils.EventEmitter):
         spotify.Error.maybe_raise(lib.sp_session_logout(self._sp_session))
 
     @property
-    @serialized
     def remembered_user_name(self):
         """The username of the remembered user from a previous :meth:`login`
         call."""

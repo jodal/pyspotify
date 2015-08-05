@@ -2,7 +2,7 @@
 Changelog
 *********
 
-v2.0.2 (UNRELEASED)
+v2.0.2 (2015-08-06)
 ===================
 
 Bug fix release.

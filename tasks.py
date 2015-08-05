@@ -1,3 +1,6 @@
+from __future__ import print_function, unicode_literals
+
+import shutil
 import sys
 
 from invoke import run, task
@@ -55,3 +58,35 @@ def watcher(task, *args, **kwargs):
                 '--exclude ".*\.(pyc|sw.)" -r docs/ spotify/ tests/')
         except KeyboardInterrupt:
             sys.exit()
+
+
+@task
+def mac_wheels():
+    """
+    Create wheel packages compatible with:
+
+    - OS X 10.6+
+    - 32-bit and 64-bit
+    - Apple-Python, Python.org-Python, Homebrew-Python
+
+    Based upon https://github.com/MacPython/wiki/wiki/Spinning-wheels
+    """
+
+    prefix = '/Library/Frameworks/Python.framework/Versions'
+    versions = [
+        ('2.7', ''),
+        ('3.4', '3'),
+    ]
+
+    # Build wheels for all Python versions
+    for version, suffix in versions:
+        run('%s/%s/bin/pip%s install -U pip wheel' % (prefix, version, suffix))
+        shutil.rmtree('./build', ignore_errors=True)
+        run('%s/%s/bin/python%s setup.py bdist_wheel' % (
+            prefix, version, suffix))
+
+    # Bundle libspotify into the wheels
+    shutil.rmtree('./fixed_dist', ignore_errors=True)
+    run('delocate-wheel -w ./fixed_dist ./dist/*.whl')
+
+    print('To upload wheels, run: twine upload fixed_dist/*')

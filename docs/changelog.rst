@@ -2,6 +2,16 @@
 Changelog
 *********
 
+v2.0.2 (UNRELEASED)
+===================
+
+Bug fix release.
+
+- Make :attr:`spotify.Session.remembered_user_name` and
+  :attr:`spotify.Link.uri` acquire the global lock while working on data
+  returned from libspotify.
+
+
 v2.0.1 (2015-07-20)
 ===================
 

@@ -102,6 +102,7 @@ class Link(object):
         return hash(self._sp_link)
 
     @property
+    @serialized
     def uri(self):
         """The link's Spotify URI."""
         return utils.get_with_growing_buffer(

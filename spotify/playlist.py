@@ -57,13 +57,12 @@ class Playlist(utils.EventEmitter):
         self._session = session
 
         if uri is not None:
-            playlist = spotify.Link(self._session, uri).as_playlist()
-            if playlist is None:
+            sp_playlist = spotify.Link(self._session, uri)._as_sp_playlist()
+            if sp_playlist is None:
                 raise spotify.Error(
                     'Failed to get playlist from Spotify URI: %r' % uri)
-            sp_playlist = playlist._sp_playlist
             session._cache[sp_playlist] = self
-            add_ref = True
+            add_ref = False
 
         if add_ref:
             lib.sp_playlist_add_ref(sp_playlist)

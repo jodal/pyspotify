@@ -1,6 +1,7 @@
 python-spotify (2.0.2-0mopidy1) UNRELEASED; urgency=medium
 
   * New upstream release.
+  * Run sort-and-wrap -t -a
 
  -- Stein Magnus Jodal <stein.magnus@jodal.no>  Tue, 11 Aug 2015 00:50:01 +0200
 

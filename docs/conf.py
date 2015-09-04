@@ -96,7 +96,7 @@ intersphinx_mapping = {
 
 # -- Options for HTML output --------------------------------------------------
 
-html_theme = 'default'
+#html_theme = 'default'
 html_static_path = ['_static']
 
 html_use_modindex = True

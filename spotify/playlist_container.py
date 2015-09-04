@@ -357,6 +357,8 @@ class PlaylistContainer(collections.MutableSequence, utils.EventEmitter):
         If ``dry_run`` is :class:`True` the move isn't actually done. It is
         only checked if the move is possible.
         """
+        if from_index == to_index:
+            return
         spotify.Error.maybe_raise(lib.sp_playlistcontainer_move_playlist(
             self._sp_playlistcontainer, from_index, to_index, int(dry_run)))
 

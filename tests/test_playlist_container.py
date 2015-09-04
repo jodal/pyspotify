@@ -1024,6 +1024,18 @@ class PlaylistContainerTest(unittest.TestCase):
         with self.assertRaises(spotify.Error):
             playlist_container.move_playlist(5, 7)
 
+    def test_move_playlist_to_itself_is_a_noop(self, lib_mock):
+        lib_mock.sp_playlistcontainer_move_playlist.return_value = int(
+            spotify.ErrorType.INVALID_INDATA)
+        sp_playlistcontainer = spotify.ffi.cast('sp_playlistcontainer *', 42)
+        playlist_container = spotify.PlaylistContainer(
+            self.session, sp_playlistcontainer=sp_playlistcontainer)
+
+        playlist_container.move_playlist(5, 5)
+
+        self.assertEqual(
+            lib_mock.sp_playlistcontainer_move_playlist.call_count, 0)
+
     @mock.patch('spotify.User', spec=spotify.User)
     def test_owner(self, user_mock, lib_mock):
         user_mock.return_value = mock.sentinel.user

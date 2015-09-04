@@ -2,6 +2,18 @@
 Changelog
 *********
 
+
+v2.0.3 (2015-09-05)
+===================
+
+Bug fix release.
+
+- Make moving a playlist to its own location a no-op instead of causing an
+  error like libspotify does. (Fixes: :issue:`175`)
+
+- New better installation instructions. (Fixes: :issue:`174`)
+
+
 v2.0.2 (2015-08-06)
 ===================
 

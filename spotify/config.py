@@ -36,6 +36,12 @@ class Config(object):
         self.compress_playlists = False
         self.dont_save_metadata_for_playlists = False
         self.initially_unload_playlists = False
+        self.device_id = ''
+        self.proxy = ''
+        self.proxy_username = ''
+        self.proxy_password = ''
+        self.ca_certs_filename = ''
+        self.tracefile = ''
 
     @property
     def api_version(self):
@@ -64,11 +70,8 @@ class Config(object):
 
     @cache_location.setter
     def cache_location(self, value):
-        # XXX: libspotify segfaults if cache_location is set to NULL, but
-        # doesn't seem to care if other strings in sp_session_config is NULL.
-        if value is None:
-            value = ''
-        self._cache_location = utils.to_char(value)
+        # NOTE libspotify segfaults if cache_location is set to NULL.
+        self._cache_location = utils.to_char('' if value is None else value)
         self._sp_session_config.cache_location = self._cache_location
 
     @property
@@ -86,7 +89,7 @@ class Config(object):
 
     @settings_location.setter
     def settings_location(self, value):
-        self._settings_location = utils.to_char_or_null(value)
+        self._settings_location = utils.to_char('' if value is None else value)
         self._sp_session_config.settings_location = self._settings_location
 
     @property
@@ -137,7 +140,7 @@ class Config(object):
 
     @user_agent.setter
     def user_agent(self, value):
-        self._user_agent = utils.to_char_or_null(value)
+        self._user_agent = utils.to_char('' if value is None else value)
         self._sp_session_config.user_agent = self._user_agent
 
     @property
@@ -196,7 +199,7 @@ class Config(object):
 
     @device_id.setter
     def device_id(self, value):
-        self._device_id = utils.to_char_or_null(value)
+        self._device_id = utils.to_char('' if value is None else value)
         self._sp_session_config.device_id = self._device_id
 
     @property
@@ -212,7 +215,9 @@ class Config(object):
 
     @proxy.setter
     def proxy(self, value):
-        self._proxy = utils.to_char_or_null(value)
+        # NOTE libspotify reuses cached values from previous sessions if this
+        # is set to NULL instead of empty string.
+        self._proxy = utils.to_char('' if value is None else value)
         self._sp_session_config.proxy = self._proxy
 
     @property
@@ -225,7 +230,9 @@ class Config(object):
 
     @proxy_username.setter
     def proxy_username(self, value):
-        self._proxy_username = utils.to_char_or_null(value)
+        # NOTE libspotify reuses cached values from previous sessions if this
+        # is set to NULL instead of empty string.
+        self._proxy_username = utils.to_char('' if value is None else value)
         self._sp_session_config.proxy_username = self._proxy_username
 
     @property
@@ -238,7 +245,9 @@ class Config(object):
 
     @proxy_password.setter
     def proxy_password(self, value):
-        self._proxy_password = utils.to_char_or_null(value)
+        # NOTE libspotify reuses cached values from previous sessions if this
+        # is set to NULL instead of empty string.
+        self._proxy_password = utils.to_char('' if value is None else value)
         self._sp_session_config.proxy_password = self._proxy_password
 
     @property
@@ -272,7 +281,8 @@ class Config(object):
     def ca_certs_filename(self, value):
         ptr = self._get_ca_certs_filename_ptr()
         if ptr is not None:
-            self._ca_certs_filename = utils.to_char_or_null(value)
+            self._ca_certs_filename = utils.to_char(
+                '' if value is None else value)
             ptr[0] = self._ca_certs_filename
 
     def _get_ca_certs_filename_ptr(self):
@@ -303,5 +313,5 @@ class Config(object):
 
     @tracefile.setter
     def tracefile(self, value):
-        self._tracefile = utils.to_char_or_null(value)
+        self._tracefile = utils.to_char('' if value is None else value)
         self._sp_session_config.tracefile = self._tracefile

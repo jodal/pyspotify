@@ -137,7 +137,7 @@ class ConfigTest(unittest.TestCase):
 
         self.assertEqual(
             spotify.ffi.string(self.config._sp_session_config.user_agent), b'')
-        self.assertEqual(self.config.user_agent, b'')
+        self.assertEqual(self.config.user_agent, '')
 
     def test_compress_playlists(self):
         self.config.compress_playlists = True
@@ -184,7 +184,7 @@ class ConfigTest(unittest.TestCase):
 
         self.assertEqual(
             spotify.ffi.string(self.config._sp_session_config.device_id), b'')
-        self.assertEqual(self.config.device_id, b'')
+        self.assertEqual(self.config.device_id, '')
 
     def test_proxy(self):
         self.config.proxy = '123abc'
@@ -202,7 +202,7 @@ class ConfigTest(unittest.TestCase):
 
         self.assertEqual(
             spotify.ffi.string(self.config._sp_session_config.proxy), b'')
-        self.assertEqual(self.config.proxy, b'')
+        self.assertEqual(self.config.proxy, '')
 
     def test_proxy_username(self):
         self.config.proxy_username = '123abc'
@@ -221,7 +221,7 @@ class ConfigTest(unittest.TestCase):
         self.assertEqual(
             spotify.ffi.string(self.config._sp_session_config.proxy_username),
             b'')
-        self.assertEqual(self.config.proxy_username, b'')
+        self.assertEqual(self.config.proxy_username, '')
 
     def test_proxy_password(self):
         self.config.proxy_password = '123abc'
@@ -240,7 +240,7 @@ class ConfigTest(unittest.TestCase):
         self.assertEqual(
             spotify.ffi.string(self.config._sp_session_config.proxy_password),
             b'')
-        self.assertEqual(self.config.proxy_password, b'')
+        self.assertEqual(self.config.proxy_password, '')
 
     @unittest.skipIf(
         platform.system() == 'Darwin',
@@ -258,7 +258,7 @@ class ConfigTest(unittest.TestCase):
         platform.system() == 'Darwin',
         'The struct field does not exist in libspotify for OS X')
     def test_ca_certs_filename_defaults_to_empty_string(self):
-        self.assertEqual(self.config.ca_certs_filename, '')
+        self.assertEqual(self.config.ca_certs_filename, b'')
 
     @unittest.skipIf(
         platform.system() == 'Darwin',
@@ -291,7 +291,7 @@ class ConfigTest(unittest.TestCase):
         self.assertEqual(self.config.tracefile, b'123abc')
 
     def test_tracefile_defaults_to_empty_string(self):
-        self.assertEqual(self.config.tracefile, '')
+        self.assertEqual(self.config.tracefile, b'')
 
     def test_tracefile_converts_none_to_empty_string(self):
         self.config.tracefile = None

@@ -40,8 +40,8 @@ class Config(object):
         self.proxy = ''
         self.proxy_username = ''
         self.proxy_password = ''
-        self.ca_certs_filename = ''
-        self.tracefile = ''
+        self.ca_certs_filename = b''
+        self.tracefile = b''
 
     @property
     def api_version(self):
@@ -66,7 +66,7 @@ class Config(object):
         only be used by one session at the time. Optimally, you should use a
         lock file or similar to ensure this.
         """
-        return utils.to_bytes_or_none(self._sp_session_config.cache_location)
+        return utils.to_bytes(self._sp_session_config.cache_location)
 
     @cache_location.setter
     def cache_location(self, value):
@@ -84,8 +84,7 @@ class Config(object):
         only be used by one session at the time. Optimally, you should use a
         lock file or similar to ensure this.
         """
-        return utils.to_bytes_or_none(
-            self._sp_session_config.settings_location)
+        return utils.to_bytes(self._sp_session_config.settings_location)
 
     @settings_location.setter
     def settings_location(self, value):
@@ -136,7 +135,7 @@ class Config(object):
 
         Defaults to ``pyspotify 2.x.y``.
         """
-        return utils.to_unicode_or_none(self._sp_session_config.user_agent)
+        return utils.to_unicode(self._sp_session_config.user_agent)
 
     @user_agent.setter
     def user_agent(self, value):
@@ -195,7 +194,7 @@ class Config(object):
         between sessions or power cycles. Good examples is the device's MAC
         address or unique serial number.
         """
-        return utils.to_unicode_or_none(self._sp_session_config.device_id)
+        return utils.to_unicode(self._sp_session_config.device_id)
 
     @device_id.setter
     def device_id(self, value):
@@ -211,7 +210,7 @@ class Config(object):
         The format is protocol://host:port where protocol is
         http/https/socks4/socks5.
         """
-        return utils.to_unicode_or_none(self._sp_session_config.proxy)
+        return utils.to_unicode(self._sp_session_config.proxy)
 
     @proxy.setter
     def proxy(self, value):
@@ -226,7 +225,7 @@ class Config(object):
 
         Defaults to :class:`None`.
         """
-        return utils.to_unicode_or_none(self._sp_session_config.proxy_username)
+        return utils.to_unicode(self._sp_session_config.proxy_username)
 
     @proxy_username.setter
     def proxy_username(self, value):
@@ -241,7 +240,7 @@ class Config(object):
 
         Defaults to :class:`None`.
         """
-        return utils.to_unicode_or_none(self._sp_session_config.proxy_password)
+        return utils.to_unicode(self._sp_session_config.proxy_password)
 
     @proxy_password.setter
     def proxy_password(self, value):
@@ -273,7 +272,7 @@ class Config(object):
         """
         ptr = self._get_ca_certs_filename_ptr()
         if ptr is not None:
-            return utils.to_bytes_or_none(ptr[0])
+            return utils.to_bytes(ptr[0])
         else:
             return None
 
@@ -309,7 +308,7 @@ class Config(object):
 
         Defaults to :class:`None`. Must be a bytestring otherwise.
         """
-        return utils.to_bytes_or_none(self._sp_session_config.tracefile)
+        return utils.to_bytes(self._sp_session_config.tracefile)
 
     @tracefile.setter
     def tracefile(self, value):

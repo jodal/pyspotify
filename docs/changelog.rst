@@ -2,6 +2,18 @@
 Changelog
 *********
 
+v2.0.5 (UNRELEASED)
+===================
+
+Bug fix release.
+
+- Make :attr:`~spotify.Config.tracefile` default to :class:`None` and set to
+  ``NULL`` in the libspotify config struct. If it is set to an empty string by
+  default, libspotify will try to use a file with an empty filename for cache
+  and fail with "LibError: Unable to open trace file". Now empty strings are
+  set as ``NULL`` in the ``sp_session_config`` struct. (Fixes: :ms-issue:`70`)
+
+
 v2.0.4 (2015-09-15)
 ===================
 

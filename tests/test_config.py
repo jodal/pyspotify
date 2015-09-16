@@ -257,20 +257,8 @@ class ConfigTest(unittest.TestCase):
     @unittest.skipIf(
         platform.system() == 'Darwin',
         'The struct field does not exist in libspotify for OS X')
-    def test_ca_certs_filename_defaults_to_empty_string(self):
-        self.assertEqual(self.config.ca_certs_filename, b'')
-
-    @unittest.skipIf(
-        platform.system() == 'Darwin',
-        'The struct field does not exist in libspotify for OS X')
-    def test_ca_certs_filename_converts_none_to_empty_string(self):
-        self.config.ca_certs_filename = None
-
-        self.assertEqual(
-            spotify.ffi.string(
-                self.config._get_ca_certs_filename_ptr()[0]),
-            b'')
-        self.assertEqual(self.config.ca_certs_filename, b'')
+    def test_ca_certs_filename_defaults_to_none(self):
+        self.assertIsNone(self.config.ca_certs_filename)
 
     @unittest.skipIf(
         platform.system() != 'Darwin',
@@ -290,15 +278,15 @@ class ConfigTest(unittest.TestCase):
             b'123abc')
         self.assertEqual(self.config.tracefile, b'123abc')
 
-    def test_tracefile_defaults_to_empty_string(self):
-        self.assertEqual(self.config.tracefile, b'')
+    def test_tracefile_defaults_to_none(self):
+        self.assertIsNone(self.config.tracefile)
 
-    def test_tracefile_converts_none_to_empty_string(self):
-        self.config.tracefile = None
+    def test_tracefile_converts_empty_string_to_none(self):
+        self.config.tracefile = ''
 
         self.assertEqual(
-            spotify.ffi.string(self.config._sp_session_config.tracefile), b'')
-        self.assertEqual(self.config.tracefile, b'')
+            self.config._sp_session_config.tracefile, spotify.ffi.NULL)
+        self.assertIsNone(self.config.tracefile)
 
     def test_sp_session_config_has_unicode_encoded_as_utf8(self):
         self.config.device_id = 'æ device_id'

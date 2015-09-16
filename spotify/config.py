@@ -40,8 +40,8 @@ class Config(object):
         self.proxy = ''
         self.proxy_username = ''
         self.proxy_password = ''
-        self.ca_certs_filename = b''
-        self.tracefile = b''
+        self.ca_certs_filename = None
+        self.tracefile = None
 
     @property
     def api_version(self):
@@ -70,7 +70,8 @@ class Config(object):
 
     @cache_location.setter
     def cache_location(self, value):
-        # NOTE libspotify segfaults if cache_location is set to NULL.
+        # NOTE libspotify segfaults if cache_location is set to NULL, thus we
+        # convert None to empty string.
         self._cache_location = utils.to_char('' if value is None else value)
         self._sp_session_config.cache_location = self._cache_location
 
@@ -272,7 +273,7 @@ class Config(object):
         """
         ptr = self._get_ca_certs_filename_ptr()
         if ptr is not None:
-            return utils.to_bytes(ptr[0])
+            return utils.to_bytes_or_none(ptr[0])
         else:
             return None
 
@@ -280,8 +281,7 @@ class Config(object):
     def ca_certs_filename(self, value):
         ptr = self._get_ca_certs_filename_ptr()
         if ptr is not None:
-            self._ca_certs_filename = utils.to_char(
-                '' if value is None else value)
+            self._ca_certs_filename = utils.to_char_or_null(value)
             ptr[0] = self._ca_certs_filename
 
     def _get_ca_certs_filename_ptr(self):
@@ -308,9 +308,12 @@ class Config(object):
 
         Defaults to :class:`None`. Must be a bytestring otherwise.
         """
-        return utils.to_bytes(self._sp_session_config.tracefile)
+        return utils.to_bytes_or_none(self._sp_session_config.tracefile)
 
     @tracefile.setter
     def tracefile(self, value):
-        self._tracefile = utils.to_char('' if value is None else value)
+        # NOTE libspotify does not consider empty string as unset, and will try
+        # to open the file "" and fail with a "LibError: Unable to open trace
+        # file", thus we convert empty string to NULL.
+        self._tracefile = utils.to_char_or_null(value or None)
         self._sp_session_config.tracefile = self._tracefile

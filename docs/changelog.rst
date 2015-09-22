@@ -8,11 +8,11 @@ v2.0.4 (2015-09-15)
 Bug fix release.
 
 - It has been observed that libspotify will reuse cached proxy settings from
-  previous sessions if the proxy fields on the ``sp_config`` struct are set to
-  ``NULL``. When the ``sp_config`` fields are set to an empty string, the
-  cached settings are updated. When attributes on :class:`spotify.Config` are
-  set to :class:`None`, we now set the fields on ``sp_config`` to empty strings
-  instead of ``NULL``.
+  previous sessions if the proxy fields on the ``sp_session_config`` struct are
+  set to ``NULL``. When the ``sp_session_config`` fields are set to an empty
+  string, the cached settings are updated. When attributes on
+  :class:`spotify.Config` are set to :class:`None`, we now set the fields on
+  ``sp_session_config`` to empty strings instead of ``NULL``.
 
 
 v2.0.3 (2015-09-05)

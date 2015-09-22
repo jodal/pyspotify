@@ -176,15 +176,15 @@ class ConfigTest(unittest.TestCase):
             b'123abc')
         self.assertEqual(self.config.device_id, '123abc')
 
-    def test_device_id_defaults_to_empty_string(self):
-        self.assertEqual(self.config.device_id, '')
+    def test_device_id_defaults_to_none(self):
+        self.assertIsNone(self.config.device_id)
 
-    def test_device_id_converts_none_to_empty_string(self):
-        self.config.device_id = None
+    def test_device_id_converts_empty_string_to_none(self):
+        self.config.device_id = ''
 
         self.assertEqual(
-            spotify.ffi.string(self.config._sp_session_config.device_id), b'')
-        self.assertEqual(self.config.device_id, '')
+            self.config._sp_session_config.device_id, spotify.ffi.NULL)
+        self.assertIsNone(self.config.device_id)
 
     def test_proxy(self):
         self.config.proxy = '123abc'

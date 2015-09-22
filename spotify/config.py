@@ -36,7 +36,7 @@ class Config(object):
         self.compress_playlists = False
         self.dont_save_metadata_for_playlists = False
         self.initially_unload_playlists = False
-        self.device_id = ''
+        self.device_id = None
         self.proxy = ''
         self.proxy_username = ''
         self.proxy_password = ''
@@ -194,12 +194,17 @@ class Config(object):
         two units must supply the same Device ID. The Device ID must not change
         between sessions or power cycles. Good examples is the device's MAC
         address or unique serial number.
+
+        Setting the device ID to an empty string has the same effect as setting
+        it to :class:`None`.
         """
-        return utils.to_unicode(self._sp_session_config.device_id)
+        return utils.to_unicode_or_none(self._sp_session_config.device_id)
 
     @device_id.setter
     def device_id(self, value):
-        self._device_id = utils.to_char('' if value is None else value)
+        # NOTE libspotify segfaults if device_id is set to an empty string,
+        # thus we convert empty strings to NULL.
+        self._device_id = utils.to_char_or_null(value or None)
         self._sp_session_config.device_id = self._device_id
 
     @property

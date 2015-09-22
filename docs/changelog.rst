@@ -13,6 +13,11 @@ Bug fix release.
   and fail with "LibError: Unable to open trace file". Now empty strings are
   set as ``NULL`` in the ``sp_session_config`` struct. (Fixes: :ms-issue:`70`)
 
+- libspotify segfaults if the ``device_id`` config is set to an empty string.
+  We now avoid this segfault if :attr:`~spotify.Config.device_id` is set to an
+  empty string by setting the ``device_id`` field in libspotify's
+  ``sp_session_config`` struct to ``NULL`` instead.
+
 
 v2.0.4 (2015-09-15)
 ===================

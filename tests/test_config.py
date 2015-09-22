@@ -194,15 +194,15 @@ class ConfigTest(unittest.TestCase):
             b'123abc')
         self.assertEqual(self.config.proxy, '123abc')
 
-    def test_proxy_defaults_to_empty_string(self):
-        self.assertEqual(self.config.proxy, '')
+    def test_proxy_defaults_to_none(self):
+        self.assertIsNone(self.config.proxy)
 
-    def test_proxy_converts_none_to_empty_string(self):
+    def test_proxy_converts_none_to_empty_string_and_back(self):
         self.config.proxy = None
 
         self.assertEqual(
             spotify.ffi.string(self.config._sp_session_config.proxy), b'')
-        self.assertEqual(self.config.proxy, '')
+        self.assertIsNone(self.config.proxy)
 
     def test_proxy_username(self):
         self.config.proxy_username = '123abc'
@@ -212,16 +212,16 @@ class ConfigTest(unittest.TestCase):
             b'123abc')
         self.assertEqual(self.config.proxy_username, '123abc')
 
-    def test_proxy_username_defaults_to_empty_string(self):
-        self.assertEqual(self.config.proxy_username, '')
+    def test_proxy_username_defaults_to_none(self):
+        self.assertIsNone(self.config.proxy_username)
 
-    def test_proxy_username_converts_none_to_empty_string(self):
+    def test_proxy_username_converts_none_to_empty_string_and_back(self):
         self.config.proxy_username = None
 
         self.assertEqual(
             spotify.ffi.string(self.config._sp_session_config.proxy_username),
             b'')
-        self.assertEqual(self.config.proxy_username, '')
+        self.assertIsNone(self.config.proxy_username)
 
     def test_proxy_password(self):
         self.config.proxy_password = '123abc'
@@ -231,16 +231,16 @@ class ConfigTest(unittest.TestCase):
             b'123abc')
         self.assertEqual(self.config.proxy_password, '123abc')
 
-    def test_proxy_password_defaults_to_empty_string(self):
-        self.assertEqual(self.config.proxy_password, '')
+    def test_proxy_password_defaults_to_none(self):
+        self.assertIsNone(self.config.proxy_password)
 
-    def test_proxy_password_converts_none_to_empty_string(self):
+    def test_proxy_password_converts_none_to_empty_string_and_back(self):
         self.config.proxy_password = None
 
         self.assertEqual(
             spotify.ffi.string(self.config._sp_session_config.proxy_password),
             b'')
-        self.assertEqual(self.config.proxy_password, '')
+        self.assertIsNone(self.config.proxy_password)
 
     @unittest.skipIf(
         platform.system() == 'Darwin',

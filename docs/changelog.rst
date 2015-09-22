@@ -7,6 +7,12 @@ v2.0.5 (UNRELEASED)
 
 Bug fix release.
 
+- To follow up on the previous release, the getters for the proxy configs now
+  convert empty strings in the ``sp_session_config`` struct back to
+  :class:`None`. Thus, the need to set these configs to empty strings in the
+  struct to make sure the cached settings are cleared from disk are now an
+  internal detail, hidden from the user of pyspotify.
+
 - Make :attr:`~spotify.Config.tracefile` default to :class:`None` and set to
   ``NULL`` in the libspotify config struct. If it is set to an empty string by
   default, libspotify will try to use a file with an empty filename for cache

@@ -37,9 +37,9 @@ class Config(object):
         self.dont_save_metadata_for_playlists = False
         self.initially_unload_playlists = False
         self.device_id = None
-        self.proxy = ''
-        self.proxy_username = ''
-        self.proxy_password = ''
+        self.proxy = None
+        self.proxy_username = None
+        self.proxy_password = None
         self.ca_certs_filename = None
         self.tracefile = None
 
@@ -216,13 +216,13 @@ class Config(object):
         The format is protocol://host:port where protocol is
         http/https/socks4/socks5.
         """
-        return utils.to_unicode(self._sp_session_config.proxy)
+        return utils.to_unicode(self._sp_session_config.proxy) or None
 
     @proxy.setter
     def proxy(self, value):
         # NOTE libspotify reuses cached values from previous sessions if this
-        # is set to NULL instead of empty string.
-        self._proxy = utils.to_char('' if value is None else value)
+        # is set to NULL, thus we convert None to empty string.
+        self._proxy = utils.to_char_or_null('' if value is None else value)
         self._sp_session_config.proxy = self._proxy
 
     @property
@@ -231,12 +231,12 @@ class Config(object):
 
         Defaults to :class:`None`.
         """
-        return utils.to_unicode(self._sp_session_config.proxy_username)
+        return utils.to_unicode(self._sp_session_config.proxy_username) or None
 
     @proxy_username.setter
     def proxy_username(self, value):
         # NOTE libspotify reuses cached values from previous sessions if this
-        # is set to NULL instead of empty string.
+        # is set to NULL, thus we convert None to empty string.
         self._proxy_username = utils.to_char('' if value is None else value)
         self._sp_session_config.proxy_username = self._proxy_username
 
@@ -246,12 +246,12 @@ class Config(object):
 
         Defaults to :class:`None`.
         """
-        return utils.to_unicode(self._sp_session_config.proxy_password)
+        return utils.to_unicode(self._sp_session_config.proxy_password) or None
 
     @proxy_password.setter
     def proxy_password(self, value):
         # NOTE libspotify reuses cached values from previous sessions if this
-        # is set to NULL instead of empty string.
+        # is set to NULL, thus we convert None to empty string.
         self._proxy_password = utils.to_char('' if value is None else value)
         self._sp_session_config.proxy_password = self._proxy_password
 

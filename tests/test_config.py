@@ -176,15 +176,15 @@ class ConfigTest(unittest.TestCase):
             b'123abc')
         self.assertEqual(self.config.device_id, '123abc')
 
-    def test_device_id_defaults_to_empty_string(self):
-        self.assertEqual(self.config.device_id, '')
+    def test_device_id_defaults_to_none(self):
+        self.assertIsNone(self.config.device_id)
 
-    def test_device_id_converts_none_to_empty_string(self):
-        self.config.device_id = None
+    def test_device_id_converts_empty_string_to_none(self):
+        self.config.device_id = ''
 
         self.assertEqual(
-            spotify.ffi.string(self.config._sp_session_config.device_id), b'')
-        self.assertEqual(self.config.device_id, '')
+            self.config._sp_session_config.device_id, spotify.ffi.NULL)
+        self.assertIsNone(self.config.device_id)
 
     def test_proxy(self):
         self.config.proxy = '123abc'
@@ -194,15 +194,15 @@ class ConfigTest(unittest.TestCase):
             b'123abc')
         self.assertEqual(self.config.proxy, '123abc')
 
-    def test_proxy_defaults_to_empty_string(self):
-        self.assertEqual(self.config.proxy, '')
+    def test_proxy_defaults_to_none(self):
+        self.assertIsNone(self.config.proxy)
 
-    def test_proxy_converts_none_to_empty_string(self):
+    def test_proxy_converts_none_to_empty_string_and_back(self):
         self.config.proxy = None
 
         self.assertEqual(
             spotify.ffi.string(self.config._sp_session_config.proxy), b'')
-        self.assertEqual(self.config.proxy, '')
+        self.assertIsNone(self.config.proxy)
 
     def test_proxy_username(self):
         self.config.proxy_username = '123abc'
@@ -212,16 +212,16 @@ class ConfigTest(unittest.TestCase):
             b'123abc')
         self.assertEqual(self.config.proxy_username, '123abc')
 
-    def test_proxy_username_defaults_to_empty_string(self):
-        self.assertEqual(self.config.proxy_username, '')
+    def test_proxy_username_defaults_to_none(self):
+        self.assertIsNone(self.config.proxy_username)
 
-    def test_proxy_username_converts_none_to_empty_string(self):
+    def test_proxy_username_converts_none_to_empty_string_and_back(self):
         self.config.proxy_username = None
 
         self.assertEqual(
             spotify.ffi.string(self.config._sp_session_config.proxy_username),
             b'')
-        self.assertEqual(self.config.proxy_username, '')
+        self.assertIsNone(self.config.proxy_username)
 
     def test_proxy_password(self):
         self.config.proxy_password = '123abc'
@@ -231,16 +231,16 @@ class ConfigTest(unittest.TestCase):
             b'123abc')
         self.assertEqual(self.config.proxy_password, '123abc')
 
-    def test_proxy_password_defaults_to_empty_string(self):
-        self.assertEqual(self.config.proxy_password, '')
+    def test_proxy_password_defaults_to_none(self):
+        self.assertIsNone(self.config.proxy_password)
 
-    def test_proxy_password_converts_none_to_empty_string(self):
+    def test_proxy_password_converts_none_to_empty_string_and_back(self):
         self.config.proxy_password = None
 
         self.assertEqual(
             spotify.ffi.string(self.config._sp_session_config.proxy_password),
             b'')
-        self.assertEqual(self.config.proxy_password, '')
+        self.assertIsNone(self.config.proxy_password)
 
     @unittest.skipIf(
         platform.system() == 'Darwin',
@@ -257,20 +257,8 @@ class ConfigTest(unittest.TestCase):
     @unittest.skipIf(
         platform.system() == 'Darwin',
         'The struct field does not exist in libspotify for OS X')
-    def test_ca_certs_filename_defaults_to_empty_string(self):
-        self.assertEqual(self.config.ca_certs_filename, b'')
-
-    @unittest.skipIf(
-        platform.system() == 'Darwin',
-        'The struct field does not exist in libspotify for OS X')
-    def test_ca_certs_filename_converts_none_to_empty_string(self):
-        self.config.ca_certs_filename = None
-
-        self.assertEqual(
-            spotify.ffi.string(
-                self.config._get_ca_certs_filename_ptr()[0]),
-            b'')
-        self.assertEqual(self.config.ca_certs_filename, b'')
+    def test_ca_certs_filename_defaults_to_none(self):
+        self.assertIsNone(self.config.ca_certs_filename)
 
     @unittest.skipIf(
         platform.system() != 'Darwin',
@@ -290,15 +278,15 @@ class ConfigTest(unittest.TestCase):
             b'123abc')
         self.assertEqual(self.config.tracefile, b'123abc')
 
-    def test_tracefile_defaults_to_empty_string(self):
-        self.assertEqual(self.config.tracefile, b'')
+    def test_tracefile_defaults_to_none(self):
+        self.assertIsNone(self.config.tracefile)
 
-    def test_tracefile_converts_none_to_empty_string(self):
-        self.config.tracefile = None
+    def test_tracefile_converts_empty_string_to_none(self):
+        self.config.tracefile = ''
 
         self.assertEqual(
-            spotify.ffi.string(self.config._sp_session_config.tracefile), b'')
-        self.assertEqual(self.config.tracefile, b'')
+            self.config._sp_session_config.tracefile, spotify.ffi.NULL)
+        self.assertIsNone(self.config.tracefile)
 
     def test_sp_session_config_has_unicode_encoded_as_utf8(self):
         self.config.device_id = 'æ device_id'

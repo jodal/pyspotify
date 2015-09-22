@@ -2,17 +2,44 @@
 Changelog
 *********
 
+v2.0.5 (2015-09-22)
+===================
+
+Bug fix release.
+
+- To follow up on the previous release, the getters for the proxy configs now
+  convert empty strings in the ``sp_session_config`` struct back to
+  :class:`None`. Thus, the need to set these configs to empty strings in the
+  struct to make sure the cached settings are cleared from disk are now an
+  internal detail, hidden from the user of pyspotify.
+
+- Make :attr:`~spotify.Config.tracefile` default to :class:`None` and set to
+  ``NULL`` in the libspotify config struct. If it is set to an empty string by
+  default, libspotify will try to use a file with an empty filename for cache
+  and fail with "LibError: Unable to open trace file". Now empty strings are
+  set as ``NULL`` in the ``sp_session_config`` struct. (Fixes: :ms-issue:`70`)
+
+- libspotify segfaults if the ``device_id`` config is set to an empty string.
+  We now avoid this segfault if :attr:`~spotify.Config.device_id` is set to an
+  empty string by setting the ``device_id`` field in libspotify's
+  ``sp_session_config`` struct to ``NULL`` instead.
+
+- As some test tools (like coverage.py 4.0) no longer support Python 3.2, we no
+  longer test pyspotify on Python 3.2. Though, we have not done anything to
+  intentionally break support for Python 3.2 ourselves.
+
+
 v2.0.4 (2015-09-15)
 ===================
 
 Bug fix release.
 
 - It has been observed that libspotify will reuse cached proxy settings from
-  previous sessions if the proxy fields on the ``sp_config`` struct are set to
-  ``NULL``. When the ``sp_config`` fields are set to an empty string, the
-  cached settings are updated. When attributes on :class:`spotify.Config` are
-  set to :class:`None`, we now set the fields on ``sp_config`` to empty strings
-  instead of ``NULL``.
+  previous sessions if the proxy fields on the ``sp_session_config`` struct are
+  set to ``NULL``. When the ``sp_session_config`` fields are set to an empty
+  string, the cached settings are updated. When attributes on
+  :class:`spotify.Config` are set to :class:`None`, we now set the fields on
+  ``sp_session_config`` to empty strings instead of ``NULL``.
 
 
 v2.0.3 (2015-09-05)

@@ -24,6 +24,10 @@ Bug fix release.
   empty string by setting the ``device_id`` field in libspotify's
   ``sp_session_config`` struct to ``NULL`` instead.
 
+- As some test tools (like coverage.py 4.0) no longer support Python 3.2, we no
+  longer test pyspotify on Python 3.2. Though, we have not done anything to
+  intentionally break support for Python 3.2 ourselves.
+
 
 v2.0.4 (2015-09-15)
 ===================

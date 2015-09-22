@@ -58,7 +58,7 @@ def gc_collect():
     """Run enough GC collections to make object finalizers run."""
 
     # XXX Tests of GC and cleanup behavior are generally flaky and icky,
-    # especially when you target all of Python 2.7, 3.2+ and PyPy. Their result
+    # especially when you target all of Python 2.7, 3.3+ and PyPy. Their result
     # quickly depends on other tests, the arguments to the test runner and the
     # computer running the tests. This skips them all for now.
     raise unittest.SkipTest

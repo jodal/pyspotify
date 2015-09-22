@@ -2,6 +2,7 @@
 *.pyc
 *.so
 *.sw[po]
+.cache/
 .coverage
 .eggs/
 .tox/

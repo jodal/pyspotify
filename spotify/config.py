@@ -36,12 +36,12 @@ class Config(object):
         self.compress_playlists = False
         self.dont_save_metadata_for_playlists = False
         self.initially_unload_playlists = False
-        self.device_id = ''
-        self.proxy = ''
-        self.proxy_username = ''
-        self.proxy_password = ''
-        self.ca_certs_filename = b''
-        self.tracefile = b''
+        self.device_id = None
+        self.proxy = None
+        self.proxy_username = None
+        self.proxy_password = None
+        self.ca_certs_filename = None
+        self.tracefile = None
 
     @property
     def api_version(self):
@@ -70,7 +70,8 @@ class Config(object):
 
     @cache_location.setter
     def cache_location(self, value):
-        # NOTE libspotify segfaults if cache_location is set to NULL.
+        # NOTE libspotify segfaults if cache_location is set to NULL, thus we
+        # convert None to empty string.
         self._cache_location = utils.to_char('' if value is None else value)
         self._sp_session_config.cache_location = self._cache_location
 
@@ -193,12 +194,17 @@ class Config(object):
         two units must supply the same Device ID. The Device ID must not change
         between sessions or power cycles. Good examples is the device's MAC
         address or unique serial number.
+
+        Setting the device ID to an empty string has the same effect as setting
+        it to :class:`None`.
         """
-        return utils.to_unicode(self._sp_session_config.device_id)
+        return utils.to_unicode_or_none(self._sp_session_config.device_id)
 
     @device_id.setter
     def device_id(self, value):
-        self._device_id = utils.to_char('' if value is None else value)
+        # NOTE libspotify segfaults if device_id is set to an empty string,
+        # thus we convert empty strings to NULL.
+        self._device_id = utils.to_char_or_null(value or None)
         self._sp_session_config.device_id = self._device_id
 
     @property
@@ -210,13 +216,13 @@ class Config(object):
         The format is protocol://host:port where protocol is
         http/https/socks4/socks5.
         """
-        return utils.to_unicode(self._sp_session_config.proxy)
+        return utils.to_unicode(self._sp_session_config.proxy) or None
 
     @proxy.setter
     def proxy(self, value):
         # NOTE libspotify reuses cached values from previous sessions if this
-        # is set to NULL instead of empty string.
-        self._proxy = utils.to_char('' if value is None else value)
+        # is set to NULL, thus we convert None to empty string.
+        self._proxy = utils.to_char_or_null('' if value is None else value)
         self._sp_session_config.proxy = self._proxy
 
     @property
@@ -225,12 +231,12 @@ class Config(object):
 
         Defaults to :class:`None`.
         """
-        return utils.to_unicode(self._sp_session_config.proxy_username)
+        return utils.to_unicode(self._sp_session_config.proxy_username) or None
 
     @proxy_username.setter
     def proxy_username(self, value):
         # NOTE libspotify reuses cached values from previous sessions if this
-        # is set to NULL instead of empty string.
+        # is set to NULL, thus we convert None to empty string.
         self._proxy_username = utils.to_char('' if value is None else value)
         self._sp_session_config.proxy_username = self._proxy_username
 
@@ -240,12 +246,12 @@ class Config(object):
 
         Defaults to :class:`None`.
         """
-        return utils.to_unicode(self._sp_session_config.proxy_password)
+        return utils.to_unicode(self._sp_session_config.proxy_password) or None
 
     @proxy_password.setter
     def proxy_password(self, value):
         # NOTE libspotify reuses cached values from previous sessions if this
-        # is set to NULL instead of empty string.
+        # is set to NULL, thus we convert None to empty string.
         self._proxy_password = utils.to_char('' if value is None else value)
         self._sp_session_config.proxy_password = self._proxy_password
 
@@ -272,7 +278,7 @@ class Config(object):
         """
         ptr = self._get_ca_certs_filename_ptr()
         if ptr is not None:
-            return utils.to_bytes(ptr[0])
+            return utils.to_bytes_or_none(ptr[0])
         else:
             return None
 
@@ -280,8 +286,7 @@ class Config(object):
     def ca_certs_filename(self, value):
         ptr = self._get_ca_certs_filename_ptr()
         if ptr is not None:
-            self._ca_certs_filename = utils.to_char(
-                '' if value is None else value)
+            self._ca_certs_filename = utils.to_char_or_null(value)
             ptr[0] = self._ca_certs_filename
 
     def _get_ca_certs_filename_ptr(self):
@@ -308,9 +313,12 @@ class Config(object):
 
         Defaults to :class:`None`. Must be a bytestring otherwise.
         """
-        return utils.to_bytes(self._sp_session_config.tracefile)
+        return utils.to_bytes_or_none(self._sp_session_config.tracefile)
 
     @tracefile.setter
     def tracefile(self, value):
-        self._tracefile = utils.to_char('' if value is None else value)
+        # NOTE libspotify does not consider empty string as unset, and will try
+        # to open the file "" and fail with a "LibError: Unable to open trace
+        # file", thus we convert empty string to NULL.
+        self._tracefile = utils.to_char_or_null(value or None)
         self._sp_session_config.tracefile = self._tracefile

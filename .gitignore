@@ -13,4 +13,3 @@ cover/
 dist/
 spotify_appkey.key
 tmp/
-xunit-*.xml

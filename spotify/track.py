@@ -210,7 +210,7 @@ class Track(object):
     def artists(self):
         """The artists performing on the track.
 
-        Will always return :class:`None` if the track isn't loaded.
+        Will always return an empty list if the track isn't loaded.
         """
         spotify.Error.maybe_raise(
             self.error, ignores=[spotify.ErrorType.IS_LOADING])

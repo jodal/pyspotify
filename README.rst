@@ -47,10 +47,6 @@ Project resources
     :target: https://pypi.python.org/pypi/pyspotify/
     :alt: Latest PyPI version
 
-.. image:: https://img.shields.io/pypi/dm/pyspotify.svg?style=flat
-    :target: https://pypi.python.org/pypi/pyspotify/
-    :alt: Number of PyPI downloads
-
 .. image:: https://img.shields.io/travis/mopidy/pyspotify/v2.x/develop.svg?style=flat
     :target: https://travis-ci.org/mopidy/pyspotify
     :alt: Travis CI build status

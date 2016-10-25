@@ -4,10 +4,10 @@ import logging
 import weakref
 
 import spotify
-from spotify import ffi, lib, serialized, utils
 import spotify.connection
 import spotify.player
 import spotify.social
+from spotify import ffi, lib, serialized, utils
 
 
 __all__ = [

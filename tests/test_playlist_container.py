@@ -1,6 +1,7 @@
 from __future__ import unicode_literals
 
 import collections
+import os
 import unittest
 
 import spotify
@@ -1142,6 +1143,9 @@ class PlaylistContainerTest(unittest.TestCase):
         self.assertNotIn(playlist_container, self.session._emitters)
 
 
+@unittest.skipIf(
+    'TRAVIS' in os.environ,
+    'Crashes on Travis trusty with Python 3.5.0')
 @mock.patch('spotify.playlist_container.lib', spec=spotify.lib)
 class PlaylistContainerCallbacksTest(unittest.TestCase):
 
@@ -1154,8 +1158,6 @@ class PlaylistContainerCallbacksTest(unittest.TestCase):
 
     @mock.patch('spotify.playlist.lib', spec=spotify.lib)
     def test_playlist_added_callback(self, playlist_lib_mock, lib_mock):
-        raise unittest.SkipTest  # Attempt at having py35 env pass on Travis
-
         callback = mock.Mock()
         sp_playlist = spotify.ffi.cast('sp_playlist *', 42)
         sp_playlistcontainer = spotify.ffi.cast('sp_playlistcontainer *', 43)

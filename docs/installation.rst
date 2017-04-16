@@ -153,6 +153,10 @@ libspotify in the homebrew/binary tap::
 
     brew install homebrew/binary/libspotify
 
+Install libffi as a dependency::
+
+    brew install libffi
+
 .. warning::
 
    There's an issue with building pyspotify against libspotify on OS X where

@@ -213,6 +213,15 @@ Homebrew working, you should run this command::
     cffi Python package, try running the above command.
 
 
+Fedora
+~~~~~~~~~~
+
+If you're on Fedora, you can install the pyspotify build dependencies by
+running::
+
+    sudo dnf install redhat-rpm-config
+
+
 pyspotify
 ---------
 

@@ -238,7 +238,7 @@ typedef enum sp_availability {
   SP_TRACK_AVAILABILITY_UNAVAILABLE = 0, ///< Track is not available
   SP_TRACK_AVAILABILITY_AVAILABLE   = 1, ///< Track is available and can be played
   SP_TRACK_AVAILABILITY_NOT_STREAMABLE = 2, ///< Track can not be streamed using this account
-  SP_TRACK_AVAILABILITY_BANNED_BY_ARTIST = 3, ///< Track not available on artist's reqeust
+  SP_TRACK_AVAILABILITY_BANNED_BY_ARTIST = 3, ///< Track not available on artist's request
 } sp_track_availability;
 
 /**
@@ -318,7 +318,7 @@ typedef enum sp_artistbrowse_type {
               */
   SP_ARTISTBROWSE_NO_ALBUMS,    /**< Only return data about the artist (artist name, similar artist
              biography, etc
-             No tracks or album will be abailable.
+             No tracks or album will be available.
              sp_artistbrowse_num_tracks() and sp_artistbrowse_num_albums()
              will both return 0
               */
@@ -651,7 +651,7 @@ typedef struct sp_session_callbacks {
   * Called when there is a change in the private session mode
   *
   * @param[in]  session    Session
-  * @param[in]  isPrivate  True if in private session, false otherwhise
+  * @param[in]  isPrivate  True if in private session, false otherwise
   */
   void (SP_CALLCONV *private_session_mode_changed)(sp_session *session, bool is_private);
 
@@ -708,7 +708,7 @@ typedef struct sp_session_config {
 
   /**
    * Url to the proxy server that should be used.
-   * The format is protocol://<host>:port (where protocal is http/https/socks4/socks5)
+   * The format is protocol://<host>:port (where protocol is http/https/socks4/socks5)
    */
   const char *proxy;
   /**
@@ -1207,7 +1207,7 @@ SP_LIBEXPORT(bool) sp_session_is_private_session(sp_session *session);
 SP_LIBEXPORT(sp_error) sp_session_set_scrobbling(sp_session *session, sp_social_provider provider, sp_scrobbling_state state);
 
 /**
- * Return the scrobbling state. This makes it possible to find out if scrobbling is locally overrided or
+ * Return the scrobbling state. This makes it possible to find out if scrobbling is locally overridden or
  * if the global setting is used.
  *
  * @param[in]  session         Session object
@@ -1491,7 +1491,7 @@ SP_LIBEXPORT(sp_link *) sp_link_create_from_search(sp_search *search);
  * @note Due to reasons in the playlist backend design and the Spotify URI
  * scheme you need to wait for the playlist to be loaded before you can
  * successfully construct an URI. If sp_link_create_from_playlist() returns
- * NULL, try again after teh playlist_state_changed callback has fired.
+ * NULL, try again after the playlist_state_changed callback has fired.
  */
 SP_LIBEXPORT(sp_link *) sp_link_create_from_playlist(sp_playlist *playlist);
 
@@ -3154,7 +3154,7 @@ SP_LIBEXPORT(sp_user *) sp_playlist_owner(sp_playlist *playlist);
 /**
  * Return collaborative status for a playlist.
  *
- * A playlist in collaborative state can be modifed by all users, not only the user owning the list
+ * A playlist in collaborative state can be modified by all users, not only the user owning the list
  *
  * @param[in]  playlist   Playlist object
  *
@@ -3345,7 +3345,7 @@ SP_LIBEXPORT(sp_error) sp_playlist_update_subscribers(sp_session *session, sp_pl
  *             nor extract playlist title until the application calls
  *             sp_playlist_set_in_ram(..., true). So an application
  *             that needs to stay within a low memory profile would need to
- *             cycle thru all new playlists in order to extract metadata.
+ *             cycle through all new playlists in order to extract metadata.
  *
  *             The easiest way to detect this case is when
  *             sp_playlist_is_in_ram() returns false and
@@ -3659,7 +3659,7 @@ SP_LIBEXPORT(sp_error) sp_playlistcontainer_move_playlist(sp_playlistcontainer *
  * SP_PLAYLIST_TYPE_END_FOLDER one.
  *
  * To remove a playlist folder both of these must be deleted or the list
- * will be left in an inconsistant state.
+ * will be left in an inconsistent state.
  *
  * There is no way to rename a playlist folder. Instead you need to remove
  * the folder and recreate it again.

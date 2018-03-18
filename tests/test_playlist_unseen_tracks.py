@@ -58,7 +58,7 @@ class PlaylistUnseenTracksTest(unittest.TestCase):
         self.assertIsInstance(track0, spotify.Track)
         self.assertEqual(track0._sp_track, sp_tracks[0])
 
-        # Getting alrady retrieved tracks causes no new retrieval:
+        # Getting already retrieved tracks causes no new retrieval:
         track1 = tracks[1]
         self.assertEqual(
             lib_mock.sp_playlistcontainer_get_unseen_tracks.call_count, 2)

@@ -11,6 +11,7 @@ except ImportError:
     import Queue as queue
 
 import spotify
+
 from tests import mock
 
 

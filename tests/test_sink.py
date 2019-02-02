@@ -3,6 +3,7 @@ from __future__ import unicode_literals
 import unittest
 
 import spotify
+
 from tests import mock
 
 

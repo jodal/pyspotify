@@ -4,6 +4,7 @@ import unittest
 
 import spotify
 from spotify import utils
+
 import tests
 from tests import mock
 

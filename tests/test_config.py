@@ -7,6 +7,7 @@ import tempfile
 import unittest
 
 import spotify
+
 from tests import mock
 
 

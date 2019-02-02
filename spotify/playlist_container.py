@@ -311,7 +311,7 @@ class PlaylistContainer(collections.MutableSequence, utils.EventEmitter):
     def _validate_name(self, name):
         if len(name) > 255:
             raise ValueError('Playlist name cannot be longer than 255 chars')
-        if len(re.sub('\s+', '', name)) == 0:
+        if len(re.sub(r'\s+', '', name)) == 0:
             raise ValueError('Playlist name cannot be space-only')
 
     def remove_playlist(self, index, recursive=False):

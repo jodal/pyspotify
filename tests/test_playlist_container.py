@@ -6,6 +6,7 @@ import unittest
 
 import spotify
 from spotify.playlist_container import _PlaylistContainerCallbacks
+
 import tests
 from tests import mock
 

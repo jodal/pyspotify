@@ -1,5 +1,4 @@
 import os
-
 from distutils.version import StrictVersion
 
 import cffi

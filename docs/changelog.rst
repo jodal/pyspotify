@@ -2,6 +2,14 @@
 Changelog
 *********
 
+v2.0.6 (UNRELEASED)
+===================
+
+Bug fix release.
+
+- Run test suite on Python 3.6 and 3.7 too.
+
+
 v2.0.5 (2015-09-22)
 ===================
 

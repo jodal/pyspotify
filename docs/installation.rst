@@ -15,8 +15,8 @@ Debian/Ubuntu: Install from apt.mopidy.com
 The `Mopidy <https://www.mopidy.com/>`_ project runs its own APT archive which
 includes pyspotify built for:
 
-- Debian wheezy (oldstable), which also works for Ubuntu 12.04 LTS.
-- Debian jessie (stable), which also works for Ubuntu 14.04 LTS and newer.
+- Debian jessie (oldstable), which also works for Ubuntu 14.04 LTS.
+- Debian stretch (stable), which also works for Ubuntu 16.04 LTS and newer.
 
 The packages are available for multiple CPU architectures: i386, amd64, armel,
 and armhf (compatible with Raspbian and Raspberry Pi 1).
@@ -27,13 +27,13 @@ To install and receive future updates:
 
        wget -q -O - https://apt.mopidy.com/mopidy.gpg | sudo apt-key add -
 
-2. If you run Debian wheezy or Ubuntu 12.04 LTS::
+2. If you run Debian jessie or Ubuntu 14.04 LTS::
 
-       sudo wget -q -O /etc/apt/sources.list.d/mopidy.list https://apt.mopidy.com/wheezy.list
+       sudo wget -q -O /etc/apt/sources.list.d/mopidy.list https://apt.mopidy.com/jessie.list
 
    Or, if you run any newer Debian/Ubuntu distro::
 
-       sudo wget -q -O /etc/apt/sources.list.d/mopidy.list https://apt.mopidy.com/jessie.list
+       sudo wget -q -O /etc/apt/sources.list.d/mopidy.list https://apt.mopidy.com/stretch.list
 
 3. Install pyspotify and all dependencies::
 
@@ -105,13 +105,13 @@ libspotify
 ----------
 
 libspotify is provided as a binary download for a selection of operating
-systems and CPU architectures from the `libspotify site
-<https://developer.spotify.com/technologies/libspotify/>`__. If libspotify
+systems and CPU architectures from our `unofficial libspotify archive
+<https://mopidy.github.io/libspotify-archive/>`__. If libspotify
 isn't available for your OS or architecture, then you're out of luck and can't
 use pyspotify either.
 
 To install libspotify, use one of the options below, or follow the instructions
-on the libspotify site and in the README file of the libspotify tarball.
+in the README file of the libspotify tarball.
 
 
 Debian/Ubuntu
@@ -134,15 +134,6 @@ libspotify is packaged in `AUR
 run::
 
     yaourt -S libspotify
-
-
-Fedora
-~~~~~~
-
-libspotify is packaged in `rpmfusion non-free <http://rpmfusion.org/>`_.
-Install the repository package, then run::
-
-    yum -y install libspotify-devel
 
 
 OS X

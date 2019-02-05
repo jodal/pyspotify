@@ -1,11 +1,10 @@
 from __future__ import unicode_literals
 
-import collections
 import logging
 import pprint
 
 import spotify
-from spotify import ffi, lib, serialized
+from spotify import compat, ffi, lib, serialized
 
 
 __all__ = [
@@ -15,7 +14,7 @@ __all__ = [
 logger = logging.getLogger(__name__)
 
 
-class PlaylistUnseenTracks(collections.Sequence):
+class PlaylistUnseenTracks(compat.Sequence):
 
     """A list of unseen tracks in a playlist.
 

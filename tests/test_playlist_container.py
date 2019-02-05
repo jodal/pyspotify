@@ -1,10 +1,10 @@
 from __future__ import unicode_literals
 
-import collections
 import os
 import unittest
 
 import spotify
+from spotify import compat
 from spotify.playlist_container import _PlaylistContainerCallbacks
 
 import tests
@@ -507,14 +507,14 @@ class PlaylistContainerTest(unittest.TestCase):
         playlist_container = spotify.PlaylistContainer(
             self.session, sp_playlistcontainer=sp_playlistcontainer)
 
-        self.assertIsInstance(playlist_container, collections.Sequence)
+        self.assertIsInstance(playlist_container, compat.Sequence)
 
     def test_is_a_mutable_sequence(self, lib_mock):
         sp_playlistcontainer = spotify.ffi.cast('sp_playlistcontainer *', 42)
         playlist_container = spotify.PlaylistContainer(
             self.session, sp_playlistcontainer=sp_playlistcontainer)
 
-        self.assertIsInstance(playlist_container, collections.MutableSequence)
+        self.assertIsInstance(playlist_container, compat.MutableSequence)
 
     @mock.patch('spotify.playlist.lib', lib=spotify.lib)
     def test_add_new_playlist_to_end_of_container(

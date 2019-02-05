@@ -245,7 +245,7 @@ def load(session, obj, timeout=None):
     return obj
 
 
-class Sequence(collections.Sequence):
+class Sequence(compat.Sequence):
 
     """Helper class for making sequences from a length and getitem function.
 

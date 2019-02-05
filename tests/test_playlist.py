@@ -2,10 +2,10 @@
 
 from __future__ import unicode_literals
 
-import collections
 import unittest
 
 import spotify
+from spotify import compat
 from spotify.playlist import _PlaylistCallbacks
 
 import tests
@@ -213,7 +213,7 @@ class PlaylistTest(unittest.TestCase):
         sp_playlist = spotify.ffi.cast('sp_playlist *', 42)
         playlist = spotify.Playlist(self.session, sp_playlist=sp_playlist)
 
-        self.assertIsInstance(playlist.tracks, collections.MutableSequence)
+        self.assertIsInstance(playlist.tracks, compat.MutableSequence)
 
     def test_tracks_setitem(self, lib_mock):
         sp_playlist = spotify.ffi.cast('sp_playlist *', 42)

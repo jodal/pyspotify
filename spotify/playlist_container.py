@@ -6,7 +6,7 @@ import pprint
 import re
 
 import spotify
-from spotify import ffi, lib, serialized, utils
+from spotify import compat, ffi, lib, serialized, utils
 
 
 __all__ = [
@@ -20,7 +20,7 @@ __all__ = [
 logger = logging.getLogger(__name__)
 
 
-class PlaylistContainer(collections.MutableSequence, utils.EventEmitter):
+class PlaylistContainer(compat.MutableSequence, utils.EventEmitter):
 
     """A Spotify playlist container.
 
@@ -148,7 +148,7 @@ class PlaylistContainer(collections.MutableSequence, utils.EventEmitter):
         return utils.load(self._session, self, timeout=timeout)
 
     def __len__(self):
-        # Required by collections.Sequence
+        # Required by collections.abc.Sequence
 
         length = lib.sp_playlistcontainer_num_playlists(
             self._sp_playlistcontainer)
@@ -158,7 +158,7 @@ class PlaylistContainer(collections.MutableSequence, utils.EventEmitter):
 
     @serialized
     def __getitem__(self, key):
-        # Required by collections.Sequence
+        # Required by collections.abc.Sequence
 
         if isinstance(key, slice):
             return list(self).__getitem__(key)
@@ -195,14 +195,14 @@ class PlaylistContainer(collections.MutableSequence, utils.EventEmitter):
             raise spotify.Error('Unknown playlist type: %r' % playlist_type)
 
     def __setitem__(self, key, value):
-        # Required by collections.MutableSequence
+        # Required by collections.abc.MutableSequence
 
         if not isinstance(key, (int, slice)):
             raise TypeError(
                 'list indices must be int or slice, not %s' %
                 key.__class__.__name__)
         if isinstance(key, slice):
-            if not isinstance(value, collections.Iterable):
+            if not isinstance(value, compat.Iterable):
                 raise TypeError('can only assign an iterable')
         if isinstance(key, int):
             if not 0 <= key < self.__len__():
@@ -223,7 +223,7 @@ class PlaylistContainer(collections.MutableSequence, utils.EventEmitter):
         del self[key]
 
     def __delitem__(self, key):
-        # Required by collections.MutableSequence
+        # Required by collections.abc.MutableSequence
 
         if isinstance(key, slice):
             start, stop, step = key.indices(self.__len__())
@@ -390,7 +390,7 @@ class PlaylistContainer(collections.MutableSequence, utils.EventEmitter):
             raise spotify.Error('Failed clearing unseen tracks')
 
     def insert(self, index, value):
-        # Required by collections.MutableSequence
+        # Required by collections.abc.MutableSequence
 
         self[index:index] = [value]
 

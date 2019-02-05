@@ -7,7 +7,10 @@ v2.0.6 (UNRELEASED)
 
 Bug fix release.
 
-- Run test suite on Python 3.6 and 3.7 too.
+- Drop support for Python 3.3 as it reached end of life in September 2017.
+
+- Add support for Python 3.6 and 3.7. No changes was required, but the test
+  suite now runs on these versions too.
 
 
 v2.0.5 (2015-09-22)

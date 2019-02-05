@@ -12,10 +12,12 @@ Development setup
 1. Make sure you have the following Python versions installed:
 
    - CPython 2.7
-   - CPython 3.3
    - CPython 3.4
-   - PyPy 2.6+
-   - PyPy3 2.5+
+   - CPython 3.5
+   - CPython 3.6
+   - CPython 3.7
+   - PyPy2.7 6.0+
+   - PyPy3.5 6.0+
 
    If you're on Ubuntu, the `Dead Snakes PPA
    <https://launchpad.net/~fkrull/+archive/deadsnakes>`_ has packages of both

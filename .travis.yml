@@ -1,28 +1,35 @@
-sudo: required
-dist: trusty
+dist: xenial
 
 language: python
 
-python:
-  - "2.7"
+addons:
+  apt:
+    sources:
+      - sourceline: 'deb http://apt.mopidy.com/ stretch main contrib non-free'
+        key_url: 'https://apt.mopidy.com/mopidy.gpg'
+    packages:
+      - libspotify-dev
 
-env:
-  - TOX_ENV=py27
-  - TOX_ENV=py34
-  - TOX_ENV=py35
-  - TOX_ENV=py36
-  - TOX_ENV=py37
-  - TOX_ENV=pypy
-  - TOX_ENV=docs
-  - TOX_ENV=flake8
-
-  #- TOX_ENV=pypy3
-
-before_install:
-  - "wget -q -O - https://apt.mopidy.com/mopidy.gpg | sudo apt-key add -"
-  - "sudo wget -q -O /etc/apt/sources.list.d/mopidy.list https://apt.mopidy.com/jessie.list"
-  - "sudo apt-get update -qq"
-  - "sudo apt-get install -y libffi-dev libspotify-dev python-dev python3-dev"
+matrix:
+  include:
+    - python: 2.7
+      env: TOX_ENV=py27
+    - python: 3.4
+      env: TOX_ENV=py34
+    - python: 3.5
+      env: TOX_ENV=py35
+    - python: 3.6
+      env: TOX_ENV=py36
+    - python: 3.7
+      env: TOX_ENV=py37
+    - python: pypy2.7-6.0
+      env: TOX_ENV=pypy
+    - python: pypy3.5-6.0
+      env: TOX_ENV=pypy3
+    - python: 3.7
+      env: TOX_ENV=docs
+    - python: 3.7
+      env: TOX_ENV=flake8
 
 install:
   - "pip install tox"

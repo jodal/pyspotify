@@ -3,7 +3,7 @@ from __future__ import unicode_literals
 import unittest
 
 import spotify
-from spotify import utils
+from spotify import compat
 
 import tests
 from tests import mock
@@ -584,7 +584,7 @@ class AlbumBrowserTest(unittest.TestCase):
             sp_albumbrowse)
 
         item = result[0]
-        self.assertIsInstance(item, utils.text_type)
+        self.assertIsInstance(item, compat.text_type)
         self.assertEqual(item, 'Apple Records 1973')
         self.assertEqual(lib_mock.sp_albumbrowse_copyright.call_count, 1)
         lib_mock.sp_albumbrowse_copyright.assert_called_with(sp_albumbrowse, 0)
@@ -668,7 +668,7 @@ class AlbumBrowserTest(unittest.TestCase):
 
         result = browser.review
 
-        self.assertIsInstance(result, utils.text_type)
+        self.assertIsInstance(result, compat.text_type)
         self.assertEqual(result, 'A nice album')
 
 

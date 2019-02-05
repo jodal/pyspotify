@@ -3,7 +3,7 @@ from __future__ import unicode_literals
 import unittest
 
 import spotify
-from spotify import utils
+from spotify import compat
 
 import tests
 from tests import mock
@@ -718,7 +718,7 @@ class ArtistBrowserTest(unittest.TestCase):
 
         result = browser.biography
 
-        self.assertIsInstance(result, utils.text_type)
+        self.assertIsInstance(result, compat.text_type)
         self.assertEqual(result, 'Lived, played, and died')
 
 

@@ -3,23 +3,10 @@ from __future__ import unicode_literals
 import collections
 import functools
 import pprint
-import sys
 import time
 
 import spotify
-from spotify import ffi, lib, serialized
-
-
-PY2 = sys.version_info[0] == 2
-
-if PY2:  # pragma: no branch
-    string_types = (basestring,)  # noqa
-    text_type = unicode  # noqa
-    binary_type = str
-else:
-    string_types = (str,)
-    text_type = str
-    binary_type = bytes
+from spotify import compat, ffi, lib, serialized
 
 
 class EventEmitter(object):
@@ -301,11 +288,11 @@ def to_bytes(value):
 
     Unicode strings are encoded to UTF-8.
     """
-    if isinstance(value, text_type):
+    if isinstance(value, compat.text_type):
         return value.encode('utf-8')
     elif isinstance(value, ffi.CData):
         return ffi.string(value)
-    elif isinstance(value, binary_type):
+    elif isinstance(value, compat.binary_type):
         return value
     else:
         raise ValueError('Value must be text, bytes, or char[]')
@@ -328,9 +315,9 @@ def to_unicode(value):
     """
     if isinstance(value, ffi.CData):
         return ffi.string(value).decode('utf-8')
-    elif isinstance(value, binary_type):
+    elif isinstance(value, compat.binary_type):
         return value.decode('utf-8')
-    elif isinstance(value, text_type):
+    elif isinstance(value, compat.text_type):
         return value
     else:
         raise ValueError('Value must be text, bytes, or char[]')

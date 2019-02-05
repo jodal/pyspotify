@@ -3,18 +3,17 @@ pyspotify
 *********
 
 pyspotify provides a Python interface to
-`Spotify's <http://www.spotify.com/>`__ online music streaming service.
+`Spotify's <https://www.spotify.com/>`__ online music streaming service.
 
 With pyspotify you can access music metadata, search in Spotify's library of
 20+ million tracks, manage your Spotify playlists, and play music from
 Spotify. All from your own Python applications.
 
 pyspotify uses `CFFI <https://cffi.readthedocs.org/>`_ to make a pure Python
-wrapper around the official `libspotify
-<https://developer.spotify.com/technologies/libspotify/>`__ library. It works
-on CPython 2.7 and 3.4+, as well as PyPy 2.6+ and PyPy3 2.5+.  It is known to
-work on Linux and OS X. Windows support should be possible, but is awaiting a
-contributor with the interest and knowledge to maintain it.
+wrapper around the official libspotify library. It works on CPython 2.7 and
+3.4+, as well as PyPy 2.6+ and PyPy3 2.5+. It is known to work on Linux and
+macOS. Windows support should be possible, but is awaiting a contributor with
+the interest and knowledge to maintain it.
 
 
 libspotify's deprecation
@@ -38,10 +37,10 @@ work with the Spotify service for a long time into the future.
 Project resources
 =================
 
-- `Documentation <http://pyspotify.mopidy.com/>`_
+- `Documentation <https://pyspotify.mopidy.com/>`_
 - `Source code <https://github.com/mopidy/pyspotify>`_
 - `Issue tracker <https://github.com/mopidy/pyspotify/issues>`_
-- IRC: ``#mopidy`` at `irc.freenode.net <http://freenode.net/>`_
+- IRC: ``#mopidy`` at `irc.freenode.net <https://freenode.net/>`_
 
 .. image:: https://img.shields.io/pypi/v/pyspotify.svg?style=flat
     :target: https://pypi.python.org/pypi/pyspotify/

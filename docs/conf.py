@@ -50,7 +50,7 @@ import spotify  # noqa
 for mod_name, mod in vars(spotify).items():
     if not isinstance(mod, types.ModuleType) or mod_name in ('threading',):
         continue
-    for class_name, cls in vars(mod).items():
+    for cls in vars(mod).values():
         if not isinstance(cls, type):
             continue
         for method_name, method in vars(cls).items():

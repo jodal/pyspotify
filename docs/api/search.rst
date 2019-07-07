@@ -3,6 +3,7 @@ Search
 ******
 
 .. module:: spotify
+    :noindex:
 
 .. autoclass:: Search
 

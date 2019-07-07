@@ -3,6 +3,7 @@ Audio
 *****
 
 .. module:: spotify
+    :noindex:
 
 .. autoclass:: AudioBufferStats
     :no-inherited-members:

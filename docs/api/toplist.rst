@@ -3,6 +3,7 @@ Toplists
 ********
 
 .. module:: spotify
+    :noindex:
 
 .. autoclass:: Toplist
 

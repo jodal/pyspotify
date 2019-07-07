@@ -3,6 +3,7 @@ Sessions
 ********
 
 .. module:: spotify
+    :noindex:
 
 .. autoclass:: Session
 

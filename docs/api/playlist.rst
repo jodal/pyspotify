@@ -3,6 +3,7 @@ Playlists
 *********
 
 .. module:: spotify
+    :noindex:
 
 .. autoclass:: Playlist
 

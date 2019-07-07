@@ -3,6 +3,7 @@ Connection
 **********
 
 .. module:: spotify
+    :noindex:
 
 .. autoclass:: spotify.connection.Connection
 

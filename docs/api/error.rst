@@ -3,6 +3,7 @@ Error handling
 **************
 
 .. module:: spotify
+    :noindex:
 
 .. autoexception:: Error
     :no-undoc-members:

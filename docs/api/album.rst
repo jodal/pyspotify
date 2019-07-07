@@ -3,6 +3,7 @@ Albums
 ******
 
 .. module:: spotify
+    :noindex:
 
 .. autoclass:: Album
 

@@ -3,41 +3,42 @@ from __future__ import print_function, unicode_literals
 import shutil
 import sys
 
-from invoke import run, task
+from invoke import task
 
 
 @task
-def docs(watch=False, warn=False):
+def docs(ctx, watch=False, warn=False):
     if watch:
-        return watcher(docs)
-    run('make -C docs/ html', warn=warn)
+        return watcher(ctx, docs)
+    ctx.run('make -C docs/ html', warn=warn)
 
 
 @task
-def test(coverage=False, watch=False, warn=False):
+def test(ctx, coverage=False, watch=False, warn=False):
     if watch:
-        return watcher(test, coverage=coverage)
+        return watcher(ctx, test, coverage=coverage)
     cmd = 'py.test'
     if coverage:
         cmd += ' --cov=spotify --cov-report=term-missing'
-    run(cmd, pty=True, warn=warn)
+    ctx.run(cmd, pty=True, warn=warn)
 
 
 @task
-def preprocess_header():
-    run(
+def preprocess_header(ctx):
+    ctx.run(
         'cpp -nostdinc spotify/api.h | egrep -v "(^#)|(^$)" '
         '> spotify/api.processed.h || true')
 
 
 @task
-def update_authors():
+def update_authors(ctx):
     # Keep authors in the order of appearance and use awk to filter out dupes
-    run("git log --format='- %aN <%aE>' --reverse | awk '!x[$0]++' > AUTHORS")
+    ctx.run(
+        "git log --format='- %aN <%aE>' --reverse | awk '!x[$0]++' > AUTHORS")
 
 
 @task
-def update_sp_constants():
+def update_sp_constants(ctx):
     import spotify
     constants = [
         '%s,%s\n' % (attr, getattr(spotify.lib, attr))
@@ -47,13 +48,13 @@ def update_sp_constants():
         fh.writelines(constants)
 
 
-def watcher(task, *args, **kwargs):
+def watcher(ctx, task, *args, **kwargs):
     while True:
-        run('clear')
+        ctx.run('clear')
         kwargs['warn'] = True
         task(*args, **kwargs)
         try:
-            run(
+            ctx.run(
                 r'inotifywait -q -e create -e modify -e delete '
                 r'--exclude ".*\.(pyc|sw.)" -r docs/ spotify/ tests/')
         except KeyboardInterrupt:
@@ -61,7 +62,7 @@ def watcher(task, *args, **kwargs):
 
 
 @task
-def mac_wheels():
+def mac_wheels(ctx):
     """
     Create wheel packages compatible with:
 
@@ -80,13 +81,14 @@ def mac_wheels():
 
     # Build wheels for all Python versions
     for version, suffix in versions:
-        run('%s/%s/bin/pip%s install -U pip wheel' % (prefix, version, suffix))
+        ctx.run('%s/%s/bin/pip%s install -U pip wheel' % (
+            prefix, version, suffix))
         shutil.rmtree('./build', ignore_errors=True)
-        run('%s/%s/bin/python%s setup.py bdist_wheel' % (
+        ctx.run('%s/%s/bin/python%s setup.py bdist_wheel' % (
             prefix, version, suffix))
 
     # Bundle libspotify into the wheels
     shutil.rmtree('./fixed_dist', ignore_errors=True)
-    run('delocate-wheel -w ./fixed_dist ./dist/*.whl')
+    ctx.run('delocate-wheel -w ./fixed_dist ./dist/*.whl')
 
     print('To upload wheels, run: twine upload fixed_dist/*')

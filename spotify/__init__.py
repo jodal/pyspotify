@@ -56,6 +56,7 @@ def serialized(f):
     def wrapper(*args, **kwargs):
         with _lock:
             return f(*args, **kwargs)
+
     if not hasattr(wrapper, '__wrapped__'):
         # Workaround for Python < 3.2
         wrapper.__wrapped__ = f

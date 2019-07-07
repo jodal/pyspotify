@@ -22,23 +22,27 @@ def test(ctx, coverage=False, warn=False):
 def preprocess_header(ctx):
     ctx.run(
         'cpp -nostdinc spotify/api.h | egrep -v "(^#)|(^$)" '
-        '> spotify/api.processed.h || true')
+        '> spotify/api.processed.h || true'
+    )
 
 
 @task
 def update_authors(ctx):
     # Keep authors in the order of appearance and use awk to filter out dupes
     ctx.run(
-        "git log --format='- %aN <%aE>' --reverse | awk '!x[$0]++' > AUTHORS")
+        "git log --format='- %aN <%aE>' --reverse | awk '!x[$0]++' > AUTHORS"
+    )
 
 
 @task
 def update_sp_constants(ctx):
     import spotify
+
     constants = [
         '%s,%s\n' % (attr, getattr(spotify.lib, attr))
         for attr in dir(spotify.lib)
-        if attr.startswith('SP_')]
+        if attr.startswith('SP_')
+    ]
     with open('docs/sp-constants.csv', 'w+') as fh:
         fh.writelines(constants)
 
@@ -76,4 +80,4 @@ def mac_wheels(ctx):
     shutil.rmtree('./fixed_dist', ignore_errors=True)
     ctx.run('delocate-wheel -w ./fixed_dist ./dist/*.whl')
 
-    print('To upload wheels, run: twine upload fixed_dist/*')
+    print ('To upload wheels, run: twine upload fixed_dist/*')

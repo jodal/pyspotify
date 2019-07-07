@@ -28,7 +28,8 @@ class EventEmitter(object):
         not be called the next time the ``event`` is emitted.
         """
         self._listeners[event].append(
-            _Listener(callback=listener, user_args=user_args))
+            _Listener(callback=listener, user_args=user_args)
+        )
 
     @serialized
     def off(self, event=None, listener=None):
@@ -49,8 +50,8 @@ class EventEmitter(object):
                 self._listeners[event] = []
             else:
                 self._listeners[event] = [
-                    l for l in self._listeners[event]
-                    if l.callback != listener]
+                    l for l in self._listeners[event] if l.callback != listener
+                ]
 
     def emit(self, event, *event_args):
         """Call the registered listeners for ``event``.
@@ -89,15 +90,15 @@ class EventEmitter(object):
         # when registering the second listener instead of when the event is
         # emitted.
         assert self.num_listeners(event) == 1, (
-            'Expected exactly 1 event listener, found %d listeners' %
-            self.num_listeners(event))
+            'Expected exactly 1 event listener, found %d listeners'
+            % self.num_listeners(event)
+        )
         listener = self._listeners[event][0]
         args = list(event_args) + list(listener.user_args)
         return listener.callback(*args)
 
 
-class _Listener(collections.namedtuple(
-        'Listener', ['callback', 'user_args'])):
+class _Listener(collections.namedtuple('Listener', ['callback', 'user_args'])):
 
     """An listener of events from an :class:`EventEmitter`"""
 
@@ -146,6 +147,7 @@ def make_enum(lib_prefix, enum_prefix=''):
                 name = attr.replace(lib_prefix, enum_prefix)
                 cls.add(name, getattr(lib, attr))
         return cls
+
     return wrapper
 
 
@@ -190,7 +192,8 @@ def get_with_growing_buffer(func, *args):
 def _check_error(obj):
     error_type = getattr(obj, 'error', spotify.ErrorType.OK)
     spotify.Error.maybe_raise(
-        error_type, ignores=[spotify.ErrorType.IS_LOADING])
+        error_type, ignores=[spotify.ErrorType.IS_LOADING]
+    )
 
 
 def load(session, obj, timeout=None):
@@ -218,7 +221,8 @@ def load(session, obj, timeout=None):
     if session.connection.state is not spotify.ConnectionState.LOGGED_IN:
         raise spotify.Error(
             'Session must be logged in and online to load objects: %r'
-            % session.connection.state)
+            % session.connection.state
+        )
 
     if timeout is None:
         timeout = 10
@@ -255,7 +259,8 @@ class Sequence(compat.Sequence):
     """
 
     def __init__(
-            self, sp_obj, add_ref_func, release_func, len_func, getitem_func):
+        self, sp_obj, add_ref_func, release_func, len_func, getitem_func
+    ):
 
         add_ref_func(sp_obj)
         self._sp_obj = ffi.gc(sp_obj, release_func)
@@ -270,8 +275,9 @@ class Sequence(compat.Sequence):
             return list(self).__getitem__(key)
         if not isinstance(key, int):
             raise TypeError(
-                'list indices must be int or slice, not %s' %
-                key.__class__.__name__)
+                'list indices must be int or slice, not %s'
+                % key.__class__.__name__
+            )
         if key < 0:
             key += self.__len__()
         if not 0 <= key < self.__len__():
@@ -279,8 +285,7 @@ class Sequence(compat.Sequence):
         return self._getitem_func(self._sp_obj, key)
 
     def __repr__(self):
-        return '%s(%s)' % (
-            self.__class__.__name__, pprint.pformat(list(self)))
+        return '%s(%s)' % (self.__class__.__name__, pprint.pformat(list(self)))
 
 
 def to_bytes(value):
@@ -354,7 +359,7 @@ def to_char_or_null(value):
 def to_country(code):
     """Converts a numeric libspotify country code to an ISO 3166-1 two-letter
     country code in a unicode string."""
-    return to_unicode(chr(code >> 8) + chr(code & 0xff))
+    return to_unicode(chr(code >> 8) + chr(code & 0xFF))
 
 
 def to_country_code(country):
@@ -365,7 +370,8 @@ def to_country_code(country):
     if len(country) != 2:
         raise ValueError('Must be exactly two chars')
     first, second = (ord(char) for char in country)
-    if (not (ord('A') <= first <= ord('Z')) or
-            not (ord('A') <= second <= ord('Z'))):
+    if not (ord('A') <= first <= ord('Z')) or not (
+        ord('A') <= second <= ord('Z')
+    ):
         raise ValueError('Chars must be in range A-Z')
     return first << 8 | second

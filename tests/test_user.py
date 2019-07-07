@@ -10,7 +10,6 @@ from tests import mock
 
 @mock.patch('spotify.user.lib', spec=spotify.lib)
 class UserTest(unittest.TestCase):
-
     def setUp(self):
         self.session = tests.create_session_mock()
 
@@ -23,7 +22,8 @@ class UserTest(unittest.TestCase):
         sp_user = spotify.ffi.cast('sp_user *', 42)
         link_instance_mock = link_mock.return_value
         link_instance_mock.as_user.return_value = spotify.User(
-            self.session, sp_user=sp_user)
+            self.session, sp_user=sp_user
+        )
         uri = 'spotify:user:foo'
 
         result = spotify.User(self.session, uri=uri)
@@ -71,7 +71,8 @@ class UserTest(unittest.TestCase):
 
     def test_canonical_name(self, lib_mock):
         lib_mock.sp_user_canonical_name.return_value = spotify.ffi.new(
-            'char[]', b'alicefoobar')
+            'char[]', b'alicefoobar'
+        )
         sp_user = spotify.ffi.cast('sp_user *', 42)
         user = spotify.User(self.session, sp_user=sp_user)
 
@@ -82,7 +83,8 @@ class UserTest(unittest.TestCase):
 
     def test_display_name(self, lib_mock):
         lib_mock.sp_user_display_name.return_value = spotify.ffi.new(
-            'char[]', b'Alice Foobar')
+            'char[]', b'Alice Foobar'
+        )
         sp_user = spotify.ffi.cast('sp_user *', 42)
         user = spotify.User(self.session, sp_user=sp_user)
 
@@ -121,13 +123,15 @@ class UserTest(unittest.TestCase):
         result = user.link
 
         link_mock.assert_called_once_with(
-            self.session, sp_link=sp_link, add_ref=False)
+            self.session, sp_link=sp_link, add_ref=False
+        )
         self.assertEqual(result, mock.sentinel.link)
 
     def test_starred(self, lib_mock):
         self.session.get_starred.return_value = mock.sentinel.playlist
         lib_mock.sp_user_canonical_name.return_value = spotify.ffi.new(
-            'char[]', b'alice')
+            'char[]', b'alice'
+        )
         sp_user = spotify.ffi.cast('sp_user *', 42)
         user = spotify.User(self.session, sp_user=sp_user)
 
@@ -138,9 +142,11 @@ class UserTest(unittest.TestCase):
 
     def test_published_playlists(self, lib_mock):
         self.session.get_published_playlists.return_value = (
-            mock.sentinel.playlist_container)
+            mock.sentinel.playlist_container
+        )
         lib_mock.sp_user_canonical_name.return_value = spotify.ffi.new(
-            'char[]', b'alice')
+            'char[]', b'alice'
+        )
         sp_user = spotify.ffi.cast('sp_user *', 42)
         user = spotify.User(self.session, sp_user=sp_user)
 

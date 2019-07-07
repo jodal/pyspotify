@@ -7,11 +7,7 @@ import spotify
 from spotify import ffi, lib, serialized, utils
 
 
-__all__ = [
-    'Toplist',
-    'ToplistRegion',
-    'ToplistType',
-]
+__all__ = ['Toplist', 'ToplistRegion', 'ToplistType']
 
 logger = logging.getLogger(__name__)
 
@@ -50,11 +46,21 @@ class Toplist(object):
     """:class:`threading.Event` that is set when the toplist is loaded."""
 
     def __init__(
-            self, session, type=None, region=None, canonical_username=None,
-            callback=None, sp_toplistbrowse=None, add_ref=True):
+        self,
+        session,
+        type=None,
+        region=None,
+        canonical_username=None,
+        callback=None,
+        sp_toplistbrowse=None,
+        add_ref=True,
+    ):
 
-        assert (type is not None and region is not None) or sp_toplistbrowse, \
+        assert (
+            type is not None and region is not None
+        ) or sp_toplistbrowse, (
             'type and region, or sp_toplistbrowse, is required'
+        )
 
         self._session = session
         self.type = type
@@ -72,19 +78,27 @@ class Toplist(object):
             self._session._callback_handles.add(handle)
 
             sp_toplistbrowse = lib.sp_toplistbrowse_create(
-                self._session._sp_session, int(type), region,
+                self._session._sp_session,
+                int(type),
+                region,
                 utils.to_char_or_null(canonical_username),
-                _toplistbrowse_complete_callback, handle)
+                _toplistbrowse_complete_callback,
+                handle,
+            )
             add_ref = False
 
         if add_ref:
             lib.sp_toplistbrowse_add_ref(sp_toplistbrowse)
         self._sp_toplistbrowse = ffi.gc(
-            sp_toplistbrowse, lib.sp_toplistbrowse_release)
+            sp_toplistbrowse, lib.sp_toplistbrowse_release
+        )
 
     def __repr__(self):
         return 'Toplist(type=%r, region=%r, canonical_username=%r)' % (
-            self.type, self.region, self.canonical_username)
+            self.type,
+            self.region,
+            self.canonical_username,
+        )
 
     def __eq__(self, other):
         if isinstance(other, self.__class__):
@@ -120,7 +134,8 @@ class Toplist(object):
         Check to see if there was problems creating the toplist.
         """
         return spotify.ErrorType(
-            lib.sp_toplistbrowse_error(self._sp_toplistbrowse))
+            lib.sp_toplistbrowse_error(self._sp_toplistbrowse)
+        )
 
     @property
     def backend_request_duration(self):
@@ -133,7 +148,8 @@ class Toplist(object):
         if not self.is_loaded:
             return None
         return lib.sp_toplistbrowse_backend_request_duration(
-            self._sp_toplistbrowse)
+            self._sp_toplistbrowse
+        )
 
     @property
     @serialized
@@ -151,14 +167,16 @@ class Toplist(object):
             return spotify.Track(
                 self._session,
                 sp_track=lib.sp_toplistbrowse_track(sp_toplistbrowse, key),
-                add_ref=True)
+                add_ref=True,
+            )
 
         return utils.Sequence(
             sp_obj=self._sp_toplistbrowse,
             add_ref_func=lib.sp_toplistbrowse_add_ref,
             release_func=lib.sp_toplistbrowse_release,
             len_func=lib.sp_toplistbrowse_num_tracks,
-            getitem_func=get_track)
+            getitem_func=get_track,
+        )
 
     @property
     @serialized
@@ -176,14 +194,16 @@ class Toplist(object):
             return spotify.Album(
                 self._session,
                 sp_album=lib.sp_toplistbrowse_album(sp_toplistbrowse, key),
-                add_ref=True)
+                add_ref=True,
+            )
 
         return utils.Sequence(
             sp_obj=self._sp_toplistbrowse,
             add_ref_func=lib.sp_toplistbrowse_add_ref,
             release_func=lib.sp_toplistbrowse_release,
             len_func=lib.sp_toplistbrowse_num_albums,
-            getitem_func=get_album)
+            getitem_func=get_album,
+        )
 
     @property
     @serialized
@@ -201,14 +221,16 @@ class Toplist(object):
             return spotify.Artist(
                 self._session,
                 sp_artist=lib.sp_toplistbrowse_artist(sp_toplistbrowse, key),
-                add_ref=True)
+                add_ref=True,
+            )
 
         return utils.Sequence(
             sp_obj=self._sp_toplistbrowse,
             add_ref_func=lib.sp_toplistbrowse_add_ref,
             release_func=lib.sp_toplistbrowse_release,
             len_func=lib.sp_toplistbrowse_num_artists,
-            getitem_func=get_artist)
+            getitem_func=get_artist,
+        )
 
 
 @ffi.callback('void(sp_toplistbrowse *, void *)')
@@ -218,7 +240,8 @@ def _toplistbrowse_complete_callback(sp_toplistbrowse, handle):
     if handle == ffi.NULL:
         logger.warning(
             'pyspotify toplistbrowse_complete_callback '
-            'called without userdata')
+            'called without userdata'
+        )
         return
     (session, toplist, callback) = ffi.from_handle(handle)
     session._callback_handles.remove(handle)

@@ -4,9 +4,7 @@ import spotify
 from spotify import ffi, utils
 from spotify.session import _SessionCallbacks
 
-__all__ = [
-    'Config',
-]
+__all__ = ['Config']
 
 
 class Config(object):
@@ -24,9 +22,9 @@ class Config(object):
 
     def __init__(self):
         self._sp_session_callbacks = _SessionCallbacks.get_struct()
-        self._sp_session_config = ffi.new('sp_session_config *', {
-            'callbacks': self._sp_session_callbacks,
-        })
+        self._sp_session_config = ffi.new(
+            'sp_session_config *', {'callbacks': self._sp_session_callbacks}
+        )
 
         # Defaults
         self.api_version = spotify.get_libspotify_api_version()
@@ -101,7 +99,8 @@ class Config(object):
         the file into :attr:`application_key`.
         """
         return utils.to_bytes_or_none(
-            ffi.cast('char *', self._sp_session_config.application_key))
+            ffi.cast('char *', self._sp_session_config.application_key)
+        )
 
     @application_key.setter
     def application_key(self, value):
@@ -110,11 +109,13 @@ class Config(object):
         else:
             size = len(value)
         assert size in (0, 321), (
-            'Invalid application key; expected 321 bytes, got %d bytes' % size)
+            'Invalid application key; expected 321 bytes, got %d bytes' % size
+        )
 
         self._application_key = utils.to_char_or_null(value)
         self._sp_session_config.application_key = ffi.cast(
-            'void *', self._application_key)
+            'void *', self._application_key
+        )
         self._sp_session_config.application_key_size = size
 
     def load_application_key_file(self, filename=b'spotify_appkey.key'):
@@ -300,9 +301,11 @@ class Config(object):
         # struct only if the SP_WITH_CURL macro is defined, ref. the
         # sp_session_create example in the libspotify docs.
         proxy_password_ptr = spotify.ffi.addressof(
-            self._sp_session_config, 'proxy_password')
+            self._sp_session_config, 'proxy_password'
+        )
         tracefile_ptr = spotify.ffi.addressof(
-            self._sp_session_config, 'tracefile')
+            self._sp_session_config, 'tracefile'
+        )
         if tracefile_ptr - proxy_password_ptr != 2:
             return None
         return proxy_password_ptr + 1

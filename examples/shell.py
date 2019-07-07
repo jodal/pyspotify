@@ -11,7 +11,7 @@ Then run the ``help`` command on the ``spotify>`` prompt to view all available
 commands.
 """
 
-from __future__ import unicode_literals
+from __future__ import print_function, unicode_literals
 
 import cmd
 import logging
@@ -37,15 +37,16 @@ class Commander(cmd.Cmd):
         self.session = spotify.Session()
         self.session.on(
             spotify.SessionEvent.CONNECTION_STATE_UPDATED,
-            self.on_connection_state_changed)
-        self.session.on(
-            spotify.SessionEvent.END_OF_TRACK, self.on_end_of_track)
+            self.on_connection_state_changed,
+        )
+        self.session.on(spotify.SessionEvent.END_OF_TRACK, self.on_end_of_track)
 
         try:
             self.audio_driver = spotify.AlsaSink(self.session)
         except ImportError:
             self.logger.warning(
-                'No audio sink found; audio playback unavailable.')
+                'No audio sink found; audio playback unavailable.'
+            )
 
         self.event_loop = spotify.EventLoop(self.session)
         self.event_loop.start()
@@ -71,30 +72,30 @@ class Commander(cmd.Cmd):
 
     def do_debug(self, line):
         "Show more logging output"
-        print('Logging at DEBUG level')
+        print ('Logging at DEBUG level')
         logger = logging.getLogger()
         logger.setLevel(logging.DEBUG)
 
     def do_info(self, line):
         "Show normal logging output"
-        print('Logging at INFO level')
+        print ('Logging at INFO level')
         logger = logging.getLogger()
         logger.setLevel(logging.INFO)
 
     def do_warning(self, line):
         "Show less logging output"
-        print('Logging at WARNING level')
+        print ('Logging at WARNING level')
         logger = logging.getLogger()
         logger.setLevel(logging.WARNING)
 
     def do_EOF(self, line):
         "Exit"
         if self.logged_in.is_set():
-            print('Logging out...')
+            print ('Logging out...')
             self.session.logout()
             self.logged_out.wait()
         self.event_loop.stop()
-        print('')
+        print ('')
         return True
 
     def do_login(self, line):
@@ -131,11 +132,13 @@ class Commander(cmd.Cmd):
                 'I am %s aka %s. You can find me at %s',
                 self.session.user.canonical_name,
                 self.session.user.display_name,
-                self.session.user.link)
+                self.session.user.link,
+            )
         else:
             self.logger.info(
                 'I am not logged in, but I may be %s',
-                self.session.remembered_user)
+                self.session.remembered_user,
+            )
 
     def do_play_uri(self, line):
         "play <spotify track uri>"
@@ -189,12 +192,16 @@ class Commander(cmd.Cmd):
             return
         self.logger.info(
             '%d tracks, %d albums, %d artists, and %d playlists found.',
-            result.track_total, result.album_total,
-            result.artist_total, result.playlist_total)
+            result.track_total,
+            result.album_total,
+            result.artist_total,
+            result.playlist_total,
+        )
         self.logger.info('Top tracks:')
         for track in result.tracks:
             self.logger.info(
-                '[%s] %s - %s', track.link, track.artists[0].name, track.name)
+                '[%s] %s - %s', track.link, track.artists[0].name, track.name
+            )
 
 
 if __name__ == '__main__':

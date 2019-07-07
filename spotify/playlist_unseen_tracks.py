@@ -7,9 +7,7 @@ import spotify
 from spotify import compat, ffi, lib, serialized
 
 
-__all__ = [
-    'PlaylistUnseenTracks',
-]
+__all__ = ['PlaylistUnseenTracks']
 
 logger = logging.getLogger(__name__)
 
@@ -31,7 +29,8 @@ class PlaylistUnseenTracks(compat.Sequence):
 
         lib.sp_playlistcontainer_add_ref(sp_playlistcontainer)
         self._sp_playlistcontainer = ffi.gc(
-            sp_playlistcontainer, lib.sp_playlistcontainer_release)
+            sp_playlistcontainer, lib.sp_playlistcontainer_release
+        )
 
         lib.sp_playlist_add_ref(sp_playlist)
         self._sp_playlist = ffi.gc(sp_playlist, lib.sp_playlist_release)
@@ -43,11 +42,15 @@ class PlaylistUnseenTracks(compat.Sequence):
     @serialized
     def _get_more_tracks(self):
         self._sp_tracks_len = min(
-            self._num_tracks, self._sp_tracks_len + self._BATCH_SIZE)
+            self._num_tracks, self._sp_tracks_len + self._BATCH_SIZE
+        )
         self._sp_tracks = ffi.new('sp_track *[]', self._sp_tracks_len)
         self._num_tracks = lib.sp_playlistcontainer_get_unseen_tracks(
-            self._sp_playlistcontainer, self._sp_playlist,
-            self._sp_tracks, self._sp_tracks_len)
+            self._sp_playlistcontainer,
+            self._sp_playlist,
+            self._sp_tracks,
+            self._sp_tracks_len,
+        )
 
         if self._num_tracks < 0:
             raise spotify.Error('Failed to get unseen tracks for playlist')
@@ -60,8 +63,9 @@ class PlaylistUnseenTracks(compat.Sequence):
             return list(self).__getitem__(key)
         if not isinstance(key, int):
             raise TypeError(
-                'list indices must be int or slice, not %s' %
-                key.__class__.__name__)
+                'list indices must be int or slice, not %s'
+                % key.__class__.__name__
+            )
         if key < 0:
             key += self.__len__()
         if not 0 <= key < self.__len__():

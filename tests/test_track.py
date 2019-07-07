@@ -10,13 +10,11 @@ from tests import mock
 
 @mock.patch('spotify.track.lib', spec=spotify.lib)
 class TrackTest(unittest.TestCase):
-
     def setUp(self):
         self.session = tests.create_session_mock()
 
     def assert_fails_if_error(self, lib_mock, func):
-        lib_mock.sp_track_error.return_value = (
-            spotify.ErrorType.BAD_API_VERSION)
+        lib_mock.sp_track_error.return_value = spotify.ErrorType.BAD_API_VERSION
         sp_track = spotify.ffi.cast('sp_track *', 42)
         track = spotify.Track(self.session, sp_track=sp_track)
 
@@ -32,7 +30,8 @@ class TrackTest(unittest.TestCase):
         sp_track = spotify.ffi.cast('sp_track *', 42)
         link_instance_mock = link_mock.return_value
         link_instance_mock.as_track.return_value = spotify.Track(
-            self.session, sp_track=sp_track)
+            self.session, sp_track=sp_track
+        )
         uri = 'spotify:track:foo'
 
         result = spotify.Track(self.session, uri=uri)
@@ -111,8 +110,7 @@ class TrackTest(unittest.TestCase):
         self.assertTrue(result)
 
     def test_error(self, lib_mock):
-        lib_mock.sp_track_error.return_value = int(
-            spotify.ErrorType.IS_LOADING)
+        lib_mock.sp_track_error.return_value = int(spotify.ErrorType.IS_LOADING)
         sp_track = spotify.ffi.cast('sp_track *', 42)
         track = spotify.Track(self.session, sp_track=sp_track)
 
@@ -153,8 +151,7 @@ class TrackTest(unittest.TestCase):
         self.assertIsNone(result)
 
     def test_offline_status_fails_if_error(self, lib_mock):
-        lib_mock.sp_track_error.return_value = (
-            spotify.ErrorType.BAD_API_VERSION)
+        lib_mock.sp_track_error.return_value = spotify.ErrorType.BAD_API_VERSION
         lib_mock.sp_track_offline_get_status.return_value = 2
         sp_track = spotify.ffi.cast('sp_track *', 42)
         track = spotify.Track(self.session, sp_track=sp_track)
@@ -171,7 +168,8 @@ class TrackTest(unittest.TestCase):
         result = track.availability
 
         lib_mock.sp_track_get_availability.assert_called_with(
-            self.session._sp_session, sp_track)
+            self.session._sp_session, sp_track
+        )
         self.assertIs(result, spotify.TrackAvailability.AVAILABLE)
 
     def test_availability_is_none_if_unloaded(self, lib_mock):
@@ -197,7 +195,8 @@ class TrackTest(unittest.TestCase):
         result = track.is_local
 
         lib_mock.sp_track_is_local.assert_called_with(
-            self.session._sp_session, sp_track)
+            self.session._sp_session, sp_track
+        )
         self.assertTrue(result)
 
     def test_is_local_is_none_if_unloaded(self, lib_mock):
@@ -223,7 +222,8 @@ class TrackTest(unittest.TestCase):
         result = track.is_autolinked
 
         lib_mock.sp_track_is_autolinked.assert_called_with(
-            self.session._sp_session, sp_track)
+            self.session._sp_session, sp_track
+        )
         self.assertTrue(result)
 
     def test_is_autolinked_is_none_if_unloaded(self, lib_mock):
@@ -250,7 +250,8 @@ class TrackTest(unittest.TestCase):
         result = track.playable
 
         lib_mock.sp_track_get_playable.assert_called_with(
-            self.session._sp_session, sp_track)
+            self.session._sp_session, sp_track
+        )
         lib_mock.sp_track_add_ref.assert_called_with(sp_track_playable)
         self.assertIsInstance(result, spotify.Track)
         self.assertEqual(result._sp_track, sp_track_playable)
@@ -303,7 +304,8 @@ class TrackTest(unittest.TestCase):
         result = track.starred
 
         lib_mock.sp_track_is_starred.assert_called_with(
-            self.session._sp_session, sp_track)
+            self.session._sp_session, sp_track
+        )
         self.assertTrue(result)
 
     def test_is_starred_is_none_if_unloaded(self, lib_mock):
@@ -328,12 +330,14 @@ class TrackTest(unittest.TestCase):
         track.starred = True
 
         lib_mock.sp_track_set_starred.assert_called_with(
-            self.session._sp_session, mock.ANY, 1, 1)
+            self.session._sp_session, mock.ANY, 1, 1
+        )
 
     def test_set_starred_fails_if_error(self, lib_mock):
         tests.create_session_mock()
         lib_mock.sp_track_set_starred.return_value = (
-            spotify.ErrorType.BAD_API_VERSION)
+            spotify.ErrorType.BAD_API_VERSION
+        )
         sp_track = spotify.ffi.cast('sp_track *', 42)
         track = spotify.Track(self.session, sp_track=sp_track)
 
@@ -420,7 +424,8 @@ class TrackTest(unittest.TestCase):
     def test_name(self, lib_mock):
         lib_mock.sp_track_error.return_value = spotify.ErrorType.OK
         lib_mock.sp_track_name.return_value = spotify.ffi.new(
-            'char[]', b'Foo Bar Baz')
+            'char[]', b'Foo Bar Baz'
+        )
         sp_track = spotify.ffi.cast('sp_track *', 42)
         track = spotify.Track(self.session, sp_track=sp_track)
 
@@ -554,10 +559,10 @@ class TrackTest(unittest.TestCase):
 
         result = track.link
 
-        lib_mock.sp_link_create_from_track.asssert_called_once_with(
-            sp_track, 0)
+        lib_mock.sp_link_create_from_track.asssert_called_once_with(sp_track, 0)
         link_mock.assert_called_once_with(
-            self.session, sp_link=sp_link, add_ref=False)
+            self.session, sp_link=sp_link, add_ref=False
+        )
         self.assertEqual(result, mock.sentinel.link)
 
     @mock.patch('spotify.Link', spec=spotify.Link)
@@ -571,21 +576,21 @@ class TrackTest(unittest.TestCase):
         result = track.link_with_offset(90)
 
         lib_mock.sp_link_create_from_track.asssert_called_once_with(
-            sp_track, 90)
+            sp_track, 90
+        )
         link_mock.assert_called_once_with(
-            self.session, sp_link=sp_link, add_ref=False)
+            self.session, sp_link=sp_link, add_ref=False
+        )
         self.assertEqual(result, mock.sentinel.link)
 
 
 class TrackAvailability(unittest.TestCase):
-
     def test_has_constants(self):
         self.assertEqual(spotify.TrackAvailability.UNAVAILABLE, 0)
         self.assertEqual(spotify.TrackAvailability.AVAILABLE, 1)
 
 
 class TrackOfflineStatusTest(unittest.TestCase):
-
     def test_has_constants(self):
         self.assertEqual(spotify.TrackOfflineStatus.NO, 0)
         self.assertEqual(spotify.TrackOfflineStatus.DOWNLOADING, 2)

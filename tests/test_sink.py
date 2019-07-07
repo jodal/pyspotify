@@ -8,10 +8,10 @@ from tests import mock
 
 
 class BaseSinkTest(object):
-
     def test_init_connects_to_music_delivery_event(self):
         self.session.on.assert_called_with(
-            spotify.SessionEvent.MUSIC_DELIVERY, self.sink._on_music_delivery)
+            spotify.SessionEvent.MUSIC_DELIVERY, self.sink._on_music_delivery
+        )
 
     def test_off_disconnects_from_music_delivery_event(self):
         self.assertEqual(self.session.off.call_count, 0)
@@ -19,7 +19,8 @@ class BaseSinkTest(object):
         self.sink.off()
 
         self.session.off.assert_called_with(
-            spotify.SessionEvent.MUSIC_DELIVERY, mock.ANY)
+            spotify.SessionEvent.MUSIC_DELIVERY, mock.ANY
+        )
 
     def test_on_connects_to_music_delivery_event(self):
         self.assertEqual(self.session.on.call_count, 1)
@@ -31,7 +32,6 @@ class BaseSinkTest(object):
 
 
 class AlsaSinkTest(unittest.TestCase, BaseSinkTest):
-
     def setUp(self):
         self.session = mock.Mock()
         self.session.num_listeners.return_value = 0
@@ -58,12 +58,16 @@ class AlsaSinkTest(unittest.TestCase, BaseSinkTest):
         num_frames = 2048
 
         self.sink._on_music_delivery(
-            mock.sentinel.session, audio_format, mock.sentinel.frames,
-            num_frames)
+            mock.sentinel.session,
+            audio_format,
+            mock.sentinel.frames,
+            num_frames,
+        )
 
         # The ``device`` kwarg was added in pyalsaaudio 0.8
         self.alsaaudio.PCM.assert_called_with(
-            mode=self.alsaaudio.PCM_NONBLOCK, device='default')
+            mode=self.alsaaudio.PCM_NONBLOCK, device='default'
+        )
 
         device.setformat.assert_called_with(mock.ANY)
         device.setrate.assert_called_with(audio_format.sample_rate)
@@ -80,12 +84,16 @@ class AlsaSinkTest(unittest.TestCase, BaseSinkTest):
         num_frames = 2048
 
         self.sink._on_music_delivery(
-            mock.sentinel.session, audio_format, mock.sentinel.frames,
-            num_frames)
+            mock.sentinel.session,
+            audio_format,
+            mock.sentinel.frames,
+            num_frames,
+        )
 
         # The ``card`` kwarg was deprecated in pyalsaaudio 0.8
         self.alsaaudio.PCM.assert_called_with(
-            mode=self.alsaaudio.PCM_NONBLOCK, card='default')
+            mode=self.alsaaudio.PCM_NONBLOCK, card='default'
+        )
 
     def test_sets_little_endian_format_if_little_endian_system(self):
         device = mock.Mock()
@@ -99,8 +107,11 @@ class AlsaSinkTest(unittest.TestCase, BaseSinkTest):
             sys_mock.byteorder = 'little'
 
             self.sink._on_music_delivery(
-                mock.sentinel.session, audio_format, mock.sentinel.frames,
-                num_frames)
+                mock.sentinel.session,
+                audio_format,
+                mock.sentinel.frames,
+                num_frames,
+            )
 
         device.setformat.assert_called_with(self.alsaaudio.PCM_FORMAT_S16_LE)
 
@@ -116,8 +127,11 @@ class AlsaSinkTest(unittest.TestCase, BaseSinkTest):
             sys_mock.byteorder = 'big'
 
             self.sink._on_music_delivery(
-                mock.sentinel.session, audio_format, mock.sentinel.frames,
-                num_frames)
+                mock.sentinel.session,
+                audio_format,
+                mock.sentinel.frames,
+                num_frames,
+            )
 
         device.setformat.assert_called_with(self.alsaaudio.PCM_FORMAT_S16_BE)
 
@@ -127,16 +141,19 @@ class AlsaSinkTest(unittest.TestCase, BaseSinkTest):
         audio_format.sample_type = spotify.SampleType.INT16_NATIVE_ENDIAN
 
         num_consumed_frames = self.sink._on_music_delivery(
-            mock.sentinel.session, audio_format, mock.sentinel.frames,
-            mock.sentinel.num_frames)
+            mock.sentinel.session,
+            audio_format,
+            mock.sentinel.frames,
+            mock.sentinel.num_frames,
+        )
 
         self.sink._device.write.assert_called_with(mock.sentinel.frames)
         self.assertEqual(
-            num_consumed_frames, self.sink._device.write.return_value)
+            num_consumed_frames, self.sink._device.write.return_value
+        )
 
 
 class PortAudioSinkTest(unittest.TestCase, BaseSinkTest):
-
     def setUp(self):
         self.session = mock.Mock()
         self.session.num_listeners.return_value = 0
@@ -162,14 +179,19 @@ class PortAudioSinkTest(unittest.TestCase, BaseSinkTest):
         audio_format.sample_type = spotify.SampleType.INT16_NATIVE_ENDIAN
 
         self.sink._on_music_delivery(
-            mock.sentinel.session, audio_format, mock.sentinel.frames,
-            mock.sentinel.num_frames)
+            mock.sentinel.session,
+            audio_format,
+            mock.sentinel.frames,
+            mock.sentinel.num_frames,
+        )
 
         self.sink._device.open.assert_called_with(
-            format=self.pyaudio.paInt16, channels=audio_format.channels,
-            rate=audio_format.sample_rate, output=True)
-        self.assertEqual(
-            self.sink._stream, self.sink._device.open.return_value)
+            format=self.pyaudio.paInt16,
+            channels=audio_format.channels,
+            rate=audio_format.sample_rate,
+            output=True,
+        )
+        self.assertEqual(self.sink._stream, self.sink._device.open.return_value)
 
     def test_music_delivery_writes_frames_to_stream(self):
         self.sink._stream = mock.Mock()
@@ -177,9 +199,13 @@ class PortAudioSinkTest(unittest.TestCase, BaseSinkTest):
         audio_format.sample_type = spotify.SampleType.INT16_NATIVE_ENDIAN
 
         num_consumed_frames = self.sink._on_music_delivery(
-            mock.sentinel.session, audio_format, mock.sentinel.frames,
-            mock.sentinel.num_frames)
+            mock.sentinel.session,
+            audio_format,
+            mock.sentinel.frames,
+            mock.sentinel.num_frames,
+        )
 
         self.sink._stream.write.assert_called_with(
-            mock.sentinel.frames, num_frames=mock.sentinel.num_frames)
+            mock.sentinel.frames, num_frames=mock.sentinel.num_frames
+        )
         self.assertEqual(num_consumed_frames, mock.sentinel.num_frames)

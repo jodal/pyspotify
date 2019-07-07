@@ -7,11 +7,7 @@ import spotify
 from spotify import ffi, lib, serialized, utils
 
 
-__all__ = [
-    'Album',
-    'AlbumBrowser',
-    'AlbumType',
-]
+__all__ = ['Album', 'AlbumBrowser', 'AlbumType']
 
 logger = logging.getLogger(__name__)
 
@@ -39,7 +35,8 @@ class Album(object):
             album = spotify.Link(self._session, uri=uri).as_album()
             if album is None:
                 raise ValueError(
-                    'Failed to get album from Spotify URI: %r' % uri)
+                    'Failed to get album from Spotify URI: %r' % uri
+                )
             sp_album = album._sp_album
             add_ref = True
 
@@ -120,7 +117,8 @@ class Album(object):
             return None
         sp_image = lib.sp_image_create(self._session._sp_session, cover_id)
         return spotify.Image(
-            self._session, sp_image=sp_image, add_ref=False, callback=callback)
+            self._session, sp_image=sp_image, add_ref=False, callback=callback
+        )
 
     def cover_link(self, image_size=None):
         """A :class:`Link` to the album's cover.
@@ -135,7 +133,8 @@ class Album(object):
         if image_size is None:
             image_size = spotify.ImageSize.NORMAL
         sp_link = lib.sp_link_create_from_album_cover(
-            self._sp_album, int(image_size))
+            self._sp_album, int(image_size)
+        )
         return spotify.Link(self._session, sp_link=sp_link, add_ref=False)
 
     @property
@@ -184,7 +183,8 @@ class Album(object):
         Can be created without the album being loaded.
         """
         return spotify.AlbumBrowser(
-            self._session, album=self, callback=callback)
+            self._session, album=self, callback=callback
+        )
 
 
 class AlbumBrowser(object):
@@ -204,8 +204,13 @@ class AlbumBrowser(object):
     """
 
     def __init__(
-            self, session, album=None, callback=None,
-            sp_albumbrowse=None, add_ref=True):
+        self,
+        session,
+        album=None,
+        callback=None,
+        sp_albumbrowse=None,
+        add_ref=True,
+    ):
 
         assert album or sp_albumbrowse, 'album or sp_albumbrowse is required'
 
@@ -217,14 +222,18 @@ class AlbumBrowser(object):
             self._session._callback_handles.add(handle)
 
             sp_albumbrowse = lib.sp_albumbrowse_create(
-                self._session._sp_session, album._sp_album,
-                _albumbrowse_complete_callback, handle)
+                self._session._sp_session,
+                album._sp_album,
+                _albumbrowse_complete_callback,
+                handle,
+            )
             add_ref = False
 
         if add_ref:
             lib.sp_albumbrowse_add_ref(sp_albumbrowse)
         self._sp_albumbrowse = ffi.gc(
-            sp_albumbrowse, lib.sp_albumbrowse_release)
+            sp_albumbrowse, lib.sp_albumbrowse_release
+        )
 
     def __repr__(self):
         if self.is_loaded:
@@ -269,8 +278,7 @@ class AlbumBrowser(object):
 
         Check to see if there was problems creating the album browser.
         """
-        return spotify.ErrorType(
-            lib.sp_albumbrowse_error(self._sp_albumbrowse))
+        return spotify.ErrorType(lib.sp_albumbrowse_error(self._sp_albumbrowse))
 
     @property
     def backend_request_duration(self):
@@ -282,8 +290,7 @@ class AlbumBrowser(object):
         """
         if not self.is_loaded:
             return None
-        return lib.sp_albumbrowse_backend_request_duration(
-            self._sp_albumbrowse)
+        return lib.sp_albumbrowse_backend_request_duration(self._sp_albumbrowse)
 
     @property
     @serialized
@@ -322,14 +329,16 @@ class AlbumBrowser(object):
         @serialized
         def get_copyright(sp_albumbrowse, key):
             return utils.to_unicode(
-                lib.sp_albumbrowse_copyright(sp_albumbrowse, key))
+                lib.sp_albumbrowse_copyright(sp_albumbrowse, key)
+            )
 
         return utils.Sequence(
             sp_obj=self._sp_albumbrowse,
             add_ref_func=lib.sp_albumbrowse_add_ref,
             release_func=lib.sp_albumbrowse_release,
             len_func=lib.sp_albumbrowse_num_copyrights,
-            getitem_func=get_copyright)
+            getitem_func=get_copyright,
+        )
 
     @property
     @serialized
@@ -346,14 +355,16 @@ class AlbumBrowser(object):
             return spotify.Track(
                 self._session,
                 sp_track=lib.sp_albumbrowse_track(sp_albumbrowse, key),
-                add_ref=True)
+                add_ref=True,
+            )
 
         return utils.Sequence(
             sp_obj=self._sp_albumbrowse,
             add_ref_func=lib.sp_albumbrowse_add_ref,
             release_func=lib.sp_albumbrowse_release,
             len_func=lib.sp_albumbrowse_num_tracks,
-            getitem_func=get_track)
+            getitem_func=get_track,
+        )
 
     @property
     @serialized
@@ -362,8 +373,7 @@ class AlbumBrowser(object):
 
         Will always return an empty string if the album browser isn't loaded.
         """
-        return utils.to_unicode(
-            lib.sp_albumbrowse_review(self._sp_albumbrowse))
+        return utils.to_unicode(lib.sp_albumbrowse_review(self._sp_albumbrowse))
 
 
 @ffi.callback('void(sp_albumbrowse *, void *)')
@@ -372,7 +382,8 @@ def _albumbrowse_complete_callback(sp_albumbrowse, handle):
     logger.debug('albumbrowse_complete_callback called')
     if handle == ffi.NULL:
         logger.warning(
-            'pyspotify albumbrowse_complete_callback called without userdata')
+            'pyspotify albumbrowse_complete_callback called without userdata'
+        )
         return
     (session, album_browser, callback) = ffi.from_handle(handle)
     session._callback_handles.remove(handle)

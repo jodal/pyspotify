@@ -11,7 +11,6 @@ from tests import mock
 
 @mock.patch('spotify.artist.lib', spec=spotify.lib)
 class ArtistTest(unittest.TestCase):
-
     def setUp(self):
         self.session = tests.create_session_mock()
 
@@ -24,7 +23,8 @@ class ArtistTest(unittest.TestCase):
         sp_artist = spotify.ffi.cast('sp_artist *', 42)
         link_instance_mock = link_mock.return_value
         link_instance_mock.as_artist.return_value = spotify.Artist(
-            self.session, sp_artist=sp_artist)
+            self.session, sp_artist=sp_artist
+        )
         lib_mock.sp_link_as_artist.return_value = sp_artist
         uri = 'spotify:artist:foo'
 
@@ -96,7 +96,8 @@ class ArtistTest(unittest.TestCase):
 
     def test_name(self, lib_mock):
         lib_mock.sp_artist_name.return_value = spotify.ffi.new(
-            'char[]', b'Foo Bar Baz')
+            'char[]', b'Foo Bar Baz'
+        )
         sp_artist = spotify.ffi.cast('sp_artist *', 42)
         artist = spotify.Artist(self.session, sp_artist=sp_artist)
 
@@ -150,15 +151,18 @@ class ArtistTest(unittest.TestCase):
 
         self.assertIs(result, mock.sentinel.image)
         lib_mock.sp_artist_portrait.assert_called_with(
-            sp_artist, int(image_size))
+            sp_artist, int(image_size)
+        )
         lib_mock.sp_image_create.assert_called_with(
-            self.session._sp_session, sp_image_id)
+            self.session._sp_session, sp_image_id
+        )
 
         # Since we *created* the sp_image, we already have a refcount of 1 and
         # shouldn't increase the refcount when wrapping this sp_image in an
         # Image object
         image_mock.assert_called_with(
-            self.session, sp_image=sp_image, add_ref=False, callback=callback)
+            self.session, sp_image=sp_image, add_ref=False, callback=callback
+        )
 
     @mock.patch('spotify.Image', spec=spotify.Image)
     def test_portrait_defaults_to_normal_size(self, image_mock, lib_mock):
@@ -172,7 +176,8 @@ class ArtistTest(unittest.TestCase):
         artist.portrait()
 
         lib_mock.sp_artist_portrait.assert_called_with(
-            sp_artist, int(spotify.ImageSize.NORMAL))
+            sp_artist, int(spotify.ImageSize.NORMAL)
+        )
 
     def test_portrait_is_none_if_null(self, lib_mock):
         lib_mock.sp_artist_portrait.return_value = spotify.ffi.NULL
@@ -182,7 +187,8 @@ class ArtistTest(unittest.TestCase):
         result = artist.portrait()
 
         lib_mock.sp_artist_portrait.assert_called_with(
-            sp_artist, int(spotify.ImageSize.NORMAL))
+            sp_artist, int(spotify.ImageSize.NORMAL)
+        )
         self.assertIsNone(result)
 
     @mock.patch('spotify.Link', spec=spotify.Link)
@@ -197,9 +203,11 @@ class ArtistTest(unittest.TestCase):
         result = artist.portrait_link(image_size)
 
         lib_mock.sp_link_create_from_artist_portrait.assert_called_once_with(
-            sp_artist, int(image_size))
+            sp_artist, int(image_size)
+        )
         link_mock.assert_called_once_with(
-            self.session, sp_link=sp_link, add_ref=False)
+            self.session, sp_link=sp_link, add_ref=False
+        )
         self.assertEqual(result, mock.sentinel.link)
 
     @mock.patch('spotify.Link', spec=spotify.Link)
@@ -213,7 +221,8 @@ class ArtistTest(unittest.TestCase):
         artist.portrait_link()
 
         lib_mock.sp_link_create_from_artist_portrait.assert_called_once_with(
-            sp_artist, int(spotify.ImageSize.NORMAL))
+            sp_artist, int(spotify.ImageSize.NORMAL)
+        )
 
     @mock.patch('spotify.Link', spec=spotify.Link)
     def test_link_creates_link_to_artist(self, link_mock, lib_mock):
@@ -226,13 +235,13 @@ class ArtistTest(unittest.TestCase):
         result = artist.link
 
         link_mock.assert_called_once_with(
-            self.session, sp_link=sp_link, add_ref=False)
+            self.session, sp_link=sp_link, add_ref=False
+        )
         self.assertEqual(result, mock.sentinel.link)
 
 
 @mock.patch('spotify.artist.lib', spec=spotify.lib)
 class ArtistBrowserTest(unittest.TestCase):
-
     def setUp(self):
         self.session = tests.create_session_mock()
         spotify._session_instance = self.session
@@ -253,12 +262,17 @@ class ArtistBrowserTest(unittest.TestCase):
         result = artist.browse()
 
         lib_mock.sp_artistbrowse_create.assert_called_with(
-            self.session._sp_session, sp_artist,
-            int(spotify.ArtistBrowserType.FULL), mock.ANY, mock.ANY)
+            self.session._sp_session,
+            sp_artist,
+            int(spotify.ArtistBrowserType.FULL),
+            mock.ANY,
+            mock.ANY,
+        )
         self.assertIsInstance(result, spotify.ArtistBrowser)
 
-        artistbrowse_complete_cb = (
-            lib_mock.sp_artistbrowse_create.call_args[0][3])
+        artistbrowse_complete_cb = lib_mock.sp_artistbrowse_create.call_args[0][
+            3
+        ]
         userdata = lib_mock.sp_artistbrowse_create.call_args[0][4]
         self.assertFalse(result.loaded_event.is_set())
         artistbrowse_complete_cb(sp_artistbrowse, userdata)
@@ -272,13 +286,19 @@ class ArtistBrowserTest(unittest.TestCase):
         callback = mock.Mock()
 
         result = artist.browse(
-            type=spotify.ArtistBrowserType.NO_TRACKS, callback=callback)
+            type=spotify.ArtistBrowserType.NO_TRACKS, callback=callback
+        )
 
         lib_mock.sp_artistbrowse_create.assert_called_with(
-            self.session._sp_session, sp_artist,
-            int(spotify.ArtistBrowserType.NO_TRACKS), mock.ANY, mock.ANY)
-        artistbrowse_complete_cb = (
-            lib_mock.sp_artistbrowse_create.call_args[0][3])
+            self.session._sp_session,
+            sp_artist,
+            int(spotify.ArtistBrowserType.NO_TRACKS),
+            mock.ANY,
+            mock.ANY,
+        )
+        artistbrowse_complete_cb = lib_mock.sp_artistbrowse_create.call_args[0][
+            3
+        ]
         userdata = lib_mock.sp_artistbrowse_create.call_args[0][4]
         artistbrowse_complete_cb(sp_artistbrowse, userdata)
 
@@ -293,22 +313,25 @@ class ArtistBrowserTest(unittest.TestCase):
         callback = mock.Mock()
 
         result = spotify.ArtistBrowser(
-            self.session, artist=artist, callback=callback)
+            self.session, artist=artist, callback=callback
+        )
         loaded_event = result.loaded_event
         result = None  # noqa
         tests.gc_collect()
 
         # The mock keeps the handle/userdata alive, thus this test doesn't
         # really test that session._callback_handles keeps the handle alive.
-        artistbrowse_complete_cb = (
-            lib_mock.sp_artistbrowse_create.call_args[0][3])
+        artistbrowse_complete_cb = lib_mock.sp_artistbrowse_create.call_args[0][
+            3
+        ]
         userdata = lib_mock.sp_artistbrowse_create.call_args[0][4]
         artistbrowse_complete_cb(sp_artistbrowse, userdata)
 
         loaded_event.wait(3)
         self.assertEqual(callback.call_count, 1)
         self.assertEqual(
-            callback.call_args[0][0]._sp_artistbrowse, sp_artistbrowse)
+            callback.call_args[0][0]._sp_artistbrowse, sp_artistbrowse
+        )
 
     def test_adds_ref_to_sp_artistbrowse_when_created(self, lib_mock):
         sp_artistbrowse = spotify.ffi.cast('sp_artistbrowse *', 42)
@@ -321,7 +344,8 @@ class ArtistBrowserTest(unittest.TestCase):
         sp_artistbrowse = spotify.ffi.cast('sp_artistbrowse *', 42)
 
         browser = spotify.ArtistBrowser(
-            self.session, sp_artistbrowse=sp_artistbrowse)
+            self.session, sp_artistbrowse=sp_artistbrowse
+        )
         browser = None  # noqa
         tests.gc_collect()
 
@@ -331,7 +355,8 @@ class ArtistBrowserTest(unittest.TestCase):
     def test_repr(self, link_mock, lib_mock):
         sp_artistbrowse = spotify.ffi.cast('sp_artistbrowse *', 42)
         browser = spotify.ArtistBrowser(
-            self.session, sp_artistbrowse=sp_artistbrowse)
+            self.session, sp_artistbrowse=sp_artistbrowse
+        )
         lib_mock.sp_artistbrowse_is_loaded.return_value = 1
         sp_artist = spotify.ffi.cast('sp_artist *', 42)
         lib_mock.sp_artistbrowse_artist.return_value = sp_artist
@@ -345,7 +370,8 @@ class ArtistBrowserTest(unittest.TestCase):
     def test_repr_if_unloaded(self, lib_mock):
         sp_artistbrowse = spotify.ffi.cast('sp_artistbrowse *', 42)
         browser = spotify.ArtistBrowser(
-            self.session, sp_artistbrowse=sp_artistbrowse)
+            self.session, sp_artistbrowse=sp_artistbrowse
+        )
         lib_mock.sp_artistbrowse_is_loaded.return_value = 0
 
         result = repr(browser)
@@ -355,9 +381,11 @@ class ArtistBrowserTest(unittest.TestCase):
     def test_eq(self, lib_mock):
         sp_artistbrowse = spotify.ffi.cast('sp_artistbrowse *', 42)
         browser1 = spotify.ArtistBrowser(
-            self.session, sp_artistbrowse=sp_artistbrowse)
+            self.session, sp_artistbrowse=sp_artistbrowse
+        )
         browser2 = spotify.ArtistBrowser(
-            self.session, sp_artistbrowse=sp_artistbrowse)
+            self.session, sp_artistbrowse=sp_artistbrowse
+        )
 
         self.assertTrue(browser1 == browser2)
         self.assertFalse(browser1 == 'foo')
@@ -365,18 +393,22 @@ class ArtistBrowserTest(unittest.TestCase):
     def test_ne(self, lib_mock):
         sp_artistbrowse = spotify.ffi.cast('sp_artistbrowse *', 42)
         browser1 = spotify.ArtistBrowser(
-            self.session, sp_artistbrowse=sp_artistbrowse)
+            self.session, sp_artistbrowse=sp_artistbrowse
+        )
         browser2 = spotify.ArtistBrowser(
-            self.session, sp_artistbrowse=sp_artistbrowse)
+            self.session, sp_artistbrowse=sp_artistbrowse
+        )
 
         self.assertFalse(browser1 != browser2)
 
     def test_hash(self, lib_mock):
         sp_artistbrowse = spotify.ffi.cast('sp_artistbrowse *', 42)
         browser1 = spotify.ArtistBrowser(
-            self.session, sp_artistbrowse=sp_artistbrowse)
+            self.session, sp_artistbrowse=sp_artistbrowse
+        )
         browser2 = spotify.ArtistBrowser(
-            self.session, sp_artistbrowse=sp_artistbrowse)
+            self.session, sp_artistbrowse=sp_artistbrowse
+        )
 
         self.assertEqual(hash(browser1), hash(browser2))
 
@@ -384,19 +416,22 @@ class ArtistBrowserTest(unittest.TestCase):
         lib_mock.sp_artistbrowse_is_loaded.return_value = 1
         sp_artistbrowse = spotify.ffi.cast('sp_artistbrowse *', 42)
         browser = spotify.ArtistBrowser(
-            self.session, sp_artistbrowse=sp_artistbrowse)
+            self.session, sp_artistbrowse=sp_artistbrowse
+        )
 
         result = browser.is_loaded
 
         lib_mock.sp_artistbrowse_is_loaded.assert_called_once_with(
-            sp_artistbrowse)
+            sp_artistbrowse
+        )
         self.assertTrue(result)
 
     @mock.patch('spotify.utils.load')
     def test_load(self, load_mock, lib_mock):
         sp_artistbrowse = spotify.ffi.cast('sp_artistbrowse *', 42)
         browser = spotify.ArtistBrowser(
-            self.session, sp_artistbrowse=sp_artistbrowse)
+            self.session, sp_artistbrowse=sp_artistbrowse
+        )
 
         browser.load(10)
 
@@ -404,10 +439,12 @@ class ArtistBrowserTest(unittest.TestCase):
 
     def test_error(self, lib_mock):
         lib_mock.sp_artistbrowse_error.return_value = int(
-            spotify.ErrorType.OTHER_PERMANENT)
+            spotify.ErrorType.OTHER_PERMANENT
+        )
         sp_artistbrowse = spotify.ffi.cast('sp_artistbrowse *', 42)
         browser = spotify.ArtistBrowser(
-            self.session, sp_artistbrowse=sp_artistbrowse)
+            self.session, sp_artistbrowse=sp_artistbrowse
+        )
 
         result = browser.error
 
@@ -418,31 +455,36 @@ class ArtistBrowserTest(unittest.TestCase):
         lib_mock.sp_artistbrowse_backend_request_duration.return_value = 137
         sp_artistbrowse = spotify.ffi.cast('sp_artistbrowse *', 42)
         browser = spotify.ArtistBrowser(
-            self.session, sp_artistbrowse=sp_artistbrowse)
+            self.session, sp_artistbrowse=sp_artistbrowse
+        )
 
         result = browser.backend_request_duration
 
         lib_mock.sp_artistbrowse_backend_request_duration.assert_called_with(
-            sp_artistbrowse)
+            sp_artistbrowse
+        )
         self.assertEqual(result, 137)
 
     def test_backend_request_duration_when_not_loaded(self, lib_mock):
         lib_mock.sp_artistbrowse_is_loaded.return_value = 0
         sp_artistbrowse = spotify.ffi.cast('sp_artistbrowse *', 42)
         browser = spotify.ArtistBrowser(
-            self.session, sp_artistbrowse=sp_artistbrowse)
+            self.session, sp_artistbrowse=sp_artistbrowse
+        )
 
         result = browser.backend_request_duration
 
         lib_mock.sp_artistbrowse_is_loaded.assert_called_with(sp_artistbrowse)
         self.assertEqual(
-            lib_mock.sp_artistbrowse_backend_request_duration.call_count, 0)
+            lib_mock.sp_artistbrowse_backend_request_duration.call_count, 0
+        )
         self.assertIsNone(result)
 
     def test_artist(self, lib_mock):
         sp_artistbrowse = spotify.ffi.cast('sp_artistbrowse *', 42)
         browser = spotify.ArtistBrowser(
-            self.session, sp_artistbrowse=sp_artistbrowse)
+            self.session, sp_artistbrowse=sp_artistbrowse
+        )
         sp_artist = spotify.ffi.cast('sp_artist *', 43)
         lib_mock.sp_artistbrowse_artist.return_value = sp_artist
 
@@ -454,7 +496,8 @@ class ArtistBrowserTest(unittest.TestCase):
     def test_artist_when_not_loaded(self, lib_mock):
         sp_artistbrowse = spotify.ffi.cast('sp_artistbrowse *', 42)
         browser = spotify.ArtistBrowser(
-            self.session, sp_artistbrowse=sp_artistbrowse)
+            self.session, sp_artistbrowse=sp_artistbrowse
+        )
         lib_mock.sp_artistbrowse_artist.return_value = spotify.ffi.NULL
 
         result = browser.artist
@@ -466,7 +509,8 @@ class ArtistBrowserTest(unittest.TestCase):
     def test_portraits(self, image_mock, lib_mock):
         sp_artistbrowse = spotify.ffi.cast('sp_artistbrowse *', 42)
         browser = spotify.ArtistBrowser(
-            self.session, sp_artistbrowse=sp_artistbrowse)
+            self.session, sp_artistbrowse=sp_artistbrowse
+        )
         lib_mock.sp_artistbrowse_num_portraits.return_value = 1
         image_id = spotify.ffi.new('char[]', b'image-id')
         lib_mock.sp_artistbrowse_portrait.return_value = image_id
@@ -481,38 +525,42 @@ class ArtistBrowserTest(unittest.TestCase):
 
         self.assertEqual(len(result), 1)
         lib_mock.sp_artistbrowse_num_portraits.assert_called_with(
-            sp_artistbrowse)
+            sp_artistbrowse
+        )
 
         item = result[0]
         self.assertIs(item, mock.sentinel.image)
         self.assertEqual(lib_mock.sp_artistbrowse_portrait.call_count, 1)
-        lib_mock.sp_artistbrowse_portrait.assert_called_with(
-            sp_artistbrowse, 0)
+        lib_mock.sp_artistbrowse_portrait.assert_called_with(sp_artistbrowse, 0)
 
         # Since we *created* the sp_image, we already have a refcount of 1 and
         # shouldn't increase the refcount when wrapping this sp_image in an
         # Image object
         image_mock.assert_called_with(
-            self.session, sp_image=sp_image, add_ref=False, callback=callback)
+            self.session, sp_image=sp_image, add_ref=False, callback=callback
+        )
 
     def test_portraits_if_no_portraits(self, lib_mock):
         lib_mock.sp_artistbrowse_num_portraits.return_value = 0
         sp_artistbrowse = spotify.ffi.cast('sp_artistbrowse *', 42)
         browser = spotify.ArtistBrowser(
-            self.session, sp_artistbrowse=sp_artistbrowse)
+            self.session, sp_artistbrowse=sp_artistbrowse
+        )
 
         result = browser.portraits()
 
         self.assertEqual(len(result), 0)
         lib_mock.sp_artistbrowse_num_portraits.assert_called_with(
-            sp_artistbrowse)
+            sp_artistbrowse
+        )
         self.assertEqual(lib_mock.sp_artistbrowse_portrait.call_count, 0)
 
     def test_portraits_if_unloaded(self, lib_mock):
         lib_mock.sp_artistbrowse_is_loaded.return_value = 0
         sp_artistbrowse = spotify.ffi.cast('sp_artistbrowse *', 42)
         browser = spotify.ArtistBrowser(
-            self.session, sp_artistbrowse=sp_artistbrowse)
+            self.session, sp_artistbrowse=sp_artistbrowse
+        )
 
         result = browser.portraits()
 
@@ -526,7 +574,8 @@ class ArtistBrowserTest(unittest.TestCase):
         lib_mock.sp_artistbrowse_track.return_value = sp_track
         sp_artistbrowse = spotify.ffi.cast('sp_artistbrowse *', 42)
         browser = spotify.ArtistBrowser(
-            self.session, sp_artistbrowse=sp_artistbrowse)
+            self.session, sp_artistbrowse=sp_artistbrowse
+        )
 
         self.assertEqual(lib_mock.sp_artistbrowse_add_ref.call_count, 1)
         result = browser.tracks
@@ -546,7 +595,8 @@ class ArtistBrowserTest(unittest.TestCase):
         lib_mock.sp_artistbrowse_num_tracks.return_value = 0
         sp_artistbrowse = spotify.ffi.cast('sp_artistbrowse *', 42)
         browser = spotify.ArtistBrowser(
-            self.session, sp_artistbrowse=sp_artistbrowse)
+            self.session, sp_artistbrowse=sp_artistbrowse
+        )
 
         result = browser.tracks
 
@@ -558,7 +608,8 @@ class ArtistBrowserTest(unittest.TestCase):
         lib_mock.sp_artistbrowse_is_loaded.return_value = 0
         sp_artistbrowse = spotify.ffi.cast('sp_artistbrowse *', 42)
         browser = spotify.ArtistBrowser(
-            self.session, sp_artistbrowse=sp_artistbrowse)
+            self.session, sp_artistbrowse=sp_artistbrowse
+        )
 
         result = browser.tracks
 
@@ -572,7 +623,8 @@ class ArtistBrowserTest(unittest.TestCase):
         lib_mock.sp_artistbrowse_tophit_track.return_value = sp_track
         sp_artistbrowse = spotify.ffi.cast('sp_artistbrowse *', 42)
         browser = spotify.ArtistBrowser(
-            self.session, sp_artistbrowse=sp_artistbrowse)
+            self.session, sp_artistbrowse=sp_artistbrowse
+        )
 
         self.assertEqual(lib_mock.sp_artistbrowse_add_ref.call_count, 1)
         result = browser.tophit_tracks
@@ -580,34 +632,39 @@ class ArtistBrowserTest(unittest.TestCase):
 
         self.assertEqual(len(result), 1)
         lib_mock.sp_artistbrowse_num_tophit_tracks.assert_called_with(
-            sp_artistbrowse)
+            sp_artistbrowse
+        )
 
         item = result[0]
         self.assertIsInstance(item, spotify.Track)
         self.assertEqual(item._sp_track, sp_track)
         self.assertEqual(lib_mock.sp_artistbrowse_tophit_track.call_count, 1)
         lib_mock.sp_artistbrowse_tophit_track.assert_called_with(
-            sp_artistbrowse, 0)
+            sp_artistbrowse, 0
+        )
         track_lib_mock.sp_track_add_ref.assert_called_with(sp_track)
 
     def test_tophit_tracks_if_no_tracks(self, lib_mock):
         lib_mock.sp_artistbrowse_num_tophit_tracks.return_value = 0
         sp_artistbrowse = spotify.ffi.cast('sp_artistbrowse *', 42)
         browser = spotify.ArtistBrowser(
-            self.session, sp_artistbrowse=sp_artistbrowse)
+            self.session, sp_artistbrowse=sp_artistbrowse
+        )
 
         result = browser.tophit_tracks
 
         self.assertEqual(len(result), 0)
         lib_mock.sp_artistbrowse_num_tophit_tracks.assert_called_with(
-            sp_artistbrowse)
+            sp_artistbrowse
+        )
         self.assertEqual(lib_mock.sp_artistbrowse_track.call_count, 0)
 
     def test_tophit_tracks_if_unloaded(self, lib_mock):
         lib_mock.sp_artistbrowse_is_loaded.return_value = 0
         sp_artistbrowse = spotify.ffi.cast('sp_artistbrowse *', 42)
         browser = spotify.ArtistBrowser(
-            self.session, sp_artistbrowse=sp_artistbrowse)
+            self.session, sp_artistbrowse=sp_artistbrowse
+        )
 
         result = browser.tophit_tracks
 
@@ -621,7 +678,8 @@ class ArtistBrowserTest(unittest.TestCase):
         lib_mock.sp_artistbrowse_album.return_value = sp_album
         sp_artistbrowse = spotify.ffi.cast('sp_artistbrowse *', 42)
         browser = spotify.ArtistBrowser(
-            self.session, sp_artistbrowse=sp_artistbrowse)
+            self.session, sp_artistbrowse=sp_artistbrowse
+        )
 
         self.assertEqual(lib_mock.sp_artistbrowse_add_ref.call_count, 1)
         result = browser.albums
@@ -641,7 +699,8 @@ class ArtistBrowserTest(unittest.TestCase):
         lib_mock.sp_artistbrowse_num_albums.return_value = 0
         sp_artistbrowse = spotify.ffi.cast('sp_artistbrowse *', 42)
         browser = spotify.ArtistBrowser(
-            self.session, sp_artistbrowse=sp_artistbrowse)
+            self.session, sp_artistbrowse=sp_artistbrowse
+        )
 
         result = browser.albums
 
@@ -653,7 +712,8 @@ class ArtistBrowserTest(unittest.TestCase):
         lib_mock.sp_artistbrowse_is_loaded.return_value = 0
         sp_artistbrowse = spotify.ffi.cast('sp_artistbrowse *', 42)
         browser = spotify.ArtistBrowser(
-            self.session, sp_artistbrowse=sp_artistbrowse)
+            self.session, sp_artistbrowse=sp_artistbrowse
+        )
 
         result = browser.albums
 
@@ -666,7 +726,8 @@ class ArtistBrowserTest(unittest.TestCase):
         lib_mock.sp_artistbrowse_similar_artist.return_value = sp_artist
         sp_artistbrowse = spotify.ffi.cast('sp_artistbrowse *', 42)
         browser = spotify.ArtistBrowser(
-            self.session, sp_artistbrowse=sp_artistbrowse)
+            self.session, sp_artistbrowse=sp_artistbrowse
+        )
 
         self.assertEqual(lib_mock.sp_artistbrowse_add_ref.call_count, 1)
         result = browser.similar_artists
@@ -674,35 +735,39 @@ class ArtistBrowserTest(unittest.TestCase):
 
         self.assertEqual(len(result), 1)
         lib_mock.sp_artistbrowse_num_similar_artists.assert_called_with(
-            sp_artistbrowse)
+            sp_artistbrowse
+        )
 
         item = result[0]
         self.assertIsInstance(item, spotify.Artist)
         self.assertEqual(item._sp_artist, sp_artist)
-        self.assertEqual(
-            lib_mock.sp_artistbrowse_similar_artist.call_count, 1)
+        self.assertEqual(lib_mock.sp_artistbrowse_similar_artist.call_count, 1)
         lib_mock.sp_artistbrowse_similar_artist.assert_called_with(
-            sp_artistbrowse, 0)
+            sp_artistbrowse, 0
+        )
         lib_mock.sp_artist_add_ref.assert_called_with(sp_artist)
 
     def test_similar_artists_if_no_artists(self, lib_mock):
         lib_mock.sp_artistbrowse_num_similar_artists.return_value = 0
         sp_artistbrowse = spotify.ffi.cast('sp_artistbrowse *', 42)
         browser = spotify.ArtistBrowser(
-            self.session, sp_artistbrowse=sp_artistbrowse)
+            self.session, sp_artistbrowse=sp_artistbrowse
+        )
 
         result = browser.similar_artists
 
         self.assertEqual(len(result), 0)
         lib_mock.sp_artistbrowse_num_similar_artists.assert_called_with(
-            sp_artistbrowse)
+            sp_artistbrowse
+        )
         self.assertEqual(lib_mock.sp_artistbrowse_similar_artist.call_count, 0)
 
     def test_similar_artists_if_unloaded(self, lib_mock):
         lib_mock.sp_artistbrowse_is_loaded.return_value = 0
         sp_artistbrowse = spotify.ffi.cast('sp_artistbrowse *', 42)
         browser = spotify.ArtistBrowser(
-            self.session, sp_artistbrowse=sp_artistbrowse)
+            self.session, sp_artistbrowse=sp_artistbrowse
+        )
 
         result = browser.similar_artists
 
@@ -712,7 +777,8 @@ class ArtistBrowserTest(unittest.TestCase):
     def test_biography(self, lib_mock):
         sp_artistbrowse = spotify.ffi.cast('sp_artistbrowse *', 42)
         browser = spotify.ArtistBrowser(
-            self.session, sp_artistbrowse=sp_artistbrowse)
+            self.session, sp_artistbrowse=sp_artistbrowse
+        )
         biography = spotify.ffi.new('char[]', b'Lived, played, and died')
         lib_mock.sp_artistbrowse_biography.return_value = biography
 
@@ -723,7 +789,6 @@ class ArtistBrowserTest(unittest.TestCase):
 
 
 class ArtistBrowserTypeTest(unittest.TestCase):
-
     def test_has_constants(self):
         self.assertEqual(spotify.ArtistBrowserType.FULL, 0)
         self.assertEqual(spotify.ArtistBrowserType.NO_TRACKS, 1)

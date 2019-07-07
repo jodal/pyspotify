@@ -16,6 +16,8 @@ Bug fix release.
   :class:`Sequence` from :mod:`collections.abc` instead of :mod:`collections`.
   This fixes a deprecation warning on Python 3.7 and prepares for Python 3.8.
 
+- Format soruce code with Black.
+
 
 v2.0.5 (2015-09-22)
 ===================

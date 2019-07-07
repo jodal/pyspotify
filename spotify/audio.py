@@ -5,18 +5,15 @@ import collections
 from spotify import utils
 
 
-__all__ = [
-    'AudioBufferStats',
-    'AudioFormat',
-    'Bitrate',
-    'SampleType',
-]
+__all__ = ['AudioBufferStats', 'AudioFormat', 'Bitrate', 'SampleType']
 
 
-class AudioBufferStats(collections.namedtuple(
-        'AudioBufferStats', ['samples', 'stutter'])):
+class AudioBufferStats(
+    collections.namedtuple('AudioBufferStats', ['samples', 'stutter'])
+):
 
     """Stats about the application's audio buffers."""
+
     pass
 
 

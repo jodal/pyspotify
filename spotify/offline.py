@@ -4,9 +4,7 @@ import spotify
 from spotify import ffi, lib
 
 
-__all__ = [
-    'OfflineSyncStatus',
-]
+__all__ = ['OfflineSyncStatus']
 
 
 class Offline(object):
@@ -42,7 +40,8 @@ class Offline(object):
         """
         sp_offline_sync_status = ffi.new('sp_offline_sync_status *')
         syncing = lib.sp_offline_sync_get_status(
-            self._session._sp_session, sp_offline_sync_status)
+            self._session._sp_session, sp_offline_sync_status
+        )
         if syncing:
             return spotify.OfflineSyncStatus(sp_offline_sync_status)
 

@@ -55,19 +55,22 @@ def mac_wheels(ctx):
     Based upon https://github.com/MacPython/wiki/wiki/Spinning-wheels
     """
 
-    prefix = '/Library/Frameworks/Python.framework/Versions'
     versions = [
-        ('2.7', ''),
-        ('3.4', '3'),
+        # Python.org Python 2.7 for Mac OS X 10.6 and later
+        '/Library/Frameworks/Python.framework/Versions/2.7/bin/python',
+        # Python.org Python 3.7 for Mac OS X 10.6 and later
+        '/Library/Frameworks/Python.framework/Versions/3.7/bin/python3',
+        # Homebrew Python 2.7
+        '/usr/local/bin/python2.7',
+        # Homebrew Python 3.7
+        '/usr/local/bin/python3.7',
     ]
 
     # Build wheels for all Python versions
-    for version, suffix in versions:
-        ctx.run('%s/%s/bin/pip%s install -U pip wheel' % (
-            prefix, version, suffix))
+    for executable in versions:
         shutil.rmtree('./build', ignore_errors=True)
-        ctx.run('%s/%s/bin/python%s setup.py bdist_wheel' % (
-            prefix, version, suffix))
+        ctx.run('%s -m pip install wheel' % executable)
+        ctx.run('%s setup.py bdist_wheel' % executable)
 
     # Bundle libspotify into the wheels
     shutil.rmtree('./fixed_dist', ignore_errors=True)

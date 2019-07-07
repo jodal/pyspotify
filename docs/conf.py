@@ -10,10 +10,10 @@ import sys
 import types
 
 try:
-    # Python 3.3+
+    # Python 3.5+
     from unittest import mock
 except ImportError:
-    # Python <3.3
+    # Python 2.7
     import mock
 
 

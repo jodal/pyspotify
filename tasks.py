@@ -1,22 +1,17 @@
 from __future__ import print_function, unicode_literals
 
 import shutil
-import sys
 
 from invoke import task
 
 
 @task
-def docs(ctx, watch=False, warn=False):
-    if watch:
-        return watcher(ctx, docs)
+def docs(ctx, warn=False):
     ctx.run('make -C docs/ html', warn=warn)
 
 
 @task
-def test(ctx, coverage=False, watch=False, warn=False):
-    if watch:
-        return watcher(ctx, test, coverage=coverage)
+def test(ctx, coverage=False, warn=False):
     cmd = 'py.test'
     if coverage:
         cmd += ' --cov=spotify --cov-report=term-missing'
@@ -46,19 +41,6 @@ def update_sp_constants(ctx):
         if attr.startswith('SP_')]
     with open('docs/sp-constants.csv', 'w+') as fh:
         fh.writelines(constants)
-
-
-def watcher(ctx, task, *args, **kwargs):
-    while True:
-        ctx.run('clear')
-        kwargs['warn'] = True
-        task(*args, **kwargs)
-        try:
-            ctx.run(
-                r'inotifywait -q -e create -e modify -e delete '
-                r'--exclude ".*\.(pyc|sw.)" -r docs/ spotify/ tests/')
-        except KeyboardInterrupt:
-            sys.exit()
 
 
 @task

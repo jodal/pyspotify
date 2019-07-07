@@ -2,10 +2,10 @@
 Changelog
 *********
 
-v2.0.6 (UNRELEASED)
+v2.0.6 (2019-07-08)
 ===================
 
-Bug fix release.
+Maintenance release.
 
 - Drop support for Python 3.3 and 3.4, as both has reached end of life.
 

@@ -554,7 +554,8 @@ class Session(utils.EventEmitter):
         Search Spotify for tracks, albums, artists, and playlists matching
         ``query``.
 
-        .. warning:: Search API is not working
+        .. warning::
+
             The search API was broken at 2016-02-03 by a server-side change
             made by Spotify. The functionality was never restored.
 

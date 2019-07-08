@@ -13,9 +13,7 @@ except ImportError:
 import spotify
 
 
-__all__ = [
-    'EventLoop',
-]
+__all__ = ['EventLoop']
 
 logger = logging.getLogger(__name__)
 
@@ -63,16 +61,16 @@ class EventLoop(threading.Thread):
     def start(self):
         """Start the event loop."""
         self._session.on(
-            spotify.SessionEvent.NOTIFY_MAIN_THREAD,
-            self._on_notify_main_thread)
+            spotify.SessionEvent.NOTIFY_MAIN_THREAD, self._on_notify_main_thread
+        )
         threading.Thread.start(self)
 
     def stop(self):
         """Stop the event loop."""
         self._runnable = False
         self._session.off(
-            spotify.SessionEvent.NOTIFY_MAIN_THREAD,
-            self._on_notify_main_thread)
+            spotify.SessionEvent.NOTIFY_MAIN_THREAD, self._on_notify_main_thread
+        )
 
     def run(self):
         logger.debug('Spotify event loop started')
@@ -96,4 +94,5 @@ class EventLoop(threading.Thread):
             self._queue.put_nowait(1)
         except queue.Full:
             logger.warning(
-                'pyspotify event loop queue full; dropped notification event')
+                'pyspotify event loop queue full; dropped notification event'
+            )

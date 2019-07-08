@@ -4,9 +4,7 @@ import spotify
 from spotify import lib
 
 
-__all__ = [
-    'PlayerState',
-]
+__all__ = ['PlayerState']
 
 
 class PlayerState(object):
@@ -42,14 +40,18 @@ class Player(object):
 
     def load(self, track):
         """Load :class:`Track` for playback."""
-        spotify.Error.maybe_raise(lib.sp_session_player_load(
-            self._session._sp_session, track._sp_track))
+        spotify.Error.maybe_raise(
+            lib.sp_session_player_load(
+                self._session._sp_session, track._sp_track
+            )
+        )
         self.state = PlayerState.LOADED
 
     def seek(self, offset):
         """Seek to the offset in ms in the currently loaded track."""
         spotify.Error.maybe_raise(
-            lib.sp_session_player_seek(self._session._sp_session, offset))
+            lib.sp_session_player_seek(self._session._sp_session, offset)
+        )
 
     def play(self, play=True):
         """Play the currently loaded track.
@@ -59,8 +61,9 @@ class Player(object):
 
         If ``play`` is set to :class:`False`, playback will be paused.
         """
-        spotify.Error.maybe_raise(lib.sp_session_player_play(
-            self._session._sp_session, play))
+        spotify.Error.maybe_raise(
+            lib.sp_session_player_play(self._session._sp_session, play)
+        )
         if play:
             self.state = PlayerState.PLAYING
         else:
@@ -76,7 +79,8 @@ class Player(object):
     def unload(self):
         """Stops the currently playing track."""
         spotify.Error.maybe_raise(
-            lib.sp_session_player_unload(self._session._sp_session))
+            lib.sp_session_player_unload(self._session._sp_session)
+        )
         self.state = PlayerState.UNLOADED
 
     def prefetch(self, track):
@@ -85,5 +89,8 @@ class Player(object):
         This can be used to make libspotify download and cache a track before
         playing it.
         """
-        spotify.Error.maybe_raise(lib.sp_session_player_prefetch(
-            self._session._sp_session, track._sp_track))
+        spotify.Error.maybe_raise(
+            lib.sp_session_player_prefetch(
+                self._session._sp_session, track._sp_track
+            )
+        )

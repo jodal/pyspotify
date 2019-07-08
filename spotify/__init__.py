@@ -3,7 +3,7 @@ from __future__ import unicode_literals
 import threading
 
 
-__version__ = '2.0.5'
+__version__ = '2.1.0'
 
 
 # Global reentrant lock to be held whenever libspotify functions are called or
@@ -56,6 +56,7 @@ def serialized(f):
     def wrapper(*args, **kwargs):
         with _lock:
             return f(*args, **kwargs)
+
     if not hasattr(wrapper, '__wrapped__'):
         # Workaround for Python < 3.2
         wrapper.__wrapped__ = f

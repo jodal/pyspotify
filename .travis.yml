@@ -1,27 +1,33 @@
-sudo: false
+dist: xenial
 
 language: python
 
 addons:
   apt:
     sources:
-      - mopidy-stable
+      - sourceline: 'deb http://apt.mopidy.com/ stretch main contrib non-free'
+        key_url: 'https://apt.mopidy.com/mopidy.gpg'
     packages:
-      - libffi-dev
       - libspotify-dev
-      - python-dev
-      - python3-dev
 
-env:
-  - TOX_ENV=py27
-  - TOX_ENV=py33
-  - TOX_ENV=py34
-  - TOX_ENV=docs
-  - TOX_ENV=flake8
-
-# Pending pypy 2.6+ on Travis
-#  - TOX_ENV=pypy
-#  - TOX_ENV=pypy3
+matrix:
+  include:
+    - python: 2.7
+      env: TOX_ENV=py27
+    - python: 3.5
+      env: TOX_ENV=py35
+    - python: 3.6
+      env: TOX_ENV=py36
+    - python: 3.7
+      env: TOX_ENV=py37
+    - python: pypy2.7-6.0
+      env: TOX_ENV=pypy
+    - python: pypy3.5-6.0
+      env: TOX_ENV=pypy3
+    - python: 3.7
+      env: TOX_ENV=docs
+    - python: 3.7
+      env: TOX_ENV=flake8
 
 install:
   - "pip install tox"
@@ -35,12 +41,3 @@ after_success:
 branches:
   except:
     - v2.x/debian
-
-notifications:
-  irc:
-    channels:
-      - "irc.freenode.org#mopidy"
-    on_success: change
-    on_failure: change
-    use_notice: true
-    skip_join: true

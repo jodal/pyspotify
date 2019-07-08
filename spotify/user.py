@@ -4,9 +4,7 @@ import spotify
 from spotify import ffi, lib, serialized, utils
 
 
-__all__ = [
-    'User',
-]
+__all__ = ['User']
 
 
 class User(object):
@@ -32,7 +30,8 @@ class User(object):
             user = spotify.Link(self._session, uri=uri).as_user()
             if user is None:
                 raise ValueError(
-                    'Failed to get user from Spotify URI: %r' % uri)
+                    'Failed to get user from Spotify URI: %r' % uri
+                )
             sp_user = user._sp_user
             add_ref = True
 
@@ -75,7 +74,9 @@ class User(object):
         """A :class:`Link` to the user."""
         return spotify.Link(
             self._session,
-            sp_link=lib.sp_link_create_from_user(self._sp_user), add_ref=False)
+            sp_link=lib.sp_link_create_from_user(self._sp_user),
+            add_ref=False,
+        )
 
     @property
     def starred(self):

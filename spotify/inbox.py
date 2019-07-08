@@ -7,9 +7,7 @@ import spotify
 from spotify import ffi, lib, serialized, utils
 
 
-__all__ = [
-    'InboxPostResult',
-]
+__all__ = ['InboxPostResult']
 
 logger = logging.getLogger(__name__)
 
@@ -20,11 +18,19 @@ class InboxPostResult(object):
 
     @serialized
     def __init__(
-            self, session, canonical_username=None, tracks=None, message='',
-            callback=None, sp_inbox=None, add_ref=True):
+        self,
+        session,
+        canonical_username=None,
+        tracks=None,
+        message='',
+        callback=None,
+        sp_inbox=None,
+        add_ref=True,
+    ):
 
-        assert canonical_username and tracks or sp_inbox, \
-            'canonical_username and tracks, or sp_inbox, is required'
+        assert (
+            canonical_username and tracks or sp_inbox
+        ), 'canonical_username and tracks, or sp_inbox, is required'
 
         self._session = session
         self.loaded_event = threading.Event()
@@ -41,9 +47,14 @@ class InboxPostResult(object):
             self._session._callback_handles.add(handle)
 
             sp_inbox = lib.sp_inbox_post_tracks(
-                self._session._sp_session, canonical_username,
-                [t._sp_track for t in tracks], len(tracks),
-                message, _inboxpost_complete_callback, handle)
+                self._session._sp_session,
+                canonical_username,
+                [t._sp_track for t in tracks],
+                len(tracks),
+                message,
+                _inboxpost_complete_callback,
+                handle,
+            )
             add_ref = True
 
             if sp_inbox == ffi.NULL:
@@ -91,7 +102,8 @@ def _inboxpost_complete_callback(sp_inbox, handle):
     logger.debug('inboxpost_complete_callback called')
     if handle == ffi.NULL:
         logger.warning(
-            'pyspotify inboxpost_complete_callback called without userdata')
+            'pyspotify inboxpost_complete_callback called without userdata'
+        )
         return
     (session, inbox_post_result, callback) = ffi.from_handle(handle)
     session._callback_handles.remove(handle)

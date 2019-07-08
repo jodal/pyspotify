@@ -3,12 +3,7 @@ from __future__ import unicode_literals
 from spotify import lib, serialized, utils
 
 
-__all__ = [
-    'Error',
-    'ErrorType',
-    'LibError',
-    'Timeout',
-]
+__all__ = ['Error', 'ErrorType', 'LibError', 'Timeout']
 
 
 class Error(Exception):

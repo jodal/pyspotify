@@ -16,29 +16,42 @@ logger = logging.getLogger(__name__)
 def make_parser():
     parser = argparse.ArgumentParser()
     parser.add_argument(
-        '-u', '--username', action='store', required=True,
-        help='Spotify username')
+        '-u',
+        '--username',
+        action='store',
+        required=True,
+        help='Spotify username',
+    )
     parser.add_argument(
-        '-p', '--password', action='store', required=True,
-        help='Spotify password')
+        '-p',
+        '--password',
+        action='store',
+        required=True,
+        help='Spotify password',
+    )
     parser.add_argument(
-        '-v', '--verbose', action='store_true', help='Turn on debug logging')
+        '-v', '--verbose', action='store_true', help='Turn on debug logging'
+    )
     subparsers = parser.add_subparsers(
-        dest='command', help='sub-command --help')
+        dest='command', help='sub-command --help'
+    )
 
     subparsers.add_parser('info', help='Get account info')
 
     create_playlist_parser = subparsers.add_parser(
-        'create-playlist', help='Create a new playlist')
+        'create-playlist', help='Create a new playlist'
+    )
     create_playlist_parser.add_argument(
-        'name', action='store', help='Name of new playlist')
+        'name', action='store', help='Name of new playlist'
+    )
 
     add_track_parser = subparsers.add_parser(
-        'add-track', help='Add track to playlist')
+        'add-track', help='Add track to playlist'
+    )
     add_track_parser.add_argument(
-        'playlist', action='store', help='URI of playlist')
-    add_track_parser.add_argument(
-        'track', action='store', help='URI of track')
+        'playlist', action='store', help='URI of playlist'
+    )
+    add_track_parser.add_argument('track', action='store', help='URI of track')
 
     return parser
 
@@ -118,14 +131,12 @@ def main(args):
             result = {
                 'success': True,
                 'action': args.command,
-                'response': {
-                    'playlist_name': name,
-                    'playlist_uri': uri,
-                },
+                'response': {'playlist_name': name, 'playlist_uri': uri},
             }
         elif args.command == 'add-track':
             playlist_uri, track_uri = add_track(
-                session, args.playlist, args.track)
+                session, args.playlist, args.track
+            )
             result = {
                 'success': True,
                 'action': args.command,
@@ -136,11 +147,7 @@ def main(args):
             }
     except spotify.Error as error:
         logger.exception('%s failed', args.command)
-        result = {
-            'success': False,
-            'action': args.command,
-            'error': str(error),
-        }
+        result = {'success': False, 'action': args.command, 'error': str(error)}
 
     # Proper logout ensures that all data is persisted properly
     logout(session)
@@ -152,5 +159,5 @@ if __name__ == '__main__':
     parser = make_parser()
     args = parser.parse_args()
     result = main(args)
-    print(json.dumps(result, indent=2))
+    print (json.dumps(result, indent=2))
     sys.exit(not result['success'])

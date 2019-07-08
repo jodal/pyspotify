@@ -3,6 +3,7 @@ Artists
 *******
 
 .. module:: spotify
+    :noindex:
 
 .. autoclass:: Artist
 

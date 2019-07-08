@@ -7,11 +7,7 @@ import spotify
 from spotify import lib, utils
 
 
-__all__ = [
-    'ConnectionRule',
-    'ConnectionState',
-    'ConnectionType',
-]
+__all__ = ['ConnectionRule', 'ConnectionState', 'ConnectionType']
 
 
 class Connection(object):
@@ -51,7 +47,8 @@ class Connection(object):
         notified when the connection state changes.
         """
         return spotify.ConnectionState(
-            lib.sp_session_connectionstate(self._session._sp_session))
+            lib.sp_session_connectionstate(self._session._sp_session)
+        )
 
     @property
     def type(self):
@@ -71,8 +68,9 @@ class Connection(object):
 
     @type.setter
     def type(self, value):
-        spotify.Error.maybe_raise(lib.sp_session_set_connection_type(
-            self._session._sp_session, value))
+        spotify.Error.maybe_raise(
+            lib.sp_session_set_connection_type(self._session._sp_session, value)
+        )
         self._connection_type = value
 
     @property
@@ -145,8 +143,11 @@ class Connection(object):
         if self._allow_sync_over_mobile:
             rules.append(spotify.ConnectionRule.ALLOW_SYNC_OVER_MOBILE)
         rules = functools.reduce(operator.or_, rules, 0)
-        spotify.Error.maybe_raise(lib.sp_session_set_connection_rules(
-            self._session._sp_session, rules))
+        spotify.Error.maybe_raise(
+            lib.sp_session_set_connection_rules(
+                self._session._sp_session, rules
+            )
+        )
 
 
 @utils.make_enum('SP_CONNECTION_RULE_')

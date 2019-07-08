@@ -3,13 +3,13 @@ from __future__ import unicode_literals
 import unittest
 
 import spotify
+
 import tests
 from tests import mock
 
 
 @mock.patch('spotify.playlist_track.lib', spec=spotify.lib)
 class PlaylistTrackTest(unittest.TestCase):
-
     def setUp(self):
         self.session = tests.create_session_mock()
 
@@ -48,8 +48,9 @@ class PlaylistTrackTest(unittest.TestCase):
 
         self.assertEqual(
             result,
-            'PlaylistTrack(uri=%r, creator=%r, create_time=%d)' % (
-                'foo', 'alice-user-object', 1234567890))
+            'PlaylistTrack(uri=%r, creator=%r, create_time=%d)'
+            % ('foo', 'alice-user-object', 1234567890),
+        )
 
     def test_eq(self, lib_mock):
         sp_playlist = spotify.ffi.cast('sp_playlist *', 42)
@@ -85,7 +86,8 @@ class PlaylistTrackTest(unittest.TestCase):
         result = playlist_track.create_time
 
         lib_mock.sp_playlist_track_create_time.assert_called_with(
-            sp_playlist, 0)
+            sp_playlist, 0
+        )
         self.assertEqual(result, 1234567890)
 
     @mock.patch('spotify.user.lib', spec=spotify.lib)
@@ -114,18 +116,21 @@ class PlaylistTrackTest(unittest.TestCase):
 
     def test_set_seen(self, lib_mock):
         lib_mock.sp_playlist_track_set_seen.return_value = int(
-            spotify.ErrorType.OK)
+            spotify.ErrorType.OK
+        )
         sp_playlist = spotify.ffi.cast('sp_playlist *', 42)
         playlist_track = spotify.PlaylistTrack(self.session, sp_playlist, 0)
 
         playlist_track.seen = True
 
         lib_mock.sp_playlist_track_set_seen.assert_called_with(
-            sp_playlist, 0, 1)
+            sp_playlist, 0, 1
+        )
 
     def test_set_seen_fails_if_error(self, lib_mock):
         lib_mock.sp_playlist_track_set_seen.return_value = int(
-            spotify.ErrorType.BAD_API_VERSION)
+            spotify.ErrorType.BAD_API_VERSION
+        )
         sp_playlist = spotify.ffi.cast('sp_playlist *', 42)
         playlist_track = spotify.PlaylistTrack(self.session, sp_playlist, 0)
 
@@ -134,7 +139,8 @@ class PlaylistTrackTest(unittest.TestCase):
 
     def test_message(self, lib_mock):
         lib_mock.sp_playlist_track_message.return_value = spotify.ffi.new(
-            'char[]', b'foo bar')
+            'char[]', b'foo bar'
+        )
         sp_playlist = spotify.ffi.cast('sp_playlist *', 42)
         playlist_track = spotify.PlaylistTrack(self.session, sp_playlist, 0)
 

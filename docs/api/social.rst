@@ -3,6 +3,7 @@ Social
 ******
 
 .. module:: spotify
+    :noindex:
 
 .. autoclass:: spotify.social.Social
 

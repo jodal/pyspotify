@@ -3,6 +3,7 @@ Images
 ******
 
 .. module:: spotify
+    :noindex:
 
 .. autoclass:: Image
 

@@ -1,0 +1,7 @@
+[build-system]
+requires = ["setuptools", "wheel"]
+
+[tool.black]
+target-version = ['py27']
+line-length = 80
+skip-string-normalization = true

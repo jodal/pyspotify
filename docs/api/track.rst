@@ -3,6 +3,7 @@ Tracks
 ******
 
 .. module:: spotify
+    :noindex:
 
 .. autoclass:: Track
 

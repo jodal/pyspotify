@@ -3,6 +3,7 @@ Event loop
 **********
 
 .. module:: spotify
+    :noindex:
 
 .. autoclass:: EventLoop
     :no-undoc-members:

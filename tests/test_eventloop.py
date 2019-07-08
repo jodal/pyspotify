@@ -11,11 +11,11 @@ except ImportError:
     import Queue as queue
 
 import spotify
+
 from tests import mock
 
 
 class EventLoopTest(unittest.TestCase):
-
     def setUp(self):
         self.timeout = 0.1
         self.session = mock.Mock(spec=spotify.Session)
@@ -48,14 +48,16 @@ class EventLoopTest(unittest.TestCase):
 
         self.session.on.assert_called_once_with(
             spotify.SessionEvent.NOTIFY_MAIN_THREAD,
-            self.loop._on_notify_main_thread)
+            self.loop._on_notify_main_thread,
+        )
 
     def test_stop_unregisters_notify_main_thread_listener(self):
         self.loop.stop()
 
         self.session.off.assert_called_once_with(
             spotify.SessionEvent.NOTIFY_MAIN_THREAD,
-            self.loop._on_notify_main_thread)
+            self.loop._on_notify_main_thread,
+        )
 
     def test_run_immediately_process_events(self):
         self.loop._runnable = False  # Short circuit run()

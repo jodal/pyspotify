@@ -2,6 +2,7 @@
 *.pyc
 *.so
 *.sw[po]
+.cache/
 .coverage
 .eggs/
 .tox/
@@ -13,4 +14,3 @@ cover/
 dist/
 spotify_appkey.key
 tmp/
-xunit-*.xml

@@ -1,9 +1,12 @@
+black
 delocate
 flake8
+flake8-bugbear
 flake8-import-order
 invoke
 mock
 pytest
 pytest-cov
+sphinx
 tox
 twine

@@ -12,10 +12,7 @@ except ImportError:
 import spotify
 from spotify import ffi, lib, serialized, utils
 
-__all__ = [
-    'Link',
-    'LinkType',
-]
+__all__ = ['Link', 'LinkType']
 
 
 class Link(object):
@@ -66,11 +63,13 @@ class Link(object):
 
         if uri is not None:
             sp_link = lib.sp_link_create_from_string(
-                utils.to_char(Link._normalize_uri(uri)))
+                utils.to_char(Link._normalize_uri(uri))
+            )
             add_ref = False
             if sp_link == ffi.NULL:
                 raise ValueError(
-                    'Failed to get link from Spotify URI: %r' % uri)
+                    'Failed to get link from Spotify URI: %r' % uri
+                )
 
         if add_ref:
             lib.sp_link_add_ref(sp_link)
@@ -107,13 +106,15 @@ class Link(object):
     def uri(self):
         """The link's Spotify URI."""
         return utils.get_with_growing_buffer(
-            lib.sp_link_as_string, self._sp_link)
+            lib.sp_link_as_string, self._sp_link
+        )
 
     @property
     def url(self):
         """The link's HTTP URL."""
         return 'https://open.spotify.com%s' % (
-            self.uri[len('spotify'):].replace(':', '/'))
+            self.uri[len('spotify') :].replace(':', '/')
+        )
 
     @property
     def type(self):
@@ -158,19 +159,22 @@ class Link(object):
         if sp_playlist is None:
             return None
         return spotify.Playlist._cached(
-            self._session, sp_playlist, add_ref=False)
+            self._session, sp_playlist, add_ref=False
+        )
 
     def _as_sp_playlist(self):
         sp_playlist = None
         if self.type == LinkType.PLAYLIST:
             sp_playlist = lib.sp_playlist_create(
-                self._session._sp_session, self._sp_link)
+                self._session._sp_session, self._sp_link
+            )
         elif self.type == LinkType.STARRED:
             matches = re.match(r'^spotify:user:([^:]+):starred$', self.uri)
             if matches:
                 username = matches.group(1)
                 sp_playlist = lib.sp_session_starred_for_user_create(
-                    self._session._sp_session, utils.to_bytes(username))
+                    self._session._sp_session, utils.to_bytes(username)
+                )
         if sp_playlist is None or sp_playlist == ffi.NULL:
             return None
         return sp_playlist
@@ -193,11 +197,13 @@ class Link(object):
         if self.type is not LinkType.IMAGE:
             return None
         sp_image = lib.sp_image_create_from_link(
-            self._session._sp_session, self._sp_link)
+            self._session._sp_session, self._sp_link
+        )
         if sp_image == ffi.NULL:
             return None
         return spotify.Image(
-            self._session, sp_image=sp_image, add_ref=False, callback=callback)
+            self._session, sp_image=sp_image, add_ref=False, callback=callback
+        )
 
 
 @utils.make_enum('SP_LINKTYPE_')

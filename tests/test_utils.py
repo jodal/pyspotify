@@ -6,12 +6,12 @@ import unittest
 
 import spotify
 from spotify import utils
+
 import tests
 from tests import mock
 
 
 class EventEmitterTest(unittest.TestCase):
-
     def test_listener_receives_event_args(self):
         listener_mock = mock.Mock()
         emitter = utils.EventEmitter()
@@ -153,7 +153,6 @@ class EventEmitterTest(unittest.TestCase):
 
 
 class IntEnumTest(unittest.TestCase):
-
     def setUp(self):
         class Foo(utils.IntEnum):
             pass
@@ -180,7 +179,6 @@ class IntEnumTest(unittest.TestCase):
 
 @mock.patch('spotify.search.lib', spec=spotify.lib)
 class SequenceTest(unittest.TestCase):
-
     def test_adds_ref_to_sp_obj_when_created(self, lib_mock):
         sp_search = spotify.ffi.cast('sp_search *', 42)
         utils.Sequence(
@@ -188,7 +186,8 @@ class SequenceTest(unittest.TestCase):
             add_ref_func=lib_mock.sp_search_add_ref,
             release_func=lib_mock.sp_search_release,
             len_func=None,
-            getitem_func=None)
+            getitem_func=None,
+        )
 
         self.assertEqual(lib_mock.sp_search_add_ref.call_count, 1)
 
@@ -199,7 +198,8 @@ class SequenceTest(unittest.TestCase):
             add_ref_func=lib_mock.sp_search_add_ref,
             release_func=lib_mock.sp_search_release,
             len_func=None,
-            getitem_func=None)
+            getitem_func=None,
+        )
 
         seq = None  # noqa
         tests.gc_collect()
@@ -215,7 +215,8 @@ class SequenceTest(unittest.TestCase):
             add_ref_func=lib_mock.sp_search_add_ref,
             release_func=lib_mock.sp_search_release,
             len_func=len_func,
-            getitem_func=None)
+            getitem_func=None,
+        )
 
         result = len(seq)
 
@@ -231,7 +232,8 @@ class SequenceTest(unittest.TestCase):
             add_ref_func=lib_mock.sp_search_add_ref,
             release_func=lib_mock.sp_search_release,
             len_func=lambda x: 1,
-            getitem_func=getitem_func)
+            getitem_func=getitem_func,
+        )
 
         result = seq[0]
 
@@ -247,7 +249,8 @@ class SequenceTest(unittest.TestCase):
             add_ref_func=lib_mock.sp_search_add_ref,
             release_func=lib_mock.sp_search_release,
             len_func=lambda x: 1,
-            getitem_func=getitem_func)
+            getitem_func=getitem_func,
+        )
 
         result = seq[-1]
 
@@ -267,7 +270,8 @@ class SequenceTest(unittest.TestCase):
             add_ref_func=lib_mock.sp_search_add_ref,
             release_func=lib_mock.sp_search_release,
             len_func=lambda x: 3,
-            getitem_func=getitem_func)
+            getitem_func=getitem_func,
+        )
 
         result = seq[0:2]
 
@@ -287,7 +291,8 @@ class SequenceTest(unittest.TestCase):
             add_ref_func=lib_mock.sp_search_add_ref,
             release_func=lib_mock.sp_search_release,
             len_func=lambda x: 1,
-            getitem_func=None)
+            getitem_func=None,
+        )
 
         with self.assertRaises(IndexError):
             seq[-3]
@@ -299,7 +304,8 @@ class SequenceTest(unittest.TestCase):
             add_ref_func=lib_mock.sp_search_add_ref,
             release_func=lib_mock.sp_search_release,
             len_func=lambda x: 1,
-            getitem_func=None)
+            getitem_func=None,
+        )
 
         with self.assertRaises(IndexError):
             seq[1]
@@ -311,7 +317,8 @@ class SequenceTest(unittest.TestCase):
             add_ref_func=lib_mock.sp_search_add_ref,
             release_func=lib_mock.sp_search_release,
             len_func=lambda x: 1,
-            getitem_func=None)
+            getitem_func=None,
+        )
 
         with self.assertRaises(TypeError):
             seq['abc']
@@ -323,7 +330,8 @@ class SequenceTest(unittest.TestCase):
             add_ref_func=lib_mock.sp_search_add_ref,
             release_func=lib_mock.sp_search_release,
             len_func=lambda x: 1,
-            getitem_func=lambda s, i: 123)
+            getitem_func=lambda s, i: 123,
+        )
 
         result = repr(seq)
 
@@ -331,13 +339,13 @@ class SequenceTest(unittest.TestCase):
 
 
 class ToBytesTest(unittest.TestCase):
-
     def test_unicode_to_bytes_is_encoded_as_utf8(self):
         self.assertEqual(utils.to_bytes('æøå'), 'æøå'.encode('utf-8'))
 
     def test_bytes_to_bytes_is_passed_through(self):
         self.assertEqual(
-            utils.to_bytes('æøå'.encode('utf-8')), 'æøå'.encode('utf-8'))
+            utils.to_bytes('æøå'.encode('utf-8')), 'æøå'.encode('utf-8')
+        )
 
     def test_cdata_to_bytes_is_unwrapped(self):
         cdata = spotify.ffi.new('char[]', 'æøå'.encode('utf-8'))
@@ -352,7 +360,6 @@ class ToBytesTest(unittest.TestCase):
 
 
 class ToBytesOrNoneTest(unittest.TestCase):
-
     def test_null_becomes_none(self):
         self.assertEqual(utils.to_bytes_or_none(spotify.ffi.NULL), None)
 
@@ -367,7 +374,6 @@ class ToBytesOrNoneTest(unittest.TestCase):
 
 
 class ToUnicodeTest(unittest.TestCase):
-
     def test_unicode_to_unicode_is_passed_through(self):
         self.assertEqual(utils.to_unicode('æøå'), 'æøå')
 
@@ -387,13 +393,13 @@ class ToUnicodeTest(unittest.TestCase):
 
 
 class ToUnicodeOrNoneTest(unittest.TestCase):
-
     def test_null_becomes_none(self):
         self.assertEqual(utils.to_unicode_or_none(spotify.ffi.NULL), None)
 
     def test_char_becomes_bytes(self):
         result = utils.to_unicode_or_none(
-            spotify.ffi.new('char[]', 'æøå'.encode('utf-8')))
+            spotify.ffi.new('char[]', 'æøå'.encode('utf-8'))
+        )
 
         self.assertEqual(result, 'æøå')
 
@@ -403,7 +409,6 @@ class ToUnicodeOrNoneTest(unittest.TestCase):
 
 
 class ToCharTest(unittest.TestCase):
-
     def test_bytes_becomes_char(self):
         result = utils.to_char(b'abc')
 
@@ -425,7 +430,6 @@ class ToCharTest(unittest.TestCase):
 
 
 class ToCharOrNullTest(unittest.TestCase):
-
     def test_none_becomes_null(self):
         self.assertEqual(utils.to_char_or_null(None), spotify.ffi.NULL)
 
@@ -447,7 +451,6 @@ class ToCharOrNullTest(unittest.TestCase):
 
 
 class ToCountryCodeTest(unittest.TestCase):
-
     def test_unicode_to_country_code(self):
         self.assertEqual(utils.to_country_code('NO'), 20047)
         self.assertEqual(utils.to_country_code('SE'), 21317)
@@ -466,7 +469,6 @@ class ToCountryCodeTest(unittest.TestCase):
 
 
 class ToCountryTest(unittest.TestCase):
-
     def test_to_country(self):
         self.assertEqual(utils.to_country(20047), 'NO')
         self.assertEqual(utils.to_country(21317), 'SE')

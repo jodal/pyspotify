@@ -3,6 +3,7 @@ Links
 *****
 
 .. module:: spotify
+    :noindex:
 
 .. autoclass:: Link
 

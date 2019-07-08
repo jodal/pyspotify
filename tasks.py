@@ -1,67 +1,54 @@
 from __future__ import print_function, unicode_literals
 
 import shutil
-import sys
 
-from invoke import run, task
-
-
-@task
-def docs(watch=False, warn=False):
-    if watch:
-        return watcher(docs)
-    run('make -C docs/ html', warn=warn)
+from invoke import task
 
 
 @task
-def test(coverage=False, watch=False, warn=False):
-    if watch:
-        return watcher(test, coverage=coverage)
+def docs(ctx, warn=False):
+    ctx.run('make -C docs/ html', warn=warn)
+
+
+@task
+def test(ctx, coverage=False, warn=False):
     cmd = 'py.test'
     if coverage:
         cmd += ' --cov=spotify --cov-report=term-missing'
-    run(cmd, pty=True, warn=warn)
+    ctx.run(cmd, pty=True, warn=warn)
 
 
 @task
-def preprocess_header():
-    run(
+def preprocess_header(ctx):
+    ctx.run(
         'cpp -nostdinc spotify/api.h | egrep -v "(^#)|(^$)" '
-        '> spotify/api.processed.h || true')
+        '> spotify/api.processed.h || true'
+    )
 
 
 @task
-def update_authors():
+def update_authors(ctx):
     # Keep authors in the order of appearance and use awk to filter out dupes
-    run("git log --format='- %aN <%aE>' --reverse | awk '!x[$0]++' > AUTHORS")
+    ctx.run(
+        "git log --format='- %aN <%aE>' --reverse | awk '!x[$0]++' > AUTHORS"
+    )
 
 
 @task
-def update_sp_constants():
+def update_sp_constants(ctx):
     import spotify
+
     constants = [
         '%s,%s\n' % (attr, getattr(spotify.lib, attr))
         for attr in dir(spotify.lib)
-        if attr.startswith('SP_')]
+        if attr.startswith('SP_')
+    ]
     with open('docs/sp-constants.csv', 'w+') as fh:
         fh.writelines(constants)
 
 
-def watcher(task, *args, **kwargs):
-    while True:
-        run('clear')
-        kwargs['warn'] = True
-        task(*args, **kwargs)
-        try:
-            run(
-                'inotifywait -q -e create -e modify -e delete '
-                '--exclude ".*\.(pyc|sw.)" -r docs/ spotify/ tests/')
-        except KeyboardInterrupt:
-            sys.exit()
-
-
 @task
-def mac_wheels():
+def mac_wheels(ctx):
     """
     Create wheel packages compatible with:
 
@@ -72,21 +59,25 @@ def mac_wheels():
     Based upon https://github.com/MacPython/wiki/wiki/Spinning-wheels
     """
 
-    prefix = '/Library/Frameworks/Python.framework/Versions'
     versions = [
-        ('2.7', ''),
-        ('3.4', '3'),
+        # Python.org Python 2.7 for Mac OS X 10.6 and later
+        '/Library/Frameworks/Python.framework/Versions/2.7/bin/python',
+        # Python.org Python 3.7 for Mac OS X 10.6 and later
+        '/Library/Frameworks/Python.framework/Versions/3.7/bin/python3',
+        # Homebrew Python 2.7
+        '/usr/local/bin/python2.7',
+        # Homebrew Python 3.7
+        '/usr/local/bin/python3.7',
     ]
 
     # Build wheels for all Python versions
-    for version, suffix in versions:
-        run('%s/%s/bin/pip%s install -U pip wheel' % (prefix, version, suffix))
+    for executable in versions:
         shutil.rmtree('./build', ignore_errors=True)
-        run('%s/%s/bin/python%s setup.py bdist_wheel' % (
-            prefix, version, suffix))
+        ctx.run('%s -m pip install wheel' % executable)
+        ctx.run('%s setup.py bdist_wheel' % executable)
 
     # Bundle libspotify into the wheels
     shutil.rmtree('./fixed_dist', ignore_errors=True)
-    run('delocate-wheel -w ./fixed_dist ./dist/*.whl')
+    ctx.run('delocate-wheel -w ./fixed_dist ./dist/*.whl')
 
-    print('To upload wheels, run: twine upload fixed_dist/*')
+    print ('To upload wheels, run: twine upload fixed_dist/*')

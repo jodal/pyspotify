@@ -10,10 +10,10 @@ import sys
 import types
 
 try:
-    # Python 3.3+
+    # Python 3.5+
     from unittest import mock
 except ImportError:
-    # Python <3.3
+    # Python 2.7
     import mock
 
 
@@ -46,11 +46,12 @@ with open('sp-constants.csv') as fh:
 
 
 # Unwrap decorated methods so Sphinx can inspect their signatures
-import spotify  # flake8: noqa
+import spotify  # noqa
+
 for mod_name, mod in vars(spotify).items():
     if not isinstance(mod, types.ModuleType) or mod_name in ('threading',):
         continue
-    for class_name, cls in vars(mod).items():
+    for cls in vars(mod).values():
         if not isinstance(cls, type):
             continue
         for method_name, method in vars(cls).items():
@@ -96,7 +97,7 @@ intersphinx_mapping = {
 
 # -- Options for HTML output --------------------------------------------------
 
-#html_theme = 'default'
+# html_theme = 'default'
 html_static_path = ['_static']
 
 html_use_modindex = True
@@ -112,5 +113,6 @@ extlinks = {
     'issue': ('https://github.com/mopidy/pyspotify/issues/%s', '#'),
     'ms-issue': (
         'https://github.com/mopidy/mopidy-spotify/issues/%s',
-        'mopidy-spotify#'),
+        'mopidy-spotify#',
+    ),
 }

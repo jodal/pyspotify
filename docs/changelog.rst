@@ -2,6 +2,27 @@
 Changelog
 *********
 
+v2.1.0 (2019-07-08)
+===================
+
+Maintenance release.
+
+- Drop support for Python 3.3 and 3.4, as both has reached end of life.
+
+- Add support for Python 3.6 and 3.7. No changes was required, but the test
+  suite now runs on these versions too.
+
+- On Python 3, import :class:`Iterable`, :class:`MutableSequence`, and
+  :class:`Sequence` from :mod:`collections.abc` instead of :mod:`collections`.
+  This fixes a deprecation warning on Python 3.7 and prepares for Python 3.8.
+
+- Document that the search API is broken. If it is used, raise an exception
+  instead of sending the search to Spotify, as that seems to disconnect your
+  session. (Fixes: :issue:`183`)
+
+- Format source code with Black.
+
+
 v2.0.5 (2015-09-22)
 ===================
 
@@ -468,7 +489,7 @@ Bug fixes
 - We now cache playlists when created from URIs. Previously, only playlists
   created from ``sp_playlist`` objects were cached. This avoids a potentially
   large number of wrapper object recreations due to a flood of updates to the
-  playlist when it is intially loaded. Combined with having registered a
+  playlist when it is initially loaded. Combined with having registered a
   callback for the libspotify ``playlist_update_in_progress`` callback, this
   could cause deep call stacks reaching the maximum recursion depth. (Fixes:
   :issue:`122`)

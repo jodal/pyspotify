@@ -7,11 +7,7 @@ import spotify
 from spotify import ffi, lib, serialized, utils
 
 
-__all__ = [
-    'Search',
-    'SearchPlaylist',
-    'SearchType',
-]
+__all__ = ['Search', 'SearchPlaylist', 'SearchType']
 
 logger = logging.getLogger(__name__)
 
@@ -25,13 +21,22 @@ class Search(object):
     """
 
     def __init__(
-            self, session, query='', callback=None,
-            track_offset=0, track_count=20,
-            album_offset=0, album_count=20,
-            artist_offset=0, artist_count=20,
-            playlist_offset=0, playlist_count=20,
-            search_type=None,
-            sp_search=None, add_ref=True):
+        self,
+        session,
+        query='',
+        callback=None,
+        track_offset=0,
+        track_count=20,
+        album_offset=0,
+        album_count=20,
+        artist_offset=0,
+        artist_count=20,
+        playlist_offset=0,
+        playlist_count=20,
+        search_type=None,
+        sp_search=None,
+        add_ref=True,
+    ):
 
         assert query or sp_search, 'query or sp_search is required'
 
@@ -56,12 +61,20 @@ class Search(object):
             self._session._callback_handles.add(handle)
 
             sp_search = lib.sp_search_create(
-                self._session._sp_session, utils.to_char(query),
-                track_offset, track_count,
-                album_offset, album_count,
-                artist_offset, artist_count,
-                playlist_offset, playlist_count,
-                int(search_type), _search_complete_callback, handle)
+                self._session._sp_session,
+                utils.to_char(query),
+                track_offset,
+                track_count,
+                album_offset,
+                album_count,
+                artist_offset,
+                artist_count,
+                playlist_offset,
+                playlist_count,
+                int(search_type),
+                _search_complete_callback,
+                handle,
+            )
             add_ref = False
 
         if add_ref:
@@ -130,7 +143,8 @@ class Search(object):
         """
         spotify.Error.maybe_raise(self.error)
         did_you_mean = utils.to_unicode(
-            lib.sp_search_did_you_mean(self._sp_search))
+            lib.sp_search_did_you_mean(self._sp_search)
+        )
         return did_you_mean if did_you_mean else None
 
     @property
@@ -141,7 +155,8 @@ class Search(object):
         Will always return an empty list if the search isn't loaded.
         """
         spotify.Error.maybe_raise(
-            self.error, ignores=[spotify.ErrorType.IS_LOADING])
+            self.error, ignores=[spotify.ErrorType.IS_LOADING]
+        )
         if not self.is_loaded:
             return []
 
@@ -150,14 +165,16 @@ class Search(object):
             return spotify.Track(
                 self._session,
                 sp_track=lib.sp_search_track(sp_search, key),
-                add_ref=True)
+                add_ref=True,
+            )
 
         return utils.Sequence(
             sp_obj=self._sp_search,
             add_ref_func=lib.sp_search_add_ref,
             release_func=lib.sp_search_release,
             len_func=lib.sp_search_num_tracks,
-            getitem_func=get_track)
+            getitem_func=get_track,
+        )
 
     @property
     def track_total(self):
@@ -178,7 +195,8 @@ class Search(object):
         Will always return an empty list if the search isn't loaded.
         """
         spotify.Error.maybe_raise(
-            self.error, ignores=[spotify.ErrorType.IS_LOADING])
+            self.error, ignores=[spotify.ErrorType.IS_LOADING]
+        )
         if not self.is_loaded:
             return []
 
@@ -187,14 +205,16 @@ class Search(object):
             return spotify.Album(
                 self._session,
                 sp_album=lib.sp_search_album(sp_search, key),
-                add_ref=True)
+                add_ref=True,
+            )
 
         return utils.Sequence(
             sp_obj=self._sp_search,
             add_ref_func=lib.sp_search_add_ref,
             release_func=lib.sp_search_release,
             len_func=lib.sp_search_num_albums,
-            getitem_func=get_album)
+            getitem_func=get_album,
+        )
 
     @property
     def album_total(self):
@@ -215,7 +235,8 @@ class Search(object):
         Will always return an empty list if the search isn't loaded.
         """
         spotify.Error.maybe_raise(
-            self.error, ignores=[spotify.ErrorType.IS_LOADING])
+            self.error, ignores=[spotify.ErrorType.IS_LOADING]
+        )
         if not self.is_loaded:
             return []
 
@@ -224,14 +245,16 @@ class Search(object):
             return spotify.Artist(
                 self._session,
                 sp_artist=lib.sp_search_artist(sp_search, key),
-                add_ref=True)
+                add_ref=True,
+            )
 
         return utils.Sequence(
             sp_obj=self._sp_search,
             add_ref_func=lib.sp_search_add_ref,
             release_func=lib.sp_search_release,
             len_func=lib.sp_search_num_artists,
-            getitem_func=get_artist)
+            getitem_func=get_artist,
+        )
 
     @property
     def artist_total(self):
@@ -254,7 +277,8 @@ class Search(object):
         Will always return an empty list if the search isn't loaded.
         """
         spotify.Error.maybe_raise(
-            self.error, ignores=[spotify.ErrorType.IS_LOADING])
+            self.error, ignores=[spotify.ErrorType.IS_LOADING]
+        )
         if not self.is_loaded:
             return []
 
@@ -263,18 +287,23 @@ class Search(object):
             return spotify.SearchPlaylist(
                 self._session,
                 name=utils.to_unicode(
-                    lib.sp_search_playlist_name(self._sp_search, key)),
+                    lib.sp_search_playlist_name(self._sp_search, key)
+                ),
                 uri=utils.to_unicode(
-                    lib.sp_search_playlist_uri(self._sp_search, key)),
+                    lib.sp_search_playlist_uri(self._sp_search, key)
+                ),
                 image_uri=utils.to_unicode(
-                    lib.sp_search_playlist_image_uri(self._sp_search, key)))
+                    lib.sp_search_playlist_image_uri(self._sp_search, key)
+                ),
+            )
 
         return utils.Sequence(
             sp_obj=self._sp_search,
             add_ref_func=lib.sp_search_add_ref,
             release_func=lib.sp_search_release,
             len_func=lib.sp_search_num_playlists,
-            getitem_func=getitem)
+            getitem_func=getitem,
+        )
 
     @property
     def playlist_total(self):
@@ -288,9 +317,13 @@ class Search(object):
         return lib.sp_search_total_playlists(self._sp_search)
 
     def more(
-            self, callback=None,
-            track_count=None, album_count=None, artist_count=None,
-            playlist_count=None):
+        self,
+        callback=None,
+        track_count=None,
+        album_count=None,
+        artist_count=None,
+        playlist_count=None,
+    ):
         """Get the next page of search results for the same query.
 
         If called without arguments, the ``callback`` and ``*_count`` arguments
@@ -308,12 +341,19 @@ class Search(object):
         playlist_count = playlist_count or self.playlist_count
 
         return Search(
-            self._session, query=self.query, callback=callback,
-            track_offset=track_offset, track_count=track_count,
-            album_offset=album_offset, album_count=album_count,
-            artist_offset=artist_offset, artist_count=artist_count,
-            playlist_offset=playlist_offset, playlist_count=playlist_count,
-            search_type=self.search_type)
+            self._session,
+            query=self.query,
+            callback=callback,
+            track_offset=track_offset,
+            track_count=track_count,
+            album_offset=album_offset,
+            album_count=album_count,
+            artist_offset=artist_offset,
+            artist_count=artist_count,
+            playlist_offset=playlist_offset,
+            playlist_count=playlist_count,
+            search_type=self.search_type,
+        )
 
     @property
     def link(self):
@@ -321,7 +361,8 @@ class Search(object):
         return spotify.Link(
             self._session,
             sp_link=lib.sp_link_create_from_search(self._sp_search),
-            add_ref=False)
+            add_ref=False,
+        )
 
 
 @ffi.callback('void(sp_search *, void *)')
@@ -330,7 +371,8 @@ def _search_complete_callback(sp_search, handle):
     logger.debug('search_complete_callback called')
     if handle == ffi.NULL:
         logger.warning(
-            'pyspotify search_complete_callback called without userdata')
+            'pyspotify search_complete_callback called without userdata'
+        )
         return
     (session, search_result, callback) = ffi.from_handle(handle)
     session._callback_handles.remove(handle)

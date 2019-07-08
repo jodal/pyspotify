@@ -50,7 +50,7 @@ If you are running Arch Linux, you can install Mopidy using the
 
 1. To install pyspotify with all dependencies, run::
 
-       yaourt -S python2-pyspotify
+       yay -S python2-pyspotify
 
 
 OS X: Install wheel package from PyPI with pip
@@ -133,7 +133,7 @@ libspotify is packaged in `AUR
 <https://aur.archlinux.org/packages/libspotify/>`_. To install libspotify,
 run::
 
-    yaourt -S libspotify
+    yay -S libspotify
 
 
 OS X

@@ -3,6 +3,7 @@ Player
 ******
 
 .. module:: spotify
+    :noindex:
 
 .. autoclass:: spotify.player.Player
 

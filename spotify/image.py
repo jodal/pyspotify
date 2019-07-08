@@ -8,11 +8,7 @@ import spotify
 from spotify import ffi, lib, serialized, utils
 
 
-__all__ = [
-    'Image',
-    'ImageFormat',
-    'ImageSize',
-]
+__all__ = ['Image', 'ImageFormat', 'ImageSize']
 
 logger = logging.getLogger(__name__)
 
@@ -38,8 +34,8 @@ class Image(object):
     """
 
     def __init__(
-            self, session, uri=None, sp_image=None, add_ref=True,
-            callback=None):
+        self, session, uri=None, sp_image=None, add_ref=True, callback=None
+    ):
 
         assert uri or sp_image, 'uri or sp_image is required'
 
@@ -49,7 +45,8 @@ class Image(object):
             image = spotify.Link(self._session, uri=uri).as_image()
             if image is None:
                 raise ValueError(
-                    'Failed to get image from Spotify URI: %r' % uri)
+                    'Failed to get image from Spotify URI: %r' % uri
+                )
             sp_image = image._sp_image
             add_ref = True
 
@@ -61,8 +58,11 @@ class Image(object):
 
         handle = ffi.new_handle((self._session, self, callback))
         self._session._callback_handles.add(handle)
-        spotify.Error.maybe_raise(lib.sp_image_add_load_callback(
-            self._sp_image, _image_load_callback, handle))
+        spotify.Error.maybe_raise(
+            lib.sp_image_add_load_callback(
+                self._sp_image, _image_load_callback, handle
+            )
+        )
 
     def __repr__(self):
         return 'Image(%r)' % self.link.uri
@@ -129,7 +129,9 @@ class Image(object):
         buffer_ = ffi.buffer(data, data_size_ptr[0])
         data_bytes = buffer_[:]
         assert len(data_bytes) == data_size_ptr[0], '%r == %r' % (
-            len(data_bytes), data_size_ptr[0])
+            len(data_bytes),
+            data_size_ptr[0],
+        )
         return data_bytes
 
     @property
@@ -143,7 +145,8 @@ class Image(object):
         if self.format is not ImageFormat.JPEG:
             raise ValueError('Unknown image format: %r' % self.format)
         return 'data:image/jpeg;base64,%s' % (
-            base64.b64encode(self.data).decode('ascii'))
+            base64.b64encode(self.data).decode('ascii')
+        )
 
     @property
     def link(self):
@@ -151,7 +154,8 @@ class Image(object):
         return spotify.Link(
             self._session,
             sp_link=lib.sp_link_create_from_image(self._sp_image),
-            add_ref=False)
+            add_ref=False,
+        )
 
 
 @ffi.callback('void(sp_image *, void *)')

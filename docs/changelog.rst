@@ -20,7 +20,7 @@ Maintenance release.
   instead of sending the search to Spotify, as that seems to disconnect your
   session. (Fixes: :issue:`183`)
 
-- Format soruce code with Black.
+- Format source code with Black.
 
 
 v2.0.5 (2015-09-22)

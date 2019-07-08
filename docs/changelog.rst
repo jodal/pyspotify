@@ -16,6 +16,10 @@ Maintenance release.
   :class:`Sequence` from :mod:`collections.abc` instead of :mod:`collections`.
   This fixes a deprecation warning on Python 3.7 and prepares for Python 3.8.
 
+- Document that the search API is broken. If it is used, raise an exception
+  instead of sending the search to Spotify, as that seems to disconnect your
+  session. (Fixes: :issue:`183`)
+
 - Format soruce code with Black.
 
 

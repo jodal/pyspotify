@@ -554,6 +554,12 @@ class Session(utils.EventEmitter):
         Search Spotify for tracks, albums, artists, and playlists matching
         ``query``.
 
+        .. warning:: Search API is not working
+            The search API was broken at 2016-02-03 by a server-side change
+            made by Spotify. The functionality was never restored.
+
+            Please use the Spotify Web API to perform searches.
+
         The ``query`` string can be free format, or use some prefixes like
         ``title:`` and ``artist:`` to limit what to match on. There is no
         official docs on the search query format, but there's a `Spotify blog
@@ -579,20 +585,9 @@ class Session(utils.EventEmitter):
 
         Returns a :class:`Search` instance.
         """
-        return spotify.Search(
-            self,
-            query=query,
-            callback=callback,
-            track_offset=track_offset,
-            track_count=track_count,
-            album_offset=album_offset,
-            album_count=album_count,
-            artist_offset=artist_offset,
-            artist_count=artist_count,
-            playlist_offset=playlist_offset,
-            playlist_count=playlist_count,
-            search_type=search_type,
-        )
+        raise Exception(
+            'Spotify broke the libspotify search API 2016-02-03 '
+            'and never restored it.')
 
     def get_toplist(
         self, type=None, region=None, canonical_username=None, callback=None

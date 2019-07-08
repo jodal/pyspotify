@@ -723,25 +723,11 @@ class SessionTest(unittest.TestCase):
     @mock.patch('spotify.Search')
     def test_search(self, search_mock, lib_mock):
         session = tests.create_real_session(lib_mock)
-        search_mock.return_value = mock.sentinel.search
 
-        result = session.search('alice')
+        with self.assertRaises(Exception):
+            session.search('alice')
 
-        self.assertIs(result, mock.sentinel.search)
-        search_mock.assert_called_with(
-            session,
-            query='alice',
-            callback=None,
-            track_offset=0,
-            track_count=20,
-            album_offset=0,
-            album_count=20,
-            artist_offset=0,
-            artist_count=20,
-            playlist_offset=0,
-            playlist_count=20,
-            search_type=None,
-        )
+        self.assertEqual(search_mock.call_count, 0)
 
     @mock.patch('spotify.Toplist')
     def test_toplist(self, toplist_mock, lib_mock):

@@ -55,7 +55,7 @@ the `python2-pyspotify package
 .. note::
 
    AUR does not provide libspotify for all CPU architectures e.g. arm. See
-   :ref:`_source-install` in these cases.
+   :ref:`installing from source <source-install>` in these cases.
 
 
 OS X: Install wheel package from PyPI with pip

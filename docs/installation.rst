@@ -15,11 +15,11 @@ Debian/Ubuntu: Install from apt.mopidy.com
 The `Mopidy <https://www.mopidy.com/>`_ project runs its own APT archive which
 includes pyspotify built for:
 
-- Debian jessie (oldstable), which also works for Ubuntu 14.04 LTS.
-- Debian stretch (stable), which also works for Ubuntu 16.04 LTS and newer.
+- Debian stretch (oldstable), which also works for Ubuntu 16.04 LTS.
+- Debian buster (stable), which also works for Ubuntu 18.04 LTS and newer.
 
 The packages are available for multiple CPU architectures: i386, amd64, armel,
-and armhf (compatible with Raspbian and Raspberry Pi 1).
+and armhf (compatible with Raspbian and all Raspberry Pi models).
 
 To install and receive future updates:
 
@@ -27,13 +27,13 @@ To install and receive future updates:
 
        wget -q -O - https://apt.mopidy.com/mopidy.gpg | sudo apt-key add -
 
-2. If you run Debian jessie or Ubuntu 14.04 LTS::
+2. If you run Debian stretch or Ubuntu 16.04 LTS::
 
-       sudo wget -q -O /etc/apt/sources.list.d/mopidy.list https://apt.mopidy.com/jessie.list
+       sudo wget -q -O /etc/apt/sources.list.d/mopidy.list https://apt.mopidy.com/stretch.list
 
    Or, if you run any newer Debian/Ubuntu distro::
 
-       sudo wget -q -O /etc/apt/sources.list.d/mopidy.list https://apt.mopidy.com/stretch.list
+       sudo wget -q -O /etc/apt/sources.list.d/mopidy.list https://apt.mopidy.com/buster.list
 
 3. Install pyspotify and all dependencies::
 
@@ -44,13 +44,18 @@ To install and receive future updates:
 Arch Linux: Install from AUR
 ============================
 
-If you are running Arch Linux, you can install Mopidy using the
-`python2-pyspotify package
+If you are running Arch Linux on x86 or x86_64, you can install pyspotify using
+the `python2-pyspotify package
 <https://aur.archlinux.org/packages/python2-pyspotify/>`_ found in AUR.
 
 1. To install pyspotify with all dependencies, run::
 
        yay -S python2-pyspotify
+
+.. note::
+
+   AUR does not provide libspotify for all CPU architectures e.g. arm. See
+   :ref:`_source-install` in these cases.
 
 
 OS X: Install wheel package from PyPI with pip
@@ -92,6 +97,8 @@ its dependencies.
        brew install mopidy/mopidy/python-spotify
 
 
+.. _source-install:
+
 Install from source
 ===================
 
@@ -129,11 +136,18 @@ then install libspotify::
 Arch Linux
 ~~~~~~~~~~
 
-libspotify is packaged in `AUR
+libspotify for x86 and x86_64 is packaged in `AUR
 <https://aur.archlinux.org/packages/libspotify/>`_. To install libspotify,
 run::
 
     yay -S libspotify
+
+.. note::
+
+   AUR only provides libspotify binaries for x86 and x86_64 CPUs. If you
+   require libspotify for a different CPU architecture you'll need to download
+   it from our `unofficial libspotify archive
+   <https://mopidy.github.io/libspotify-archive/>`__ instead.
 
 
 OS X

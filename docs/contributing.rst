@@ -91,7 +91,7 @@ Submitting changes
 
 - One branch per feature or fix. Keep branches small and on topic.
 
-- Send a pull request to the ``v2.x/develop`` branch. See the `GitHub pull
+- Send a pull request to the ``v2.x/master`` branch. See the `GitHub pull
   request docs <https://help.github.com/articles/using-pull-requests>`_ for
   help.
 

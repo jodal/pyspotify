@@ -46,10 +46,10 @@ Project resources
     :target: https://pypi.python.org/pypi/pyspotify/
     :alt: Latest PyPI version
 
-.. image:: https://img.shields.io/travis/mopidy/pyspotify/v2.x/develop.svg?style=flat
+.. image:: https://img.shields.io/travis/mopidy/pyspotify/v2.x/master.svg?style=flat
     :target: https://travis-ci.org/mopidy/pyspotify
     :alt: Travis CI build status
 
-.. image:: https://img.shields.io/coveralls/mopidy/pyspotify/v2.x/develop.svg?style=flat
-   :target: https://coveralls.io/r/mopidy/pyspotify?branch=v2.x/develop
+.. image:: https://img.shields.io/coveralls/mopidy/pyspotify/v2.x/master.svg?style=flat
+   :target: https://coveralls.io/r/mopidy/pyspotify?branch=v2.x/master
    :alt: Test coverage

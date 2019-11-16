@@ -41,14 +41,14 @@ Project resources
 - `Source code <https://github.com/mopidy/pyspotify>`_
 - `Issue tracker <https://github.com/mopidy/pyspotify/issues>`_
 
-.. image:: https://img.shields.io/pypi/v/pyspotify.svg?style=flat
-    :target: https://pypi.python.org/pypi/pyspotify/
+.. image:: https://img.shields.io/pypi/v/pyspotify
+    :target: https://pypi.org/project/pyspotify/
     :alt: Latest PyPI version
 
-.. image:: https://img.shields.io/travis/mopidy/pyspotify/v2.x/master.svg?style=flat
-    :target: https://travis-ci.org/mopidy/pyspotify
-    :alt: Travis CI build status
+.. image:: https://img.shields.io/circleci/build/gh/mopidy/pyspotify
+    :target: https://circleci.com/gh/mopidy/pyspotify
+    :alt: CircleCI build status
 
-.. image:: https://img.shields.io/coveralls/mopidy/pyspotify/v2.x/master.svg?style=flat
-   :target: https://coveralls.io/r/mopidy/pyspotify?branch=v2.x/master
+.. image:: https://img.shields.io/codecov/c/gh/mopidy/pyspotify
+   :target: https://codecov.io/gh/mopidy/pyspotify
    :alt: Test coverage

@@ -80,4 +80,4 @@ def mac_wheels(ctx):
     shutil.rmtree('./fixed_dist', ignore_errors=True)
     ctx.run('delocate-wheel -w ./fixed_dist ./dist/*.whl')
 
-    print ('To upload wheels, run: twine upload fixed_dist/*')
+    print('To upload wheels, run: twine upload fixed_dist/*')

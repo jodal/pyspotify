@@ -159,5 +159,5 @@ if __name__ == '__main__':
     parser = make_parser()
     args = parser.parse_args()
     result = main(args)
-    print (json.dumps(result, indent=2))
+    print(json.dumps(result, indent=2))
     sys.exit(not result['success'])

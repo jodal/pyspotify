@@ -347,7 +347,7 @@ class ConfigTest(unittest.TestCase):
         'The struct field does not exist in libspotify for OS X',
     )
     def test_sp_session_config_ca_certs_filename_has_unicode_encoded_as_utf8(
-        self
+        self,
     ):
 
         self.config.ca_certs_filename = 'æ ca_certs_filename'

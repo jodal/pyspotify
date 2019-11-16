@@ -588,7 +588,8 @@ class Session(utils.EventEmitter):
         """
         raise Exception(
             'Spotify broke the libspotify search API 2016-02-03 '
-            'and never restored it.')
+            'and never restored it.'
+        )
 
     def get_toplist(
         self, type=None, region=None, canonical_username=None, callback=None

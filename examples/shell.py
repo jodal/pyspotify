@@ -72,30 +72,30 @@ class Commander(cmd.Cmd):
 
     def do_debug(self, line):
         "Show more logging output"
-        print ('Logging at DEBUG level')
+        print('Logging at DEBUG level')
         logger = logging.getLogger()
         logger.setLevel(logging.DEBUG)
 
     def do_info(self, line):
         "Show normal logging output"
-        print ('Logging at INFO level')
+        print('Logging at INFO level')
         logger = logging.getLogger()
         logger.setLevel(logging.INFO)
 
     def do_warning(self, line):
         "Show less logging output"
-        print ('Logging at WARNING level')
+        print('Logging at WARNING level')
         logger = logging.getLogger()
         logger.setLevel(logging.WARNING)
 
     def do_EOF(self, line):
         "Exit"
         if self.logged_in.is_set():
-            print ('Logging out...')
+            print('Logging out...')
             self.session.logout()
             self.logged_out.wait()
         self.event_loop.stop()
-        print ('')
+        print('')
         return True
 
     def do_login(self, line):

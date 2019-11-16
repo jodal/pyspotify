@@ -24,13 +24,13 @@ user.published_playlists.load()
 time.sleep(10)
 session.process_events()
 
-print ('%d playlists found' % len(user.published_playlists))
+print('%d playlists found' % len(user.published_playlists))
 
 for playlist in user.published_playlists:
     playlist.load()
-    print ('Loaded', playlist)
+    print('Loaded', playlist)
 
-print (user.published_playlists)
+print(user.published_playlists)
 
 session.logout()
 session.process_events()

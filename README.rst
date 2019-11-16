@@ -40,7 +40,6 @@ Project resources
 - `Documentation <https://pyspotify.mopidy.com/>`_
 - `Source code <https://github.com/mopidy/pyspotify>`_
 - `Issue tracker <https://github.com/mopidy/pyspotify/issues>`_
-- IRC: ``#mopidy`` at `irc.freenode.net <https://freenode.net/>`_
 
 .. image:: https://img.shields.io/pypi/v/pyspotify.svg?style=flat
     :target: https://pypi.python.org/pypi/pyspotify/

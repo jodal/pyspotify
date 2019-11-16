@@ -99,8 +99,6 @@ Submitting changes
 Additional resources
 ====================
 
-- IRC channel: ``#mopidy`` at `irc.freenode.net <http://freenode.net/>`_
-
 - `Issue tracker <https://github.com/mopidy/pyspotify/issues>`_
 
 - `Mailing List <https://groups.google.com/forum/?fromgroups=#!forum/mopidy>`_

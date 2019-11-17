@@ -4,12 +4,11 @@
 
 from __future__ import unicode_literals
 
+import configparser
 import os
 import re
 import sys
 import types
-
-import pkg_resources
 
 try:
     # Python 3.5+
@@ -17,6 +16,14 @@ try:
 except ImportError:
     # Python 2.7
     import mock
+
+
+def get_version():
+    # Get current library version without requiring the library to be
+    # installed, like ``pkg_resources.get_distribution(...).version`` requires.
+    cp = configparser.ConfigParser()
+    cp.read(os.path.join(os.path.dirname(__file__), '..', 'setup.cfg'))
+    return cp['metadata']['version']
 
 
 # -- Workarounds to have autodoc generate API docs ----------------------------
@@ -73,7 +80,7 @@ master_doc = 'index'
 project = 'pyspotify'
 copyright = '2013-2019, Stein Magnus Jodal and contributors'
 
-release = pkg_resources.get_distribution('pyspotify').version
+release = get_version()
 version = '.'.join(release.split('.')[:2])
 
 exclude_patterns = ['_build']

@@ -2,8 +2,13 @@
 Changelog
 *********
 
-v2.1.1 (UNRELEASED)
+v2.1.1 (2019-11-17)
 ===================
+
+Maintanance release.
+
+- Add support for Python 3.8. No changes was required, but the test suite now
+  runs on this version too.
 
 - Switch from Travis CI to CircleCI.
 

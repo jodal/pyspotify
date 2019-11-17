@@ -38,7 +38,7 @@ Development setup
 
 4. Install development dependencies::
 
-       pip install -r dev-requirements.txt
+       pip install -e ".[dev]
 
 5. Run tests.
 

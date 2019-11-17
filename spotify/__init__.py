@@ -2,8 +2,10 @@ from __future__ import unicode_literals
 
 import threading
 
+import pkg_resources
 
-__version__ = '2.1.0'
+
+__version__ = pkg_resources.get_distribution('pyspotify').version
 
 
 # Global reentrant lock to be held whenever libspotify functions are called or

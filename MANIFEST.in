@@ -1,12 +1,15 @@
 include *.py
 include *.rst
-include *.txt
 include .mailmap
-include .travis.yml
+include .readthedocs.yml
 include AUTHORS
 include LICENSE
 include MANIFEST.in
+include pyproject.toml
 include tox.ini
+
+recursive-include .circleci *
+recursive-include .github *
 
 recursive-include docs *
 prune docs/_build

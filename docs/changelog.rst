@@ -2,6 +2,12 @@
 Changelog
 *********
 
+v2.1.1 (UNRELEASED)
+===================
+
+- Switch from Travis CI to CircleCI.
+
+
 v2.1.0 (2019-07-08)
 ===================
 

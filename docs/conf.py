@@ -9,18 +9,14 @@ import re
 import sys
 import types
 
+import pkg_resources
+
 try:
     # Python 3.5+
     from unittest import mock
 except ImportError:
     # Python 2.7
     import mock
-
-
-def get_version(filename):
-    init_py = open(filename).read()
-    metadata = dict(re.findall("__([a-z]+)__ = '([^']+)'", init_py))
-    return metadata['version']
 
 
 # -- Workarounds to have autodoc generate API docs ----------------------------
@@ -75,9 +71,9 @@ source_suffix = '.rst'
 master_doc = 'index'
 
 project = 'pyspotify'
-copyright = '2013-2015, Stein Magnus Jodal and contributors'
+copyright = '2013-2019, Stein Magnus Jodal and contributors'
 
-release = get_version('../spotify/__init__.py')
+release = pkg_resources.get_distribution('pyspotify').version
 version = '.'.join(release.split('.')[:2])
 
 exclude_patterns = ['_build']

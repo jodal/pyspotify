@@ -41,6 +41,12 @@ module.lib.sp_error_message.__name__ = str('sp_error_message')
 sys.modules['spotify._spotify'] = module
 
 
+# Mock pkg_resources module
+module = mock.Mock()
+module.get_distribution.return_value.version = get_version()
+sys.modules['pkg_resources'] = module
+
+
 # Add all libspotify constants to the lib mock
 with open('sp-constants.csv') as fh:
     for line in fh.readlines():

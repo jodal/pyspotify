@@ -56,6 +56,13 @@ def serialized(f):
 
     @functools.wraps(f)
     def wrapper(*args, **kwargs):
+        if _lock is None:
+            # During process teardown, objects wrapped with `ffi.gc()` might be
+            # freed and their libspotify release functions called after the lock
+            # has been freed. When this happens, `_lock` will be `None`.
+            # Since we're already shutting down the process, we just abort the
+            # call when the lock is gone.
+            return
         with _lock:
             return f(*args, **kwargs)
 

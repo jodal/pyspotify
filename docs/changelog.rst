@@ -2,10 +2,20 @@
 Changelog
 *********
 
+v2.1.2 (UNRELEASED)
+===================
+
+Maintenance release.
+
+- Silently abort libspotify `sp_*_release()` function calls that happen during
+  process shutdown, after pyspotify's global lock is freed. (Fixes:
+  :issue:`202`)
+
+
 v2.1.1 (2019-11-17)
 ===================
 
-Maintanance release.
+Maintenance release.
 
 - Add support for Python 3.8. No changes was required, but the test suite now
   runs on this version too.

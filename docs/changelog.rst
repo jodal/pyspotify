@@ -2,7 +2,7 @@
 Changelog
 *********
 
-v2.1.2 (UNRELEASED)
+v2.1.2 (2019-12-10)
 ===================
 
 Maintenance release.

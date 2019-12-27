@@ -103,5 +103,5 @@ Additional resources
 
 - `GitHub documentation <https://help.github.com/>`_
 
-- `libspotify documentation
-  <https://developer.spotify.com/technologies/libspotify/>`_
+- `libspotify downloads and documentation archive
+  <https://mopidy.github.io/libspotify-archive/>`_

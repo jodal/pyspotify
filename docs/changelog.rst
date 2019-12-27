@@ -611,4 +611,4 @@ v1.x series
 ===========
 
 See the `pyspotify 1.x changelog
-<http://pyspotify.mopidy.com/en/v1.x-develop/changes/>`__.
+<http://pyspotify.readthedocs.io/en/v1.x-develop/changes/>`__.

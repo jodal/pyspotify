@@ -12,7 +12,7 @@ OS and/or distribution.
 Debian/Ubuntu: Install from apt.mopidy.com
 ==========================================
 
-The `Mopidy <https://www.mopidy.com/>`_ project runs its own APT archive which
+The `Mopidy <https://mopidy.com/>`_ project runs its own APT archive which
 includes pyspotify built for:
 
 - Debian stretch (oldstable), which also works for Ubuntu 16.04 LTS.
@@ -81,7 +81,7 @@ libspotify. The packages should work on all combinations of:
 OS X: Install from Homebrew
 ===========================
 
-The `Mopidy <https://www.mopidy.com/>`__ project maintains its own `Homebrew
+The `Mopidy <https://mopidy.com/>`__ project maintains its own `Homebrew
 tap <https://github.com/mopidy/homebrew-mopidy>`_ which includes pyspotify and
 its dependencies.
 

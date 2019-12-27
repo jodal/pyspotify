@@ -99,9 +99,7 @@ Submitting changes
 Additional resources
 ====================
 
-- `Issue tracker <https://github.com/mopidy/pyspotify/issues>`_
-
-- `Mailing List <https://groups.google.com/forum/?fromgroups=#!forum/mopidy>`_
+- `Issue tracker <https://github.com/jodal/pyspotify/issues>`_
 
 - `GitHub documentation <https://help.github.com/>`_
 

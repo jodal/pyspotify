@@ -119,7 +119,7 @@ htmlhelp_basename = 'pyspotify'
 # -- Options for extlink extension --------------------------------------------
 
 extlinks = {
-    'issue': ('https://github.com/mopidy/pyspotify/issues/%s', '#'),
+    'issue': ('https://github.com/jodal/pyspotify/issues/%s', '#'),
     'ms-issue': (
         'https://github.com/mopidy/mopidy-spotify/issues/%s',
         'mopidy-spotify#',

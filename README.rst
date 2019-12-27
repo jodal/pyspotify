@@ -37,18 +37,18 @@ work with the Spotify service for a long time into the future.
 Project resources
 =================
 
-- `Documentation <https://pyspotify.mopidy.com/>`_
-- `Source code <https://github.com/mopidy/pyspotify>`_
-- `Issue tracker <https://github.com/mopidy/pyspotify/issues>`_
+- `Documentation <https://pyspotify.readthedocs.io/>`_
+- `Source code <https://github.com/jodal/pyspotify>`_
+- `Issue tracker <https://github.com/jodal/pyspotify/issues>`_
 
 .. image:: https://img.shields.io/pypi/v/pyspotify
     :target: https://pypi.org/project/pyspotify/
     :alt: Latest PyPI version
 
-.. image:: https://img.shields.io/circleci/build/gh/mopidy/pyspotify
-    :target: https://circleci.com/gh/mopidy/pyspotify
+.. image:: https://img.shields.io/circleci/build/gh/jodal/pyspotify
+    :target: https://circleci.com/gh/jodal/pyspotify
     :alt: CircleCI build status
 
-.. image:: https://img.shields.io/codecov/c/gh/mopidy/pyspotify
-   :target: https://codecov.io/gh/mopidy/pyspotify
+.. image:: https://img.shields.io/codecov/c/gh/jodal/pyspotify
+   :target: https://codecov.io/gh/jodal/pyspotify
    :alt: Test coverage

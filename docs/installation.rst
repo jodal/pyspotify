@@ -15,8 +15,8 @@ Debian/Ubuntu: Install from apt.mopidy.com
 The `Mopidy <https://mopidy.com/>`_ project runs its own APT archive which
 includes pyspotify built for:
 
-- Debian stretch (oldstable), which also works for Ubuntu 16.04 LTS.
-- Debian buster (stable), which also works for Ubuntu 18.04 LTS and newer.
+- Debian 9 (Stretch), which also works for Ubuntu 18.04 LTS.
+- Debian 10 (Buster), which also works for Ubuntu 19.10 and newer.
 
 The packages are available for multiple CPU architectures: i386, amd64, armel,
 and armhf (compatible with Raspbian and all Raspberry Pi models).
@@ -94,7 +94,7 @@ its dependencies.
 
 3. Install pyspotify from the mopidy/mopidy tap::
 
-       brew install mopidy/mopidy/python-spotify
+       brew install mopidy/mopidy/pyspotify
 
 
 .. _source-install:
@@ -150,31 +150,13 @@ run::
    <https://mopidy.github.io/libspotify-archive/>`__ instead.
 
 
-OS X
-~~~~
+macOS
+~~~~~
 
 If you're using `Homebrew <http://brew.sh/>`_, it has a formula for
-libspotify in the homebrew/binary tap::
+libspotify in the mopidy/mopidy tap::
 
-    brew install homebrew/binary/libspotify
-
-.. warning::
-
-   There's an issue with building pyspotify against libspotify on OS X where
-   the pyspotify installation fails with "Reason: image not found".
-
-   A known workaround is to create a symlink after installing libspotify, but
-   before installing pyspotify::
-
-       ln -s /usr/local/opt/libspotify/lib/libspotify.12.1.51.dylib \
-       /usr/local/opt/libspotify/lib/libspotify
-
-   Alternatively, the mopidy/mopidy Homebrew tap has a libspotify formula which
-   includes the workaround::
-
-       brew install mopidy/mopidy/libspotify
-
-   For details, or if you have a proper fix for this, see :issue:`130`.
+    brew install mopidy/mopidy/libspotify
 
 
 Build tools
@@ -191,7 +173,7 @@ Debian/Ubuntu
 If you're on a Debian-based system, you can install the pyspotify build
 dependencies by running::
 
-    sudo apt-get install build-essential python-dev python3-dev libffi-dev
+    sudo apt install build-essential python-dev python3-dev libffi-dev
 
 
 Arch Linux
@@ -203,10 +185,10 @@ running::
     sudo pacman -S base-devel python2 python
 
 
-OS X
+macOS
 ~~~~
 
-If you're on OS X, you'll need to install the Xcode command line developer
+If you're on macOS, you'll need to install the Xcode command line developer
 tools. Even if you've already installed Xcode from the App Store, e.g. to get
 Homebrew working, you should run this command::
 

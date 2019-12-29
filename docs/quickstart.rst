@@ -421,6 +421,13 @@ mean based on popularity, etc. instead of exact token matches::
 Playlist management
 ===================
 
+.. warning::
+
+    The playlists API was broken at 2018-05-24 by a server-side change
+    made by Spotify. The functionality was never restored.
+
+    Please use the Spotify Web API to work with playlists.
+
 Another way to find some music is to use your Spotify
 :class:`~spotify.Playlist`, which can be found in
 :attr:`~spotify.Session.playlist_container`::

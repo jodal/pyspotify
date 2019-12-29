@@ -2,6 +2,13 @@
 Playlists
 *********
 
+.. warning::
+
+    The playlists API was broken at 2018-05-24 by a server-side change
+    made by Spotify. The functionality was never restored.
+
+    Please use the Spotify Web API to work with playlists.
+
 .. module:: spotify
     :noindex:
 

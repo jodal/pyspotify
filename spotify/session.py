@@ -1,6 +1,7 @@
 from __future__ import unicode_literals
 
 import logging
+import warnings
 import weakref
 
 import spotify
@@ -225,7 +226,20 @@ class Session(utils.EventEmitter):
     @property
     @serialized
     def playlist_container(self):
-        """The :class:`PlaylistContainer` for the currently logged in user."""
+        """The :class:`PlaylistContainer` for the currently logged in user.
+
+        .. warning::
+
+            The playlists API was broken at 2018-05-24 by a server-side change
+            made by Spotify. The functionality was never restored.
+
+            Please use the Spotify Web API to work with playlists.
+        """
+        warnings.warn(
+            "Spotify broke the libspotify playlists API 2018-05-24 "
+            "and never restored it. "
+            "Please use the Spotify Web API to work with playlists."
+        )
         sp_playlistcontainer = lib.sp_session_playlistcontainer(
             self._sp_session
         )
@@ -237,7 +251,20 @@ class Session(utils.EventEmitter):
 
     @property
     def inbox(self):
-        """The inbox :class:`Playlist` for the currently logged in user."""
+        """The inbox :class:`Playlist` for the currently logged in user.
+
+        .. warning::
+
+            The playlists API was broken at 2018-05-24 by a server-side change
+            made by Spotify. The functionality was never restored.
+
+            Please use the Spotify Web API to work with playlists.
+        """
+        warnings.warn(
+            "Spotify broke the libspotify playlists API 2018-05-24 "
+            "and never restored it. "
+            "Please use the Spotify Web API to work with playlists."
+        )
         sp_playlist = lib.sp_session_inbox_create(self._sp_session)
         if sp_playlist == ffi.NULL:
             return None
@@ -339,9 +366,21 @@ class Session(utils.EventEmitter):
         """Get the starred :class:`Playlist` for the user with
         ``canonical_username``.
 
+        .. warning::
+
+            The playlists API was broken at 2018-05-24 by a server-side change
+            made by Spotify. The functionality was never restored.
+
+            Please use the Spotify Web API to work with playlists.
+
         If ``canonical_username`` isn't specified, the starred playlist for
         the currently logged in user is returned.
         """
+        warnings.warn(
+            "Spotify broke the libspotify playlists API 2018-05-24 "
+            "and never restored it. "
+            "Please use the Spotify Web API to work with playlists."
+        )
         if canonical_username is None:
             sp_playlist = lib.sp_session_starred_create(self._sp_session)
         else:
@@ -356,9 +395,21 @@ class Session(utils.EventEmitter):
         """Get the :class:`PlaylistContainer` of published playlists for the
         user with ``canonical_username``.
 
+        .. warning::
+
+            The playlists API was broken at 2018-05-24 by a server-side change
+            made by Spotify. The functionality was never restored.
+
+            Please use the Spotify Web API to work with playlists.
+
         If ``canonical_username`` isn't specified, the published container for
         the currently logged in user is returned.
         """
+        warnings.warn(
+            "Spotify broke the libspotify playlists API 2018-05-24 "
+            "and never restored it. "
+            "Please use the Spotify Web API to work with playlists."
+        )
         if canonical_username is None:
             canonical_username = ffi.NULL
         else:
@@ -492,6 +543,13 @@ class Session(utils.EventEmitter):
         """
         Get :class:`Playlist` from a Spotify playlist URI.
 
+        .. warning::
+
+            The playlists API was broken at 2018-05-24 by a server-side change
+            made by Spotify. The functionality was never restored.
+
+            Please use the Spotify Web API to work with playlists.
+
         Example::
 
             >>> session = spotify.Session()
@@ -501,6 +559,11 @@ class Session(utils.EventEmitter):
             >>> playlist.load().name
             u'500C feelgood playlist'
         """
+        warnings.warn(
+            "Spotify broke the libspotify playlists API 2018-05-24 "
+            "and never restored it. "
+            "Please use the Spotify Web API to work with playlists."
+        )
         return spotify.Playlist(self, uri=uri)
 
     def get_user(self, uri):

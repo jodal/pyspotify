@@ -4,6 +4,8 @@ from __future__ import unicode_literals
 
 import unittest
 
+import pytest
+
 import spotify
 from spotify.session import _SessionCallbacks
 
@@ -256,7 +258,10 @@ class SessionTest(unittest.TestCase):
         )
         session = tests.create_real_session(lib_mock)
 
-        result = session.playlist_container
+        with pytest.warns(
+            UserWarning, match='Spotify broke the libspotify playlists API'
+        ):
+            result = session.playlist_container
 
         lib_mock.sp_session_playlistcontainer.assert_called_with(
             session._sp_session
@@ -272,11 +277,17 @@ class SessionTest(unittest.TestCase):
         )
         session = tests.create_real_session(lib_mock)
 
-        result1 = session.playlist_container
+        with pytest.warns(
+            UserWarning, match='Spotify broke the libspotify playlists API'
+        ):
+            result1 = session.playlist_container
         result1.on(
             spotify.PlaylistContainerEvent.PLAYLIST_ADDED, lambda *args: None
         )
-        result2 = session.playlist_container
+        with pytest.warns(
+            UserWarning, match='Spotify broke the libspotify playlists API'
+        ):
+            result2 = session.playlist_container
 
         result1.off()
 
@@ -287,7 +298,10 @@ class SessionTest(unittest.TestCase):
         lib_mock.sp_session_playlistcontainer.return_value = spotify.ffi.NULL
         session = tests.create_real_session(lib_mock)
 
-        result = session.playlist_container
+        with pytest.warns(
+            UserWarning, match='Spotify broke the libspotify playlists API'
+        ):
+            result = session.playlist_container
 
         lib_mock.sp_session_playlistcontainer.assert_called_with(
             session._sp_session
@@ -301,7 +315,10 @@ class SessionTest(unittest.TestCase):
         )
         session = tests.create_real_session(lib_mock)
 
-        result = session.inbox
+        with pytest.warns(
+            UserWarning, match='Spotify broke the libspotify playlists API'
+        ):
+            result = session.inbox
 
         lib_mock.sp_session_inbox_create.assert_called_with(session._sp_session)
         self.assertIsInstance(result, spotify.Playlist)
@@ -315,7 +332,10 @@ class SessionTest(unittest.TestCase):
         lib_mock.sp_session_inbox_create.return_value = spotify.ffi.NULL
         session = tests.create_real_session(lib_mock)
 
-        result = session.inbox
+        with pytest.warns(
+            UserWarning, match='Spotify broke the libspotify playlists API'
+        ):
+            result = session.inbox
 
         lib_mock.sp_session_inbox_create.assert_called_with(session._sp_session)
         self.assertIsNone(result)
@@ -496,7 +516,10 @@ class SessionTest(unittest.TestCase):
         )
         session = tests.create_real_session(lib_mock)
 
-        result = session.get_starred('alice')
+        with pytest.warns(
+            UserWarning, match='Spotify broke the libspotify playlists API'
+        ):
+            result = session.get_starred('alice')
 
         lib_mock.sp_session_starred_for_user_create.assert_called_with(
             session._sp_session, b'alice'
@@ -515,7 +538,10 @@ class SessionTest(unittest.TestCase):
         )
         session = tests.create_real_session(lib_mock)
 
-        result = session.get_starred()
+        with pytest.warns(
+            UserWarning, match='Spotify broke the libspotify playlists API'
+        ):
+            result = session.get_starred()
 
         lib_mock.sp_session_starred_create.assert_called_with(
             session._sp_session
@@ -533,7 +559,10 @@ class SessionTest(unittest.TestCase):
         )
         session = tests.create_real_session(lib_mock)
 
-        result = session.get_starred('alice')
+        with pytest.warns(
+            UserWarning, match='Spotify broke the libspotify playlists API'
+        ):
+            result = session.get_starred('alice')
 
         lib_mock.sp_session_starred_for_user_create.assert_called_with(
             session._sp_session, b'alice'
@@ -546,7 +575,10 @@ class SessionTest(unittest.TestCase):
         func_mock.return_value = spotify.ffi.cast('sp_playlistcontainer *', 42)
         session = tests.create_real_session(lib_mock)
 
-        result = session.get_published_playlists('alice')
+        with pytest.warns(
+            UserWarning, match='Spotify broke the libspotify playlists API'
+        ):
+            result = session.get_published_playlists('alice')
 
         func_mock.assert_called_with(session._sp_session, b'alice')
         self.assertIsInstance(result, spotify.PlaylistContainer)
@@ -566,7 +598,10 @@ class SessionTest(unittest.TestCase):
         func_mock.return_value = spotify.ffi.cast('sp_playlistcontainer *', 42)
         session = tests.create_real_session(lib_mock)
 
-        result = session.get_published_playlists()
+        with pytest.warns(
+            UserWarning, match='Spotify broke the libspotify playlists API'
+        ):
+            result = session.get_published_playlists()
 
         func_mock.assert_called_with(session._sp_session, spotify.ffi.NULL)
         self.assertIsInstance(result, spotify.PlaylistContainer)
@@ -576,7 +611,10 @@ class SessionTest(unittest.TestCase):
         func_mock.return_value = spotify.ffi.NULL
         session = tests.create_real_session(lib_mock)
 
-        result = session.get_published_playlists('alice')
+        with pytest.warns(
+            UserWarning, match='Spotify broke the libspotify playlists API'
+        ):
+            result = session.get_published_playlists('alice')
 
         func_mock.assert_called_with(session._sp_session, b'alice')
         self.assertIsNone(result)
@@ -692,7 +730,10 @@ class SessionTest(unittest.TestCase):
         session = tests.create_real_session(lib_mock)
         playlist_mock.return_value = mock.sentinel.playlist
 
-        result = session.get_playlist('spotify:playlist:foo')
+        with pytest.warns(
+            UserWarning, match='Spotify broke the libspotify playlists API'
+        ):
+            result = session.get_playlist('spotify:playlist:foo')
 
         self.assertIs(result, mock.sentinel.playlist)
         playlist_mock.assert_called_with(session, uri='spotify:playlist:foo')

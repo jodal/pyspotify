@@ -2,13 +2,15 @@
 Changelog
 *********
 
-v2.1.3 (UNRELEASED)
+v2.1.3 (2019-12-29)
 ===================
 
 Maintenance release.
 
 - Document that the playlists API is broken. If it is used, emit a warning to notify
   the user of the playlist functionality.
+
+- Update project links.
 
 
 v2.1.2 (2019-12-10)

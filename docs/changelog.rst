@@ -18,8 +18,8 @@ v2.1.2 (2019-12-10)
 
 Maintenance release.
 
-- Silently abort libspotify `sp_*_release()` function calls that happen during
-  process shutdown, after pyspotify's global lock is freed. (Fixes:
+- Silently abort libspotify ``sp_*_release()`` function calls that happen
+  during process shutdown, after pyspotify's global lock is freed. (Fixes:
   :issue:`202`)
 
 

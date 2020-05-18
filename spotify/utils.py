@@ -50,7 +50,7 @@ class EventEmitter(object):
                 self._listeners[event] = []
             else:
                 self._listeners[event] = [
-                    l for l in self._listeners[event] if l.callback != listener
+                    v for v in self._listeners[event] if v.callback != listener
                 ]
 
     def emit(self, event, *event_args):
@@ -75,7 +75,7 @@ class EventEmitter(object):
         if event is not None:
             return len(self._listeners[event])
         else:
-            return sum(len(l) for l in self._listeners.values())
+            return sum(len(v) for v in self._listeners.values())
 
     def call(self, event, *event_args):
         """Call the single registered listener for ``event``.

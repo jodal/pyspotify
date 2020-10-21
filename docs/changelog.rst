@@ -2,6 +2,15 @@
 Changelog
 *********
 
+v2.1.4 (UNRELEASED)
+===================
+
+Maintenance release.
+
+- Add support for Python 3.9. No changes was required, but the test suite now
+  runs on this version too. (PR: :issue:`203`)
+
+
 v2.1.3 (2019-12-29)
 ===================
 

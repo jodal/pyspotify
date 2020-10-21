@@ -5,7 +5,9 @@
 .eggs/
 .mypy_cache/
 .pytest_cache/
+.python-version
 .tox/
+.venv/
 __pycache__/
 _build/
 _spotify.*

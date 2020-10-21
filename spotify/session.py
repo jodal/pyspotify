@@ -414,8 +414,10 @@ class Session(utils.EventEmitter):
             canonical_username = ffi.NULL
         else:
             canonical_username = utils.to_bytes(canonical_username)
-        sp_playlistcontainer = lib.sp_session_publishedcontainer_for_user_create(
-            self._sp_session, canonical_username
+        sp_playlistcontainer = (
+            lib.sp_session_publishedcontainer_for_user_create(
+                self._sp_session, canonical_username
+            )
         )
         if sp_playlistcontainer == ffi.NULL:
             return None

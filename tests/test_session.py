@@ -511,8 +511,8 @@ class SessionTest(unittest.TestCase):
 
     @mock.patch('spotify.playlist.lib', spec=spotify.lib)
     def test_get_starred(self, playlist_lib_mock, lib_mock):
-        lib_mock.sp_session_starred_for_user_create.return_value = spotify.ffi.cast(
-            'sp_playlist *', 42
+        lib_mock.sp_session_starred_for_user_create.return_value = (
+            spotify.ffi.cast('sp_playlist *', 42)
         )
         session = tests.create_real_session(lib_mock)
 

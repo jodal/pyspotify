@@ -3,13 +3,12 @@ from __future__ import unicode_literals
 import unittest
 
 import spotify
-
 import tests
 from tests import mock
 
 
-@mock.patch('spotify.connection.lib', spec=spotify.lib)
-@mock.patch('spotify.session.lib', spec=spotify.lib)
+@mock.patch("spotify.connection.lib", spec=spotify.lib)
+@mock.patch("spotify.session.lib", spec=spotify.lib)
 class ConnectionTest(unittest.TestCase):
     def tearDown(self):
         spotify._session_instance = None
@@ -20,20 +19,12 @@ class ConnectionTest(unittest.TestCase):
         )
         session = tests.create_real_session(session_lib_mock)
 
-        self.assertIs(
-            session.connection.state, spotify.ConnectionState.LOGGED_OUT
-        )
+        self.assertIs(session.connection.state, spotify.ConnectionState.LOGGED_OUT)
 
-        lib_mock.sp_session_connectionstate.assert_called_once_with(
-            session._sp_session
-        )
+        lib_mock.sp_session_connectionstate.assert_called_once_with(session._sp_session)
 
-    def test_connection_type_defaults_to_unknown(
-        self, session_lib_mock, lib_mock
-    ):
-        lib_mock.sp_session_set_connection_type.return_value = (
-            spotify.ErrorType.OK
-        )
+    def test_connection_type_defaults_to_unknown(self, session_lib_mock, lib_mock):
+        lib_mock.sp_session_set_connection_type.return_value = spotify.ErrorType.OK
         session = tests.create_real_session(session_lib_mock)
 
         result = session.connection.type
@@ -42,9 +33,7 @@ class ConnectionTest(unittest.TestCase):
         self.assertEqual(lib_mock.sp_session_set_connection_type.call_count, 0)
 
     def test_set_connection_type(self, session_lib_mock, lib_mock):
-        lib_mock.sp_session_set_connection_type.return_value = (
-            spotify.ErrorType.OK
-        )
+        lib_mock.sp_session_set_connection_type.return_value = spotify.ErrorType.OK
         session = tests.create_real_session(session_lib_mock)
 
         session.connection.type = spotify.ConnectionType.MOBILE_ROAMING
@@ -57,9 +46,7 @@ class ConnectionTest(unittest.TestCase):
 
         self.assertIs(result, spotify.ConnectionType.MOBILE_ROAMING)
 
-    def test_set_connection_type_fail_raises_error(
-        self, session_lib_mock, lib_mock
-    ):
+    def test_set_connection_type_fail_raises_error(self, session_lib_mock, lib_mock):
         lib_mock.sp_session_set_connection_type.return_value = (
             spotify.ErrorType.BAD_API_VERSION
         )
@@ -78,9 +65,7 @@ class ConnectionTest(unittest.TestCase):
         self.assertTrue(session.connection.allow_network)
 
     def test_set_allow_network(self, session_lib_mock, lib_mock):
-        lib_mock.sp_session_set_connection_rules.return_value = (
-            spotify.ErrorType.OK
-        )
+        lib_mock.sp_session_set_connection_rules.return_value = spotify.ErrorType.OK
         session = tests.create_real_session(session_lib_mock)
 
         session.connection.allow_network = False
@@ -99,9 +84,7 @@ class ConnectionTest(unittest.TestCase):
         self.assertFalse(session.connection.allow_network_if_roaming)
 
     def test_set_allow_network_if_roaming(self, session_lib_mock, lib_mock):
-        lib_mock.sp_session_set_connection_rules.return_value = (
-            spotify.ErrorType.OK
-        )
+        lib_mock.sp_session_set_connection_rules.return_value = spotify.ErrorType.OK
         session = tests.create_real_session(session_lib_mock)
 
         session.connection.allow_network_if_roaming = True
@@ -114,17 +97,13 @@ class ConnectionTest(unittest.TestCase):
             | spotify.ConnectionRule.ALLOW_SYNC_OVER_WIFI,
         )
 
-    def test_allow_sync_over_wifi_defaults_to_true(
-        self, session_lib_mock, lib_mock
-    ):
+    def test_allow_sync_over_wifi_defaults_to_true(self, session_lib_mock, lib_mock):
         session = tests.create_real_session(session_lib_mock)
 
         self.assertTrue(session.connection.allow_sync_over_wifi)
 
     def test_set_allow_sync_over_wifi(self, session_lib_mock, lib_mock):
-        lib_mock.sp_session_set_connection_rules.return_value = (
-            spotify.ErrorType.OK
-        )
+        lib_mock.sp_session_set_connection_rules.return_value = spotify.ErrorType.OK
         session = tests.create_real_session(session_lib_mock)
 
         session.connection.allow_sync_over_wifi = False
@@ -134,17 +113,13 @@ class ConnectionTest(unittest.TestCase):
             session._sp_session, int(spotify.ConnectionRule.NETWORK)
         )
 
-    def test_allow_sync_over_mobile_defaults_to_false(
-        self, session_lib_mock, lib_mock
-    ):
+    def test_allow_sync_over_mobile_defaults_to_false(self, session_lib_mock, lib_mock):
         session = tests.create_real_session(session_lib_mock)
 
         self.assertFalse(session.connection.allow_sync_over_mobile)
 
     def test_set_allow_sync_over_mobile(self, session_lib_mock, lib_mock):
-        lib_mock.sp_session_set_connection_rules.return_value = (
-            spotify.ErrorType.OK
-        )
+        lib_mock.sp_session_set_connection_rules.return_value = spotify.ErrorType.OK
         session = tests.create_real_session(session_lib_mock)
 
         session.connection.allow_sync_over_mobile = True
@@ -157,12 +132,8 @@ class ConnectionTest(unittest.TestCase):
             | spotify.ConnectionRule.ALLOW_SYNC_OVER_MOBILE,
         )
 
-    def test_set_connection_rules_without_rules(
-        self, session_lib_mock, lib_mock
-    ):
-        lib_mock.sp_session_set_connection_rules.return_value = (
-            spotify.ErrorType.OK
-        )
+    def test_set_connection_rules_without_rules(self, session_lib_mock, lib_mock):
+        lib_mock.sp_session_set_connection_rules.return_value = spotify.ErrorType.OK
         session = tests.create_real_session(session_lib_mock)
 
         session.connection.allow_network = False
@@ -172,9 +143,7 @@ class ConnectionTest(unittest.TestCase):
             session._sp_session, 0
         )
 
-    def test_set_connection_rules_fail_raises_error(
-        self, session_lib_mock, lib_mock
-    ):
+    def test_set_connection_rules_fail_raises_error(self, session_lib_mock, lib_mock):
         lib_mock.sp_session_set_connection_rules.return_value = (
             spotify.ErrorType.BAD_API_VERSION
         )

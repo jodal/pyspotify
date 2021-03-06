@@ -4,8 +4,7 @@ import threading
 
 import pkg_resources
 
-
-__version__ = pkg_resources.get_distribution('pyspotify').version
+__version__ = pkg_resources.get_distribution("pyspotify").version
 
 
 # Global reentrant lock to be held whenever libspotify functions are called or
@@ -29,7 +28,7 @@ def _setup_logging():
     """
     import logging
 
-    logger = logging.getLogger('spotify')
+    logger = logging.getLogger("spotify")
     handler = logging.NullHandler()
     logger.addHandler(handler)
 
@@ -66,7 +65,7 @@ def serialized(f):
         with _lock:
             return f(*args, **kwargs)
 
-    if not hasattr(wrapper, '__wrapped__'):
+    if not hasattr(wrapper, "__wrapped__"):
         # Workaround for Python < 3.2
         wrapper.__wrapped__ = f
     return wrapper
@@ -81,7 +80,7 @@ class _SerializedLib(object):
     def __init__(self, lib):
         for name in dir(lib):
             attr = getattr(lib, name)
-            if name.startswith('sp_') and callable(attr):
+            if name.startswith("sp_") and callable(attr):
                 attr = serialized(attr)
             setattr(self, name, attr)
 

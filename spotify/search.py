@@ -6,8 +6,7 @@ import threading
 import spotify
 from spotify import ffi, lib, serialized, utils
 
-
-__all__ = ['Search', 'SearchPlaylist', 'SearchType']
+__all__ = ["Search", "SearchPlaylist", "SearchType"]
 
 logger = logging.getLogger(__name__)
 
@@ -23,7 +22,7 @@ class Search(object):
     def __init__(
         self,
         session,
-        query='',
+        query="",
         callback=None,
         track_offset=0,
         track_count=20,
@@ -38,7 +37,7 @@ class Search(object):
         add_ref=True,
     ):
 
-        assert query or sp_search, 'query or sp_search is required'
+        assert query or sp_search, "query or sp_search is required"
 
         self._session = session
         self.callback = callback
@@ -82,7 +81,7 @@ class Search(object):
         self._sp_search = ffi.gc(sp_search, lib.sp_search_release)
 
     def __repr__(self):
-        return 'Search(%r)' % self.link.uri
+        return "Search(%r)" % self.link.uri
 
     def __eq__(self, other):
         if isinstance(other, self.__class__):
@@ -142,9 +141,7 @@ class Search(object):
         Will always return :class:`None` if the search isn't loaded.
         """
         spotify.Error.maybe_raise(self.error)
-        did_you_mean = utils.to_unicode(
-            lib.sp_search_did_you_mean(self._sp_search)
-        )
+        did_you_mean = utils.to_unicode(lib.sp_search_did_you_mean(self._sp_search))
         return did_you_mean if did_you_mean else None
 
     @property
@@ -154,9 +151,7 @@ class Search(object):
 
         Will always return an empty list if the search isn't loaded.
         """
-        spotify.Error.maybe_raise(
-            self.error, ignores=[spotify.ErrorType.IS_LOADING]
-        )
+        spotify.Error.maybe_raise(self.error, ignores=[spotify.ErrorType.IS_LOADING])
         if not self.is_loaded:
             return []
 
@@ -194,9 +189,7 @@ class Search(object):
 
         Will always return an empty list if the search isn't loaded.
         """
-        spotify.Error.maybe_raise(
-            self.error, ignores=[spotify.ErrorType.IS_LOADING]
-        )
+        spotify.Error.maybe_raise(self.error, ignores=[spotify.ErrorType.IS_LOADING])
         if not self.is_loaded:
             return []
 
@@ -234,9 +227,7 @@ class Search(object):
 
         Will always return an empty list if the search isn't loaded.
         """
-        spotify.Error.maybe_raise(
-            self.error, ignores=[spotify.ErrorType.IS_LOADING]
-        )
+        spotify.Error.maybe_raise(self.error, ignores=[spotify.ErrorType.IS_LOADING])
         if not self.is_loaded:
             return []
 
@@ -276,9 +267,7 @@ class Search(object):
 
         Will always return an empty list if the search isn't loaded.
         """
-        spotify.Error.maybe_raise(
-            self.error, ignores=[spotify.ErrorType.IS_LOADING]
-        )
+        spotify.Error.maybe_raise(self.error, ignores=[spotify.ErrorType.IS_LOADING])
         if not self.is_loaded:
             return []
 
@@ -289,9 +278,7 @@ class Search(object):
                 name=utils.to_unicode(
                     lib.sp_search_playlist_name(self._sp_search, key)
                 ),
-                uri=utils.to_unicode(
-                    lib.sp_search_playlist_uri(self._sp_search, key)
-                ),
+                uri=utils.to_unicode(lib.sp_search_playlist_uri(self._sp_search, key)),
                 image_uri=utils.to_unicode(
                     lib.sp_search_playlist_image_uri(self._sp_search, key)
                 ),
@@ -365,14 +352,12 @@ class Search(object):
         )
 
 
-@ffi.callback('void(sp_search *, void *)')
+@ffi.callback("void(sp_search *, void *)")
 @serialized
 def _search_complete_callback(sp_search, handle):
-    logger.debug('search_complete_callback called')
+    logger.debug("search_complete_callback called")
     if handle == ffi.NULL:
-        logger.warning(
-            'pyspotify search_complete_callback called without userdata'
-        )
+        logger.warning("pyspotify search_complete_callback called without userdata")
         return
     (session, search_result, callback) = ffi.from_handle(handle)
     session._callback_handles.remove(handle)
@@ -401,7 +386,7 @@ class SearchPlaylist(object):
         self.image_uri = image_uri
 
     def __repr__(self):
-        return 'SearchPlaylist(name=%r, uri=%r)' % (self.name, self.uri)
+        return "SearchPlaylist(name=%r, uri=%r)" % (self.name, self.uri)
 
     @property
     def playlist(self):
@@ -416,6 +401,6 @@ class SearchPlaylist(object):
         return self._session.get_image(self.image_uri)
 
 
-@utils.make_enum('SP_SEARCH_')
+@utils.make_enum("SP_SEARCH_")
 class SearchType(utils.IntEnum):
     pass

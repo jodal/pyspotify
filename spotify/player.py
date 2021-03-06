@@ -3,15 +3,14 @@ from __future__ import unicode_literals
 import spotify
 from spotify import lib
 
-
-__all__ = ['PlayerState']
+__all__ = ["PlayerState"]
 
 
 class PlayerState(object):
-    UNLOADED = 'unloaded'
-    LOADED = 'loaded'
-    PLAYING = 'playing'
-    PAUSED = 'paused'
+    UNLOADED = "unloaded"
+    LOADED = "loaded"
+    PLAYING = "playing"
+    PAUSED = "paused"
 
 
 class Player(object):
@@ -41,9 +40,7 @@ class Player(object):
     def load(self, track):
         """Load :class:`Track` for playback."""
         spotify.Error.maybe_raise(
-            lib.sp_session_player_load(
-                self._session._sp_session, track._sp_track
-            )
+            lib.sp_session_player_load(self._session._sp_session, track._sp_track)
         )
         self.state = PlayerState.LOADED
 
@@ -90,7 +87,5 @@ class Player(object):
         playing it.
         """
         spotify.Error.maybe_raise(
-            lib.sp_session_player_prefetch(
-                self._session._sp_session, track._sp_track
-            )
+            lib.sp_session_player_prefetch(self._session._sp_session, track._sp_track)
         )

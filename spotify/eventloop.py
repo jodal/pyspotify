@@ -12,8 +12,7 @@ except ImportError:
 
 import spotify
 
-
-__all__ = ['EventLoop']
+__all__ = ["EventLoop"]
 
 logger = logging.getLogger(__name__)
 
@@ -49,7 +48,7 @@ class EventLoop(threading.Thread):
     """
 
     daemon = True
-    name = 'SpotifyEventLoop'
+    name = "SpotifyEventLoop"
 
     def __init__(self, session):
         threading.Thread.__init__(self)
@@ -73,19 +72,19 @@ class EventLoop(threading.Thread):
         )
 
     def run(self):
-        logger.debug('Spotify event loop started')
+        logger.debug("Spotify event loop started")
         timeout = self._session.process_events() / 1000.0
         while self._runnable:
             try:
-                logger.debug('Waiting %.3fs for new events', timeout)
+                logger.debug("Waiting %.3fs for new events", timeout)
                 self._queue.get(timeout=timeout)
             except queue.Empty:
-                logger.debug('Timeout reached; processing events')
+                logger.debug("Timeout reached; processing events")
             else:
-                logger.debug('Notification received; processing events')
+                logger.debug("Notification received; processing events")
             finally:
                 timeout = self._session.process_events() / 1000.0
-        logger.debug('Spotify event loop stopped')
+        logger.debug("Spotify event loop stopped")
 
     def _on_notify_main_thread(self, session):
         # WARNING: This event listener is called from an internal libspotify
@@ -94,5 +93,5 @@ class EventLoop(threading.Thread):
             self._queue.put_nowait(1)
         except queue.Full:
             logger.warning(
-                'pyspotify event loop queue full; dropped notification event'
+                "pyspotify event loop queue full; dropped notification event"
             )

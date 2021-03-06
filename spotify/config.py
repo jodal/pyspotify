@@ -4,7 +4,7 @@ import spotify
 from spotify import ffi, utils
 from spotify.session import _SessionCallbacks
 
-__all__ = ['Config']
+__all__ = ["Config"]
 
 
 class Config(object):
@@ -23,14 +23,14 @@ class Config(object):
     def __init__(self):
         self._sp_session_callbacks = _SessionCallbacks.get_struct()
         self._sp_session_config = ffi.new(
-            'sp_session_config *', {'callbacks': self._sp_session_callbacks}
+            "sp_session_config *", {"callbacks": self._sp_session_callbacks}
         )
 
         # Defaults
         self.api_version = spotify.get_libspotify_api_version()
-        self.cache_location = b'tmp'
-        self.settings_location = b'tmp'
-        self.user_agent = 'pyspotify %s' % spotify.__version__
+        self.cache_location = b"tmp"
+        self.settings_location = b"tmp"
+        self.user_agent = "pyspotify %s" % spotify.__version__
         self.compress_playlists = False
         self.dont_save_metadata_for_playlists = False
         self.initially_unload_playlists = False
@@ -70,7 +70,7 @@ class Config(object):
     def cache_location(self, value):
         # NOTE libspotify segfaults if cache_location is set to NULL, thus we
         # convert None to empty string.
-        self._cache_location = utils.to_char('' if value is None else value)
+        self._cache_location = utils.to_char("" if value is None else value)
         self._sp_session_config.cache_location = self._cache_location
 
     @property
@@ -87,7 +87,7 @@ class Config(object):
 
     @settings_location.setter
     def settings_location(self, value):
-        self._settings_location = utils.to_char('' if value is None else value)
+        self._settings_location = utils.to_char("" if value is None else value)
         self._sp_session_config.settings_location = self._settings_location
 
     @property
@@ -99,7 +99,7 @@ class Config(object):
         the file into :attr:`application_key`.
         """
         return utils.to_bytes_or_none(
-            ffi.cast('char *', self._sp_session_config.application_key)
+            ffi.cast("char *", self._sp_session_config.application_key)
         )
 
     @application_key.setter
@@ -109,16 +109,16 @@ class Config(object):
         else:
             size = len(value)
         assert size in (0, 321), (
-            'Invalid application key; expected 321 bytes, got %d bytes' % size
+            "Invalid application key; expected 321 bytes, got %d bytes" % size
         )
 
         self._application_key = utils.to_char_or_null(value)
         self._sp_session_config.application_key = ffi.cast(
-            'void *', self._application_key
+            "void *", self._application_key
         )
         self._sp_session_config.application_key_size = size
 
-    def load_application_key_file(self, filename=b'spotify_appkey.key'):
+    def load_application_key_file(self, filename=b"spotify_appkey.key"):
         """Load your libspotify application key file.
 
         If called without arguments, it tries to read ``spotify_appkey.key``
@@ -128,7 +128,7 @@ class Config(object):
         file must be a binary key file, not the C code key file that can be
         compiled into an application.
         """
-        with open(filename, 'rb') as fh:
+        with open(filename, "rb") as fh:
             self.application_key = fh.read()
 
     @property
@@ -141,7 +141,7 @@ class Config(object):
 
     @user_agent.setter
     def user_agent(self, value):
-        self._user_agent = utils.to_char('' if value is None else value)
+        self._user_agent = utils.to_char("" if value is None else value)
         self._sp_session_config.user_agent = self._user_agent
 
     @property
@@ -223,7 +223,7 @@ class Config(object):
     def proxy(self, value):
         # NOTE libspotify reuses cached values from previous sessions if this
         # is set to NULL, thus we convert None to empty string.
-        self._proxy = utils.to_char_or_null('' if value is None else value)
+        self._proxy = utils.to_char_or_null("" if value is None else value)
         self._sp_session_config.proxy = self._proxy
 
     @property
@@ -238,7 +238,7 @@ class Config(object):
     def proxy_username(self, value):
         # NOTE libspotify reuses cached values from previous sessions if this
         # is set to NULL, thus we convert None to empty string.
-        self._proxy_username = utils.to_char('' if value is None else value)
+        self._proxy_username = utils.to_char("" if value is None else value)
         self._sp_session_config.proxy_username = self._proxy_username
 
     @property
@@ -253,7 +253,7 @@ class Config(object):
     def proxy_password(self, value):
         # NOTE libspotify reuses cached values from previous sessions if this
         # is set to NULL, thus we convert None to empty string.
-        self._proxy_password = utils.to_char('' if value is None else value)
+        self._proxy_password = utils.to_char("" if value is None else value)
         self._sp_session_config.proxy_password = self._proxy_password
 
     @property
@@ -301,11 +301,9 @@ class Config(object):
         # struct only if the SP_WITH_CURL macro is defined, ref. the
         # sp_session_create example in the libspotify docs.
         proxy_password_ptr = spotify.ffi.addressof(
-            self._sp_session_config, 'proxy_password'
+            self._sp_session_config, "proxy_password"
         )
-        tracefile_ptr = spotify.ffi.addressof(
-            self._sp_session_config, 'tracefile'
-        )
+        tracefile_ptr = spotify.ffi.addressof(self._sp_session_config, "tracefile")
         if tracefile_ptr - proxy_password_ptr != 2:
             return None
         return proxy_password_ptr + 1

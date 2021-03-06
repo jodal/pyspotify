@@ -3,8 +3,7 @@ from __future__ import unicode_literals
 import spotify
 from spotify import ffi, lib, serialized, utils
 
-
-__all__ = ['User']
+__all__ = ["User"]
 
 
 class User(object):
@@ -22,16 +21,14 @@ class User(object):
     """
 
     def __init__(self, session, uri=None, sp_user=None, add_ref=True):
-        assert uri or sp_user, 'uri or sp_user is required'
+        assert uri or sp_user, "uri or sp_user is required"
 
         self._session = session
 
         if uri is not None:
             user = spotify.Link(self._session, uri=uri).as_user()
             if user is None:
-                raise ValueError(
-                    'Failed to get user from Spotify URI: %r' % uri
-                )
+                raise ValueError("Failed to get user from Spotify URI: %r" % uri)
             sp_user = user._sp_user
             add_ref = True
 
@@ -40,7 +37,7 @@ class User(object):
         self._sp_user = ffi.gc(sp_user, lib.sp_user_release)
 
     def __repr__(self):
-        return 'User(%r)' % self.link.uri
+        return "User(%r)" % self.link.uri
 
     @property
     @serialized

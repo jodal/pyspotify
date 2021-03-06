@@ -7,8 +7,7 @@ import threading
 import spotify
 from spotify import ffi, lib, serialized, utils
 
-
-__all__ = ['Image', 'ImageFormat', 'ImageSize']
+__all__ = ["Image", "ImageFormat", "ImageSize"]
 
 logger = logging.getLogger(__name__)
 
@@ -33,20 +32,16 @@ class Image(object):
     the image is done loading.
     """
 
-    def __init__(
-        self, session, uri=None, sp_image=None, add_ref=True, callback=None
-    ):
+    def __init__(self, session, uri=None, sp_image=None, add_ref=True, callback=None):
 
-        assert uri or sp_image, 'uri or sp_image is required'
+        assert uri or sp_image, "uri or sp_image is required"
 
         self._session = session
 
         if uri is not None:
             image = spotify.Link(self._session, uri=uri).as_image()
             if image is None:
-                raise ValueError(
-                    'Failed to get image from Spotify URI: %r' % uri
-                )
+                raise ValueError("Failed to get image from Spotify URI: %r" % uri)
             sp_image = image._sp_image
             add_ref = True
 
@@ -59,13 +54,11 @@ class Image(object):
         handle = ffi.new_handle((self._session, self, callback))
         self._session._callback_handles.add(handle)
         spotify.Error.maybe_raise(
-            lib.sp_image_add_load_callback(
-                self._sp_image, _image_load_callback, handle
-            )
+            lib.sp_image_add_load_callback(self._sp_image, _image_load_callback, handle)
         )
 
     def __repr__(self):
-        return 'Image(%r)' % self.link.uri
+        return "Image(%r)" % self.link.uri
 
     def __eq__(self, other):
         if isinstance(other, self.__class__):
@@ -124,11 +117,11 @@ class Image(object):
         """
         if not self.is_loaded:
             return None
-        data_size_ptr = ffi.new('size_t *')
+        data_size_ptr = ffi.new("size_t *")
         data = lib.sp_image_data(self._sp_image, data_size_ptr)
         buffer_ = ffi.buffer(data, data_size_ptr[0])
         data_bytes = buffer_[:]
-        assert len(data_bytes) == data_size_ptr[0], '%r == %r' % (
+        assert len(data_bytes) == data_size_ptr[0], "%r == %r" % (
             len(data_bytes),
             data_size_ptr[0],
         )
@@ -143,9 +136,9 @@ class Image(object):
         if not self.is_loaded:
             return None
         if self.format is not ImageFormat.JPEG:
-            raise ValueError('Unknown image format: %r' % self.format)
-        return 'data:image/jpeg;base64,%s' % (
-            base64.b64encode(self.data).decode('ascii')
+            raise ValueError("Unknown image format: %r" % self.format)
+        return "data:image/jpeg;base64,%s" % (
+            base64.b64encode(self.data).decode("ascii")
         )
 
     @property
@@ -158,12 +151,12 @@ class Image(object):
         )
 
 
-@ffi.callback('void(sp_image *, void *)')
+@ffi.callback("void(sp_image *, void *)")
 @serialized
 def _image_load_callback(sp_image, handle):
-    logger.debug('image_load_callback called')
+    logger.debug("image_load_callback called")
     if handle == ffi.NULL:
-        logger.warning('pyspotify image_load_callback called without userdata')
+        logger.warning("pyspotify image_load_callback called without userdata")
         return
     (session, image, callback) = ffi.from_handle(handle)
     session._callback_handles.remove(handle)
@@ -176,11 +169,11 @@ def _image_load_callback(sp_image, handle):
     lib.sp_image_remove_load_callback(sp_image, _image_load_callback, handle)
 
 
-@utils.make_enum('SP_IMAGE_FORMAT_')
+@utils.make_enum("SP_IMAGE_FORMAT_")
 class ImageFormat(utils.IntEnum):
     pass
 
 
-@utils.make_enum('SP_IMAGE_SIZE_')
+@utils.make_enum("SP_IMAGE_SIZE_")
 class ImageSize(utils.IntEnum):
     pass

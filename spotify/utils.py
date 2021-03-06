@@ -27,9 +27,7 @@ class EventEmitter(object):
         If the listener function returns :class:`False`, it is removed and will
         not be called the next time the ``event`` is emitted.
         """
-        self._listeners[event].append(
-            _Listener(callback=listener, user_args=user_args)
-        )
+        self._listeners[event].append(_Listener(callback=listener, user_args=user_args))
 
     @serialized
     def off(self, event=None, listener=None):
@@ -90,7 +88,7 @@ class EventEmitter(object):
         # when registering the second listener instead of when the event is
         # emitted.
         assert self.num_listeners(event) == 1, (
-            'Expected exactly 1 event listener, found %d listeners'
+            "Expected exactly 1 event listener, found %d listeners"
             % self.num_listeners(event)
         )
         listener = self._listeners[event][0]
@@ -98,7 +96,7 @@ class EventEmitter(object):
         return listener.callback(*args)
 
 
-class _Listener(collections.namedtuple('Listener', ['callback', 'user_args'])):
+class _Listener(collections.namedtuple("Listener", ["callback", "user_args"])):
 
     """An listener of events from an :class:`EventEmitter`"""
 
@@ -112,17 +110,17 @@ class IntEnum(int):
     """
 
     def __new__(cls, value):
-        if not hasattr(cls, '_values'):
+        if not hasattr(cls, "_values"):
             cls._values = {}
         if value not in cls._values:
             cls._values[value] = int.__new__(cls, value)
         return cls._values[value]
 
     def __repr__(self):
-        if hasattr(self, '_name'):
-            return '<%s.%s: %d>' % (self.__class__.__name__, self._name, self)
+        if hasattr(self, "_name"):
+            return "<%s.%s: %d>" % (self.__class__.__name__, self._name, self)
         else:
-            return '<Unknown %s: %d>' % (self.__class__.__name__, self)
+            return "<Unknown %s: %d>" % (self.__class__.__name__, self)
 
     @classmethod
     def add(cls, name, value):
@@ -132,7 +130,7 @@ class IntEnum(int):
         setattr(cls, name, attr)
 
 
-def make_enum(lib_prefix, enum_prefix=''):
+def make_enum(lib_prefix, enum_prefix=""):
     """Class decorator for automatically adding enum values.
 
     The values are read directly from the :attr:`spotify.lib` CFFI wrapper
@@ -160,7 +158,7 @@ def get_with_fixed_buffer(buffer_length, func, *args):
     Returns the buffer's value decoded from UTF-8 to a unicode string.
     """
     func = functools.partial(func, *args)
-    buffer_ = ffi.new('char[]', buffer_length)
+    buffer_ = ffi.new("char[]", buffer_length)
     func(buffer_, buffer_length)
     return to_unicode(buffer_)
 
@@ -182,7 +180,7 @@ def get_with_growing_buffer(func, *args):
     buffer_length = actual_length
     while actual_length >= buffer_length:
         buffer_length = actual_length + 1
-        buffer_ = ffi.new('char[]', buffer_length)
+        buffer_ = ffi.new("char[]", buffer_length)
         actual_length = func(buffer_, buffer_length)
     if actual_length == -1:
         return None
@@ -190,10 +188,8 @@ def get_with_growing_buffer(func, *args):
 
 
 def _check_error(obj):
-    error_type = getattr(obj, 'error', spotify.ErrorType.OK)
-    spotify.Error.maybe_raise(
-        error_type, ignores=[spotify.ErrorType.IS_LOADING]
-    )
+    error_type = getattr(obj, "error", spotify.ErrorType.OK)
+    spotify.Error.maybe_raise(error_type, ignores=[spotify.ErrorType.IS_LOADING])
 
 
 def load(session, obj, timeout=None):
@@ -220,7 +216,7 @@ def load(session, obj, timeout=None):
 
     if session.connection.state is not spotify.ConnectionState.LOGGED_IN:
         raise spotify.Error(
-            'Session must be logged in and online to load objects: %r'
+            "Session must be logged in and online to load objects: %r"
             % session.connection.state
         )
 
@@ -258,9 +254,7 @@ class Sequence(compat.Sequence):
     when the ``sp_obj`` object is GC-ed.
     """
 
-    def __init__(
-        self, sp_obj, add_ref_func, release_func, len_func, getitem_func
-    ):
+    def __init__(self, sp_obj, add_ref_func, release_func, len_func, getitem_func):
 
         add_ref_func(sp_obj)
         self._sp_obj = ffi.gc(sp_obj, release_func)
@@ -275,17 +269,16 @@ class Sequence(compat.Sequence):
             return list(self).__getitem__(key)
         if not isinstance(key, int):
             raise TypeError(
-                'list indices must be int or slice, not %s'
-                % key.__class__.__name__
+                "list indices must be int or slice, not %s" % key.__class__.__name__
             )
         if key < 0:
             key += self.__len__()
         if not 0 <= key < self.__len__():
-            raise IndexError('list index out of range')
+            raise IndexError("list index out of range")
         return self._getitem_func(self._sp_obj, key)
 
     def __repr__(self):
-        return '%s(%s)' % (self.__class__.__name__, pprint.pformat(list(self)))
+        return "%s(%s)" % (self.__class__.__name__, pprint.pformat(list(self)))
 
 
 def to_bytes(value):
@@ -294,13 +287,13 @@ def to_bytes(value):
     Unicode strings are encoded to UTF-8.
     """
     if isinstance(value, compat.text_type):
-        return value.encode('utf-8')
+        return value.encode("utf-8")
     elif isinstance(value, ffi.CData):
         return ffi.string(value)
     elif isinstance(value, compat.binary_type):
         return value
     else:
-        raise ValueError('Value must be text, bytes, or char[]')
+        raise ValueError("Value must be text, bytes, or char[]")
 
 
 def to_bytes_or_none(value):
@@ -310,7 +303,7 @@ def to_bytes_or_none(value):
     elif isinstance(value, ffi.CData):
         return ffi.string(value)
     else:
-        raise ValueError('Value must be char[] or NULL')
+        raise ValueError("Value must be char[] or NULL")
 
 
 def to_unicode(value):
@@ -319,13 +312,13 @@ def to_unicode(value):
     Bytes and C char arrays are decoded from UTF-8.
     """
     if isinstance(value, ffi.CData):
-        return ffi.string(value).decode('utf-8')
+        return ffi.string(value).decode("utf-8")
     elif isinstance(value, compat.binary_type):
-        return value.decode('utf-8')
+        return value.decode("utf-8")
     elif isinstance(value, compat.text_type):
         return value
     else:
-        raise ValueError('Value must be text, bytes, or char[]')
+        raise ValueError("Value must be text, bytes, or char[]")
 
 
 def to_unicode_or_none(value):
@@ -336,14 +329,14 @@ def to_unicode_or_none(value):
     if value == ffi.NULL:
         return None
     elif isinstance(value, ffi.CData):
-        return ffi.string(value).decode('utf-8')
+        return ffi.string(value).decode("utf-8")
     else:
-        raise ValueError('Value must be char[] or NULL')
+        raise ValueError("Value must be char[] or NULL")
 
 
 def to_char(value):
     """Converts bytes, unicode, and C char arrays to C char arrays.  """
-    return ffi.new('char[]', to_bytes(value))
+    return ffi.new("char[]", to_bytes(value))
 
 
 def to_char_or_null(value):
@@ -368,10 +361,8 @@ def to_country_code(country):
     """
     country = to_unicode(country)
     if len(country) != 2:
-        raise ValueError('Must be exactly two chars')
+        raise ValueError("Must be exactly two chars")
     first, second = (ord(char) for char in country)
-    if not (ord('A') <= first <= ord('Z')) or not (
-        ord('A') <= second <= ord('Z')
-    ):
-        raise ValueError('Chars must be in range A-Z')
+    if not (ord("A") <= first <= ord("Z")) or not (ord("A") <= second <= ord("Z")):
+        raise ValueError("Chars must be in range A-Z")
     return first << 8 | second

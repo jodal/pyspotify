@@ -6,8 +6,7 @@ import threading
 import spotify
 from spotify import ffi, lib, serialized, utils
 
-
-__all__ = ['Artist', 'ArtistBrowser', 'ArtistBrowserType']
+__all__ = ["Artist", "ArtistBrowser", "ArtistBrowserType"]
 
 logger = logging.getLogger(__name__)
 
@@ -28,16 +27,14 @@ class Artist(object):
     """
 
     def __init__(self, session, uri=None, sp_artist=None, add_ref=True):
-        assert uri or sp_artist, 'uri or sp_artist is required'
+        assert uri or sp_artist, "uri or sp_artist is required"
 
         self._session = session
 
         if uri is not None:
             artist = spotify.Link(self._session, uri=uri).as_artist()
             if artist is None:
-                raise ValueError(
-                    'Failed to get artist from Spotify URI: %r' % uri
-                )
+                raise ValueError("Failed to get artist from Spotify URI: %r" % uri)
             sp_artist = artist._sp_artist
 
         if add_ref:
@@ -45,7 +42,7 @@ class Artist(object):
         self._sp_artist = ffi.gc(sp_artist, lib.sp_artist_release)
 
     def __repr__(self):
-        return 'Artist(%r)' % self.link.uri
+        return "Artist(%r)" % self.link.uri
 
     def __eq__(self, other):
         if isinstance(other, self.__class__):
@@ -175,9 +172,7 @@ class ArtistBrowser(object):
         add_ref=True,
     ):
 
-        assert (
-            artist or sp_artistbrowse
-        ), 'artist or sp_artistbrowse is required'
+        assert artist or sp_artistbrowse, "artist or sp_artistbrowse is required"
 
         self._session = session
         self.loaded_event = threading.Event()
@@ -200,9 +195,7 @@ class ArtistBrowser(object):
 
         if add_ref:
             lib.sp_artistbrowse_add_ref(sp_artistbrowse)
-        self._sp_artistbrowse = ffi.gc(
-            sp_artistbrowse, lib.sp_artistbrowse_release
-        )
+        self._sp_artistbrowse = ffi.gc(sp_artistbrowse, lib.sp_artistbrowse_release)
 
     loaded_event = None
     """:class:`threading.Event` that is set when the artist browser is loaded.
@@ -210,9 +203,9 @@ class ArtistBrowser(object):
 
     def __repr__(self):
         if self.is_loaded:
-            return 'ArtistBrowser(%r)' % self.artist.link.uri
+            return "ArtistBrowser(%r)" % self.artist.link.uri
         else:
-            return 'ArtistBrowser(<not loaded>)'
+            return "ArtistBrowser(<not loaded>)"
 
     def __eq__(self, other):
         if isinstance(other, self.__class__):
@@ -247,9 +240,7 @@ class ArtistBrowser(object):
 
         Check to see if there was problems creating the artist browser.
         """
-        return spotify.ErrorType(
-            lib.sp_artistbrowse_error(self._sp_artistbrowse)
-        )
+        return spotify.ErrorType(lib.sp_artistbrowse_error(self._sp_artistbrowse))
 
     @property
     def backend_request_duration(self):
@@ -261,9 +252,7 @@ class ArtistBrowser(object):
         """
         if not self.is_loaded:
             return None
-        return lib.sp_artistbrowse_backend_request_duration(
-            self._sp_artistbrowse
-        )
+        return lib.sp_artistbrowse_backend_request_duration(self._sp_artistbrowse)
 
     @property
     @serialized
@@ -412,9 +401,7 @@ class ArtistBrowser(object):
         def get_artist(sp_artistbrowse, key):
             return spotify.Artist(
                 self._session,
-                sp_artist=lib.sp_artistbrowse_similar_artist(
-                    sp_artistbrowse, key
-                ),
+                sp_artist=lib.sp_artistbrowse_similar_artist(sp_artistbrowse, key),
                 add_ref=True,
             )
 
@@ -433,18 +420,16 @@ class ArtistBrowser(object):
 
         Will always return an empty string if the artist browser isn't loaded.
         """
-        return utils.to_unicode(
-            lib.sp_artistbrowse_biography(self._sp_artistbrowse)
-        )
+        return utils.to_unicode(lib.sp_artistbrowse_biography(self._sp_artistbrowse))
 
 
-@ffi.callback('void(sp_artistbrowse *, void *)')
+@ffi.callback("void(sp_artistbrowse *, void *)")
 @serialized
 def _artistbrowse_complete_callback(sp_artistbrowse, handle):
-    logger.debug('artistbrowse_complete_callback called')
+    logger.debug("artistbrowse_complete_callback called")
     if handle == ffi.NULL:
         logger.warning(
-            'pyspotify artistbrowse_complete_callback called without userdata'
+            "pyspotify artistbrowse_complete_callback called without userdata"
         )
         return
     (session, artist_browser, callback) = ffi.from_handle(handle)
@@ -454,6 +439,6 @@ def _artistbrowse_complete_callback(sp_artistbrowse, handle):
         callback(artist_browser)
 
 
-@utils.make_enum('SP_ARTISTBROWSE_')
+@utils.make_enum("SP_ARTISTBROWSE_")
 class ArtistBrowserType(utils.IntEnum):
     pass

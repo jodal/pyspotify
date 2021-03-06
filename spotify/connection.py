@@ -6,8 +6,7 @@ import operator
 import spotify
 from spotify import lib, utils
 
-
-__all__ = ['ConnectionRule', 'ConnectionState', 'ConnectionType']
+__all__ = ["ConnectionRule", "ConnectionState", "ConnectionType"]
 
 
 class Connection(object):
@@ -144,22 +143,20 @@ class Connection(object):
             rules.append(spotify.ConnectionRule.ALLOW_SYNC_OVER_MOBILE)
         rules = functools.reduce(operator.or_, rules, 0)
         spotify.Error.maybe_raise(
-            lib.sp_session_set_connection_rules(
-                self._session._sp_session, rules
-            )
+            lib.sp_session_set_connection_rules(self._session._sp_session, rules)
         )
 
 
-@utils.make_enum('SP_CONNECTION_RULE_')
+@utils.make_enum("SP_CONNECTION_RULE_")
 class ConnectionRule(utils.IntEnum):
     pass
 
 
-@utils.make_enum('SP_CONNECTION_STATE_')
+@utils.make_enum("SP_CONNECTION_STATE_")
 class ConnectionState(utils.IntEnum):
     pass
 
 
-@utils.make_enum('SP_CONNECTION_TYPE_')
+@utils.make_enum("SP_CONNECTION_TYPE_")
 class ConnectionType(utils.IntEnum):
     pass

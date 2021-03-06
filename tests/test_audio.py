@@ -19,10 +19,8 @@ class AudioBufferStatsTest(unittest.TestCase):
 
 class AudioFormatTest(unittest.TestCase):
     def setUp(self):
-        self._sp_audioformat = spotify.ffi.new('sp_audioformat *')
-        self._sp_audioformat.sample_type = (
-            spotify.SampleType.INT16_NATIVE_ENDIAN
-        )
+        self._sp_audioformat = spotify.ffi.new("sp_audioformat *")
+        self._sp_audioformat.sample_type = spotify.SampleType.INT16_NATIVE_ENDIAN
         self._sp_audioformat.sample_rate = 44100
         self._sp_audioformat.channels = 2
         self.audio_format = spotify.AudioFormat(self._sp_audioformat)
@@ -41,9 +39,7 @@ class AudioFormatTest(unittest.TestCase):
 
     def test_frame_size(self):
         # INT16 means 16 bits aka 2 bytes per channel
-        self._sp_audioformat.sample_type = (
-            spotify.SampleType.INT16_NATIVE_ENDIAN
-        )
+        self._sp_audioformat.sample_type = spotify.SampleType.INT16_NATIVE_ENDIAN
 
         self._sp_audioformat.channels = 1
         self.assertEqual(self.audio_format.frame_size(), 2)

@@ -12,7 +12,7 @@ except ImportError:
 import spotify
 from spotify import ffi, lib, serialized, utils
 
-__all__ = ['Link', 'LinkType']
+__all__ = ["Link", "LinkType"]
 
 
 class Link(object):
@@ -57,7 +57,7 @@ class Link(object):
     """
 
     def __init__(self, session, uri=None, sp_link=None, add_ref=True):
-        assert uri or sp_link, 'uri or sp_link is required'
+        assert uri or sp_link, "uri or sp_link is required"
 
         self._session = session
 
@@ -67,9 +67,7 @@ class Link(object):
             )
             add_ref = False
             if sp_link == ffi.NULL:
-                raise ValueError(
-                    'Failed to get link from Spotify URI: %r' % uri
-                )
+                raise ValueError("Failed to get link from Spotify URI: %r" % uri)
 
         if add_ref:
             lib.sp_link_add_ref(sp_link)
@@ -77,15 +75,15 @@ class Link(object):
 
     @staticmethod
     def _normalize_uri(uri):
-        if uri.startswith('spotify:'):
+        if uri.startswith("spotify:"):
             return uri
         parsed = urlparse(uri)
-        if parsed.netloc not in ('open.spotify.com', 'play.spotify.com'):
+        if parsed.netloc not in ("open.spotify.com", "play.spotify.com"):
             return uri
-        return 'spotify%s' % parsed.path.strip().replace('/', ':')
+        return "spotify%s" % parsed.path.strip().replace("/", ":")
 
     def __repr__(self):
-        return 'Link(%r)' % self.uri
+        return "Link(%r)" % self.uri
 
     def __str__(self):
         return self.uri
@@ -105,15 +103,13 @@ class Link(object):
     @property
     def uri(self):
         """The link's Spotify URI."""
-        return utils.get_with_growing_buffer(
-            lib.sp_link_as_string, self._sp_link
-        )
+        return utils.get_with_growing_buffer(lib.sp_link_as_string, self._sp_link)
 
     @property
     def url(self):
         """The link's HTTP URL."""
-        return 'https://open.spotify.com%s' % (
-            self.uri[len('spotify') :].replace(':', '/')
+        return "https://open.spotify.com%s" % (
+            self.uri[len("spotify") :].replace(":", "/")
         )
 
     @property
@@ -131,7 +127,7 @@ class Link(object):
 
     def as_track_offset(self):
         """Get the track offset in milliseconds from the link."""
-        offset = ffi.new('int *')
+        offset = ffi.new("int *")
         sp_track = lib.sp_link_as_track_and_offset(self._sp_link, offset)
         if sp_track == ffi.NULL:
             return None
@@ -158,9 +154,7 @@ class Link(object):
         sp_playlist = self._as_sp_playlist()
         if sp_playlist is None:
             return None
-        return spotify.Playlist._cached(
-            self._session, sp_playlist, add_ref=False
-        )
+        return spotify.Playlist._cached(self._session, sp_playlist, add_ref=False)
 
     def _as_sp_playlist(self):
         sp_playlist = None
@@ -169,7 +163,7 @@ class Link(object):
                 self._session._sp_session, self._sp_link
             )
         elif self.type == LinkType.STARRED:
-            matches = re.match(r'^spotify:user:([^:]+):starred$', self.uri)
+            matches = re.match(r"^spotify:user:([^:]+):starred$", self.uri)
             if matches:
                 username = matches.group(1)
                 sp_playlist = lib.sp_session_starred_for_user_create(
@@ -206,6 +200,6 @@ class Link(object):
         )
 
 
-@utils.make_enum('SP_LINKTYPE_')
+@utils.make_enum("SP_LINKTYPE_")
 class LinkType(utils.IntEnum):
     pass

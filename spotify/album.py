@@ -6,8 +6,7 @@ import threading
 import spotify
 from spotify import ffi, lib, serialized, utils
 
-
-__all__ = ['Album', 'AlbumBrowser', 'AlbumType']
+__all__ = ["Album", "AlbumBrowser", "AlbumType"]
 
 logger = logging.getLogger(__name__)
 
@@ -27,16 +26,14 @@ class Album(object):
     """
 
     def __init__(self, session, uri=None, sp_album=None, add_ref=True):
-        assert uri or sp_album, 'uri or sp_album is required'
+        assert uri or sp_album, "uri or sp_album is required"
 
         self._session = session
 
         if uri is not None:
             album = spotify.Link(self._session, uri=uri).as_album()
             if album is None:
-                raise ValueError(
-                    'Failed to get album from Spotify URI: %r' % uri
-                )
+                raise ValueError("Failed to get album from Spotify URI: %r" % uri)
             sp_album = album._sp_album
             add_ref = True
 
@@ -45,7 +42,7 @@ class Album(object):
         self._sp_album = ffi.gc(sp_album, lib.sp_album_release)
 
     def __repr__(self):
-        return 'Album(%r)' % self.link.uri
+        return "Album(%r)" % self.link.uri
 
     def __eq__(self, other):
         if isinstance(other, self.__class__):
@@ -132,9 +129,7 @@ class Album(object):
         """
         if image_size is None:
             image_size = spotify.ImageSize.NORMAL
-        sp_link = lib.sp_link_create_from_album_cover(
-            self._sp_album, int(image_size)
-        )
+        sp_link = lib.sp_link_create_from_album_cover(self._sp_album, int(image_size))
         return spotify.Link(self._session, sp_link=sp_link, add_ref=False)
 
     @property
@@ -182,9 +177,7 @@ class Album(object):
 
         Can be created without the album being loaded.
         """
-        return spotify.AlbumBrowser(
-            self._session, album=self, callback=callback
-        )
+        return spotify.AlbumBrowser(self._session, album=self, callback=callback)
 
 
 class AlbumBrowser(object):
@@ -212,7 +205,7 @@ class AlbumBrowser(object):
         add_ref=True,
     ):
 
-        assert album or sp_albumbrowse, 'album or sp_albumbrowse is required'
+        assert album or sp_albumbrowse, "album or sp_albumbrowse is required"
 
         self._session = session
         self.loaded_event = threading.Event()
@@ -231,15 +224,13 @@ class AlbumBrowser(object):
 
         if add_ref:
             lib.sp_albumbrowse_add_ref(sp_albumbrowse)
-        self._sp_albumbrowse = ffi.gc(
-            sp_albumbrowse, lib.sp_albumbrowse_release
-        )
+        self._sp_albumbrowse = ffi.gc(sp_albumbrowse, lib.sp_albumbrowse_release)
 
     def __repr__(self):
         if self.is_loaded:
-            return 'AlbumBrowser(%r)' % self.album.link.uri
+            return "AlbumBrowser(%r)" % self.album.link.uri
         else:
-            return 'AlbumBrowser(<not loaded>)'
+            return "AlbumBrowser(<not loaded>)"
 
     def __eq__(self, other):
         if isinstance(other, self.__class__):
@@ -328,9 +319,7 @@ class AlbumBrowser(object):
 
         @serialized
         def get_copyright(sp_albumbrowse, key):
-            return utils.to_unicode(
-                lib.sp_albumbrowse_copyright(sp_albumbrowse, key)
-            )
+            return utils.to_unicode(lib.sp_albumbrowse_copyright(sp_albumbrowse, key))
 
         return utils.Sequence(
             sp_obj=self._sp_albumbrowse,
@@ -376,13 +365,13 @@ class AlbumBrowser(object):
         return utils.to_unicode(lib.sp_albumbrowse_review(self._sp_albumbrowse))
 
 
-@ffi.callback('void(sp_albumbrowse *, void *)')
+@ffi.callback("void(sp_albumbrowse *, void *)")
 @serialized
 def _albumbrowse_complete_callback(sp_albumbrowse, handle):
-    logger.debug('albumbrowse_complete_callback called')
+    logger.debug("albumbrowse_complete_callback called")
     if handle == ffi.NULL:
         logger.warning(
-            'pyspotify albumbrowse_complete_callback called without userdata'
+            "pyspotify albumbrowse_complete_callback called without userdata"
         )
         return
     (session, album_browser, callback) = ffi.from_handle(handle)
@@ -392,6 +381,6 @@ def _albumbrowse_complete_callback(sp_albumbrowse, handle):
         callback(album_browser)
 
 
-@utils.make_enum('SP_ALBUMTYPE_')
+@utils.make_enum("SP_ALBUMTYPE_")
 class AlbumType(utils.IntEnum):
     pass

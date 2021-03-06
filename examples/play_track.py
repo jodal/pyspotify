@@ -26,7 +26,7 @@ import spotify
 if sys.argv[1:]:
     track_uri = sys.argv[1]
 else:
-    track_uri = 'spotify:track:6xZtSE6xaBxmRozKA0F6TA'
+    track_uri = "spotify:track:6xZtSE6xaBxmRozKA0F6TA"
 
 # Assuming a spotify_appkey.key in the current dir
 session = spotify.Session()
@@ -53,9 +53,7 @@ def on_end_of_track(self):
 
 
 # Register event listeners
-session.on(
-    spotify.SessionEvent.CONNECTION_STATE_UPDATED, on_connection_state_updated
-)
+session.on(spotify.SessionEvent.CONNECTION_STATE_UPDATED, on_connection_state_updated)
 session.on(spotify.SessionEvent.END_OF_TRACK, on_end_of_track)
 
 # Assuming a previous login with remember_me=True and a proper logout

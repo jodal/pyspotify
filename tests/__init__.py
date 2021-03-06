@@ -30,7 +30,7 @@ def buffer_writer(string):
         # Due to Python 3 treating bytes as an array of ints, we have to
         # encode and copy chars one by one.
         for i in range(length):
-            buffer_[i] = string[i].encode('utf-8')
+            buffer_[i] = string[i].encode("utf-8")
 
         return len(string)
 
@@ -41,7 +41,7 @@ def create_real_session(lib_mock):
     """Create a real :class:`spotify.Session` using ``lib_mock``."""
     lib_mock.sp_session_create.return_value = spotify.ErrorType.OK
     config = spotify.Config()
-    config.application_key = b'\x01' * 321
+    config.application_key = b"\x01" * 321
     return spotify.Session(config=config)
 
 
@@ -63,7 +63,7 @@ def gc_collect():
     # computer running the tests. This skips them all for now.
     raise unittest.SkipTest
 
-    if platform.python_implementation() == 'PyPy':
+    if platform.python_implementation() == "PyPy":
         # Since PyPy use garbage collection instead of reference counting
         # objects are not finalized before the next major GC collection.
         # Currently, the best way we have to ensure a major GC collection has

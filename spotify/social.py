@@ -3,8 +3,7 @@ from __future__ import unicode_literals
 import spotify
 from spotify import ffi, lib, utils
 
-
-__all__ = ['ScrobblingState', 'SocialProvider']
+__all__ = ["ScrobblingState", "SocialProvider"]
 
 
 class Social(object):
@@ -25,9 +24,7 @@ class Social(object):
 
         Set to :class:`True` or :class:`False` to change.
         """
-        return bool(
-            lib.sp_session_is_private_session(self._session._sp_session)
-        )
+        return bool(lib.sp_session_is_private_session(self._session._sp_session))
 
     @private_session.setter
     def private_session(self, value):
@@ -37,20 +34,18 @@ class Social(object):
         # has been reported to Spotify on IRC.
         if self._session.connection.state != spotify.ConnectionState.LOGGED_IN:
             raise RuntimeError(
-                'private_session can only be set when the session is logged '
-                'in. This is temporary workaround of a libspotify bug, '
-                'causing the application to segfault otherwise.'
+                "private_session can only be set when the session is logged "
+                "in. This is temporary workaround of a libspotify bug, "
+                "causing the application to segfault otherwise."
             )
         spotify.Error.maybe_raise(
-            lib.sp_session_set_private_session(
-                self._session._sp_session, bool(value)
-            )
+            lib.sp_session_set_private_session(self._session._sp_session, bool(value))
         )
 
     def is_scrobbling(self, social_provider):
         """Get the :class:`ScrobblingState` for the given
         ``social_provider``."""
-        scrobbling_state = ffi.new('sp_scrobbling_state *')
+        scrobbling_state = ffi.new("sp_scrobbling_state *")
         spotify.Error.maybe_raise(
             lib.sp_session_is_scrobbling(
                 self._session._sp_session, social_provider, scrobbling_state
@@ -60,7 +55,7 @@ class Social(object):
 
     def is_scrobbling_possible(self, social_provider):
         """Check if the scrobbling settings should be shown to the user."""
-        out = ffi.new('bool *')
+        out = ffi.new("bool *")
         spotify.Error.maybe_raise(
             lib.sp_session_is_scrobbling_possible(
                 self._session._sp_session, social_provider, out
@@ -95,11 +90,11 @@ class Social(object):
         )
 
 
-@utils.make_enum('SP_SCROBBLING_STATE_')
+@utils.make_enum("SP_SCROBBLING_STATE_")
 class ScrobblingState(utils.IntEnum):
     pass
 
 
-@utils.make_enum('SP_SOCIAL_PROVIDER_')
+@utils.make_enum("SP_SOCIAL_PROVIDER_")
 class SocialProvider(utils.IntEnum):
     pass

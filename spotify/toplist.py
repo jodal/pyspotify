@@ -6,8 +6,7 @@ import threading
 import spotify
 from spotify import ffi, lib, serialized, utils
 
-
-__all__ = ['Toplist', 'ToplistRegion', 'ToplistType']
+__all__ = ["Toplist", "ToplistRegion", "ToplistType"]
 
 logger = logging.getLogger(__name__)
 
@@ -58,9 +57,7 @@ class Toplist(object):
 
         assert (
             type is not None and region is not None
-        ) or sp_toplistbrowse, (
-            'type and region, or sp_toplistbrowse, is required'
-        )
+        ) or sp_toplistbrowse, "type and region, or sp_toplistbrowse, is required"
 
         self._session = session
         self.type = type
@@ -89,12 +86,10 @@ class Toplist(object):
 
         if add_ref:
             lib.sp_toplistbrowse_add_ref(sp_toplistbrowse)
-        self._sp_toplistbrowse = ffi.gc(
-            sp_toplistbrowse, lib.sp_toplistbrowse_release
-        )
+        self._sp_toplistbrowse = ffi.gc(sp_toplistbrowse, lib.sp_toplistbrowse_release)
 
     def __repr__(self):
-        return 'Toplist(type=%r, region=%r, canonical_username=%r)' % (
+        return "Toplist(type=%r, region=%r, canonical_username=%r)" % (
             self.type,
             self.region,
             self.canonical_username,
@@ -133,9 +128,7 @@ class Toplist(object):
 
         Check to see if there was problems creating the toplist.
         """
-        return spotify.ErrorType(
-            lib.sp_toplistbrowse_error(self._sp_toplistbrowse)
-        )
+        return spotify.ErrorType(lib.sp_toplistbrowse_error(self._sp_toplistbrowse))
 
     @property
     def backend_request_duration(self):
@@ -147,9 +140,7 @@ class Toplist(object):
         """
         if not self.is_loaded:
             return None
-        return lib.sp_toplistbrowse_backend_request_duration(
-            self._sp_toplistbrowse
-        )
+        return lib.sp_toplistbrowse_backend_request_duration(self._sp_toplistbrowse)
 
     @property
     @serialized
@@ -233,14 +224,13 @@ class Toplist(object):
         )
 
 
-@ffi.callback('void(sp_toplistbrowse *, void *)')
+@ffi.callback("void(sp_toplistbrowse *, void *)")
 @serialized
 def _toplistbrowse_complete_callback(sp_toplistbrowse, handle):
-    logger.debug('toplistbrowse_complete_callback called')
+    logger.debug("toplistbrowse_complete_callback called")
     if handle == ffi.NULL:
         logger.warning(
-            'pyspotify toplistbrowse_complete_callback '
-            'called without userdata'
+            "pyspotify toplistbrowse_complete_callback " "called without userdata"
         )
         return
     (session, toplist, callback) = ffi.from_handle(handle)
@@ -250,11 +240,11 @@ def _toplistbrowse_complete_callback(sp_toplistbrowse, handle):
         callback(toplist)
 
 
-@utils.make_enum('SP_TOPLIST_REGION_')
+@utils.make_enum("SP_TOPLIST_REGION_")
 class ToplistRegion(utils.IntEnum):
     pass
 
 
-@utils.make_enum('SP_TOPLIST_TYPE_')
+@utils.make_enum("SP_TOPLIST_TYPE_")
 class ToplistType(utils.IntEnum):
     pass

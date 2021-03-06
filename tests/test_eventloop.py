@@ -11,7 +11,6 @@ except ImportError:
     import Queue as queue
 
 import spotify
-
 from tests import mock
 
 
@@ -31,7 +30,7 @@ class EventLoopTest(unittest.TestCase):
         self.assertTrue(self.loop.daemon)
 
     def test_has_a_descriptive_thread_name(self):
-        self.assertEqual(self.loop.name, 'SpotifyEventLoop')
+        self.assertEqual(self.loop.name, "SpotifyEventLoop")
 
     def test_can_be_started_and_stopped_and_joined(self):
         self.assertFalse(self.loop.is_alive())

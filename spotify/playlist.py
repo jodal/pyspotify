@@ -5,8 +5,7 @@ import logging
 import spotify
 from spotify import compat, ffi, lib, serialized, utils
 
-
-__all__ = ['Playlist', 'PlaylistEvent', 'PlaylistOfflineStatus']
+__all__ = ["Playlist", "PlaylistEvent", "PlaylistOfflineStatus"]
 
 logger = logging.getLogger(__name__)
 
@@ -47,16 +46,14 @@ class Playlist(utils.EventEmitter):
     def __init__(self, session, uri=None, sp_playlist=None, add_ref=True):
         super(Playlist, self).__init__()
 
-        assert uri or sp_playlist, 'uri or sp_playlist is required'
+        assert uri or sp_playlist, "uri or sp_playlist is required"
 
         self._session = session
 
         if uri is not None:
             sp_playlist = spotify.Link(self._session, uri)._as_sp_playlist()
             if sp_playlist is None:
-                raise spotify.Error(
-                    'Failed to get playlist from Spotify URI: %r' % uri
-                )
+                raise spotify.Error("Failed to get playlist from Spotify URI: %r" % uri)
             session._cache[sp_playlist] = self
             add_ref = False
 
@@ -71,9 +68,9 @@ class Playlist(utils.EventEmitter):
         self._lib = lib
 
     def __del__(self):
-        if not hasattr(self, '_lib'):
+        if not hasattr(self, "_lib"):
             return
-        if getattr(self, '_sp_playlist_callbacks', None) is None:
+        if getattr(self, "_sp_playlist_callbacks", None) is None:
             return
         self._lib.sp_playlist_remove_callbacks(
             self._sp_playlist, self._sp_playlist_callbacks, ffi.NULL
@@ -81,11 +78,11 @@ class Playlist(utils.EventEmitter):
 
     def __repr__(self):
         if not self.is_loaded:
-            return 'Playlist(<not loaded>)'
+            return "Playlist(<not loaded>)"
         try:
-            return 'Playlist(%r)' % self.link.uri
+            return "Playlist(%r)" % self.link.uri
         except spotify.Error as exc:
-            return 'Playlist(<error: %s>)' % exc
+            return "Playlist(<error: %s>)" % exc
 
     def __eq__(self, other):
         if isinstance(other, self.__class__):
@@ -215,7 +212,7 @@ class Playlist(utils.EventEmitter):
         Will always return :class:`None` if the playlist isn't loaded or the
         playlist has no image.
         """
-        image_id = ffi.new('char[20]')
+        image_id = ffi.new("char[20]")
         has_image = bool(lib.sp_playlist_get_image(self._sp_playlist, image_id))
         if not has_image:
             return None
@@ -262,9 +259,7 @@ class Playlist(utils.EventEmitter):
             indexes = [indexes]
         indexes = list(set(indexes))  # Remove duplicates
         spotify.Error.maybe_raise(
-            lib.sp_playlist_remove_tracks(
-                self._sp_playlist, indexes, len(indexes)
-            )
+            lib.sp_playlist_remove_tracks(self._sp_playlist, indexes, len(indexes))
         )
 
     def reorder_tracks(self, indexes, new_index):
@@ -315,7 +310,7 @@ class Playlist(utils.EventEmitter):
         # The ``subscribers`` field is ``char *[1]`` according to the struct,
         # so we must cast it to ``char **`` to be able to access more than the
         # first subscriber.
-        subscribers = ffi.cast('char **', sp_subscribers.subscribers)
+        subscribers = ffi.cast("char **", sp_subscribers.subscribers)
         usernames = []
         for i in range(sp_subscribers.count):
             usernames.append(utils.to_unicode(subscribers[i]))
@@ -348,9 +343,7 @@ class Playlist(utils.EventEmitter):
         playlist loaded into RAM.
         """
         return bool(
-            lib.sp_playlist_is_in_ram(
-                self._session._sp_session, self._sp_playlist
-            )
+            lib.sp_playlist_is_in_ram(self._session._sp_session, self._sp_playlist)
         )
 
     def set_in_ram(self, in_ram=True):
@@ -403,16 +396,16 @@ class Playlist(utils.EventEmitter):
     def link(self):
         """A :class:`Link` to the playlist."""
         if not self.is_loaded:
-            raise spotify.Error('The playlist must be loaded to create a link')
+            raise spotify.Error("The playlist must be loaded to create a link")
         sp_link = lib.sp_link_create_from_playlist(self._sp_playlist)
         if sp_link == ffi.NULL:
             if not self.is_in_ram:
                 raise spotify.Error(
-                    'The playlist must have been in RAM to create a link'
+                    "The playlist must have been in RAM to create a link"
                 )
             # XXX Figure out why we can still get NULL here even if
             # the playlist is both loaded and in RAM.
-            raise spotify.Error('Failed to get link from Spotify playlist')
+            raise spotify.Error("Failed to get link from Spotify playlist")
         return spotify.Link(self._session, sp_link=sp_link, add_ref=False)
 
     @serialized
@@ -464,7 +457,7 @@ class PlaylistEvent(object):
     functions just to log that they're called.
     """
 
-    TRACKS_ADDED = 'tracks_added'
+    TRACKS_ADDED = "tracks_added"
     """Called when one or more tracks have been added to the playlist.
 
     :param playlist: the playlist
@@ -475,7 +468,7 @@ class PlaylistEvent(object):
     :type index: int
     """
 
-    TRACKS_REMOVED = 'tracks_removed'
+    TRACKS_REMOVED = "tracks_removed"
     """Called when one or more tracks have been removed from the playlist.
 
     :param playlist: the playlist
@@ -484,7 +477,7 @@ class PlaylistEvent(object):
     :type indexes: list of ints
     """
 
-    TRACKS_MOVED = 'tracks_moved'
+    TRACKS_MOVED = "tracks_moved"
     """Called when one or more tracks have been moved within a playlist.
 
     :param playlist: the playlist
@@ -495,14 +488,14 @@ class PlaylistEvent(object):
     :type new_index: int
     """
 
-    PLAYLIST_RENAMED = 'playlist_renamed'
+    PLAYLIST_RENAMED = "playlist_renamed"
     """Called when the playlist has been renamed.
 
     :param playlist: the playlist
     :type playlist: :class:`Playlist`
     """
 
-    PLAYLIST_STATE_CHANGED = 'playlist_state_changed'
+    PLAYLIST_STATE_CHANGED = "playlist_state_changed"
     """Called when the state changed for a playlist.
 
     There are three states that trigger this callback:
@@ -518,7 +511,7 @@ class PlaylistEvent(object):
     :type playlist: :class:`Playlist`
     """
 
-    PLAYLIST_UPDATE_IN_PROGRESS = 'playlist_update_in_progress'
+    PLAYLIST_UPDATE_IN_PROGRESS = "playlist_update_in_progress"
     """Called when a playlist is updating or is done updating.
 
     This is called before and after a series of changes are applied to the
@@ -531,7 +524,7 @@ class PlaylistEvent(object):
     :type done: bool
     """
 
-    PLAYLIST_METADATA_UPDATED = 'playlist_metadata_updated'
+    PLAYLIST_METADATA_UPDATED = "playlist_metadata_updated"
     """Called when metadata for one or more tracks in the playlist have been
     updated.
 
@@ -539,7 +532,7 @@ class PlaylistEvent(object):
     :type playlist: :class:`Playlist`
     """
 
-    TRACK_CREATED_CHANGED = 'track_created_changed'
+    TRACK_CREATED_CHANGED = "track_created_changed"
     """Called when the create time and/or creator for a playlist entry changes.
 
     :param playlist: the playlist
@@ -552,7 +545,7 @@ class PlaylistEvent(object):
     :type time: int
     """
 
-    TRACK_SEEN_CHANGED = 'track_seen_changed'
+    TRACK_SEEN_CHANGED = "track_seen_changed"
     """Called when the seen attribute of a playlist entry changes.
 
     :param playlist: the playlist
@@ -563,7 +556,7 @@ class PlaylistEvent(object):
     :type seen: bool
     """
 
-    DESCRIPTION_CHANGED = 'description_changed'
+    DESCRIPTION_CHANGED = "description_changed"
     """Called when the playlist description has changed.
 
     :param playlist: the playlist
@@ -572,7 +565,7 @@ class PlaylistEvent(object):
     :type description: string
     """
 
-    IMAGE_CHANGED = 'image_changed'
+    IMAGE_CHANGED = "image_changed"
     """Called when the playlist image has changed.
 
     :param playlist: the playlist
@@ -581,7 +574,7 @@ class PlaylistEvent(object):
     :type image: :class:`Image`
     """
 
-    TRACK_MESSAGE_CHANGED = 'track_message_changed'
+    TRACK_MESSAGE_CHANGED = "track_message_changed"
     """Called when the message attribute of a playlist entry changes.
 
     :param playlist: the playlist
@@ -592,7 +585,7 @@ class PlaylistEvent(object):
     :type message: string
     """
 
-    SUBSCRIBERS_CHANGED = 'subscribers_changed'
+    SUBSCRIBERS_CHANGED = "subscribers_changed"
     """Called when playlist subscribers changes, either the count or the
     subscriber names.
 
@@ -605,21 +598,21 @@ class _PlaylistCallbacks(object):
     @classmethod
     def get_struct(cls):
         return ffi.new(
-            'sp_playlist_callbacks *',
+            "sp_playlist_callbacks *",
             {
-                'tracks_added': cls.tracks_added,
-                'tracks_removed': cls.tracks_removed,
-                'tracks_moved': cls.tracks_moved,
-                'playlist_renamed': cls.playlist_renamed,
-                'playlist_state_changed': cls.playlist_state_changed,
-                'playlist_update_in_progress': cls.playlist_update_in_progress,
-                'playlist_metadata_updated': cls.playlist_metadata_updated,
-                'track_created_changed': cls.track_created_changed,
-                'track_seen_changed': cls.track_seen_changed,
-                'description_changed': cls.description_changed,
-                'image_changed': cls.image_changed,
-                'track_message_changed': cls.track_message_changed,
-                'subscribers_changed': cls.subscribers_changed,
+                "tracks_added": cls.tracks_added,
+                "tracks_removed": cls.tracks_removed,
+                "tracks_moved": cls.tracks_moved,
+                "playlist_renamed": cls.playlist_renamed,
+                "playlist_state_changed": cls.playlist_state_changed,
+                "playlist_update_in_progress": cls.playlist_update_in_progress,
+                "playlist_metadata_updated": cls.playlist_metadata_updated,
+                "track_created_changed": cls.track_created_changed,
+                "track_seen_changed": cls.track_seen_changed,
+                "description_changed": cls.description_changed,
+                "image_changed": cls.image_changed,
+                "track_message_changed": cls.track_message_changed,
+                "subscribers_changed": cls.subscribers_changed,
             },
         )
 
@@ -628,11 +621,11 @@ class _PlaylistCallbacks(object):
 
     @staticmethod
     @ffi.callback(
-        'void(sp_playlist *playlist, sp_track **tracks, int num_tracks, '
-        'int position, void *userdata)'
+        "void(sp_playlist *playlist, sp_track **tracks, int num_tracks, "
+        "int position, void *userdata)"
     )
     def tracks_added(sp_playlist, sp_tracks, num_tracks, index, userdata):
-        logger.debug('Tracks added to playlist')
+        logger.debug("Tracks added to playlist")
         playlist = Playlist._cached(
             spotify._session_instance, sp_playlist, add_ref=True
         )
@@ -646,11 +639,10 @@ class _PlaylistCallbacks(object):
 
     @staticmethod
     @ffi.callback(
-        'void(sp_playlist *playlist, int *tracks, int num_tracks, '
-        'void *userdata)'
+        "void(sp_playlist *playlist, int *tracks, int num_tracks, " "void *userdata)"
     )
     def tracks_removed(sp_playlist, tracks, num_tracks, userdata):
-        logger.debug('Tracks removed from playlist')
+        logger.debug("Tracks removed from playlist")
         playlist = Playlist._cached(
             spotify._session_instance, sp_playlist, add_ref=True
         )
@@ -659,52 +651,48 @@ class _PlaylistCallbacks(object):
 
     @staticmethod
     @ffi.callback(
-        'void(sp_playlist *playlist, int *tracks, int num_tracks, '
-        'int position, void *userdata)'
+        "void(sp_playlist *playlist, int *tracks, int num_tracks, "
+        "int position, void *userdata)"
     )
     def tracks_moved(sp_playlist, old_indexes, num_tracks, new_index, userdata):
-        logger.debug('Tracks moved within playlist')
+        logger.debug("Tracks moved within playlist")
         playlist = Playlist._cached(
             spotify._session_instance, sp_playlist, add_ref=True
         )
         old_indexes = [int(old_indexes[i]) for i in range(num_tracks)]
-        playlist.emit(
-            PlaylistEvent.TRACKS_MOVED, playlist, old_indexes, int(new_index)
-        )
+        playlist.emit(PlaylistEvent.TRACKS_MOVED, playlist, old_indexes, int(new_index))
 
     @staticmethod
-    @ffi.callback('void(sp_playlist *playlist, void *userdata)')
+    @ffi.callback("void(sp_playlist *playlist, void *userdata)")
     def playlist_renamed(sp_playlist, userdata):
-        logger.debug('Playlist renamed')
+        logger.debug("Playlist renamed")
         playlist = Playlist._cached(
             spotify._session_instance, sp_playlist, add_ref=True
         )
         playlist.emit(PlaylistEvent.PLAYLIST_RENAMED, playlist)
 
     @staticmethod
-    @ffi.callback('void(sp_playlist *playlist, void *userdata)')
+    @ffi.callback("void(sp_playlist *playlist, void *userdata)")
     def playlist_state_changed(sp_playlist, userdata):
-        logger.debug('Playlist state changed')
+        logger.debug("Playlist state changed")
         playlist = Playlist._cached(
             spotify._session_instance, sp_playlist, add_ref=True
         )
         playlist.emit(PlaylistEvent.PLAYLIST_STATE_CHANGED, playlist)
 
     @staticmethod
-    @ffi.callback('void(sp_playlist *playlist, bool done, void *userdata)')
+    @ffi.callback("void(sp_playlist *playlist, bool done, void *userdata)")
     def playlist_update_in_progress(sp_playlist, done, userdata):
-        logger.debug('Playlist update in progress')
+        logger.debug("Playlist update in progress")
         playlist = Playlist._cached(
             spotify._session_instance, sp_playlist, add_ref=True
         )
-        playlist.emit(
-            PlaylistEvent.PLAYLIST_UPDATE_IN_PROGRESS, playlist, bool(done)
-        )
+        playlist.emit(PlaylistEvent.PLAYLIST_UPDATE_IN_PROGRESS, playlist, bool(done))
 
     @staticmethod
-    @ffi.callback('void(sp_playlist *playlist, void *userdata)')
+    @ffi.callback("void(sp_playlist *playlist, void *userdata)")
     def playlist_metadata_updated(sp_playlist, userdata):
-        logger.debug('Playlist metadata updated')
+        logger.debug("Playlist metadata updated")
         playlist = Playlist._cached(
             spotify._session_instance, sp_playlist, add_ref=True
         )
@@ -712,17 +700,15 @@ class _PlaylistCallbacks(object):
 
     @staticmethod
     @ffi.callback(
-        'void(sp_playlist *playlist, int position, sp_user *user, '
-        'int when, void *userdata)'
+        "void(sp_playlist *playlist, int position, sp_user *user, "
+        "int when, void *userdata)"
     )
     def track_created_changed(sp_playlist, index, sp_user, when, userdata):
-        logger.debug('Playlist track created changed')
+        logger.debug("Playlist track created changed")
         playlist = Playlist._cached(
             spotify._session_instance, sp_playlist, add_ref=True
         )
-        user = spotify.User(
-            spotify._session_instance, sp_user=sp_user, add_ref=True
-        )
+        user = spotify.User(spotify._session_instance, sp_user=sp_user, add_ref=True)
         playlist.emit(
             PlaylistEvent.TRACK_CREATED_CHANGED,
             playlist,
@@ -733,10 +719,10 @@ class _PlaylistCallbacks(object):
 
     @staticmethod
     @ffi.callback(
-        'void(sp_playlist *playlist, int position, bool seen, void *userdata)'
+        "void(sp_playlist *playlist, int position, bool seen, void *userdata)"
     )
     def track_seen_changed(sp_playlist, index, seen, userdata):
-        logger.debug('Playlist track seen changed')
+        logger.debug("Playlist track seen changed")
         playlist = Playlist._cached(
             spotify._session_instance, sp_playlist, add_ref=True
         )
@@ -745,9 +731,9 @@ class _PlaylistCallbacks(object):
         )
 
     @staticmethod
-    @ffi.callback('void(sp_playlist *playlist, char *desc, void *userdata)')
+    @ffi.callback("void(sp_playlist *playlist, char *desc, void *userdata)")
     def description_changed(sp_playlist, desc, userdata):
-        logger.debug('Playlist description changed')
+        logger.debug("Playlist description changed")
         playlist = Playlist._cached(
             spotify._session_instance, sp_playlist, add_ref=True
         )
@@ -756,15 +742,13 @@ class _PlaylistCallbacks(object):
         )
 
     @staticmethod
-    @ffi.callback('void(sp_playlist *playlist, byte *image, void *userdata)')
+    @ffi.callback("void(sp_playlist *playlist, byte *image, void *userdata)")
     def image_changed(sp_playlist, image_id, userdata):
-        logger.debug('Playlist image changed')
+        logger.debug("Playlist image changed")
         playlist = Playlist._cached(
             spotify._session_instance, sp_playlist, add_ref=True
         )
-        sp_image = lib.sp_image_create(
-            spotify._session_instance._sp_session, image_id
-        )
+        sp_image = lib.sp_image_create(spotify._session_instance._sp_session, image_id)
         image = spotify.Image(
             spotify._session_instance, sp_image=sp_image, add_ref=False
         )
@@ -772,11 +756,10 @@ class _PlaylistCallbacks(object):
 
     @staticmethod
     @ffi.callback(
-        'void(sp_playlist *playlist, int position, char *message, '
-        'void *userdata)'
+        "void(sp_playlist *playlist, int position, char *message, " "void *userdata)"
     )
     def track_message_changed(sp_playlist, index, message, userdata):
-        logger.debug('Playlist track message changed')
+        logger.debug("Playlist track message changed")
         playlist = Playlist._cached(
             spotify._session_instance, sp_playlist, add_ref=True
         )
@@ -788,16 +771,16 @@ class _PlaylistCallbacks(object):
         )
 
     @staticmethod
-    @ffi.callback('void(sp_playlist *playlist, void *userdata)')
+    @ffi.callback("void(sp_playlist *playlist, void *userdata)")
     def subscribers_changed(sp_playlist, userdata):
-        logger.debug('Playlist subscribers changed')
+        logger.debug("Playlist subscribers changed")
         playlist = Playlist._cached(
             spotify._session_instance, sp_playlist, add_ref=True
         )
         playlist.emit(PlaylistEvent.SUBSCRIBERS_CHANGED, playlist)
 
 
-@utils.make_enum('SP_PLAYLIST_OFFLINE_STATUS_')
+@utils.make_enum("SP_PLAYLIST_OFFLINE_STATUS_")
 class PlaylistOfflineStatus(utils.IntEnum):
     pass
 
@@ -827,15 +810,14 @@ class _Tracks(utils.Sequence, compat.MutableSequence):
 
         if not isinstance(key, (int, slice)):
             raise TypeError(
-                'list indices must be int or slice, not %s'
-                % key.__class__.__name__
+                "list indices must be int or slice, not %s" % key.__class__.__name__
             )
         if isinstance(key, slice):
             if not isinstance(value, compat.Iterable):
-                raise TypeError('can only assign an iterable')
+                raise TypeError("can only assign an iterable")
         if isinstance(key, int):
             if not 0 <= key < self.__len__():
-                raise IndexError('list index out of range')
+                raise IndexError("list index out of range")
             key = slice(key, key + 1)
             value = [value]
 
@@ -856,11 +838,10 @@ class _Tracks(utils.Sequence, compat.MutableSequence):
             return
         if not isinstance(key, int):
             raise TypeError(
-                'list indices must be int or slice, not %s'
-                % key.__class__.__name__
+                "list indices must be int or slice, not %s" % key.__class__.__name__
             )
         if not 0 <= key < self.__len__():
-            raise IndexError('list index out of range')
+            raise IndexError("list index out of range")
         self._playlist.remove_tracks(key)
 
     def insert(self, index, value):

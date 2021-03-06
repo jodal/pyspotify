@@ -8,7 +8,6 @@ import re
 import spotify
 from spotify import compat, ffi, lib, serialized, utils
 
-
 __all__ = [
     'PlaylistContainer',
     'PlaylistContainerEvent',

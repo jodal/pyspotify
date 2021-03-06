@@ -3,7 +3,6 @@ from distutils.version import StrictVersion
 
 import cffi
 
-
 if StrictVersion(cffi.__version__) < StrictVersion('1.0.0'):
     raise RuntimeError(
         'pyspotify requires cffi >= 1.0, but found %s' % cffi.__version__

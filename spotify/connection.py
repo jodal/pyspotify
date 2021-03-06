@@ -6,7 +6,6 @@ import operator
 import spotify
 from spotify import lib, utils
 
-
 __all__ = ['ConnectionRule', 'ConnectionState', 'ConnectionType']
 
 

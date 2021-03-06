@@ -3,7 +3,6 @@ from __future__ import unicode_literals
 import spotify
 from spotify import ffi, lib, serialized, utils
 
-
 __all__ = ['Track', 'TrackAvailability', 'TrackOfflineStatus']
 
 

@@ -5,7 +5,6 @@ import logging
 import spotify
 from spotify import compat, ffi, lib, serialized, utils
 
-
 __all__ = ['Playlist', 'PlaylistEvent', 'PlaylistOfflineStatus']
 
 logger = logging.getLogger(__name__)

@@ -9,7 +9,6 @@ import time
 
 import spotify
 
-
 logger = logging.getLogger(__name__)
 
 

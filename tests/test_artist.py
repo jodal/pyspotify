@@ -3,9 +3,8 @@ from __future__ import unicode_literals
 import unittest
 
 import spotify
-from spotify import compat
-
 import tests
+from spotify import compat
 from tests import mock
 
 

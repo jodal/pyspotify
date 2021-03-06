@@ -5,10 +5,9 @@ from __future__ import unicode_literals
 import unittest
 
 import spotify
+import tests
 from spotify import compat
 from spotify.playlist import _PlaylistCallbacks
-
-import tests
 from tests import mock
 
 

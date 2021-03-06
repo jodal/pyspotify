@@ -6,7 +6,6 @@ import threading
 import spotify
 from spotify import ffi, lib, serialized, utils
 
-
 __all__ = ['Toplist', 'ToplistRegion', 'ToplistType']
 
 logger = logging.getLogger(__name__)

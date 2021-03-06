@@ -6,7 +6,6 @@ import unittest
 from distutils.version import StrictVersion as SV
 
 import spotify
-
 from tests import mock
 
 

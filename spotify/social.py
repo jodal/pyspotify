@@ -3,7 +3,6 @@ from __future__ import unicode_literals
 import spotify
 from spotify import ffi, lib, utils
 
-
 __all__ = ['ScrobblingState', 'SocialProvider']
 
 

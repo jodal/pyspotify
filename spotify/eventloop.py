@@ -12,7 +12,6 @@ except ImportError:
 
 import spotify
 
-
 __all__ = ['EventLoop']
 
 logger = logging.getLogger(__name__)

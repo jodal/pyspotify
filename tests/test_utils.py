@@ -5,9 +5,8 @@ from __future__ import unicode_literals
 import unittest
 
 import spotify
-from spotify import utils
-
 import tests
+from spotify import utils
 from tests import mock
 
 

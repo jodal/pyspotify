@@ -10,7 +10,6 @@ import spotify.player
 import spotify.social
 from spotify import ffi, lib, serialized, utils
 
-
 __all__ = ['Session', 'SessionEvent']
 
 logger = logging.getLogger(__name__)

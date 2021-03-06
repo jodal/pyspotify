@@ -7,7 +7,6 @@ import time
 
 import spotify
 
-
 if len(sys.argv) != 3:
     sys.exit('Usage: %s USERNAME PASSWORD' % sys.argv[0])
 

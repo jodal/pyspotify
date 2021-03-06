@@ -4,10 +4,9 @@ import os
 import unittest
 
 import spotify
+import tests
 from spotify import compat
 from spotify.playlist_container import _PlaylistContainerCallbacks
-
-import tests
 from tests import mock
 
 

@@ -7,9 +7,8 @@ import unittest
 import pytest
 
 import spotify
-from spotify.session import _SessionCallbacks
-
 import tests
+from spotify.session import _SessionCallbacks
 from tests import mock
 
 

@@ -4,7 +4,6 @@ import collections
 
 from spotify import utils
 
-
 __all__ = ['AudioBufferStats', 'AudioFormat', 'Bitrate', 'SampleType']
 
 

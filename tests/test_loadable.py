@@ -4,9 +4,8 @@ import time
 import unittest
 
 import spotify
-from spotify.utils import load
-
 import tests
+from spotify.utils import load
 from tests import mock
 
 

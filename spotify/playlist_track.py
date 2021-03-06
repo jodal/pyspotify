@@ -5,7 +5,6 @@ import logging
 import spotify
 from spotify import ffi, lib, serialized, utils
 
-
 __all__ = ['PlaylistTrack']
 
 logger = logging.getLogger(__name__)

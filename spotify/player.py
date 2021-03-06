@@ -3,7 +3,6 @@ from __future__ import unicode_literals
 import spotify
 from spotify import lib
 
-
 __all__ = ['PlayerState']
 
 

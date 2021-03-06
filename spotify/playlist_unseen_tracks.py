@@ -6,7 +6,6 @@ import pprint
 import spotify
 from spotify import compat, ffi, lib, serialized
 
-
 __all__ = ['PlaylistUnseenTracks']
 
 logger = logging.getLogger(__name__)

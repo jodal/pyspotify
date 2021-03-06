@@ -18,7 +18,6 @@ workflows:
       - docs
       - flake8
       - check-manifest
-      - black
 
 jobs:
   py39: &test-template
@@ -106,5 +105,3 @@ jobs:
   flake8: *test-template
 
   check-manifest: *test-template
-
-  black: *test-template

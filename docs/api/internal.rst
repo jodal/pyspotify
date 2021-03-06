@@ -12,7 +12,7 @@ Internal API
 libspotify CFFI interface
 =========================
 
-The `CFFI <http://cffi.readthedocs.org/>`__ wrapper for the full libspotify API
+The `CFFI <http://cffi.readthedocs.io/>`__ wrapper for the full libspotify API
 is available as :attr:`spotify.ffi` and :attr:`spotify.lib`.
 
 .. attribute:: spotify.ffi

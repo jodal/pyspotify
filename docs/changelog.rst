@@ -148,7 +148,7 @@ v2.0.0 (2015-06-01)
 
 pyspotify 2.x is a full rewrite of pyspotify. While pyspotify 1.x is a
 CPython C extension, pyspotify 2.x uses `CFFI
-<https://cffi.readthedocs.org/>`__ to wrap the libspotify C library. It works
+<https://cffi.readthedocs.io/>`__ to wrap the libspotify C library. It works
 on CPython 2.7 and 3.2+, as well as PyPy 2.6+. pyspotify 2.0 makes 100% of the
 libspotify 12.1.51 API available from Python, going far beyond the API coverage
 of pyspotify 1.x.
@@ -360,7 +360,7 @@ v2.0.0b1 (2014-04-24)
 =====================
 
 pyspotify 2.x is a full rewrite of pyspotify. While pyspotify 1.x is a
-CPython C extension, pyspotify 2.x uses `CFFI <http://cffi.readthedocs.org/>`__
+CPython C extension, pyspotify 2.x uses `CFFI <http://cffi.readthedocs.io/>`__
 to make 100% of the libspotify C library available from Python. It works on
 CPython 2.7 and 3.2+, as well as PyPy 2.1+.
 
@@ -556,7 +556,7 @@ v2.0.0a1 (2014-02-14)
 =====================
 
 pyspotify 2.x is a full rewrite of pyspotify. While pyspotify 1.x is a
-CPython C extension, pyspotify 2.x uses `CFFI <http://cffi.readthedocs.org/>`__
+CPython C extension, pyspotify 2.x uses `CFFI <http://cffi.readthedocs.io/>`__
 to wrap the libspotify C library. It works on CPython 2.7 and 3.2+, as well as
 PyPy 2.1+.
 

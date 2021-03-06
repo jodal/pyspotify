@@ -32,9 +32,7 @@ class InboxPostResultTest(unittest.TestCase):
     def test_releases_sp_inbox_when_result_dies(self, lib_mock):
         sp_inbox = spotify.ffi.cast('sp_inbox *', 42)
 
-        inbox_post_result = spotify.InboxPostResult(
-            self.session, sp_inbox=sp_inbox
-        )
+        inbox_post_result = spotify.InboxPostResult(self.session, sp_inbox=sp_inbox)
         inbox_post_result = None  # noqa
         tests.gc_collect()
 
@@ -49,9 +47,7 @@ class InboxPostResultTest(unittest.TestCase):
         sp_inbox = spotify.ffi.cast('sp_inbox *', 42)
         lib_mock.sp_inbox_post_tracks.return_value = sp_inbox
 
-        result = spotify.InboxPostResult(
-            self.session, 'alice', [track1, track2], '♥'
-        )
+        result = spotify.InboxPostResult(self.session, 'alice', [track1, track2], '♥')
 
         lib_mock.sp_inbox_post_tracks.assert_called_with(
             self.session._sp_session,
@@ -88,9 +84,7 @@ class InboxPostResultTest(unittest.TestCase):
         sp_inbox = spotify.ffi.cast('sp_inbox *', 42)
         lib_mock.sp_inbox_post_tracks.return_value = sp_inbox
 
-        result = spotify.InboxPostResult(
-            self.session, 'alice', track1, 'Enjoy!'
-        )
+        result = spotify.InboxPostResult(self.session, 'alice', track1, 'Enjoy!')
 
         lib_mock.sp_inbox_post_tracks.assert_called_with(
             self.session._sp_session,
@@ -165,26 +159,18 @@ class InboxPostResultTest(unittest.TestCase):
         lib_mock.sp_inbox_post_tracks.return_value = spotify.ffi.NULL
 
         with self.assertRaises(spotify.Error):
-            spotify.InboxPostResult(
-                self.session, 'alice', [track1, track2], 'Enjoy!'
-            )
+            spotify.InboxPostResult(self.session, 'alice', [track1, track2], 'Enjoy!')
 
     def test_repr(self, lib_mock):
         sp_inbox = spotify.ffi.cast('sp_inbox *', 42)
-        inbox_post_result = spotify.InboxPostResult(
-            self.session, sp_inbox=sp_inbox
-        )
+        inbox_post_result = spotify.InboxPostResult(self.session, sp_inbox=sp_inbox)
 
         self.assertEqual(repr(inbox_post_result), 'InboxPostResult(<pending>)')
 
         inbox_post_result.loaded_event.set()
-        lib_mock.sp_inbox_error.return_value = int(
-            spotify.ErrorType.INBOX_IS_FULL
-        )
+        lib_mock.sp_inbox_error.return_value = int(spotify.ErrorType.INBOX_IS_FULL)
 
-        self.assertEqual(
-            repr(inbox_post_result), 'InboxPostResult(INBOX_IS_FULL)'
-        )
+        self.assertEqual(repr(inbox_post_result), 'InboxPostResult(INBOX_IS_FULL)')
 
         lib_mock.sp_inbox_error.return_value = int(spotify.ErrorType.OK)
 
@@ -213,13 +199,9 @@ class InboxPostResultTest(unittest.TestCase):
         self.assertEqual(hash(inbox1), hash(inbox2))
 
     def test_error(self, lib_mock):
-        lib_mock.sp_inbox_error.return_value = int(
-            spotify.ErrorType.INBOX_IS_FULL
-        )
+        lib_mock.sp_inbox_error.return_value = int(spotify.ErrorType.INBOX_IS_FULL)
         sp_inbox = spotify.ffi.cast('sp_inbox *', 42)
-        inbox_post_result = spotify.InboxPostResult(
-            self.session, sp_inbox=sp_inbox
-        )
+        inbox_post_result = spotify.InboxPostResult(self.session, sp_inbox=sp_inbox)
 
         result = inbox_post_result.error
 

@@ -67,9 +67,7 @@ class Link(object):
             )
             add_ref = False
             if sp_link == ffi.NULL:
-                raise ValueError(
-                    'Failed to get link from Spotify URI: %r' % uri
-                )
+                raise ValueError('Failed to get link from Spotify URI: %r' % uri)
 
         if add_ref:
             lib.sp_link_add_ref(sp_link)
@@ -105,9 +103,7 @@ class Link(object):
     @property
     def uri(self):
         """The link's Spotify URI."""
-        return utils.get_with_growing_buffer(
-            lib.sp_link_as_string, self._sp_link
-        )
+        return utils.get_with_growing_buffer(lib.sp_link_as_string, self._sp_link)
 
     @property
     def url(self):
@@ -158,9 +154,7 @@ class Link(object):
         sp_playlist = self._as_sp_playlist()
         if sp_playlist is None:
             return None
-        return spotify.Playlist._cached(
-            self._session, sp_playlist, add_ref=False
-        )
+        return spotify.Playlist._cached(self._session, sp_playlist, add_ref=False)
 
     def _as_sp_playlist(self):
         sp_playlist = None

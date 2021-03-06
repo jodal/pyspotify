@@ -31,9 +31,7 @@ def make_parser():
     parser.add_argument(
         '-v', '--verbose', action='store_true', help='Turn on debug logging'
     )
-    subparsers = parser.add_subparsers(
-        dest='command', help='sub-command --help'
-    )
+    subparsers = parser.add_subparsers(dest='command', help='sub-command --help')
 
     subparsers.add_parser('info', help='Get account info')
 
@@ -44,12 +42,8 @@ def make_parser():
         'name', action='store', help='Name of new playlist'
     )
 
-    add_track_parser = subparsers.add_parser(
-        'add-track', help='Add track to playlist'
-    )
-    add_track_parser.add_argument(
-        'playlist', action='store', help='URI of playlist'
-    )
+    add_track_parser = subparsers.add_parser('add-track', help='Add track to playlist')
+    add_track_parser.add_argument('playlist', action='store', help='URI of playlist')
     add_track_parser.add_argument('track', action='store', help='URI of track')
 
     return parser
@@ -133,9 +127,7 @@ def main(args):
                 'response': {'playlist_name': name, 'playlist_uri': uri},
             }
         elif args.command == 'add-track':
-            playlist_uri, track_uri = add_track(
-                session, args.playlist, args.track
-            )
+            playlist_uri, track_uri = add_track(session, args.playlist, args.track)
             result = {
                 'success': True,
                 'action': args.command,

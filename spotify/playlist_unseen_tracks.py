@@ -62,8 +62,7 @@ class PlaylistUnseenTracks(compat.Sequence):
             return list(self).__getitem__(key)
         if not isinstance(key, int):
             raise TypeError(
-                'list indices must be int or slice, not %s'
-                % key.__class__.__name__
+                'list indices must be int or slice, not %s' % key.__class__.__name__
             )
         if key < 0:
             key += self.__len__()

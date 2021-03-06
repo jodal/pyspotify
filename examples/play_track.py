@@ -53,9 +53,7 @@ def on_end_of_track(self):
 
 
 # Register event listeners
-session.on(
-    spotify.SessionEvent.CONNECTION_STATE_UPDATED, on_connection_state_updated
-)
+session.on(spotify.SessionEvent.CONNECTION_STATE_UPDATED, on_connection_state_updated)
 session.on(spotify.SessionEvent.END_OF_TRACK, on_end_of_track)
 
 # Assuming a previous login with remember_me=True and a proper logout

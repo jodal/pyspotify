@@ -17,9 +17,7 @@ with open(header_file) as fh:
 
 ffi = cffi.FFI()
 ffi.cdef(header)
-ffi.set_source(
-    'spotify._spotify', '#include "libspotify/api.h"', libraries=['spotify']
-)
+ffi.set_source('spotify._spotify', '#include "libspotify/api.h"', libraries=['spotify'])
 
 
 if __name__ == '__main__':

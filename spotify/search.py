@@ -141,9 +141,7 @@ class Search(object):
         Will always return :class:`None` if the search isn't loaded.
         """
         spotify.Error.maybe_raise(self.error)
-        did_you_mean = utils.to_unicode(
-            lib.sp_search_did_you_mean(self._sp_search)
-        )
+        did_you_mean = utils.to_unicode(lib.sp_search_did_you_mean(self._sp_search))
         return did_you_mean if did_you_mean else None
 
     @property
@@ -153,9 +151,7 @@ class Search(object):
 
         Will always return an empty list if the search isn't loaded.
         """
-        spotify.Error.maybe_raise(
-            self.error, ignores=[spotify.ErrorType.IS_LOADING]
-        )
+        spotify.Error.maybe_raise(self.error, ignores=[spotify.ErrorType.IS_LOADING])
         if not self.is_loaded:
             return []
 
@@ -193,9 +189,7 @@ class Search(object):
 
         Will always return an empty list if the search isn't loaded.
         """
-        spotify.Error.maybe_raise(
-            self.error, ignores=[spotify.ErrorType.IS_LOADING]
-        )
+        spotify.Error.maybe_raise(self.error, ignores=[spotify.ErrorType.IS_LOADING])
         if not self.is_loaded:
             return []
 
@@ -233,9 +227,7 @@ class Search(object):
 
         Will always return an empty list if the search isn't loaded.
         """
-        spotify.Error.maybe_raise(
-            self.error, ignores=[spotify.ErrorType.IS_LOADING]
-        )
+        spotify.Error.maybe_raise(self.error, ignores=[spotify.ErrorType.IS_LOADING])
         if not self.is_loaded:
             return []
 
@@ -275,9 +267,7 @@ class Search(object):
 
         Will always return an empty list if the search isn't loaded.
         """
-        spotify.Error.maybe_raise(
-            self.error, ignores=[spotify.ErrorType.IS_LOADING]
-        )
+        spotify.Error.maybe_raise(self.error, ignores=[spotify.ErrorType.IS_LOADING])
         if not self.is_loaded:
             return []
 
@@ -288,9 +278,7 @@ class Search(object):
                 name=utils.to_unicode(
                     lib.sp_search_playlist_name(self._sp_search, key)
                 ),
-                uri=utils.to_unicode(
-                    lib.sp_search_playlist_uri(self._sp_search, key)
-                ),
+                uri=utils.to_unicode(lib.sp_search_playlist_uri(self._sp_search, key)),
                 image_uri=utils.to_unicode(
                     lib.sp_search_playlist_image_uri(self._sp_search, key)
                 ),
@@ -369,9 +357,7 @@ class Search(object):
 def _search_complete_callback(sp_search, handle):
     logger.debug('search_complete_callback called')
     if handle == ffi.NULL:
-        logger.warning(
-            'pyspotify search_complete_callback called without userdata'
-        )
+        logger.warning('pyspotify search_complete_callback called without userdata')
         return
     (session, search_result, callback) = ffi.from_handle(handle)
     session._callback_handles.remove(handle)

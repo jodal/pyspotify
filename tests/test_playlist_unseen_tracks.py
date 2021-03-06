@@ -23,8 +23,7 @@ class PlaylistUnseenTracksTest(unittest.TestCase):
 
         total_num_tracks = 3
         sp_tracks = [
-            spotify.ffi.cast('sp_track *', 44 + i)
-            for i in range(total_num_tracks)
+            spotify.ffi.cast('sp_track *', 44 + i) for i in range(total_num_tracks)
         ]
 
         def func(sp_pc, sp_p, sp_t, num_t):
@@ -39,25 +38,19 @@ class PlaylistUnseenTracksTest(unittest.TestCase):
         )
 
         # Collection keeps references to container and playlist:
-        lib_mock.sp_playlistcontainer_add_ref.assert_called_with(
-            sp_playlistcontainer
-        )
+        lib_mock.sp_playlistcontainer_add_ref.assert_called_with(sp_playlistcontainer)
         lib_mock.sp_playlist_add_ref.assert_called_with(sp_playlist)
 
         # Getting collection and length causes no tracks to be retrieved:
         self.assertEqual(len(tracks), total_num_tracks)
-        self.assertEqual(
-            lib_mock.sp_playlistcontainer_get_unseen_tracks.call_count, 1
-        )
+        self.assertEqual(lib_mock.sp_playlistcontainer_get_unseen_tracks.call_count, 1)
         lib_mock.sp_playlistcontainer_get_unseen_tracks.assert_called_with(
             sp_playlistcontainer, sp_playlist, mock.ANY, 0
         )
 
         # Getting items causes more tracks to be retrieved:
         track0 = tracks[0]
-        self.assertEqual(
-            lib_mock.sp_playlistcontainer_get_unseen_tracks.call_count, 2
-        )
+        self.assertEqual(lib_mock.sp_playlistcontainer_get_unseen_tracks.call_count, 2)
         lib_mock.sp_playlistcontainer_get_unseen_tracks.assert_called_with(
             sp_playlistcontainer, sp_playlist, mock.ANY, total_num_tracks
         )
@@ -66,18 +59,14 @@ class PlaylistUnseenTracksTest(unittest.TestCase):
 
         # Getting already retrieved tracks causes no new retrieval:
         track1 = tracks[1]
-        self.assertEqual(
-            lib_mock.sp_playlistcontainer_get_unseen_tracks.call_count, 2
-        )
+        self.assertEqual(lib_mock.sp_playlistcontainer_get_unseen_tracks.call_count, 2)
         self.assertIsInstance(track1, spotify.Track)
         self.assertEqual(track1._sp_track, sp_tracks[1])
 
         # Getting item with negative index
         track2 = tracks[-3]
         self.assertEqual(track2._sp_track, track0._sp_track)
-        self.assertEqual(
-            lib_mock.sp_playlistcontainer_get_unseen_tracks.call_count, 2
-        )
+        self.assertEqual(lib_mock.sp_playlistcontainer_get_unseen_tracks.call_count, 2)
 
     def test_raises_error_on_failure(self, lib_mock):
         sp_playlistcontainer = spotify.ffi.cast('sp_playlistcontainer *', 42)
@@ -96,8 +85,7 @@ class PlaylistUnseenTracksTest(unittest.TestCase):
 
         total_num_tracks = 3
         sp_tracks = [
-            spotify.ffi.cast('sp_track *', 44 + i)
-            for i in range(total_num_tracks)
+            spotify.ffi.cast('sp_track *', 44 + i) for i in range(total_num_tracks)
         ]
 
         def func(sp_pc, sp_p, sp_t, num_t):

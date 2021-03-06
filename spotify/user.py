@@ -28,9 +28,7 @@ class User(object):
         if uri is not None:
             user = spotify.Link(self._session, uri=uri).as_user()
             if user is None:
-                raise ValueError(
-                    'Failed to get user from Spotify URI: %r' % uri
-                )
+                raise ValueError('Failed to get user from Spotify URI: %r' % uri)
             sp_user = user._sp_user
             add_ref = True
 

@@ -53,9 +53,7 @@ class Playlist(utils.EventEmitter):
         if uri is not None:
             sp_playlist = spotify.Link(self._session, uri)._as_sp_playlist()
             if sp_playlist is None:
-                raise spotify.Error(
-                    'Failed to get playlist from Spotify URI: %r' % uri
-                )
+                raise spotify.Error('Failed to get playlist from Spotify URI: %r' % uri)
             session._cache[sp_playlist] = self
             add_ref = False
 
@@ -261,9 +259,7 @@ class Playlist(utils.EventEmitter):
             indexes = [indexes]
         indexes = list(set(indexes))  # Remove duplicates
         spotify.Error.maybe_raise(
-            lib.sp_playlist_remove_tracks(
-                self._sp_playlist, indexes, len(indexes)
-            )
+            lib.sp_playlist_remove_tracks(self._sp_playlist, indexes, len(indexes))
         )
 
     def reorder_tracks(self, indexes, new_index):
@@ -347,9 +343,7 @@ class Playlist(utils.EventEmitter):
         playlist loaded into RAM.
         """
         return bool(
-            lib.sp_playlist_is_in_ram(
-                self._session._sp_session, self._sp_playlist
-            )
+            lib.sp_playlist_is_in_ram(self._session._sp_session, self._sp_playlist)
         )
 
     def set_in_ram(self, in_ram=True):
@@ -645,8 +639,7 @@ class _PlaylistCallbacks(object):
 
     @staticmethod
     @ffi.callback(
-        'void(sp_playlist *playlist, int *tracks, int num_tracks, '
-        'void *userdata)'
+        'void(sp_playlist *playlist, int *tracks, int num_tracks, ' 'void *userdata)'
     )
     def tracks_removed(sp_playlist, tracks, num_tracks, userdata):
         logger.debug('Tracks removed from playlist')
@@ -667,9 +660,7 @@ class _PlaylistCallbacks(object):
             spotify._session_instance, sp_playlist, add_ref=True
         )
         old_indexes = [int(old_indexes[i]) for i in range(num_tracks)]
-        playlist.emit(
-            PlaylistEvent.TRACKS_MOVED, playlist, old_indexes, int(new_index)
-        )
+        playlist.emit(PlaylistEvent.TRACKS_MOVED, playlist, old_indexes, int(new_index))
 
     @staticmethod
     @ffi.callback('void(sp_playlist *playlist, void *userdata)')
@@ -696,9 +687,7 @@ class _PlaylistCallbacks(object):
         playlist = Playlist._cached(
             spotify._session_instance, sp_playlist, add_ref=True
         )
-        playlist.emit(
-            PlaylistEvent.PLAYLIST_UPDATE_IN_PROGRESS, playlist, bool(done)
-        )
+        playlist.emit(PlaylistEvent.PLAYLIST_UPDATE_IN_PROGRESS, playlist, bool(done))
 
     @staticmethod
     @ffi.callback('void(sp_playlist *playlist, void *userdata)')
@@ -719,9 +708,7 @@ class _PlaylistCallbacks(object):
         playlist = Playlist._cached(
             spotify._session_instance, sp_playlist, add_ref=True
         )
-        user = spotify.User(
-            spotify._session_instance, sp_user=sp_user, add_ref=True
-        )
+        user = spotify.User(spotify._session_instance, sp_user=sp_user, add_ref=True)
         playlist.emit(
             PlaylistEvent.TRACK_CREATED_CHANGED,
             playlist,
@@ -761,9 +748,7 @@ class _PlaylistCallbacks(object):
         playlist = Playlist._cached(
             spotify._session_instance, sp_playlist, add_ref=True
         )
-        sp_image = lib.sp_image_create(
-            spotify._session_instance._sp_session, image_id
-        )
+        sp_image = lib.sp_image_create(spotify._session_instance._sp_session, image_id)
         image = spotify.Image(
             spotify._session_instance, sp_image=sp_image, add_ref=False
         )
@@ -771,8 +756,7 @@ class _PlaylistCallbacks(object):
 
     @staticmethod
     @ffi.callback(
-        'void(sp_playlist *playlist, int position, char *message, '
-        'void *userdata)'
+        'void(sp_playlist *playlist, int position, char *message, ' 'void *userdata)'
     )
     def track_message_changed(sp_playlist, index, message, userdata):
         logger.debug('Playlist track message changed')
@@ -826,8 +810,7 @@ class _Tracks(utils.Sequence, compat.MutableSequence):
 
         if not isinstance(key, (int, slice)):
             raise TypeError(
-                'list indices must be int or slice, not %s'
-                % key.__class__.__name__
+                'list indices must be int or slice, not %s' % key.__class__.__name__
             )
         if isinstance(key, slice):
             if not isinstance(value, compat.Iterable):
@@ -855,8 +838,7 @@ class _Tracks(utils.Sequence, compat.MutableSequence):
             return
         if not isinstance(key, int):
             raise TypeError(
-                'list indices must be int or slice, not %s'
-                % key.__class__.__name__
+                'list indices must be int or slice, not %s' % key.__class__.__name__
             )
         if not 0 <= key < self.__len__():
             raise IndexError('list index out of range')

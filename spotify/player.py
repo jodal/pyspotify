@@ -40,9 +40,7 @@ class Player(object):
     def load(self, track):
         """Load :class:`Track` for playback."""
         spotify.Error.maybe_raise(
-            lib.sp_session_player_load(
-                self._session._sp_session, track._sp_track
-            )
+            lib.sp_session_player_load(self._session._sp_session, track._sp_track)
         )
         self.state = PlayerState.LOADED
 
@@ -89,7 +87,5 @@ class Player(object):
         playing it.
         """
         spotify.Error.maybe_raise(
-            lib.sp_session_player_prefetch(
-                self._session._sp_session, track._sp_track
-            )
+            lib.sp_session_player_prefetch(self._session._sp_session, track._sp_track)
         )

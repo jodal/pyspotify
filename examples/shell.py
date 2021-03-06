@@ -44,9 +44,7 @@ class Commander(cmd.Cmd):
         try:
             self.audio_driver = spotify.AlsaSink(self.session)
         except ImportError:
-            self.logger.warning(
-                'No audio sink found; audio playback unavailable.'
-            )
+            self.logger.warning('No audio sink found; audio playback unavailable.')
 
         self.event_loop = spotify.EventLoop(self.session)
         self.event_loop.start()

@@ -24,9 +24,7 @@ class Social(object):
 
         Set to :class:`True` or :class:`False` to change.
         """
-        return bool(
-            lib.sp_session_is_private_session(self._session._sp_session)
-        )
+        return bool(lib.sp_session_is_private_session(self._session._sp_session))
 
     @private_session.setter
     def private_session(self, value):
@@ -41,9 +39,7 @@ class Social(object):
                 'causing the application to segfault otherwise.'
             )
         spotify.Error.maybe_raise(
-            lib.sp_session_set_private_session(
-                self._session._sp_session, bool(value)
-            )
+            lib.sp_session_set_private_session(self._session._sp_session, bool(value))
         )
 
     def is_scrobbling(self, social_provider):

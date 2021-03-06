@@ -147,9 +147,7 @@ class AlsaSinkTest(unittest.TestCase, BaseSinkTest):
         )
 
         self.sink._device.write.assert_called_with(mock.sentinel.frames)
-        self.assertEqual(
-            num_consumed_frames, self.sink._device.write.return_value
-        )
+        self.assertEqual(num_consumed_frames, self.sink._device.write.return_value)
 
 
 class PortAudioSinkTest(unittest.TestCase, BaseSinkTest):

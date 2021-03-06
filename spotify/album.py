@@ -33,9 +33,7 @@ class Album(object):
         if uri is not None:
             album = spotify.Link(self._session, uri=uri).as_album()
             if album is None:
-                raise ValueError(
-                    'Failed to get album from Spotify URI: %r' % uri
-                )
+                raise ValueError('Failed to get album from Spotify URI: %r' % uri)
             sp_album = album._sp_album
             add_ref = True
 
@@ -131,9 +129,7 @@ class Album(object):
         """
         if image_size is None:
             image_size = spotify.ImageSize.NORMAL
-        sp_link = lib.sp_link_create_from_album_cover(
-            self._sp_album, int(image_size)
-        )
+        sp_link = lib.sp_link_create_from_album_cover(self._sp_album, int(image_size))
         return spotify.Link(self._session, sp_link=sp_link, add_ref=False)
 
     @property
@@ -181,9 +177,7 @@ class Album(object):
 
         Can be created without the album being loaded.
         """
-        return spotify.AlbumBrowser(
-            self._session, album=self, callback=callback
-        )
+        return spotify.AlbumBrowser(self._session, album=self, callback=callback)
 
 
 class AlbumBrowser(object):
@@ -230,9 +224,7 @@ class AlbumBrowser(object):
 
         if add_ref:
             lib.sp_albumbrowse_add_ref(sp_albumbrowse)
-        self._sp_albumbrowse = ffi.gc(
-            sp_albumbrowse, lib.sp_albumbrowse_release
-        )
+        self._sp_albumbrowse = ffi.gc(sp_albumbrowse, lib.sp_albumbrowse_release)
 
     def __repr__(self):
         if self.is_loaded:
@@ -327,9 +319,7 @@ class AlbumBrowser(object):
 
         @serialized
         def get_copyright(sp_albumbrowse, key):
-            return utils.to_unicode(
-                lib.sp_albumbrowse_copyright(sp_albumbrowse, key)
-            )
+            return utils.to_unicode(lib.sp_albumbrowse_copyright(sp_albumbrowse, key))
 
         return utils.Sequence(
             sp_obj=self._sp_albumbrowse,

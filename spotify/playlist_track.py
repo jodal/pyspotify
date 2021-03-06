@@ -36,8 +36,7 @@ class PlaylistTrack(object):
     def __eq__(self, other):
         if isinstance(other, self.__class__):
             return (
-                self._sp_playlist == other._sp_playlist
-                and self._index == other._index
+                self._sp_playlist == other._sp_playlist and self._index == other._index
             )
         else:
             return False
@@ -71,9 +70,7 @@ class PlaylistTrack(object):
         """The :class:`~spotify.User` that added the track to the playlist."""
         return spotify.User(
             self._session,
-            sp_user=lib.sp_playlist_track_creator(
-                self._sp_playlist, self._index
-            ),
+            sp_user=lib.sp_playlist_track_creator(self._sp_playlist, self._index),
             add_ref=True,
         )
 
@@ -82,9 +79,7 @@ class PlaylistTrack(object):
 
     def set_seen(self, value):
         spotify.Error.maybe_raise(
-            lib.sp_playlist_track_set_seen(
-                self._sp_playlist, self._index, int(value)
-            )
+            lib.sp_playlist_track_set_seen(self._sp_playlist, self._index, int(value))
         )
 
     seen = property(is_seen, set_seen)

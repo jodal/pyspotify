@@ -27,9 +27,7 @@ class EventEmitter(object):
         If the listener function returns :class:`False`, it is removed and will
         not be called the next time the ``event`` is emitted.
         """
-        self._listeners[event].append(
-            _Listener(callback=listener, user_args=user_args)
-        )
+        self._listeners[event].append(_Listener(callback=listener, user_args=user_args))
 
     @serialized
     def off(self, event=None, listener=None):
@@ -191,9 +189,7 @@ def get_with_growing_buffer(func, *args):
 
 def _check_error(obj):
     error_type = getattr(obj, 'error', spotify.ErrorType.OK)
-    spotify.Error.maybe_raise(
-        error_type, ignores=[spotify.ErrorType.IS_LOADING]
-    )
+    spotify.Error.maybe_raise(error_type, ignores=[spotify.ErrorType.IS_LOADING])
 
 
 def load(session, obj, timeout=None):
@@ -258,9 +254,7 @@ class Sequence(compat.Sequence):
     when the ``sp_obj`` object is GC-ed.
     """
 
-    def __init__(
-        self, sp_obj, add_ref_func, release_func, len_func, getitem_func
-    ):
+    def __init__(self, sp_obj, add_ref_func, release_func, len_func, getitem_func):
 
         add_ref_func(sp_obj)
         self._sp_obj = ffi.gc(sp_obj, release_func)
@@ -275,8 +269,7 @@ class Sequence(compat.Sequence):
             return list(self).__getitem__(key)
         if not isinstance(key, int):
             raise TypeError(
-                'list indices must be int or slice, not %s'
-                % key.__class__.__name__
+                'list indices must be int or slice, not %s' % key.__class__.__name__
             )
         if key < 0:
             key += self.__len__()
@@ -370,8 +363,6 @@ def to_country_code(country):
     if len(country) != 2:
         raise ValueError('Must be exactly two chars')
     first, second = (ord(char) for char in country)
-    if not (ord('A') <= first <= ord('Z')) or not (
-        ord('A') <= second <= ord('Z')
-    ):
+    if not (ord('A') <= first <= ord('Z')) or not (ord('A') <= second <= ord('Z')):
         raise ValueError('Chars must be in range A-Z')
     return first << 8 | second

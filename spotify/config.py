@@ -303,9 +303,7 @@ class Config(object):
         proxy_password_ptr = spotify.ffi.addressof(
             self._sp_session_config, 'proxy_password'
         )
-        tracefile_ptr = spotify.ffi.addressof(
-            self._sp_session_config, 'tracefile'
-        )
+        tracefile_ptr = spotify.ffi.addressof(self._sp_session_config, 'tracefile')
         if tracefile_ptr - proxy_password_ptr != 2:
             return None
         return proxy_password_ptr + 1

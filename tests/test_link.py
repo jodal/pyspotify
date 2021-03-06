@@ -31,9 +31,7 @@ class LinkTest(unittest.TestCase):
 
         lib_mock.sp_link_create_from_string.assert_called_once_with(mock.ANY)
         self.assertEqual(
-            spotify.ffi.string(
-                lib_mock.sp_link_create_from_string.call_args[0][0]
-            ),
+            spotify.ffi.string(lib_mock.sp_link_create_from_string.call_args[0][0]),
             b'spotify:track:foo',
         )
         self.assertEqual(lib_mock.sp_link_add_ref.call_count, 0)
@@ -46,9 +44,7 @@ class LinkTest(unittest.TestCase):
 
         lib_mock.sp_link_create_from_string.assert_called_once_with(mock.ANY)
         self.assertEqual(
-            spotify.ffi.string(
-                lib_mock.sp_link_create_from_string.call_args[0][0]
-            ),
+            spotify.ffi.string(lib_mock.sp_link_create_from_string.call_args[0][0]),
             b'spotify:track:bar',
         )
 
@@ -56,15 +52,11 @@ class LinkTest(unittest.TestCase):
         sp_link = spotify.ffi.cast('sp_link *', 42)
         lib_mock.sp_link_create_from_string.return_value = sp_link
 
-        spotify.Link(
-            self.session, 'https://play.spotify.com/track/bar?gurba=123'
-        )
+        spotify.Link(self.session, 'https://play.spotify.com/track/bar?gurba=123')
 
         lib_mock.sp_link_create_from_string.assert_called_once_with(mock.ANY)
         self.assertEqual(
-            spotify.ffi.string(
-                lib_mock.sp_link_create_from_string.call_args[0][0]
-            ),
+            spotify.ffi.string(lib_mock.sp_link_create_from_string.call_args[0][0]),
             b'spotify:track:bar',
         )
 
@@ -138,9 +130,7 @@ class LinkTest(unittest.TestCase):
 
         result = link.uri
 
-        lib_mock.sp_link_as_string.assert_called_with(
-            sp_link, mock.ANY, mock.ANY
-        )
+        lib_mock.sp_link_as_string.assert_called_with(sp_link, mock.ANY, mock.ANY)
         self.assertEqual(result, string)
 
     def test_url_expands_uri_to_http_url(self, lib_mock):
@@ -203,14 +193,10 @@ class LinkTest(unittest.TestCase):
         offset = link.as_track_offset()
 
         self.assertEqual(offset, 90)
-        lib_mock.sp_link_as_track_and_offset.assert_called_once_with(
-            sp_link, mock.ANY
-        )
+        lib_mock.sp_link_as_track_and_offset.assert_called_once_with(sp_link, mock.ANY)
 
     @mock.patch('spotify.track.lib', spec=spotify.lib)
-    def test_as_track_with_offset_if_not_a_track(
-        self, track_lib_mock, lib_mock
-    ):
+    def test_as_track_with_offset_if_not_a_track(self, track_lib_mock, lib_mock):
         sp_link = spotify.ffi.cast('sp_link *', 42)
         lib_mock.sp_link_create_from_string.return_value = sp_link
         lib_mock.sp_link_as_track_and_offset.return_value = spotify.ffi.NULL
@@ -219,9 +205,7 @@ class LinkTest(unittest.TestCase):
         offset = link.as_track_offset()
 
         self.assertIsNone(offset)
-        lib_mock.sp_link_as_track_and_offset.assert_called_once_with(
-            sp_link, mock.ANY
-        )
+        lib_mock.sp_link_as_track_and_offset.assert_called_once_with(sp_link, mock.ANY)
 
     @mock.patch('spotify.album.lib', spec=spotify.lib)
     def test_as_album(self, album_lib_mock, lib_mock):

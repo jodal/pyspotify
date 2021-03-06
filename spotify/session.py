@@ -54,9 +54,7 @@ class Session(utils.EventEmitter):
         sp_session_ptr = ffi.new('sp_session **')
 
         spotify.Error.maybe_raise(
-            lib.sp_session_create(
-                self.config._sp_session_config, sp_session_ptr
-            )
+            lib.sp_session_create(self.config._sp_session_config, sp_session_ptr)
         )
 
         self._sp_session = ffi.gc(sp_session_ptr[0], lib.sp_session_release)
@@ -239,9 +237,7 @@ class Session(utils.EventEmitter):
             "and never restored it. "
             "Please use the Spotify Web API to work with playlists."
         )
-        sp_playlistcontainer = lib.sp_session_playlistcontainer(
-            self._sp_session
-        )
+        sp_playlistcontainer = lib.sp_session_playlistcontainer(self._sp_session)
         if sp_playlistcontainer == ffi.NULL:
             return None
         return spotify.PlaylistContainer._cached(
@@ -267,18 +263,14 @@ class Session(utils.EventEmitter):
         sp_playlist = lib.sp_session_inbox_create(self._sp_session)
         if sp_playlist == ffi.NULL:
             return None
-        return spotify.Playlist._cached(
-            self, sp_playlist=sp_playlist, add_ref=False
-        )
+        return spotify.Playlist._cached(self, sp_playlist=sp_playlist, add_ref=False)
 
     def set_cache_size(self, size):
         """Set maximum size in MB for libspotify's cache.
 
         If set to 0 (the default), up to 10% of the free disk space will be
         used."""
-        spotify.Error.maybe_raise(
-            lib.sp_session_set_cache_size(self._sp_session, size)
-        )
+        spotify.Error.maybe_raise(lib.sp_session_set_cache_size(self._sp_session, size))
 
     def flush_caches(self):
         """Write all cached data to disk.
@@ -342,9 +334,7 @@ class Session(utils.EventEmitter):
 
         return next_timeout[0]
 
-    def inbox_post_tracks(
-        self, canonical_username, tracks, message, callback=None
-    ):
+    def inbox_post_tracks(self, canonical_username, tracks, message, callback=None):
         """Post a ``message`` and one or more ``tracks`` to the inbox of the
         user with the given ``canonical_username``.
 
@@ -413,10 +403,8 @@ class Session(utils.EventEmitter):
             canonical_username = ffi.NULL
         else:
             canonical_username = utils.to_bytes(canonical_username)
-        sp_playlistcontainer = (
-            lib.sp_session_publishedcontainer_for_user_create(
-                self._sp_session, canonical_username
-            )
+        sp_playlistcontainer = lib.sp_session_publishedcontainer_for_user_create(
+            self._sp_session, canonical_username
         )
         if sp_playlistcontainer == ffi.NULL:
             return None
@@ -1077,22 +1065,15 @@ class _SessionCallbacks(object):
         )
 
     @staticmethod
-    @ffi.callback(
-        'int(sp_session *, const sp_audioformat *, const void *, int)'
-    )
+    @ffi.callback('int(sp_session *, const sp_audioformat *, const void *, int)')
     def music_delivery(sp_session, sp_audioformat, frames, num_frames):
         if not spotify._session_instance:
             return 0
-        if (
-            spotify._session_instance.num_listeners(SessionEvent.MUSIC_DELIVERY)
-            == 0
-        ):
+        if spotify._session_instance.num_listeners(SessionEvent.MUSIC_DELIVERY) == 0:
             logger.debug('Music delivery, but no listener')
             return 0
         audio_format = spotify.AudioFormat(sp_audioformat)
-        frames_buffer = ffi.buffer(
-            frames, audio_format.frame_size() * num_frames
-        )
+        frames_buffer = ffi.buffer(frames, audio_format.frame_size() * num_frames)
         frames_bytes = frames_buffer[:]
         num_frames_consumed = spotify._session_instance.call(
             SessionEvent.MUSIC_DELIVERY,
@@ -1186,9 +1167,7 @@ class _SessionCallbacks(object):
         if not spotify._session_instance:
             return
         if (
-            spotify._session_instance.num_listeners(
-                SessionEvent.GET_AUDIO_BUFFER_STATS
-            )
+            spotify._session_instance.num_listeners(SessionEvent.GET_AUDIO_BUFFER_STATS)
             == 0
         ):
             logger.debug('Audio buffer stats requested, but no listener')

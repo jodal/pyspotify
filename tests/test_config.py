@@ -21,9 +21,7 @@ class ConfigTest(unittest.TestCase):
         self.assertEqual(self.config.api_version, 71)
 
     def test_api_version_defaults_to_current_lib_version(self):
-        self.assertEqual(
-            self.config.api_version, spotify.lib.SPOTIFY_API_VERSION
-        )
+        self.assertEqual(self.config.api_version, spotify.lib.SPOTIFY_API_VERSION)
 
     def test_cache_location(self):
         self.config.cache_location = b'/cache'
@@ -50,9 +48,7 @@ class ConfigTest(unittest.TestCase):
         self.config.settings_location = b'/settings'
 
         self.assertEqual(
-            spotify.ffi.string(
-                self.config._sp_session_config.settings_location
-            ),
+            spotify.ffi.string(self.config._sp_session_config.settings_location),
             b'/settings',
         )
         self.assertEqual(self.config.settings_location, b'/settings')
@@ -64,9 +60,7 @@ class ConfigTest(unittest.TestCase):
         self.config.settings_location = None
 
         self.assertEqual(
-            spotify.ffi.string(
-                self.config._sp_session_config.settings_location
-            ),
+            spotify.ffi.string(self.config._sp_session_config.settings_location),
             b'',
         )
         self.assertEqual(self.config.settings_location, b'')
@@ -93,9 +87,7 @@ class ConfigTest(unittest.TestCase):
     def test_application_key_size_is_calculated_correctly(self):
         self.config.application_key = b'\x01' * 321
 
-        self.assertEqual(
-            self.config._sp_session_config.application_key_size, 321
-        )
+        self.assertEqual(self.config._sp_session_config.application_key_size, 321)
 
     def test_application_key_can_be_reset_to_none(self):
         self.config.application_key = None
@@ -139,9 +131,7 @@ class ConfigTest(unittest.TestCase):
         self.assertEqual(self.config.user_agent, 'an agent')
 
     def test_user_agent_defaults_to_pyspotify_with_version_number(self):
-        self.assertEqual(
-            self.config.user_agent, 'pyspotify %s' % spotify.__version__
-        )
+        self.assertEqual(self.config.user_agent, 'pyspotify %s' % spotify.__version__)
 
     def test_user_agent_location_converts_none_to_empty_string(self):
         self.config.user_agent = None
@@ -174,9 +164,7 @@ class ConfigTest(unittest.TestCase):
     def test_initially_unload_playlists(self):
         self.config.initially_unload_playlists = True
 
-        self.assertEqual(
-            self.config._sp_session_config.initially_unload_playlists, 1
-        )
+        self.assertEqual(self.config._sp_session_config.initially_unload_playlists, 1)
         self.assertEqual(self.config.initially_unload_playlists, True)
 
     def test_initially_unload_playlists_defaults_to_false(self):
@@ -197,9 +185,7 @@ class ConfigTest(unittest.TestCase):
     def test_device_id_converts_empty_string_to_none(self):
         self.config.device_id = ''
 
-        self.assertEqual(
-            self.config._sp_session_config.device_id, spotify.ffi.NULL
-        )
+        self.assertEqual(self.config._sp_session_config.device_id, spotify.ffi.NULL)
         self.assertIsNone(self.config.device_id)
 
     def test_proxy(self):
@@ -216,9 +202,7 @@ class ConfigTest(unittest.TestCase):
     def test_proxy_converts_none_to_empty_string_and_back(self):
         self.config.proxy = None
 
-        self.assertEqual(
-            spotify.ffi.string(self.config._sp_session_config.proxy), b''
-        )
+        self.assertEqual(spotify.ffi.string(self.config._sp_session_config.proxy), b'')
         self.assertIsNone(self.config.proxy)
 
     def test_proxy_username(self):
@@ -308,9 +292,7 @@ class ConfigTest(unittest.TestCase):
     def test_tracefile_converts_empty_string_to_none(self):
         self.config.tracefile = ''
 
-        self.assertEqual(
-            self.config._sp_session_config.tracefile, spotify.ffi.NULL
-        )
+        self.assertEqual(self.config._sp_session_config.tracefile, spotify.ffi.NULL)
         self.assertIsNone(self.config.tracefile)
 
     def test_sp_session_config_has_unicode_encoded_as_utf8(self):

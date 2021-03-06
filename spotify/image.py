@@ -32,9 +32,7 @@ class Image(object):
     the image is done loading.
     """
 
-    def __init__(
-        self, session, uri=None, sp_image=None, add_ref=True, callback=None
-    ):
+    def __init__(self, session, uri=None, sp_image=None, add_ref=True, callback=None):
 
         assert uri or sp_image, 'uri or sp_image is required'
 
@@ -43,9 +41,7 @@ class Image(object):
         if uri is not None:
             image = spotify.Link(self._session, uri=uri).as_image()
             if image is None:
-                raise ValueError(
-                    'Failed to get image from Spotify URI: %r' % uri
-                )
+                raise ValueError('Failed to get image from Spotify URI: %r' % uri)
             sp_image = image._sp_image
             add_ref = True
 
@@ -58,9 +54,7 @@ class Image(object):
         handle = ffi.new_handle((self._session, self, callback))
         self._session._callback_handles.add(handle)
         spotify.Error.maybe_raise(
-            lib.sp_image_add_load_callback(
-                self._sp_image, _image_load_callback, handle
-            )
+            lib.sp_image_add_load_callback(self._sp_image, _image_load_callback, handle)
         )
 
     def __repr__(self):

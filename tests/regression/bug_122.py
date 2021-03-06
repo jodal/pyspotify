@@ -39,9 +39,7 @@ loop.start()
 login(session, username, password)
 
 logger.debug('Getting playlist')
-pl = session.get_playlist(
-    'spotify:user:durden20:playlist:1chOHrXPCFcShCwB357MFX'
-)
+pl = session.get_playlist('spotify:user:durden20:playlist:1chOHrXPCFcShCwB357MFX')
 logger.debug('Got playlist %r %r', pl, pl._sp_playlist)
 logger.debug('Loading playlist %r %r', pl, pl._sp_playlist)
 pl.load()

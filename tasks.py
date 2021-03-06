@@ -29,9 +29,7 @@ def preprocess_header(ctx):
 @task
 def update_authors(ctx):
     # Keep authors in the order of appearance and use awk to filter out dupes
-    ctx.run(
-        "git log --format='- %aN <%aE>' --reverse | awk '!x[$0]++' > AUTHORS"
-    )
+    ctx.run("git log --format='- %aN <%aE>' --reverse | awk '!x[$0]++' > AUTHORS")
 
 
 @task

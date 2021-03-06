@@ -15,26 +15,16 @@ class Sink(object):
         only need to call this method if you ever call :meth:`off` and want to
         turn the sink back on.
         """
-        assert (
-            self._session.num_listeners(spotify.SessionEvent.MUSIC_DELIVERY)
-            == 0
-        )
-        self._session.on(
-            spotify.SessionEvent.MUSIC_DELIVERY, self._on_music_delivery
-        )
+        assert self._session.num_listeners(spotify.SessionEvent.MUSIC_DELIVERY) == 0
+        self._session.on(spotify.SessionEvent.MUSIC_DELIVERY, self._on_music_delivery)
 
     def off(self):
         """Turn off the audio sink.
 
         This disconnects the sink from the relevant session events.
         """
-        self._session.off(
-            spotify.SessionEvent.MUSIC_DELIVERY, self._on_music_delivery
-        )
-        assert (
-            self._session.num_listeners(spotify.SessionEvent.MUSIC_DELIVERY)
-            == 0
-        )
+        self._session.off(spotify.SessionEvent.MUSIC_DELIVERY, self._on_music_delivery)
+        assert self._session.num_listeners(spotify.SessionEvent.MUSIC_DELIVERY) == 0
         self._close()
 
     def _on_music_delivery(self, session, audio_format, frames, num_frames):
@@ -94,9 +84,7 @@ class AlsaSink(Sink):
         self.on()
 
     def _on_music_delivery(self, session, audio_format, frames, num_frames):
-        assert (
-            audio_format.sample_type == spotify.SampleType.INT16_NATIVE_ENDIAN
-        )
+        assert audio_format.sample_type == spotify.SampleType.INT16_NATIVE_ENDIAN
 
         if self._device is None:
             if hasattr(self._alsaaudio, 'pcms'):  # pyalsaaudio >= 0.8
@@ -163,9 +151,7 @@ class PortAudioSink(Sink):
         self.on()
 
     def _on_music_delivery(self, session, audio_format, frames, num_frames):
-        assert (
-            audio_format.sample_type == spotify.SampleType.INT16_NATIVE_ENDIAN
-        )
+        assert audio_format.sample_type == spotify.SampleType.INT16_NATIVE_ENDIAN
 
         if self._stream is None:
             self._stream = self._device.open(

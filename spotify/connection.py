@@ -143,9 +143,7 @@ class Connection(object):
             rules.append(spotify.ConnectionRule.ALLOW_SYNC_OVER_MOBILE)
         rules = functools.reduce(operator.or_, rules, 0)
         spotify.Error.maybe_raise(
-            lib.sp_session_set_connection_rules(
-                self._session._sp_session, rules
-            )
+            lib.sp_session_set_connection_rules(self._session._sp_session, rules)
         )
 
 

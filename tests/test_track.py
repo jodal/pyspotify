@@ -334,9 +334,7 @@ class TrackTest(unittest.TestCase):
 
     def test_set_starred_fails_if_error(self, lib_mock):
         tests.create_session_mock()
-        lib_mock.sp_track_set_starred.return_value = (
-            spotify.ErrorType.BAD_API_VERSION
-        )
+        lib_mock.sp_track_set_starred.return_value = spotify.ErrorType.BAD_API_VERSION
         sp_track = spotify.ffi.cast('sp_track *', 42)
         track = spotify.Track(self.session, sp_track=sp_track)
 
@@ -422,9 +420,7 @@ class TrackTest(unittest.TestCase):
 
     def test_name(self, lib_mock):
         lib_mock.sp_track_error.return_value = spotify.ErrorType.OK
-        lib_mock.sp_track_name.return_value = spotify.ffi.new(
-            'char[]', b'Foo Bar Baz'
-        )
+        lib_mock.sp_track_name.return_value = spotify.ffi.new('char[]', b'Foo Bar Baz')
         sp_track = spotify.ffi.cast('sp_track *', 42)
         track = spotify.Track(self.session, sp_track=sp_track)
 
@@ -559,9 +555,7 @@ class TrackTest(unittest.TestCase):
         result = track.link
 
         lib_mock.sp_link_create_from_track.asssert_called_once_with(sp_track, 0)
-        link_mock.assert_called_once_with(
-            self.session, sp_link=sp_link, add_ref=False
-        )
+        link_mock.assert_called_once_with(self.session, sp_link=sp_link, add_ref=False)
         self.assertEqual(result, mock.sentinel.link)
 
     @mock.patch('spotify.Link', spec=spotify.Link)
@@ -574,12 +568,8 @@ class TrackTest(unittest.TestCase):
 
         result = track.link_with_offset(90)
 
-        lib_mock.sp_link_create_from_track.asssert_called_once_with(
-            sp_track, 90
-        )
-        link_mock.assert_called_once_with(
-            self.session, sp_link=sp_link, add_ref=False
-        )
+        lib_mock.sp_link_create_from_track.asssert_called_once_with(sp_track, 90)
+        link_mock.assert_called_once_with(self.session, sp_link=sp_link, add_ref=False)
         self.assertEqual(result, mock.sentinel.link)
 
 

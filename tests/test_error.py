@@ -62,9 +62,7 @@ class LibErrorTest(unittest.TestCase):
         self.assertEqual('%s' % error, 'Invalid library version')
 
     def test_has_error_constants(self):
-        self.assertEqual(
-            spotify.LibError.OK, spotify.LibError(spotify.ErrorType.OK)
-        )
+        self.assertEqual(spotify.LibError.OK, spotify.LibError(spotify.ErrorType.OK))
         self.assertEqual(
             spotify.LibError.BAD_API_VERSION,
             spotify.LibError(spotify.ErrorType.BAD_API_VERSION),

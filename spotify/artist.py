@@ -34,9 +34,7 @@ class Artist(object):
         if uri is not None:
             artist = spotify.Link(self._session, uri=uri).as_artist()
             if artist is None:
-                raise ValueError(
-                    'Failed to get artist from Spotify URI: %r' % uri
-                )
+                raise ValueError('Failed to get artist from Spotify URI: %r' % uri)
             sp_artist = artist._sp_artist
 
         if add_ref:
@@ -174,9 +172,7 @@ class ArtistBrowser(object):
         add_ref=True,
     ):
 
-        assert (
-            artist or sp_artistbrowse
-        ), 'artist or sp_artistbrowse is required'
+        assert artist or sp_artistbrowse, 'artist or sp_artistbrowse is required'
 
         self._session = session
         self.loaded_event = threading.Event()
@@ -199,9 +195,7 @@ class ArtistBrowser(object):
 
         if add_ref:
             lib.sp_artistbrowse_add_ref(sp_artistbrowse)
-        self._sp_artistbrowse = ffi.gc(
-            sp_artistbrowse, lib.sp_artistbrowse_release
-        )
+        self._sp_artistbrowse = ffi.gc(sp_artistbrowse, lib.sp_artistbrowse_release)
 
     loaded_event = None
     """:class:`threading.Event` that is set when the artist browser is loaded.
@@ -246,9 +240,7 @@ class ArtistBrowser(object):
 
         Check to see if there was problems creating the artist browser.
         """
-        return spotify.ErrorType(
-            lib.sp_artistbrowse_error(self._sp_artistbrowse)
-        )
+        return spotify.ErrorType(lib.sp_artistbrowse_error(self._sp_artistbrowse))
 
     @property
     def backend_request_duration(self):
@@ -260,9 +252,7 @@ class ArtistBrowser(object):
         """
         if not self.is_loaded:
             return None
-        return lib.sp_artistbrowse_backend_request_duration(
-            self._sp_artistbrowse
-        )
+        return lib.sp_artistbrowse_backend_request_duration(self._sp_artistbrowse)
 
     @property
     @serialized
@@ -411,9 +401,7 @@ class ArtistBrowser(object):
         def get_artist(sp_artistbrowse, key):
             return spotify.Artist(
                 self._session,
-                sp_artist=lib.sp_artistbrowse_similar_artist(
-                    sp_artistbrowse, key
-                ),
+                sp_artist=lib.sp_artistbrowse_similar_artist(sp_artistbrowse, key),
                 add_ref=True,
             )
 
@@ -432,9 +420,7 @@ class ArtistBrowser(object):
 
         Will always return an empty string if the artist browser isn't loaded.
         """
-        return utils.to_unicode(
-            lib.sp_artistbrowse_biography(self._sp_artistbrowse)
-        )
+        return utils.to_unicode(lib.sp_artistbrowse_biography(self._sp_artistbrowse))
 
 
 @ffi.callback('void(sp_artistbrowse *, void *)')

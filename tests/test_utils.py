@@ -342,9 +342,7 @@ class ToBytesTest(unittest.TestCase):
         self.assertEqual(utils.to_bytes('æøå'), 'æøå'.encode('utf-8'))
 
     def test_bytes_to_bytes_is_passed_through(self):
-        self.assertEqual(
-            utils.to_bytes('æøå'.encode('utf-8')), 'æøå'.encode('utf-8')
-        )
+        self.assertEqual(utils.to_bytes('æøå'.encode('utf-8')), 'æøå'.encode('utf-8'))
 
     def test_cdata_to_bytes_is_unwrapped(self):
         cdata = spotify.ffi.new('char[]', 'æøå'.encode('utf-8'))

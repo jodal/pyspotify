@@ -84,9 +84,7 @@ class PlaylistTrackTest(unittest.TestCase):
 
         result = playlist_track.create_time
 
-        lib_mock.sp_playlist_track_create_time.assert_called_with(
-            sp_playlist, 0
-        )
+        lib_mock.sp_playlist_track_create_time.assert_called_with(sp_playlist, 0)
         self.assertEqual(result, 1234567890)
 
     @mock.patch('spotify.user.lib', spec=spotify.lib)
@@ -114,17 +112,13 @@ class PlaylistTrackTest(unittest.TestCase):
         self.assertEqual(result, False)
 
     def test_set_seen(self, lib_mock):
-        lib_mock.sp_playlist_track_set_seen.return_value = int(
-            spotify.ErrorType.OK
-        )
+        lib_mock.sp_playlist_track_set_seen.return_value = int(spotify.ErrorType.OK)
         sp_playlist = spotify.ffi.cast('sp_playlist *', 42)
         playlist_track = spotify.PlaylistTrack(self.session, sp_playlist, 0)
 
         playlist_track.seen = True
 
-        lib_mock.sp_playlist_track_set_seen.assert_called_with(
-            sp_playlist, 0, 1
-        )
+        lib_mock.sp_playlist_track_set_seen.assert_called_with(sp_playlist, 0, 1)
 
     def test_set_seen_fails_if_error(self, lib_mock):
         lib_mock.sp_playlist_track_set_seen.return_value = int(

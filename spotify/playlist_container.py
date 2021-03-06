@@ -136,9 +136,7 @@ class PlaylistContainer(compat.MutableSequence, utils.EventEmitter):
     @property
     def is_loaded(self):
         """Whether the playlist container's data is loaded."""
-        return bool(
-            lib.sp_playlistcontainer_is_loaded(self._sp_playlistcontainer)
-        )
+        return bool(lib.sp_playlistcontainer_is_loaded(self._sp_playlistcontainer))
 
     def load(self, timeout=None):
         """Block until the playlist container's data is loaded.
@@ -153,9 +151,7 @@ class PlaylistContainer(compat.MutableSequence, utils.EventEmitter):
     def __len__(self):
         # Required by collections.abc.Sequence
 
-        length = lib.sp_playlistcontainer_num_playlists(
-            self._sp_playlistcontainer
-        )
+        length = lib.sp_playlistcontainer_num_playlists(self._sp_playlistcontainer)
         if length == -1:
             return 0
         return length
@@ -168,8 +164,7 @@ class PlaylistContainer(compat.MutableSequence, utils.EventEmitter):
             return list(self).__getitem__(key)
         if not isinstance(key, int):
             raise TypeError(
-                'list indices must be int or slice, not %s'
-                % key.__class__.__name__
+                'list indices must be int or slice, not %s' % key.__class__.__name__
             )
         if key < 0:
             key += self.__len__()
@@ -177,18 +172,14 @@ class PlaylistContainer(compat.MutableSequence, utils.EventEmitter):
             raise IndexError('list index out of range')
 
         playlist_type = PlaylistType(
-            lib.sp_playlistcontainer_playlist_type(
-                self._sp_playlistcontainer, key
-            )
+            lib.sp_playlistcontainer_playlist_type(self._sp_playlistcontainer, key)
         )
 
         if playlist_type is PlaylistType.PLAYLIST:
             sp_playlist = lib.sp_playlistcontainer_playlist(
                 self._sp_playlistcontainer, key
             )
-            return spotify.Playlist._cached(
-                self._session, sp_playlist, add_ref=True
-            )
+            return spotify.Playlist._cached(self._session, sp_playlist, add_ref=True)
         elif playlist_type in (
             PlaylistType.START_FOLDER,
             PlaylistType.END_FOLDER,
@@ -215,8 +206,7 @@ class PlaylistContainer(compat.MutableSequence, utils.EventEmitter):
 
         if not isinstance(key, (int, slice)):
             raise TypeError(
-                'list indices must be int or slice, not %s'
-                % key.__class__.__name__
+                'list indices must be int or slice, not %s' % key.__class__.__name__
             )
         if isinstance(key, slice):
             if not isinstance(value, compat.Iterable):
@@ -250,8 +240,7 @@ class PlaylistContainer(compat.MutableSequence, utils.EventEmitter):
             return
         if not isinstance(key, int):
             raise TypeError(
-                'list indices must be int or slice, not %s'
-                % key.__class__.__name__
+                'list indices must be int or slice, not %s' % key.__class__.__name__
             )
         if not 0 <= key < self.__len__():
             raise IndexError('list index out of range')
@@ -274,9 +263,7 @@ class PlaylistContainer(compat.MutableSequence, utils.EventEmitter):
         )
         if sp_playlist == ffi.NULL:
             raise spotify.Error('Playlist creation failed')
-        playlist = spotify.Playlist._cached(
-            self._session, sp_playlist, add_ref=True
-        )
+        playlist = spotify.Playlist._cached(self._session, sp_playlist, add_ref=True)
         if index is not None:
             self.move_playlist(self.__len__() - 1, index)
         return playlist
@@ -309,9 +296,7 @@ class PlaylistContainer(compat.MutableSequence, utils.EventEmitter):
         )
         if sp_playlist == ffi.NULL:
             return None
-        playlist = spotify.Playlist._cached(
-            self._session, sp_playlist, add_ref=True
-        )
+        playlist = spotify.Playlist._cached(self._session, sp_playlist, add_ref=True)
         if index is not None:
             self.move_playlist(self.__len__() - 1, index)
         return playlist
@@ -361,9 +346,7 @@ class PlaylistContainer(compat.MutableSequence, utils.EventEmitter):
             indexes = [index]
         for i in reversed(sorted(indexes)):
             spotify.Error.maybe_raise(
-                lib.sp_playlistcontainer_remove_playlist(
-                    self._sp_playlistcontainer, i
-                )
+                lib.sp_playlistcontainer_remove_playlist(self._sp_playlistcontainer, i)
             )
 
     @staticmethod
@@ -619,9 +602,7 @@ class _PlaylistContainerCallbacks(object):
         )
 
 
-class PlaylistFolder(
-    collections.namedtuple('PlaylistFolder', ['id', 'name', 'type'])
-):
+class PlaylistFolder(collections.namedtuple('PlaylistFolder', ['id', 'name', 'type'])):
 
     """An object marking the start or end of a playlist folder."""
 

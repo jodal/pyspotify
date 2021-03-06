@@ -121,9 +121,7 @@ class UserTest(unittest.TestCase):
 
         result = user.link
 
-        link_mock.assert_called_once_with(
-            self.session, sp_link=sp_link, add_ref=False
-        )
+        link_mock.assert_called_once_with(self.session, sp_link=sp_link, add_ref=False)
         self.assertEqual(result, mock.sentinel.link)
 
     def test_starred(self, lib_mock):

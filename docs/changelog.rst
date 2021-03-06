@@ -10,6 +10,8 @@ Maintenance release.
 - Add support for Python 3.9. No changes was required, but the test suite now
   runs on this version too. (PR: :issue:`203`)
 
+- Switch from CircleCI to GitHub Actions.
+
 
 v2.1.3 (2019-12-29)
 ===================

@@ -45,9 +45,13 @@ Project resources
     :target: https://pypi.org/project/pyspotify/
     :alt: Latest PyPI version
 
-.. image:: https://img.shields.io/circleci/build/gh/jodal/pyspotify
-    :target: https://circleci.com/gh/jodal/pyspotify
-    :alt: CircleCI build status
+.. image:: https://img.shields.io/github/workflow/status/jodal/pyspotify/CI
+    :target: https://github.com/jodal/pyspotify/actions?workflow=CI
+    :alt: CI build status
+
+.. image:: https://img.shields.io/readthedocs/pyspotify.svg
+    :target: https://pyspotify.readthedocs.io/
+    :alt: Read the Docs build status
 
 .. image:: https://img.shields.io/codecov/c/gh/jodal/pyspotify
    :target: https://codecov.io/gh/jodal/pyspotify

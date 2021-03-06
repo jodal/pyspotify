@@ -7,8 +7,8 @@ import tests
 from tests import mock
 
 
-@mock.patch('spotify.social.lib', spec=spotify.lib)
-@mock.patch('spotify.session.lib', spec=spotify.lib)
+@mock.patch("spotify.social.lib", spec=spotify.lib)
+@mock.patch("spotify.session.lib", spec=spotify.lib)
 class SocialTest(unittest.TestCase):
     def tearDown(self):
         spotify._session_instance = None
@@ -22,7 +22,7 @@ class SocialTest(unittest.TestCase):
         lib_mock.sp_session_is_private_session.assert_called_with(session._sp_session)
         self.assertFalse(result)
 
-    @mock.patch('spotify.connection.lib', spec=spotify.lib)
+    @mock.patch("spotify.connection.lib", spec=spotify.lib)
     def test_set_private_session(self, conn_lib_mock, session_lib_mock, lib_mock):
         lib_mock.sp_session_set_private_session.return_value = spotify.ErrorType.OK
         session = tests.create_real_session(session_lib_mock)
@@ -33,7 +33,7 @@ class SocialTest(unittest.TestCase):
             session._sp_session, 1
         )
 
-    @mock.patch('spotify.connection.lib', spec=spotify.lib)
+    @mock.patch("spotify.connection.lib", spec=spotify.lib)
     def test_set_private_session_fail_raises_error(
         self, conn_lib_mock, session_lib_mock, lib_mock
     ):
@@ -125,7 +125,7 @@ class SocialTest(unittest.TestCase):
         session = tests.create_real_session(session_lib_mock)
 
         session.social.set_social_credentials(
-            spotify.SocialProvider.LASTFM, 'alice', 'secret'
+            spotify.SocialProvider.LASTFM, "alice", "secret"
         )
 
         lib_mock.sp_session_set_social_credentials.assert_called_once_with(
@@ -138,13 +138,13 @@ class SocialTest(unittest.TestCase):
             spotify.ffi.string(
                 lib_mock.sp_session_set_social_credentials.call_args[0][2]
             ),
-            b'alice',
+            b"alice",
         )
         self.assertEqual(
             spotify.ffi.string(
                 lib_mock.sp_session_set_social_credentials.call_args[0][3]
             ),
-            b'secret',
+            b"secret",
         )
 
     def test_set_social_credentials_fail_raises_error(self, session_lib_mock, lib_mock):
@@ -153,7 +153,7 @@ class SocialTest(unittest.TestCase):
 
         with self.assertRaises(spotify.Error):
             session.social.set_social_credentials(
-                spotify.SocialProvider.LASTFM, 'alice', 'secret'
+                spotify.SocialProvider.LASTFM, "alice", "secret"
             )
 
 

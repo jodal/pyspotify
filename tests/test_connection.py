@@ -7,8 +7,8 @@ import tests
 from tests import mock
 
 
-@mock.patch('spotify.connection.lib', spec=spotify.lib)
-@mock.patch('spotify.session.lib', spec=spotify.lib)
+@mock.patch("spotify.connection.lib", spec=spotify.lib)
+@mock.patch("spotify.session.lib", spec=spotify.lib)
 class ConnectionTest(unittest.TestCase):
     def tearDown(self):
         spotify._session_instance = None

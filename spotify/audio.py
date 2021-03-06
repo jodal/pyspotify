@@ -4,11 +4,11 @@ import collections
 
 from spotify import utils
 
-__all__ = ['AudioBufferStats', 'AudioFormat', 'Bitrate', 'SampleType']
+__all__ = ["AudioBufferStats", "AudioFormat", "Bitrate", "SampleType"]
 
 
 class AudioBufferStats(
-    collections.namedtuple('AudioBufferStats', ['samples', 'stutter'])
+    collections.namedtuple("AudioBufferStats", ["samples", "stutter"])
 ):
 
     """Stats about the application's audio buffers."""
@@ -16,12 +16,12 @@ class AudioBufferStats(
     pass
 
 
-@utils.make_enum('SP_BITRATE_', 'BITRATE_')
+@utils.make_enum("SP_BITRATE_", "BITRATE_")
 class Bitrate(utils.IntEnum):
     pass
 
 
-@utils.make_enum('SP_SAMPLETYPE_')
+@utils.make_enum("SP_SAMPLETYPE_")
 class SampleType(utils.IntEnum):
     pass
 
@@ -59,4 +59,4 @@ class AudioFormat(object):
         if self.sample_type == SampleType.INT16_NATIVE_ENDIAN:
             return 2 * self.channels
         else:
-            raise ValueError('Unknown sample type: %d', self.sample_type)
+            raise ValueError("Unknown sample type: %d", self.sample_type)

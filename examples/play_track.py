@@ -26,7 +26,7 @@ import spotify
 if sys.argv[1:]:
     track_uri = sys.argv[1]
 else:
-    track_uri = 'spotify:track:6xZtSE6xaBxmRozKA0F6TA'
+    track_uri = "spotify:track:6xZtSE6xaBxmRozKA0F6TA"
 
 # Assuming a spotify_appkey.key in the current dir
 session = spotify.Session()

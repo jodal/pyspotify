@@ -8,7 +8,7 @@ import time
 import spotify
 
 if len(sys.argv) != 3:
-    sys.exit('Usage: %s USERNAME PASSWORD' % sys.argv[0])
+    sys.exit("Usage: %s USERNAME PASSWORD" % sys.argv[0])
 
 username, password = sys.argv[1], sys.argv[2]
 
@@ -23,7 +23,7 @@ def login(session, username, password):
     session.login(username, password)
 
     if not logged_in_event.wait(10):
-        raise RuntimeError('Login timed out')
+        raise RuntimeError("Login timed out")
 
     while session.connection.state != spotify.ConnectionState.LOGGED_IN:
         time.sleep(0.1)
@@ -38,12 +38,12 @@ loop.start()
 
 login(session, username, password)
 
-logger.debug('Getting playlist')
-pl = session.get_playlist('spotify:user:durden20:playlist:1chOHrXPCFcShCwB357MFX')
-logger.debug('Got playlist %r %r', pl, pl._sp_playlist)
-logger.debug('Loading playlist %r %r', pl, pl._sp_playlist)
+logger.debug("Getting playlist")
+pl = session.get_playlist("spotify:user:durden20:playlist:1chOHrXPCFcShCwB357MFX")
+logger.debug("Got playlist %r %r", pl, pl._sp_playlist)
+logger.debug("Loading playlist %r %r", pl, pl._sp_playlist)
 pl.load()
-logger.debug('Loaded playlist %r %r', pl, pl._sp_playlist)
+logger.debug("Loaded playlist %r %r", pl, pl._sp_playlist)
 
 print(pl)
 print(pl.tracks)

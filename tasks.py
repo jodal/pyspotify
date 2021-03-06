@@ -7,14 +7,14 @@ from invoke import task
 
 @task
 def docs(ctx, warn=False):
-    ctx.run('make -C docs/ html', warn=warn)
+    ctx.run("make -C docs/ html", warn=warn)
 
 
 @task
 def test(ctx, coverage=False, warn=False):
-    cmd = 'py.test'
+    cmd = "py.test"
     if coverage:
-        cmd += ' --cov=spotify --cov-report=term-missing'
+        cmd += " --cov=spotify --cov-report=term-missing"
     ctx.run(cmd, pty=True, warn=warn)
 
 
@@ -22,7 +22,7 @@ def test(ctx, coverage=False, warn=False):
 def preprocess_header(ctx):
     ctx.run(
         'cpp -nostdinc spotify/api.h | egrep -v "(^#)|(^$)" '
-        '> spotify/api.processed.h || true'
+        "> spotify/api.processed.h || true"
     )
 
 
@@ -37,11 +37,11 @@ def update_sp_constants(ctx):
     import spotify
 
     constants = [
-        '%s,%s\n' % (attr, getattr(spotify.lib, attr))
+        "%s,%s\n" % (attr, getattr(spotify.lib, attr))
         for attr in dir(spotify.lib)
-        if attr.startswith('SP_')
+        if attr.startswith("SP_")
     ]
-    with open('docs/sp-constants.csv', 'w+') as fh:
+    with open("docs/sp-constants.csv", "w+") as fh:
         fh.writelines(constants)
 
 
@@ -59,23 +59,23 @@ def mac_wheels(ctx):
 
     versions = [
         # Python.org Python 2.7 for Mac OS X 10.6 and later
-        '/Library/Frameworks/Python.framework/Versions/2.7/bin/python',
+        "/Library/Frameworks/Python.framework/Versions/2.7/bin/python",
         # Python.org Python 3.7 for Mac OS X 10.6 and later
-        '/Library/Frameworks/Python.framework/Versions/3.7/bin/python3',
+        "/Library/Frameworks/Python.framework/Versions/3.7/bin/python3",
         # Homebrew Python 2.7
-        '/usr/local/bin/python2.7',
+        "/usr/local/bin/python2.7",
         # Homebrew Python 3.7
-        '/usr/local/bin/python3.7',
+        "/usr/local/bin/python3.7",
     ]
 
     # Build wheels for all Python versions
     for executable in versions:
-        shutil.rmtree('./build', ignore_errors=True)
-        ctx.run('%s -m pip install wheel' % executable)
-        ctx.run('%s setup.py bdist_wheel' % executable)
+        shutil.rmtree("./build", ignore_errors=True)
+        ctx.run("%s -m pip install wheel" % executable)
+        ctx.run("%s setup.py bdist_wheel" % executable)
 
     # Bundle libspotify into the wheels
-    shutil.rmtree('./fixed_dist', ignore_errors=True)
-    ctx.run('delocate-wheel -w ./fixed_dist ./dist/*.whl')
+    shutil.rmtree("./fixed_dist", ignore_errors=True)
+    ctx.run("delocate-wheel -w ./fixed_dist ./dist/*.whl")
 
-    print('To upload wheels, run: twine upload fixed_dist/*')
+    print("To upload wheels, run: twine upload fixed_dist/*")

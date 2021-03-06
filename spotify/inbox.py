@@ -6,7 +6,7 @@ import threading
 import spotify
 from spotify import ffi, lib, serialized, utils
 
-__all__ = ['InboxPostResult']
+__all__ = ["InboxPostResult"]
 
 logger = logging.getLogger(__name__)
 
@@ -21,7 +21,7 @@ class InboxPostResult(object):
         session,
         canonical_username=None,
         tracks=None,
-        message='',
+        message="",
         callback=None,
         sp_inbox=None,
         add_ref=True,
@@ -29,7 +29,7 @@ class InboxPostResult(object):
 
         assert (
             canonical_username and tracks or sp_inbox
-        ), 'canonical_username and tracks, or sp_inbox, is required'
+        ), "canonical_username and tracks, or sp_inbox, is required"
 
         self._session = session
         self.loaded_event = threading.Event()
@@ -57,7 +57,7 @@ class InboxPostResult(object):
             add_ref = True
 
             if sp_inbox == ffi.NULL:
-                raise spotify.Error('Inbox post request failed to initialize')
+                raise spotify.Error("Inbox post request failed to initialize")
 
         if add_ref:
             lib.sp_inbox_add_ref(sp_inbox)
@@ -70,9 +70,9 @@ class InboxPostResult(object):
 
     def __repr__(self):
         if not self.loaded_event.is_set():
-            return 'InboxPostResult(<pending>)'
+            return "InboxPostResult(<pending>)"
         else:
-            return 'InboxPostResult(%s)' % self.error._name
+            return "InboxPostResult(%s)" % self.error._name
 
     def __eq__(self, other):
         if isinstance(other, self.__class__):
@@ -95,12 +95,12 @@ class InboxPostResult(object):
         return spotify.ErrorType(lib.sp_inbox_error(self._sp_inbox))
 
 
-@ffi.callback('void(sp_inbox *, void *)')
+@ffi.callback("void(sp_inbox *, void *)")
 @serialized
 def _inboxpost_complete_callback(sp_inbox, handle):
-    logger.debug('inboxpost_complete_callback called')
+    logger.debug("inboxpost_complete_callback called")
     if handle == ffi.NULL:
-        logger.warning('pyspotify inboxpost_complete_callback called without userdata')
+        logger.warning("pyspotify inboxpost_complete_callback called without userdata")
         return
     (session, inbox_post_result, callback) = ffi.from_handle(handle)
     session._callback_handles.remove(handle)

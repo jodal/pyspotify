@@ -4,7 +4,7 @@ import sys
 
 import spotify
 
-__all__ = ['AlsaSink', 'PortAudioSink']
+__all__ = ["AlsaSink", "PortAudioSink"]
 
 
 class Sink(object):
@@ -72,7 +72,7 @@ class AlsaSink(Sink):
         # Listen to music...
     """
 
-    def __init__(self, session, device='default'):
+    def __init__(self, session, device="default"):
         self._session = session
         self._device_name = device
 
@@ -87,7 +87,7 @@ class AlsaSink(Sink):
         assert audio_format.sample_type == spotify.SampleType.INT16_NATIVE_ENDIAN
 
         if self._device is None:
-            if hasattr(self._alsaaudio, 'pcms'):  # pyalsaaudio >= 0.8
+            if hasattr(self._alsaaudio, "pcms"):  # pyalsaaudio >= 0.8
                 self._device = self._alsaaudio.PCM(
                     mode=self._alsaaudio.PCM_NONBLOCK, device=self._device_name
                 )
@@ -95,7 +95,7 @@ class AlsaSink(Sink):
                 self._device = self._alsaaudio.PCM(
                     mode=self._alsaaudio.PCM_NONBLOCK, card=self._device_name
                 )
-            if sys.byteorder == 'little':
+            if sys.byteorder == "little":
                 self._device.setformat(self._alsaaudio.PCM_FORMAT_S16_LE)
             else:
                 self._device.setformat(self._alsaaudio.PCM_FORMAT_S16_BE)

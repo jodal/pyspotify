@@ -3,7 +3,7 @@ from __future__ import unicode_literals
 import spotify
 from spotify import ffi, lib
 
-__all__ = ['OfflineSyncStatus']
+__all__ = ["OfflineSyncStatus"]
 
 
 class Offline(object):
@@ -37,7 +37,7 @@ class Offline(object):
         The :attr:`~SessionEvent.OFFLINE_STATUS_UPDATED` event is emitted on
         the session object when this is updated.
         """
-        sp_offline_sync_status = ffi.new('sp_offline_sync_status *')
+        sp_offline_sync_status = ffi.new("sp_offline_sync_status *")
         syncing = lib.sp_offline_sync_get_status(
             self._session._sp_session, sp_offline_sync_status
         )

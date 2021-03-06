@@ -27,8 +27,8 @@ class FooWithError(Foo):
         return spotify.Error(spotify.Error.OK)
 
 
-@mock.patch('spotify.utils.time')
-@mock.patch.object(Foo, 'is_loaded', new_callable=mock.PropertyMock)
+@mock.patch("spotify.utils.time")
+@mock.patch.object(Foo, "is_loaded", new_callable=mock.PropertyMock)
 class LoadableTest(unittest.TestCase):
     def setUp(self):
         self.session = tests.create_session_mock()
@@ -80,7 +80,7 @@ class LoadableTest(unittest.TestCase):
         self.assertEqual(self.session.process_events.call_count, 2)
         self.assertEqual(time_mock.sleep.call_count, 2)
 
-    @mock.patch.object(FooWithError, 'error', new_callable=mock.PropertyMock)
+    @mock.patch.object(FooWithError, "error", new_callable=mock.PropertyMock)
     def test_load_raises_exception_on_error(
         self, error_mock, is_loaded_mock, time_mock
     ):

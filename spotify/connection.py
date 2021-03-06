@@ -6,7 +6,7 @@ import operator
 import spotify
 from spotify import lib, utils
 
-__all__ = ['ConnectionRule', 'ConnectionState', 'ConnectionType']
+__all__ = ["ConnectionRule", "ConnectionState", "ConnectionType"]
 
 
 class Connection(object):
@@ -147,16 +147,16 @@ class Connection(object):
         )
 
 
-@utils.make_enum('SP_CONNECTION_RULE_')
+@utils.make_enum("SP_CONNECTION_RULE_")
 class ConnectionRule(utils.IntEnum):
     pass
 
 
-@utils.make_enum('SP_CONNECTION_STATE_')
+@utils.make_enum("SP_CONNECTION_STATE_")
 class ConnectionState(utils.IntEnum):
     pass
 
 
-@utils.make_enum('SP_CONNECTION_TYPE_')
+@utils.make_enum("SP_CONNECTION_TYPE_")
 class ConnectionType(utils.IntEnum):
     pass

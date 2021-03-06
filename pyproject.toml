@@ -4,7 +4,6 @@ requires = ["setuptools >= 30.3.0", "wheel"]
 
 [tool.black]
 target-version = ["py27"]
-skip-string-normalization = true
 
 
 [tool.isort]

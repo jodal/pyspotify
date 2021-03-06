@@ -36,7 +36,7 @@ class AlsaSinkTest(unittest.TestCase, BaseSinkTest):
         self.session.num_listeners.return_value = 0
         self.alsaaudio = mock.Mock()
         self.alsaaudio.pcms = mock.Mock()
-        with mock.patch.dict('sys.modules', {'alsaaudio': self.alsaaudio}):
+        with mock.patch.dict("sys.modules", {"alsaaudio": self.alsaaudio}):
             self.sink = spotify.AlsaSink(self.session)
 
     def test_off_closes_audio_device(self):
@@ -65,7 +65,7 @@ class AlsaSinkTest(unittest.TestCase, BaseSinkTest):
 
         # The ``device`` kwarg was added in pyalsaaudio 0.8
         self.alsaaudio.PCM.assert_called_with(
-            mode=self.alsaaudio.PCM_NONBLOCK, device='default'
+            mode=self.alsaaudio.PCM_NONBLOCK, device="default"
         )
 
         device.setformat.assert_called_with(mock.ANY)
@@ -91,7 +91,7 @@ class AlsaSinkTest(unittest.TestCase, BaseSinkTest):
 
         # The ``card`` kwarg was deprecated in pyalsaaudio 0.8
         self.alsaaudio.PCM.assert_called_with(
-            mode=self.alsaaudio.PCM_NONBLOCK, card='default'
+            mode=self.alsaaudio.PCM_NONBLOCK, card="default"
         )
 
     def test_sets_little_endian_format_if_little_endian_system(self):
@@ -102,8 +102,8 @@ class AlsaSinkTest(unittest.TestCase, BaseSinkTest):
         audio_format.sample_type = spotify.SampleType.INT16_NATIVE_ENDIAN
         num_frames = 2048
 
-        with mock.patch('spotify.sink.sys') as sys_mock:
-            sys_mock.byteorder = 'little'
+        with mock.patch("spotify.sink.sys") as sys_mock:
+            sys_mock.byteorder = "little"
 
             self.sink._on_music_delivery(
                 mock.sentinel.session,
@@ -122,8 +122,8 @@ class AlsaSinkTest(unittest.TestCase, BaseSinkTest):
         audio_format.sample_type = spotify.SampleType.INT16_NATIVE_ENDIAN
         num_frames = 2048
 
-        with mock.patch('spotify.sink.sys') as sys_mock:
-            sys_mock.byteorder = 'big'
+        with mock.patch("spotify.sink.sys") as sys_mock:
+            sys_mock.byteorder = "big"
 
             self.sink._on_music_delivery(
                 mock.sentinel.session,
@@ -155,7 +155,7 @@ class PortAudioSinkTest(unittest.TestCase, BaseSinkTest):
         self.session = mock.Mock()
         self.session.num_listeners.return_value = 0
         self.pyaudio = mock.Mock()
-        with mock.patch.dict('sys.modules', {'pyaudio': self.pyaudio}):
+        with mock.patch.dict("sys.modules", {"pyaudio": self.pyaudio}):
             self.sink = spotify.PortAudioSink(self.session)
 
     def test_init_creates_device(self):

@@ -9,11 +9,11 @@ import spotify
 from spotify import compat, ffi, lib, serialized, utils
 
 __all__ = [
-    'PlaylistContainer',
-    'PlaylistContainerEvent',
-    'PlaylistFolder',
-    'PlaylistPlaceholder',
-    'PlaylistType',
+    "PlaylistContainer",
+    "PlaylistContainerEvent",
+    "PlaylistFolder",
+    "PlaylistPlaceholder",
+    "PlaylistType",
 ]
 
 logger = logging.getLogger(__name__)
@@ -108,9 +108,9 @@ class PlaylistContainer(compat.MutableSequence, utils.EventEmitter):
         self._lib = lib
 
     def __del__(self):
-        if not hasattr(self, '_lib'):
+        if not hasattr(self, "_lib"):
             return
-        if getattr(self, '_sp_playlistcontainer_callbacks', None) is None:
+        if getattr(self, "_sp_playlistcontainer_callbacks", None) is None:
             return
         self._lib.sp_playlistcontainer_remove_callbacks(
             self._sp_playlistcontainer,
@@ -119,7 +119,7 @@ class PlaylistContainer(compat.MutableSequence, utils.EventEmitter):
         )
 
     def __repr__(self):
-        return 'PlaylistContainer(%s)' % pprint.pformat(list(self))
+        return "PlaylistContainer(%s)" % pprint.pformat(list(self))
 
     def __eq__(self, other):
         if isinstance(other, self.__class__):
@@ -164,12 +164,12 @@ class PlaylistContainer(compat.MutableSequence, utils.EventEmitter):
             return list(self).__getitem__(key)
         if not isinstance(key, int):
             raise TypeError(
-                'list indices must be int or slice, not %s' % key.__class__.__name__
+                "list indices must be int or slice, not %s" % key.__class__.__name__
             )
         if key < 0:
             key += self.__len__()
         if not 0 <= key < self.__len__():
-            raise IndexError('list index out of range')
+            raise IndexError("list index out of range")
 
         playlist_type = PlaylistType(
             lib.sp_playlistcontainer_playlist_type(self._sp_playlistcontainer, key)
@@ -199,21 +199,21 @@ class PlaylistContainer(compat.MutableSequence, utils.EventEmitter):
         elif playlist_type is PlaylistType.PLACEHOLDER:
             return PlaylistPlaceholder()
         else:
-            raise spotify.Error('Unknown playlist type: %r' % playlist_type)
+            raise spotify.Error("Unknown playlist type: %r" % playlist_type)
 
     def __setitem__(self, key, value):
         # Required by collections.abc.MutableSequence
 
         if not isinstance(key, (int, slice)):
             raise TypeError(
-                'list indices must be int or slice, not %s' % key.__class__.__name__
+                "list indices must be int or slice, not %s" % key.__class__.__name__
             )
         if isinstance(key, slice):
             if not isinstance(value, compat.Iterable):
-                raise TypeError('can only assign an iterable')
+                raise TypeError("can only assign an iterable")
         if isinstance(key, int):
             if not 0 <= key < self.__len__():
-                raise IndexError('list index out of range')
+                raise IndexError("list index out of range")
             key = slice(key, key + 1)
             value = [value]
 
@@ -240,10 +240,10 @@ class PlaylistContainer(compat.MutableSequence, utils.EventEmitter):
             return
         if not isinstance(key, int):
             raise TypeError(
-                'list indices must be int or slice, not %s' % key.__class__.__name__
+                "list indices must be int or slice, not %s" % key.__class__.__name__
             )
         if not 0 <= key < self.__len__():
-            raise IndexError('list index out of range')
+            raise IndexError("list index out of range")
         self.remove_playlist(key)
 
     @serialized
@@ -262,7 +262,7 @@ class PlaylistContainer(compat.MutableSequence, utils.EventEmitter):
             self._sp_playlistcontainer, utils.to_char(name)
         )
         if sp_playlist == ffi.NULL:
-            raise spotify.Error('Playlist creation failed')
+            raise spotify.Error("Playlist creation failed")
         playlist = spotify.Playlist._cached(self._session, sp_playlist, add_ref=True)
         if index is not None:
             self.move_playlist(self.__len__() - 1, index)
@@ -289,7 +289,7 @@ class PlaylistContainer(compat.MutableSequence, utils.EventEmitter):
             link = playlist.link
         else:
             raise TypeError(
-                'Argument must be Link or Playlist, got %s' % type(playlist)
+                "Argument must be Link or Playlist, got %s" % type(playlist)
             )
         sp_playlist = lib.sp_playlistcontainer_add_playlist(
             self._sp_playlistcontainer, link._sp_link
@@ -321,9 +321,9 @@ class PlaylistContainer(compat.MutableSequence, utils.EventEmitter):
 
     def _validate_name(self, name):
         if len(name) > 255:
-            raise ValueError('Playlist name cannot be longer than 255 chars')
-        if len(re.sub(r'\s+', '', name)) == 0:
-            raise ValueError('Playlist name cannot be space-only')
+            raise ValueError("Playlist name cannot be longer than 255 chars")
+        if len(re.sub(r"\s+", "", name)) == 0:
+            raise ValueError("Playlist name cannot be space-only")
 
     def remove_playlist(self, index, recursive=False):
         """Remove playlist at the given index from the container.
@@ -357,7 +357,7 @@ class PlaylistContainer(compat.MutableSequence, utils.EventEmitter):
                 indexes.append(i)
         assert (
             len(indexes) <= 2
-        ), 'Found more than 2 items with the same playlist folder ID'
+        ), "Found more than 2 items with the same playlist folder ID"
         if recursive and len(indexes) == 2:
             start, end = indexes
             indexes = list(range(start, end + 1))
@@ -405,7 +405,7 @@ class PlaylistContainer(compat.MutableSequence, utils.EventEmitter):
             self._sp_playlistcontainer, playlist._sp_playlist
         )
         if result == -1:
-            raise spotify.Error('Failed clearing unseen tracks')
+            raise spotify.Error("Failed clearing unseen tracks")
 
     def insert(self, index, value):
         # Required by collections.abc.MutableSequence
@@ -465,7 +465,7 @@ class PlaylistContainerEvent(object):
     functions just to log that they're called.
     """
 
-    PLAYLIST_ADDED = 'playlist_added'
+    PLAYLIST_ADDED = "playlist_added"
     """Called when a playlist is added to the container.
 
     :param playlist_container: the playlist container
@@ -476,7 +476,7 @@ class PlaylistContainerEvent(object):
     :type index: int
     """
 
-    PLAYLIST_REMOVED = 'playlist_removed'
+    PLAYLIST_REMOVED = "playlist_removed"
     """Called when a playlist is removed from the container.
 
     :param playlist_container: the playlist container
@@ -487,7 +487,7 @@ class PlaylistContainerEvent(object):
     :type index: int
     """
 
-    PLAYLIST_MOVED = 'playlist_moved'
+    PLAYLIST_MOVED = "playlist_moved"
     """Called when a playlist is moved in the container.
 
     :param playlist_container: the playlist container
@@ -500,7 +500,7 @@ class PlaylistContainerEvent(object):
     :type new_index: int
     """
 
-    CONTAINER_LOADED = 'container_loaded'
+    CONTAINER_LOADED = "container_loaded"
     """Called when the playlist container is loaded.
 
     :param playlist_container: the playlist container
@@ -515,12 +515,12 @@ class _PlaylistContainerCallbacks(object):
     @classmethod
     def get_struct(cls):
         return ffi.new(
-            'sp_playlistcontainer_callbacks *',
+            "sp_playlistcontainer_callbacks *",
             {
-                'playlist_added': cls.playlist_added,
-                'playlist_removed': cls.playlist_removed,
-                'playlist_moved': cls.playlist_moved,
-                'container_loaded': cls.container_loaded,
+                "playlist_added": cls.playlist_added,
+                "playlist_removed": cls.playlist_removed,
+                "playlist_moved": cls.playlist_moved,
+                "container_loaded": cls.container_loaded,
             },
         )
 
@@ -529,11 +529,11 @@ class _PlaylistContainerCallbacks(object):
 
     @staticmethod
     @ffi.callback(
-        'void(sp_playlistcontainer *pc, sp_playlist *playlist, int position, '
-        'void *userdata)'
+        "void(sp_playlistcontainer *pc, sp_playlist *playlist, int position, "
+        "void *userdata)"
     )
     def playlist_added(sp_playlistcontainer, sp_playlist, index, userdata):
-        logger.debug('Playlist added at index %d', index)
+        logger.debug("Playlist added at index %d", index)
         playlist_container = PlaylistContainer._cached(
             spotify._session_instance, sp_playlistcontainer, add_ref=True
         )
@@ -549,11 +549,11 @@ class _PlaylistContainerCallbacks(object):
 
     @staticmethod
     @ffi.callback(
-        'void(sp_playlistcontainer *pc, sp_playlist *playlist, int position, '
-        'void *userdata)'
+        "void(sp_playlistcontainer *pc, sp_playlist *playlist, int position, "
+        "void *userdata)"
     )
     def playlist_removed(sp_playlistcontainer, sp_playlist, index, userdata):
-        logger.debug('Playlist removed at index %d', index)
+        logger.debug("Playlist removed at index %d", index)
         playlist_container = PlaylistContainer._cached(
             spotify._session_instance, sp_playlistcontainer, add_ref=True
         )
@@ -569,13 +569,13 @@ class _PlaylistContainerCallbacks(object):
 
     @staticmethod
     @ffi.callback(
-        'void(sp_playlistcontainer *pc, sp_playlist *playlist, int position, '
-        'int new_position, void *userdata)'
+        "void(sp_playlistcontainer *pc, sp_playlist *playlist, int position, "
+        "int new_position, void *userdata)"
     )
     def playlist_moved(
         sp_playlistcontainer, sp_playlist, old_index, new_index, userdata
     ):
-        logger.debug('Playlist moved from index %d to %d', old_index, new_index)
+        logger.debug("Playlist moved from index %d to %d", old_index, new_index)
         playlist_container = PlaylistContainer._cached(
             spotify._session_instance, sp_playlistcontainer, add_ref=True
         )
@@ -591,9 +591,9 @@ class _PlaylistContainerCallbacks(object):
         )
 
     @staticmethod
-    @ffi.callback('void(sp_playlistcontainer *pc, void *userdata)')
+    @ffi.callback("void(sp_playlistcontainer *pc, void *userdata)")
     def container_loaded(sp_playlistcontainer, userdata):
-        logger.debug('Playlist container loaded')
+        logger.debug("Playlist container loaded")
         playlist_container = PlaylistContainer._cached(
             spotify._session_instance, sp_playlistcontainer, add_ref=True
         )
@@ -602,7 +602,7 @@ class _PlaylistContainerCallbacks(object):
         )
 
 
-class PlaylistFolder(collections.namedtuple('PlaylistFolder', ['id', 'name', 'type'])):
+class PlaylistFolder(collections.namedtuple("PlaylistFolder", ["id", "name", "type"])):
 
     """An object marking the start or end of a playlist folder."""
 
@@ -615,6 +615,6 @@ class PlaylistPlaceholder(object):
     pass
 
 
-@utils.make_enum('SP_PLAYLIST_TYPE_')
+@utils.make_enum("SP_PLAYLIST_TYPE_")
 class PlaylistType(utils.IntEnum):
     pass

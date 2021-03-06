@@ -19,7 +19,7 @@ class AudioBufferStatsTest(unittest.TestCase):
 
 class AudioFormatTest(unittest.TestCase):
     def setUp(self):
-        self._sp_audioformat = spotify.ffi.new('sp_audioformat *')
+        self._sp_audioformat = spotify.ffi.new("sp_audioformat *")
         self._sp_audioformat.sample_type = spotify.SampleType.INT16_NATIVE_ENDIAN
         self._sp_audioformat.sample_rate = 44100
         self._sp_audioformat.channels = 2

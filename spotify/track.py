@@ -3,7 +3,7 @@ from __future__ import unicode_literals
 import spotify
 from spotify import ffi, lib, serialized, utils
 
-__all__ = ['Track', 'TrackAvailability', 'TrackOfflineStatus']
+__all__ = ["Track", "TrackAvailability", "TrackOfflineStatus"]
 
 
 class Track(object):
@@ -21,14 +21,14 @@ class Track(object):
     """
 
     def __init__(self, session, uri=None, sp_track=None, add_ref=True):
-        assert uri or sp_track, 'uri or sp_track is required'
+        assert uri or sp_track, "uri or sp_track is required"
 
         self._session = session
 
         if uri is not None:
             track = spotify.Link(self._session, uri=uri).as_track()
             if track is None:
-                raise ValueError('Failed to get track from Spotify URI: %r' % uri)
+                raise ValueError("Failed to get track from Spotify URI: %r" % uri)
             sp_track = track._sp_track
             add_ref = True
 
@@ -37,7 +37,7 @@ class Track(object):
         self._sp_track = ffi.gc(sp_track, lib.sp_track_release)
 
     def __repr__(self):
-        return 'Track(%r)' % self.link.uri
+        return "Track(%r)" % self.link.uri
 
     def __eq__(self, other):
         if isinstance(other, self.__class__):
@@ -187,7 +187,7 @@ class Track(object):
 
     @starred.setter
     def starred(self, value):
-        tracks = ffi.new('sp_track *[]', 1)
+        tracks = ffi.new("sp_track *[]", 1)
         tracks[0] = self._sp_track
         spotify.Error.maybe_raise(
             lib.sp_track_set_starred(
@@ -308,11 +308,11 @@ class Track(object):
         )
 
 
-@utils.make_enum('SP_TRACK_AVAILABILITY_')
+@utils.make_enum("SP_TRACK_AVAILABILITY_")
 class TrackAvailability(utils.IntEnum):
     pass
 
 
-@utils.make_enum('SP_TRACK_OFFLINE_')
+@utils.make_enum("SP_TRACK_OFFLINE_")
 class TrackOfflineStatus(utils.IntEnum):
     pass

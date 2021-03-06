@@ -10,7 +10,7 @@ import spotify.player
 import spotify.social
 from spotify import ffi, lib, serialized, utils
 
-__all__ = ['Session', 'SessionEvent']
+__all__ = ["Session", "SessionEvent"]
 
 logger = logging.getLogger(__name__)
 
@@ -41,7 +41,7 @@ class Session(utils.EventEmitter):
         super(Session, self).__init__()
 
         if spotify._session_instance is not None:
-            raise RuntimeError('Session has already been initialized')
+            raise RuntimeError("Session has already been initialized")
 
         if config is not None:
             self.config = config
@@ -51,7 +51,7 @@ class Session(utils.EventEmitter):
         if self.config.application_key is None:
             self.config.load_application_key_file()
 
-        sp_session_ptr = ffi.new('sp_session **')
+        sp_session_ptr = ffi.new("sp_session **")
 
         spotify.Error.maybe_raise(
             lib.sp_session_create(self.config._sp_session_config, sp_session_ptr)
@@ -155,7 +155,7 @@ class Session(utils.EventEmitter):
             password = ffi.NULL
             blob = utils.to_char(blob)
         else:
-            raise AttributeError('password or blob is required to login')
+            raise AttributeError("password or blob is required to login")
 
         spotify.Error.maybe_raise(
             lib.sp_session_login(
@@ -326,7 +326,7 @@ class Session(utils.EventEmitter):
         pyspotify provides an :class:`~spotify.EventLoop` that you can use for
         processing events when needed.
         """
-        next_timeout = ffi.new('int *')
+        next_timeout = ffi.new("int *")
 
         spotify.Error.maybe_raise(
             lib.sp_session_process_events(self._sp_session, next_timeout)
@@ -483,11 +483,11 @@ class Session(utils.EventEmitter):
         """
 
         if artist is None:
-            artist = ''
+            artist = ""
         if title is None:
-            title = ''
+            title = ""
         if album is None:
-            album = ''
+            album = ""
         if length is None:
             length = -1
 
@@ -639,8 +639,8 @@ class Session(utils.EventEmitter):
         Returns a :class:`Search` instance.
         """
         raise Exception(
-            'Spotify broke the libspotify search API 2016-02-03 '
-            'and never restored it.'
+            "Spotify broke the libspotify search API 2016-02-03 "
+            "and never restored it."
         )
 
     def get_toplist(
@@ -717,7 +717,7 @@ class SessionEvent(object):
     functions just to log that they're called.
     """
 
-    LOGGED_IN = 'logged_in'
+    LOGGED_IN = "logged_in"
     """Called when login has completed.
 
     Note that even if login has succeeded, that does not mean that you're
@@ -734,7 +734,7 @@ class SessionEvent(object):
     :type error_type: :class:`ErrorType`
     """
 
-    LOGGED_OUT = 'logged_out'
+    LOGGED_OUT = "logged_out"
     """Called when logout has completed or there is a permanent connection
     error.
 
@@ -742,7 +742,7 @@ class SessionEvent(object):
     :type session: :class:`Session`
     """
 
-    METADATA_UPDATED = 'metadata_updated'
+    METADATA_UPDATED = "metadata_updated"
     """Called when some metadata has been updated.
 
     There is no way to know what metadata was updated, so you'll have to
@@ -752,7 +752,7 @@ class SessionEvent(object):
     :type session: :class:`Session`
     """
 
-    CONNECTION_ERROR = 'connection_error'
+    CONNECTION_ERROR = "connection_error"
     """Called when there is a connection error and libspotify has problems
     reconnecting to the Spotify service.
 
@@ -765,7 +765,7 @@ class SessionEvent(object):
     :type error_type: :class:`ErrorType`
     """
 
-    MESSAGE_TO_USER = 'message_to_user'
+    MESSAGE_TO_USER = "message_to_user"
     """Called when libspotify wants to show a message to the end user.
 
     :param session: the current session
@@ -774,7 +774,7 @@ class SessionEvent(object):
     :type data: text
     """
 
-    NOTIFY_MAIN_THREAD = 'notify_main_thread'
+    NOTIFY_MAIN_THREAD = "notify_main_thread"
     """Called when processing on the main thread is needed.
 
     When this is called, you should call :meth:`~Session.process_events` from
@@ -791,7 +791,7 @@ class SessionEvent(object):
     :type session: :class:`Session`
     """
 
-    MUSIC_DELIVERY = 'music_delivery'
+    MUSIC_DELIVERY = "music_delivery"
     """Called when there is decompressed audio data available.
 
     If the function returns a lower number of frames consumed than
@@ -820,7 +820,7 @@ class SessionEvent(object):
     :returns: the number of frames consumed
     """
 
-    PLAY_TOKEN_LOST = 'play_token_lost'
+    PLAY_TOKEN_LOST = "play_token_lost"
     """Music has been paused because an account only allows music to be played
     from one location simultaneously.
 
@@ -830,7 +830,7 @@ class SessionEvent(object):
     :type session: :class:`Session`
     """
 
-    LOG_MESSAGE = 'log_message'
+    LOG_MESSAGE = "log_message"
     """Called when libspotify have something to log.
 
     Note that pyspotify logs this for you, so you'll probably never need to
@@ -842,14 +842,14 @@ class SessionEvent(object):
     :type data: text
     """
 
-    END_OF_TRACK = 'end_of_track'
+    END_OF_TRACK = "end_of_track"
     """Called when all audio data for the current track has been delivered.
 
     :param session: the current session
     :type session: :class:`Session`
     """
 
-    STREAMING_ERROR = 'streaming_error'
+    STREAMING_ERROR = "streaming_error"
     """Called when audio streaming cannot start or continue.
 
     :param session: the current session
@@ -858,14 +858,14 @@ class SessionEvent(object):
     :type error_type: :class:`ErrorType`
     """
 
-    USER_INFO_UPDATED = 'user_info_updated'
+    USER_INFO_UPDATED = "user_info_updated"
     """Called when anything related to :class:`User` objects is updated.
 
     :param session: the current session
     :type session: :class:`Session`
     """
 
-    START_PLAYBACK = 'start_playback'
+    START_PLAYBACK = "start_playback"
     """Called when audio playback should start.
 
     You need to implement a listener for the :attr:`GET_AUDIO_BUFFER_STATS`
@@ -881,7 +881,7 @@ class SessionEvent(object):
     :type session: :class:`Session`
     """
 
-    STOP_PLAYBACK = 'stop_playback'
+    STOP_PLAYBACK = "stop_playback"
     """Called when audio playback should stop.
 
     You need to implement a listener for the :attr:`GET_AUDIO_BUFFER_STATS`
@@ -897,7 +897,7 @@ class SessionEvent(object):
     :type session: :class:`Session`
     """
 
-    GET_AUDIO_BUFFER_STATS = 'get_audio_buffer_stats'
+    GET_AUDIO_BUFFER_STATS = "get_audio_buffer_stats"
     """Called to query the application about its audio buffer.
 
     .. note::
@@ -915,14 +915,14 @@ class SessionEvent(object):
     :returns: an :class:`AudioBufferStats` instance
     """
 
-    OFFLINE_STATUS_UPDATED = 'offline_status_updated'
+    OFFLINE_STATUS_UPDATED = "offline_status_updated"
     """Called when offline sync status is updated.
 
     :param session: the current session
     :type session: :class:`Session`
     """
 
-    CREDENTIALS_BLOB_UPDATED = 'credentials_blob_updated'
+    CREDENTIALS_BLOB_UPDATED = "credentials_blob_updated"
     """Called when storable credentials have been updated, typically right
     after login.
 
@@ -935,7 +935,7 @@ class SessionEvent(object):
     :type blob: bytestring
     """
 
-    CONNECTION_STATE_UPDATED = 'connection_state_updated'
+    CONNECTION_STATE_UPDATED = "connection_state_updated"
     """Called when the connection state is updated.
 
     The connection state includes login, logout, offline mode, etc.
@@ -944,7 +944,7 @@ class SessionEvent(object):
     :type session: :class:`Session`
     """
 
-    SCROBBLE_ERROR = 'scrobble_error'
+    SCROBBLE_ERROR = "scrobble_error"
     """Called when there is a scrobble error event.
 
     :param session: the current session
@@ -953,7 +953,7 @@ class SessionEvent(object):
     :type error_type: :class:`ErrorType`
     """
 
-    PRIVATE_SESSION_MODE_CHANGED = 'private_session_mode_changed'
+    PRIVATE_SESSION_MODE_CHANGED = "private_session_mode_changed"
     """Called when there is a change in the private session mode.
 
     :param session: the current session
@@ -970,28 +970,28 @@ class _SessionCallbacks(object):
     @classmethod
     def get_struct(cls):
         return ffi.new(
-            'sp_session_callbacks *',
+            "sp_session_callbacks *",
             {
-                'logged_in': cls.logged_in,
-                'logged_out': cls.logged_out,
-                'metadata_updated': cls.metadata_updated,
-                'connection_error': cls.connection_error,
-                'message_to_user': cls.message_to_user,
-                'notify_main_thread': cls.notify_main_thread,
-                'music_delivery': cls.music_delivery,
-                'play_token_lost': cls.play_token_lost,
-                'log_message': cls.log_message,
-                'end_of_track': cls.end_of_track,
-                'streaming_error': cls.streaming_error,
-                'userinfo_updated': cls.user_info_updated,
-                'start_playback': cls.start_playback,
-                'stop_playback': cls.stop_playback,
-                'get_audio_buffer_stats': cls.get_audio_buffer_stats,
-                'offline_status_updated': cls.offline_status_updated,
-                'credentials_blob_updated': cls.credentials_blob_updated,
-                'connectionstate_updated': cls.connection_state_updated,
-                'scrobble_error': cls.scrobble_error,
-                'private_session_mode_changed': cls.private_session_mode_changed,
+                "logged_in": cls.logged_in,
+                "logged_out": cls.logged_out,
+                "metadata_updated": cls.metadata_updated,
+                "connection_error": cls.connection_error,
+                "message_to_user": cls.message_to_user,
+                "notify_main_thread": cls.notify_main_thread,
+                "music_delivery": cls.music_delivery,
+                "play_token_lost": cls.play_token_lost,
+                "log_message": cls.log_message,
+                "end_of_track": cls.end_of_track,
+                "streaming_error": cls.streaming_error,
+                "userinfo_updated": cls.user_info_updated,
+                "start_playback": cls.start_playback,
+                "stop_playback": cls.stop_playback,
+                "get_audio_buffer_stats": cls.get_audio_buffer_stats,
+                "offline_status_updated": cls.offline_status_updated,
+                "credentials_blob_updated": cls.credentials_blob_updated,
+                "connectionstate_updated": cls.connection_state_updated,
+                "scrobble_error": cls.scrobble_error,
+                "private_session_mode_changed": cls.private_session_mode_changed,
             },
         )
 
@@ -999,78 +999,78 @@ class _SessionCallbacks(object):
     # callbacks.
 
     @staticmethod
-    @ffi.callback('void(sp_session *, sp_error)')
+    @ffi.callback("void(sp_session *, sp_error)")
     def logged_in(sp_session, sp_error):
         if not spotify._session_instance:
             return
         error_type = spotify.ErrorType(sp_error)
         if error_type == spotify.ErrorType.OK:
-            logger.info('Spotify logged in')
+            logger.info("Spotify logged in")
         else:
-            logger.error('Spotify login error: %r', error_type)
+            logger.error("Spotify login error: %r", error_type)
         spotify._session_instance.emit(
             SessionEvent.LOGGED_IN, spotify._session_instance, error_type
         )
 
     @staticmethod
-    @ffi.callback('void(sp_session *)')
+    @ffi.callback("void(sp_session *)")
     def logged_out(sp_session):
         if not spotify._session_instance:
             return
-        logger.info('Spotify logged out')
+        logger.info("Spotify logged out")
         spotify._session_instance.emit(
             SessionEvent.LOGGED_OUT, spotify._session_instance
         )
 
     @staticmethod
-    @ffi.callback('void(sp_session *)')
+    @ffi.callback("void(sp_session *)")
     def metadata_updated(sp_session):
         if not spotify._session_instance:
             return
-        logger.debug('Metadata updated')
+        logger.debug("Metadata updated")
         spotify._session_instance.emit(
             SessionEvent.METADATA_UPDATED, spotify._session_instance
         )
 
     @staticmethod
-    @ffi.callback('void(sp_session *, sp_error)')
+    @ffi.callback("void(sp_session *, sp_error)")
     def connection_error(sp_session, sp_error):
         if not spotify._session_instance:
             return
         error_type = spotify.ErrorType(sp_error)
-        logger.error('Spotify connection error: %r', error_type)
+        logger.error("Spotify connection error: %r", error_type)
         spotify._session_instance.emit(
             SessionEvent.CONNECTION_ERROR, spotify._session_instance, error_type
         )
 
     @staticmethod
-    @ffi.callback('void(sp_session *, const char *)')
+    @ffi.callback("void(sp_session *, const char *)")
     def message_to_user(sp_session, data):
         if not spotify._session_instance:
             return
         data = utils.to_unicode(data).strip()
-        logger.debug('Message to user: %s', data)
+        logger.debug("Message to user: %s", data)
         spotify._session_instance.emit(
             SessionEvent.MESSAGE_TO_USER, spotify._session_instance, data
         )
 
     @staticmethod
-    @ffi.callback('void(sp_session *)')
+    @ffi.callback("void(sp_session *)")
     def notify_main_thread(sp_session):
         if not spotify._session_instance:
             return
-        logger.debug('Notify main thread')
+        logger.debug("Notify main thread")
         spotify._session_instance.emit(
             SessionEvent.NOTIFY_MAIN_THREAD, spotify._session_instance
         )
 
     @staticmethod
-    @ffi.callback('int(sp_session *, const sp_audioformat *, const void *, int)')
+    @ffi.callback("int(sp_session *, const sp_audioformat *, const void *, int)")
     def music_delivery(sp_session, sp_audioformat, frames, num_frames):
         if not spotify._session_instance:
             return 0
         if spotify._session_instance.num_listeners(SessionEvent.MUSIC_DELIVERY) == 0:
-            logger.debug('Music delivery, but no listener')
+            logger.debug("Music delivery, but no listener")
             return 0
         audio_format = spotify.AudioFormat(sp_audioformat)
         frames_buffer = ffi.buffer(frames, audio_format.frame_size() * num_frames)
@@ -1083,86 +1083,86 @@ class _SessionCallbacks(object):
             num_frames,
         )
         logger.debug(
-            'Music delivery of %d frames, %d consumed',
+            "Music delivery of %d frames, %d consumed",
             num_frames,
             num_frames_consumed,
         )
         return num_frames_consumed
 
     @staticmethod
-    @ffi.callback('void(sp_session *)')
+    @ffi.callback("void(sp_session *)")
     def play_token_lost(sp_session):
         if not spotify._session_instance:
             return
-        logger.debug('Play token lost')
+        logger.debug("Play token lost")
         spotify._session_instance.emit(
             SessionEvent.PLAY_TOKEN_LOST, spotify._session_instance
         )
 
     @staticmethod
-    @ffi.callback('void(sp_session *, const char *)')
+    @ffi.callback("void(sp_session *, const char *)")
     def log_message(sp_session, data):
         if not spotify._session_instance:
             return
         data = utils.to_unicode(data).strip()
-        logger.debug('libspotify log message: %s', data)
+        logger.debug("libspotify log message: %s", data)
         spotify._session_instance.emit(
             SessionEvent.LOG_MESSAGE, spotify._session_instance, data
         )
 
     @staticmethod
-    @ffi.callback('void(sp_session *)')
+    @ffi.callback("void(sp_session *)")
     def end_of_track(sp_session):
         if not spotify._session_instance:
             return
-        logger.debug('End of track')
+        logger.debug("End of track")
         spotify._session_instance.emit(
             SessionEvent.END_OF_TRACK, spotify._session_instance
         )
 
     @staticmethod
-    @ffi.callback('void(sp_session *, sp_error)')
+    @ffi.callback("void(sp_session *, sp_error)")
     def streaming_error(sp_session, sp_error):
         if not spotify._session_instance:
             return
         error_type = spotify.ErrorType(sp_error)
-        logger.error('Spotify streaming error: %r', error_type)
+        logger.error("Spotify streaming error: %r", error_type)
         spotify._session_instance.emit(
             SessionEvent.STREAMING_ERROR, spotify._session_instance, error_type
         )
 
     @staticmethod
-    @ffi.callback('void(sp_session *)')
+    @ffi.callback("void(sp_session *)")
     def user_info_updated(sp_session):
         if not spotify._session_instance:
             return
-        logger.debug('User info updated')
+        logger.debug("User info updated")
         spotify._session_instance.emit(
             SessionEvent.USER_INFO_UPDATED, spotify._session_instance
         )
 
     @staticmethod
-    @ffi.callback('void(sp_session *)')
+    @ffi.callback("void(sp_session *)")
     def start_playback(sp_session):
         if not spotify._session_instance:
             return
-        logger.debug('Start playback called')
+        logger.debug("Start playback called")
         spotify._session_instance.emit(
             SessionEvent.START_PLAYBACK, spotify._session_instance
         )
 
     @staticmethod
-    @ffi.callback('void(sp_session *)')
+    @ffi.callback("void(sp_session *)")
     def stop_playback(sp_session):
         if not spotify._session_instance:
             return
-        logger.debug('Stop playback called')
+        logger.debug("Stop playback called")
         spotify._session_instance.emit(
             SessionEvent.STOP_PLAYBACK, spotify._session_instance
         )
 
     @staticmethod
-    @ffi.callback('void(sp_session *, sp_audio_buffer_stats *)')
+    @ffi.callback("void(sp_session *, sp_audio_buffer_stats *)")
     def get_audio_buffer_stats(sp_session, sp_audio_buffer_stats):
         if not spotify._session_instance:
             return
@@ -1170,9 +1170,9 @@ class _SessionCallbacks(object):
             spotify._session_instance.num_listeners(SessionEvent.GET_AUDIO_BUFFER_STATS)
             == 0
         ):
-            logger.debug('Audio buffer stats requested, but no listener')
+            logger.debug("Audio buffer stats requested, but no listener")
             return
-        logger.debug('Audio buffer stats requested')
+        logger.debug("Audio buffer stats requested")
         stats = spotify._session_instance.call(
             SessionEvent.GET_AUDIO_BUFFER_STATS, spotify._session_instance
         )
@@ -1180,22 +1180,22 @@ class _SessionCallbacks(object):
         sp_audio_buffer_stats.stutter = stats.stutter
 
     @staticmethod
-    @ffi.callback('void(sp_session *)')
+    @ffi.callback("void(sp_session *)")
     def offline_status_updated(sp_session):
         if not spotify._session_instance:
             return
-        logger.debug('Offline status updated')
+        logger.debug("Offline status updated")
         spotify._session_instance.emit(
             SessionEvent.OFFLINE_STATUS_UPDATED, spotify._session_instance
         )
 
     @staticmethod
-    @ffi.callback('void(sp_session *, const char *)')
+    @ffi.callback("void(sp_session *, const char *)")
     def credentials_blob_updated(sp_session, data):
         if not spotify._session_instance:
             return
         data = ffi.string(data)
-        logger.debug('Credentials blob updated: %r', data)
+        logger.debug("Credentials blob updated: %r", data)
         spotify._session_instance.emit(
             SessionEvent.CREDENTIALS_BLOB_UPDATED,
             spotify._session_instance,
@@ -1203,34 +1203,34 @@ class _SessionCallbacks(object):
         )
 
     @staticmethod
-    @ffi.callback('void(sp_session *)')
+    @ffi.callback("void(sp_session *)")
     def connection_state_updated(sp_session):
         if not spotify._session_instance:
             return
-        logger.debug('Connection state updated')
+        logger.debug("Connection state updated")
         spotify._session_instance.emit(
             SessionEvent.CONNECTION_STATE_UPDATED, spotify._session_instance
         )
 
     @staticmethod
-    @ffi.callback('void(sp_session *, sp_error)')
+    @ffi.callback("void(sp_session *, sp_error)")
     def scrobble_error(sp_session, sp_error):
         if not spotify._session_instance:
             return
         error_type = spotify.ErrorType(sp_error)
-        logger.error('Spotify scrobble error: %r', error_type)
+        logger.error("Spotify scrobble error: %r", error_type)
         spotify._session_instance.emit(
             SessionEvent.SCROBBLE_ERROR, spotify._session_instance, error_type
         )
 
     @staticmethod
-    @ffi.callback('void(sp_session *, bool)')
+    @ffi.callback("void(sp_session *, bool)")
     def private_session_mode_changed(sp_session, is_private):
         if not spotify._session_instance:
             return
         is_private = bool(is_private)
-        status = 'private' if is_private else 'public'
-        logger.debug('Private session mode changed: %s', status)
+        status = "private" if is_private else "public"
+        logger.debug("Private session mode changed: %s", status)
         spotify._session_instance.emit(
             SessionEvent.PRIVATE_SESSION_MODE_CHANGED,
             spotify._session_instance,

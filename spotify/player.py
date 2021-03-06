@@ -3,14 +3,14 @@ from __future__ import unicode_literals
 import spotify
 from spotify import lib
 
-__all__ = ['PlayerState']
+__all__ = ["PlayerState"]
 
 
 class PlayerState(object):
-    UNLOADED = 'unloaded'
-    LOADED = 'loaded'
-    PLAYING = 'playing'
-    PAUSED = 'paused'
+    UNLOADED = "unloaded"
+    LOADED = "loaded"
+    PLAYING = "playing"
+    PAUSED = "paused"
 
 
 class Player(object):

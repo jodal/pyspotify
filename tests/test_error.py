@@ -51,15 +51,15 @@ class LibErrorTest(unittest.TestCase):
 
     def test_error_has_useful_repr(self):
         error = spotify.LibError(0)
-        self.assertIn('No error', repr(error))
+        self.assertIn("No error", repr(error))
 
     def test_error_has_useful_string_representation(self):
         error = spotify.LibError(0)
-        self.assertEqual('%s' % error, 'No error')
-        self.assertIsInstance('%s' % error, compat.text_type)
+        self.assertEqual("%s" % error, "No error")
+        self.assertIsInstance("%s" % error, compat.text_type)
 
         error = spotify.LibError(1)
-        self.assertEqual('%s' % error, 'Invalid library version')
+        self.assertEqual("%s" % error, "Invalid library version")
 
     def test_has_error_constants(self):
         self.assertEqual(spotify.LibError.OK, spotify.LibError(spotify.ErrorType.OK))
@@ -82,9 +82,9 @@ class TimeoutTest(unittest.TestCase):
 
     def test_has_useful_repr(self):
         error = spotify.Timeout(0.5)
-        self.assertIn('Operation did not complete in 0.500s', repr(error))
+        self.assertIn("Operation did not complete in 0.500s", repr(error))
 
     def test_has_useful_string_representation(self):
         error = spotify.Timeout(0.5)
-        self.assertEqual('%s' % error, 'Operation did not complete in 0.500s')
-        self.assertIsInstance('%s' % error, compat.text_type)
+        self.assertEqual("%s" % error, "Operation did not complete in 0.500s")
+        self.assertIsInstance("%s" % error, compat.text_type)

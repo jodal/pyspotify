@@ -7,8 +7,8 @@ import tests
 from tests import mock
 
 
-@mock.patch('spotify.offline.lib', spec=spotify.lib)
-@mock.patch('spotify.session.lib', spec=spotify.lib)
+@mock.patch("spotify.offline.lib", spec=spotify.lib)
+@mock.patch("spotify.session.lib", spec=spotify.lib)
 class OfflineTest(unittest.TestCase):
     def tearDown(self):
         spotify._session_instance = None
@@ -70,7 +70,7 @@ class OfflineTest(unittest.TestCase):
 
 class OfflineSyncStatusTest(unittest.TestCase):
     def setUp(self):
-        self._sp_offline_sync_status = spotify.ffi.new('sp_offline_sync_status *')
+        self._sp_offline_sync_status = spotify.ffi.new("sp_offline_sync_status *")
         self._sp_offline_sync_status.queued_tracks = 5
         self._sp_offline_sync_status.done_tracks = 16
         self._sp_offline_sync_status.copied_tracks = 27

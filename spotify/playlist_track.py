@@ -5,7 +5,7 @@ import logging
 import spotify
 from spotify import ffi, lib, serialized, utils
 
-__all__ = ['PlaylistTrack']
+__all__ = ["PlaylistTrack"]
 
 logger = logging.getLogger(__name__)
 
@@ -27,7 +27,7 @@ class PlaylistTrack(object):
         self._index = index
 
     def __repr__(self):
-        return 'PlaylistTrack(uri=%r, creator=%r, create_time=%d)' % (
+        return "PlaylistTrack(uri=%r, creator=%r, create_time=%d)" % (
             self.track.link.uri,
             self.creator,
             self.create_time,

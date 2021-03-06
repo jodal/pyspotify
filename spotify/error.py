@@ -2,7 +2,7 @@ from __future__ import unicode_literals
 
 from spotify import lib, serialized, utils
 
-__all__ = ['Error', 'ErrorType', 'LibError', 'Timeout']
+__all__ = ["Error", "ErrorType", "LibError", "Timeout"]
 
 
 class Error(Exception):
@@ -25,7 +25,7 @@ class Error(Exception):
             raise LibError(error_type)
 
 
-@utils.make_enum('SP_ERROR_')
+@utils.make_enum("SP_ERROR_")
 class ErrorType(utils.IntEnum):
     pass
 
@@ -50,15 +50,15 @@ class LibError(Error):
         super(Error, self).__init__(message)
 
     def __eq__(self, other):
-        return self.error_type == getattr(other, 'error_type', None)
+        return self.error_type == getattr(other, "error_type", None)
 
     def __ne__(self, other):
         return not self.__eq__(other)
 
 
 for attr in dir(lib):
-    if attr.startswith('SP_ERROR_'):
-        name = attr.replace('SP_ERROR_', '')
+    if attr.startswith("SP_ERROR_"):
+        name = attr.replace("SP_ERROR_", "")
         error_no = getattr(lib, attr)
         setattr(LibError, name, LibError(error_no))
 
@@ -69,5 +69,5 @@ class Timeout(Error):
     timeout."""
 
     def __init__(self, timeout):
-        message = 'Operation did not complete in %.3fs' % timeout
+        message = "Operation did not complete in %.3fs" % timeout
         super(Timeout, self).__init__(message)

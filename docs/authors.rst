@@ -2,7 +2,7 @@
 Authors
 *******
 
-pyspotify 2.x is copyright 2013-2015 Stein Magnus Jodal and contributors.
+pyspotify 2.x is copyright 2013-2021 Stein Magnus Jodal and contributors.
 pyspotify is licensed under the Apache License, Version 2.0.
 
 Thanks to Thomas Adamcik who continuously reviewed code and provided feedback

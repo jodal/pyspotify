@@ -249,7 +249,7 @@ class ConfigTest(unittest.TestCase):
 
     @unittest.skipIf(
         platform.system() == "Darwin",
-        "The struct field does not exist in libspotify for OS X",
+        "The struct field does not exist in libspotify for macOS",
     )
     def test_ca_certs_filename(self):
         self.config.ca_certs_filename = b"ca.crt"
@@ -262,7 +262,7 @@ class ConfigTest(unittest.TestCase):
 
     @unittest.skipIf(
         platform.system() == "Darwin",
-        "The struct field does not exist in libspotify for OS X",
+        "The struct field does not exist in libspotify for macOS",
     )
     def test_ca_certs_filename_defaults_to_none(self):
         self.assertIsNone(self.config.ca_certs_filename)
@@ -325,7 +325,7 @@ class ConfigTest(unittest.TestCase):
 
     @unittest.skipIf(
         platform.system() == "Darwin",
-        "The struct field does not exist in libspotify for OS X",
+        "The struct field does not exist in libspotify for macOS",
     )
     def test_sp_session_config_ca_certs_filename_has_unicode_encoded_as_utf8(
         self,

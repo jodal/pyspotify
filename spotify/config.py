@@ -267,7 +267,7 @@ class Config(object):
         used for verifying third parties' HTTPS servers, like the Last.fm
         servers if you scrobbling the music you listen to through libspotify.
 
-        libspotify for OS X use other means for communicating with HTTPS
+        libspotify for macOS use other means for communicating with HTTPS
         servers and ignores this configuration.
 
         The file must be a concatenation of all certificates in PEM format.

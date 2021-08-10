@@ -50,7 +50,7 @@ def mac_wheels(ctx):
     """
     Create wheel packages compatible with:
 
-    - OS X 10.6+
+    - macOS 10.6+
     - 32-bit and 64-bit
     - Apple-Python, Python.org-Python, Homebrew-Python
 
@@ -58,9 +58,9 @@ def mac_wheels(ctx):
     """
 
     versions = [
-        # Python.org Python 2.7 for Mac OS X 10.6 and later
+        # Python.org Python 2.7 for macOS 10.6 and later
         "/Library/Frameworks/Python.framework/Versions/2.7/bin/python",
-        # Python.org Python 3.7 for Mac OS X 10.6 and later
+        # Python.org Python 3.7 for macOS 10.6 and later
         "/Library/Frameworks/Python.framework/Versions/3.7/bin/python3",
         # Homebrew Python 2.7
         "/usr/local/bin/python2.7",

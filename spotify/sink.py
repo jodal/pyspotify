@@ -115,7 +115,7 @@ class PortAudioSink(Sink):
 
     """Audio sink for `PortAudio <http://www.portaudio.com/>`_.
 
-    PortAudio is available for many platforms, including Linux, OS X, and
+    PortAudio is available for many platforms, including Linux, macOS, and
     Windows. This audio sink requires `PyAudio
     <https://pypi.python.org/pypi/pyaudio>`_.  PyAudio is probably packaged in
     your Linux distribution.
@@ -130,7 +130,7 @@ class PortAudioSink(Sink):
         sudo apt-get install portaudio19-dev
         pip install --allow-unverified=pyaudio pyaudio
 
-    On OS X you can install PortAudio using Homebrew::
+    On macOS you can install PortAudio using Homebrew::
 
         brew install portaudio
         pip install --allow-unverified=pyaudio pyaudio

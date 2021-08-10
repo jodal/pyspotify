@@ -58,13 +58,13 @@ the `python2-pyspotify package
    :ref:`installing from source <source-install>` in these cases.
 
 
-OS X: Install wheel package from PyPI with pip
+macOS: Install wheel package from PyPI with pip
 ==============================================
 
 From PyPI, you can install precompiled wheel packages of pyspotify that bundle
 libspotify. The packages should work on all combinations of:
 
-- OS X 10.6 and newer
+- macOS 10.6 and newer
 - 32-bit and 64-bit
 - Apple-Python, Python.org-Python, Homebrew-Python
 
@@ -78,7 +78,7 @@ libspotify. The packages should work on all combinations of:
        pip install pyspotify
 
 
-OS X: Install from Homebrew
+macOS: Install from Homebrew
 ===========================
 
 The `Mopidy <https://mopidy.com/>`__ project maintains its own `Homebrew

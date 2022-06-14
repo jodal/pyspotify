@@ -83,7 +83,7 @@ source_suffix = ".rst"
 master_doc = "index"
 
 project = "pyspotify"
-copyright = "2013-2021, Stein Magnus Jodal and contributors"
+copyright = "2013-2022, Stein Magnus Jodal and contributors"
 
 release = get_version()
 version = ".".join(release.split(".")[:2])

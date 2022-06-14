@@ -732,7 +732,7 @@ class SessionTest(unittest.TestCase):
     def test_search(self, search_mock, lib_mock):
         session = tests.create_real_session(lib_mock)
 
-        with self.assertRaises(Exception):
+        with self.assertRaises(Exception):  # noqa
             session.search("alice")
 
         self.assertEqual(search_mock.call_count, 0)

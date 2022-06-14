@@ -335,7 +335,7 @@ def to_unicode_or_none(value):
 
 
 def to_char(value):
-    """Converts bytes, unicode, and C char arrays to C char arrays.  """
+    """Converts bytes, unicode, and C char arrays to C char arrays."""
     return ffi.new("char[]", to_bytes(value))
 
 

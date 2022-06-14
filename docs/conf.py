@@ -83,7 +83,7 @@ source_suffix = ".rst"
 master_doc = "index"
 
 project = "pyspotify"
-copyright = "2013-2021, Stein Magnus Jodal and contributors"
+copyright = "2013-2022, Stein Magnus Jodal and contributors"
 
 release = get_version()
 version = ".".join(release.split(".")[:2])
@@ -118,9 +118,9 @@ htmlhelp_basename = "pyspotify"
 # -- Options for extlink extension --------------------------------------------
 
 extlinks = {
-    "issue": ("https://github.com/jodal/pyspotify/issues/%s", "#"),
+    "issue": ("https://github.com/jodal/pyspotify/issues/%s", "#%s"),
     "ms-issue": (
         "https://github.com/mopidy/mopidy-spotify/issues/%s",
-        "mopidy-spotify#",
+        "mopidy-spotify#%s",
     ),
 }

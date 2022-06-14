@@ -7,8 +7,8 @@ v2.1.4 (UNRELEASED)
 
 Maintenance release.
 
-- Add support for Python 3.9. No changes was required, but the test suite now
-  runs on this version too. (PR: :issue:`203`)
+- Add support for Python 3.9 and 3.10. No changes was required, but the test
+  suite now runs on these versions too. (PR: :issue:`203`)
 
 - Switch from CircleCI to GitHub Actions.
 

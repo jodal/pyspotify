@@ -2,7 +2,7 @@
 Changelog
 *********
 
-v2.1.4 (UNRELEASED)
+v2.1.4 (2022-06-15)
 ===================
 
 Maintenance release.

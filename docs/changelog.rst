@@ -7,6 +7,8 @@ v2.1.4 (UNRELEASED)
 
 Maintenance release.
 
+- Declare the pyspotify project as dead.
+
 - Add support for Python 3.9 and 3.10. No changes was required, but the test
   suite now runs on these versions too. (PR: :issue:`203`)
 

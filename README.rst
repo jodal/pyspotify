@@ -2,6 +2,42 @@
 pyspotify
 *********
 
+WARNING: This library no longer works
+=====================================
+
+pyspotify is a Python wrapper around the libspotify C library, and thus depends
+on libspotify for everything it does.
+
+In May 2015, libspotify was deprecated by Spotify and active maintenance
+stopped. At this point, libspotify had been the main way to integrate with
+Spotify for six years, and was part of numerous open source projects and
+commercial applications, including many receivers and even cars.  It remained
+the only API for playback outside Android and iOS.
+
+In February 2016, server side changes to the Spotify API caused the search
+functionality to stop working, without Spotify ever acknowledging it. Users of
+pyspotify could work around this by using the Spotify web API for searches and
+pyspotify for playback.
+
+In April 2022, `Spotify announced
+<https://developer.spotify.com/community/news/2022/04/12/libspotify-sunset/>`_
+that they would sunset the libspotify API one month later.
+
+In May 2022, new libspotify connections to Spotify started failing. With
+libspotify dead, pyspotify was dead too.
+
+After two years in development from May 2013 to May 2015, and seven years of
+loyal service this project has reached its end.
+
+**There will be no further updates to pyspotify.**
+
+Hopefully, the pyspotify source code can still serve as a complete example of
+how to successfully wrap a large C library in Python using CFFI.
+
+
+Introduction
+============
+
 pyspotify provides a Python interface to
 `Spotify's <https://www.spotify.com/>`__ online music streaming service.
 
@@ -14,24 +50,6 @@ wrapper around the official libspotify library. It works on CPython 2.7 and
 3.5+, as well as PyPy 2.7 and 3.5+. It is known to work on Linux and
 macOS. Windows support should be possible, but is awaiting a contributor with
 the interest and knowledge to maintain it.
-
-
-libspotify's deprecation
-========================
-
-Note that as of May 2015 libspotify is officially deprecated by Spotify and is
-no longer actively maintained.
-
-Spotify has published newer libraries intended for Android and iOS development,
-as well as web APIs to access track metadata and manage playlists. Though, for
-making apps with Spotify playback capabilities, on any other platform than
-Android and iOS, there is currently no alternative to libspotify.
-
-libspotify has been the main way of integrating with Spotify since 2009, and is
-today a part of numerous open source projects and commercial applications,
-including many receivers and even cars. There's no guarantees, but one can hope
-that the large deployment of libspotify means that the library will continue to
-work with the Spotify service for a long time into the future.
 
 
 Project resources
